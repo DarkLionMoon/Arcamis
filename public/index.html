@@ -2,1168 +2,740 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Arcamis — Wiki</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Arcamis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --bg:       #080604;
-  --bg2:      #110e09;
-  --bg3:      #1c1610;
-  --bg4:      #241c12;
-  --border:   #3a2e1e;
-  --gold:     #c9942a;
-  --gold2:    #e8b84b;
-  --gold3:    #f5d98a;
-  --text:     #e2ceaa;
-  --text2:    #a89070;
-  --text3:    #6a5840;
-  --red:      #8b2020;
-  --red2:     #c43030;
-  --sidebar-w: 280px;
-  --header-h:  60px;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#080604;
+  --bg2:#0f0c08;
+  --bg3:#181309;
+  --bg4:#221a0e;
+  --border:#2a2010;
+  --border2:#3a2e18;
+  --gold:#c8902a;
+  --gold2:#e4ad4a;
+  --gold3:#f5d88a;
+  --text:#e0cfa8;
+  --text2:#a08858;
+  --text3:#5a4428;
+  --nav-h:64px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,serif;font-size:18px;line-height:1.7;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+
+/* ── NAV ── */
+#nav{
+  position:fixed;top:0;left:0;right:0;
+  height:var(--nav-h);
+  background:rgba(8,6,4,0.92);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(12px);
+  z-index:1000;
+  display:flex;align-items:center;
+  padding:0 32px;gap:0;
+}
+#nav::after{
+  content:'';
+  position:absolute;bottom:-2px;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:.5;
+}
+#nav-logo{
+  font-family:'Cinzel Decorative',serif;
+  font-size:20px;font-weight:700;
+  background:linear-gradient(135deg,var(--gold),var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  cursor:pointer;user-select:none;
+  margin-right:40px;
+  white-space:nowrap;
+}
+#nav-links{
+  display:flex;align-items:center;gap:2px;flex:1;
+  list-style:none;
+}
+.nav-link{
+  position:relative;
+  font-family:'Cinzel',serif;font-size:12px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text2);
+  padding:8px 14px;
+  cursor:pointer;user-select:none;
+  border-radius:4px;
+  transition:color .2s;
+  white-space:nowrap;
+}
+.nav-link:hover{color:var(--gold2)}
+.nav-link.active{color:var(--gold)}
+.nav-link.has-drop:after{content:'▾';margin-left:5px;font-size:9px;opacity:.6}
+
+/* Dropdown */
+.nav-drop{
+  position:absolute;top:100%;left:0;
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  padding:6px 0;
+  min-width:200px;
+  opacity:0;visibility:hidden;
+  transform:translateY(6px);
+  transition:all .2s;
+  z-index:100;
+  box-shadow:0 16px 40px rgba(0,0,0,.6);
+}
+.nav-link:hover .nav-drop{opacity:1;visibility:visible;transform:translateY(0)}
+.drop-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;
+  font-family:'Cinzel',serif;font-size:12px;
+  color:var(--text2);
+  cursor:pointer;
+  transition:all .15s;
+}
+.drop-item:hover{background:var(--bg4);color:var(--gold2)}
+.drop-item .di{width:20px;text-align:center;font-size:15px}
+
+#nav-hamburger{
+  display:none;
+  flex-direction:column;justify-content:space-between;
+  width:22px;height:16px;
+  cursor:pointer;border:none;background:none;
+  margin-left:auto;
+}
+#nav-hamburger span{display:block;height:2px;background:var(--gold);border-radius:2px;transition:.3s}
+
+/* Mobile nav */
+#mobile-nav{
+  display:none;
+  position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;
+  background:rgba(8,6,4,.97);
+  z-index:999;
+  overflow-y:auto;
+  padding:20px 0 40px;
+}
+#mobile-nav.open{display:block}
+.mob-section{border-bottom:1px solid var(--border);padding:12px 0}
+.mob-section-title{
+  font-family:'Cinzel',serif;font-size:11px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--text3);
+  padding:6px 24px;
+}
+.mob-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 24px;
+  font-family:'Cinzel',serif;font-size:13px;
+  color:var(--text2);cursor:pointer;
+  transition:color .15s;
+}
+.mob-item:hover{color:var(--gold)}
+
+/* ── VIEWS ── */
+#app{padding-top:var(--nav-h)}
+.view{display:none}
+.view.active{display:block}
+
+/* ── HERO ── */
+#hero{
+  position:relative;
+  min-height:calc(100vh - var(--nav-h));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  padding:60px 20px;
+  overflow:hidden;
+}
+#hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(200,144,42,.06) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(200,144,42,.04) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 20%, rgba(200,144,42,.03) 0%, transparent 60%);
+}
+#hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(200,144,42,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(200,144,42,.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 80%);
+}
+#hero-content{position:relative;z-index:1;max-width:700px}
+#hero-rune{
+  font-size:72px;display:block;margin-bottom:24px;
+  animation:float 5s ease-in-out infinite;
+  filter:drop-shadow(0 0 20px rgba(200,144,42,.3));
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+#hero-title{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(36px,7vw,72px);font-weight:700;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold3) 45%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:.05em;line-height:1.1;
+  margin-bottom:16px;
+  text-shadow:none;
+}
+#hero-sub{
+  font-size:20px;color:var(--text2);font-style:italic;
+  margin-bottom:48px;letter-spacing:.02em;
+}
+#hero-discord{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,#5865F2,#4752c4);
+  color:#fff;font-family:'Cinzel',serif;font-size:13px;
+  font-weight:600;letter-spacing:.08em;
+  padding:13px 28px;border-radius:30px;
+  text-decoration:none;
+  transition:all .25s;
+  box-shadow:0 4px 24px rgba(88,101,242,.3);
+  border:1px solid rgba(255,255,255,.1);
+}
+#hero-discord:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(88,101,242,.4)}
+
+/* Cards grid */
+#hero-cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:14px;
+  max-width:680px;margin:0 auto;
+  margin-top:60px;
+  position:relative;z-index:1;
+}
+.hero-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:24px 16px;
+  cursor:pointer;
+  transition:all .25s;
+  text-align:center;
+}
+.hero-card:hover{
+  border-color:var(--gold);background:var(--bg3);
+  transform:translateY(-4px);
+  box-shadow:0 12px 32px rgba(200,144,42,.08);
+}
+.hc-icon{font-size:36px;margin-bottom:10px;display:block}
+.hc-label{
+  font-family:'Cinzel',serif;font-size:12px;font-weight:600;
+  letter-spacing:.08em;color:var(--text2);
+}
+.hero-card:hover .hc-label{color:var(--gold2)}
+
+/* ── PAGE VIEW ── */
+#page-view{padding:48px 0 80px}
+#page-inner{max-width:760px;margin:0 auto;padding:0 32px}
+
+/* Breadcrumb */
+#breadcrumb{
+  display:flex;align-items:center;gap:8px;
+  font-family:'Cinzel',serif;font-size:12px;letter-spacing:.06em;
+  color:var(--text3);margin-bottom:36px;flex-wrap:wrap;
+}
+#breadcrumb span{cursor:pointer;transition:color .2s}
+#breadcrumb span:hover{color:var(--gold)}
+#breadcrumb .bc-sep{opacity:.4;cursor:default}
+#breadcrumb .bc-cur{color:var(--text2);cursor:default}
+
+/* Page header */
+#pheader{margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--border);position:relative}
+#pheader::after{
+  content:'';position:absolute;bottom:-3px;left:0;
+  width:60px;height:3px;
+  background:linear-gradient(90deg,var(--gold),transparent);
+  border-radius:2px;
+}
+#picon{font-size:52px;line-height:1;margin-bottom:16px;display:block}
+#ptitle{
+  font-family:'Cinzel',serif;font-size:34px;font-weight:700;
+  color:var(--gold3);letter-spacing:.04em;line-height:1.15;
+  text-shadow:0 0 60px rgba(200,144,42,.2);
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* Notion blocks */
+.nc>*+*{margin-top:.65em}
+.n-p{color:var(--text);line-height:1.8}
+.n-p:empty{min-height:1em}
+.n-h1{font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:var(--gold2);margin-top:1.8em!important;margin-bottom:.3em;border-bottom:1px solid var(--border);padding-bottom:8px;letter-spacing:.03em}
+.n-h2{font-family:'Cinzel',serif;font-size:20px;font-weight:600;color:var(--gold);margin-top:1.5em!important;margin-bottom:.2em;letter-spacing:.02em}
+.n-h3{font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:var(--text);margin-top:1.2em!important;margin-bottom:.15em;text-transform:uppercase;letter-spacing:.09em;opacity:.85}
+.n-ul{padding-left:20px;list-style:none}
+.n-ul>li{position:relative;padding-left:18px;margin-bottom:.3em}
+.n-ul>li::before{content:'◆';position:absolute;left:0;top:.45em;color:var(--gold);font-size:7px}
+.n-ol{padding-left:24px}
+.n-ol>li{margin-bottom:.3em;padding-left:4px}
+.n-ol>li::marker{color:var(--gold)}
+.n-quote{
+  border-left:3px solid var(--gold);
+  padding:12px 20px;margin:14px 0;
+  background:var(--bg3);border-radius:0 6px 6px 0;
+  color:var(--text2);font-style:italic;font-size:19px;
+}
+.n-divider{
+  border:none;border-top:1px solid var(--border);
+  margin:32px 0;position:relative;
+}
+.n-divider::before{
+  content:'✦';
+  position:absolute;left:50%;transform:translateX(-50%) translateY(-50%);
+  background:var(--bg2);color:var(--gold);padding:0 12px;font-size:11px;
+}
+.n-callout{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--bg4);border:1px solid var(--border2);
+  border-radius:8px;padding:16px 20px;margin:12px 0;
+}
+.n-callout-icon{flex-shrink:0;font-size:22px;margin-top:1px}
+.n-callout-body{flex:1}
+details>.n-toggle-summary{
+  list-style:none;display:flex;align-items:center;gap:8px;
+  cursor:pointer;user-select:none;font-weight:500;padding:4px 0;color:var(--text);
+}
+details>.n-toggle-summary::before{content:'▶';font-size:10px;color:var(--gold);transition:.2s;flex-shrink:0}
+details[open]>.n-toggle-summary::before{transform:rotate(90deg)}
+.n-toggle-children{padding:8px 0 4px 22px;border-left:1px solid var(--border);margin-left:5px}
+.n-code{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 18px;overflow-x:auto;font-family:'Courier New',monospace;font-size:14px;color:var(--gold3);line-height:1.5}
+.n-image{margin:18px 0;text-align:center}
+.n-image img{max-width:100%;border-radius:8px;border:1px solid var(--border);box-shadow:0 4px 30px rgba(0,0,0,.5)}
+.n-image figcaption{margin-top:8px;font-size:14px;color:var(--text3);font-style:italic}
+.n-child-page{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:10px 16px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:6px;color:var(--gold);cursor:pointer;
+  font-size:16px;transition:all .2s;margin:3px 0;text-decoration:none;
+}
+.n-child-page:hover{background:var(--bg4);border-color:var(--gold);color:var(--gold2);transform:translateX(4px)}
+.n-child-page::before{content:'↳';color:var(--text3)}
+.n-table-wrap{overflow-x:auto;margin:16px 0}
+table.n-table{width:100%;border-collapse:collapse;font-size:16px}
+table.n-table th{background:var(--bg4);color:var(--gold2);font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:.07em;padding:10px 14px;border:1px solid var(--border);text-align:left}
+table.n-table td{padding:9px 14px;border:1px solid var(--border);color:var(--text)}
+table.n-table tr:nth-child(even) td{background:var(--bg3)}
+.n-columns{display:grid;gap:24px;margin:14px 0}
+.n-bookmark{display:flex;gap:12px;border:1px solid var(--border);border-radius:8px;padding:12px 16px;background:var(--bg3);margin:10px 0;text-decoration:none;color:var(--text);transition:border-color .2s}
+.n-bookmark:hover{border-color:var(--gold)}
+.n-bookmark-url{font-size:13px;color:var(--gold);margin-top:4px}
+.rt-bold{font-weight:700}
+.rt-italic{font-style:italic}
+.rt-strike{text-decoration:line-through;opacity:.7}
+.rt-underline{text-decoration:underline}
+.rt-code{font-family:'Courier New',monospace;font-size:.87em;background:var(--bg4);border:1px solid var(--border);border-radius:3px;padding:1px 5px;color:var(--gold3)}
+.rt-link{color:var(--gold);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.rt-link:hover{color:var(--gold2)}
+.rt-gray{color:var(--text3)}.rt-red{color:#d06060}.rt-orange{color:#d08840}.rt-yellow{color:#d0b840}.rt-green{color:#50a050}.rt-blue{color:#5080c0}.rt-purple{color:#8050b0}.rt-pink{color:#c05090}
 
-html { scroll-behavior: smooth; }
+/* Loading / error */
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:20px;color:var(--text3)}
+.spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-wrap p{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.1em}
+.err-box{background:rgba(130,30,30,.15);border:1px solid #7a2020;border-radius:8px;padding:20px 24px;color:#d07070;font-family:'Cinzel',serif;font-size:14px}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 17px;
-  line-height: 1.7;
-  min-height: 100vh;
-  overflow-x: hidden;
+/* ── CATEGORY VIEW (list of pages in a section) ── */
+#cat-view{padding:48px 0 80px}
+#cat-inner{max-width:760px;margin:0 auto;padding:0 32px}
+#cat-title{font-family:'Cinzel',serif;font-size:32px;font-weight:700;color:var(--gold3);margin-bottom:10px;letter-spacing:.04em}
+#cat-desc{color:var(--text2);font-style:italic;font-size:18px;margin-bottom:40px}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.cat-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:24px 20px;cursor:pointer;transition:all .22s;
 }
+.cat-card:hover{border-color:var(--gold);background:var(--bg3);transform:translateY(-3px);box-shadow:0 10px 30px rgba(200,144,42,.08)}
+.cat-card-icon{font-size:32px;margin-bottom:12px;display:block}
+.cat-card-title{font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--text);letter-spacing:.05em}
+.cat-card:hover .cat-card-title{color:var(--gold2)}
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg2); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+/* Page enter */
+.page-enter{animation:pgIn .3s ease forwards}
+@keyframes pgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── Header ── */
-#header {
-  position: fixed; top: 0; left: 0; right: 0;
-  height: var(--header-h);
-  background: linear-gradient(180deg, #0d0a06 0%, rgba(8,6,4,0.95) 100%);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 14px;
-  padding: 0 20px;
-  z-index: 1000;
-  backdrop-filter: blur(8px);
+/* Responsive */
+@media(max-width:700px){
+  #nav-links{display:none}
+  #nav-hamburger{display:flex}
+  #page-inner,#cat-inner{padding:0 18px}
+  #ptitle{font-size:26px}
+  #hero-title{font-size:32px}
+  #hero-cards{grid-template-columns:repeat(2,1fr)}
 }
-
-#header::after {
-  content: '';
-  position: absolute; bottom: -3px; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--gold), var(--gold2), var(--gold), transparent);
-  opacity: 0.6;
-}
-
-#hamburger {
-  display: none;
-  flex-direction: column; justify-content: space-between;
-  width: 24px; height: 18px;
-  cursor: pointer; border: none; background: none; padding: 0;
-}
-#hamburger span {
-  display: block; height: 2px;
-  background: var(--gold); border-radius: 2px;
-  transition: all 0.3s;
-}
-
-#logo {
-  font-family: 'Cinzel Decorative', serif;
-  font-size: 22px;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--gold) 0%, var(--gold3) 50%, var(--gold) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-  cursor: pointer;
-  user-select: none;
-}
-
-#search-wrap {
-  margin-left: auto;
-  position: relative;
-}
-#search {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  color: var(--text);
-  font-family: 'EB Garamond', serif;
-  font-size: 15px;
-  padding: 6px 14px 6px 36px;
-  width: 200px;
-  outline: none;
-  transition: border-color 0.2s, width 0.3s;
-}
-#search:focus { border-color: var(--gold); width: 260px; }
-#search::placeholder { color: var(--text3); }
-#search-icon {
-  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-  color: var(--text3); font-size: 14px; pointer-events: none;
-}
-
-/* ── Layout ── */
-#layout {
-  display: flex;
-  padding-top: var(--header-h);
-  min-height: 100vh;
-}
-
-/* ── Sidebar ── */
-#sidebar {
-  position: fixed;
-  top: var(--header-h); bottom: 0; left: 0;
-  width: var(--sidebar-w);
-  background: var(--bg2);
-  border-right: 1px solid var(--border);
-  overflow-y: auto;
-  overflow-x: hidden;
-  z-index: 900;
-  transition: transform 0.3s ease;
-}
-
-#sidebar-inner { padding: 16px 0 40px; }
-
-.nav-section {
-  margin-bottom: 4px;
-}
-
-.nav-section-header {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 18px;
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text3);
-  cursor: pointer;
-  user-select: none;
-  transition: color 0.2s;
-}
-.nav-section-header:hover { color: var(--gold); }
-.nav-section-header .arrow {
-  margin-left: auto;
-  font-size: 10px;
-  transition: transform 0.25s;
-  opacity: 0.6;
-}
-.nav-section.open > .nav-section-header .arrow { transform: rotate(90deg); }
-
-.nav-children { display: none; }
-.nav-section.open > .nav-children { display: block; }
-
-.nav-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 7px 18px 7px 28px;
-  font-size: 15px;
-  color: var(--text2);
-  cursor: pointer;
-  user-select: none;
-  border-left: 2px solid transparent;
-  transition: all 0.18s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.nav-item:hover { color: var(--text); background: var(--bg3); }
-.nav-item.active {
-  color: var(--gold2);
-  border-left-color: var(--gold);
-  background: var(--bg4);
-}
-.nav-item .icon { flex-shrink: 0; width: 18px; text-align: center; }
-
-.nav-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 10px 18px;
-  opacity: 0.4;
-}
-
-/* ── Main content ── */
-#main {
-  margin-left: var(--sidebar-w);
-  flex: 1;
-  min-width: 0;
-}
-
-#content-area {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 48px 48px 80px;
-}
-
-/* ── Page header ── */
-#page-header {
-  margin-bottom: 40px;
-  padding-bottom: 28px;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-}
-#page-header::after {
-  content: '';
-  position: absolute; bottom: -4px; left: 0;
-  width: 80px; height: 3px;
-  background: linear-gradient(90deg, var(--gold), transparent);
-  border-radius: 2px;
-}
-
-#page-icon {
-  font-size: 48px;
-  line-height: 1;
-  margin-bottom: 14px;
-  display: block;
-}
-
-#page-title {
-  font-family: 'Cinzel', serif;
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--gold3);
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-  text-shadow: 0 0 40px rgba(201,148,42,0.25);
-}
-
-/* ── Notion Block Styles ── */
-.notion-content > * + * { margin-top: 0.6em; }
-
-.n-p { line-height: 1.75; color: var(--text); }
-.n-p:empty { min-height: 1.2em; }
-
-.n-h1 {
-  font-family: 'Cinzel', serif;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--gold2);
-  margin-top: 1.6em !important;
-  margin-bottom: 0.3em;
-  letter-spacing: 0.03em;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 8px;
-}
-.n-h2 {
-  font-family: 'Cinzel', serif;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--gold);
-  margin-top: 1.4em !important;
-  margin-bottom: 0.2em;
-  letter-spacing: 0.02em;
-}
-.n-h3 {
-  font-family: 'Cinzel', serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text);
-  margin-top: 1.2em !important;
-  margin-bottom: 0.1em;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  opacity: 0.9;
-}
-
-.n-ul, .n-ol {
-  padding-left: 24px;
-  color: var(--text);
-}
-.n-ul { list-style: none; }
-.n-ul > li { position: relative; padding-left: 16px; }
-.n-ul > li::before {
-  content: '◆';
-  position: absolute; left: -4px;
-  color: var(--gold);
-  font-size: 8px;
-  top: 8px;
-}
-.n-ol { list-style: decimal; }
-.n-ol > li { padding-left: 4px; }
-.n-ol > li::marker { color: var(--gold); }
-
-.n-quote {
-  border-left: 3px solid var(--gold);
-  padding: 10px 18px;
-  margin: 12px 0;
-  background: var(--bg3);
-  border-radius: 0 6px 6px 0;
-  color: var(--text2);
-  font-style: italic;
-}
-
-.n-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 28px 0;
-  position: relative;
-}
-.n-divider::before {
-  content: '✦';
-  position: absolute;
-  left: 50%; transform: translateX(-50%) translateY(-50%);
-  background: var(--bg2);
-  color: var(--gold);
-  padding: 0 10px;
-  font-size: 12px;
-}
-
-.n-callout {
-  display: flex; gap: 12px; align-items: flex-start;
-  background: var(--bg4);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px 18px;
-  margin: 10px 0;
-}
-.n-callout-icon { flex-shrink: 0; font-size: 20px; margin-top: 1px; }
-.n-callout-body { flex: 1; }
-
-.n-toggle-summary {
-  display: flex; align-items: center; gap: 8px;
-  cursor: pointer;
-  user-select: none;
-  list-style: none;
-  font-weight: 500;
-  color: var(--text);
-  padding: 4px 0;
-}
-.n-toggle-summary::before {
-  content: '▶';
-  font-size: 10px;
-  color: var(--gold);
-  transition: transform 0.2s;
-  flex-shrink: 0;
-}
-details[open] > .n-toggle-summary::before { transform: rotate(90deg); }
-.n-toggle-children {
-  padding: 6px 0 4px 20px;
-  border-left: 1px solid var(--border);
-  margin-left: 6px;
-}
-
-.n-code {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 14px 18px;
-  overflow-x: auto;
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  color: var(--gold3);
-  line-height: 1.5;
-}
-
-.n-image {
-  margin: 16px 0;
-  text-align: center;
-}
-.n-image img {
-  max-width: 100%;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-}
-.n-image figcaption {
-  margin-top: 8px;
-  font-size: 14px;
-  color: var(--text3);
-  font-style: italic;
-}
-
-.n-child-page {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 14px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--gold);
-  cursor: pointer;
-  font-size: 15px;
-  transition: all 0.2s;
-  margin: 3px 0;
-  text-decoration: none;
-}
-.n-child-page:hover {
-  background: var(--bg4);
-  border-color: var(--gold);
-  color: var(--gold2);
-  transform: translateX(4px);
-}
-.n-child-page::before { content: '↳'; color: var(--text3); }
-
-.n-table-wrap { overflow-x: auto; margin: 14px 0; }
-table.n-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 15px;
-}
-table.n-table th {
-  background: var(--bg4);
-  color: var(--gold2);
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  text-align: left;
-}
-table.n-table td {
-  padding: 9px 14px;
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-table.n-table tr:nth-child(even) td { background: var(--bg3); }
-table.n-table tr:hover td { background: var(--bg4); }
-
-.n-bookmark {
-  display: flex; gap: 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 16px;
-  background: var(--bg3);
-  margin: 10px 0;
-  text-decoration: none;
-  color: var(--text);
-  transition: border-color 0.2s;
-}
-.n-bookmark:hover { border-color: var(--gold); }
-.n-bookmark-url { font-size: 13px; color: var(--gold); margin-top: 4px; }
-
-.n-columns {
-  display: grid;
-  gap: 20px;
-  margin: 12px 0;
-}
-
-/* Rich text inline styles */
-.rt-bold { font-weight: 700; color: var(--text); }
-.rt-italic { font-style: italic; }
-.rt-strike { text-decoration: line-through; opacity: 0.7; }
-.rt-underline { text-decoration: underline; }
-.rt-code {
-  font-family: 'Courier New', monospace;
-  font-size: 0.88em;
-  background: var(--bg4);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 1px 5px;
-  color: var(--gold3);
-}
-.rt-link { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-.rt-link:hover { color: var(--gold2); }
-
-/* Color classes */
-.rt-red { color: #e06060; }
-.rt-orange { color: #e0904a; }
-.rt-yellow { color: #e0c040; }
-.rt-green { color: #60b060; }
-.rt-blue { color: #6090d0; }
-.rt-purple { color: #9060c0; }
-.rt-pink { color: #d060a0; }
-.rt-gray { color: var(--text3); }
-.rt-brown { color: #a07050; }
-
-/* ── Loading ── */
-#loading {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 80px 20px;
-  gap: 20px;
-  color: var(--text3);
-}
-.loader {
-  width: 40px; height: 40px;
-  border: 2px solid var(--border);
-  border-top-color: var(--gold);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-#loading p { font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 0.1em; }
-
-/* ── Welcome screen ── */
-#welcome {
-  text-align: center;
-  padding: 60px 20px;
-}
-.welcome-rune {
-  font-size: 80px;
-  display: block;
-  margin-bottom: 24px;
-  animation: float 4s ease-in-out infinite;
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-.welcome-title {
-  font-family: 'Cinzel Decorative', serif;
-  font-size: 38px;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--gold), var(--gold3), var(--gold));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 16px;
-  line-height: 1.2;
-}
-.welcome-sub {
-  font-size: 18px;
-  color: var(--text2);
-  font-style: italic;
-  margin-bottom: 40px;
-}
-.welcome-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 14px;
-  max-width: 600px;
-  margin: 0 auto;
-}
-.welcome-card {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px 16px;
-  cursor: pointer;
-  transition: all 0.22s;
-  text-align: center;
-}
-.welcome-card:hover {
-  border-color: var(--gold);
-  background: var(--bg4);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(201,148,42,0.1);
-}
-.welcome-card .card-icon { font-size: 32px; margin-bottom: 8px; }
-.welcome-card .card-label {
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--text2);
-}
-
-/* ── Error ── */
-#error-msg {
-  background: rgba(139,32,32,0.15);
-  border: 1px solid var(--red);
-  border-radius: 8px;
-  padding: 20px 24px;
-  color: #e08080;
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
-}
-
-/* ── Overlay for mobile ── */
-#overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 850;
-  backdrop-filter: blur(2px);
-}
-
-/* ── Responsive ── */
-@media (max-width: 768px) {
-  :root { --sidebar-w: 260px; }
-  #hamburger { display: flex; }
-  #sidebar { transform: translateX(-100%); }
-  #sidebar.open { transform: translateX(0); }
-  #overlay.show { display: block; }
-  #main { margin-left: 0; }
-  #content-area { padding: 32px 20px 60px; }
-  #page-title { font-size: 24px; }
-  .welcome-title { font-size: 28px; }
-  #search { width: 150px; }
-  #search:focus { width: 180px; }
-}
-
-@media (max-width: 480px) {
-  #content-area { padding: 24px 16px 50px; }
-}
-
-/* ── Page enter animation ── */
-.page-enter {
-  animation: pageIn 0.35s ease forwards;
-}
-@keyframes pageIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Breadcrumb ── */
-#breadcrumb {
-  display: flex; align-items: center; gap: 6px;
-  margin-bottom: 24px;
-  font-size: 13px;
-  color: var(--text3);
-  font-family: 'Cinzel', serif;
-  letter-spacing: 0.04em;
-  flex-wrap: wrap;
-}
-#breadcrumb span { cursor: pointer; transition: color 0.2s; }
-#breadcrumb span:hover { color: var(--gold); }
-#breadcrumb .sep { opacity: 0.4; }
-#breadcrumb .current { color: var(--text2); cursor: default; }
 </style>
 </head>
 <body>
 
-<!-- Header -->
-<header id="header">
-  <button id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+<!-- NAV -->
+<nav id="nav">
+  <div id="nav-logo" onclick="goHome()">Arcamis</div>
+  <ul id="nav-links">
+    <li class="nav-link has-drop" data-cat="regolamento">
+      Regolamento
+      <div class="nav-drop">
+        <div class="drop-item" onclick="loadPage('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')"><span class="di">⚔️</span>Gameplay</div>
+        <div class="drop-item" onclick="loadPage('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')"><span class="di">📜</span>Regole</div>
+        <div class="drop-item" onclick="loadPage('3130274fdc1c807eb61fde24e8236659','Materiale approvato','📋')"><span class="di">📋</span>Materiale approvato</div>
+      </div>
+    </li>
+    <li class="nav-link has-drop" data-cat="personaggio">
+      Personaggio
+      <div class="nav-drop">
+        <div class="drop-item" onclick="loadPage('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')"><span class="di">🌟</span>Come si inizia</div>
+        <div class="drop-item" onclick="loadPage('5cea525d149f4acb9c59007bf6b3d5ff','Andando avanti','📈')"><span class="di">📈</span>Andando avanti</div>
+        <div class="drop-item" onclick="loadPage('30a0274fdc1c804ab56bd3943add26d2','Classi','🎭')"><span class="di">🎭</span>Classi</div>
+        <div class="drop-item" onclick="loadPage('2fd0274fdc1c80d8b948c4133f874f28','Galleria PG','🖼️')"><span class="di">🖼️</span>Galleria PG</div>
+      </div>
+    </li>
+    <li class="nav-link has-drop" data-cat="lavori">
+      Lavori
+      <div class="nav-drop">
+        <div class="drop-item" onclick="loadPage('2f00274fdc1c8089bfe6c24434d53b67','Biblioteca','📚')"><span class="di">📚</span>Biblioteca</div>
+        <div class="drop-item" onclick="loadPage('2f00274fdc1c801c9697e75caa8d5f13','Bottega farmaceutica','💊')"><span class="di">💊</span>Bottega farmaceutica</div>
+        <div class="drop-item" onclick="loadPage('2ff0274fdc1c80688dd6c2b293a1f626','Caserma','🛡️')"><span class="di">🛡️</span>Caserma</div>
+        <div class="drop-item" onclick="loadPage('2ff0274fdc1c80769a4ae243f22f0582','Corporazione costruttori','🔨')"><span class="di">🔨</span>Corporazione costruttori</div>
+        <div class="drop-item" onclick="loadPage('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')"><span class="di">🔥</span>Forgia</div>
+        <div class="drop-item" onclick="loadPage('2f00274fdc1c801b8c13cefd9e15694e','Gilda degli avventurieri','🗡️')"><span class="di">🗡️</span>Gilda degli avventurieri</div>
+        <div class="drop-item" onclick="loadPage('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')"><span class="di">🍺</span>Locanda</div>
+        <div class="drop-item" onclick="loadPage('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')"><span class="di">⚕️</span>Ospedale</div>
+        <div class="drop-item" onclick="loadPage('2ff0274fdc1c8035bad4f0b6ab705192','Sartoria','🧵')"><span class="di">🧵</span>Sartoria</div>
+      </div>
+    </li>
+    <li class="nav-link" onclick="loadPage('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')">Pantheon</li>
+    <li class="nav-link" onclick="loadPage('3000274fdc1c8033a214c44a1aa7f01f','Changelog','📝')">Changelog</li>
+  </ul>
+  <button id="nav-hamburger" onclick="toggleMob()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
-  <div id="logo" onclick="showWelcome()">Arcamis</div>
-  <div id="search-wrap">
-    <span id="search-icon">🔍</span>
-    <input id="search" type="text" placeholder="Cerca nella wiki…" oninput="onSearch(this.value)"/>
+</nav>
+
+<!-- Mobile nav -->
+<div id="mobile-nav">
+  <div class="mob-section">
+    <div class="mob-section-title">Regolamento</div>
+    <div class="mob-item" onclick="loadPage('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️');closeMob()">⚔️ Gameplay</div>
+    <div class="mob-item" onclick="loadPage('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜');closeMob()">📜 Regole</div>
+    <div class="mob-item" onclick="loadPage('3130274fdc1c807eb61fde24e8236659','Materiale approvato','📋');closeMob()">📋 Materiale approvato</div>
   </div>
-</header>
+  <div class="mob-section">
+    <div class="mob-section-title">Personaggio</div>
+    <div class="mob-item" onclick="loadPage('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟');closeMob()">🌟 Come si inizia</div>
+    <div class="mob-item" onclick="loadPage('5cea525d149f4acb9c59007bf6b3d5ff','Andando avanti','📈');closeMob()">📈 Andando avanti</div>
+    <div class="mob-item" onclick="loadPage('30a0274fdc1c804ab56bd3943add26d2','Classi','🎭');closeMob()">🎭 Classi</div>
+    <div class="mob-item" onclick="loadPage('2fd0274fdc1c80d8b948c4133f874f28','Galleria PG','🖼️');closeMob()">🖼️ Galleria PG</div>
+  </div>
+  <div class="mob-section">
+    <div class="mob-section-title">Lavori</div>
+    <div class="mob-item" onclick="loadPage('2f00274fdc1c8089bfe6c24434d53b67','Biblioteca','📚');closeMob()">📚 Biblioteca</div>
+    <div class="mob-item" onclick="loadPage('2f00274fdc1c801c9697e75caa8d5f13','Bottega farmaceutica','💊');closeMob()">💊 Bottega farmaceutica</div>
+    <div class="mob-item" onclick="loadPage('2ff0274fdc1c80688dd6c2b293a1f626','Caserma','🛡️');closeMob()">🛡️ Caserma</div>
+    <div class="mob-item" onclick="loadPage('2ff0274fdc1c80769a4ae243f22f0582','Corporazione costruttori','🔨');closeMob()">🔨 Corporazione costruttori</div>
+    <div class="mob-item" onclick="loadPage('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥');closeMob()">🔥 Forgia</div>
+    <div class="mob-item" onclick="loadPage('2f00274fdc1c801b8c13cefd9e15694e','Gilda degli avventurieri','🗡️');closeMob()">🗡️ Gilda degli avventurieri</div>
+    <div class="mob-item" onclick="loadPage('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺');closeMob()">🍺 Locanda</div>
+    <div class="mob-item" onclick="loadPage('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️');closeMob()">⚕️ Ospedale</div>
+    <div class="mob-item" onclick="loadPage('2ff0274fdc1c8035bad4f0b6ab705192','Sartoria','🧵');closeMob()">🧵 Sartoria</div>
+  </div>
+  <div class="mob-section">
+    <div class="mob-item" onclick="loadPage('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐');closeMob()">🛐 Pantheon</div>
+    <div class="mob-item" onclick="loadPage('3000274fdc1c8033a214c44a1aa7f01f','Changelog','📝');closeMob()">📝 Changelog</div>
+  </div>
+</div>
 
-<!-- Overlay -->
-<div id="overlay" onclick="closeSidebar()"></div>
+<div id="app">
+  <!-- HOME -->
+  <div id="view-home" class="view active">
+    <section id="hero">
+      <div id="hero-bg"></div>
+      <div id="hero-grid"></div>
+      <div id="hero-content">
+        <span id="hero-rune">🏰</span>
+        <h1 id="hero-title">Arcamis</h1>
+        <p id="hero-sub">Benvenuti, giovani avventurieri</p>
+        <a href="https://discord.gg/a3mvUnBV53" target="_blank" id="hero-discord">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+          Unisciti al server
+        </a>
+      </div>
+      <div id="hero-cards">
+        <div class="hero-card" onclick="loadPage('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')">
+          <span class="hc-icon">⚔️</span><div class="hc-label">Gameplay</div>
+        </div>
+        <div class="hero-card" onclick="loadPage('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')">
+          <span class="hc-icon">📜</span><div class="hc-label">Regole</div>
+        </div>
+        <div class="hero-card" onclick="loadPage('30a0274fdc1c804ab56bd3943add26d2','Classi','🎭')">
+          <span class="hc-icon">🎭</span><div class="hc-label">Classi</div>
+        </div>
+        <div class="hero-card" onclick="showCat('lavori')">
+          <span class="hc-icon">🛠️</span><div class="hc-label">Lavori</div>
+        </div>
+        <div class="hero-card" onclick="loadPage('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')">
+          <span class="hc-icon">🛐</span><div class="hc-label">Pantheon</div>
+        </div>
+        <div class="hero-card" onclick="loadPage('3000274fdc1c8033a214c44a1aa7f01f','Changelog','📝')">
+          <span class="hc-icon">📝</span><div class="hc-label">Changelog</div>
+        </div>
+      </div>
+    </section>
+  </div>
 
-<!-- Layout -->
-<div id="layout">
-
-  <!-- Sidebar -->
-  <nav id="sidebar">
-    <div id="sidebar-inner"></div>
-  </nav>
-
-  <!-- Main -->
-  <main id="main">
-    <div id="content-area">
-      <div id="breadcrumb"></div>
-      <div id="page-content">
-        <div id="welcome"></div>
+  <!-- CATEGORY -->
+  <div id="view-cat" class="view">
+    <div id="cat-view">
+      <div id="cat-inner">
+        <div id="breadcrumb-cat"></div>
+        <h2 id="cat-title"></h2>
+        <p id="cat-desc"></p>
+        <div class="cat-grid" id="cat-grid"></div>
       </div>
     </div>
-  </main>
+  </div>
 
+  <!-- PAGE -->
+  <div id="view-page" class="view">
+    <div id="page-view">
+      <div id="page-inner">
+        <div id="breadcrumb"></div>
+        <div id="pheader">
+          <span id="picon"></span>
+          <h1 id="ptitle"></h1>
+        </div>
+        <div id="page-body"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-// ─────────────────────────────────────────────
-// Navigation structure (IDs without dashes for Notion API)
-// ─────────────────────────────────────────────
-const NAV = [
-  { label: 'Regolamento', icon: '⚖️', open: true, children: [
-    { label: 'Gameplay',            icon: '⚔️', id: '2f00274fdc1c8065a11ff45192aa5dcb' },
-    { label: 'Regole',              icon: '📜', id: '2f00274fdc1c800b9d8fc366e8e40c5c' },
-    { label: 'Materiale approvato', icon: '📋', id: '3130274fdc1c807eb61fde24e8236659' },
-  ]},
-  { label: 'Personaggio', icon: '🧙', open: true, children: [
-    { label: 'Come si inizia',  icon: '🌟', id: '2dd222f22ef8413f8cb48f03bbb4f4b0' },
-    { label: 'Andando avanti', icon: '📈', id: '5cea525d149f4acb9c59007bf6b3d5ff' },
-    { label: 'Classi',         icon: '🎭', id: '30a0274fdc1c804ab56bd3943add26d2' },
-    { label: 'Galleria PG',    icon: '🖼️', id: '2fd0274fdc1c80d8b948c4133f874f28' },
-  ]},
-  { label: 'Lavori', icon: '🛠️', open: false, children: [
-    { label: 'Biblioteca',                  icon: '📚', id: '2f00274fdc1c8089bfe6c24434d53b67' },
-    { label: 'Bottega farmaceutica',        icon: '💊', id: '2f00274fdc1c801c9697e75caa8d5f13' },
-    { label: 'Caserma',                     icon: '🛡️', id: '2ff0274fdc1c80688dd6c2b293a1f626' },
-    { label: 'Corporazione costruttori',    icon: '🔨', id: '2ff0274fdc1c80769a4ae243f22f0582' },
-    { label: 'Forgia',                      icon: '🔥', id: '2f00274fdc1c805ca01ec57f18d2ffee' },
-    { label: 'Gilda degli avventurieri',    icon: '🗡️', id: '2f00274fdc1c801b8c13cefd9e15694e' },
-    { label: 'Locanda',                     icon: '🍺', id: '2f00274fdc1c80faa99eda064ef0fabc' },
-    { label: 'Ospedale',                    icon: '⚕️', id: '2f00274fdc1c807aa03cc6cbeb3687cc' },
-    { label: 'Sartoria',                    icon: '🧵', id: '2ff0274fdc1c8035bad4f0b6ab705192' },
-  ]},
-  { label: 'Pantheon',   icon: '🛐', id: '2f00274fdc1c80679bd3c3df8a1fa040' },
-  { label: 'Changelog',  icon: '📝', id: '3000274fdc1c8033a214c44a1aa7f01f' },
-];
-
-// ─────────────────────────────────────────────
-// State
-// ─────────────────────────────────────────────
-let currentPageId = null;
-let allNavItems = [];  // flat list for search
-
-// ─────────────────────────────────────────────
-// Sidebar render
-// ─────────────────────────────────────────────
-function buildSidebar() {
-  const inner = document.getElementById('sidebar-inner');
-  inner.innerHTML = '';
-
-  function renderItem(item, depth = 0) {
-    if (item.children) {
-      const sec = document.createElement('div');
-      sec.className = 'nav-section' + (item.open ? ' open' : '');
-      sec.innerHTML = `
-        <div class="nav-section-header" onclick="toggleSection(this.parentElement)">
-          <span>${item.icon}</span>
-          <span>${item.label}</span>
-          <span class="arrow">▶</span>
-        </div>
-        <div class="nav-children"></div>
-      `;
-      if (item.id) {
-        sec.querySelector('.nav-section-header').addEventListener('click', (e) => {
-          // only navigate if clicking on the label text area, not arrow
-        });
-      }
-      item.children.forEach(child => {
-        sec.querySelector('.nav-children').appendChild(renderItem(child, depth + 1));
-      });
-      inner.appendChild(sec);
-      return sec;
-    } else {
-      const el = document.createElement('div');
-      el.className = 'nav-item';
-      el.dataset.id = item.id;
-      el.innerHTML = `<span class="icon">${item.icon}</span><span>${item.label}</span>`;
-      el.onclick = () => loadPage(item.id, item.label, item.icon);
-      allNavItems.push({ id: item.id, label: item.label, icon: item.icon, el });
-      return el;
-    }
+var CATS = {
+  lavori: {
+    title: '🛠️ Lavori',
+    desc: 'Ogni lavoro richiede turni di 8 ore al giorno per 7 giorni.',
+    items: [
+      {label:'Biblioteca',icon:'📚',id:'2f00274fdc1c8089bfe6c24434d53b67'},
+      {label:'Bottega farmaceutica',icon:'💊',id:'2f00274fdc1c801c9697e75caa8d5f13'},
+      {label:'Caserma',icon:'🛡️',id:'2ff0274fdc1c80688dd6c2b293a1f626'},
+      {label:'Corporazione costruttori',icon:'🔨',id:'2ff0274fdc1c80769a4ae243f22f0582'},
+      {label:'Forgia',icon:'🔥',id:'2f00274fdc1c805ca01ec57f18d2ffee'},
+      {label:'Gilda degli avventurieri',icon:'🗡️',id:'2f00274fdc1c801b8c13cefd9e15694e'},
+      {label:'Locanda',icon:'🍺',id:'2f00274fdc1c80faa99eda064ef0fabc'},
+      {label:'Ospedale',icon:'⚕️',id:'2f00274fdc1c807aa03cc6cbeb3687cc'},
+      {label:'Sartoria',icon:'🧵',id:'2ff0274fdc1c8035bad4f0b6ab705192'},
+    ]
+  },
+  personaggio: {
+    title: '🧙 Personaggio',
+    desc: 'Tutto ciò che riguarda la creazione e progressione del tuo PG.',
+    items: [
+      {label:'Come si inizia',icon:'🌟',id:'2dd222f22ef8413f8cb48f03bbb4f4b0'},
+      {label:'Andando avanti',icon:'📈',id:'5cea525d149f4acb9c59007bf6b3d5ff'},
+      {label:'Classi',icon:'🎭',id:'30a0274fdc1c804ab56bd3943add26d2'},
+      {label:'Galleria PG',icon:'🖼️',id:'2fd0274fdc1c80d8b948c4133f874f28'},
+    ]
+  },
+  regolamento: {
+    title: '⚖️ Regolamento',
+    desc: 'Le regole fondamentali del server Arcamis.',
+    items: [
+      {label:'Gameplay',icon:'⚔️',id:'2f00274fdc1c8065a11ff45192aa5dcb'},
+      {label:'Regole',icon:'📜',id:'2f00274fdc1c800b9d8fc366e8e40c5c'},
+      {label:'Materiale approvato',icon:'📋',id:'3130274fdc1c807eb61fde24e8236659'},
+    ]
   }
+};
 
-  NAV.forEach(item => {
-    if (item.children) {
-      const sec = document.createElement('div');
-      sec.className = 'nav-section' + (item.open ? ' open' : '');
-      sec.innerHTML = `
-        <div class="nav-section-header" onclick="toggleSection(this.parentElement)">
-          <span>${item.icon}</span>
-          <span>${item.label}</span>
-          <span class="arrow">▶</span>
-        </div>
-        <div class="nav-children"></div>
-      `;
-      item.children.forEach(child => {
-        const childEl = renderItem(child, 1);
-        sec.querySelector('.nav-children').appendChild(childEl);
-      });
-      inner.appendChild(sec);
-    } else {
-      const el = document.createElement('div');
-      el.className = 'nav-item';
-      el.dataset.id = item.id;
-      el.innerHTML = `<span class="icon">${item.icon}</span><span>${item.label}</span>`;
-      el.onclick = () => loadPage(item.id, item.label, item.icon);
-      allNavItems.push({ id: item.id, label: item.label, icon: item.icon, el });
-      inner.appendChild(el);
-    }
+// ── Views ──
+function showView(id) {
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});
+  document.getElementById('view-'+id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goHome() {
+  showView('home');
+  document.title = 'Arcamis';
+  history.pushState({},'','/');
+}
+
+function showCat(key) {
+  var cat = CATS[key];
+  if (!cat) return;
+  document.getElementById('cat-title').textContent = cat.title;
+  document.getElementById('cat-desc').textContent = cat.desc;
+  document.getElementById('breadcrumb-cat').innerHTML =
+    '<span onclick="goHome()">🏰 Home</span><span class="bc-sep"> › </span><span class="bc-cur">'+cat.title+'</span>';
+  var grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+  cat.items.forEach(function(item) {
+    var card = document.createElement('div');
+    card.className = 'cat-card';
+    card.innerHTML = '<span class="cat-card-icon">'+item.icon+'</span><div class="cat-card-title">'+item.label+'</div>';
+    card.onclick = function(){loadPage(item.id,item.label,item.icon)};
+    grid.appendChild(card);
   });
+  showView('cat');
+  document.title = cat.title.replace(/\S+\s/,'') + ' — Arcamis';
 }
 
-function toggleSection(el) {
-  el.classList.toggle('open');
+// ── Rich text ──
+function allNavItems() {
+  var items = [];
+  Object.values(CATS).forEach(function(c){c.items.forEach(function(i){items.push(i)})});
+  return items;
 }
 
-function setActiveNav(pageId) {
-  document.querySelectorAll('.nav-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.id === pageId);
-  });
-}
-
-// ─────────────────────────────────────────────
-// Search
-// ─────────────────────────────────────────────
-function onSearch(q) {
-  const query = q.toLowerCase().trim();
-  if (!query) {
-    document.querySelectorAll('.nav-item').forEach(el => el.style.display = '');
-    document.querySelectorAll('.nav-section').forEach(el => el.style.display = '');
-    return;
-  }
-  allNavItems.forEach(({ label, el }) => {
-    el.style.display = label.toLowerCase().includes(query) ? '' : 'none';
-  });
-  document.querySelectorAll('.nav-section').forEach(sec => {
-    const visible = [...sec.querySelectorAll('.nav-item')].some(el => el.style.display !== 'none');
-    sec.style.display = visible ? '' : 'none';
-    if (visible) sec.classList.add('open');
-  });
-}
-
-// ─────────────────────────────────────────────
-// Mobile
-// ─────────────────────────────────────────────
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('show');
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.remove('show');
-}
-
-// ─────────────────────────────────────────────
-// Rich text renderer
-// ─────────────────────────────────────────────
-function renderRichText(richTexts) {
-  if (!richTexts || richTexts.length === 0) return '';
-  return richTexts.map(rt => {
-    let text = rt.plain_text || '';
-    text = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const a = rt.annotations || {};
-    const classes = [];
-    if (a.bold) classes.push('rt-bold');
-    if (a.italic) classes.push('rt-italic');
-    if (a.strikethrough) classes.push('rt-strike');
-    if (a.underline) classes.push('rt-underline');
-    if (a.code) classes.push('rt-code');
-    if (a.color && a.color !== 'default') {
-      const c = a.color.replace('_background','');
-      classes.push('rt-' + c);
-    }
-    const href = rt.href;
-    if (href) {
-      // Check if it's an internal Notion page link
-      const notionMatch = href.match(/([a-f0-9]{32})(?:\?|$)/);
-      if (notionMatch) {
-        const pid = notionMatch[1];
-        const navItem = allNavItems.find(n => n.id === pid);
-        const tag = classes.length ? `<span class="${classes.join(' ')}">${text}</span>` : text;
-        return `<a class="rt-link" onclick="loadPage('${pid}','${navItem?.label||''}','${navItem?.icon||'📄'}')">${tag}</a>`;
+function rt(richTexts) {
+  if (!richTexts||!richTexts.length) return '';
+  return richTexts.map(function(r){
+    var t = (r.plain_text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var a = r.annotations||{};
+    var cls = [];
+    if (a.bold) cls.push('rt-bold');
+    if (a.italic) cls.push('rt-italic');
+    if (a.strikethrough) cls.push('rt-strike');
+    if (a.underline) cls.push('rt-underline');
+    if (a.code) cls.push('rt-code');
+    if (a.color&&a.color!=='default') cls.push('rt-'+a.color.replace('_background',''));
+    var inner = cls.length ? '<span class="'+cls.join(' ')+'">'+t+'</span>' : t;
+    if (r.href) {
+      var m = r.href.match(/([a-f0-9]{32})(?:\?|$)/);
+      if (m) {
+        var ni = allNavItems().find(function(n){return n.id===m[1]});
+        return '<a class="rt-link" onclick="loadPage(\''+m[1]+'\',\''+(ni?ni.label:'')+'\',\''+(ni?ni.icon:'📄')+'\')">'+inner+'</a>';
       }
-      const tag = classes.length ? `<span class="${classes.join(' ')}">${text}</span>` : text;
-      return `<a href="${href}" target="_blank" rel="noopener" class="rt-link">${tag}</a>`;
+      return '<a href="'+r.href+'" target="_blank" rel="noopener" class="rt-link">'+inner+'</a>';
     }
-    if (classes.length === 0) return text;
-    return `<span class="${classes.join(' ')}">${text}</span>`;
+    return inner;
   }).join('');
 }
 
-// ─────────────────────────────────────────────
-// Block renderer
-// ─────────────────────────────────────────────
-function renderBlocks(blocks, numbered = {}) {
-  if (!blocks || blocks.length === 0) return '';
-  let html = '';
-
-  for (let i = 0; i < blocks.length; i++) {
-    const block = blocks[i];
-    const type = block.type;
-    const data = block[type] || {};
-
-    switch (type) {
-      case 'paragraph': {
-        const content = renderRichText(data.rich_text);
-        html += `<p class="n-p">${content || '<br>'}</p>`;
-        break;
-      }
+// ── Blocks ──
+function renderBlocks(blocks) {
+  if (!blocks||!blocks.length) return '';
+  var html = '';
+  for (var i=0;i<blocks.length;i++) {
+    var b = blocks[i];
+    var d = b[b.type]||{};
+    switch(b.type) {
+      case 'paragraph':
+        html += '<p class="n-p">'+(rt(d.rich_text)||'<br>')+'</p>'; break;
       case 'heading_1':
-        html += `<h2 class="n-h1">${renderRichText(data.rich_text)}</h2>`;
-        break;
+        html += '<h2 class="n-h1">'+rt(d.rich_text)+'</h2>'; break;
       case 'heading_2':
-        html += `<h3 class="n-h2">${renderRichText(data.rich_text)}</h3>`;
-        break;
+        html += '<h3 class="n-h2">'+rt(d.rich_text)+'</h3>'; break;
       case 'heading_3':
-        html += `<h4 class="n-h3">${renderRichText(data.rich_text)}</h4>`;
-        break;
-
-      case 'bulleted_list_item': {
-        const children = block.children ? renderBlocks(block.children) : '';
-        html += `<ul class="n-ul"><li>${renderRichText(data.rich_text)}${children}</li></ul>`;
-        break;
-      }
-      case 'numbered_list_item': {
-        const children = block.children ? renderBlocks(block.children) : '';
-        html += `<ol class="n-ol"><li>${renderRichText(data.rich_text)}${children}</li></ol>`;
-        break;
-      }
-      case 'quote': {
-        const children = block.children ? renderBlocks(block.children) : '';
-        html += `<blockquote class="n-quote">${renderRichText(data.rich_text)}${children}</blockquote>`;
-        break;
-      }
+        html += '<h4 class="n-h3">'+rt(d.rich_text)+'</h4>'; break;
+      case 'bulleted_list_item':
+        html += '<ul class="n-ul"><li>'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</li></ul>'; break;
+      case 'numbered_list_item':
+        html += '<ol class="n-ol"><li>'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</li></ol>'; break;
+      case 'quote':
+        html += '<blockquote class="n-quote">'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</blockquote>'; break;
       case 'divider':
-        html += `<hr class="n-divider"/>`;
+        html += '<hr class="n-divider"/>'; break;
+      case 'callout':
+        var ico = d.icon&&d.icon.emoji ? d.icon.emoji : '💡';
+        html += '<div class="n-callout"><div class="n-callout-icon">'+ico+'</div><div class="n-callout-body">'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</div></div>'; break;
+      case 'toggle':
+        html += '<details><summary class="n-toggle-summary">'+rt(d.rich_text)+'</summary><div class="n-toggle-children">'+(b.children?renderBlocks(b.children):'')+'</div></details>'; break;
+      case 'code':
+        html += '<pre class="n-code"><code>'+(d.rich_text||[]).map(function(r){return r.plain_text}).join('').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</code></pre>'; break;
+      case 'image':
+        var src = d.type==='external' ? (d.external&&d.external.url) : (d.file&&d.file.url);
+        if (src) html += '<figure class="n-image"><img src="'+src+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'"/>'+(d.caption&&d.caption.length?'<figcaption>'+rt(d.caption)+'</figcaption>':'')+'</figure>';
         break;
-
-      case 'callout': {
-        const icon = data.icon?.emoji || data.icon?.external?.url || '💡';
-        const iconHtml = icon.startsWith('http')
-          ? `<img src="${icon}" style="width:20px;height:20px;object-fit:contain;"/>`
-          : icon;
-        const children = block.children ? renderBlocks(block.children) : '';
-        html += `<div class="n-callout">
-          <div class="n-callout-icon">${iconHtml}</div>
-          <div class="n-callout-body">${renderRichText(data.rich_text)}${children}</div>
-        </div>`;
-        break;
-      }
-
-      case 'toggle': {
-        const children = block.children ? renderBlocks(block.children) : '';
-        html += `<details>
-          <summary class="n-toggle-summary">${renderRichText(data.rich_text)}</summary>
-          <div class="n-toggle-children">${children}</div>
-        </details>`;
-        break;
-      }
-
-      case 'code': {
-        const lang = data.language || '';
-        const code = (data.rich_text || []).map(rt => rt.plain_text).join('');
-        html += `<pre class="n-code" data-lang="${lang}"><code>${code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code></pre>`;
-        break;
-      }
-
-      case 'image': {
-        let src = '';
-        if (data.type === 'external') src = data.external?.url || '';
-        else if (data.type === 'file') src = data.file?.url || '';
-        const caption = renderRichText(data.caption);
-        if (src) {
-          html += `<figure class="n-image">
-            <img src="${src}" alt="${caption || 'immagine'}" loading="lazy" onerror="this.parentElement.style.display='none'"/>
-            ${caption ? `<figcaption>${caption}</figcaption>` : ''}
-          </figure>`;
-        }
-        break;
-      }
-
-      case 'child_page': {
-        const title = data.title || 'Pagina';
-        const pid = block.id.replace(/-/g, '');
-        const navItem = allNavItems.find(n => n.id === pid);
-        const icon = navItem?.icon || '📄';
-        html += `<div class="n-child-page" onclick="loadPage('${pid}','${title}','${icon}')">
-          <span>${icon}</span> ${title}
-        </div>`;
-        break;
-      }
-
-      case 'child_database': {
-        const title = data.title || 'Database';
-        html += `<div class="n-callout">
-          <div class="n-callout-icon">🗃️</div>
-          <div class="n-callout-body"><em>${title}</em> <span style="color:var(--text3);font-size:13px;">(database)</span></div>
-        </div>`;
-        break;
-      }
-
-      case 'table': {
-        const rows = block.children || [];
-        const hasColHeader = data.has_column_header;
-        const hasRowHeader = data.has_row_header;
-        let thtml = `<div class="n-table-wrap"><table class="n-table"><tbody>`;
-        rows.forEach((row, ri) => {
-          const cells = row.table_row?.cells || [];
-          thtml += '<tr>';
-          cells.forEach((cell, ci) => {
-            const isHeader = (hasColHeader && ri === 0) || (hasRowHeader && ci === 0);
-            const tag = isHeader ? 'th' : 'td';
-            thtml += `<${tag}>${renderRichText(cell)}</${tag}>`;
+      case 'child_page':
+        var pid = b.id.replace(/-/g,'');
+        var ni = allNavItems().find(function(n){return n.id===pid});
+        html += '<div class="n-child-page" onclick="loadPage(\''+pid+'\',\''+(d.title||'Pagina')+'\',\''+(ni?ni.icon:'📄')+'\')"><span>'+(ni?ni.icon:'📄')+'</span> '+(d.title||'Pagina')+'</div>'; break;
+      case 'child_database':
+        html += '<div class="n-callout"><div class="n-callout-icon">🗃️</div><div class="n-callout-body"><em>'+(d.title||'Database')+'</em></div></div>'; break;
+      case 'table':
+        var rows = b.children||[];
+        var th = d.has_column_header, rh = d.has_row_header;
+        html += '<div class="n-table-wrap"><table class="n-table"><tbody>';
+        rows.forEach(function(row,ri){
+          var cells = row.table_row&&row.table_row.cells||[];
+          html += '<tr>';
+          cells.forEach(function(cell,ci){
+            var tag = (th&&ri===0)||(rh&&ci===0)?'th':'td';
+            html += '<'+tag+'>'+rt(cell)+'</'+tag+'>';
           });
-          thtml += '</tr>';
+          html += '</tr>';
         });
-        thtml += `</tbody></table></div>`;
-        html += thtml;
-        break;
-      }
-
-      case 'column_list': {
-        const cols = block.children || [];
-        const count = cols.length || 1;
-        html += `<div class="n-columns" style="grid-template-columns:repeat(${count},1fr)">`;
-        cols.forEach(col => {
-          html += `<div>${renderBlocks(col.children || [])}</div>`;
-        });
-        html += `</div>`;
-        break;
-      }
-
-      case 'bookmark': {
-        const url = data.url || '#';
-        const caption = renderRichText(data.caption);
-        const domain = (() => { try { return new URL(url).hostname; } catch { return url; } })();
-        html += `<a href="${url}" target="_blank" rel="noopener" class="n-bookmark">
-          <div>
-            <div>${caption || domain}</div>
-            <div class="n-bookmark-url">${url}</div>
-          </div>
-        </a>`;
-        break;
-      }
-
-      case 'to_do': {
-        const checked = data.checked ? '✅' : '☐';
-        html += `<p class="n-p">${checked} ${renderRichText(data.rich_text)}</p>`;
-        break;
-      }
-
-      case 'embed':
-      case 'video': {
-        const url = data.url || data.external?.url || data.file?.url || '';
-        if (url) {
-          html += `<a href="${url}" target="_blank" rel="noopener" class="n-bookmark">
-            <div>
-              <div>🔗 Contenuto embed</div>
-              <div class="n-bookmark-url">${url}</div>
-            </div>
-          </a>`;
-        }
-        break;
-      }
-
-      default:
-        // Skip unsupported blocks silently
-        break;
+        html += '</tbody></table></div>'; break;
+      case 'column_list':
+        var cols = b.children||[];
+        html += '<div class="n-columns" style="grid-template-columns:repeat('+cols.length+',1fr)">';
+        cols.forEach(function(col){html += '<div>'+(col.children?renderBlocks(col.children):'')+'</div>'});
+        html += '</div>'; break;
+      case 'to_do':
+        html += '<p class="n-p">'+(d.checked?'✅':'☐')+' '+rt(d.rich_text)+'</p>'; break;
+      case 'bookmark':
+        var burl = d.url||'#';
+        var dom = burl; try{dom=new URL(burl).hostname}catch(e){}
+        html += '<a href="'+burl+'" target="_blank" rel="noopener" class="n-bookmark"><div><div>'+(d.caption&&d.caption.length?rt(d.caption):dom)+'</div><div class="n-bookmark-url">'+burl+'</div></div></a>'; break;
     }
   }
-
-  // Merge consecutive lists
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  mergeLists(div, 'ul');
-  mergeLists(div, 'ol');
-  return div.innerHTML;
-}
-
-function mergeLists(container, tag) {
-  const lists = container.querySelectorAll(tag + '.' + (tag === 'ul' ? 'n-ul' : 'n-ol'));
-  lists.forEach(list => {
-    const prev = list.previousElementSibling;
-    if (prev && prev.tagName === tag.toUpperCase() && prev.className === list.className) {
-      while (list.firstChild) prev.appendChild(list.firstChild);
-      list.remove();
-    }
+  // Merge adjacent lists
+  var tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  ['ul','ol'].forEach(function(tag){
+    tmp.querySelectorAll(tag).forEach(function(el){
+      var prev = el.previousElementSibling;
+      if (prev&&prev.tagName===tag.toUpperCase()&&prev.className===el.className){
+        while(el.firstChild) prev.appendChild(el.firstChild);
+        el.remove();
+      }
+    });
   });
+  return tmp.innerHTML;
 }
 
-// ─────────────────────────────────────────────
-// Page loader
-// ─────────────────────────────────────────────
+// ── Load page ──
 async function loadPage(pageId, label, icon) {
-  if (!pageId) return;
-  currentPageId = pageId;
-  closeSidebar();
-  setActiveNav(pageId);
-
-  // Update breadcrumb
-  const bc = document.getElementById('breadcrumb');
-  bc.innerHTML = `
-    <span onclick="showWelcome()">🏰 Arcamis</span>
-    <span class="sep">›</span>
-    <span class="current">${icon} ${label}</span>
-  `;
-
-  const pc = document.getElementById('page-content');
-  pc.innerHTML = `
-    <div id="loading">
-      <div class="loader"></div>
-      <p>Caricamento in corso…</p>
-    </div>
-  `;
+  document.getElementById('ptitle').textContent = label||'...';
+  document.getElementById('picon').textContent = icon||'📄';
+  document.getElementById('breadcrumb').innerHTML =
+    '<span onclick="goHome()">🏰 Home</span><span class="bc-sep"> › </span><span class="bc-cur">'+(icon||'')+(label?' '+label:'')+'</span>';
+  document.getElementById('page-body').innerHTML =
+    '<div class="loading-wrap"><div class="spinner"></div><p>Caricamento…</p></div>';
+  showView('page');
+  document.title = (label||'Pagina')+' — Arcamis';
+  window.scrollTo({top:0});
 
   try {
-    const res = await fetch(`/api/notion?pageId=${pageId}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const { page, blocks } = await res.json();
+    var res = await fetch('/api/notion?pageId='+pageId);
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    var data = await res.json();
+    var page = data.page, blocks = data.blocks;
 
-    // Get title and icon from page
-    const titleProp = page.properties?.title?.title || [];
-    const pageTitle = titleProp.map(t => t.plain_text).join('') || label;
-    let pageIcon = icon;
-    if (page.icon?.emoji) pageIcon = page.icon.emoji;
-    else if (page.icon?.external?.url) pageIcon = `<img src="${page.icon.external.url}" style="height:48px;width:48px;object-fit:contain;"/>`;
+    // Title
+    var titleArr = page.properties&&page.properties.title&&page.properties.title.title||[];
+    var pageTitle = titleArr.map(function(t){return t.plain_text}).join('')||label;
+    var pageIcon = icon;
+    if (page.icon&&page.icon.emoji) pageIcon = page.icon.emoji;
 
-    const blocksHtml = renderBlocks(blocks);
+    document.getElementById('picon').textContent = pageIcon;
+    document.getElementById('ptitle').textContent = pageTitle;
+    document.title = pageTitle+' — Arcamis';
 
-    pc.innerHTML = `
-      <div class="page-enter">
-        <div id="page-header">
-          <span id="page-icon">${pageIcon}</span>
-          <h1 id="page-title">${pageTitle}</h1>
-        </div>
-        <div class="notion-content">${blocksHtml || '<p class="n-p" style="color:var(--text3);font-style:italic;">Pagina vuota o contenuto non disponibile.</p>'}</div>
-      </div>
-    `;
+    var body = renderBlocks(blocks);
+    document.getElementById('page-body').innerHTML =
+      '<div class="nc page-enter">'+(body||'<p class="n-p" style="color:var(--text3);font-style:italic">Pagina vuota.</p>')+'</div>';
 
-    // Scroll to top
-    document.getElementById('main').scrollTo({ top: 0, behavior: 'smooth' });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  } catch (err) {
-    pc.innerHTML = `
-      <div id="error-msg">
-        ⚠️ Impossibile caricare la pagina: ${err.message}<br>
-        <small style="opacity:0.7">Assicurati che NOTION_TOKEN sia configurato su Vercel.</small>
-      </div>
-    `;
+  } catch(e) {
+    document.getElementById('page-body').innerHTML =
+      '<div class="err-box">⚠️ Impossibile caricare la pagina: '+e.message+'</div>';
   }
 }
 
-// ─────────────────────────────────────────────
-// Welcome screen
-// ─────────────────────────────────────────────
-function showWelcome() {
-  currentPageId = null;
-  document.getElementById('breadcrumb').innerHTML = '';
-  setActiveNav('');
-  const quickLinks = [
-    { label: 'Gameplay', icon: '⚔️', id: '2f00274fdc1c8065a11ff45192aa5dcb' },
-    { label: 'Regole',   icon: '📜', id: '2f00274fdc1c800b9d8fc366e8e40c5c' },
-    { label: 'Classi',   icon: '🎭', id: '30a0274fdc1c804ab56bd3943add26d2' },
-    { label: 'Lavori',   icon: '🛠️', id: null },
-    { label: 'Pantheon', icon: '🛐', id: '2f00274fdc1c80679bd3c3df8a1fa040' },
-    { label: 'Changelog',icon: '📝', id: '3000274fdc1c8033a214c44a1aa7f01f' },
-  ];
-  const cards = quickLinks.map(l => `
-    <div class="welcome-card" onclick="${l.id ? `loadPage('${l.id}','${l.label}','${l.icon}')` : `openSection('${l.label}')`}">
-      <div class="card-icon">${l.icon}</div>
-      <div class="card-label">${l.label}</div>
-    </div>
-  `).join('');
-
-  document.getElementById('page-content').innerHTML = `
-    <div id="welcome" class="page-enter">
-      <span class="welcome-rune">🏰</span>
-      <div class="welcome-title">Arcamis</div>
-      <p class="welcome-sub">Benvenuti, giovani avventurieri</p>
-      <div class="welcome-grid">${cards}</div>
-    </div>
-  `;
-}
-
-function openSection(label) {
-  document.querySelectorAll('.nav-section-header').forEach(h => {
-    if (h.textContent.includes(label)) {
-      const sec = h.parentElement;
-      sec.classList.add('open');
-      h.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  });
-}
-
-// ─────────────────────────────────────────────
-// Init
-// ─────────────────────────────────────────────
-buildSidebar();
-showWelcome();
-
-// Handle URL hash navigation
-function handleHash() {
-  const hash = location.hash.slice(1);
-  if (hash) {
-    const item = allNavItems.find(n => n.id === hash);
-    if (item) loadPage(item.id, item.label, item.icon);
-  }
-}
-window.addEventListener('hashchange', handleHash);
-handleHash();
+// ── Mobile ──
+function toggleMob(){document.getElementById('mobile-nav').classList.toggle('open')}
+function closeMob(){document.getElementById('mobile-nav').classList.remove('open')}
 </script>
 </body>
 </html>
