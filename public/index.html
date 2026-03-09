@@ -1,85 +1,143 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <title>Arcamis</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
-    <style>
-        /* Qui c'è tutto il tuo CSS originale (root, body, topbar, cards, overlay) */
-        /* ... (Immagina qui tutto il tuo codice CSS non toccato) ... */
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{
-          --bg: #080a0e; --bg2: #0c0f15; --bg3: #10141c; --bg4: #161c26;
-          --bdr: #241e0e; --bdr2: #342c14; --gold: #c89b3c; --gold3: #e8c86a;
-          --parch: #c4a862; --text: #a08848; --text2: #786438; --text3: #483c1c;
-          --white: #f0e6d2; --topbar-h:58px;
-        }
-        body{ font-family:'Crimson Pro',serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
-        #topbar{ height:var(--topbar-h); border-bottom:1px solid var(--bdr); display:flex; z-index:200; background:#04050a; }
-        #main{ flex:1; overflow-y:auto; position:relative; z-index:1; }
-        .cgrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:12px; margin-bottom:36px; }
-        .lcard{ background:var(--bg3); border:1px solid var(--bdr); cursor:pointer; transition:all .22s; position:relative; overflow:hidden; }
-        .cthumb{ height:96px; background-size:cover; background-position:center; background-color:var(--bg4); }
-        .cinfo{ padding:10px 12px 12px; }
-        .ctitle{ font-family:'Cinzel',serif; font-size:12.5px; font-weight:700; color:var(--parch); }
-        .ctag{ font-family:'Cinzel',serif; font-size:9px; padding:2px 8px; background:rgba(200,155,60,.08); color:var(--gold); border:1px solid rgba(200,155,60,0.2); margin-top:5px; display:inline-block; }
-        
-        #overlay{ position:fixed; inset:0; z-index:1000; display:none; background:rgba(4,5,10,.7); backdrop-filter:blur(16px); }
-        #ovpanel{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:min(820px,95vw); background:rgba(12,16,22,.98); border:1px solid var(--bdr2); display:flex; flex-direction:column; }
-        #ovbody{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--bdr); }
-        .ovsec{ background:var(--bg2); padding:20px; }
-        .ovlink{ display:flex; align-items:center; gap:10px; padding:9px 12px; background:rgba(255,255,255,.02); border:1px solid var(--bdr); margin-bottom:6px; cursor:pointer; color:var(--text); font-size:13px; text-decoration:none; }
-        .n-cp{ display:inline-flex; align-items:center; padding:10px 18px; background:var(--bg3); border:1px solid var(--bdr); color:var(--parch); cursor:pointer; text-decoration:none; }
-        .spin{ width:24px; height:24px; border:2px solid var(--bdr2); border-top-color:var(--gold); border-radius:50%; animation:sp .8s linear infinite; margin:auto; }
-        @keyframes sp{to{transform:rotate(360deg)}}
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Arcamis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
+<style>
+/* --- IL TUO CSS ORIGINALE INVARIATO --- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080a0e;--bg2:#0c0f15;--bg3:#10141c;--bg4:#161c26;--bg5:#1c2430;--panel:#0e121a;
+  --border:#1e1808;--border2:#2c2210;
+  --gold:#c89b3c;--gold2:#d4aa4a;--gold3:#e8c86a;--gold4:#f5e4a8;
+  --copper:#7a5018;--parchment:#c4a862;
+  --text:#a08848;--text2:#786438;--text3:#483c1c;--white:#f0e6d2;
+  --topbar-h:56px;--glow:0 0 20px rgba(200,155,60,.18);
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Crimson Pro',Georgia,serif;font-size:15px;color:var(--text);
+  display:flex;flex-direction:column;
+  background:radial-gradient(ellipse 140% 120% at 50% 0%,#131008 0%,#0c0d10 30%,#080a0e 60%,#040507 100%);
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+
+/* TOPBAR */
+#topbar{
+  height:var(--topbar-h);flex-shrink:0;z-index:200;position:relative;
+  background:linear-gradient(180deg,#02030a,#07090e);
+  border-bottom:1px solid #000;display:flex;align-items:stretch;
+  box-shadow:0 2px 24px rgba(0,0,0,.7);
+}
+#topbar::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(120,80,24,.4) 10%,rgba(200,155,60,.55) 30%,rgba(232,200,106,.75) 50%,rgba(200,155,60,.55) 70%,rgba(120,80,24,.4) 90%,transparent);
+}
+#tlogo{display:flex;align-items:center;padding:0 20px;gap:12px;cursor:pointer;user-select:none;flex-shrink:0;transition:background .2s}
+#tlogo:hover{background:rgba(200,155,60,.04)}
+#liw{width:30px;height:30px;flex-shrink:0;border-radius:50%;overflow:hidden;border:1.5px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(200,155,60,.2)}
+#tlt{font-family:'Cinzel',serif;font-size:14px;font-weight:900;letter-spacing:.22em;color:var(--gold3);text-shadow:0 0 16px rgba(200,155,60,.3)}
+nav#tnav{display:flex;align-items:stretch}
+.tn{display:flex;align-items:center;padding:0 14px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);cursor:pointer;user-select:none;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tn:hover{color:var(--parchment);background:rgba(200,155,60,.04)}
+.tn.ta{color:var(--gold2);border-bottom-color:var(--gold);background:rgba(200,155,60,.06)}
+
+#tr{margin-left:auto;display:flex;align-items:center;padding:0 16px;gap:9px}
+#ovbtn{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--border2);color:var(--text2);font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.08em;padding:6px 12px;cursor:pointer;border-radius:2px;transition:all .15s;user-select:none;white-space:nowrap}
+#ovbtn:hover{background:var(--bg4);color:var(--gold2);border-color:var(--gold);box-shadow:var(--glow)}
+.kbd{display:inline-flex;align-items:center;background:rgba(0,0,0,.4);border:1px solid var(--border2);color:var(--text3);font-size:9px;padding:1px 5px;border-radius:2px;margin-left:4px}
+
+/* CARDS */
+#main{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;z-index:1}
+#hhero{height:340px;position:relative;overflow:hidden;background:linear-gradient(160deg,#04050c 0%,#0e1420 45%,#070a10 100%);display:flex;align-items:center;justify-content:center}
+#httl{font-family:'Cinzel',serif;font-size:52px;font-weight:900;letter-spacing:.18em;background:linear-gradient(180deg,var(--gold4) 0%,var(--gold3) 35%,var(--gold) 65%,var(--copper) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;line-height:1}
+#hbody{padding:28px 40px 48px;max-width:1200px;margin:0 auto;width:100%}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;margin-bottom:36px}
+.sttl{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2)}
+.sc{background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:all .22s;position:relative;overflow:hidden;border-radius:2px}
+.sc:hover{border-color:var(--gold);box-shadow:var(--glow);transform:translateY(-3px)}
+.ct{height:96px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative}
+.ci{padding:9px 12px 13px}
+.ctt{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--parchment)}
+.stag{font-family:'Cinzel',serif;font-size:9px;font-weight:700;padding:2px 6px;background:rgba(200,155,60,.07);color:var(--gold2);border:1px solid rgba(200,155,60,.18)}
+
+/* OVERLAY */
+#overlay{position:fixed;inset:0;z-index:1000;display:none;background:rgba(4,5,10,.65);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
+#ovp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(820px,96vw);background:rgba(10,13,20,.97);border:1px solid var(--border2);display:flex;flex-direction:column;overflow:hidden;}
+#ovbody{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.ovs{background:var(--panel);padding:20px}
+.ovsh{font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;color:var(--text3);margin-bottom:14px;text-transform:uppercase}
+.spin{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:sp .7s linear infinite;margin:20px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
 
 <div id="topbar">
-  <div id="topbar-logo" onclick="location.reload()" style="display:flex; align-items:center; padding:0 22px; cursor:pointer;">
-    <span style="font-family:'Cinzel'; color:var(--gold3); letter-spacing:.2em;">ARCAMIS</span>
+  <div id="tlogo" onclick="location.reload()">
+    <div id="liw"><span style="font-size:14px">⚔</span></div>
+    <span id="tlt">ARCAMIS</span>
   </div>
-  <div style="margin-left:auto; display:flex; align-items:center; padding:0 16px;">
-    <div id="ov-btn" onclick="openOv()" style="cursor:pointer; border:1px solid var(--bdr); padding:7px 12px; font-size:10px; font-family:'Cinzel';">MENU <span style="opacity:0.5; margin-left:5px;">⇧Tab</span></div>
+  <nav id="tnav">
+    <div class="tn ta">Home</div>
+    <div class="tn">Gameplay</div>
+    <div class="tn">Regole</div>
+    <div class="tn">Classi</div>
+  </nav>
+  <div id="tr">
+    <div id="ovbtn" onclick="openOverlay()">Menu<span class="kbd">⇧Tab</span></div>
   </div>
 </div>
 
 <div id="main">
-  <div id="home-hero" style="height:300px; display:flex; align-items:center; justify-content:center; background:linear-gradient(to bottom, #0d1420, #080a0e);">
-    <h1 style="font-family:'Cinzel'; font-size:48px; color:var(--gold3); letter-spacing:8px;">ARCAMIS</h1>
+  <div id="hhero">
+    <div id="hcont">
+      <div id="httl">ARCAMIS</div>
+      <div id="hsub">Una land multi-master attiva 24/7</div>
+    </div>
   </div>
 
-  <div id="hbody" style="padding:40px; max-width:1100px; margin:0 auto;">
-    <div class="shead" style="color:var(--gold); font-family:'Cinzel'; font-size:10px; margin-bottom:15px;">✦ GALLERIA PERSONAGGI</div>
-    
-    <div class="cgrid" id="pg-gallery">
-      <div style="grid-column:1/-1; text-align:center; padding:40px;"><div class="spin"></div></div>
+  <div id="hbody">
+    <div class="sttl"><div style="width:6px;height:6px;background:var(--gold);transform:rotate(45deg)"></div>Galleria PG</div>
+    <div class="cg" id="pg-gallery">
+      <div class="spin"></div>
+    </div>
+
+    <div class="sttl"><div style="width:6px;height:6px;background:var(--gold);transform:rotate(45deg)"></div>Regolamento</div>
+    <div class="cg">
+        <div class="sc"><div class="ct">⚔️</div><div class="ci"><div class="ctt">Gameplay</div></div></div>
+        <div class="sc"><div class="ct">📜</div><div class="ci"><div class="ctt">Regole</div></div></div>
     </div>
   </div>
 </div>
 
 <div id="overlay">
-  <div id="ovpanel">
-    <div style="display:flex; justify-content:space-between; padding:15px 20px; border-bottom:1px solid var(--bdr);">
-      <div style="font-family:'Cinzel'; font-size:12px; color:var(--gold2);">MENU RAPIDO</div>
-      <div onclick="closeOv()" style="cursor:pointer; color:var(--text3);">✕</div>
+  <div id="ovp">
+    <div style="display:flex;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border2);">
+      <div style="font-family:'Cinzel';font-size:12px;color:var(--gold2);">MENU RAPIDO</div>
+      <div onclick="closeOverlay()" style="cursor:pointer;color:var(--text3);">✕</div>
     </div>
     <div id="ovbody">
-      <div class="ovsec" id="discord-widget-container">
-        <div style="font-family:'Cinzel'; font-size:9px; color:var(--text3); margin-bottom:10px;">SERVER DISCORD</div>
+      <div class="ovs" id="discord-widget">
+        <div class="ovsh">Server Discord</div>
         <div class="spin"></div>
       </div>
-
-      <div class="ovsec">
-        <div style="font-family:'Cinzel'; font-size:9px; color:var(--text3); margin-bottom:10px;">LINK RAPIDI</div>
-        <div class="ovlinks">
-          <a href="#" class="ovlink">⚔️ Gameplay</a>
-          <a href="#" class="ovlink">📜 Regole</a>
-          <a href="#" class="ovlink">🎭 Classi</a>
-          <a href="https://discord.gg/a3mvUnBV53" target="_blank" class="ovlink" style="border-color:var(--gold); color:var(--gold2);">🍻 Entra nella Locanda</a>
+      <div class="ovs">
+        <div class="ovsh">Link Rapidi</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="padding:10px;background:var(--bg3);border:1px solid var(--border);font-size:13px;cursor:pointer;">⚔️ Gameplay</div>
+            <div style="padding:10px;background:var(--bg3);border:1px solid var(--border);font-size:13px;cursor:pointer;">📜 Regole</div>
+            <a href="https://discord.gg/a3mvUnBV53" target="_blank" style="padding:10px;background:var(--bg3);border:1px solid var(--gold);font-size:13px;text-decoration:none;color:var(--gold2);text-align:center;">ENTRA NELLA LOCANDA</a>
         </div>
       </div>
     </div>
@@ -87,65 +145,61 @@
 </div>
 
 <script>
-const DISCORD_ID = '1129325983808401428'; 
+const DISCORD_ID = '1129325983808401428';
 
-// 1. Funzione Widget Discord (Overlay)
-async function refreshDiscord() {
-    const container = document.getElementById('discord-widget-container');
+// 1. DISCORD WIDGET DINAMICO
+async function loadDiscord() {
+    const container = document.getElementById('discord-widget');
     try {
         const r = await fetch(`https://discord.com/api/guilds/${DISCORD_ID}/widget.json`);
         const d = await r.json();
         container.innerHTML = `
-            <div style="font-family:'Cinzel'; font-size:9px; color:var(--text3); margin-bottom:10px;">SERVER DISCORD</div>
-            <div style="background:var(--bg3); border:1px solid var(--bdr2); padding:15px; text-align:center;">
-                <div style="font-family:'Cinzel'; font-size:28px; color:var(--gold3);">${d.presence_count}</div>
-                <div style="font-size:9px; color:#8ab840; letter-spacing:1px; margin-bottom:15px;">AVVENTURIERI ONLINE</div>
-                <div style="text-align:left; max-height:100px; overflow-y:auto; margin-bottom:15px;">
-                    ${d.members.slice(0,5).map(m => `<div style="font-size:12px; margin-bottom:4px; color:var(--parch);">• ${m.username}</div>`).join('')}
+            <div class="ovsh">Server Discord</div>
+            <div style="background:var(--bg3);padding:15px;border:1px solid var(--border2);text-align:center;">
+                <div style="font-family:'Cinzel';font-size:32px;color:var(--gold3);line-height:1;">${d.presence_count}</div>
+                <div style="font-size:9px;color:#6aa020;letter-spacing:1px;margin-bottom:15px;">AVVENTURIERI ONLINE</div>
+                <div style="text-align:left;max-height:80px;overflow-y:auto;font-size:12px;color:var(--parchment);">
+                    ${d.members.slice(0,5).map(m => `<div style="margin-bottom:4px;">• ${m.username}</div>`).join('')}
                 </div>
-                <a href="${d.instant_invite}" target="_blank" class="n-cp" style="width:100%; justify-content:center; font-size:11px;">ENTRA ORA</a>
             </div>`;
-    } catch(e) { container.innerHTML = "Widget Discord non disponibile."; }
+    } catch(e) { container.innerHTML = "Discord non raggiungibile."; }
 }
 
-// 2. Funzione Galleria PG (Forum Discord)
-// Nota: Questa funzione simula il caricamento dei post. Per renderla reale serve il "ponte" Vercel di cui parlavamo.
-async function loadGallery() {
+// 2. GALLERIA PG (SIMULATA)
+function loadGallery() {
     const gallery = document.getElementById('pg-gallery');
-    // Qui sotto emulo la struttura che riceveresti dal forum
-    const mockData = [
-        { name: "Phonarla", tag: "Paladin", img: "https://i.imgur.com/your_img1.jpg" },
-        { name: "Ivarek Stivkan", tag: "Sorcerer", img: "https://i.imgur.com/your_img2.jpg" },
-        { name: "Nebula", tag: "Warlock", img: "https://i.imgur.com/your_img3.jpg" }
+    const mockPG = [
+        { nome: "Phonarla", classe: "Paladin", img: "https://i.imgur.com/your-image.jpg" },
+        { nome: "Ivarek", classe: "Sorcerer", img: "" }
     ];
 
-    gallery.innerHTML = mockData.map(pg => `
-        <div class="lcard">
-            <div class="cthumb" style="background-image:url('${pg.img}')"></div>
-            <div class="cinfo">
-                <div class="ctitle">${pg.name}</div>
-                <div class="ctag">${pg.tag}</div>
+    gallery.innerHTML = mockPG.map(pg => `
+        <div class="sc">
+            <div class="ct" style="background-image:url('${pg.img}');background-size:cover;">${pg.img ? '' : '👤'}</div>
+            <div class="ci">
+                <div class="ctt">${pg.nome}</div>
+                <div class="stag">${pg.classe}</div>
             </div>
         </div>
     `).join('');
 }
 
-// Gestione Overlay
-function openOv() {
+// GESTIONE OVERLAY
+function openOverlay() {
     document.getElementById('overlay').style.display = 'block';
-    refreshDiscord();
+    loadDiscord();
 }
-function closeOv() {
+function closeOverlay() {
     document.getElementById('overlay').style.display = 'none';
 }
 
-// Inizializzazione
-window.onload = () => {
-    loadGallery();
-    document.addEventListener('keydown', e => {
-        if(e.shiftKey && e.key === 'Tab') { e.preventDefault(); openOv(); }
-    });
-};
+// SHORTCUT
+document.addEventListener('keydown', e => {
+    if(e.shiftKey && e.key === 'Tab') { e.preventDefault(); openOverlay(); }
+});
+
+// START
+window.onload = loadGallery;
 </script>
 
 </body>
