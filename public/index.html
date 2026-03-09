@@ -578,37 +578,27 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 </div><!-- /main -->
 
 <!-- ═══ OVERLAY (Discord live) ═══ -->
-<div id="overlay" onclick="hOvClick(event)">
-  <div id="ovpanel">
-    <div id="ovtop">
-      <div id="ovtitle">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-        Locanda di Arcamis — Chi è Online
-      </div>
-      <div id="ovcls" onclick="closeOv()">✕</div>
+<div id="overlay">
+  <div id="ovp">
+    <div style="padding:15px 20px; border-bottom:1px solid var(--bdr2); display:flex; justify-content:space-between; background:#000; align-items:center;">
+      <div style="font-family:'Cinzel'; font-size:12px; color:var(--gold2); letter-spacing:3px; font-weight:900;">DISCORD</div>
+      <div onclick="cv()" style="cursor:pointer; color:var(--text3); font-size:20px; padding:0 10px;">✕</div>
     </div>
     <div id="ovbody">
-      <!-- LEFT: Discord widget iframe -->
       <div class="ovs">
-        <div class="ovsh">Avventurieri in locanda</div>
-        <div id="roster-wrap" style="height:360px;overflow:hidden;background:rgba(0,0,0,.2);border:1px solid var(--bdr)">
-          <iframe src="https://discord.com/widget?id=1348723468157456425&theme=dark"
-            width="100%" height="100%" frameborder="0" allowtransparency="true"
-            sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
-            style="border:none;display:block"></iframe>
+        <div class="ovsh">Locanda Online <span id="avv-count" style="color:var(--gold); font-size:12px; margin-left:8px;"></span></div>
+        <div id="ovdw" style="background:rgba(0,0,0,0.4); border:1px solid var(--bdr); height:400px; overflow-y:auto; border-radius:2px;">
+          <div id="roster-list">
+            <div style="text-align:center; padding:50px; color:var(--text3); font-style:italic; font-size:13px;">In ascolto dei cancelli...</div>
+          </div>
         </div>
       </div>
-      <!-- RIGHT: join + quick links -->
-      <div class="ovs">
-        <div class="ovsh">Portale di accesso</div>
-        <div class="ov-right">
-          <a href="https://discord.gg/a3mvUnBV53" target="_blank" rel="noopener" class="ov-join-btn">
-            Entra nel Discord di Arcamis
-          </a>
-          <div class="ov-quote">"Siediti accanto al fuoco e racconta la tua storia. La locanda di Arcamis non dorme mai."</div>
-          <div class="ovsh" style="margin-top:14px;margin-bottom:8px">Link rapidi</div>
-          <div class="ov-ql" id="ov-ql"></div>
-        </div>
+      <div class="ovs" style="border-left:1px solid var(--bdr); display:flex; flex-direction:column; justify-content:center;">
+        <div class="ovsh">Portale di Accesso</div>
+        <a href="https://discord.gg/a3mvUnBV53" target="_blank" rel="noopener" style="display:block; padding:20px; background:linear-gradient(135deg, var(--bg4), var(--bg5)); border:1.5px solid var(--gold); color:var(--gold2); text-align:center; text-decoration:none; font-family:'Cinzel'; font-size:11px; font-weight:700; letter-spacing:2px; box-shadow:var(--glow); transition:0.3s; border-radius:2px;">ENTRA NEL DISCORD</a>
+        <p style="color:var(--text2); font-size:14px; font-style:italic; line-height:1.7; margin-top:30px; text-align:center; padding:0 10px;">
+          "Siediti accanto al fuoco e racconta la tua storia. La locanda di Arcamis non dorme mai."
+        </p>
       </div>
     </div>
   </div>
@@ -821,33 +811,10 @@ async function gp(id,label,icon){
    OVERLAY + DISCORD LIVE
 ══════════════════════════════ */
 var _ovOpen=false;
-async function openOv(){
+function openOv(){
   _ovOpen=true;
   var ov=document.getElementById('overlay');
   ov.classList.remove('ovclose');ov.classList.add('ovopen');ov.style.display='block';
-  // fetch discord members
-  var list=document.getElementById('roster-list');
-  var cnt=document.getElementById('avv-count');
-  list.innerHTML='<div class="roster-empty"><span>In ascolto dei cancelli…</span></div>';
-  try{
-    var res=await fetch('https://discord.com/api/guilds/'+GUILD+'/widget.json');
-    var data=await res.json();
-    if(data.members&&data.members.length){
-      cnt.textContent='('+data.presence_count+' online)';
-      list.innerHTML=data.members.map(function(u){
-        return'<div class="roster-member">'
-          +'<img class="roster-avatar" src="'+u.avatar_url+'" alt="" onerror="this.style.display=\'none\'">'
-          +'<div><div class="roster-name">'+u.username+'</div>'
-          +(u.game?'<div class="roster-game">🎮 '+u.game.name+'</div>':'')
-          +'</div></div>';
-      }).join('');
-    }else{
-      cnt.textContent='';
-      list.innerHTML='<div class="roster-empty"><span>Nessun avventuriero online.</span></div>';
-    }
-  }catch(e){
-    list.innerHTML='<div class="roster-empty"><span>Widget Discord non disponibile.</span></div>';
-  }
 }
 function closeOv(){
   if(!_ovOpen)return;_ovOpen=false;
