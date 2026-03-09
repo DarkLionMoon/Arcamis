@@ -1,23 +1,64 @@
-module.exports = async function(req, res) {
-  try {
-    var token = process.env.NOTION_TOKEN;
-    if (!token) {
-      return res.status(500).json({ error: 'NOTION_TOKEN mancante' });
+const NOTION_VERSION = '2022-06-28';
+
+async function notionFetch(path, token) {
+  var res = await fetch('https://api.notion.com/v1' + path, {
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Notion-Version': NOTION_VERSION,
+    },
+  });
+  if (!res.ok) {
+    var err = await res.json().catch(function() { return {}; });
+    throw new Error(err.message || ('Notion API error ' + res.status));
+  }
+  return res.json();
+}
+
+async function fetchAllBlocks(blockId, token, depth) {
+  if (!depth) depth = 0;
+  if (depth > 4) return [];
+  var blocks = [];
+  var cursor;
+
+  do {
+    var qs = cursor ? ('?page_size=100&start_cursor=' + cursor) : '?page_size=100';
+    var data = await notionFetch('/blocks/' + blockId + '/children' + qs, token);
+    blocks = blocks.concat(data.results || []);
+    cursor = data.has_more ? data.next_cursor : undefined;
+  } while (cursor);
+
+  for (var i = 0; i < blocks.length; i++) {
+    var block = blocks[i];
+    if (block.has_children && block.type !== 'child_page' && block.type !== 'child_database') {
+      block.children = await fetchAllBlocks(block.id, token, depth + 1);
     }
+  }
 
-    var pageId = req.query.pageId || '2f00274fdc1c8065a11ff45192aa5dcb';
+  return blocks;
+}
 
-    var response = await fetch('https://api.notion.com/v1/pages/' + pageId, {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Notion-Version': '2022-06-28'
-      }
-    });
+module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
 
-    var data = await response.json();
-    return res.status(200).json(data);
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-  } catch(e) {
-    return res.status(500).json({ error: e.message, stack: e.stack });
+  var token = process.env.NOTION_TOKEN;
+  if (!token) return res.status(500).json({ error: 'NOTION_TOKEN non configurato' });
+
+  var pageId = req.query.pageId;
+  if (!pageId) return res.status(400).json({ error: 'pageId mancante' });
+
+  try {
+    var results = await Promise.all([
+      notionFetch('/pages/' + pageId, token),
+      fetchAllBlocks(pageId, token, 0),
+    ]);
+    return res.status(200).json({ page: results[0], blocks: results[1] });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
   }
 };
