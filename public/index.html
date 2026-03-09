@@ -373,7 +373,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 @keyframes ovout{from{opacity:1}to{opacity:0}}
 #overlay.ovopen{display:block;animation:ovin .18s ease forwards}
 #overlay.ovclose{display:block;animation:ovout .16s ease forwards}
-#ovpanel{
+#ovpanel,#ovp{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   width:min(860px,95vw);max-height:90vh;
   background:rgba(8,10,16,.97);border:1px solid var(--bdr2);
@@ -381,7 +381,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
   display:flex;flex-direction:column;overflow:hidden;
 }
 @keyframes pnlin{from{opacity:0;transform:translate(-50%,-48%) scale(.97)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-#overlay.ovopen #ovpanel{animation:pnlin .22s cubic-bezier(.2,.8,.3,1) forwards}
+#overlay.ovopen #ovpanel,#overlay.ovopen #ovp{animation:pnlin .22s cubic-bezier(.2,.8,.3,1) forwards}
 #ovtop{
   display:flex;align-items:center;justify-content:space-between;
   padding:13px 20px;border-bottom:1px solid var(--bdr2);background:rgba(0,0,0,.4);flex-shrink:0;
@@ -458,7 +458,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
         oninput="hsearch(this.value)" onblur="setTimeout(csearch,200)"/>
       <div id="sr"></div>
     </div>
-    <div id="ovbtn" onclick="openOv()">Menu<span class="kbd">⇧Tab</span></div>
+    <div id="ovbtn" onclick="ovo()">Menu<span class="kbd">⇧Tab</span></div>
     <a href="https://discord.gg/a3mvUnBV53" target="_blank" rel="noopener" id="dcbtn">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
       Discord
@@ -810,22 +810,37 @@ async function gp(id,label,icon){
 /* ══════════════════════════════
    OVERLAY + DISCORD LIVE
 ══════════════════════════════ */
-var _ovOpen=false;
-function openOv(){
-  _ovOpen=true;
-  var ov=document.getElementById('overlay');
-  ov.classList.remove('ovclose');ov.classList.add('ovopen');ov.style.display='block';
+async function aggiornaLocanda() {
+  var guildId='1348723468157456425';
+  var list=document.getElementById('roster-list');
+  var count=document.getElementById('avv-count');
+  try{
+    var res=await fetch('https://discord.com/api/guilds/'+guildId+'/widget.json');
+    var data=await res.json();
+    if(data.members){
+      count.innerText='['+data.presence_count+' presenti]';
+      var html='';
+      data.members.forEach(function(user){
+        html+='<div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid rgba(200,155,60,0.08);transition:background .2s;">'
+          +'<img src="'+user.avatar_url+'" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--gold);padding:1px;background:var(--bg2);">'
+          +'<div style="flex:1">'
+          +'<div style="font-family:\'Cinzel\';font-size:13px;color:var(--parch);font-weight:600;">'+user.username+'</div>'
+          +'<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:5px;">'
+          +'<span style="width:6px;height:6px;background:#6aa020;border-radius:50%;box-shadow:0 0 6px #6aa020;"></span> Online'
+          +'</div></div></div>';
+      });
+      list.innerHTML=html||'<div style="text-align:center;color:var(--text3);padding:40px;">La locanda è attualmente vuota.</div>';
+    }
+  }catch(e){
+    list.innerHTML='<div style="text-align:center;color:var(--text3);padding:40px;">Errore magico nella connessione.</div>';
+  }
 }
-function closeOv(){
-  if(!_ovOpen)return;_ovOpen=false;
-  var ov=document.getElementById('overlay');
-  ov.classList.remove('ovopen');ov.classList.add('ovclose');
-  setTimeout(function(){ov.style.display='none';ov.classList.remove('ovclose')},160);
-}
-function hOvClick(e){if(e.target===document.getElementById('overlay'))closeOv()}
+function ovo(){document.getElementById('overlay').style.display='block';aggiornaLocanda();}
+function cv(){document.getElementById('overlay').style.display='none';}
 document.addEventListener('keydown',function(e){
-  if(e.shiftKey&&e.key==='Tab'){e.preventDefault();_ovOpen?closeOv():openOv()}
-  if(e.key==='Escape'&&_ovOpen)closeOv();
+  if(e.shiftKey&&e.key==='Tab'){e.preventDefault();
+    document.getElementById('overlay').style.display==='block'?cv():ovo();}
+  if(e.key==='Escape')cv();
 });
 </script>
 </body>
