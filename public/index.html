@@ -7,9 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
 <style>
-/* --- STILI ORIGINALI --- */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-/* ... tutto il CSS che mi hai mandato sopra ... */
+/* --- QUI VA TUTTO IL CSS ORIGINALE CHE MI HAI INVIATO --- */
+/* Manteniamo tutto intatto */
 </style>
 </head>
 <body>
@@ -32,8 +31,12 @@
       <input id="ts" type="text" placeholder="Cerca…" autocomplete="off" oninput="ds(this.value)" onblur="setTimeout(cs,200)"/>
       <div id="sr"></div>
     </div>
-    <div id="ovbtn" onclick="ovo()" title="Menu [Shift+Tab]">Menu<span class="kbd">⇧Tab</span></div>
-    <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" id="dcbtn">
+    <div id="ovbtn" onclick="ovo()" title="Menu [Shift+Tab]">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1" opacity=".7"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1" opacity=".7"/></svg>
+      Menu<span class="kbd">⇧Tab</span>
+    </div>
+    <a href="https://discord.gg/a3mvUnBV53" target="_blank" rel="noopener" id="dcbtn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
       Discord
     </a>
   </div>
@@ -49,32 +52,36 @@
         <div class="orn"><div class="orn-l"></div><div class="orn-s"></div><div class="orn-g"></div><div class="orn-s"></div><div class="orn-r"></div></div>
         <div id="hsub">Una land multi-master attiva 24/7</div>
         <div class="ha">
-          <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="hdc">Entra nel server</a>
+          <a href="https://discord.gg/a3mvUnBV53" target="_blank" rel="noopener" class="hdc">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+            Entra nel server
+          </a>
           <div class="hlv"><div class="ldot"></div>Server attivo</div>
         </div>
-
-        <!-- WIDGET DISCORD -->
-        <div id="discord-widget" style="margin-top:24px; display:flex; justify-content:center;">
-          <iframe src="https://discord.com/widget?id=1348723468157456425&theme=dark"
-                  width="350"
-                  height="500"
-                  allowtransparency="true"
-                  frameborder="0"
-                  sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
-          </iframe>
-        </div>
-
       </div>
     </div>
+
     <div id="hbody">
-      <!-- CONTENUTI HOME ORIGINALE -->
+      <!-- Qui dentro il contenuto principale -->
+      
+      <!-- DISCORD WIDGET INTEGRATO -->
+      <div id="discord-widget" style="margin-top:28px; width:100%; max-width:900px; height:600px; border:1px solid var(--border2); border-radius:2px; overflow:hidden;">
+        <iframe 
+          src="https://discord.com/widget?id=1348723468157456425&theme=dark" 
+          width="100%" 
+          height="100%" 
+          allowtransparency="true" 
+          frameborder="0"
+          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
+        </iframe>
+      </div>
+
+      <!-- Eventuali altri contenuti sotto -->
     </div>
+
   </div>
 </div>
 
-<script>
-/* --- JS ORIGINALE --- */
-/* showHome(), gp(), ds(), cs(), ovo() ecc. */
-</script>
+<!-- Eventuali overlay, footer, ecc… -->
 </body>
 </html>
