@@ -122,32 +122,30 @@ nav#tnav{display:flex;align-items:stretch}
 }
 #ctrack{display:flex;width:300%;height:100%;transition:transform .72s cubic-bezier(.4,0,.2,1)}
 .slide{
-  width:33.3333%;height:100%;position:relative;
+  width:33.3333%;flex-shrink:0;height:100%;position:relative;
   display:flex;align-items:flex-end;padding:64px 80px;overflow:hidden;
+  background-size:cover;background-position:center;
 }
-/* Ken Burns — each slide zooms slowly while visible */
-.slide-bg{
-  position:absolute;inset:-8%;background-size:cover;background-position:center;
-  will-change:transform;transition:transform 8s ease;
-  transform:scale(1);
+/* Ken Burns — animazione CSS che parte quando la slide diventa active */
+@keyframes kbz{from{transform:scale(1) translate(0,0)}to{transform:scale(1.08) translate(-1%,-1%)}}
+.slide::before{
+  content:'';position:absolute;inset:-5%;z-index:0;
+  background:inherit;background-size:cover;background-position:center;
 }
-.slide.active .slide-bg{transform:scale(1.06)}
+.slide.active::before{animation:kbz 9s ease-out forwards}
 /* vignette */
 .slide::after{
   content:'';position:absolute;inset:0;
   background:linear-gradient(0deg,rgba(6,7,10,1) 0%,rgba(6,7,10,.5) 30%,rgba(6,7,10,.15) 65%,transparent 100%);
-  z-index:2;
-}
-/* left atmospheric haze */
-.slide::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(200,155,60,.04) 0%,transparent 50%);z-index:2;
+  z-index:1;
 }
 .scnt{
   position:relative;z-index:3;max-width:680px;
-  opacity:0;transform:translateY(22px);transition:opacity .55s .32s,transform .55s .32s;
+  opacity:0;transform:translateY(22px);
+  transition:opacity .55s .32s, transform .55s .32s;
 }
 .slide.active .scnt{opacity:1;transform:translateY(0)}
+.slide.was-active .scnt{opacity:0;transform:translateY(-10px);transition:opacity .25s, transform .25s}
 .stag{
   font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;
   color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:10px;
@@ -480,7 +478,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
       <div id="ctrack">
         <!-- SLIDE 1 -->
         <div class="slide active">
-          <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1400&q=80')"></div>
+          <div class="slide-bg" style="background:linear-gradient(135deg,#06080c 0%,#0e1420 40%,#1a1208 70%,#0a0c10 100%)"></div>
           <div class="scnt">
             <div class="stag">Server Online</div>
             <div class="stit">BENVENUTO SU<br>ARCAMIS</div>
@@ -496,7 +494,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
         </div>
         <!-- SLIDE 2 -->
         <div class="slide">
-          <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1564415315949-7a0c4c73aab4?w=1400&q=80')"></div>
+          <div class="slide-bg" style="background:linear-gradient(135deg,#0a0614 0%,#160820 40%,#0e0418 70%,#080610 100%)"></div>
           <div class="scnt">
             <div class="stag">Pantheon</div>
             <div class="stit">LE DIVINITÀ<br>DI ARCAMIS</div>
@@ -506,7 +504,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
         </div>
         <!-- SLIDE 3 -->
         <div class="slide">
-          <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1512632578888-169bbbc64f33?w=1400&q=80')"></div>
+          <div class="slide-bg" style="background:linear-gradient(135deg,#0e0a04 0%,#1c1408 40%,#140c04 70%,#0a0800 100%)"></div>
           <div class="scnt">
             <div class="stag">Personaggio</div>
             <div class="stit">CREA IL TUO<br>EROE</div>
@@ -660,10 +658,15 @@ var slideIdx=0;var slideTimer;
 function cslide(n){
   var slides=document.querySelectorAll('.slide');
   var dots=document.querySelectorAll('.cdot');
+  var prev=slideIdx;
   slideIdx=((n%slides.length)+slides.length)%slides.length;
-  document.getElementById('ctrack').style.transform='translateX(-'+slideIdx*(100/slides.length)+'%)';
-  slides.forEach(function(s,i){s.classList.toggle('active',i===slideIdx)});
+  if(prev===slideIdx)return;
+  slides[prev].classList.add('was-active');
+  slides[prev].classList.remove('active');
+  setTimeout(function(){slides[prev].classList.remove('was-active')},300);
+  slides[slideIdx].classList.add('active');
   dots.forEach(function(d,i){d.classList.toggle('ca',i===slideIdx)});
+  document.getElementById('ctrack').style.transform='translateX(-'+slideIdx*(100/slides.length)+'%)';
   clearInterval(slideTimer);
   slideTimer=setInterval(function(){cslide(slideIdx+1)},7000);
 }
