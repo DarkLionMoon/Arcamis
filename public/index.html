@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
 <style>
-/* --- IL TUO CSS ORIGINALE --- */
+/* --- BASE & VARIABILI --- */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#080a0e;--bg2:#0c0f15;--bg3:#10141c;--bg4:#161c26;--bg5:#1c2430;--panel:#0e121a;
@@ -46,21 +46,21 @@ body::before{
 #tlogo{display:flex;align-items:center;padding:0 20px;gap:12px;cursor:pointer;user-select:none;flex-shrink:0;transition:background .2s}
 #tlogo:hover{background:rgba(200,155,60,.04)}
 #liw{width:30px;height:30px;flex-shrink:0;border-radius:50%;overflow:hidden;border:1.5px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(200,155,60,.2)}
-#li{width:100%;height:100%;object-fit:cover;display:none}
-#lf{font-size:14px}
+#li{width:100%;height:100%;object-fit:cover;display:block} /* Immagine Logo Visibile */
+#lf{display:none} /* Nascondo l'icona fallback se c'è l'immagine */
 #tlt{font-family:'Cinzel',serif;font-size:14px;font-weight:900;letter-spacing:.22em;color:var(--gold3);text-shadow:0 0 16px rgba(200,155,60,.3)}
+
 nav#tnav{display:flex;align-items:stretch}
 .tn{display:flex;align-items:center;padding:0 14px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);cursor:pointer;user-select:none;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
 .tn:hover{color:var(--parchment);background:rgba(200,155,60,.04)}
 .tn.ta{color:var(--gold2);border-bottom-color:var(--gold);background:rgba(200,155,60,.06)}
+
 #tr{margin-left:auto;display:flex;align-items:center;padding:0 16px;gap:9px}
 #ovbtn{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--border2);color:var(--text2);font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.08em;padding:6px 12px;cursor:pointer;border-radius:2px;transition:all .15s;user-select:none;white-space:nowrap}
 #ovbtn:hover{background:var(--bg4);color:var(--gold2);border-color:var(--gold);box-shadow:var(--glow)}
 .kbd{display:inline-flex;align-items:center;background:rgba(0,0,0,.4);border:1px solid var(--border2);color:var(--text3);font-size:9px;padding:1px 5px;border-radius:2px;margin-left:4px}
-#dcbtn{display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#3c3fa8,#5865F2);color:#fff;font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;padding:7px 14px;text-decoration:none;border-radius:2px;border:1px solid rgba(255,255,255,.12);transition:all .15s;white-space:nowrap}
-#dcbtn:hover{background:linear-gradient(135deg,#3238a0,#4752c4);transform:translateY(-1px);box-shadow:0 4px 14px rgba(88,101,242,.35)}
 
-/* MAIN */
+/* MAIN & HERO */
 #main{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;z-index:1}
 #hhero{height:340px;position:relative;overflow:hidden;background:linear-gradient(160deg,#04050c 0%,#0e1420 45%,#070a10 100%);display:flex;align-items:center;justify-content:center}
 #hhero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 120% at 50% -5%,rgba(200,155,60,.07),transparent 60%)}
@@ -72,35 +72,40 @@ nav#tnav{display:flex;align-items:stretch}
 .ldot{width:7px;height:7px;border-radius:50%;background:#6aa020;box-shadow:0 0 8px #6aa020;animation:lp 2s infinite}
 @keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* HOME BODY & CARDS */
+/* CARDS GRID */
 #hbody{padding:28px 40px 48px;max-width:1200px;margin:0 auto;width:100%}
 .sttl{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2)}
 .sgem{width:6px;height:6px;background:var(--gold);transform:rotate(45deg);flex-shrink:0}
 .cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;margin-bottom:36px}
 .sc{background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:all .22s;position:relative;overflow:hidden;border-radius:2px}
 .sc:hover{border-color:var(--gold);box-shadow:var(--glow);transform:translateY(-3px)}
-.ct{height:96px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative}
+.ct{height:96px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
 .ci{padding:9px 12px 13px}
 .ctt{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--parchment);letter-spacing:.04em;margin-bottom:2px}
 .csb{font-size:12px;color:var(--text3);font-style:italic}
 .stag{font-family:'Cinzel',serif;font-size:9px;font-weight:700;padding:2px 6px;border-radius:2px;background:rgba(200,155,60,.07);color:var(--gold2);border:1px solid rgba(200,155,60,.18)}
 
-/* OVERLAY */
-#overlay{position:fixed;inset:0;z-index:1000;display:none;background:rgba(4,5,10,.65);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-#ovp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(820px,96vw);background:rgba(10,13,20,.97);border:1px solid var(--border2);border-radius:3px;box-shadow:0 24px 80px rgba(0,0,0,.9),var(--glow);overflow:hidden;display:flex;flex-direction:column}
-#ovbody{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+/* OVERLAY & WIDGET */
+#overlay{position:fixed;inset:0;z-index:1000;display:none;background:rgba(4,5,10,.65);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);animation:ovin .2s ease forwards}
+@keyframes ovin{from{opacity:0}to{opacity:1}}
+#ovp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(820px,96vw);max-height:88vh;background:rgba(10,13,20,.97);border:1px solid var(--border2);border-radius:3px;box-shadow:0 24px 80px rgba(0,0,0,.9),var(--glow);overflow:hidden;display:flex;flex-direction:column}
+#ovbody{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);flex:1;min-height:0;overflow:auto}
 .ovs{background:var(--panel);padding:20px}
+.ovsh{font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
+#ovdw{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:2px;overflow:hidden;height:350px} /* Altezza per Discord */
+
+@media(max-width:720px){#ovbody{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
 <div id="topbar">
   <div id="tlogo" onclick="location.reload()">
-    <div id="liw"><span id="lf">⚔</span></div>
+    <div id="liw"><img id="li" src="image_e87635.jpg" alt="Logo"/></div>
     <span id="tlt">ARCAMIS</span>
   </div>
   <nav id="tnav">
-    <div class="tn ta" onclick="location.reload()">Home</div>
+    <div class="tn ta">Home</div>
     <div class="tn">Gameplay</div>
     <div class="tn">Regole</div>
     <div class="tn">Classi</div>
@@ -108,7 +113,7 @@ nav#tnav{display:flex;align-items:stretch}
   </nav>
   <div id="tr">
     <div id="ovbtn" onclick="ovo()">Menu<span class="kbd">⇧Tab</span></div>
-    <a href="https://discord.gg/a3mvUnBV53" target="_blank" id="dcbtn">Discord</a>
+    <a href="https://discord.gg/a3mvUnBV53" target="_blank" style="text-decoration:none" id="dcbtn">Discord</a>
   </div>
 </div>
 
@@ -133,8 +138,9 @@ nav#tnav{display:flex;align-items:stretch}
 
       <div class="sttl"><div class="sgem"></div>Personaggio</div>
       <div class="cg">
-        <div class="sc"><div class="ct">🌟</div><div class="ci"><div class="ctt">Inizio</div><div class="csb">Creazione PG</div></div></div>
-        <div class="sc"><div class="ct">🎭</div><div class="ci"><div class="ctt">Classi</div><div class="csb">Archetipi</div></div></div>
+        <div class="sc"><div class="ct">🌟</div><div class="ci"><div class="ctt">Come si inizia</div><div class="csb">Creazione PG</div></div></div>
+        <div class="sc"><div class="ct">🎭</div><div class="ci"><div class="ctt">Classi</div><div class="csb">Classi e sottoclassi</div></div></div>
+        <div class="sc"><div class="ct">📈</div><div class="ci"><div class="ctt">Progressione</div><div class="csb">Andando avanti</div></div></div>
       </div>
 
       <div class="sttl"><div class="sgem"></div>Lavori</div>
@@ -145,48 +151,48 @@ nav#tnav{display:flex;align-items:stretch}
         <div class="sc"><div class="ct">⚕️</div><div class="ci"><div class="ctt">Ospedale</div><div class="stag">WIS</div></div></div>
         <div class="sc"><div class="ct">🧵</div><div class="ci"><div class="ctt">Sartoria</div><div class="stag">DEX</div></div></div>
       </div>
-
-      <div class="sttl"><div class="sgem"></div>Locanda Online</div>
-      <div id="discord-widget" style="width:100%; height:500px; margin-top:16px; background:var(--bg3); border:1px solid var(--border); border-radius:2px; overflow:hidden;">
-        <iframe 
-          src="https://discord.com/widget?id=1348723468157456425&theme=dark" 
-          style="width:100%; height:100%; border:0;" 
-          allowtransparency="true" 
-          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
-        </iframe>
-      </div>
     </div>
   </div>
 </div>
 
 <div id="overlay">
   <div id="ovp">
-    <div style="display:flex; justify-content:space-between; padding:15px 20px; border-bottom:1px solid var(--border2); background:#000;">
-      <div style="font-family:'Cinzel'; font-size:12px; color:var(--gold2);">MENU RAPIDO</div>
-      <div onclick="cv()" style="cursor:pointer; color:var(--text3);">✕</div>
+    <div id="ovtb">
+      <div id="ovttl">MENU RAPIDO</div>
+      <div id="ovcl" onclick="cv()">✕</div>
     </div>
     <div id="ovbody">
       <div class="ovs">
-        <p style="font-size:13px; color:var(--parchment);">Benvenuto su Arcamis. Esplora le land o unisciti alla locanda su Discord.</p>
+        <div class="ovsh">Locanda Online</div>
+        <div id="ovdw">
+          <iframe 
+            src="https://discord.com/widget?id=1348723468157456425&theme=dark" 
+            style="width:100%; height:100%; border:0;" 
+            allowtransparency="true" 
+            sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
+          </iframe>
+        </div>
       </div>
       <div class="ovs" style="border-left:1px solid var(--border);">
-        <a href="https://discord.gg/a3mvUnBV53" target="_blank" style="display:block; padding:12px; background:var(--bg4); border:1px solid var(--gold); color:var(--gold); text-align:center; text-decoration:none; font-family:'Cinzel'; font-size:11px;">ENTRA NEL SERVER</a>
+        <div class="ovsh">Collegamenti</div>
+        <a href="https://discord.gg/a3mvUnBV53" target="_blank" style="display:block; padding:12px; background:var(--bg4); border:1px solid var(--gold); color:var(--gold); text-align:center; text-decoration:none; font-family:'Cinzel'; font-size:11px; letter-spacing:1px;">ENTRA NEL DISCORD</a>
+        <p style="margin-top:20px; font-size:14px; color:var(--text2); font-style:italic; line-height:1.6;">
+          Usa il menu per navigare rapidamente tra le sezioni della land o per controllare chi è attivo in locanda.
+        </p>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// Funzioni Base
 function ovo() { document.getElementById('overlay').style.display = 'block'; }
 function cv() { document.getElementById('overlay').style.display = 'none'; }
 
-// Shortcut Tastiera (Shift+Tab)
 document.addEventListener('keydown', e => {
   if(e.shiftKey && e.key === 'Tab') { e.preventDefault(); ovo(); }
+  if(e.key === 'Escape') cv();
 });
 
-// Chiudi overlay con clic fuori
 window.onclick = e => {
   if(e.target == document.getElementById('overlay')) cv();
 };
