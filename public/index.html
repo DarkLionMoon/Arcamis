@@ -1,141 +1,137 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARCAMIS</title>
-  <style>
-    :root {
-      --gold: #f1c40f;
-      --bg: #0a0d14;
-      --text: #ffffff;
-    }
-    body {
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    /* TOPBAR */
-    #topbar {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:10px 20px;
-      background:#11141d;
-      position:fixed;
-      top:0;
-      width:100%;
-      z-index:9999;
-    }
-    #tlogo {
-      display:flex;
-      align-items:center;
-      cursor:pointer;
-    }
-    #liw { display:flex; align-items:center; }
-    #li { height:24px; width:24px; }
-    #lf { margin-left:5px; font-weight:bold; }
-    #tlt { margin-left:10px; font-size:1.2em; font-weight:bold; }
-    #tnav { display:flex; gap:15px; }
-    .tn { cursor:pointer; padding:5px 10px; border-radius:4px; transition:0.2s; }
-    .tn:hover { background:var(--gold); color:#000; }
-    #tr { display:flex; align-items:center; gap:10px; }
-    #sw { position:relative; }
-    #ts { padding:5px; border-radius:4px; border:none; }
-    #ovbtn {
-      display:flex;
-      align-items:center;
-      gap:5px;
-      padding:5px 10px;
-      background:var(--gold);
-      color:#000;
-      border-radius:4px;
-      cursor:pointer;
-      transition:0.2s;
-    }
-    #ovbtn:hover { background:#d4ac0d; }
-    /* WIDGET DISCORD */
-    #discord-widget {
-      display:none;
-      position:fixed;
-      top:56px;
-      right:20px;
-      width:350px;
-      height:500px;
-      z-index:10000;
-      border:2px solid var(--gold);
-      border-radius:4px;
-      overflow:hidden;
-      box-shadow:0 12px 36px rgba(0,0,0,0.7);
-      background:#0a0d14;
-      transition:all 0.3s ease;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Il tuo Sito</title>
+<style>
+  :root { --gold: #ffcc00; --gold-dark: #e6b800; --bg-dark: #0f0f1a; }
+  body { margin:0; font-family: Arial, sans-serif; background:var(--bg-dark); color:#fff; }
+
+  /* Header */
+  header { display:flex; justify-content:flex-end; align-items:center; padding:10px 20px; background:#11141d; position:fixed; top:0; width:100%; z-index:100; box-shadow:0 2px 6px #000; }
+  #tr { display:flex; gap:10px; align-items:center; }
+  #ovbtn, .invite-btn { cursor:pointer; padding:8px 14px; background:var(--gold); color:#000; border-radius:6px; text-decoration:none; font-weight:bold; transition:0.3s; }
+  #ovbtn:hover, .invite-btn:hover { background:var(--gold-dark); transform: scale(1.05); }
+
+  /* Animazioni pulsante */
+  @keyframes shakeScaleColor {
+    0%,100% { transform: translateX(0) scale(1); background: var(--gold); }
+    20% { transform: translateX(-3px) scale(1.05); background: var(--gold-dark); }
+    40% { transform: translateX(3px) scale(1.05); background: var(--gold-dark); }
+    60% { transform: translateX(-3px) scale(1.05); background: var(--gold-dark); }
+    80% { transform: translateX(3px) scale(1.05); background: var(--gold-dark); }
+  }
+
+  @keyframes pulseGold {
+    0%,100% { box-shadow: 0 0 0px var(--gold); }
+    50% { box-shadow: 0 0 15px var(--gold); }
+  }
+
+  #ovbtn.animate { animation: shakeScaleColor 0.6s ease infinite; }
+  #ovbtn.pulse { animation: pulseGold 1s ease infinite; }
+
+  /* Widget scorrevole */
+  #widget-container { 
+    position:fixed; top:60px; right:-370px; /* nascosto inizialmente */
+    width:350px; height:500px; border:2px solid var(--gold); border-radius:8px; overflow:hidden; 
+    box-shadow:0 0 20px var(--gold); transition:right 0.4s ease, box-shadow 0.3s ease; z-index:1000;
+  }
+  #widget-container.active { right:20px; box-shadow:0 0 30px var(--gold-dark); }
+  iframe { display:block; width:100%; height:100%; }
+
+  /* Overlay */
+  #overlay { 
+    position:fixed; top:0; left:0; width:100%; height:100%; display:none; z-index:900; 
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(2px);
+  }
+
+  /* Main content */
+  main { padding:100px 20px 20px 20px; }
+  section#galleria { margin-top:40px; }
+</style>
 </head>
 <body>
 
-  <!-- TOPBAR -->
-  <div id="topbar">
-    <div id="tlogo" onclick="showHome()">
-      <div id="liw"><img id="li" alt=""/><span id="lf">⚔</span></div>
-      <span id="tlt">ARCAMIS</span>
-    </div>
-    <nav id="tnav">
-      <div class="tn" data-v="home" onclick="showHome()">Home</div>
-      <div class="tn" data-v="gameplay" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')">Gameplay</div>
-      <div class="tn" data-v="regole" onclick="gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')">Regole</div>
-      <div class="tn" data-v="classi" onclick="gp('30a0274fdc1c804ab56bd3943add26d2','Classi','🎭')">Classi</div>
-      <div class="tn" data-v="pantheon" onclick="gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')">Pantheon</div>
-      <div class="tn" data-v="changelog" onclick="gp('3000274fdc1c8033a214c44a1aa7f01f','Changelog','📝')">Changelog</div>
-    </nav>
-    <div id="tr">
-      <div id="sw">
-        <span id="si">⌕</span>
-        <input id="ts" type="text" placeholder="Cerca…" autocomplete="off" oninput="ds(this.value)" onblur="setTimeout(cs,200)"/>
-        <div id="sr"></div>
-      </div>
-      <!-- Pulsante Discord con widget + invito -->
-      <div id="ovbtn" title="Apri widget Discord">
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-          <rect x="1" y="1" width="6" height="6" rx="1" opacity=".7"/>
-          <rect x="9" y="1" width="6" height="6" rx="1"/>
-          <rect x="1" y="9" width="6" height="6" rx="1"/>
-          <rect x="9" y="9" width="6" height="6" rx="1" opacity=".7"/>
-        </svg>
-        <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" style="color:#000; text-decoration:none;">Discord</a>
-      </div>
-    </div>
+<header>
+  <div id="tr">
+    <!-- Pulsante apri widget -->
+    <div id="ovbtn" title="Apri widget Discord">Discord</div>
+    <!-- Pulsante invito -->
+    <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" class="invite-btn">Entra nel server</a>
   </div>
+</header>
 
-  <!-- WIDGET DISCORD -->
-  <div id="discord-widget">
-    <iframe src="https://discord.com/widget?id=1348723468157456425&theme=dark" width="100%" height="100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-  </div>
+<!-- Overlay invisibile -->
+<div id="overlay"></div>
 
-  <!-- CONTENUTO PRINCIPALE -->
-  <main style="padding-top:80px;">
-    <h1>Benvenuti ad Arcamis</h1>
-    <p>Qui va tutto il contenuto del sito...</p>
-  </main>
+<!-- Container widget scorrevole -->
+<div id="widget-container">
+  <iframe src="https://discord.com/widget?id=1348723468157456425&theme=dark" 
+          allowtransparency="true" frameborder="0" 
+          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
+  </iframe>
+</div>
 
-  <script>
-    const ovbtn = document.getElementById('ovbtn');
-    const widget = document.getElementById('discord-widget');
+<main>
+  <h1>Benvenuto sul nostro sito!</h1>
+  <p>Qui puoi aggiungere tutto il contenuto originale: testo, immagini, gallerie, ecc.</p>
+  <section id="galleria">
+    <h2>Galleria</h2>
+    <p>Le immagini della galleria appariranno qui.</p>
+  </section>
+</main>
 
-    // Click sul pulsante: mostra/nascondi widget
-    ovbtn.addEventListener('click', () => {
-      if(widget.style.display === 'none' || widget.style.display === '') {
-        widget.style.display = 'block';
-      } else {
-        widget.style.display = 'none';
-      }
-    });
+<script>
+  const ovbtn = document.getElementById('ovbtn');
+  const widget = document.getElementById('widget-container');
+  const overlay = document.getElementById('overlay');
 
-    function showHome() { console.log('Torna home'); }
-    function gp(id,title,emoji) { console.log(id,title,emoji); }
-    function ds(val) { console.log('Cerca:',val); }
-    function cs() { console.log('Chiudi ricerca'); }
-  </script>
+  // Funzioni animazione pulsante
+  function startAnimation() {
+    if(!widget.classList.contains('active')){
+      ovbtn.classList.add('animate');
+    }
+  }
+  function stopAnimation() { ovbtn.classList.remove('animate'); }
+
+  // Animazione pulsante lampeggio gold dopo 10s se widget chiuso
+  function startPulse() {
+    if(!widget.classList.contains('active')){
+      ovbtn.classList.add('pulse');
+    }
+  }
+  function stopPulse() { ovbtn.classList.remove('pulse'); }
+
+  // Ripete shake ogni 6 secondi
+  setInterval(startAnimation, 6000);
+  // Timer pulse dopo 10 secondi di inattività
+  let pulseTimer = setTimeout(startPulse, 10000);
+
+  ovbtn.addEventListener('click', () => {
+    const isActive = widget.classList.contains('active');
+    if(!isActive){
+      widget.classList.add('active');
+      overlay.style.display = 'block';
+      stopAnimation();
+      stopPulse();
+      clearTimeout(pulseTimer);
+    } else {
+      widget.classList.remove('active');
+      overlay.style.display = 'none';
+      startAnimation();
+      pulseTimer = setTimeout(startPulse, 10000);
+    }
+  });
+
+  overlay.addEventListener('click', () => {
+    widget.classList.remove('active');
+    overlay.style.display = 'none';
+    startAnimation();
+    pulseTimer = setTimeout(startPulse, 10000);
+  });
+</script>
+
 </body>
 </html>
