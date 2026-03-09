@@ -46,8 +46,8 @@ body::before{
 #tlogo{display:flex;align-items:center;padding:0 20px;gap:12px;cursor:pointer;user-select:none;flex-shrink:0;transition:background .2s}
 #tlogo:hover{background:rgba(200,155,60,.04)}
 #liw{width:30px;height:30px;flex-shrink:0;border-radius:50%;overflow:hidden;border:1.5px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(200,155,60,.2)}
-#li{width:100%;height:100%;object-fit:cover;display:block}
-#lf{display:none}
+#li{width:100%;height:100%;object-fit:cover;display:block} 
+#lf{display:none} 
 #tlt{font-family:'Cinzel',serif;font-size:14px;font-weight:900;letter-spacing:.22em;color:var(--gold3);text-shadow:0 0 16px rgba(200,155,60,.3)}
 
 nav#tnav{display:flex;align-items:stretch}
@@ -60,17 +60,127 @@ nav#tnav{display:flex;align-items:stretch}
 #ovbtn:hover{background:var(--bg4);color:var(--gold2);border-color:var(--gold);box-shadow:var(--glow)}
 .kbd{display:inline-flex;align-items:center;background:rgba(0,0,0,.4);border:1px solid var(--border2);color:var(--text3);font-size:9px;padding:1px 5px;border-radius:2px;margin-left:4px}
 
-/* MAIN & HERO */
-#main{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;z-index:1}
-#hhero{height:340px;position:relative;overflow:hidden;background:linear-gradient(160deg,#04050c 0%,#0e1420 45%,#070a10 100%);display:flex;align-items:center;justify-content:center}
-#hhero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 120% at 50% -5%,rgba(200,155,60,.07),transparent 60%)}
-#hcont{position:relative;text-align:center;padding:0 30px}
-#httl{font-family:'Cinzel',serif;font-size:52px;font-weight:900;letter-spacing:.18em;background:linear-gradient(180deg,var(--gold4) 0%,var(--gold3) 35%,var(--gold) 65%,var(--copper) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;line-height:1}
-#hsub{font-size:17px;font-style:italic;color:var(--parchment);opacity:.6;margin-bottom:22px}
-.ha{display:flex;align-items:center;justify-content:center;gap:10px}
-.hlv{display:inline-flex;align-items:center;gap:7px;background:rgba(0,0,0,.4);border:1px solid var(--border2);color:var(--text2);font-family:'Cinzel',serif;font-size:9.5px;padding:9px 14px;border-radius:2px;letter-spacing:.08em}
-.ldot{width:7px;height:7px;border-radius:50%;background:#6aa020;box-shadow:0 0 8px #6aa020;animation:lp 2s infinite}
-@keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
+/* MAIN & HERO CAROUSEL STEAM STYLE */
+#carousel-wrapper {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  background: #05060a;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border2);
+}
+
+#carousel-container {
+  display: flex;
+  width: 300%;
+  height: 100%;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide {
+  width: 33.3333%;
+  height: 100%;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  padding: 60px 80px;
+}
+
+.slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(8,10,14,1) 0%, rgba(8,10,14,0.4) 40%, transparent 100%);
+  z-index: 1;
+}
+
+.slide-content {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.5s 0.3s;
+}
+
+.slide.active .slide-content {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slide-tag {
+  font-family: 'Cinzel';
+  color: var(--gold);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.slide-title {
+  font-family: 'Cinzel';
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 15px;
+  text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+}
+
+.slide-desc {
+  color: var(--parchment);
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 25px;
+  opacity: 0.8;
+}
+
+.c-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 50px;
+  height: 80px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(200,155,60,0.2);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  transition: 0.2s;
+}
+.c-nav:hover { background: rgba(200,155,60,0.1); border-color: var(--gold); }
+#c-prev { left: 0; border-radius: 0 4px 4px 0; }
+#c-next { right: 0; border-radius: 4px 0 0 4px; }
+
+.c-dots {
+  position: absolute;
+  bottom: 30px;
+  right: 60px;
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+.c-dot {
+  width: 45px;
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+  cursor: pointer;
+  transition: 0.3s;
+}
+.c-dot.active { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+
+@media (max-width: 768px) {
+  .slide { padding: 40px; }
+  .slide-title { font-size: 32px; }
+  #carousel-wrapper { height: 400px; }
+}
 
 /* CARDS GRID */
 #hbody{padding:28px 40px 48px;max-width:1200px;margin:0 auto;width:100%}
@@ -85,13 +195,15 @@ nav#tnav{display:flex;align-items:stretch}
 .csb{font-size:12px;color:var(--text3);font-style:italic}
 .stag{font-family:'Cinzel',serif;font-size:9px;font-weight:700;padding:2px 6px;border-radius:2px;background:rgba(200,155,60,.07);color:var(--gold2);border:1px solid rgba(200,155,60,.18)}
 
-/* OVERLAY & WIDGET DINAMICO */
+/* OVERLAY & WIDGET */
 #overlay{position:fixed;inset:0;z-index:1000;display:none;background:rgba(4,5,10,.65);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);animation:ovin .2s ease forwards}
 @keyframes ovin{from{opacity:0}to{opacity:1}}
 #ovp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(820px,96vw);max-height:88vh;background:rgba(10,13,20,.97);border:1px solid var(--border2);border-radius:3px;box-shadow:0 24px 80px rgba(0,0,0,.9),var(--glow);overflow:hidden;display:flex;flex-direction:column}
+#ovbody{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);flex:1;min-height:0;overflow:auto}
 .ovs{background:var(--panel);padding:20px}
 .ovsh{font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
 #ovdw{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:2px;overflow:hidden;height:350px}
+
 @media(max-width:720px){#ovbody{grid-template-columns:1fr}}
 </style>
 </head>
@@ -115,124 +227,54 @@ nav#tnav{display:flex;align-items:stretch}
   </div>
 </div>
 
+<!-- HERO CAROUSEL STEAM STYLE -->
+<div id="carousel-wrapper">
+  <div class="c-nav" id="c-prev" onclick="changeSlide(-1)">&#10094;</div>
+  <div class="c-nav" id="c-next" onclick="changeSlide(1)">&#10095;</div>
+  
+  <div id="carousel-container">
+    <div class="slide active" style="background-image: url('https://wallpaperaccess.com/full/1155011.jpg');">
+      <div class="slide-content">
+        <div class="slide-tag">Server Online</div>
+        <div class="slide-title">BENVENUTO SU ARCAMIS</div>
+        <p class="slide-desc">Unisciti a una comunità di sognatori e guerrieri in una terra dove ogni scelta plasma il destino del regno.</p>
+        <div class="hlv"><div class="ldot"></div>Gioca Ora</div>
+      </div>
+    </div>
+    
+    <div class="slide" style="background-image: url('https://wallpaperaccess.com/full/150893.jpg');">
+      <div class="slide-content">
+        <div class="slide-tag">Evento Attivo</div>
+        <div class="slide-title">L'ECLISSI D'ORO</div>
+        <p class="slide-desc">I templi del Pantheon hanno aperto i cancelli. Partecipa alla spedizione sacra questa settimana.</p>
+      </div>
+    </div>
+
+    <div class="slide" style="background-image: url('https://wallpaperaccess.com/full/222216.jpg');">
+      <div class="slide-content">
+        <div class="slide-tag">Aggiornamento</div>
+        <div class="slide-title">NUOVI ARCHETIPI</div>
+        <p class="slide-desc">Scopri le nuove sottoclassi per Maghi e Guerrieri. Il potere degli antichi è tornato.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="c-dots">
+    <div class="c-dot active" onclick="jumpToSlide(0)"></div>
+    <div class="c-dot" onclick="jumpToSlide(1)"></div>
+    <div class="c-dot" onclick="jumpToSlide(2)"></div>
+  </div>
+</div>
+
 <div id="main">
-  <div id="hv">
-    <div id="hhero">
-      <div id="hcont">
-        <div id="httl">ARCAMIS</div>
-        <div id="hsub">Una land multi-master attiva 24/7</div>
-        <div class="ha">
-          <div class="hlv"><div class="ldot"></div>Server attivo</div>
-        </div>
-      </div>
+  <div id="hbody">
+    <div class="sttl"><div class="sgem"></div>Regolamento</div>
+    <div class="cg">
+      <div class="sc"><div class="ct">⚔️</div><div class="ci"><div class="ctt">Gameplay</div><div class="csb">Regole di gioco</div></div></div>
+      <div class="sc"><div class="ct">📜</div><div class="ci"><div class="ctt">Regole</div><div class="csb">Codice di condotta</div></div></div>
     </div>
 
-    <div id="hbody">
-      <div class="sttl"><div class="sgem"></div>Regolamento</div>
-      <div class="cg">
-        <div class="sc"><div class="ct">⚔️</div><div class="ci"><div class="ctt">Gameplay</div><div class="csb">Regole di gioco</div></div></div>
-        <div class="sc"><div class="ct">📜</div><div class="ci"><div class="ctt">Regole</div><div class="csb">Codice di condotta</div></div></div>
-      </div>
-
-      <div class="sttl"><div class="sgem"></div>Personaggio</div>
-      <div class="cg">
-        <div class="sc"><div class="ct">🌟</div><div class="ci"><div class="ctt">Come si inizia</div><div class="csb">Creazione PG</div></div></div>
-        <div class="sc"><div class="ct">🎭</div><div class="ci"><div class="ctt">Classi</div><div class="csb">Classi e sottoclassi</div></div></div>
-        <div class="sc"><div class="ct">📈</div><div class="ci"><div class="ctt">Progressione</div><div class="csb">Andando avanti</div></div></div>
-      </div>
-
-      <div class="sttl"><div class="sgem"></div>Lavori</div>
-      <div class="cg">
-        <div class="sc"><div class="ct">📚</div><div class="ci"><div class="ctt">Biblioteca</div><div class="stag">INT</div></div></div>
-        <div class="sc"><div class="ct">🛡️</div><div class="ci"><div class="ctt">Caserma</div><div class="stag">STR</div></div></div>
-        <div class="sc"><div class="ct">🍺</div><div class="ci"><div class="ctt">Locanda</div><div class="stag">CHA</div></div></div>
-        <div class="sc"><div class="ct">⚕️</div><div class="ci"><div class="ctt">Ospedale</div><div class="stag">WIS</div></div></div>
-        <div class="sc"><div class="ct">🧵</div><div class="ci"><div class="ctt">Sartoria</div><div class="stag">DEX</div></div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- NUOVO OVERLAY DINAMICO -->
-<div id="overlay">
-  <div id="ovp">
-    <div style="padding:15px 20px; border-bottom:1px solid var(--border2); display:flex; justify-content:space-between; background:#000; align-items:center;">
-      <div style="font-family:'Cinzel'; font-size:12px; color:var(--gold2); letter-spacing:3px; font-weight:900;">DISCORD</div>
-      <div onclick="cv()" style="cursor:pointer; color:var(--text3); font-size:20px; padding:0 10px;">✕</div>
-    </div>
-
-    <div id="ovbody">
-      <div class="ovs">
-        <div class="ovsh">Locanda Online <span id="avv-count" style="color:var(--gold); font-size:12px; margin-left:8px;"></span></div>
-        <div id="ovdw" style="background:rgba(0,0,0,0.4); border:1px solid var(--border); height:400px; overflow-y:auto; border-radius:2px;">
-          <div id="roster-list">
-            <div style="text-align:center; padding:50px; color:var(--text3); font-style:italic; font-size:13px;">In ascolto dei cancelli...</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="ovs" style="border-left:1px solid var(--border); display:flex; flex-direction:column; justify-content:center;">
-        <div class="ovsh">Portale di Accesso</div>
-        <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" style="display:block; padding:20px; background:linear-gradient(135deg, var(--bg4), var(--bg5)); border:1.5px solid var(--gold); color:var(--gold2); text-align:center; text-decoration:none; font-family:'Cinzel'; font-size:11px; font-weight:700; letter-spacing:2px; box-shadow: var(--glow); transition: 0.3s; border-radius:2px;">ENTRA NEL DISCORD</a>
-        
-        <p style="color:var(--text2); font-size:14px; font-style:italic; line-height:1.7; margin-top:30px; text-align:center; padding:0 10px;">
-          "Siediti accanto al fuoco e racconta la tua storia. La locanda di Arcamis non dorme mai."
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-// FUNZIONI OVERLAY
-async function aggiornaLocanda() {
-  const guildId = '1348723468157456425';
-  const list = document.getElementById('roster-list');
-  const count = document.getElementById('avv-count');
-
-  try {
-    const res = await fetch(`https://discord.com/api/guilds/${guildId}/widget.json`);
-    const data = await res.json();
-
-    if (data.members) {
-      count.innerText = `[${data.presence_count} presenti]`;
-      let html = "";
-      
-      data.members.forEach(user => {
-        html += `
-          <div style="display:flex; align-items:center; gap:12px; padding:12px; border-bottom:1px solid rgba(200,155,60,0.08); transition: background 0.2s;">
-            <img src="${user.avatar_url}" style="width:34px; height:34px; border-radius:50%; border:1px solid var(--gold); padding:1px; background:var(--bg2);">
-            <div style="flex:1">
-              <div style="font-family:'Cinzel'; font-size:13px; color:var(--parchment); font-weight:600;">${user.username}</div>
-              <div style="font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:5px;">
-                <span style="width:6px; height:6px; background:#6aa020; border-radius:50%; box-shadow:0 0 6px #6aa020;"></span> Online
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      list.innerHTML = html || "<div style='text-align:center; color:var(--text3); padding:40px;'>La locanda è attualmente vuota.</div>";
-    }
-  } catch (e) {
-    list.innerHTML = "<div style='text-align:center; color:var(--text3); padding:40px;'>Errore magico nella connessione.</div>";
-  }
-}
-
-function ovo() { 
-  document.getElementById('overlay').style.display = 'block'; 
-  aggiornaLocanda(); 
-}
-function cv() { document.getElementById('overlay').style.display = 'none'; }
-
-document.addEventListener('keydown', e => {
-  if(e.shiftKey && e.key === 'Tab') { e.preventDefault(); ovo(); }
-  if(e.key === 'Escape') cv();
-});
-
-window.onclick = e => {
-  if(e.target == document.getElementById('overlay')) cv();
-};
-</script>
-
-</body>
-</html>
+    <div class="sttl"><div class="sgem"></div>Personaggio</div>
+    <div class="cg">
+      <div class="sc"><div class="ct">🌟</div><div class="ci"><div class="ctt">Come si inizia</div><div class="csb">Creazione PG</div></div></div>
+      <div class="sc"><div class="ct">🎭</div><div class
