@@ -462,7 +462,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 
       <div id="ctrack">
         <!-- SLIDE 1 -->
-        <div class="slide active" style="background:linear-gradient(135deg,#06080c 0%,#0e1420 40%,#1a1208 70%,#0a0c10 100%)">
+        <div class="slide active" style="background-image:url('cover.png');background-size:cover;background-position:center 45%">>
           <div class="scnt">
             <div class="stag">Server Online</div>
             <div class="stit">BENVENUTO SU<br>ARCAMIS</div>
@@ -537,6 +537,14 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
         <div class="lcard" onclick="gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#0a0814,#14101e)"><span>🛐</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Pantheon</div><div class="csub">Divinità di Arcamis</div></div></div>
         <div class="lcard" onclick="gp('3000274fdc1c8033a214c44a1aa7f01f','Changelog','📝')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#080808,#121212)"><span>📝</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Changelog</div><div class="csub">Aggiornamenti</div></div></div>
       </div>
+
+      <div class="shead"><div class="shead-gem"></div>In-game</div>
+      <div class="cgrid">
+        <div class="lcard" onclick="gp('2f00274fdc1c802a9babd4239d97a319','Maestria / Titoli ed altro','🔨')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#100a04,#1a1208)"><span>🔨</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Maestria / Titoli</div><div class="csub">ed altro</div><div class="ctags"><span class="ctag-g ctag">WIP</span></div></div></div>
+        <div class="lcard" onclick="gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📚')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#120800,#1c1008)"><span>📚</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Lore</div><div class="csub">Storia del mondo</div></div></div>
+        <div class="lcard" onclick="gp('2f00274fdc1c80e78ad7ce985007b7c6','Homebrew','❓')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#0a0814,#141020)"><span>❓</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Homebrew</div><div class="csub">Regole aggiuntive</div></div></div>
+        <div class="lcard" onclick="gp('2f10274fdc1c80489f23c49164747770','Mappe','🗺️')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#04100a,#081a10)"><span>🗺️</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Mappe</div><div class="csub">Cartografia di Arcamis</div></div></div>
+      </div>
     </div><!-- /hbody -->
   </div><!-- /home view -->
 
@@ -607,6 +615,10 @@ var pages=[
   {k:'sartoria',l:'Sartoria',i:'🧵',id:'2ff0274fdc1c8035bad4f0b6ab705192'},
   {k:'pantheon',l:'Pantheon',i:'🛐',id:'2f00274fdc1c80679bd3c3df8a1fa040'},
   {k:'changelog',l:'Changelog',i:'📝',id:'3000274fdc1c8033a214c44a1aa7f01f'},
+  {k:'maestria',l:'Maestria / Titoli ed altro',i:'🔨',id:'2f00274fdc1c802a9babd4239d97a319'},
+  {k:'lore',l:'Lore',i:'📚',id:'2f00274fdc1c806f8f17dbc6532d2211'},
+  {k:'homebrew',l:'Homebrew',i:'❓',id:'2f00274fdc1c80e78ad7ce985007b7c6'},
+  {k:'mappe',l:'Mappe',i:'🗺️',id:'2f10274fdc1c80489f23c49164747770'},
 ];
 
 /* ── Build overlay quick links ── */
@@ -657,7 +669,16 @@ resetTimer();
     var img=document.getElementById('li');
     img.onload=function(){img.style.display='block';document.getElementById('lf').style.display='none'};
     img.src=url;
-  }catch(e){}
+  }catch(e){
+    // fallback to local logo
+    var img2=document.getElementById('li');
+    if(img2){img2.src='Artboard_1.png';img2.style.display='block';var lf=document.getElementById('lf');if(lf)lf.style.display='none';}
+  }
+})();
+// Also preload local logo as immediate fallback
+(function(){
+  var img=document.getElementById('li');
+  if(img&&!img.src){img.src='Artboard_1.png';img.style.display='block';var lf=document.getElementById('lf');if(lf)lf.style.display='none';}
 })();
 
 /* ══════════════════════════════
