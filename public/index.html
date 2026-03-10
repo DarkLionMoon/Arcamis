@@ -87,6 +87,61 @@ nav#tnav{display:flex;align-items:stretch}
 }
 .tn:hover{color:var(--parch);background:rgba(200,155,60,.04)}
 .tn.ta{color:var(--gold2);border-bottom-color:var(--gold);background:rgba(200,155,60,.06)}
+
+/* ════════════════════════════════════
+   DROPDOWN NAVBAR
+════════════════════════════════════ */
+.tn-drop{position:relative;display:flex;align-items:stretch}
+.tn-drop>.tn{gap:5px}
+.tn-drop>.tn::after{
+  content:'▾';font-size:7px;line-height:1;
+  transition:transform .18s;display:inline-block;margin-left:2px;opacity:.6;
+}
+.tn-drop.open>.tn{color:var(--gold2);background:rgba(200,155,60,.06);border-bottom-color:var(--gold)}
+.tn-drop.open>.tn::after{transform:rotate(180deg);opacity:1}
+/* Panel */
+.tn-menu{
+  position:absolute;top:calc(100% + 1px);left:0;min-width:210px;
+  background:rgba(6,7,12,.97);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(200,155,60,.2);
+  border-top:2px solid var(--gold);
+  box-shadow:0 20px 60px rgba(0,0,0,.85),0 0 0 1px rgba(200,155,60,.05);
+  z-index:600;display:none;overflow:hidden;
+}
+.tn-drop.open .tn-menu{display:block;animation:ddopen .16s ease forwards}
+@keyframes ddopen{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+/* Shine sweep on open */
+.tn-drop.open .tn-menu::before{
+  content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;
+  background:linear-gradient(105deg,transparent 30%,rgba(200,155,60,.05) 50%,transparent 70%);
+  animation:ddshine .35s ease forwards;pointer-events:none;z-index:10;
+}
+@keyframes ddshine{from{left:-100%}to{left:160%}}
+/* Section label */
+.tn-menu-label{
+  padding:10px 16px 7px;
+  font-family:'Cinzel',serif;font-size:7.5px;font-weight:700;letter-spacing:.3em;
+  color:var(--gold);text-transform:uppercase;opacity:.55;
+}
+/* Divider */
+.tn-div{height:1px;margin:4px 0;background:linear-gradient(90deg,transparent,rgba(200,155,60,.14) 20%,rgba(200,155,60,.14) 80%,transparent)}
+/* Item */
+.tn-item{
+  display:flex;align-items:center;gap:10px;padding:9px 16px;
+  cursor:pointer;transition:background .1s,color .1s;
+  font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.07em;
+  color:var(--text2);white-space:nowrap;position:relative;overflow:hidden;
+}
+.tn-item::after{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--gold3),var(--gold));
+  transform:scaleY(0);transition:transform .14s;transform-origin:bottom;
+}
+.tn-item:hover{color:var(--gold2);background:rgba(200,155,60,.06)}
+.tn-item:hover::after{transform:scaleY(1)}
+.tn-ii{font-size:14px;flex-shrink:0;opacity:.75;width:18px;text-align:center}
+
 #tr{margin-left:auto;display:flex;align-items:center;padding:0 14px;gap:9px}
 /* search */
 #sw{position:relative}
@@ -991,12 +1046,64 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
     <span id="tlt">ARCAMIS</span>
   </div>
   <nav id="tnav">
-    <div class="tn ta" data-v="home" onclick="showHome()">Home</div>
-    <div class="tn" data-v="gameplay" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')">Gameplay</div>
-    <div class="tn" data-v="regole" onclick="gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')">Regole</div>
-    <div class="tn" data-v="classi" onclick="gp('30a0274fdc1c804ab56bd3943add26d2','Classi','🎭')">Classi</div>
-    <div class="tn" data-v="pantheon" onclick="gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')">Pantheon</div>
-    <div class="tn" data-v="changelog" onclick="gp('3000274fdc1c8033a214c44a1aa7f01f','Changelog','📝')">Changelog</div>
+    <div class="tn ta" data-v="home" onclick="showHome();closeDd()">Home</div>
+
+    <!-- ── Regole ▾ ── -->
+    <div class="tn-drop" id="dd-regole">
+      <div class="tn" onclick="toggleDd('dd-regole')">Regole</div>
+      <div class="tn-menu">
+        <div class="tn-menu-label">Regolamento</div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')"><span class="tn-ii">⚔️</span>Gameplay</div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')"><span class="tn-ii">📜</span>Regole generali</div>
+        <div class="tn-item" onclick="closeDd();gp('3130274fdc1c807eb61fde24e8236659','Materiale approvato','📋')"><span class="tn-ii">📋</span>Materiale approvato</div>
+      </div>
+    </div>
+
+    <!-- ── Personaggio ▾ ── -->
+    <div class="tn-drop" id="dd-pg">
+      <div class="tn" onclick="toggleDd('dd-pg')">Personaggio</div>
+      <div class="tn-menu">
+        <div class="tn-menu-label">Il tuo PG</div>
+        <div class="tn-item" onclick="closeDd();gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')"><span class="tn-ii">🌟</span>Come si inizia</div>
+        <div class="tn-item" onclick="closeDd();gp('5cea525d149f4acb9c59007bf6b3d5ff','Andando avanti','📈')"><span class="tn-ii">📈</span>Andando avanti</div>
+        <div class="tn-item" onclick="closeDd();gp('30a0274fdc1c804ab56bd3943add26d2','Classi','🎭')"><span class="tn-ii">🎭</span>Classi</div>
+        <div class="tn-item" onclick="closeDd();gp('2fd0274fdc1c80d8b948c4133f874f28','Galleria PG','🖼️')"><span class="tn-ii">🖼️</span>Galleria PG</div>
+        <div class="tn-div"></div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c802a9babd4239d97a319','Maestria / Titoli','🏅')"><span class="tn-ii">🏅</span>Maestria / Titoli</div>
+      </div>
+    </div>
+
+    <!-- ── Lavori ▾ ── -->
+    <div class="tn-drop" id="dd-lavori">
+      <div class="tn" onclick="toggleDd('dd-lavori')">Lavori</div>
+      <div class="tn-menu">
+        <div class="tn-menu-label">Gilde &amp; Mestieri</div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️')"><span class="tn-ii">🗡️</span>Gilda avventurieri</div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')"><span class="tn-ii">🍺</span>Locanda</div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')"><span class="tn-ii">🔥</span>Forgia</div>
+        <div class="tn-div"></div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c8089bfe6c24434d53b67','Biblioteca','📚')"><span class="tn-ii">📚</span>Biblioteca</div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801c9697e75caa8d5f13','Bottega farmaceutica','💊')"><span class="tn-ii">💊</span>Bottega farmaceutica</div>
+        <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c80688dd6c2b293a1f626','Caserma','🛡️')"><span class="tn-ii">🛡️</span>Caserma</div>
+        <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c80769a4ae243f22f0582','Corporazione costruttori','🔨')"><span class="tn-ii">🔨</span>Corporazione</div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')"><span class="tn-ii">⚕️</span>Ospedale</div>
+        <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c8035bad4f0b6ab705192','Sartoria','🧵')"><span class="tn-ii">🧵</span>Sartoria</div>
+      </div>
+    </div>
+
+    <!-- ── Lore ▾ ── -->
+    <div class="tn-drop" id="dd-lore">
+      <div class="tn" onclick="toggleDd('dd-lore')">Lore</div>
+      <div class="tn-menu">
+        <div class="tn-menu-label">Il Mondo</div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📖')"><span class="tn-ii">📖</span>Storia del mondo</div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')"><span class="tn-ii">🛐</span>Pantheon</div>
+        <div class="tn-item" onclick="closeDd();gp('2f10274fdc1c80489f23c49164747770','Mappe','🗺️')"><span class="tn-ii">🗺️</span>Mappe</div>
+        <div class="tn-div"></div>
+        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c80e78ad7ce985007b7c6','Homebrew','⚗️')"><span class="tn-ii">⚗️</span>Homebrew</div>
+        <div class="tn-item" onclick="closeDd();gp('3000274fdc1c8033a214c44a1aa7f01f','Changelog','📝')"><span class="tn-ii">📝</span>Changelog</div>
+      </div>
+    </div>
   </nav>
   <div id="tr">
     <div id="sw">
@@ -1006,7 +1113,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
       <div id="sr"></div>
     </div>
     <div id="ovbtn" onclick="ovo()">Menu<span class="kbd">⇧Tab</span></div>
-    <a href="https://discord.gg/a3mvUnBV53" target="_blank" rel="noopener" id="dcbtn">
+    <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" id="dcbtn">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
       Discord
     </a>
@@ -1033,7 +1140,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
             <div class="stit">ARCAMIS</div>
             <p class="sdesc">Città portuale delle Marche di Arcamis, porta d'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.</p>
             <div style="display:flex;gap:14px;flex-wrap:wrap">
-              <a href="https://discord.gg/a3mvUnBV53" target="_blank" rel="noopener" class="sbtn">
+              <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="sbtn">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
                 Entra nel Discord
               </a>
@@ -1258,7 +1365,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
         </div>
       </div>
       <div class="cta-row">
-        <a href="https://discord.gg/a3mvUnBV53" target="_blank" rel="noopener" class="sbtn">
+        <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="sbtn">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
           Entra nel Discord
         </a>
@@ -1351,7 +1458,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
       </div>
       <div class="ovs" style="border-left:1px solid var(--bdr); display:flex; flex-direction:column; justify-content:center;">
         <div class="ovsh">Portale di Accesso</div>
-        <a href="https://discord.gg/a3mvUnBV53" target="_blank" rel="noopener" style="display:block; padding:20px; background:linear-gradient(135deg, var(--bg4), var(--bg5)); border:1.5px solid var(--gold); color:var(--gold2); text-align:center; text-decoration:none; font-family:'Cinzel'; font-size:11px; font-weight:700; letter-spacing:2px; box-shadow:var(--glow); transition:0.3s; border-radius:2px;">ENTRA NEL DISCORD</a>
+        <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" style="display:block; padding:20px; background:linear-gradient(135deg, var(--bg4), var(--bg5)); border:1.5px solid var(--gold); color:var(--gold2); text-align:center; text-decoration:none; font-family:'Cinzel'; font-size:11px; font-weight:700; letter-spacing:2px; box-shadow:var(--glow); transition:0.3s; border-radius:2px;">ENTRA NEL DISCORD</a>
         <p style="color:var(--text2); font-size:14px; font-style:italic; line-height:1.7; margin-top:30px; text-align:center; padding:0 10px;">
           "Siediti accanto al fuoco e racconta la tua storia. La locanda di Arcamis non dorme mai."
         </p>
@@ -1488,6 +1595,25 @@ function xfade(hide,show,cb){
     setTimeout(function(){show.classList.remove('fi');_busy=false;if(cb)cb()},220);
   },150);
 }
+/* ══════════════════════════════
+   DROPDOWN NAV
+══════════════════════════════ */
+function toggleDd(id){
+  var el=document.getElementById(id);
+  var wasOpen=el.classList.contains('open');
+  closeDd();
+  if(!wasOpen)el.classList.add('open');
+}
+function closeDd(){
+  document.querySelectorAll('.tn-drop.open').forEach(function(d){d.classList.remove('open')});
+}
+// Close dropdown on outside click
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.tn-drop'))closeDd();
+});
+// Close on ESC
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDd()});
+
 function setNav(v){
   document.querySelectorAll('.tn').forEach(function(el){el.classList.toggle('ta',el.dataset.v===v)});
 }
