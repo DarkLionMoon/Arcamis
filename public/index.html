@@ -1421,6 +1421,13 @@ function changeSlide(n){showSlide(slideIdx+n);resetTimer();}
 function jumpToSlide(n){showSlide(n);resetTimer();}
 function resetTimer(){clearInterval(slideTimer);slideTimer=setInterval(function(){showSlide(slideIdx+1)},7000);}
 
+// Pausa su hover
+var _cw2=document.getElementById('carousel-wrap');
+if(_cw2){
+  _cw2.addEventListener('mouseenter',function(){clearInterval(slideTimer)});
+  _cw2.addEventListener('mouseleave',function(){resetTimer()});
+}
+
 // Init
 showSlide(0);
 resetTimer();
