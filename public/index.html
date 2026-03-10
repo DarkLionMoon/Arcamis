@@ -828,9 +828,18 @@ nav#tnav{display:flex;align-items:stretch}
    PAGE VIEW
 ════════════════════════════════════ */
 #page-hero{
-  height:205px;position:relative;overflow:hidden;
-  background:linear-gradient(160deg,#06080e,#0c1018,#06080e);
-  display:flex;align-items:flex-end;
+  min-height:260px;position:relative;overflow:hidden;
+  background:#06080e;display:flex;align-items:flex-end;
+}
+.ph-covbg{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  filter:saturate(.6) brightness(.45);
+  transition:opacity .5s;
+}
+.ph-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(4,6,12,.97) 0%,rgba(4,6,12,.65) 50%,rgba(4,6,12,.2) 100%);
 }
 .ph-bg{
   position:absolute;inset:0;
@@ -842,22 +851,88 @@ nav#tnav{display:flex;align-items:stretch}
 .ph-topline{
   position:absolute;top:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg,transparent,var(--copper),var(--gold3),var(--gold),var(--gold3),var(--copper),transparent);
-  opacity:.38;
+  opacity:.45;
 }
-.ph-icon{position:absolute;right:44px;top:50%;transform:translateY(-50%);font-size:88px;opacity:.055;pointer-events:none;user-select:none}
-.ph-inner{position:relative;padding:20px 32px 24px;z-index:2}
-.ph-crumb{display:flex;align-items:center;gap:5px;margin-bottom:8px;font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:.1em;color:var(--text3)}
+.ph-btmline{
+  position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.25),transparent);
+}
+.ph-icon{position:absolute;right:44px;top:50%;transform:translateY(-50%);font-size:100px;opacity:.05;pointer-events:none;user-select:none}
+.ph-inner{position:relative;padding:24px 44px 30px;z-index:2;width:100%}
+.ph-crumb{display:flex;align-items:center;gap:5px;margin-bottom:14px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:var(--text3)}
 .ph-bc{cursor:pointer;transition:.15s}.ph-bc:hover{color:var(--gold)}
-.ph-sep{opacity:.3;padding:0 2px}.ph-cur{color:var(--text2);cursor:default}
-.ph-title{font-family:'Cinzel',serif;font-size:27px;font-weight:700;color:var(--white);letter-spacing:.05em;text-shadow:0 2px 14px rgba(0,0,0,.9)}
-.ph-line{margin-top:11px;width:160px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);opacity:.5}
+.ph-sep{opacity:.3;padding:0 2px}.ph-cur{color:rgba(200,155,60,.55);cursor:default}
+.ph-eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.35em;color:var(--gold);opacity:.7;text-transform:uppercase;margin-bottom:8px}
+.ph-title{font-family:'Cinzel',serif;font-size:34px;font-weight:700;color:var(--white);letter-spacing:.04em;text-shadow:0 2px 20px rgba(0,0,0,.95),0 0 60px rgba(200,155,60,.12);line-height:1.15}
+.ph-sub{font-family:'Crimson Pro',serif;font-size:15px;color:rgba(196,168,98,.7);font-style:italic;margin-top:8px;letter-spacing:.02em}
+.ph-divider{margin-top:18px;display:flex;align-items:center;gap:10px}
+.ph-divider-line{flex:1;max-width:120px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);opacity:.5}
+.ph-divider-gem{color:var(--gold);font-size:8px;opacity:.6}
 
 /* page body */
-#pbody{padding:28px 44px;max-width:860px;margin:0 auto;width:100%}
+#pbody{padding:36px 44px 60px;max-width:860px;margin:0 auto;width:100%}
+@media(max-width:700px){#pbody{padding:24px 20px 48px}.ph-inner{padding:20px 20px 24px}.ph-title{font-size:24px}}
 
 /* ── Notion block rendering ── */
-.nc>*+*{margin-top:.62em}
+.nc>*+*{margin-top:.7em}
 .n-p{font-size:16px;line-height:1.85;color:var(--text)}
+/* Headings with fantasy treatment */
+.n-h1{
+  font-family:'Cinzel',serif;font-size:22px;font-weight:700;
+  color:var(--gold3);letter-spacing:.06em;
+  display:flex;align-items:center;gap:10px;
+  padding-bottom:10px;margin-top:40px!important;margin-bottom:4px;
+  border-bottom:1px solid rgba(200,155,60,.15);
+}
+.n-h1::before{content:'◈';color:var(--gold);font-size:14px;opacity:.8;flex-shrink:0}
+.n-h2{
+  font-family:'Cinzel',serif;font-size:16px;font-weight:700;
+  color:var(--parch);letter-spacing:.08em;
+  display:flex;align-items:center;gap:8px;
+  margin-top:32px!important;margin-bottom:2px;
+}
+.n-h2::before{content:'✦';color:var(--gold);font-size:10px;opacity:.7;flex-shrink:0}
+.n-h3{font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:rgba(196,168,98,.8);letter-spacing:.1em;margin-top:22px!important;text-transform:uppercase}
+/* Fancy divider */
+.n-divider{
+  border:none;margin:32px 0;position:relative;height:18px;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+}
+.n-divider::before,.n-divider::after{
+  content:'';flex:1;max-width:200px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.35));
+}
+.n-divider::after{background:linear-gradient(270deg,transparent,rgba(200,155,60,.35))}
+.n-divider-gem{color:var(--gold);font-size:9px;opacity:.7;flex-shrink:0}
+/* Callout */
+.n-callout{
+  display:flex;gap:14px;align-items:flex-start;
+  border-left:3px solid var(--callout-c,rgba(200,155,60,.5));
+  background:var(--callout-bg,rgba(200,155,60,.04));
+  padding:14px 18px;margin:16px 0;
+}
+.n-callout-icon{flex-shrink:0;font-size:20px;margin-top:1px}
+.n-callout-body{flex:1;font-size:15.5px;line-height:1.75}
+/* Quote */
+.n-quote{
+  border-left:3px solid rgba(200,155,60,.35);
+  padding:10px 20px;margin:16px 0;
+  font-family:'Crimson Pro',serif;font-size:18px;
+  color:rgba(196,168,98,.75);font-style:italic;line-height:1.6;
+}
+/* Page footer */
+.n-page-footer{
+  margin-top:56px;padding-top:28px;text-align:center;
+  border-top:1px solid rgba(200,155,60,.12);
+}
+.n-page-footer-gems{
+  font-family:'Cinzel',serif;font-size:11px;color:rgba(200,155,60,.35);
+  letter-spacing:.4em;margin-bottom:8px;
+}
+.n-page-footer-text{
+  font-family:'Crimson Pro',serif;font-size:12px;
+  color:rgba(200,155,60,.2);font-style:italic;letter-spacing:.06em;
+}
 .n-p:empty{min-height:.7em}
 .n-h1{
   font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:var(--white);
@@ -2218,13 +2293,18 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
   <!-- PAGE VIEW -->
   <div id="pv" class="vp" style="display:none">
     <div id="page-hero">
+      <div class="ph-covbg" id="ph-covbg"></div>
+      <div class="ph-overlay" id="ph-overlay"></div>
       <div class="ph-bg"></div>
       <div class="ph-topline"></div>
+      <div class="ph-btmline"></div>
       <span class="ph-icon" id="ph-icon"></span>
       <div class="ph-inner">
         <div class="ph-crumb" id="ph-crumb"></div>
+        <div class="ph-eyebrow" id="ph-eyebrow"></div>
         <div class="ph-title" id="ph-title"></div>
-        <div class="ph-line"></div>
+        <div class="ph-sub" id="ph-sub"></div>
+        <div class="ph-divider"><div class="ph-divider-line"></div><div class="ph-divider-gem">◆</div></div>
       </div>
     </div>
     <div id="pbody"></div>
@@ -2489,8 +2569,19 @@ function renderBlocks(blocks){
       case'bulleted_list_item':h+='<ul class="n-ul"><li>'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</li></ul>';break;
       case'numbered_list_item':h+='<ol class="n-ol"><li>'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</li></ol>';break;
       case'quote':h+='<blockquote class="n-quote">'+rt(d.rich_text)+'</blockquote>';break;
-      case'divider':h+='<div class="n-divider"></div>';break;
-      case'callout':var ic=d.icon&&d.icon.emoji?d.icon.emoji:'💡';h+='<div class="n-callout"><div class="n-callout-icon">'+ic+'</div><div class="n-callout-body">'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</div></div>';break;
+      case'divider':h+='<div class="n-divider"><span class="n-divider-gem">✦</span></div>';break;
+      case'callout':
+        var ic=d.icon&&d.icon.emoji?d.icon.emoji:'💡';
+        var cbg='rgba(200,155,60,.04)',cc='rgba(200,155,60,.5)';
+        if(['📜','📖','📚','🗒️'].indexOf(ic)>-1){cbg='rgba(120,90,40,.07)';cc='rgba(180,130,50,.5)';}
+        else if(['⚠️','🔥','⚡','🗡️','⚔️'].indexOf(ic)>-1){cbg='rgba(180,50,40,.06)';cc='rgba(200,60,50,.5)';}
+        else if(['🌊','💧','🌙','⭐','✨'].indexOf(ic)>-1){cbg='rgba(40,80,180,.07)';cc='rgba(60,100,200,.5)';}
+        else if(['🌿','🌱','🍃','🌲','🌳'].indexOf(ic)>-1){cbg='rgba(30,100,50,.07)';cc='rgba(50,140,70,.5)';}
+        else if(['🔮','💜','🌑','👁️'].indexOf(ic)>-1){cbg='rgba(100,50,180,.07)';cc='rgba(130,70,220,.5)';}
+        h+='<div class="n-callout" style="--callout-bg:'+cbg+';--callout-c:'+cc+'">'
+          +'<div class="n-callout-icon">'+ic+'</div>'
+          +'<div class="n-callout-body">'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</div></div>';
+        break;
       case'toggle':h+='<details><summary class="n-ts">'+rt(d.rich_text)+'</summary><div class="n-tc">'+(b.children?renderBlocks(b.children):'')+'</div></details>';break;
       case'code':h+='<pre class="n-code"><code>'+(d.rich_text||[]).map(function(r){return r.plain_text}).join('').replace(/</g,'&lt;')+'</code></pre>';break;
       case'image':var src=d.type==='external'?(d.external&&d.external.url):(d.file&&d.file.url);if(src)h+='<figure class="n-image"><img src="'+src+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'"/>'+(d.caption&&d.caption.length?'<figcaption>'+rt(d.caption)+'</figcaption>':'')+'</figure>';break;
@@ -2544,9 +2635,20 @@ async function loadDbGalleries(container) {
 async function gp(id,label,icon){
   var hv=document.getElementById('hv'),pv=document.getElementById('pv');
   setNav('');
-  document.getElementById('ph-title').textContent=label;
-  document.getElementById('ph-icon').textContent=icon;
-  document.getElementById('ph-crumb').innerHTML=
+  var phTitle=document.getElementById('ph-title');
+  var phIcon=document.getElementById('ph-icon');
+  var phCrumb=document.getElementById('ph-crumb');
+  var phCovbg=document.getElementById('ph-covbg');
+  var phOverlay=document.getElementById('ph-overlay');
+  var phEyebrow=document.getElementById('ph-eyebrow');
+  var phSub=document.getElementById('ph-sub');
+
+  phTitle.textContent=label;
+  phIcon.textContent=icon;
+  phCovbg.style.backgroundImage='';
+  phEyebrow.textContent='';
+  phSub.textContent='';
+  phCrumb.innerHTML=
     '<span class="ph-bc" onclick="showHome()">🏰 Home</span>'
     +'<span class="ph-sep"> › </span>'
     +'<span class="ph-cur">'+label+'</span>';
@@ -2556,22 +2658,42 @@ async function gp(id,label,icon){
   else pv.style.display='block';
   document.getElementById('main').scrollTo({top:0});
   try{
-    var timeout = new Promise(function(_,rej){setTimeout(function(){rej(new Error('Timeout — la pagina ha impiegato troppo tempo'))},15000)});
-    var r=await Promise.race([fetch('/api/notion?pageId='+id), timeout]);
+    var timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('Timeout — la pagina ha impiegato troppo tempo'))},15000)});
+    var r=await Promise.race([fetch('/api/notion?pageId='+id),timeout]);
     if(!r.ok)throw new Error('HTTP '+r.status);
     var data=await r.json();
     var pg=data.page,bl=data.blocks;
     var ta=pg.properties&&pg.properties.title&&pg.properties.title.title||[];
     var ptitle=ta.map(function(t){return t.plain_text}).join('')||label;
     var picon=pg.icon&&pg.icon.emoji?pg.icon.emoji:icon;
-    document.getElementById('ph-title').textContent=ptitle;
-    document.getElementById('ph-icon').textContent=picon;
+    phTitle.textContent=ptitle;
+    phIcon.textContent=picon;
+    phEyebrow.textContent='Archivi di Arcamis';
     document.title=ptitle+' — Arcamis';
+    /* cover image */
+    var coverUrl=null;
+    if(pg.cover){
+      coverUrl=pg.cover.type==='external'?pg.cover.external.url:(pg.cover.file&&pg.cover.file.url);
+    }
+    if(coverUrl){
+      phCovbg.style.backgroundImage='url("'+coverUrl+'")';
+      phOverlay.style.opacity='1';
+      phIcon.style.opacity='0';
+    } else {
+      phCovbg.style.backgroundImage='';
+      phOverlay.style.opacity='0';
+      phIcon.style.opacity='0.05';
+    }
+    /* subtitle: first paragraph text */
+    var firstP=bl.find(function(b){return b.type==='paragraph'&&b.paragraph&&b.paragraph.rich_text&&b.paragraph.rich_text.length>0});
+    if(firstP){
+      var sub=firstP.paragraph.rich_text.map(function(t){return t.plain_text}).join('').slice(0,120);
+      if(sub)phSub.textContent=sub+(sub.length>=120?'…':'');
+    }
     var html=renderBlocks(bl);
-    var pbody = document.getElementById('pbody');
-    pbody.innerHTML=
-      '<div class="nc" style="animation:fi .22s ease forwards">'
-      +(html||'<p class="n-p" style="color:var(--text3);font-style:italic">Pagina vuota.</p>')+'</div>';
+    var pbody=document.getElementById('pbody');
+    var footer='<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div><div class="n-page-footer-text">Archivi di Arcamis — '+ptitle+'</div></div>';
+    pbody.innerHTML='<div class="nc" style="animation:fi .22s ease forwards">'+(html||'<p class="n-p" style="color:var(--text3);font-style:italic">Pagina vuota.</p>')+footer+'</div>';
     attachShine(pbody);
     loadDbGalleries(pbody);
     initFadeIn(pbody);
