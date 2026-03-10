@@ -12,37 +12,37 @@
 ════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg: #080a0e; --bg2:#0c0f15; --bg3:#10141c; --bg4:#161c26;
+  --bg: #080a0e; --bg2:#0c0f15; --bg3:#10141c;
   --panel:#0e121a; --bdr:#1e1808; --bdr2:#2c2210;
   --gold:#c89b3c; --gold2:#d4aa4a; --gold3:#e8c86a;
-  --text:#a08848; --text2:#786438; --text3:#483c1c; --white:#f0e6d2; --parch:#c4a862;
+  --text:#a08848; --text2:#786438; --white:#f0e6d2; --parch:#c4a862;
 }
-html,body{height:100%; overflow:hidden; background:var(--bg); font-family:'Crimson Pro',serif; color:var(--text);}
+html,body{height:100%; background:var(--bg); font-family:'Crimson Pro',serif; color:var(--text); overflow:hidden;}
 
 /* --- TOPBAR --- */
 #topbar{
-  height:56px; z-index:200; position:relative; background:#02030a;
+  height:56px; z-index:2000; position:relative; background:#02030a;
   border-bottom:1px solid var(--bdr2); display:flex; align-items:stretch;
 }
 #tlogo{display:flex; align-items:center; padding:0 20px; gap:12px; cursor:pointer;}
 #tlt{font-family:'Cinzel'; font-size:14px; font-weight:900; letter-spacing:.22em; color:var(--gold3);}
 nav#tnav{display:flex; align-items:stretch; margin-left:20px;}
-.tn{display:flex; align-items:center; padding:0 14px; font-family:'Cinzel'; font-size:10px; font-weight:700; color:var(--text2); text-transform:uppercase; cursor:pointer; transition: 0.3s;}
-.tn:hover{color:var(--gold); background: rgba(200,155,60,0.05);}
-.tn.ta{color:var(--gold2); border-bottom:2px solid var(--gold);}
-#tr{margin-left:auto; display:flex; align-items:center; padding:0 14px; gap:10px;}
+.tn{display:flex; align-items:center; padding:0 14px; font-family:'Cinzel'; font-size:10px; font-weight:700; color:var(--text2); text-transform:uppercase; cursor:pointer;}
+.tn:hover, .tn.ta{color:var(--gold2);}
+
+#tr{margin-left:auto; display:flex; align-items:center; padding:0 14px;}
 #ovbtn{background:var(--panel); border:1px solid var(--bdr2); color:var(--gold); font-family:'Cinzel'; font-size:9px; padding:6px 12px; cursor:pointer;}
 
-/* --- MAIN VIEWS --- */
-#main{flex:1; overflow-y:auto; height: calc(100vh - 56px);}
-.view-section{display:none; animation: fadeIn 0.4s ease-out forwards;}
-@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+/* --- MAIN CONTAINER --- */
+#main{height: calc(100vh - 56px); overflow-y:auto; position:relative;}
+.view-section{display:none; width:100%;}
+#home-view{display:block;}
 
 /* --- CAROUSEL --- */
-#carousel-wrap{position:relative; width:100%; height:480px; overflow:hidden; background:#000; border-bottom: 1px solid var(--bdr2);}
+#carousel-wrap{position:relative; width:100%; height:480px; overflow:hidden; background:#000; border-bottom:1px solid var(--bdr2);}
 #ctrack{display:flex; width:300%; height:100%; transition:transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);}
 .slide{width:33.3333%; height:100%; position:relative; display:flex; align-items:flex-end; padding:60px 80px; background-size:cover; background-position:center;}
-.slide::after{content:''; position:absolute; inset:0; z-index:1; background:linear-gradient(0deg, rgba(8,10,14,1) 0%, rgba(8,10,14,0.4) 40%, transparent 100%);}
+.slide::after{content:''; position:absolute; inset:0; z-index:1; background:linear-gradient(0deg, var(--bg) 0%, rgba(8,10,14,0.4) 40%, transparent 100%);}
 .scnt{position:relative; z-index:2; opacity:0; transform:translateY(30px); transition:0.8s;}
 .slide.active .scnt{opacity:1; transform:translateY(0);}
 .stit{font-family:'Cinzel'; font-size:48px; font-weight:900; color:var(--white); line-height:1; margin-bottom:10px;}
@@ -55,13 +55,6 @@ nav#tnav{display:flex; align-items:stretch; margin-left:20px;}
 .cdot{width:45px; height:4px; background:rgba(255,255,255,0.15); cursor:pointer;}
 .cdot.ca{background:var(--gold); box-shadow:0 0 12px var(--gold);}
 
-/* --- PAGE VIEW STYLES --- */
-#page-hero{height:200px; background:linear-gradient(160deg, #06080e, #0c1018); border-bottom:1px solid var(--bdr2); display:flex; align-items:flex-end; padding:40px;}
-.ph-title{font-family:'Cinzel'; font-size:32px; color:var(--white); letter-spacing:2px;}
-#pbody{padding:40px; max-width:900px; margin:0 auto; line-height:1.8; font-size:17px;}
-.n-h1{font-family:'Cinzel'; color:var(--gold2); border-bottom:1px solid var(--bdr2); margin:40px 0 20px; padding-bottom:10px;}
-.n-p{margin-bottom:20px; color:var(--parch);}
-
 /* --- GRID --- */
 #hbody{padding:40px; max-width:1200px; margin:0 auto;}
 .cgrid{display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:20px;}
@@ -69,10 +62,22 @@ nav#tnav{display:flex; align-items:stretch; margin-left:20px;}
 .lcard:hover{border-color:var(--gold); transform: translateY(-5px);}
 .cthumb{height:120px; display:flex; align-items:center; justify-content:center; font-size:40px; background:#050608;}
 .cinfo{padding:15px;}
+.ctit{font-family:'Cinzel'; font-size:14px; color:var(--white);}
+
+/* --- PAGE VIEW --- */
+#page-hero{height:200px; background:linear-gradient(160deg, #06080e, #0c1018); border-bottom:1px solid var(--bdr2); display:flex; align-items:flex-end; padding:40px;}
+#pbody{padding:40px; max-width:900px; margin:0 auto; line-height:1.8; color:var(--parch);}
+.n-h1{font-family:'Cinzel'; color:var(--gold2); border-bottom:1px solid var(--bdr2); margin:40px 0 20px; padding-bottom:10px;}
 
 /* --- OVERLAY --- */
-#overlay{position:fixed; inset:0; z-index:9999; display:none; background:rgba(0,0,0,0.9); backdrop-filter:blur(15px);}
-#ovp{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:min(850px,95vw); background:var(--bg2); border:1px solid var(--gold);}
+#overlay{position:fixed; inset:0; z-index:9999; display:none; background:rgba(0,0,0,0.95); backdrop-filter:blur(10px);}
+#ovp{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:min(800px,90vw); background:var(--bg2); border:1px solid var(--gold2);}
+#ovtop{padding:20px; border-bottom:1px solid var(--bdr2); display:flex; justify-content:space-between; align-items:center; background:#000;}
+#ovbody{display:grid; grid-template-columns:1fr 1fr; background:var(--bdr2); gap:1px;}
+.ovs{background:var(--panel); padding:25px;}
+#roster-wrap{height:300px; overflow-y:auto;}
+.roster-member{display:flex; align-items:center; gap:12px; padding:10px; border-bottom:1px solid rgba(200,155,60,0.1);}
+.roster-avatar{width:32px; height:32px; border-radius:50%; border:1px solid var(--gold);}
 </style>
 </head>
 <body>
@@ -82,144 +87,131 @@ nav#tnav{display:flex; align-items:stretch; margin-left:20px;}
     <span id="tlt">ARCAMIS</span>
   </div>
   <nav id="tnav">
-    <div class="tn ta" onclick="showHome()">Home</div>
+    <div class="tn" onclick="showHome()">Home</div>
     <div class="tn" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')">Gameplay</div>
     <div class="tn" onclick="gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')">Regole</div>
     <div class="tn" onclick="gp('30a0274fdc1c804ab56bd3943add26d2','Classi','🎭')">Classi</div>
   </nav>
-  <div id="tr"><div id="ovbtn" onclick="ovo()">LOCANDA</div></div>
+  <div id="tr"><div id="ovbtn" onclick="ovo()">LOCANDA (SHIFT+TAB)</div></div>
 </div>
 
 <div id="main">
-  <div id="home-view" class="view-section" style="display:block;">
+  <div id="home-view" class="view-section">
     <div id="carousel-wrap">
       <div class="cnav" onclick="changeSlide(-1)">&#10094;</div>
       <div class="cnav" id="cnext" onclick="changeSlide(1)">&#10095;</div>
       <div id="ctrack">
         <div class="slide active" style="background-image:url('https://images.unsplash.com/photo-1519074063912-ad25b57b6d1e?q=80&w=1974&auto=format&fit=crop')">
           <div class="scnt">
-            <div class="stag">Benvenuti</div>
-            <div class="stit">L'ALBA DI ARCAMIS</div>
+            <div class="stag">Benvenuti</div><div class="stit">L'ALBA DI ARCAMIS</div>
             <div class="sbtn" onclick="gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Inizia Qui','🌟')">GUIDA INIZIALE</div>
           </div>
         </div>
         <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?q=80&w=2070&auto=format&fit=crop')">
           <div class="scnt">
-            <div class="stag">Lore</div>
-            <div class="stit">IL PANTHEON</div>
-            <div class="sbtn" onclick="gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')">LEGGI IL LORE</div>
+            <div class="stag">Lore</div><div class="stit">IL PANTHEON</div>
+            <div class="sbtn" onclick="gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')">SCOPRI GLI DEI</div>
           </div>
         </div>
         <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1514539079130-25950c84af65?q=80&w=2069&auto=format&fit=crop')">
           <div class="scnt">
-            <div class="stag">Sistemi</div>
-            <div class="stit">REGOLE DI GIOCO</div>
-            <div class="sbtn" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')">SCOPRI DI PIÙ</div>
+            <div class="stag">Sistemi</div><div class="stit">REGOLE DI GIOCO</div>
+            <div class="sbtn" onclick="gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')">LEGGI IL CODICE</div>
           </div>
         </div>
       </div>
-      <div class="cdots">
-        <div class="cdot ca" onclick="jumpToSlide(0)"></div>
-        <div class="cdot" onclick="jumpToSlide(1)"></div>
-        <div class="cdot" onclick="jumpToSlide(2)"></div>
-      </div>
+      <div class="cdots"><div class="cdot ca" onclick="jumpToSlide(0)"></div><div class="cdot" onclick="jumpToSlide(1)"></div><div class="cdot" onclick="jumpToSlide(2)"></div></div>
     </div>
-    
     <div id="hbody">
       <div class="cgrid">
         <div class="lcard" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')">
-          <div class="cthumb">⚔️</div>
-          <div class="cinfo"><div class="ctit">Gameplay</div></div>
+          <div class="cthumb">⚔️</div><div class="cinfo"><div class="ctit">Gameplay</div></div>
         </div>
         <div class="lcard" onclick="gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')">
-          <div class="cthumb">📜</div>
-          <div class="cinfo"><div class="ctit">Regole</div></div>
+          <div class="cthumb">📜</div><div class="cinfo"><div class="ctit">Regole</div></div>
         </div>
         <div class="lcard" onclick="gp('30a0274fdc1c804ab56bd3943add26d2','Classi','🎭')">
-          <div class="cthumb">🎭</div>
-          <div class="cinfo"><div class="ctit">Classi</div></div>
+          <div class="cthumb">🎭</div><div class="cinfo"><div class="ctit">Classi</div></div>
         </div>
         <div class="lcard" onclick="gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')">
-          <div class="cthumb">🛐</div>
-          <div class="cinfo"><div class="ctit">Pantheon</div></div>
+          <div class="cthumb">🛐</div><div class="cinfo"><div class="ctit">Pantheon</div></div>
         </div>
       </div>
     </div>
   </div>
 
   <div id="page-view" class="view-section">
-    <div id="page-hero">
-      <div class="ph-inner">
-        <div style="cursor:pointer; color:var(--gold); font-size:12px; margin-bottom:10px;" onclick="showHome()">← Torna alla Home</div>
-        <div class="ph-title" id="p-title">Titolo Pagina</div>
-      </div>
-    </div>
-    <div id="pbody">Caricamento dal Grande Archivio...</div>
+    <div id="page-hero"><div style="cursor:pointer; color:var(--gold);" onclick="showHome()">← TORNA ALLA HOME</div><h1 id="p-title" style="margin-left:20px; font-family:'Cinzel';"></h1></div>
+    <div id="pbody">Caricamento...</div>
   </div>
 </div>
 
-<div id="overlay">...</div>
+<div id="overlay">
+  <div id="ovp">
+    <div id="ovtop"><div style="font-family:'Cinzel'; color:var(--gold);">LOCANDA ONLINE <span id="avv-count"></span></div><div onclick="cv()" style="cursor:pointer; color:var(--gold); font-size:24px;">✕</div></div>
+    <div id="ovbody">
+      <div class="ovs"><div id="roster-wrap">Caricamento avventori...</div></div>
+      <div class="ovs" style="text-align:center; display:flex; flex-direction:column; justify-content:center;">
+        <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" style="background:var(--gold); color:#000; padding:15px; text-decoration:none; font-family:'Cinzel'; font-weight:bold;">ENTRA NEL DISCORD</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-// --- LOGICA NAVIGAZIONE ---
-function showHome() {
-  document.getElementById('page-view').style.display = 'none';
-  document.getElementById('home-view').style.display = 'block';
-  window.scrollTo(0,0);
-}
+let slideIdx = 0, slideTimer;
+function showHome() { document.getElementById('page-view').style.display='none'; document.getElementById('home-view').style.display='block'; window.scrollTo(0,0); }
 
 async function gp(id, title, icon) {
-  const home = document.getElementById('home-view');
-  const page = document.getElementById('page-view');
-  const pTitle = document.getElementById('p-title');
-  const pBody = document.getElementById('pbody');
-
-  home.style.display = 'none';
-  page.style.display = 'block';
-  pTitle.innerText = `${icon} ${title}`;
-  pBody.innerHTML = '<div style="text-align:center; padding:50px;">Consultando le pergamene...</div>';
-  window.scrollTo(0,0);
-
+  document.getElementById('home-view').style.display='none';
+  document.getElementById('page-view').style.display='block';
+  document.getElementById('p-title').innerText = `${icon} ${title}`;
+  document.getElementById('pbody').innerHTML = 'Consultando gli archivi...';
   try {
     const res = await fetch(`https://notion-api.splitbee.io/v1/page/${id}`);
     const data = await res.json();
-    
-    // Semplice renderizzatore dei blocchi Notion
     let html = "";
-    Object.values(data).forEach(block => {
-      const b = block.value;
-      if (!b || !b.properties || !b.properties.title) return;
-      const text = b.properties.title[0][0];
-      
-      if (b.type === "page") return;
-      if (b.type === "header") html += `<h1 class="n-h1">${text}</h1>`;
-      if (b.type === "text") html += `<p class="n-p">${text}</p>`;
-      if (b.type === "bulleted_list") html += `<ul><li>${text}</li></ul>`;
+    Object.values(data).forEach(b => {
+      if(b.value?.properties?.title) {
+        let t = b.value.properties.title[0][0];
+        if(b.value.type === 'header') html += `<h1 class="n-h1">${t}</h1>`;
+        else if(b.value.type === 'text') html += `<p style="margin-bottom:15px;">${t}</p>`;
+      }
     });
-    
-    pBody.innerHTML = html || "La pergamena sembra essere vuota.";
-  } catch (e) {
-    pBody.innerHTML = "Errore nel recupero della pergamena. Riprova più tardi.";
-  }
+    document.getElementById('pbody').innerHTML = html || "Pagina vuota.";
+  } catch(e) { document.getElementById('pbody').innerHTML = "Errore nel caricamento."; }
 }
 
-// --- LOGICA CAROSELLO (Come prima) ---
-let slideIdx = 0;
-let slideTimer;
 function showSlide(n) {
-  const track = document.getElementById('ctrack');
-  const slides = document.querySelectorAll('.slide');
-  const dots = document.querySelectorAll('.cdot');
-  if (n >= slides.length) slideIdx = 0; else if (n < 0) slideIdx = slides.length - 1; else slideIdx = n;
+  const slides = document.querySelectorAll('.slide'), dots = document.querySelectorAll('.cdot'), track = document.getElementById('ctrack');
+  if(n >= slides.length) slideIdx = 0; else if(n < 0) slideIdx = slides.length-1; else slideIdx = n;
   track.style.transform = `translateX(-${slideIdx * 33.3333}%)`;
-  slides.forEach((s, i) => s.classList.toggle('active', i === slideIdx));
-  dots.forEach((d, i) => d.classList.toggle('ca', i === slideIdx));
+  slides.forEach((s,i) => s.classList.toggle('active', i===slideIdx));
+  dots.forEach((d,i) => d.classList.toggle('ca', i===slideIdx));
 }
-function changeSlide(n) { showSlide(slideIdx + n); resetTimer(); }
+function changeSlide(n) { showSlide(slideIdx+n); resetTimer(); }
 function jumpToSlide(n) { showSlide(n); resetTimer(); }
-function resetTimer() { clearInterval(slideTimer); slideTimer = setInterval(() => showSlide(slideIdx + 1), 7000); }
+function resetTimer() { clearInterval(slideTimer); slideTimer = setInterval(()=>showSlide(slideIdx+1), 7000); }
 
-document.addEventListener('DOMContentLoaded', () => { showSlide(0); resetTimer(); });
+async function aggiornaLocanda() {
+  try {
+    const res = await fetch(`https://discord.com/api/guilds/1348723468157456425/widget.json`);
+    const data = await res.json();
+    document.getElementById('avv-count').innerText = `(${data.presence_count})`;
+    document.getElementById('roster-wrap').innerHTML = data.members.map(u => `
+      <div class="roster-member"><img src="${u.avatar_url}" class="roster-avatar"><div>${u.username}</div></div>`).join('');
+  } catch(e) { document.getElementById('roster-wrap').innerText = "Errore Discord."; }
+}
+function ovo() { document.getElementById('overlay').style.display='block'; aggiornaLocanda(); }
+function cv() { document.getElementById('overlay').style.display='none'; }
+
+document.addEventListener('DOMContentLoaded', () => {
+  showSlide(0); resetTimer();
+  document.addEventListener('keydown', e => { 
+    if(e.shiftKey && e.key==='Tab') { e.preventDefault(); ovo(); }
+    if(e.key==='Escape') cv();
+  });
+});
 </script>
 </body>
 </html>
