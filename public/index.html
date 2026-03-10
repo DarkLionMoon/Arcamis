@@ -1574,242 +1574,95 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
       <div class="sec-h">MARCHE DI ARCAMIS</div>
       <p class="sec-p">La città portuale di Arcamis e i territori circostanti. Un piccolo angolo di un regno molto più vasto, ancora in gran parte sconosciuto.</p>
       <!-- ── MAPPA INTERATTIVA ── -->
-      <div class="map-container" style="border-radius:2px">
-        <svg id="arcamis-map" viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg" aria-label="Mappa delle Marche di Arcamis">
+      <div class="map-container" style="border-radius:2px;background:#030608">
+        <svg id="arcamis-map" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" aria-label="Mappa delle Marche di Arcamis" style="display:block;width:100%">
           <defs>
-            <radialGradient id="bg-grad" cx="45%" cy="55%" r="70%">
-              <stop offset="0%" stop-color="#0b1520"/>
-              <stop offset="60%" stop-color="#070d18"/>
-              <stop offset="100%" stop-color="#030609"/>
-            </radialGradient>
-            <radialGradient id="sea-grad" cx="50%" cy="60%" r="60%">
-              <stop offset="0%" stop-color="#0a1e3a"/>
-              <stop offset="100%" stop-color="#050d1a"/>
-            </radialGradient>
-            <radialGradient id="lake-grad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#162844"/>
-              <stop offset="100%" stop-color="#0a1a2e"/>
-            </radialGradient>
-            <filter id="glow-gold" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3.5" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="glow-green" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="4" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="glow-violet" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="5" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="fog-blur">
-              <feGaussianBlur stdDeviation="8"/>
-            </filter>
-            <!-- Water shimmer animation -->
-            <linearGradient id="water-anim" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#1a4080">
-                <animate attributeName="stop-opacity" values="0.6;0.9;0.6" dur="3s" repeatCount="indefinite"/>
-              </stop>
-              <stop offset="100%" stop-color="#0e2a5a">
-                <animate attributeName="stop-opacity" values="0.8;0.5;0.8" dur="3s" repeatCount="indefinite"/>
-              </stop>
-            </linearGradient>
-            <!-- Forest sway -->
-            <pattern id="forest-pat" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
-              <circle cx="5" cy="5" r="2.5" fill="rgba(30,90,40,0.25)"/>
-            </pattern>
+            <filter id="h-glow-gold"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="h-glow-green"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="h-glow-violet"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="h-glow-blue"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
           </defs>
 
-          <!-- ── SFONDO ── -->
-          <rect width="900" height="520" fill="url(#bg-grad)"/>
+          <!-- MAPPA BASE -->
+          <image href="mappa.png" x="0" y="0" width="1920" height="1080" preserveAspectRatio="xMidYMid meet"/>
 
-          <!-- ── MARE (angolo in alto a sinistra + basso) ── -->
-          <path d="M0,0 L220,0 L180,80 L120,140 L60,200 L0,260 Z" fill="url(#sea-grad)" opacity="0.85"/>
-          <path d="M0,0 L220,0 L180,80 L120,140 L60,200 L0,260 Z" fill="url(#water-anim)" opacity="0.4"/>
-          <!-- Mare testo -->
-          <text x="70" y="80" font-family="Cinzel,serif" font-size="9" fill="rgba(80,130,200,0.45)" letter-spacing="0.2em" text-anchor="middle" transform="rotate(-28,70,80)">MAR DEL CONFINE</text>
-          <!-- Onde stilizzate -->
-          <path d="M20,180 Q40,170 60,180 Q80,190 100,180" stroke="rgba(80,130,200,0.2)" stroke-width="1" fill="none"/>
-          <path d="M10,200 Q35,188 60,200 Q85,212 110,200" stroke="rgba(80,130,200,0.15)" stroke-width="1" fill="none"/>
-
-          <!-- ── LAGO DI GROMOT ── -->
-          <ellipse cx="530" cy="190" rx="60" ry="38" fill="url(#lake-grad)" opacity="0.9"/>
-          <ellipse cx="530" cy="190" rx="60" ry="38" fill="url(#water-anim)" opacity="0.3"/>
-          <path d="M492,178 Q510,170 530,172 Q550,170 568,178" stroke="rgba(80,140,220,0.2)" stroke-width="1" fill="none"/>
-
-          <!-- ── SELVA FOGLIABRUNA (area) ── -->
-          <path d="M560,280 Q590,255 640,260 Q700,255 730,285 Q750,310 740,350 Q730,390 700,410 Q670,425 640,420 Q600,415 575,390 Q545,360 550,330 Z" fill="rgba(20,55,28,0.55)" stroke="rgba(40,100,50,0.3)" stroke-width="1"/>
-          <!-- Alberini stilizzati -->
-          <g opacity="0.6">
-            <path d="M600,320 L598,345" stroke="#2a5e30" stroke-width="1.5"/><polygon points="600,305 593,325 607,325" fill="#234e28"/>
-            <path d="M625,340 L623,365" stroke="#2a5e30" stroke-width="1.5"/><polygon points="625,325 618,345 632,345" fill="#1e4423"/>
-            <path d="M650,315 L648,340" stroke="#2a5e30" stroke-width="1.5"/><polygon points="650,300 643,320 657,320" fill="#234e28"/>
-            <path d="M675,335 L673,360" stroke="#2a5e30" stroke-width="1.5"/><polygon points="675,320 668,340 682,340" fill="#1e4423"/>
-            <path d="M695,360 L693,385" stroke="#2a5e30" stroke-width="1.5"/><polygon points="695,345 688,365 702,365" fill="#234e28"/>
-            <path d="M615,370 L613,395" stroke="#2a5e30" stroke-width="1.5"/><polygon points="615,355 608,375 622,375" fill="#1e4423"/>
-            <path d="M660,380 L658,405" stroke="#2a5e30" stroke-width="1.5"/><polygon points="660,365 653,385 667,385" fill="#234e28"/>
-            <!-- Foschia selva animata -->
-            <ellipse cx="645" cy="395" rx="55" ry="14" fill="rgba(150,200,160,0.04)" filter="url(#fog-blur)">
-              <animate attributeName="rx" values="55;65;55" dur="6s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="1;0.5;1" dur="6s" repeatCount="indefinite"/>
-            </ellipse>
-          </g>
-
-          <!-- ── FORESTA DELLO SMARRIMENTO (area) ── -->
-          <path d="M700,130 Q740,110 800,120 Q860,125 880,165 Q900,200 880,250 Q860,290 820,300 Q780,305 750,285 Q710,260 700,220 Q685,180 700,130 Z" fill="rgba(15,20,45,0.7)" stroke="rgba(80,60,160,0.3)" stroke-width="1"/>
-          <!-- Alberini scuri/violacei -->
-          <g opacity="0.55">
-            <path d="M730,190 L728,215" stroke="#3a2870" stroke-width="1.5"/><polygon points="730,175 723,195 737,195" fill="#2e1f5e"/>
-            <path d="M755,175 L753,200" stroke="#3a2870" stroke-width="1.5"/><polygon points="755,160 748,180 762,180" fill="#251855"/>
-            <path d="M780,195 L778,220" stroke="#3a2870" stroke-width="1.5"/><polygon points="780,180 773,200 787,200" fill="#2e1f5e"/>
-            <path d="M800,220 L798,245" stroke="#3a2870" stroke-width="1.5"/><polygon points="800,205 793,225 807,225" fill="#251855"/>
-            <path d="M760,235 L758,260" stroke="#3a2870" stroke-width="1.5"/><polygon points="760,220 753,240 767,240" fill="#2e1f5e"/>
-            <path d="M820,175 L818,200" stroke="#3a2870" stroke-width="1.5"/><polygon points="820,160 813,180 827,180" fill="#251855"/>
-            <!-- Rune glow violaceo -->
-            <circle cx="780" cy="210" r="28" fill="none" stroke="rgba(130,80,220,0.12)" stroke-width="1">
-              <animate attributeName="r" values="28;34;28" dur="4s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="1;0.4;1" dur="4s" repeatCount="indefinite"/>
-            </circle>
-            <text x="780" y="213" font-size="12" text-anchor="middle" fill="rgba(130,80,220,0.3)" font-family="serif">ᚱ</text>
-          </g>
-
-          <!-- ── GRID / TEXTURE terra ── -->
-          <line x1="0" y1="260" x2="900" y2="260" stroke="rgba(200,155,60,0.04)" stroke-width="1"/>
-          <line x1="450" y1="0" x2="450" y2="520" stroke="rgba(200,155,60,0.04)" stroke-width="1"/>
-
-          <!-- ── PERCORSI / STRADE ── -->
-          <g stroke="rgba(180,140,50,0.28)" stroke-width="1.5" stroke-dasharray="6,4" fill="none">
-            <!-- Arcamis → Volonx -->
-            <path d="M185,270 Q260,255 330,260"/>
-            <!-- Volonx → Galeton -->
-            <path d="M330,260 Q390,255 440,275"/>
-            <!-- Galeton → Forte Vigilius -->
-            <path d="M440,275 Q470,240 490,210"/>
-            <!-- Forte Vigilius → Lago di Gromot -->
-            <path d="M490,210 Q510,200 530,190"/>
-            <!-- Galeton → Fumofosco -->
-            <path d="M440,275 Q460,310 470,350"/>
-            <!-- Galeton → Selva Fogliabruna (ingresso) -->
-            <path d="M440,275 Q500,275 555,310"/>
-            <!-- Vigilius separato -->
-            <path d="M440,275 Q440,380 430,430"/>
-          </g>
-
-          <!-- ══════════════════════════════
-               HOTSPOT — CITTÀ / VILLAGGI
-          ══════════════════════════════ -->
-
-          <!-- ARCAMIS (città portuale, grande) -->
+          <!-- ARCAMIS -->
           <g class="mloc t-city" id="mloc-arcamis" data-id="3090274fdc1c80e1a365ce1c36873455" data-name="Arcamis" data-desc="Città portuale delle Marche. Porto, commercio, avventura." data-type="città" data-sub="">
-            <circle cx="185" cy="270" r="22" fill="rgba(200,155,60,0.07)" class="mg"/>
-            <circle cx="185" cy="270" r="14" fill="rgba(12,18,30,0.9)" stroke="rgba(200,155,60,0.65)" stroke-width="1.5" class="mc"/>
-            <text x="185" y="266" font-size="11" text-anchor="middle" fill="rgba(200,155,60,0.75)" class="mc">🏙️</text>
-            <text x="185" y="292" font-size="8.5" text-anchor="middle" class="ml">ARCAMIS</text>
+            <circle cx="1662" cy="230" r="38" fill="rgba(200,155,60,0)" class="mg"/>
+            <circle cx="1662" cy="230" r="14" fill="rgba(200,155,60,0.12)" stroke="rgba(200,155,60,0.7)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite"/></circle>
+            <circle cx="1662" cy="230" r="4" fill="rgba(200,155,60,0.9)" class="mc"/>
+          </g>
+
+          <!-- SELVA FOGLIABRUNA -->
+          <g class="mloc t-forest" id="mloc-selvafoglia" data-id="30d0274fdc1c800999feeb0ca6669b22" data-name="Selva Fogliabruna" data-desc="Alberi troppo vecchi. Chi entra non sempre torna." data-type="foresta" data-sub="foglia">
+            <circle cx="1548" cy="210" r="38" fill="rgba(40,160,60,0)" class="mg"/>
+            <circle cx="1548" cy="210" r="14" fill="rgba(30,120,45,0.12)" stroke="rgba(60,200,80,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-green)"><animate attributeName="stroke-opacity" values="0.6;0.9;0.6" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="1548" cy="210" r="4" fill="rgba(60,200,80,0.85)" class="mc"/>
+          </g>
+
+          <!-- FORESTA DELLO SMARRIMENTO -->
+          <g class="mloc t-fog" id="mloc-forestasmari" data-id="30d0274fdc1c8016b113d5c2d7662d8f" data-name="Foresta dello Smarrimento" data-desc="Non ci sono mappe. I sentieri cambiano. Rune violacee compaiono di notte." data-type="foresta" data-sub="smari">
+            <circle cx="1680" cy="370" r="40" fill="rgba(120,80,220,0)" class="mg"/>
+            <circle cx="1680" cy="370" r="14" fill="rgba(80,40,180,0.12)" stroke="rgba(140,90,240,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-violet)"><animate attributeName="stroke-opacity" values="0.6;1;0.3;0.6" dur="3.5s" repeatCount="indefinite"/></circle>
+            <circle cx="1680" cy="370" r="4" fill="rgba(140,90,240,0.85)" class="mc"/>
           </g>
 
           <!-- VOLONX -->
           <g class="mloc t-village" id="mloc-volonx" data-id="30d0274fdc1c804b9cb7e366f02bd635" data-name="Volonx" data-desc="Insediamento ai margini. Chi ci abita, raramente se ne va." data-type="villaggio" data-sub="">
-            <circle cx="330" cy="260" r="18" fill="rgba(160,130,60,0.07)" class="mg"/>
-            <circle cx="330" cy="260" r="10" fill="rgba(10,14,24,0.9)" stroke="rgba(160,130,60,0.48)" stroke-width="1.5" class="mc"/>
-            <text x="330" y="257" font-size="9" text-anchor="middle" fill="rgba(160,130,60,0.7)" class="mc">🏘️</text>
-            <text x="330" y="278" font-size="8" text-anchor="middle" class="ml">VOLONX</text>
+            <circle cx="1792" cy="338" r="34" fill="rgba(180,140,60,0)" class="mg"/>
+            <circle cx="1792" cy="338" r="12" fill="rgba(160,120,50,0.12)" stroke="rgba(200,160,70,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.6;0.85;0.6" dur="2.8s" repeatCount="indefinite"/></circle>
+            <circle cx="1792" cy="338" r="4" fill="rgba(200,160,70,0.85)" class="mc"/>
+          </g>
+
+          <!-- VIGILIUS -->
+          <g class="mloc t-city" id="mloc-vigilius" data-id="31f0274fdc1c8059a923c73da185a0e3" data-name="Vigilius" data-desc="Città interna delle Marche. Centro politico e militare." data-type="città" data-sub="">
+            <circle cx="1452" cy="458" r="36" fill="rgba(200,155,60,0)" class="mg"/>
+            <circle cx="1452" cy="458" r="13" fill="rgba(200,155,60,0.12)" stroke="rgba(200,155,60,0.65)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.65;1;0.65" dur="2.5s" repeatCount="indefinite"/></circle>
+            <circle cx="1452" cy="458" r="4" fill="rgba(200,155,60,0.9)" class="mc"/>
           </g>
 
           <!-- GALETON -->
           <g class="mloc t-village" id="mloc-galeton" data-id="31f0274fdc1c8019945af2b26306462f" data-name="Galeton" data-desc="Crocevia commerciale. Molte strade si incontrano qui." data-type="villaggio" data-sub="">
-            <circle cx="440" cy="275" r="18" fill="rgba(160,130,60,0.07)" class="mg"/>
-            <circle cx="440" cy="275" r="10" fill="rgba(10,14,24,0.9)" stroke="rgba(160,130,60,0.48)" stroke-width="1.5" class="mc"/>
-            <text x="440" y="272" font-size="9" text-anchor="middle" fill="rgba(160,130,60,0.7)" class="mc">🏡</text>
-            <text x="440" y="293" font-size="8" text-anchor="middle" class="ml">GALETON</text>
+            <circle cx="1608" cy="598" r="34" fill="rgba(180,140,60,0)" class="mg"/>
+            <circle cx="1608" cy="598" r="12" fill="rgba(160,120,50,0.12)" stroke="rgba(200,160,70,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.6;0.85;0.6" dur="3.2s" repeatCount="indefinite"/></circle>
+            <circle cx="1608" cy="598" r="4" fill="rgba(200,160,70,0.85)" class="mc"/>
           </g>
 
-          <!-- FUMOFOSCO -->
-          <g class="mloc t-village" id="mloc-fumofosco" data-id="31f0274fdc1c805b89b8f0678463e615" data-name="Fumofosco" data-desc="Un villaggio avvolto da strane nebbie. I locali non parlano molto." data-type="villaggio" data-sub="">
-            <circle cx="470" cy="355" r="18" fill="rgba(160,130,60,0.07)" class="mg"/>
-            <circle cx="470" cy="355" r="10" fill="rgba(10,14,24,0.9)" stroke="rgba(160,130,60,0.48)" stroke-width="1.5" class="mc"/>
-            <text x="470" y="352" font-size="9" text-anchor="middle" fill="rgba(160,130,60,0.7)" class="mc">🌫️</text>
-            <text x="470" y="373" font-size="8" text-anchor="middle" class="ml">FUMOFOSCO</text>
+          <!-- LAGO DI GROMOT -->
+          <g class="mloc t-water" id="mloc-lagogromot" data-id="30d0274fdc1c803387c4fda013b857e9" data-name="Lago di Gromot" data-desc="Acque scure e profonde. Nessuno sa quanto è fondo." data-type="lago" data-sub="">
+            <circle cx="1738" cy="488" r="34" fill="rgba(60,120,220,0)" class="mg"/>
+            <circle cx="1738" cy="488" r="12" fill="rgba(40,90,200,0.15)" stroke="rgba(80,150,240,0.65)" stroke-width="2" class="mc" filter="url(#h-glow-blue)"><animate attributeName="stroke-opacity" values="0.65;0.9;0.65" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="1738" cy="488" r="4" fill="rgba(80,160,240,0.85)" class="mc"/>
+          </g>
+
+          <!-- FORTE VIGILUS -->
+          <g class="mloc t-fort" id="mloc-fortevigilius" data-id="30d0274fdc1c8090aee7ed0430170414" data-name="Forte Vigilus" data-desc="Avamposto militare sulle alture. Controlla i passi verso est." data-type="forte" data-sub="">
+            <circle cx="355" cy="272" r="34" fill="rgba(160,100,40,0)" class="mg"/>
+            <circle cx="355" cy="272" r="12" fill="rgba(150,90,30,0.12)" stroke="rgba(180,120,50,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.6;0.9;0.6" dur="2.8s" repeatCount="indefinite"/></circle>
+            <circle cx="355" cy="272" r="4" fill="rgba(180,120,50,0.85)" class="mc"/>
           </g>
 
           <!-- RIVA DI FERRO -->
           <g class="mloc t-village" id="mloc-rivadifero" data-id="31f0274fdc1c8075b0dec2e2a6bc359e" data-name="Riva di Ferro" data-desc="Porto minore. Pescatori, contrabbandieri, qualche avventuriero di passaggio." data-type="villaggio" data-sub="">
-            <circle cx="130" cy="380" r="18" fill="rgba(160,130,60,0.07)" class="mg"/>
-            <circle cx="130" cy="380" r="10" fill="rgba(10,14,24,0.9)" stroke="rgba(160,130,60,0.48)" stroke-width="1.5" class="mc"/>
-            <text x="130" y="377" font-size="9" text-anchor="middle" fill="rgba(160,130,60,0.7)" class="mc">⚓</text>
-            <text x="130" y="398" font-size="8" text-anchor="middle" class="ml">RIVA DI FERRO</text>
+            <circle cx="415" cy="618" r="34" fill="rgba(180,140,60,0)" class="mg"/>
+            <circle cx="415" cy="618" r="12" fill="rgba(160,120,50,0.12)" stroke="rgba(200,160,70,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.6;0.85;0.6" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="415" cy="618" r="4" fill="rgba(200,160,70,0.85)" class="mc"/>
           </g>
 
-          <!-- VIGILIUS (città) -->
-          <g class="mloc t-city" id="mloc-vigilius" data-id="31f0274fdc1c8059a923c73da185a0e3" data-name="Vigilius" data-desc="Città interna delle Marche. Centro politico e militare." data-type="città" data-sub="">
-            <circle cx="430" cy="435" r="20" fill="rgba(200,155,60,0.07)" class="mg"/>
-            <circle cx="430" cy="435" r="12" fill="rgba(12,18,30,0.9)" stroke="rgba(200,155,60,0.65)" stroke-width="1.5" class="mc"/>
-            <text x="430" y="432" font-size="10" text-anchor="middle" fill="rgba(200,155,60,0.75)" class="mc">🏰</text>
-            <text x="430" y="455" font-size="8.5" text-anchor="middle" class="ml">VIGILIUS</text>
+          <!-- FUMOFOSCO -->
+          <g class="mloc t-village" id="mloc-fumofosco" data-id="31f0274fdc1c805b89b8f0678463e615" data-name="Fumofosco" data-desc="Un villaggio avvolto da strane nebbie. I locali non parlano molto." data-type="villaggio" data-sub="">
+            <circle cx="750" cy="428" r="34" fill="rgba(180,140,60,0)" class="mg"/>
+            <circle cx="750" cy="428" r="12" fill="rgba(160,120,50,0.12)" stroke="rgba(200,160,70,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.6;0.85;0.6" dur="3.4s" repeatCount="indefinite"/></circle>
+            <circle cx="750" cy="428" r="4" fill="rgba(200,160,70,0.85)" class="mc"/>
           </g>
-
-          <!-- FORTE VIGILIUS -->
-          <g class="mloc t-fort" id="mloc-fortevigilius" data-id="30d0274fdc1c8090aee7ed0430170414" data-name="Forte Vigilius" data-desc="Avamposto militare sulle alture. Controlla i passi verso est." data-type="forte" data-sub="">
-            <circle cx="490" cy="210" r="18" fill="rgba(150,100,40,0.08)" class="mg"/>
-            <circle cx="490" cy="210" r="11" fill="rgba(10,14,24,0.9)" stroke="rgba(150,100,40,0.6)" stroke-width="1.5" class="mc"/>
-            <text x="490" y="207" font-size="9" text-anchor="middle" fill="rgba(150,100,40,0.75)" class="mc">🗼</text>
-            <text x="490" y="228" font-size="8" text-anchor="middle" class="ml">FORTE VIGILIUS</text>
-          </g>
-
-          <!-- ══════════════════════════════
-               HOTSPOT — NATURA
-          ══════════════════════════════ -->
-
-          <!-- LAGO DI GROMOT (cliccabile) -->
-          <g class="mloc t-water" id="mloc-lagogromot" data-id="30d0274fdc1c803387c4fda013b857e9" data-name="Lago di Gromot" data-desc="Acque scure e profonde. Nessuno sa quanto è fondo." data-type="lago" data-sub="">
-            <ellipse cx="530" cy="190" rx="60" ry="38" fill="rgba(40,90,180,0.06)" class="mg"/>
-            <text x="530" y="194" font-size="9" text-anchor="middle" fill="rgba(80,150,230,0.6)" class="ml">LAGO DI GROMOT</text>
-          </g>
-
-          <!-- SELVA FOGLIABRUNA (apre mappa secondaria) -->
-          <g class="mloc t-forest" id="mloc-selvafoglia" data-id="30d0274fdc1c800999feeb0ca6669b22" data-name="Selva Fogliabruna" data-desc="Alberi troppo vecchi. Chi entra non sempre torna." data-type="foresta" data-sub="foglia">
-            <ellipse cx="645" cy="360" rx="78" ry="50" fill="rgba(40,120,55,0.06)" class="mg"/>
-            <text x="645" y="364" font-size="8.5" text-anchor="middle" class="ml">SELVA FOGLIABRUNA</text>
-            <text x="645" y="376" font-size="7" text-anchor="middle" fill="rgba(60,180,80,0.4)">[ esplora →]</text>
-          </g>
-
-          <!-- FORESTA DELLO SMARRIMENTO (apre mappa secondaria) -->
-          <g class="mloc t-fog" id="mloc-forestasmari" data-id="30d0274fdc1c8016b113d5c2d7662d8f" data-name="Foresta dello Smarrimento" data-desc="Non ci sono mappe. I sentieri cambiano. Rune violacee compaiono di notte." data-type="foresta" data-sub="smari">
-            <ellipse cx="800" cy="210" rx="85" ry="70" fill="rgba(120,120,180,0.04)" class="mg"/>
-            <text x="800" y="214" font-size="8.5" text-anchor="middle" class="ml">FORESTA DELLO SMARRIMENTO</text>
-            <text x="800" y="226" font-size="7" text-anchor="middle" fill="rgba(140,100,220,0.45)">[ esplora →]</text>
-          </g>
-
-          <!-- ══════════════════════════════
-               HOTSPOT — ROVINE
-          ══════════════════════════════ -->
 
           <!-- ROVINE DI KALDUR -->
           <g class="mloc t-ruin" id="mloc-kaldur" data-id="31f0274fdc1c808191abe4df86d176e6" data-name="Rovine di Kaldur" data-desc="Una civiltà è finita qui. Non è chiaro perché. Le pietre bruciano ancora." data-type="rovine" data-sub="">
-            <circle cx="310" cy="420" r="20" fill="rgba(100,50,180,0.08)" class="mg"/>
-            <circle cx="310" cy="420" r="12" fill="rgba(8,6,18,0.95)" stroke="rgba(120,70,200,0.6)" stroke-width="1.5" class="mc">
-              <animate attributeName="stroke-opacity" values="0.6;0.9;0.3;0.6" dur="3.5s" repeatCount="indefinite"/>
-            </circle>
-            <text x="310" y="417" font-size="10" text-anchor="middle" fill="rgba(150,80,230,0.7)" class="mc">☽</text>
-            <text x="310" y="440" font-size="8" text-anchor="middle" class="ml">ROVINE DI KALDUR</text>
+            <circle cx="952" cy="598" r="36" fill="rgba(120,60,200,0)" class="mg"/>
+            <circle cx="952" cy="598" r="13" fill="rgba(90,40,180,0.15)" stroke="rgba(150,80,240,0.7)" stroke-width="2" class="mc" filter="url(#h-glow-violet)"><animate attributeName="stroke-opacity" values="0.7;1;0.3;0.7" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="952" cy="598" r="4" fill="rgba(150,80,240,0.9)" class="mc"/>
           </g>
 
-          <!-- ── ROSA DEI VENTI ── -->
-          <g transform="translate(55,445)" opacity="0.25">
-            <circle cx="0" cy="0" r="20" fill="none" stroke="rgba(200,155,60,0.4)" stroke-width="0.8"/>
-            <path d="M0,-20 L3,-6 L0,-10 L-3,-6 Z" fill="rgba(200,155,60,0.6)"/>
-            <path d="M0,20 L3,6 L0,10 L-3,6 Z" fill="rgba(200,155,60,0.3)"/>
-            <path d="M-20,0 L-6,3 L-10,0 L-6,-3 Z" fill="rgba(200,155,60,0.3)"/>
-            <path d="M20,0 L6,3 L10,0 L6,-3 Z" fill="rgba(200,155,60,0.3)"/>
-            <text x="0" y="-24" font-size="7" text-anchor="middle" fill="rgba(200,155,60,0.5)" font-family="Cinzel,serif">N</text>
-          </g>
-
-          <!-- ── TITOLO MAPPA ── -->
-          <text x="450" y="24" font-family="Cinzel,serif" font-size="10" fill="rgba(200,155,60,0.35)" letter-spacing="0.4em" text-anchor="middle">MARCHE DI ARCAMIS — CARTA PARZIALE</text>
-          <line x1="200" y1="30" x2="700" y2="30" stroke="rgba(200,155,60,0.1)" stroke-width="0.5"/>
-
-          <!-- ── BORDER frame ── -->
-          <rect x="1" y="1" width="898" height="518" fill="none" stroke="rgba(200,155,60,0.12)" stroke-width="1.5"/>
-          <rect x="6" y="6" width="888" height="508" fill="none" stroke="rgba(200,155,60,0.06)" stroke-width="0.8"/>
         </svg>
 
         <!-- Tooltip -->
@@ -1819,96 +1672,53 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
           <div class="map-tip-hint" id="mt-hint">Clicca per aprire</div>
         </div>
 
-        <!-- ── PANNELLO MAPPA SECONDARIA: Selva Fogliabruna ── -->
+        <!-- Selva Fogliabruna panel -->
         <div class="sub-map-panel" id="sub-foglia">
           <div class="smp-header">
-            <div class="smp-title">
-              <span>🌲</span>
-              <span>SELVA FOGLIABRUNA — Luoghi esplorati</span>
-            </div>
+            <div class="smp-title"><span>🌲</span><span>SELVA FOGLIABRUNA — Luoghi esplorati</span></div>
             <div class="smp-close" onclick="closeSubMap('sub-foglia')">✕</div>
           </div>
           <div class="smp-body">
-            <svg id="sub-svg-foglia" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;max-height:100%;cursor:crosshair">
               <rect width="500" height="300" fill="#030a06"/>
               <path d="M50,100 Q150,60 250,80 Q350,60 450,100 Q480,150 450,220 Q350,280 250,290 Q150,280 50,220 Q20,170 50,100 Z" fill="rgba(15,45,20,0.6)" stroke="rgba(30,90,35,0.3)" stroke-width="1"/>
-              <!-- Alberini -->
-              <g opacity="0.7" stroke="#2a5e30" stroke-width="1.5">
-                <line x1="150" y1="120" x2="148" y2="155"/><polygon points="150,105 143,125 157,125" fill="#234e28"/>
-                <line x1="200" y1="140" x2="198" y2="175"/><polygon points="200,125 193,145 207,145" fill="#1e4423"/>
-                <line x1="260" y1="115" x2="258" y2="150"/><polygon points="260,100 253,120 267,120" fill="#234e28"/>
-                <line x1="320" y1="135" x2="318" y2="170"/><polygon points="320,120 313,140 327,140" fill="#1e4423"/>
-                <line x1="180" y1="185" x2="178" y2="220"/><polygon points="180,170 173,190 187,190" fill="#234e28"/>
-                <line x1="340" y1="175" x2="338" y2="210"/><polygon points="340,160 333,180 347,180" fill="#1e4423"/>
-              </g>
-              <!-- Foschia -->
-              <ellipse cx="250" cy="245" r="120" ry="25" fill="rgba(150,200,160,0.06)" filter="url(#fog-blur)">
-                <animate attributeName="rx" values="120;140;120" dur="5s" repeatCount="indefinite"/>
-              </ellipse>
-              <!-- RIVOROSSO hotspot -->
-              <g class="mloc t-water" id="mloc-rivorosso" data-id="31e0274fdc1c80f3a3cee348f59cede0" data-name="Rivorosso" data-desc="Un ruscello dai riflessi rossastri. L'acqua non è tossica... dicono." data-type="luogo" data-sub="">
-                <ellipse cx="250" cy="200" rx="65" ry="15" fill="rgba(180,50,40,0.15)"/>
-                <path d="M185,200 Q215,190 250,200 Q285,210 315,200" stroke="rgba(200,60,40,0.5)" stroke-width="2" fill="none">
-                  <animate attributeName="d" values="M185,200 Q215,190 250,200 Q285,210 315,200;M185,202 Q215,192 250,202 Q285,212 315,202;M185,200 Q215,190 250,200 Q285,210 315,200" dur="2.5s" repeatCount="indefinite"/>
-                </path>
-                <text x="250" y="220" font-size="9" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(220,80,60,0.6)" class="ml">RIVOROSSO</text>
+              <g class="mloc t-water" data-id="31e0274fdc1c80f3a3cee348f59cede0" data-name="Rivorosso" data-desc="Un ruscello dai riflessi rossastri." data-type="luogo" data-sub="">
+                <path d="M185,200 Q215,190 250,200 Q285,210 315,200" stroke="rgba(200,60,40,0.6)" stroke-width="2.5" fill="none"/>
+                <circle cx="250" cy="200" r="14" fill="rgba(180,40,30,0.1)" stroke="rgba(200,60,40,0.5)" stroke-width="1.5" class="mc"/>
+                <text x="250" y="225" font-size="9" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(220,80,60,0.6)" class="ml">RIVOROSSO</text>
               </g>
               <rect x="1" y="1" width="498" height="298" fill="none" stroke="rgba(40,100,50,0.2)" stroke-width="1"/>
             </svg>
           </div>
         </div>
 
-        <!-- ── PANNELLO MAPPA SECONDARIA: Foresta dello Smarrimento ── -->
+        <!-- Foresta Smarrimento panel -->
         <div class="sub-map-panel" id="sub-smari">
           <div class="smp-header">
-            <div class="smp-title">
-              <span>🌑</span>
-              <span>FORESTA DELLO SMARRIMENTO — Luoghi noti</span>
-            </div>
+            <div class="smp-title"><span>🌑</span><span>FORESTA DELLO SMARRIMENTO — Luoghi noti</span></div>
             <div class="smp-close" onclick="closeSubMap('sub-smari')">✕</div>
           </div>
           <div class="smp-body">
-            <svg id="sub-svg-smari" viewBox="0 0 600 350" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 600 350" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;max-height:100%;cursor:crosshair">
               <rect width="600" height="350" fill="#07060f"/>
               <path d="M60,80 Q180,40 300,60 Q420,40 540,80 Q580,130 560,240 Q500,320 300,340 Q100,320 40,240 Q20,170 60,80 Z" fill="rgba(12,8,35,0.7)" stroke="rgba(80,50,160,0.2)" stroke-width="1"/>
-              <!-- Alberini viola scuri -->
-              <g opacity="0.6" stroke="#3a2870" stroke-width="1.5">
-                <line x1="120" y1="130" x2="118" y2="165"/><polygon points="120,115 113,135 127,135" fill="#2e1f5e"/>
-                <line x1="180" y1="150" x2="178" y2="185"/><polygon points="180,135 173,155 187,155" fill="#251855"/>
-                <line x1="250" y1="120" x2="248" y2="155"/><polygon points="250,105 243,125 257,125" fill="#2e1f5e"/>
-                <line x1="360" y1="140" x2="358" y2="175"/><polygon points="360,125 353,145 367,145" fill="#251855"/>
-                <line x1="420" y1="115" x2="418" y2="150"/><polygon points="420,100 413,120 427,120" fill="#2e1f5e"/>
-                <line x1="480" y1="155" x2="478" y2="190"/><polygon points="480,140 473,160 487,160" fill="#251855"/>
+              <text x="300" y="75" font-size="13" text-anchor="middle" fill="rgba(130,80,220,0.2)" font-family="serif">ᚠ ᚢ ᚦ ᚨ ᚱ</text>
+              <g class="mloc t-ruin" data-id="30d0274fdc1c80038beec3f444e45f8b" data-name="Circolo dello Smarrimento" data-desc="Un cerchio di pietre sconosciute. Chi entra perde il senso del tempo." data-type="luogo" data-sub="">
+                <circle cx="300" cy="175" r="30" fill="none" stroke="rgba(120,70,200,0.2)" stroke-width="1" stroke-dasharray="5,3"/>
+                <circle cx="300" cy="175" r="10" fill="rgba(8,6,18,0.9)" stroke="rgba(140,80,240,0.6)" stroke-width="1.5" class="mc"><animate attributeName="stroke-opacity" values="0.6;1;0.3;0.6" dur="3s" repeatCount="indefinite"/></circle>
+                <text x="300" y="215" font-size="8" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(150,80,230,0.55)" class="ml">CIRCOLO DELLO SMARRIMENTO</text>
               </g>
-              <!-- Rune fluttuanti -->
-              <text x="300" y="80" font-size="14" text-anchor="middle" fill="rgba(130,80,220,0.25)" font-family="serif">ᚠ ᚢ ᚦ ᚨ ᚱ</text>
-              <!-- HOTSPOT sub-locations -->
-              <!-- Circolo -->
-              <g class="mloc t-ruin" data-id="30d0274fdc1c80038beec3f444e45f8b" data-name="Circolo dello Smarrimento" data-desc="Un cerchio di pietre di origine sconosciuta. Chi entra nel centro perde il senso del tempo." data-type="luogo" data-sub="">
-                <circle cx="300" cy="175" r="35" fill="rgba(100,50,200,0.06)" stroke="rgba(120,70,200,0.25)" stroke-width="1" stroke-dasharray="5,3"/>
-                <circle cx="300" cy="175" r="8" fill="rgba(8,6,18,0.95)" stroke="rgba(120,70,200,0.55)" stroke-width="1.5" class="mc">
-                  <animate attributeName="stroke-opacity" values="0.55;0.9;0.3;0.55" dur="3s" repeatCount="indefinite"/>
-                </circle>
-                <text x="300" y="178" font-size="8" text-anchor="middle" fill="rgba(150,80,230,0.6)" class="mc">◉</text>
-                <text x="300" y="222" font-size="8" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(150,80,230,0.5)" class="ml">CIRCOLO DELLO SMARRIMENTO</text>
+              <g class="mloc t-forest" data-id="30d0274fdc1c80cf8cdaf328e339dfc7" data-name="Dimora degli Ursidi" data-desc="Abitato da creature enormi. Non si avvicina nessuno." data-type="luogo" data-sub="">
+                <circle cx="150" cy="240" r="10" fill="rgba(20,14,24,0.9)" stroke="rgba(80,120,50,0.55)" stroke-width="1.5" class="mc"/>
+                <text x="150" y="262" font-size="7.5" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(80,150,60,0.55)" class="ml">DIMORA DEGLI URSIDI</text>
               </g>
-              <!-- Dimora Ursidi -->
-              <g class="mloc t-forest" data-id="30d0274fdc1c80cf8cdaf328e339dfc7" data-name="Dimora degli Ursidi" data-desc="Un rifugio naturale abitato da creature enormi. Non si avvicina nessuno." data-type="luogo" data-sub="">
-                <circle cx="150" cy="240" r="14" fill="rgba(20,14,24,0.9)" stroke="rgba(80,120,50,0.5)" stroke-width="1.5" class="mc"/>
-                <text x="150" y="243" font-size="10" text-anchor="middle" fill="rgba(80,180,60,0.6)" class="mc">🐻</text>
-                <text x="150" y="265" font-size="7.5" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(80,150,60,0.5)" class="ml">DIMORA DEGLI URSIDI</text>
+              <g class="mloc t-ruin" data-id="3130274fdc1c80848fe5dfd7d2610c06" data-name="La Caverna delle Talpe" data-desc="Gallerie immense. Buio completo, rumori indefiniti." data-type="luogo" data-sub="">
+                <circle cx="450" cy="250" r="10" fill="rgba(14,10,20,0.9)" stroke="rgba(140,100,60,0.55)" stroke-width="1.5" class="mc"/>
+                <text x="450" y="272" font-size="7.5" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(150,110,60,0.55)" class="ml">CAVERNA DELLE TALPE</text>
               </g>
-              <!-- Caverna Talpe -->
-              <g class="mloc t-ruin" data-id="3130274fdc1c80848fe5dfd7d2610c06" data-name="La Caverna delle Talpe" data-desc="Gallerie scavate da qualcosa di enorme. Buio completo, rumori indefiniti." data-type="luogo" data-sub="">
-                <circle cx="450" cy="250" r="14" fill="rgba(14,10,20,0.9)" stroke="rgba(120,90,50,0.5)" stroke-width="1.5" class="mc"/>
-                <text x="450" y="253" font-size="10" text-anchor="middle" fill="rgba(150,110,60,0.6)" class="mc">🕳️</text>
-                <text x="450" y="274" font-size="7.5" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(130,100,50,0.5)" class="ml">CAVERNA DELLE TALPE</text>
-              </g>
-              <!-- Miniera Bruciascoria -->
-              <g class="mloc t-ruin" data-id="31e0274fdc1c80f581f4f9cd7284bff0" data-name="Miniera Bruciascoria" data-desc="Abbandonata dopo un incendio sotterraneo. Fuma ancora, a volte." data-type="luogo" data-sub="">
-                <circle cx="420" cy="130" r="14" fill="rgba(18,8,8,0.9)" stroke="rgba(180,80,40,0.5)" stroke-width="1.5" class="mc"/>
-                <text x="420" y="133" font-size="10" text-anchor="middle" fill="rgba(200,100,40,0.6)" class="mc">⛏️</text>
-                <text x="420" y="154" font-size="7.5" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(180,90,40,0.5)" class="ml">MINIERA BRUCIASCORIA</text>
+              <g class="mloc t-ruin" data-id="31e0274fdc1c80f581f4f9cd7284bff0" data-name="Miniera Bruciascoria" data-desc="Abbandonata dopo un incendio. Fuma ancora, a volte." data-type="luogo" data-sub="">
+                <circle cx="420" cy="130" r="10" fill="rgba(18,8,8,0.9)" stroke="rgba(200,90,40,0.55)" stroke-width="1.5" class="mc"/>
+                <text x="420" y="152" font-size="7.5" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(200,90,40,0.55)" class="ml">MINIERA BRUCIASCORIA</text>
               </g>
               <rect x="1" y="1" width="598" height="348" fill="none" stroke="rgba(80,50,160,0.15)" stroke-width="1"/>
             </svg>
@@ -1916,6 +1726,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
         </div>
       </div>
       <p class="map-or">— oppure esplora per scheda —</p>
+
 
       <div class="loc-wrap">
         <div class="la la-prev" onclick="locSlide(-1)">&#10094;</div>
@@ -2895,6 +2706,6 @@ initFadeIn();/* ═════════════════════�
     });
   });
 })();
-
+</script>
 </body>
 </html>
