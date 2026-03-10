@@ -1124,14 +1124,9 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 @media(max-width:600px){#ovp{max-height:98vh}.portal-body{padding:18px 20px}}
 
 /* ════════════════════════════════════
-   MAPPA INTERATTIVA
+   MAPPA INTERATTIVA — pin assoluti
 ════════════════════════════════════ */
-.map-sec{padding-bottom:32px}
-.map-container{
-  position:relative;border:1px solid rgba(200,155,60,.18);
-  background:#020408;overflow:hidden;margin-top:24px;
-}
-#arcamis-map{width:100%;display:block;cursor:crosshair}
+.map-container{position:relative;overflow:hidden;margin-top:24px;line-height:0}
 .map-tip{
   position:absolute;z-index:100;pointer-events:none;
   background:rgba(4,5,14,.96);border:1px solid rgba(200,155,60,.35);
@@ -1145,20 +1140,37 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 .map-tip-desc{font-size:11.5px;color:var(--parch);font-style:italic;line-height:1.5;margin-bottom:4px}
 .map-tip-hint{font-family:'Cinzel',serif;font-size:8px;color:var(--gold);letter-spacing:.1em;opacity:.65}
 .map-tip-hint.sub{color:rgba(80,200,110,.75)}
-.mloc{cursor:pointer}
-.mloc .mg{transition:opacity .2s;opacity:0}
-.mloc:hover .mg{opacity:1}
-.mloc .mc{transition:filter .2s}
-.mloc:hover .mc{filter:drop-shadow(0 0 7px var(--lc,rgba(200,155,60,.8)))}
-.mloc .ml{font-family:'Cinzel',serif;fill:rgba(200,155,60,.6);font-weight:700;letter-spacing:.05em;pointer-events:none;transition:fill .2s}
-.mloc:hover .ml{fill:var(--gold3,#e8c86a)}
-.t-city{--lc:rgba(220,175,60,.9);--fc:rgba(200,155,60,.22);--sc:rgba(200,155,60,.65);--gc:rgba(200,155,60,.09)}
-.t-fort{--lc:rgba(180,120,50,.9);--fc:rgba(150,100,40,.2);--sc:rgba(150,100,40,.6);--gc:rgba(150,100,40,.08)}
-.t-village{--lc:rgba(180,150,80,.8);--fc:rgba(160,130,60,.15);--sc:rgba(160,130,60,.48);--gc:rgba(160,130,60,.07)}
-.t-forest{--lc:rgba(60,160,80,.9);--fc:rgba(40,120,55,.2);--sc:rgba(40,120,55,.55);--gc:rgba(40,120,55,.08)}
-.t-water{--lc:rgba(80,150,230,.9);--fc:rgba(40,90,180,.25);--sc:rgba(50,100,200,.55);--gc:rgba(40,90,180,.08)}
-.t-ruin{--lc:rgba(150,80,230,.9);--fc:rgba(100,50,180,.2);--sc:rgba(120,70,200,.6);--gc:rgba(100,50,180,.1)}
-.t-fog{--lc:rgba(160,160,200,.8);--fc:rgba(120,120,180,.15);--sc:rgba(120,120,180,.45);--gc:rgba(120,120,180,.07)}
+/* pin */
+.mpin{
+  position:absolute;transform:translate(-50%,-50%);
+  width:28px;height:28px;cursor:pointer;z-index:10;
+  display:flex;align-items:center;justify-content:center;
+}
+.mpin-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--pc,rgba(200,155,60,.9));
+  box-shadow:0 0 8px var(--pg,rgba(200,155,60,.7));
+  transition:transform .2s,box-shadow .2s;z-index:2;
+}
+.mpin-ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:1.5px solid var(--pc,rgba(200,155,60,.5));
+  animation:pinpulse 2.5s ease-out infinite;
+}
+@keyframes pinpulse{
+  0%{transform:scale(.6);opacity:.9}
+  100%{transform:scale(2.2);opacity:0}
+}
+.mpin:hover .mpin-dot{transform:scale(1.5);box-shadow:0 0 16px var(--pg,rgba(200,155,60,.9))}
+/* colori per tipo */
+.mpin.t-city{--pc:rgba(220,175,60,.95);--pg:rgba(220,175,60,.8)}
+.mpin.t-village{--pc:rgba(200,155,60,.85);--pg:rgba(200,155,60,.65)}
+.mpin.t-fort{--pc:rgba(190,130,50,.85);--pg:rgba(190,130,50,.65)}
+.mpin.t-forest{--pc:rgba(60,200,80,.85);--pg:rgba(60,200,80,.65)}
+.mpin.t-water{--pc:rgba(80,160,240,.85);--pg:rgba(80,160,240,.65)}
+.mpin.t-ruin{--pc:rgba(150,80,240,.85);--pg:rgba(150,80,240,.7);animation-duration:3.5s}
+.mpin.t-fog{--pc:rgba(140,100,240,.85);--pg:rgba(140,100,240,.7)}
+/* sub-map panels */
 .sub-map-panel{
   display:none;position:absolute;inset:0;z-index:40;
   background:rgba(4,5,14,.97);backdrop-filter:blur(6px);flex-direction:column;
@@ -1175,9 +1187,14 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 }
 .smp-close:hover{color:#ff6060;border-color:#c03030}
 .smp-body{flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:16px}
-#sub-svg{max-width:100%;max-height:100%;cursor:crosshair}
 .map-or{text-align:center;margin-top:18px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.3em;color:var(--text3);opacity:.5;text-transform:uppercase}
-@media(max-width:700px){.map-tip{display:none}#arcamis-map{cursor:default}}
+/* mloc per sub-SVG panels */
+.mloc{cursor:pointer}
+.mloc .mc{transition:filter .2s}
+.mloc:hover .mc{filter:drop-shadow(0 0 7px rgba(200,155,60,.8))}
+.mloc .ml{font-family:'Cinzel',serif;fill:rgba(200,155,60,.6);font-weight:700;letter-spacing:.05em;pointer-events:none;transition:fill .2s}
+.mloc:hover .ml{fill:rgba(220,175,60,.9)}
+@media(max-width:700px){.map-tip{display:none}}
 
 @media(max-width:768px){
   nav#tnav{display:none}
@@ -1633,96 +1650,87 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
       <div class="sec-h">MARCHE DI ARCAMIS</div>
       <p class="sec-p">La città portuale di Arcamis e i territori circostanti. Un piccolo angolo di un regno molto più vasto, ancora in gran parte sconosciuto.</p>
       <!-- ── MAPPA INTERATTIVA ── -->
-      <div class="map-container" style="border-radius:2px;background:#030608">
-        <svg id="arcamis-map" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" aria-label="Mappa delle Marche di Arcamis" style="display:block;width:100%">
-          <defs>
-            <filter id="h-glow-gold"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            <filter id="h-glow-green"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            <filter id="h-glow-violet"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            <filter id="h-glow-blue"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
+      <div class="map-container" id="arcamis-map" style="border-radius:2px;position:relative;overflow:hidden;background:#030608;line-height:0">
+        <img src="mappa.png" alt="Mappa delle Marche di Arcamis" style="width:100%;display:block;pointer-events:none" draggable="false"/>
 
-          <!-- MAPPA BASE -->
-          <image href="mappa.png" x="0" y="0" width="1920" height="1080" preserveAspectRatio="xMidYMid meet"/>
+        <!-- ── HOTSPOT assoluti in % ── -->
 
-          <!-- ARCAMIS -->
-          <g class="mloc t-city" id="mloc-arcamis" data-id="3090274fdc1c80e1a365ce1c36873455" data-name="Arcamis" data-desc="Città portuale delle Marche. Porto, commercio, avventura." data-type="città" data-sub="">
-            <circle cx="1295" cy="222" r="38" fill="rgba(200,155,60,0)" class="mg"/>
-            <circle cx="1295" cy="222" r="14" fill="rgba(200,155,60,0.12)" stroke="rgba(200,155,60,0.7)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite"/></circle>
-            <circle cx="1295" cy="222" r="4" fill="rgba(200,155,60,0.9)" class="mc"/>
-          </g>
+        <!-- ARCAMIS -->
+        <div class="mpin t-city" id="mpin-arcamis" style="left:67.45%;top:17.13%"
+          data-id="3090274fdc1c80e1a365ce1c36873455" data-name="Arcamis"
+          data-desc="Città portuale delle Marche. Porto, commercio, avventura." data-sub="">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
-          <!-- SELVA FOGLIABRUNA -->
-          <g class="mloc t-forest" id="mloc-selvafoglia" data-id="30d0274fdc1c800999feeb0ca6669b22" data-name="Selva Fogliabruna" data-desc="Alberi troppo vecchi. Chi entra non sempre torna." data-type="foresta" data-sub="foglia">
-            <circle cx="1232" cy="178" r="38" fill="rgba(40,160,60,0)" class="mg"/>
-            <circle cx="1232" cy="178" r="14" fill="rgba(30,120,45,0.12)" stroke="rgba(60,200,80,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-green)"><animate attributeName="stroke-opacity" values="0.6;0.9;0.6" dur="3s" repeatCount="indefinite"/></circle>
-            <circle cx="1232" cy="178" r="4" fill="rgba(60,200,80,0.85)" class="mc"/>
-          </g>
+        <!-- SELVA FOGLIABRUNA -->
+        <div class="mpin t-forest" id="mpin-selvafoglia" style="left:62.24%;top:15.74%"
+          data-id="30d0274fdc1c800999feeb0ca6669b22" data-name="Selva Fogliabruna"
+          data-desc="Alberi troppo vecchi. Chi entra non sempre torna." data-sub="foglia">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
-          <!-- FORESTA DELLO SMARRIMENTO -->
-          <g class="mloc t-fog" id="mloc-forestasmari" data-id="30d0274fdc1c8016b113d5c2d7662d8f" data-name="Foresta dello Smarrimento" data-desc="Non ci sono mappe. I sentieri cambiano. Rune violacee compaiono di notte." data-type="foresta" data-sub="smari">
-            <circle cx="1428" cy="375" r="40" fill="rgba(120,80,220,0)" class="mg"/>
-            <circle cx="1428" cy="375" r="14" fill="rgba(80,40,180,0.12)" stroke="rgba(140,90,240,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-violet)"><animate attributeName="stroke-opacity" values="0.6;1;0.3;0.6" dur="3.5s" repeatCount="indefinite"/></circle>
-            <circle cx="1428" cy="375" r="4" fill="rgba(140,90,240,0.85)" class="mc"/>
-          </g>
+        <!-- FORESTA DELLO SMARRIMENTO -->
+        <div class="mpin t-fog" id="mpin-forestasmari" style="left:72.66%;top:33.52%"
+          data-id="30d0274fdc1c8016b113d5c2d7662d8f" data-name="Foresta dello Smarrimento"
+          data-desc="Non ci sono mappe. I sentieri cambiano. Rune violacee compaiono di notte." data-sub="smari">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
-          <!-- VOLONX -->
-          <g class="mloc t-village" id="mloc-volonx" data-id="30d0274fdc1c804b9cb7e366f02bd635" data-name="Volonx" data-desc="Insediamento ai margini. Chi ci abita, raramente se ne va." data-type="villaggio" data-sub="">
-            <circle cx="1415" cy="330" r="34" fill="rgba(180,140,60,0)" class="mg"/>
-            <circle cx="1415" cy="330" r="12" fill="rgba(160,120,50,0.12)" stroke="rgba(200,160,70,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.6;0.85;0.6" dur="2.8s" repeatCount="indefinite"/></circle>
-            <circle cx="1415" cy="330" r="4" fill="rgba(200,160,70,0.85)" class="mc"/>
-          </g>
+        <!-- VOLONX -->
+        <div class="mpin t-village" id="mpin-volonx" style="left:74.48%;top:29.81%"
+          data-id="30d0274fdc1c804b9cb7e366f02bd635" data-name="Volonx"
+          data-desc="Insediamento ai margini. Chi ci abita, raramente se ne va." data-sub="">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
-          <!-- VIGILIUS -->
-          <g class="mloc t-city" id="mloc-vigilius" data-id="31f0274fdc1c8059a923c73da185a0e3" data-name="Vigilius" data-desc="Città interna delle Marche. Centro politico e militare." data-type="città" data-sub="">
-            <circle cx="1128" cy="453" r="36" fill="rgba(200,155,60,0)" class="mg"/>
-            <circle cx="1128" cy="453" r="13" fill="rgba(200,155,60,0.12)" stroke="rgba(200,155,60,0.65)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.65;1;0.65" dur="2.5s" repeatCount="indefinite"/></circle>
-            <circle cx="1128" cy="453" r="4" fill="rgba(200,155,60,0.9)" class="mc"/>
-          </g>
+        <!-- VIGILIUS -->
+        <div class="mpin t-city" id="mpin-vigilius" style="left:58.75%;top:41.2%"
+          data-id="31f0274fdc1c8059a923c73da185a0e3" data-name="Vigilius"
+          data-desc="Città interna delle Marche. Centro politico e militare." data-sub="">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
-          <!-- GALETON -->
-          <g class="mloc t-village" id="mloc-galeton" data-id="31f0274fdc1c8019945af2b26306462f" data-name="Galeton" data-desc="Crocevia commerciale. Molte strade si incontrano qui." data-type="villaggio" data-sub="">
-            <circle cx="1220" cy="595" r="34" fill="rgba(180,140,60,0)" class="mg"/>
-            <circle cx="1220" cy="595" r="12" fill="rgba(160,120,50,0.12)" stroke="rgba(200,160,70,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.6;0.85;0.6" dur="3.2s" repeatCount="indefinite"/></circle>
-            <circle cx="1220" cy="595" r="4" fill="rgba(200,160,70,0.85)" class="mc"/>
-          </g>
+        <!-- GALETON -->
+        <div class="mpin t-village" id="mpin-galeton" style="left:63.96%;top:54.81%"
+          data-id="31f0274fdc1c8019945af2b26306462f" data-name="Galeton"
+          data-desc="Crocevia commerciale. Molte strade si incontrano qui." data-sub="">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
-          <!-- LAGO DI GROMOT -->
-          <g class="mloc t-water" id="mloc-lagogromot" data-id="30d0274fdc1c803387c4fda013b857e9" data-name="Lago di Gromot" data-desc="Acque scure e profonde. Nessuno sa quanto è fondo." data-type="lago" data-sub="">
-            <circle cx="1340" cy="490" r="34" fill="rgba(60,120,220,0)" class="mg"/>
-            <circle cx="1340" cy="490" r="12" fill="rgba(40,90,200,0.15)" stroke="rgba(80,150,240,0.65)" stroke-width="2" class="mc" filter="url(#h-glow-blue)"><animate attributeName="stroke-opacity" values="0.65;0.9;0.65" dur="3s" repeatCount="indefinite"/></circle>
-            <circle cx="1340" cy="490" r="4" fill="rgba(80,160,240,0.85)" class="mc"/>
-          </g>
+        <!-- LAGO DI GROMOT -->
+        <div class="mpin t-water" id="mpin-lagogromot" style="left:70.05%;top:44.63%"
+          data-id="30d0274fdc1c803387c4fda013b857e9" data-name="Lago di Gromot"
+          data-desc="Acque scure e profonde. Nessuno sa quanto è fondo." data-sub="">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
-          <!-- FORTE VIGILUS -->
-          <g class="mloc t-fort" id="mloc-fortevigilius" data-id="30d0274fdc1c8090aee7ed0430170414" data-name="Forte Vigilus" data-desc="Avamposto militare sulle alture. Controlla i passi verso est." data-type="forte" data-sub="">
-            <circle cx="285" cy="278" r="34" fill="rgba(160,100,40,0)" class="mg"/>
-            <circle cx="285" cy="278" r="12" fill="rgba(150,90,30,0.12)" stroke="rgba(180,120,50,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.6;0.9;0.6" dur="2.8s" repeatCount="indefinite"/></circle>
-            <circle cx="285" cy="278" r="4" fill="rgba(180,120,50,0.85)" class="mc"/>
-          </g>
+        <!-- FORTE VIGILUS -->
+        <div class="mpin t-fort" id="mpin-fortevigilius" style="left:14.74%;top:25.19%"
+          data-id="30d0274fdc1c8090aee7ed0430170414" data-name="Forte Vigilus"
+          data-desc="Avamposto militare sulle alture. Controlla i passi verso est." data-sub="">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
-          <!-- RIVA DI FERRO -->
-          <g class="mloc t-village" id="mloc-rivadifero" data-id="31f0274fdc1c8075b0dec2e2a6bc359e" data-name="Riva di Ferro" data-desc="Porto minore. Pescatori, contrabbandieri, qualche avventuriero di passaggio." data-type="villaggio" data-sub="">
-            <circle cx="365" cy="602" r="34" fill="rgba(180,140,60,0)" class="mg"/>
-            <circle cx="365" cy="602" r="12" fill="rgba(160,120,50,0.12)" stroke="rgba(200,160,70,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.6;0.85;0.6" dur="3s" repeatCount="indefinite"/></circle>
-            <circle cx="365" cy="602" r="4" fill="rgba(200,160,70,0.85)" class="mc"/>
-          </g>
+        <!-- RIVA DI FERRO -->
+        <div class="mpin t-village" id="mpin-rivadifero" style="left:18.91%;top:55.19%"
+          data-id="31f0274fdc1c8075b0dec2e2a6bc359e" data-name="Riva di Ferro"
+          data-desc="Porto minore. Pescatori, contrabbandieri, qualche avventuriero di passaggio." data-sub="">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
-          <!-- FUMOFOSCO -->
-          <g class="mloc t-village" id="mloc-fumofosco" data-id="31f0274fdc1c805b89b8f0678463e615" data-name="Fumofosco" data-desc="Un villaggio avvolto da strane nebbie. I locali non parlano molto." data-type="villaggio" data-sub="">
-            <circle cx="598" cy="408" r="34" fill="rgba(180,140,60,0)" class="mg"/>
-            <circle cx="598" cy="408" r="12" fill="rgba(160,120,50,0.12)" stroke="rgba(200,160,70,0.6)" stroke-width="2" class="mc" filter="url(#h-glow-gold)"><animate attributeName="stroke-opacity" values="0.6;0.85;0.6" dur="3.4s" repeatCount="indefinite"/></circle>
-            <circle cx="598" cy="408" r="4" fill="rgba(200,160,70,0.85)" class="mc"/>
-          </g>
+        <!-- FUMOFOSCO -->
+        <div class="mpin t-village" id="mpin-fumofosco" style="left:31.25%;top:37.04%"
+          data-id="31f0274fdc1c805b89b8f0678463e615" data-name="Fumofosco"
+          data-desc="Un villaggio avvolto da strane nebbie. I locali non parlano molto." data-sub="">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
-          <!-- ROVINE DI KALDUR -->
-          <g class="mloc t-ruin" id="mloc-kaldur" data-id="31f0274fdc1c808191abe4df86d176e6" data-name="Rovine di Kaldur" data-desc="Una civiltà è finita qui. Non è chiaro perché. Le pietre bruciano ancora." data-type="rovine" data-sub="">
-            <circle cx="773" cy="588" r="36" fill="rgba(120,60,200,0)" class="mg"/>
-            <circle cx="773" cy="588" r="13" fill="rgba(90,40,180,0.15)" stroke="rgba(150,80,240,0.7)" stroke-width="2" class="mc" filter="url(#h-glow-violet)"><animate attributeName="stroke-opacity" values="0.7;1;0.3;0.7" dur="3s" repeatCount="indefinite"/></circle>
-            <circle cx="773" cy="588" r="4" fill="rgba(150,80,240,0.9)" class="mc"/>
-          </g>
-
-        </svg>
+        <!-- ROVINE DI KALDUR -->
+        <div class="mpin t-ruin" id="mpin-kaldur" style="left:40.26%;top:53.89%"
+          data-id="31f0274fdc1c808191abe4df86d176e6" data-name="Rovine di Kaldur"
+          data-desc="Una civiltà è finita qui. Le pietre bruciano ancora." data-sub="">
+          <div class="mpin-ring"></div><div class="mpin-dot"></div>
+        </div>
 
         <!-- Tooltip -->
         <div class="map-tip" id="map-tip">
@@ -1785,6 +1793,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
         </div>
       </div>
       <p class="map-or">— oppure esplora per scheda —</p>
+
 
 
       <div class="loc-wrap">
@@ -2890,50 +2899,50 @@ initFadeIn();/* ═════════════════════�
   var tdesc=document.getElementById('mt-desc');
   var thint=document.getElementById('mt-hint');
   var mapEl=document.getElementById('arcamis-map');
-  if(!mapEl)return;
+  if(!tip||!mapEl)return;
 
-  function showTip(e,name,desc,type,hasSub){
-    tname.textContent=name;
-    tdesc.textContent=desc;
-    if(hasSub){thint.textContent='Clicca per esplorare →';thint.className='map-tip-hint sub';}
-    else{thint.textContent='Clicca per aprire';thint.className='map-tip-hint';}
-    tip.classList.add('vis');
-    moveTip(e);
-  }
   function moveTip(e){
-    var rect=tip.parentElement.getBoundingClientRect();
-    var x=e.clientX-rect.left+14;
+    var rect=mapEl.getBoundingClientRect();
+    var x=e.clientX-rect.left+16;
     var y=e.clientY-rect.top-10;
     if(x+220>rect.width)x=e.clientX-rect.left-230;
-    if(y+80>rect.height)y=e.clientY-rect.top-90;
+    if(y+80>rect.height)y=e.clientY-rect.top-85;
     tip.style.left=x+'px';tip.style.top=y+'px';
   }
   function hideTip(){tip.classList.remove('vis');}
 
-  function openSubMap(id){
-    var p=document.getElementById('sub-'+id);
-    if(p)p.classList.add('open');
-  }
   window.closeSubMap=function(id){
     var p=document.getElementById(id);
     if(p)p.classList.remove('open');
   };
 
-  document.querySelectorAll('.mloc').forEach(function(el){
+  document.querySelectorAll('.mpin').forEach(function(el){
     var nm=el.getAttribute('data-name')||'';
     var ds=el.getAttribute('data-desc')||'';
-    var tp=el.getAttribute('data-type')||'';
     var sb=el.getAttribute('data-sub')||'';
     var id=el.getAttribute('data-id')||'';
 
-    el.addEventListener('mouseenter',function(e){showTip(e,nm,ds,tp,!!sb);});
-    el.addEventListener('mousemove',function(e){moveTip(e);});
+    el.addEventListener('mouseenter',function(e){
+      tname.textContent=nm;tdesc.textContent=ds;
+      if(sb){thint.textContent='Clicca per esplorare →';thint.className='map-tip-hint sub';}
+      else{thint.textContent='Clicca per aprire';thint.className='map-tip-hint';}
+      tip.classList.add('vis');moveTip(e);
+    });
+    el.addEventListener('mousemove',moveTip);
     el.addEventListener('mouseleave',hideTip);
     el.addEventListener('click',function(){
       hideTip();
-      if(sb){openSubMap(sb);}
+      if(sb){var p=document.getElementById('sub-'+sb);if(p)p.classList.add('open');}
       else if(id){gp(id,nm,'📍');}
     });
+  });
+
+  /* sub-panel mloc */
+  document.querySelectorAll('.mloc').forEach(function(el){
+    var nm=el.getAttribute('data-name')||'';
+    var ds=el.getAttribute('data-desc')||'';
+    var id=el.getAttribute('data-id')||'';
+    el.addEventListener('click',function(){if(id)gp(id,nm,'📍');});
   });
 })();
 </script>
