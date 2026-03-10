@@ -179,9 +179,26 @@ nav#tnav{display:flex;align-items:stretch}
   background:linear-gradient(90deg,transparent,var(--copper),var(--gold3),var(--gold),var(--gold3),var(--copper),transparent);
 }
 
-/* ════════════════════════════════════
-   HOME BODY
-════════════════════════════════════ */
+/* ── Notion database gallery ── */
+.n-db-wrap{margin:14px 0}
+.n-db-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.n-db-title::before{content:'';width:18px;height:1px;background:var(--gold);opacity:.5}
+.n-db-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.n-db-card{
+  background:var(--bg3);border:1px solid var(--bdr2);cursor:pointer;
+  transition:border-color .2s,transform .2s,box-shadow .2s;overflow:hidden;
+}
+.n-db-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:var(--glow)}
+.n-db-cover{
+  width:100%;height:90px;object-fit:cover;display:block;
+  background:linear-gradient(135deg,var(--bg3),var(--bg4));
+}
+.n-db-cover-placeholder{
+  width:100%;height:90px;background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  display:flex;align-items:center;justify-content:center;font-size:32px;
+}
+.n-db-name{padding:8px 10px;font-family:'Cinzel',serif;font-size:11px;color:var(--parch);line-height:1.3}
+.n-db-loading{color:var(--text3);font-style:italic;font-size:13px;padding:10px 0}
 #hbody{padding:30px 44px 54px;max-width:1140px;margin:0 auto;width:100%}
 .shead{
   display:flex;align-items:center;gap:12px;margin-bottom:18px;
@@ -772,7 +789,11 @@ function renderBlocks(blocks){
       case'code':h+='<pre class="n-code"><code>'+(d.rich_text||[]).map(function(r){return r.plain_text}).join('').replace(/</g,'&lt;')+'</code></pre>';break;
       case'image':var src=d.type==='external'?(d.external&&d.external.url):(d.file&&d.file.url);if(src)h+='<figure class="n-image"><img src="'+src+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'"/>'+(d.caption&&d.caption.length?'<figcaption>'+rt(d.caption)+'</figcaption>':'')+'</figure>';break;
       case'child_page':var pid=b.id.replace(/-/g,'');var ni=pages.find(function(n){return n.id===pid});h+='<div class="n-cp" onclick="gp(\''+pid+'\',\''+(d.title||'').replace(/'/g,"\\'")+'\',\''+(ni?ni.i:'📄')+'\')">'+(ni?ni.i:'📄')+' '+(d.title||'Pagina')+'<span class="cpa">▶</span></div>';break;
-      case'child_database':h+='<div class="n-callout"><div class="n-callout-icon">🗃️</div><div class="n-callout-body"><em>'+(d.title||'Database')+'</em></div></div>';break;
+      case'child_database':
+        var dbRawId=b.id.replace(/-/g,'');
+        h+='<div class="n-db-wrap"><div class="n-db-title">'+(d.title||'Database')+'</div>'
+          +'<div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
+        break;
       case'table':var rows=b.children||[],hasH=d.has_column_header,hasR=d.has_row_header;h+='<div class="n-twrap"><table class="n-tbl"><tbody>';rows.forEach(function(row,ri){var cells=row.table_row&&row.table_row.cells||[];h+='<tr>';cells.forEach(function(cell,ci){var tag=(hasH&&ri===0)||(hasR&&ci===0)?'th':'td';h+='<'+tag+'>'+rt(cell)+'</'+tag+'>'});h+='</tr>'});h+='</tbody></table></div>';break;
       case'column_list':var cols=b.children||[];h+='<div class="n-cols" style="grid-template-columns:repeat('+cols.length+',1fr)">';cols.forEach(function(col){h+='<div>'+(col.children?renderBlocks(col.children):'')+'</div>'});h+='</div>';break;
       case'to_do':h+='<div style="display:flex;gap:10px;align-items:flex-start;margin:3px 0;font-size:16px;line-height:1.8"><span>'+(d.checked?'✅':'☐')+'</span><div>'+rt(d.rich_text)+'</div></div>';break;
@@ -782,6 +803,36 @@ function renderBlocks(blocks){
   var tmp=document.createElement('div');tmp.innerHTML=h;
   ['ul','ol'].forEach(function(tag){tmp.querySelectorAll(tag).forEach(function(el){var p=el.previousElementSibling;if(p&&p.tagName===tag.toUpperCase()&&p.className===el.className){while(el.firstChild)p.appendChild(el.firstChild);el.remove()}})});
   return tmp.innerHTML;
+}
+
+/* ══════════════════════════════
+   DATABASE GALLERY LOADER
+══════════════════════════════ */
+async function loadDbGalleries(container) {
+  var grids = container.querySelectorAll('.n-db-grid[id^="db-"]');
+  grids.forEach(async function(grid) {
+    var dbId = grid.id.replace('db-', '');
+    try {
+      var r = await fetch('/api/notion?dbId=' + dbId);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      var data = await r.json();
+      if (!data.pages || !data.pages.length) {
+        grid.innerHTML = '<div class="n-db-loading">Nessun elemento trovato.</div>';
+        return;
+      }
+      grid.innerHTML = data.pages.map(function(p) {
+        var coverHtml = p.cover
+          ? '<img class="n-db-cover" src="' + p.cover + '" loading="lazy" onerror="this.style.display=\'none\'">'
+          : '<div class="n-db-cover-placeholder">' + (p.icon || '📄') + '</div>';
+        return '<div class="n-db-card" onclick="gp(\'' + p.id + '\',\'' + p.title.replace(/'/g, "\\'") + '\',\'' + (p.icon || '📄') + '\')">'
+          + coverHtml
+          + '<div class="n-db-name">' + (p.icon ? p.icon + ' ' : '') + p.title + '</div>'
+          + '</div>';
+      }).join('');
+    } catch(e) {
+      grid.innerHTML = '<div class="n-db-loading">⚠️ Errore caricamento.</div>';
+    }
+  });
 }
 
 async function gp(id,label,icon){
@@ -799,7 +850,8 @@ async function gp(id,label,icon){
   else pv.style.display='block';
   document.getElementById('main').scrollTo({top:0});
   try{
-    var r=await fetch('/api/notion?pageId='+id);
+    var timeout = new Promise(function(_,rej){setTimeout(function(){rej(new Error('Timeout — la pagina ha impiegato troppo tempo'))},15000)});
+    var r=await Promise.race([fetch('/api/notion?pageId='+id), timeout]);
     if(!r.ok)throw new Error('HTTP '+r.status);
     var data=await r.json();
     var pg=data.page,bl=data.blocks;
@@ -810,10 +862,12 @@ async function gp(id,label,icon){
     document.getElementById('ph-icon').textContent=picon;
     document.title=ptitle+' — Arcamis';
     var html=renderBlocks(bl);
-    document.getElementById('pbody').innerHTML=
+    var pbody = document.getElementById('pbody');
+    pbody.innerHTML=
       '<div class="nc" style="animation:fi .22s ease forwards">'
       +(html||'<p class="n-p" style="color:var(--text3);font-style:italic">Pagina vuota.</p>')+'</div>';
-    attachShine(document.getElementById('pbody'));
+    attachShine(pbody);
+    loadDbGalleries(pbody);
   }catch(e){
     document.getElementById('pbody').innerHTML='<div class="errbox">⚠️ '+e.message+'</div>';
   }
