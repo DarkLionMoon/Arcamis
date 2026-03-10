@@ -39,17 +39,36 @@ body::before{
 ::-webkit-scrollbar-thumb:hover{background:var(--gold)}
 
 /* ════════════════════════════════════
-   TOPBAR
+   PROGRESS BAR
+════════════════════════════════════ */
+#progress-bar{
+  position:fixed;top:0;left:0;height:2px;width:0%;z-index:9000;pointer-events:none;
+  background:linear-gradient(90deg,var(--copper),var(--gold3),var(--gold),var(--gold3),var(--copper));
+  transition:width .1s linear;
+  box-shadow:0 0 8px rgba(200,155,60,.6);
+}
+
+/* ════════════════════════════════════
+   TOPBAR — glass floats over carousel
 ════════════════════════════════════ */
 #topbar{
   height:var(--topbar-h);flex-shrink:0;z-index:200;position:relative;
-  background:linear-gradient(180deg,#02030a,#07090e);
-  border-bottom:1px solid #000;display:flex;align-items:stretch;
-  box-shadow:0 2px 24px rgba(0,0,0,.7);
+  background:rgba(6,7,12,.55);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(200,155,60,.08);
+  display:flex;align-items:stretch;
+  margin-bottom:calc(-1 * var(--topbar-h));
+  box-shadow:0 4px 32px rgba(0,0,0,.4);
+  transition:background .3s,border-color .3s,box-shadow .3s;
+}
+#topbar.solid{
+  background:rgba(6,7,12,.96);
+  border-bottom-color:rgba(200,155,60,.22);
+  box-shadow:0 2px 24px rgba(0,0,0,.8);
 }
 #topbar::after{
   content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(120,80,24,.4) 10%,rgba(200,155,60,.55) 30%,rgba(232,200,106,.75) 50%,rgba(200,155,60,.55) 70%,rgba(120,80,24,.4) 90%,transparent);
+  background:linear-gradient(90deg,transparent,rgba(120,80,24,.4) 10%,rgba(200,155,60,.45) 30%,rgba(232,200,106,.65) 50%,rgba(200,155,60,.45) 70%,rgba(120,80,24,.4) 90%,transparent);
 }
 #tlogo{display:flex;align-items:center;padding:0 20px;gap:12px;cursor:pointer;user-select:none;flex-shrink:0;transition:background .2s}
 #tlogo:hover{background:rgba(200,155,60,.04)}
@@ -118,21 +137,32 @@ nav#tnav{display:flex;align-items:stretch}
    CAROUSEL (HERO)
 ════════════════════════════════════ */
 #carousel-wrap{
-  position:relative;width:100%;height:480px;overflow:hidden;background:#000;flex-shrink:0;
+  position:relative;width:100%;height:540px;overflow:hidden;background:#000;flex-shrink:0;
 }
 #ctrack{display:flex;width:300%;height:100%;transition:transform .7s cubic-bezier(.4,0,.2,1)}
 .slide{
   width:33.3333%;flex-shrink:0;height:100%;position:relative;
-  display:flex;align-items:flex-end;padding:60px 80px;
+  display:flex;align-items:flex-end;padding:60px 80px;padding-top:calc(var(--topbar-h) + 60px);
   background-size:cover;background-position:center;
+  will-change:transform;
 }
+/* Ken Burns zoom */
+@keyframes kbzoom{from{transform:scale(1)}to{transform:scale(1.08)}}
+.slide.active{animation:kbzoom 9s ease-out forwards}
 .slide::after{
   content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:linear-gradient(0deg,rgba(6,7,10,1) 0%,rgba(6,7,10,.5) 35%,rgba(6,7,10,.1) 75%,transparent 100%);
+  background:linear-gradient(0deg,rgba(4,5,10,.95) 0%,rgba(4,5,10,.55) 30%,rgba(4,5,10,.15) 65%,rgba(4,5,10,.05) 100%);
 }
+/* Glass hero content */
 .scnt{
-  position:relative;z-index:2;max-width:680px;
-  opacity:0;transform:translateY(20px);transition:opacity .6s .2s,transform .6s .2s;
+  position:relative;z-index:2;max-width:600px;
+  opacity:0;transform:translateY(24px);transition:opacity .7s .2s,transform .7s .2s;
+  background:rgba(6,7,14,.52);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(200,155,60,.14);
+  border-radius:2px;
+  padding:28px 32px 24px;
+  box-shadow:0 8px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(200,155,60,.08);
 }
 .slide.active .scnt{opacity:1;transform:translateY(0)}
 .stag{
@@ -148,12 +178,22 @@ nav#tnav{display:flex;align-items:stretch}
 .sdesc{font-size:16px;color:var(--parch);line-height:1.6;margin-bottom:24px;opacity:.8;max-width:520px}
 .sbtn{
   display:inline-flex;align-items:center;gap:9px;
-  background:linear-gradient(135deg,rgba(200,155,60,.15),rgba(200,155,60,.08));
+  background:linear-gradient(135deg,rgba(200,155,60,.22),rgba(180,120,30,.12));
   border:1px solid var(--gold);color:var(--gold2);
-  font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.16em;
-  padding:11px 24px;text-decoration:none;transition:all .2s;
+  font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.18em;
+  padding:11px 26px;text-decoration:none;transition:all .22s;
+  position:relative;overflow:hidden;cursor:pointer;
 }
-.sbtn:hover{background:linear-gradient(135deg,rgba(200,155,60,.28),rgba(200,155,60,.14));box-shadow:var(--glow);transform:translateY(-2px);color:var(--gold3)}
+.sbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.06),transparent);pointer-events:none}
+.sbtn:hover{
+  background:linear-gradient(135deg,rgba(200,155,60,.38),rgba(180,120,30,.22));
+  box-shadow:0 0 22px rgba(200,155,60,.35),0 4px 16px rgba(0,0,0,.4);
+  transform:translateY(-2px);color:var(--gold3);border-color:var(--gold3);
+}
+.sbtn:active{transform:translateY(0)}
+/* ripple */
+.ripple{position:absolute;border-radius:50%;background:rgba(200,155,60,.25);transform:scale(0);animation:rpl .5s linear;pointer-events:none}
+@keyframes rpl{to{transform:scale(4);opacity:0}}
 .sbtn-live{
   display:inline-flex;align-items:center;gap:8px;
   background:rgba(0,0,0,.4);border:1px solid var(--bdr2);
@@ -209,22 +249,38 @@ nav#tnav{display:flex;align-items:stretch}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(182px,1fr));gap:11px;margin-bottom:34px}
 
 /* ════════════════════════════════════
-   CARD (LoL Bronze w/ Glossy Shine)
+   SCROLL FADE-IN
+════════════════════════════════════ */
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .55s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.cgrid .lcard{transition-delay:0s}
+.cgrid .lcard:nth-child(2){transition-delay:.06s}
+.cgrid .lcard:nth-child(3){transition-delay:.12s}
+.cgrid .lcard:nth-child(4){transition-delay:.18s}
+.cgrid .lcard:nth-child(5){transition-delay:.24s}
+.cgrid .lcard:nth-child(6){transition-delay:.30s}
+.cgrid .lcard:nth-child(7){transition-delay:.36s}
+.cgrid .lcard:nth-child(8){transition-delay:.42s}
+.cgrid .lcard:nth-child(9){transition-delay:.48s}
+
+/* ════════════════════════════════════
+   CARD — Glass UI
 ════════════════════════════════════ */
 .lcard{
-  background:var(--bg3);border:1px solid var(--bdr);
-  cursor:pointer;transition:border-color .2s,box-shadow .22s,transform .22s;
+  background:rgba(14,18,26,.7);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(200,155,60,.1);
+  border-radius:2px;
+  cursor:pointer;transition:border-color .22s,box-shadow .22s,transform .22s,background .22s;
   position:relative;overflow:hidden;
 }
-/* corner triangle */
 .lcard::before{
   content:'';position:absolute;top:0;left:0;z-index:3;
-  border-style:solid;border-width:17px 17px 0 0;
-  border-color:var(--bdr) transparent transparent transparent;
+  border-style:solid;border-width:14px 14px 0 0;
+  border-color:rgba(200,155,60,.18) transparent transparent transparent;
   transition:border-color .2s;
 }
 .lcard:hover::before{border-color:var(--gold) transparent transparent transparent}
-/* glossy shine — tracks mouse via JS */
 .lcard .shine{
   position:absolute;inset:0;z-index:6;pointer-events:none;
   background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.07) 0%,transparent 58%);
@@ -232,9 +288,10 @@ nav#tnav{display:flex;align-items:stretch}
 }
 .lcard:hover .shine{opacity:1}
 .lcard:hover{
-  border-color:var(--gold);
-  box-shadow:0 0 0 1px rgba(200,155,60,.1),0 8px 28px rgba(0,0,0,.6),0 0 18px rgba(200,155,60,.07);
-  transform:translateY(-3px);
+  background:rgba(22,28,38,.85);
+  border-color:rgba(200,155,60,.45);
+  box-shadow:0 0 0 1px rgba(200,155,60,.08),0 8px 32px rgba(0,0,0,.6),0 0 24px rgba(200,155,60,.1);
+  transform:translateY(-4px);
 }
 .cthumb{height:94px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:44px}
 /* wipe sheen */
@@ -432,10 +489,22 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 }
 .ov-ql-item:hover{background:var(--bg4);border-color:var(--gold);color:var(--gold2);transform:translateX(3px)}
 .ov-ql-item .qli{font-size:15px;flex-shrink:0}
-@media(max-width:720px){#ovbody{grid-template-columns:1fr}nav#tnav{display:none}#page-hero{height:150px}#pbody,#hbody{padding:16px}}
+@media(max-width:720px){
+  #ovbody{grid-template-columns:1fr}
+  nav#tnav{display:none}
+  #page-hero{height:150px}
+  #pbody,#hbody{padding:16px}
+  .slide{padding:40px 24px;padding-top:calc(var(--topbar-h) + 40px)}
+  .scnt{padding:18px 20px}
+  .stit{font-size:28px}
+  #carousel-wrap{height:420px}
+  #hbody{padding:16px 16px 40px}
+  .cgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+}
 </style>
 </head>
 <body>
+<div id="progress-bar"></div>
 
 <!-- ═══ TOPBAR ═══ -->
 <div id="topbar">
@@ -479,7 +548,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 
       <div id="ctrack">
         <!-- SLIDE 1 -->
-        <div class="slide active" style="background-image:url('cover.png');background-size:cover;background-position:center 45%">>
+        <div class="slide active" style="background-image:url('cover.png');background-size:cover;background-position:center 45%">
           <div class="scnt">
             <div class="stag">Server Online</div>
             <div class="stit">BENVENUTO SU<br>ARCAMIS</div>
@@ -868,6 +937,7 @@ async function gp(id,label,icon){
       +(html||'<p class="n-p" style="color:var(--text3);font-style:italic">Pagina vuota.</p>')+'</div>';
     attachShine(pbody);
     loadDbGalleries(pbody);
+    initFadeIn(pbody);
   }catch(e){
     document.getElementById('pbody').innerHTML='<div class="errbox">⚠️ '+e.message+'</div>';
   }
@@ -908,6 +978,65 @@ document.addEventListener('keydown',function(e){
     document.getElementById('overlay').style.display==='block'?cv():ovo();}
   if(e.key==='Escape')cv();
 });
+
+/* ══════════════════════════════
+   PROGRESS BAR
+══════════════════════════════ */
+var _pb=document.getElementById('progress-bar');
+document.getElementById('main').addEventListener('scroll',function(){
+  var m=this,s=m.scrollTop,h=m.scrollHeight-m.clientHeight;
+  _pb.style.width=(h>0?(s/h*100):0)+'%';
+  // topbar solid after scrolling past carousel
+  var tb=document.getElementById('topbar');
+  tb.classList.toggle('solid', s > 60);
+});
+
+/* ══════════════════════════════
+   MOUSE PARALLAX ON CAROUSEL
+══════════════════════════════ */
+var _cw=document.getElementById('carousel-wrap');
+_cw.addEventListener('mousemove',function(e){
+  var r=_cw.getBoundingClientRect();
+  var xp=(e.clientX-r.left)/r.width-.5;
+  var yp=(e.clientY-r.top)/r.height-.5;
+  var slide=document.querySelector('.slide.active');
+  if(slide) slide.style.backgroundPosition='calc(center + '+(-xp*18)+'px) calc(45% + '+(-yp*12)+'px)';
+});
+_cw.addEventListener('mouseleave',function(){
+  var slide=document.querySelector('.slide.active');
+  if(slide) slide.style.backgroundPosition='center 45%';
+});
+
+/* ══════════════════════════════
+   RIPPLE ON BUTTONS
+══════════════════════════════ */
+document.addEventListener('click',function(e){
+  var btn=e.target.closest('.sbtn');
+  if(!btn)return;
+  var r=btn.getBoundingClientRect();
+  var rpl=document.createElement('span');
+  var sz=Math.max(r.width,r.height);
+  rpl.className='ripple';
+  rpl.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(e.clientX-r.left-sz/2)+'px;top:'+(e.clientY-r.top-sz/2)+'px';
+  btn.appendChild(rpl);
+  setTimeout(function(){rpl.remove()},500);
+});
+
+/* ══════════════════════════════
+   SCROLL FADE-IN (IntersectionObserver)
+══════════════════════════════ */
+var _fio=new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if(en.isIntersecting){en.target.classList.add('visible');_fio.unobserve(en.target);}
+  });
+},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+function initFadeIn(root){
+  (root||document).querySelectorAll('.shead,.cgrid,.lcard,.n-db-wrap').forEach(function(el){
+    el.classList.add('fade-in');
+    _fio.observe(el);
+  });
+}
+initFadeIn();
 </script>
 </body>
 </html>
