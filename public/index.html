@@ -27,6 +27,7 @@
   --vglow:0 0 22px rgba(102,68,170,.25);
 }
 html,body{height:100%;overflow:hidden}
+html{scroll-behavior:smooth}
 body{
   font-family:'Crimson Pro',Georgia,serif;font-size:15px;color:var(--text);
   display:flex;flex-direction:column;
@@ -40,6 +41,15 @@ body::before{
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px;transition:background .2s}
 ::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+
+/* ════════════════════════════════════
+   SCROLL REVEAL — fade-in + rise
+════════════════════════════════════ */
+.fade-in{
+  opacity:0;transform:translateY(22px);
+  transition:opacity .6s ease,transform .6s cubic-bezier(.22,1,.36,1);
+}
+.fade-in.visible{opacity:1;transform:translateY(0)}
 
 /* ════════════════════════════════════
    PROGRESS BAR
@@ -73,8 +83,8 @@ body::before{
   content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
   background:linear-gradient(90deg,transparent,rgba(120,80,24,.4) 10%,rgba(200,155,60,.45) 30%,rgba(232,200,106,.65) 50%,rgba(200,155,60,.45) 70%,rgba(120,80,24,.4) 90%,transparent);
 }
-#tlogo{display:flex;align-items:center;padding:0 20px;gap:12px;cursor:pointer;user-select:none;flex-shrink:0;transition:background .2s}
-#tlogo:hover{background:rgba(200,155,60,.04)}
+#tlogo{display:flex;align-items:center;padding:0 20px;gap:12px;cursor:pointer;user-select:none;flex-shrink:0;transition:background .2s,filter .3s,transform .3s}
+#tlogo:hover{background:rgba(200,155,60,.04);filter:drop-shadow(0 0 12px rgba(200,155,60,.35));transform:scale(1.03)}
 #liw{width:30px;height:30px;border-radius:50%;overflow:hidden;border:1.5px solid var(--bdr2);background:var(--bg3);display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(200,155,60,.2)}
 #li{width:100%;height:100%;object-fit:cover;display:none}
 #lf{font-size:15px}
@@ -777,6 +787,43 @@ nav#tnav{display:flex;align-items:stretch}
 .ctrophy{position:absolute;top:6px;right:6px;z-index:7;font-size:13px;animation:tg 2.5s ease-in-out infinite}
 @keyframes tg{0%,100%{filter:drop-shadow(0 0 4px rgba(255,200,0,.3))}50%{filter:drop-shadow(0 0 10px rgba(255,200,0,.7))}}
 
+/* ── loc-card tooltip al hover ── */
+.loc-tip{
+  font-size:11.5px;color:rgba(210,190,150,.65);font-style:italic;
+  line-height:1.5;margin-top:10px;padding-top:8px;
+  border-top:1px solid rgba(200,155,60,.15);
+  max-height:0;overflow:hidden;opacity:0;
+  transition:max-height .4s ease,opacity .35s ease;
+}
+.loc-card:hover .loc-tip{max-height:80px;opacity:1}
+
+/* ── .lcard sparkle ── */
+.spark{
+  position:absolute;pointer-events:none;z-index:10;
+  width:4px;height:4px;border-radius:50%;
+  background:var(--gold3);
+  animation:spark-fly .7s ease-out forwards;
+}
+@keyframes spark-fly{
+  0%{opacity:1;transform:translate(0,0) scale(1)}
+  100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0.2)}
+}
+
+/* ── Starfield slide Pantheon ── */
+#star-field{
+  position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.star{
+  position:absolute;border-radius:50%;background:#fff;
+  animation:twinkle var(--tw) ease-in-out infinite alternate;
+  opacity:0;
+}
+@keyframes twinkle{
+  0%{opacity:0;transform:scale(.6)}
+  40%{opacity:var(--tb)}
+  100%{opacity:var(--tb);transform:scale(1.2)}
+}
+
 /* ════════════════════════════════════
    PAGE VIEW
 ════════════════════════════════════ */
@@ -923,51 +970,53 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 }
 
 /* ════════════════════════════════════
-   DISCORD — PORTALE MAGICO
+   DISCORD — PORTALE MAGICO v2
 ════════════════════════════════════ */
 #overlay{
   position:fixed;inset:0;z-index:9999;display:none;
-  background:rgba(2,3,8,.72);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  background:rgba(2,3,8,.75);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
 }
 @keyframes ovin{from{opacity:0}to{opacity:1}}
 @keyframes ovout{from{opacity:1}to{opacity:0}}
 #overlay.ovopen{display:block;animation:ovin .2s ease forwards}
 #overlay.ovclose{display:block;animation:ovout .16s ease forwards}
 
-/* Panel portale */
 #ovp{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:min(760px,95vw);max-height:92vh;
-  background:rgba(5,6,14,.96);
-  border:1px solid rgba(200,155,60,.25);
+  width:min(540px,94vw);max-height:92vh;
+  background:rgba(4,5,14,.96);
+  border:1px solid rgba(200,155,60,.28);
   display:flex;flex-direction:column;overflow:hidden;
-  box-shadow:0 0 0 1px rgba(200,155,60,.06),0 30px 90px rgba(0,0,0,.95),0 0 60px rgba(200,155,60,.06);
+  box-shadow:
+    0 0 0 1px rgba(200,155,60,.07),
+    0 0 60px rgba(200,155,60,.08),
+    0 40px 100px rgba(0,0,0,.95);
 }
-@keyframes pnlin{from{opacity:0;transform:translate(-50%,-47%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-#overlay.ovopen #ovp{animation:pnlin .26s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes pnlin{from{opacity:0;transform:translate(-50%,-46%) scale(.95)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+#overlay.ovopen #ovp{animation:pnlin .3s cubic-bezier(.16,1,.3,1) forwards}
 
-/* Animated border glow */
+/* Glow border animation */
 #ovp::before{
-  content:'';position:absolute;inset:-1px;z-index:-1;
-  background:linear-gradient(135deg,rgba(200,155,60,.4) 0%,transparent 40%,transparent 60%,rgba(200,155,60,.3) 100%);
-  animation:portalglow 4s ease-in-out infinite;
-  pointer-events:none;
+  content:'';position:absolute;inset:-1px;z-index:-1;pointer-events:none;
+  background:conic-gradient(from var(--a,0deg),rgba(200,155,60,.4),transparent 40%,transparent 60%,rgba(200,155,60,.3));
+  animation:border-spin 6s linear infinite;
 }
-@keyframes portalglow{
-  0%,100%{opacity:.5}
-  50%{opacity:1}
-}
-/* Corner runes */
-#ovp::after{
-  content:'✦  ✦';position:absolute;top:10px;right:16px;
-  font-size:10px;color:rgba(200,155,60,.3);letter-spacing:10px;
-  pointer-events:none;animation:runeflicker 3s ease-in-out infinite;
-}
-@keyframes runeflicker{0%,100%{opacity:.3}45%{opacity:.7}50%{opacity:.2}55%{opacity:.8}}
+@property --a{syntax:'<angle>';inherits:false;initial-value:0deg;}
+@keyframes border-spin{to{--a:360deg}}
 
-/* Top bar */
+/* Rune corners */
+#ovp .rune-tl,#ovp .rune-tr,#ovp .rune-bl,#ovp .rune-br{
+  position:absolute;font-size:9px;color:rgba(200,155,60,.28);
+  pointer-events:none;animation:runeflicker 3s ease-in-out infinite;line-height:1;
+}
+#ovp .rune-tl{top:8px;left:10px}
+#ovp .rune-tr{top:8px;right:10px;animation-delay:.7s}
+#ovp .rune-bl{bottom:8px;left:10px;animation-delay:1.4s}
+#ovp .rune-br{bottom:8px;right:10px;animation-delay:2.1s}
+
+/* Portal header */
 .portal-header{
-  padding:16px 22px 14px;
+  padding:18px 24px 16px;
   background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(200,155,60,.04),rgba(0,0,0,.5));
   border-bottom:1px solid rgba(200,155,60,.15);
   display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
@@ -975,82 +1024,104 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 }
 .portal-header::after{
   content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(200,155,60,.5) 30%,rgba(200,155,60,.7) 50%,rgba(200,155,60,.5) 70%,transparent);
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.6) 50%,transparent);
 }
 .portal-title{
-  display:flex;align-items:center;gap:12px;
-  font-family:'Cinzel',serif;font-size:13px;font-weight:900;
-  letter-spacing:.22em;color:var(--gold3);text-shadow:0 0 20px rgba(200,155,60,.4);
+  display:flex;align-items:center;gap:10px;
+  font-family:'Cinzel',serif;font-size:12px;font-weight:900;
+  letter-spacing:.24em;color:var(--gold3);text-shadow:0 0 20px rgba(200,155,60,.4);
 }
-.portal-title-rune{font-size:16px;opacity:.65;animation:runeflicker 2.5s ease-in-out infinite}
+.portal-title-rune{font-size:15px;opacity:.6;animation:runeflicker 2.8s ease-in-out infinite}
 .portal-close{
   width:30px;height:30px;display:flex;align-items:center;justify-content:center;
-  border:1px solid rgba(200,155,60,.18);background:rgba(255,255,255,.03);
-  cursor:pointer;color:var(--text3);font-size:12px;transition:.15s;
+  border:1px solid rgba(200,155,60,.18);background:rgba(255,255,255,.02);
+  cursor:pointer;color:var(--text3);font-size:12px;transition:.15s;flex-shrink:0;
 }
 .portal-close:hover{background:rgba(180,20,10,.18);border-color:#c03030;color:#ff6060}
 
-/* Body */
-.portal-body{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0;overflow:auto}
-.portal-col{padding:22px;background:rgba(6,7,14,.4)}
-.portal-col+.portal-col{border-left:1px solid rgba(200,155,60,.08)}
+/* Single column body */
+.portal-body{
+  flex:1;min-height:0;overflow-y:auto;
+  display:flex;flex-direction:column;align-items:stretch;padding:28px 32px;gap:22px;
+}
+
+/* Particles canvas area */
+.portal-particles{
+  position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;
+}
+.portal-p{
+  position:absolute;border-radius:50%;
+  background:var(--gold);opacity:0;
+  animation:pp-drift var(--pd) ease-in-out infinite;
+}
+@keyframes pp-drift{
+  0%{opacity:0;transform:translateY(0) scale(0)}
+  20%{opacity:var(--po)}
+  80%{opacity:var(--po)}
+  100%{opacity:0;transform:translateY(-60px) scale(1.5)}
+}
+
+/* Roster section */
 .portal-sh{
-  font-family:'Cinzel',serif;font-size:8.5px;font-weight:700;letter-spacing:.2em;
-  color:var(--gold);text-transform:uppercase;margin-bottom:14px;opacity:.7;
+  font-family:'Cinzel',serif;font-size:8.5px;font-weight:700;letter-spacing:.22em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:10px;opacity:.65;
   display:flex;align-items:center;gap:8px;
 }
 .portal-sh::before{content:'◆';font-size:5px}
-
-/* Roster */
 #roster-wrap,#ovdw{
-  background:rgba(0,0,0,.3);border:1px solid rgba(200,155,60,.1);
-  height:300px;overflow-y:auto;
+  background:rgba(0,0,0,.35);border:1px solid rgba(200,155,60,.1);
+  height:200px;overflow-y:auto;
 }
 .roster-member{
-  display:flex;align-items:center;gap:12px;padding:10px 13px;
+  display:flex;align-items:center;gap:12px;padding:9px 13px;
   border-bottom:1px solid rgba(200,155,60,.05);transition:.12s;
 }
 .roster-member:hover{background:rgba(200,155,60,.04)}
-.roster-avatar{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(200,155,60,.2);object-fit:cover;flex-shrink:0}
-.roster-name{font-family:'Cinzel',serif;font-size:11.5px;color:var(--parch);letter-spacing:.03em}
+.roster-avatar{width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(200,155,60,.2);object-fit:cover;flex-shrink:0}
+.roster-name{font-family:'Cinzel',serif;font-size:11px;color:var(--parch);letter-spacing:.03em}
 .roster-game{font-size:11px;color:var(--text3);font-style:italic;margin-top:1px}
 
-/* Join button - portale */
+/* Center JOIN button */
 .portal-join-wrap{
-  padding:20px 0 8px;display:flex;flex-direction:column;align-items:center;gap:16px;
+  display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;z-index:1;
 }
 .portal-join-btn{
   position:relative;display:flex;align-items:center;justify-content:center;gap:10px;
-  width:100%;padding:16px 24px;overflow:hidden;
-  background:linear-gradient(135deg,rgba(50,55,180,.65),rgba(88,101,242,.55));
-  border:1px solid rgba(130,145,255,.5);
-  color:#e8ecff;font-family:'Cinzel',serif;font-size:10.5px;font-weight:700;letter-spacing:.18em;
-  text-decoration:none;transition:.22s;
-  box-shadow:0 0 24px rgba(88,101,242,.2),inset 0 1px 0 rgba(255,255,255,.08);
+  width:100%;padding:18px 28px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(50,55,180,.7),rgba(88,101,242,.6));
+  border:1px solid rgba(130,145,255,.55);
+  color:#e8ecff;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.22em;
+  text-decoration:none;transition:.25s;
+  box-shadow:0 0 30px rgba(88,101,242,.22),inset 0 1px 0 rgba(255,255,255,.1);
+  text-transform:uppercase;
 }
-/* Shine sweep on hover */
 .portal-join-btn::before{
-  content:'';position:absolute;top:0;left:-80%;width:60%;height:100%;
-  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.12) 50%,transparent 70%);
-  transition:left .4s ease;pointer-events:none;
+  content:'';position:absolute;top:0;left:-100%;width:70%;height:100%;
+  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.14) 50%,transparent 70%);
+  transition:left .45s ease;pointer-events:none;
 }
 .portal-join-btn:hover::before{left:130%}
 .portal-join-btn:hover{
-  background:linear-gradient(135deg,rgba(60,65,200,.8),rgba(100,115,255,.65));
-  border-color:rgba(180,190,255,.7);
-  box-shadow:0 0 36px rgba(88,101,242,.35),0 4px 20px rgba(0,0,0,.4);
-  transform:translateY(-2px);color:#fff;
+  background:linear-gradient(135deg,rgba(60,65,210,.85),rgba(100,120,255,.7));
+  border-color:rgba(180,190,255,.75);
+  box-shadow:0 0 44px rgba(88,101,242,.4),0 6px 22px rgba(0,0,0,.45);
+  transform:translateY(-3px);color:#fff;
 }
+/* Ripple */
+.portal-join-btn .ripple{
+  position:absolute;border-radius:50%;background:rgba(255,255,255,.18);
+  transform:scale(0);animation:btn-ripple .6s linear;pointer-events:none;
+}
+@keyframes btn-ripple{to{transform:scale(4);opacity:0}}
+
 .portal-quote{
-  font-size:13.5px;font-style:italic;color:var(--text2);line-height:1.75;
-  text-align:center;padding:12px 8px 0;
-  border-top:1px solid rgba(200,155,60,.08);
+  font-size:14px;font-style:italic;color:var(--text2);line-height:1.8;
+  text-align:center;padding:12px 12px 0;
+  border-top:1px solid rgba(200,155,60,.08);width:100%;
 }
-/* online dot */
 .online-dot{width:7px;height:7px;border-radius:50%;background:#57f287;box-shadow:0 0 8px #57f287;animation:lp 2s infinite;flex-shrink:0}
 
-@media(max-width:760px){.portal-body{grid-template-columns:1fr}}
-@media(max-width:600px){#ovp{max-height:98vh}}
+@media(max-width:600px){#ovp{max-height:98vh}.portal-body{padding:18px 20px}}
 
 /* ── Media queries mobile navbar ── */
 @media(max-width:768px){
@@ -1088,9 +1159,13 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 .loc-card{
   flex:0 0 260px;height:340px;position:relative;overflow:hidden;cursor:pointer;
   border:1px solid rgba(255,255,255,.06);background-size:cover;background-position:center;
-  transition:transform .28s,box-shadow .28s,border-color .28s;
+  transition:transform .28s cubic-bezier(.22,1,.36,1),box-shadow .28s,border-color .28s;
 }
-.loc-card:hover{transform:translateY(-7px) scale(1.015);box-shadow:0 20px 50px rgba(0,0,0,.85),0 0 30px rgba(100,80,200,.18);border-color:rgba(160,120,240,.32)}
+.loc-card:hover{
+  transform:translateY(-8px) scale(1.018);
+  box-shadow:0 22px 55px rgba(0,0,0,.85),0 0 35px rgba(200,155,60,.18),0 0 0 1px rgba(200,155,60,.2);
+  border-color:rgba(200,155,60,.38);
+}
 .loc-ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(4,5,14,.97) 0%,rgba(4,5,14,.6) 45%,rgba(4,5,14,.08) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:20px 18px;transition:background .3s}
 .loc-card:hover .loc-ov{background:linear-gradient(0deg,rgba(4,5,14,1) 0%,rgba(4,5,14,.82) 55%,rgba(20,10,40,.25) 100%)}
 .loc-badge{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--violet3);background:rgba(100,68,170,.2);border:1px solid rgba(100,68,170,.3);padding:3px 9px;display:inline-block;margin-bottom:8px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
@@ -1117,24 +1192,73 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 .arcadia-inner{display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;position:relative}
 .arcadia-crest{font-size:90px;opacity:.55;filter:drop-shadow(0 0 40px rgba(120,80,200,.45));user-select:none}
 .faction-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
-.fpill{display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(255,255,255,.025);border:1px solid rgba(100,68,170,.15);cursor:pointer;transition:.22s;position:relative;overflow:hidden}
-.fpill::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(100,68,170,.09),transparent);opacity:0;transition:.22s;pointer-events:none}
-.fpill:hover{border-color:rgba(160,120,255,.38);background:rgba(100,68,170,.09);transform:translateX(3px)}
+.fpill{
+  display:flex;align-items:center;gap:12px;padding:13px 16px;
+  background:rgba(8,6,18,.6);border:1px solid rgba(100,68,170,.18);
+  cursor:pointer;transition:.25s cubic-bezier(.22,1,.36,1);
+  position:relative;overflow:hidden;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.fpill::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(200,155,60,.07),transparent);
+  opacity:0;transition:.25s;pointer-events:none;
+}
+.fpill:hover{
+  border-color:rgba(200,155,60,.4);
+  background:rgba(16,12,4,.75);
+  transform:translateY(-4px);
+  box-shadow:0 8px 28px rgba(0,0,0,.5),0 0 20px rgba(200,155,60,.12);
+}
 .fpill:hover::after{opacity:1}
 .fp-i{font-size:18px;flex-shrink:0}
 .fp-n{font-family:'Cinzel',serif;font-size:10px;color:var(--parch);font-weight:700;display:block}
 .fp-d{font-size:11px;color:var(--text3);margin-top:2px}
 /* ── Mystery section ── */
-.mys-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
-.mys-card{position:relative;padding:24px 20px 20px;background:rgba(6,5,16,.85);border:1px solid rgba(80,60,120,.18);overflow:hidden;transition:border-color .28s,box-shadow .28s;cursor:default}
-.mys-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(80,50,120,.05),transparent);pointer-events:none}
-.mys-card:hover{border-color:rgba(140,100,220,.32);box-shadow:0 0 28px rgba(80,50,140,.13)}
-.mys-icon{font-size:26px;margin-bottom:10px;display:block;transition:filter .3s}
-.mys-card:hover .mys-icon{filter:drop-shadow(0 0 10px rgba(140,100,220,.55))}
-.mys-name{font-family:'Cinzel',serif;font-size:13px;color:var(--text);margin-bottom:6px;transition:color .25s}
+.mys-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.mys-card{
+  position:relative;padding:28px 22px 22px;overflow:hidden;cursor:default;
+  background:linear-gradient(160deg,rgba(8,5,20,.92),rgba(4,3,12,.96));
+  border:1px solid rgba(80,60,130,.22);
+  transition:transform .28s cubic-bezier(.22,1,.36,1),box-shadow .28s,border-color .28s;
+}
+/* Fog layer */
+.mys-card::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%,rgba(60,40,100,.15),transparent 60%),
+    radial-gradient(ellipse 70% 40% at 30% 100%,rgba(40,25,80,.1),transparent 50%);
+}
+/* Scanning mist line */
+.mys-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(140,100,220,.25),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.mys-card:hover{
+  transform:translateY(-6px) scale(1.01);
+  border-color:rgba(140,100,220,.42);
+  box-shadow:0 16px 44px rgba(0,0,0,.7),0 0 28px rgba(80,50,140,.2);
+}
+.mys-card:hover::after{opacity:1}
+.mys-icon{
+  font-size:28px;margin-bottom:12px;display:block;transition:filter .3s,transform .3s;
+}
+.mys-card:hover .mys-icon{
+  filter:drop-shadow(0 0 12px rgba(140,100,220,.7));
+  transform:scale(1.1);
+}
+.mys-name{
+  font-family:'Cinzel',serif;font-size:13px;color:var(--text);
+  margin-bottom:8px;transition:color .25s;letter-spacing:.04em;
+}
 .mys-card:hover .mys-name{color:var(--violet3)}
-.mys-txt{font-size:13px;color:var(--text3);font-style:italic;line-height:1.6;max-height:0;overflow:hidden;opacity:0;transition:max-height .35s,opacity .35s}
-.mys-card:hover .mys-txt{max-height:80px;opacity:1}
+.mys-txt{
+  font-size:13px;color:rgba(160,140,200,.55);font-style:italic;
+  line-height:1.65;max-height:0;overflow:hidden;opacity:0;
+  transition:max-height .4s,opacity .4s;
+}
+.mys-card:hover .mys-txt{max-height:90px;opacity:1}
 .mys-blur{filter:blur(2.5px);user-select:none}
 /* ── Come iniziare ── */
 .start-sec{border-top:1px solid rgba(200,155,60,.07)}
@@ -1349,6 +1473,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
         </div>
         <!-- SLIDE 2 — Pantheon: cielo notturno stellato -->
         <div class="slide" style="background:radial-gradient(ellipse 80% 60% at 60% 30%,#1a0840 0%,#080220 45%,#030112 100%)">
+          <div id="star-field"></div>
           <div class="scnt">
             <div class="stag">Pantheon di Arcamis</div>
             <div class="stit">LE DIVINITÀ<br>DI ARCAMIS</div>
@@ -1403,6 +1528,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
                 <div class="loc-name">Porto di Arcamis</div>
                 <div class="loc-sub">Piccolo centro commerciale e porto di frontiera. Punto d'arrivo per chiunque entri nelle Marche.</div>
                 <div class="loc-cta">Esplora →</div>
+                <div class="loc-tip">La locanda è proprio qui vicino. Ogni avventuriero degno di questo nome ha dormito tra queste mura almeno una volta.</div>
               </div>
             </div>
             <!-- Città -->
@@ -1413,6 +1539,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
                 <div class="loc-name">Città di Arcamis</div>
                 <div class="loc-sub">Il cuore pulsante delle Marche. Mercati, gilde e intrighi politici in ogni vicolo.</div>
                 <div class="loc-cta">Esplora →</div>
+                <div class="loc-tip">Tre distretti, una dozzina di gilde, e qualcuno che ti osserva sempre da una finestra buia.</div>
               </div>
             </div>
             <!-- Gilda -->
@@ -1423,6 +1550,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
                 <div class="loc-name">Gilda degli Avventurieri</div>
                 <div class="loc-sub">Base operativa per chi cerca fama, fortune e contratti pericolosi.</div>
                 <div class="loc-cta">Esplora →</div>
+                <div class="loc-tip">Le bacheche sono piene. Il lavoro non manca mai, ma nemmeno i rischi. Porta qualcuno di fidato.</div>
               </div>
             </div>
             <!-- Forgia -->
@@ -1435,6 +1563,7 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
                 <div class="loc-name">Quartiere della Forgia</div>
                 <div class="loc-sub">L'odore di metallo fuso riempie l'aria. Armi e armature tra le migliori del regno.</div>
                 <div class="loc-cta">Esplora →</div>
+                <div class="loc-tip">Il maestro fabbro non dorme. O almeno nessuno lo ha mai visto farlo. Il fumo non si spegne mai.</div>
               </div>
             </div>
             <!-- Colline — mistero -->
@@ -1537,38 +1666,32 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
     <div class="gold-sep"></div>
     <div class="hsec start-sec fade-in">
       <div class="sec-eyebrow">Guida rapida</div>
-      <div class="sec-h">INIZIA LA TUA AVVENTURA</div>
-      <p class="sec-p">Quattro passi per entrare nel mondo delle Marche di Arcamis e trovare il tuo posto nel regno.</p>
-      <div class="steps">
+      <div class="sec-h">CREA IL TUO PERSONAGGIO<br>E PARTI ALL'AVVENTURA</div>
+      <p class="sec-p">Per iniziare ti servono tre cose: una <strong style="color:var(--gold2)">Specie</strong>, una <strong style="color:var(--gold2)">Classe</strong> e un <strong style="color:var(--gold2)">Background</strong>. Tutti gli avventurieri delle Marche appartengono alla <strong style="color:var(--gold2)">Gilda degli Avventurieri</strong> — è il punto di partenza obbligatorio per chiunque cerchi fama o fortune nel regno.</p>
+      <div class="steps" style="grid-template-columns:repeat(3,1fr)">
         <div class="step">
           <div class="step-n">1</div>
           <div class="step-icon">💬</div>
           <div class="step-title">Entra nel Discord</div>
-          <div class="step-desc">Il server Discord è il cuore del gioco. Leggi le regole e presentati nella taverna.</div>
+          <div class="step-desc">Il server è il cuore del gioco. Leggi le regole, presentati e inizia a respirare l'aria di Arcamis.</div>
         </div>
         <div class="step">
           <div class="step-n">2</div>
           <div class="step-icon">🎭</div>
           <div class="step-title">Crea il tuo PG</div>
-          <div class="step-desc">Leggi la guida alla creazione del personaggio e scegli la tua classe e il tuo background.</div>
+          <div class="step-desc">Scegli <em>specie</em>, <em>classe</em> e <em>background</em>. Segui la guida alla creazione e forgia la tua storia unica.</div>
         </div>
         <div class="step">
           <div class="step-n">3</div>
           <div class="step-icon">🗡️</div>
-          <div class="step-title">Scegli una Gilda</div>
-          <div class="step-desc">Le gilde locali offrono missioni, contratti e comunità. Trova quella che si adatta al tuo stile.</div>
-        </div>
-        <div class="step">
-          <div class="step-n">4</div>
-          <div class="step-icon">🌊</div>
-          <div class="step-title">Esplora Arcamis</div>
-          <div class="step-desc">La città e i dintorni sono pieni di segreti. Ogni angolo ha una storia da scoprire.</div>
+          <div class="step-title">Unisciti alla Gilda</div>
+          <div class="step-desc">Ogni avventuriero delle Marche si registra alla Gilda. Da lì inizia tutto: missioni, contratti, e la tua leggenda.</div>
         </div>
       </div>
-      <div class="cta-row">
+      <div class="cta-row" style="margin-top:32px">
         <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="sbtn">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-          Entra nel Discord
+          Entra nel Discord — è gratis
         </a>
         <div class="sbtn" onclick="gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')" style="cursor:pointer">Guida creazione PG →</div>
       </div>
@@ -1644,37 +1767,35 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 <!-- ═══ OVERLAY (Discord live) ═══ -->
 <div id="overlay">
   <div id="ovp">
-    <!-- Header -->
+    <span class="rune-tl">✦ ᛟ</span>
+    <span class="rune-tr">ᚹ ✦</span>
+    <span class="rune-bl">ᛉ ✦</span>
+    <span class="rune-br">✦ ᚷ</span>
+    <div class="portal-particles" id="portal-pts"></div>
     <div class="portal-header">
       <div class="portal-title">
         <span class="portal-title-rune">⚜</span>
         PORTALE DI ARCAMIS
-        <span class="portal-title-rune" style="animation-delay:.8s">⚜</span>
+        <span class="portal-title-rune" style="animation-delay:.9s">⚜</span>
       </div>
       <div class="portal-close" onclick="cv()">✕</div>
     </div>
-    <!-- Body -->
     <div class="portal-body">
-      <!-- Col sinistra: roster -->
-      <div class="portal-col">
-        <div class="portal-sh">Locanda Online <span id="avv-count" style="margin-left:6px;color:var(--gold3);font-style:italic;font-family:'Crimson Pro',serif;letter-spacing:0;font-weight:400"></span></div>
+      <div>
+        <div class="portal-sh">Avventurieri Online <span id="avv-count" style="margin-left:6px;color:var(--gold3);font-style:italic;font-family:'Crimson Pro',serif;letter-spacing:0;font-weight:400;opacity:1"></span></div>
         <div id="ovdw">
           <div id="roster-list">
-            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-style:italic;font-size:13px;padding:40px">In ascolto dei cancelli…</div>
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-style:italic;font-size:13px;padding:30px">In ascolto dei cancelli…</div>
           </div>
         </div>
       </div>
-      <!-- Col destra: join + quote -->
-      <div class="portal-col">
-        <div class="portal-sh">Entra nel Regno</div>
-        <div class="portal-join-wrap">
-          <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="portal-join-btn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-            ENTRA NEL DISCORD
-          </a>
-          <div class="portal-quote">
-            "Siediti accanto al fuoco e racconta la tua storia.<br>La locanda di Arcamis non dorme mai."
-          </div>
+      <div class="portal-join-wrap">
+        <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="portal-join-btn" id="portal-join-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+          JOIN DISCORD
+        </a>
+        <div class="portal-quote">
+          "Siediti accanto al fuoco e racconta la tua storia.<br>La locanda di Arcamis non dorme mai."
         </div>
       </div>
     </div>
@@ -2128,19 +2249,179 @@ function toggleWiki(){
 }
 
 /* ══════════════════════════════
-   SCROLL FADE-IN (IntersectionObserver)
+   PORTAL — Particelle + Ripple
+══════════════════════════════ */
+(function(){
+  var pts=document.getElementById('portal-pts');
+  if(!pts)return;
+  for(var i=0;i<18;i++){
+    var p=document.createElement('div');
+    p.className='portal-p';
+    var sz=(1.5+Math.random()*2.5);
+    var dur=(3+Math.random()*5).toFixed(1)+'s';
+    var delay=(Math.random()*6).toFixed(1)+'s';
+    var op=(0.15+Math.random()*0.3).toFixed(2);
+    p.style.cssText='width:'+sz+'px;height:'+sz+'px;'
+      +'left:'+Math.random()*100+'%;'
+      +'bottom:'+(Math.random()*30)+'%;'
+      +'--pd:'+dur+';--po:'+op+';'
+      +'animation-delay:'+delay+';';
+    pts.appendChild(p);
+  }
+})();
+
+/* Ripple sul bottone JOIN */
+(function(){
+  var btn=document.getElementById('portal-join-btn');
+  if(!btn)return;
+  btn.addEventListener('click',function(e){
+    var r=btn.getBoundingClientRect();
+    var rp=document.createElement('span');
+    rp.className='ripple';
+    var sz=Math.max(r.width,r.height)*1.2;
+    rp.style.cssText='width:'+sz+'px;height:'+sz+'px;'
+      +'left:'+(e.clientX-r.left-sz/2)+'px;'
+      +'top:'+(e.clientY-r.top-sz/2)+'px;';
+    btn.appendChild(rp);
+    setTimeout(function(){rp.remove();},700);
+  });
+})();
+
+/* ══════════════════════════════
+   MYS-CARD sparkle (same pool as lcard)
+══════════════════════════════ */
+(function(){
+  document.querySelectorAll('.mys-card').forEach(function(card){
+    card.addEventListener('mouseenter',function(){
+      var n=4+Math.floor(Math.random()*3);
+      for(var i=0;i<n;i++){
+        (function(idx){
+          var sp=document.createElement('div');
+          sp.className='spark';
+          var r=card.getBoundingClientRect();
+          var ox=Math.random()*r.width;
+          var oy=Math.random()*r.height*0.6;
+          var sx=(Math.random()-0.5)*35;
+          var sy=-(15+Math.random()*28);
+          var bri=(0.5+Math.random()*0.5);
+          sp.style.cssText='left:'+ox+'px;top:'+oy+'px;'
+            +'--sx:'+sx+'px;--sy:'+sy+'px;'
+            +'background:rgba(140,100,220,'+bri+');'
+            +'box-shadow:0 0 5px rgba(140,100,220,'+bri+');'
+            +'animation-delay:'+(idx*90)+'ms;'
+            +'animation-duration:'+(450+Math.random()*250)+'ms;';
+          card.appendChild(sp);
+          setTimeout(function(){sp.remove();},800+idx*90);
+        })(i);
+      }
+    });
+  });
+})();
+
+/* ══════════════════════════════
+   FADE-IN con stagger
 ══════════════════════════════ */
 var _fio=new IntersectionObserver(function(entries){
   entries.forEach(function(en){
-    if(en.isIntersecting){en.target.classList.add('visible');_fio.unobserve(en.target);}
+    if(en.isIntersecting){
+      en.target.classList.add('visible');
+      _fio.unobserve(en.target);
+    }
   });
-},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+},{threshold:.1,rootMargin:'0px 0px -30px 0px'});
+
 function initFadeIn(root){
-  (root||document).querySelectorAll('.shead,.cgrid,.lcard,.n-db-wrap,.hsec,.arcadia-sec,.fade-in').forEach(function(el){
+  var els=(root||document).querySelectorAll('.shead,.cgrid,.lcard,.n-db-wrap,.hsec,.arcadia-sec,.fade-in,.mys-card,.step,.fpill');
+  els.forEach(function(el,i){
     if(!el.classList.contains('fade-in')){el.classList.add('fade-in');}
+    // Stagger delay per gruppi di card
+    var delay=0;
+    if(el.classList.contains('mys-card')||el.classList.contains('fpill')||el.classList.contains('step')){
+      var siblings=el.parentElement?el.parentElement.children:[];
+      for(var j=0;j<siblings.length;j++){if(siblings[j]===el){delay=j*80;break;}}
+      el.style.transitionDelay=delay+'ms';
+    }
     _fio.observe(el);
   });
 }
+/* ══════════════════════════════
+   STARFIELD — Slide Pantheon
+══════════════════════════════ */
+(function(){
+  var sf=document.getElementById('star-field');
+  if(!sf)return;
+  var count=110;
+  for(var i=0;i<count;i++){
+    var s=document.createElement('div');
+    s.className='star';
+    var size=(Math.random()<0.15)?2.5:(Math.random()<0.4)?1.5:1;
+    var bright=(0.3+Math.random()*0.65).toFixed(2);
+    var dur=(2+Math.random()*4).toFixed(1)+'s';
+    var delay=(Math.random()*5).toFixed(1)+'s';
+    s.style.cssText='left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;'
+      +'width:'+size+'px;height:'+size+'px;'
+      +'--tw:'+dur+';--tb:'+bright+';'
+      +'animation-delay:'+delay+';';
+    sf.appendChild(s);
+  }
+  // Nebula violet glow blobs
+  ['60% 20%','30% 65%','80% 75%'].forEach(function(pos,i){
+    var b=document.createElement('div');
+    b.style.cssText='position:absolute;border-radius:50%;pointer-events:none;'
+      +'width:'+(120+i*60)+'px;height:'+(80+i*40)+'px;'
+      +'left:'+pos.split(' ')[0]+';top:'+pos.split(' ')[1]+';'
+      +'transform:translate(-50%,-50%);'
+      +'background:radial-gradient(ellipse,rgba('+(i===1?'100,40,180':'60,20,140')+','+(0.06+i*0.02)+'),transparent);'
+      +'animation:nebula-pulse '+(6+i*2)+'s ease-in-out infinite alternate;';
+    sf.appendChild(b);
+  });
+})();
+
+/* ══════════════════════════════
+   LCARD — Micro sparkle
+══════════════════════════════ */
+(function(){
+  document.querySelectorAll('.lcard').forEach(function(card){
+    card.addEventListener('mouseenter',function(e){
+      spawnSparks(card,e);
+    });
+  });
+  function spawnSparks(card,e){
+    var r=card.getBoundingClientRect();
+    var n=5+Math.floor(Math.random()*4);
+    for(var i=0;i<n;i++){
+      (function(){
+        var sp=document.createElement('div');
+        sp.className='spark';
+        var ox=(Math.random()*r.width);
+        var oy=(Math.random()*r.height*0.5)+r.height*0.2;
+        var sx=(Math.random()-0.5)*40;
+        var sy=-(20+Math.random()*30);
+        var sz=(0.6+Math.random()*0.8);
+        var hue=Math.random()<0.3?'rgba(255,220,80,'+sz+')':'rgba(200,155,60,'+sz+')';
+        sp.style.cssText='left:'+ox+'px;top:'+oy+'px;'
+          +'--sx:'+sx+'px;--sy:'+sy+'px;'
+          +'background:'+hue+';'
+          +'box-shadow:0 0 4px '+hue+';'
+          +'animation-delay:'+(i*80)+'ms;'
+          +'animation-duration:'+(500+Math.random()*300)+'ms;';
+        card.appendChild(sp);
+        setTimeout(function(){sp.remove();},900+i*80);
+      })();
+    }
+  }
+})();
+
+/* Nebula pulse animation */
+(function(){
+  if(!document.querySelector('style[data-nebula]')){
+    var s=document.createElement('style');
+    s.setAttribute('data-nebula','1');
+    s.textContent='@keyframes nebula-pulse{0%{opacity:.7;transform:translate(-50%,-50%) scale(1)}100%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}';
+    document.head.appendChild(s);
+  }
+})();
+
 initFadeIn();
 </script>
 </body>
