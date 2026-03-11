@@ -61,15 +61,29 @@
 .n-callout{
   display:flex;gap:14px;align-items:flex-start;
   border-left:3px solid var(--callout-c,rgba(200,155,60,.5));
-  background:var(--callout-bg,rgba(200,155,60,.04));
-  padding:14px 18px;margin:16px 0;
+  /* effetto pergamena: gradiente caldo + noise overlay */
+  background:linear-gradient(135deg,rgba(20,14,5,.92) 0%,rgba(16,11,4,.88) 100%);
+  box-shadow:inset 0 0 40px rgba(200,155,60,.04),0 2px 12px rgba(0,0,0,.35),inset 1px 0 0 var(--callout-c,rgba(200,155,60,.3));
+  padding:14px 18px;margin:16px 0;position:relative;overflow:hidden;
 }
-/* Quote */
+.n-callout::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 60% at 10% 50%,rgba(200,155,60,.045) 0%,transparent 70%);
+}
+/* Quote — stile pergamena con virgolette decorative */
 .n-quote{
-  border-left:3px solid rgba(200,155,60,.35);
-  padding:10px 20px;margin:16px 0;
+  border-left:3px solid rgba(200,155,60,.45);
+  padding:14px 22px 14px 52px;margin:20px 0;
   font-family:'Crimson Pro',serif;font-size:18px;
-  color:rgba(196,168,98,.75);font-style:italic;line-height:1.6;
+  color:rgba(196,168,98,.8);font-style:italic;line-height:1.7;
+  background:linear-gradient(135deg,rgba(18,13,5,.88),rgba(14,10,3,.84));
+  box-shadow:inset 0 0 30px rgba(200,155,60,.03),0 2px 8px rgba(0,0,0,.3);
+  position:relative;overflow:hidden;
+}
+.n-quote::before{
+  content:'“';position:absolute;left:10px;top:-4px;
+  font-family:'Crimson Pro',serif;font-size:64px;color:rgba(200,155,60,.18);
+  line-height:1;pointer-events:none;font-style:normal;
 }
 /* Page footer */
 .n-page-footer{
@@ -500,7 +514,13 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 /* ── Location carousel ── */
 .loc-wrap{position:relative;margin:0 -10px}
 .loc-track-outer{overflow:hidden;padding:10px 10px 14px}
-.loc-track{display:flex;gap:16px;transition:transform .55s cubic-bezier(.4,0,.2,1);will-change:transform}
+.loc-track{
+  display:flex;gap:16px;
+  transition:transform .55s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+}
+/* padding virtuale dopo l'ultima card — evita che tocchi il bordo */
+.loc-track::after{content:'';flex:0 0 10px;display:block}
 .loc-card{
   flex:0 0 260px;height:340px;position:relative;overflow:hidden;cursor:pointer;
   border:1px solid rgba(255,255,255,.06);background-size:cover;background-position:center;
@@ -527,6 +547,11 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 .la:hover{background:rgba(100,68,170,.3);border-color:var(--violet3);color:var(--violet3);box-shadow:var(--vglow)}
 .la-prev{left:0}
 .la-next{right:0}
+/* freccia disabilitata a fine/inizio tracciato */
+.la[style*="pointer-events: none"],.la[style*="pointer-events:none"]{
+  opacity:.18!important;cursor:default;
+}
+.la{transition:opacity .25s ease,background .2s,border-color .2s,color .2s,box-shadow .2s}
 /* ── Arcadia section ── */
 .arcadia-sec{
   position:relative;overflow:hidden;
@@ -1123,4 +1148,21 @@ body.light .lcard:hover{box-shadow:0 14px 40px rgba(100,70,20,.15)!important}
   border:1px solid rgba(200,155,60,.28);
   font-family:'Cinzel',serif;font-size:7px;letter-spacing:.1em;padding:2px 6px;
   display:inline-block;
+}
+
+/* ════════════════════════════════════
+   DUST VFX — particelle atmosferiche
+════════════════════════════════════ */
+#dust-vfx{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.dp{
+  position:absolute;border-radius:50%;
+  background:rgba(200,155,60,.12);
+  animation:dustRise linear infinite;
+  will-change:transform,opacity;
+}
+@keyframes dustRise{
+  0%{transform:translate(0,100px) scale(1);opacity:0}
+  15%{opacity:1}
+  85%{opacity:.6}
+  100%{transform:translate(var(--dx,30px),-110vh) scale(.6);opacity:0}
 }
