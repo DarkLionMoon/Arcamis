@@ -1,0 +1,9 @@
+{
+  "buildCommand": "node scripts/fetch-notion.js",
+  "outputDirectory": "public",
+  "functions": {
+    "api/notion.js": {
+      "maxDuration": 30
+    }
+  }
+}
