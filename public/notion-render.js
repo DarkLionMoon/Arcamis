@@ -2,6 +2,10 @@
    NOTION RENDER — Versione Corretta
 ════════════════════════════════════ */
 
+var nav/* ════════════════════════════════════
+   NOTION RENDER — Arcamis Engine
+════════════════════════════════════ */
+
 var navStack = []; 
 
 function iconAccent(emoji){
@@ -45,7 +49,7 @@ function renderBlocks(blocks) {
     }
     else if(b.type === 'child_database') {
       html += '<div class="n-db-wrap" data-dbid="' + b.id.replace(/-/g,'') + '">';
-      html += '<div class="n-db-loading">Caricamento entità...</div></div>';
+      html += '<div class="n-db-loading">Caricamento in corso...</div></div>';
     }
     else if(b.type === 'child_page') {
       html += '<div class="lcard fade-in" onclick="gp(\'' + b.id.replace(/-/g,'') + '\',\'' + b.child_page.title + '\',\'📄\')">';
@@ -57,6 +61,12 @@ function renderBlocks(blocks) {
     }
     else if(b.type === 'divider') {
       html += '<hr class="n-hr">';
+    }
+    else if(b.type === 'callout') {
+      var acc = iconAccent(b.callout.icon ? b.callout.icon.emoji : '');
+      html += '<div class="n-callout" style="border-color:' + acc.c + '; background:' + acc.bg + '">';
+      if(b.callout.icon) html += '<div class="n-callout-icon">' + b.callout.icon.emoji + '</div>';
+      html += '<div class="n-callout-body">' + renderRichText(b.callout.rich_text) + '</div></div>';
     }
   });
   return html;
@@ -70,13 +80,10 @@ async function loadDbGalleries(root) {
     try {
       var res = await fetch('/api/notion?dbId=' + dbId);
       var data = await res.json();
-      el.innerHTML = '';
-      el.setAttribute('data-loaded', 'true');
-      var grid = document.createElement('div');
-      grid.className = 'cgrid';
+      el.innerHTML = ''; el.setAttribute('data-loaded', 'true');
+      var grid = document.createElement('div'); grid.className = 'cgrid';
       data.pages.forEach(function(p) {
-        var card = document.createElement('div');
-        card.className = 'lcard fade-in';
+        var card = document.createElement('div'); card.className = 'lcard fade-in';
         card.style.backgroundImage = p.cover ? 'url(' + p.cover + ')' : 'linear-gradient(135deg, #1a1c22, #0c0e12)';
         card.innerHTML = '<div class="shine"></div><div class="lcard-title">' + (p.icon||'') + ' ' + p.title + '</div>';
         card.onclick = function() { gp(p.id, p.title, p.icon||'📄'); };
@@ -85,8 +92,19 @@ async function loadDbGalleries(root) {
       el.appendChild(grid);
       if(window.attachShine) attachShine(el);
       if(window.initFadeIn) initFadeIn(el);
-    } catch(e) {
-      el.innerHTML = '<div class="n-err">Errore caricamento</div>';
-    }
+    } catch(e) { el.innerHTML = '<div class="n-err">Impossibile caricare i dati</div>'; }
+  });
+}
+
+/* ── Glossario (Mantenuto dall'originale) ── */
+var _glossary = { 'PG':'Personaggio Giocante', 'DM':'Dungeon Master', 'CA':'Classe Armatura', 'PF':'Punti Ferita' };
+function applyGlossary(root) {
+  root.querySelectorAll('.n-p,.n-callout-body').forEach(function(el) {
+    var h = el.innerHTML;
+    Object.keys(_glossary).forEach(function(k) {
+      var reg = new RegExp('\\b' + k + '\\b', 'g');
+      h = h.replace(reg, '<span class="g-term" title="' + _glossary[k] + '">' + k + '</span>');
+    });
+    el.innerHTML = h;
   });
 }
