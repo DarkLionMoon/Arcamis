@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style-base.css">
 <link rel="stylesheet" href="style-page.css">
+<link rel="stylesheet" href="style-fx.css">
 </head>
 <body>
 <!-- ═══ LOADER ═══ -->
@@ -38,7 +39,7 @@
 
     <!-- ── Regole ▾ ── -->
     <div class="tn-drop" id="dd-regole">
-      <div class="tn" onclick="toggleDd('dd-regole')">Regole</div>
+      <div class="tn" onclick=\"toggleDd('dd-regole',event)\">Regole</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Regolamento</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')"><span class="tn-ii">⚔️</span>Gameplay</div>
@@ -49,7 +50,7 @@
 
     <!-- ── Personaggio ▾ ── -->
     <div class="tn-drop" id="dd-pg">
-      <div class="tn" onclick="toggleDd('dd-pg')">Personaggio</div>
+      <div class="tn" onclick=\"toggleDd('dd-pg',event)\">Personaggio</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Il tuo PG</div>
         <div class="tn-item" onclick="closeDd();gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')"><span class="tn-ii">🌟</span>Come si inizia</div>
@@ -62,7 +63,7 @@
 
     <!-- ── Lavori ▾ ── -->
     <div class="tn-drop" id="dd-lavori">
-      <div class="tn" onclick="toggleDd('dd-lavori')">Lavori</div>
+      <div class="tn" onclick=\"toggleDd('dd-lavori',event)\">Lavori</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Gilde &amp; Mestieri</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️')"><span class="tn-ii">🗡️</span>Gilda avventurieri</div>
@@ -80,7 +81,7 @@
 
     <!-- ── Lore ▾ ── -->
     <div class="tn-drop" id="dd-lore">
-      <div class="tn" onclick="toggleDd('dd-lore')">Lore</div>
+      <div class="tn" onclick=\"toggleDd('dd-lore',event)\">Lore</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Il Mondo</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📖')"><span class="tn-ii">📖</span>Storia del mondo</div>
@@ -237,77 +238,77 @@
         <!-- ── HOTSPOT assoluti in % ── -->
 
         <!-- ARCAMIS -->
-        <div class="mpin t-city" id="mpin-arcamis" style="left:87.76%;top:28.53%"
+        <div class="mpin t-city" id="mpin-arcamis" data-explored="true" style="left:87.76%;top:28.53%"
           data-id="3090274fdc1c80e1a365ce1c36873455" data-name="Arcamis"
           data-desc="Città portuale delle Marche. Porto, commercio, avventura." data-sub="">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
         </div>
 
         <!-- SELVA FOGLIABRUNA -->
-        <div class="mpin t-forest" id="mpin-selvafoglia" style="left:78.58%;top:24.05%"
+        <div class="mpin t-forest" id="mpin-selvafoglia" data-explored="true" style="left:78.58%;top:24.05%"
           data-id="30d0274fdc1c800999feeb0ca6669b22" data-name="Selva Fogliabruna"
           data-desc="Alberi troppo vecchi. Chi entra non sempre torna." data-sub="foglia">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
         </div>
 
         <!-- FORESTA DELLO SMARRIMENTO -->
-        <div class="mpin t-fog" id="mpin-forestasmari" style="left:86.74%;top:41.99%"
+        <div class="mpin t-fog" id="mpin-forestasmari" data-explored="false" style="left:86.74%;top:41.99%"
           data-id="30d0274fdc1c8016b113d5c2d7662d8f" data-name="Foresta dello Smarrimento"
           data-desc="Non ci sono mappe. I sentieri cambiano. Rune violacee compaiono di notte." data-sub="smari">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
         </div>
 
         <!-- VOLONX -->
-        <div class="mpin t-village" id="mpin-volonx" style="left:93.13%;top:35.69%"
+        <div class="mpin t-village" id="mpin-volonx" data-explored="true" style="left:93.13%;top:35.69%"
           data-id="30d0274fdc1c804b9cb7e366f02bd635" data-name="Volonx"
           data-desc="Insediamento ai margini. Chi ci abita, raramente se ne va." data-sub="">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
         </div>
 
         <!-- VIGILIUS -->
-        <div class="mpin t-city" id="mpin-vigilius" style="left:78.74%;top:51.15%"
+        <div class="mpin t-city" id="mpin-vigilius" data-explored="true" style="left:78.74%;top:51.15%"
           data-id="31f0274fdc1c8059a923c73da185a0e3" data-name="Vigilius"
           data-desc="Città interna delle Marche. Centro politico e militare." data-sub="">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
         </div>
 
         <!-- GALETON -->
-        <div class="mpin t-village" id="mpin-galeton" style="left:86.21%;top:69.47%"
+        <div class="mpin t-village" id="mpin-galeton" data-explored="true" style="left:86.21%;top:69.47%"
           data-id="31f0274fdc1c8019945af2b26306462f" data-name="Galeton"
           data-desc="Crocevia commerciale. Molte strade si incontrano qui." data-sub="">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
         </div>
 
         <!-- LAGO DI GROMOT -->
-        <div class="mpin t-water" id="mpin-lagogromot" style="left:92.65%;top:51.72%"
+        <div class="mpin t-water" id="mpin-lagogromot" data-explored="true" style="left:92.65%;top:51.72%"
           data-id="30d0274fdc1c803387c4fda013b857e9" data-name="Lago di Gromot"
           data-desc="Acque scure e profonde. Nessuno sa quanto è fondo." data-sub="">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
         </div>
 
         <!-- FORTE VIGILUS -->
-        <div class="mpin t-fort" id="mpin-fortevigilius" style="left:20.99%;top:33.02%"
+        <div class="mpin t-fort" id="mpin-fortevigilius" data-explored="true" style="left:20.99%;top:33.02%"
           data-id="30d0274fdc1c8090aee7ed0430170414" data-name="Forte Vigilus"
           data-desc="Avamposto militare sulle alture. Controlla i passi verso est." data-sub="">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
         </div>
 
         <!-- RIVA DI FERRO -->
-        <div class="mpin t-village" id="mpin-rivadifero" style="left:20.45%;top:66.99%"
+        <div class="mpin t-village" id="mpin-rivadifero" data-explored="true" style="left:20.45%;top:66.99%"
           data-id="31f0274fdc1c8075b0dec2e2a6bc359e" data-name="Riva di Ferro"
           data-desc="Porto minore. Pescatori, contrabbandieri, qualche avventuriero di passaggio." data-sub="">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
         </div>
 
         <!-- FUMOFOSCO -->
-        <div class="mpin t-village" id="mpin-fumofosco" style="left:43.48%;top:52.48%"
+        <div class="mpin t-village" id="mpin-fumofosco" data-explored="true" style="left:43.48%;top:52.48%"
           data-id="31f0274fdc1c805b89b8f0678463e615" data-name="Fumofosco"
           data-desc="Un villaggio avvolto da strane nebbie. I locali non parlano molto." data-sub="">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
         </div>
 
         <!-- ROVINE DI KALDUR -->
-        <div class="mpin t-ruin" id="mpin-kaldur" style="left:48.09%;top:69.85%"
+        <div class="mpin t-ruin" id="mpin-kaldur" data-explored="true" style="left:48.09%;top:69.85%"
           data-id="31f0274fdc1c808191abe4df86d176e6" data-name="Rovine di Kaldur"
           data-desc="Una civiltà è finita qui. Le pietre bruciano ancora." data-sub="">
           <div class="mpin-ring"></div><div class="mpin-dot"></div>
@@ -721,6 +722,7 @@
         <div class="ph-title" id="ph-title"></div>
         <div class="ph-sub" id="ph-sub"></div>
         <div class="ph-divider"><div class="ph-divider-line"></div><div class="ph-divider-gem">◆</div></div>
+        <button class="ph-copy-btn" onclick="copyPageLink()" title="Copia link pagina">⛓ Copia link</button>
       </div>
     </div>
     <div id="pbody"></div>
@@ -799,5 +801,7 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+<div id="dust-vfx"></div>
+<div id="candlelight-overlay"></div>
 </body>
 </html>
