@@ -308,9 +308,17 @@ function markChangelogSeen(){
 
 /* ════ PREFETCH ════ */
 function prefetchPage(id){
-  var key='pg_'+id;try{if(sessionStorage.getItem(key))return;}catch(e){}
+  var key='pg_'+id;
+  /* salta se già in memoria o sessionStorage */
+  if(window._memCache&&_memCache[key])return;
+  try{if(sessionStorage.getItem(key))return;}catch(e){}
   fetch('/api/notion?pageId='+id).then(function(r){return r.ok?r.json():null;})
-    .then(function(d){if(d)try{sessionStorage.setItem(key,JSON.stringify(d));}catch(e){}}).catch(function(){});
+    .then(function(d){
+      if(!d)return;
+      /* salva in entrambi i livelli */
+      if(window._memCache)_memCache[key]=d;
+      try{sessionStorage.setItem(key,JSON.stringify(d));}catch(e){}
+    }).catch(function(){});
 }
 window.addEventListener('load',function(){setTimeout(function(){PREFETCH_IDS.forEach(prefetchPage);},2500);});
 
