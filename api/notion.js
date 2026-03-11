@@ -40,6 +40,22 @@ async function fetchAllBlocks(blockId, token, depth) {
   return blocks;
 }
 
+/* ── proxy immagine: re-fetcha l'URL e la riversa al client ──────── */
+async function proxyImage(url, res) {
+  try {
+    var r = await fetch(url, { headers: { 'User-Agent': 'Arcamis/1.0' } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    var ct = r.headers.get('content-type') || 'image/jpeg';
+    res.setHeader('Content-Type', ct);
+    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=7200');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    var buf = Buffer.from(await r.arrayBuffer());
+    return res.status(200).send(buf);
+  } catch(e) {
+    return res.status(502).json({ error: 'proxy error: ' + e.message });
+  }
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -54,6 +70,19 @@ module.exports = async function handler(req, res) {
   var pageId = req.query.pageId;
   var dbId   = req.query.dbId;
   var q      = req.query.q;
+  var imgUrl = req.query.img;
+
+  /* ── Proxy immagine (evita scadenza URL S3 Notion) ──────────────── */
+  if (imgUrl) {
+    /* accetta solo URL Notion/AWS */
+    if (!imgUrl.startsWith('https://prod-files-secure.s3') &&
+        !imgUrl.startsWith('https://s3.us-west') &&
+        !imgUrl.startsWith('https://notion.so') &&
+        !imgUrl.startsWith('https://www.notion.so')) {
+      return res.status(400).json({ error: 'URL non permesso' });
+    }
+    return proxyImage(imgUrl, res);
+  }
 
   try {
 
