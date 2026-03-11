@@ -1,39 +1,65 @@
-/* ════════════════════════════════════
-   ARCAMIS — style-page.css
-════════════════════════════════════ */
-
-#page-hero { min-height: 280px; position: relative; overflow: hidden; background: #06080e; display: flex; align-items: flex-end; }
-.ph-covbg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: saturate(.6) brightness(.45); transition: opacity .5s; }
-.ph-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(4,6,12,1) 0%, rgba(4,6,12,.4) 100%); }
-.ph-content { position: relative; z-index: 5; padding: 0 30px 40px; width: 100%; max-width: 900px; margin: 0 auto; }
-#p-icon { font-size: 48px; margin-bottom: 10px; }
-#p-title { font-size: 38px; color: var(--white); margin: 0; font-family: 'Cinzel', serif; text-shadow: 0 2px 15px #000; }
-#p-body { max-width: 900px; margin: 0 auto; padding: 40px 20px 100px; line-height: 1.8; color: var(--text); font-family: 'Crimson Pro', serif; }
-
-/* IMMAGINI FIX */
-.n-image { margin: 30px 0; text-align: center; }
-.n-image img { max-width: 100%; max-height: 550px; border-radius: 8px; border: 1px solid var(--bdr2); object-fit: contain; }
-
-/* CAROUSEL & CARDS */
-.carousel-container { position: relative; margin: 25px 0; width: 100%; }
-.carousel-track { display: flex; gap: 16px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-.carousel-track::-webkit-scrollbar { display: none; }
-.carousel-track .lcard { flex: 0 0 240px; height: 150px; }
-.single-card { margin: 15px 0; width: 100%; max-width: 350px; height: 120px; }
-
-.car-btn {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  background: rgba(12, 15, 21, 0.9); border: 1px solid var(--gold); color: var(--gold);
-  width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 10;
+#page-hero{
+  min-height:260px;position:relative;overflow:hidden;
+  background:#06080e;display:flex;align-items:flex-end;
 }
-.car-btn.left { left: -20px; }
-.car-btn.right { right: -20px; }
+.ph-covbg{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  filter:saturate(.6) brightness(.45);
+  transition:opacity .5s;
+}
+.ph-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(4,6,12,.97) 0%,rgba(4,6,12,.65) 50%,rgba(4,6,12,.2) 100%);
+}
+.ph-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 45% 110% at 12% 60%,rgba(200,155,60,.06),transparent),
+    repeating-linear-gradient(90deg,transparent,transparent 79px,rgba(200,155,60,.018) 80px),
+    repeating-linear-gradient(0deg,transparent,transparent 49px,rgba(200,155,60,.014) 50px);
+}
+.ph-btmline{
+  position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.3),transparent);
+}
+.ph-content{
+  position:relative;z-index:5;padding:0 30px 45px;width:100%;max-width:960px;margin:0 auto;
+}
+#p-icon{font-size:42px;margin-bottom:12px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
+#p-title{
+  font-size:38px;color:var(--white);margin:0;letter-spacing:1px;
+  text-shadow:0 4px 15px rgba(0,0,0,.8);line-height:1.1;
+}
+#p-breadcrumb{
+  margin-top:12px;font-size:12px;text-transform:uppercase;letter-spacing:2px;
+  color:var(--gold);opacity:.7;font-weight:600;
+}
 
-/* BLOCCHI NOTION */
-.n-p { margin-bottom: 1.5em; font-size: 1.15rem; }
-.n-h1 { font-family: 'Cinzel'; color: var(--gold); margin: 2em 0 1em; border-bottom: 1px solid var(--bdr2); }
-.n-callout { display: flex; gap: 15px; padding: 20px; border-radius: 6px; border-left: 4px solid var(--gold); background: rgba(200,155,60,0.05); margin: 20px 0; }
-.n-ul { margin-left: 20px; margin-bottom: 1.5em; color: var(--text); }
+#p-body{
+  max-width:900px;margin:0 auto;padding:50px 25px 100px;
+  line-height:1.75;color:var(--text);font-family:'Crimson Pro',serif;
+}
 
-/* FONT SCALE */
-.n-p, .n-callout-body, .n-ul li { font-size: calc(16px * var(--font-scale, 1)) !important; }
+/* ──── FIX TOGGLE PANTHEON (Aggiunto) ──── */
+.n-th-wrapper { margin-bottom: 18px; border-bottom: 1px solid var(--bdr2); }
+.n-th { 
+  font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.35rem;
+  padding: 15px 0; cursor: pointer; list-style: none; outline: none;
+  transition: 0.3s; position: relative;
+}
+.n-th:hover { color: var(--gold3); padding-left: 10px; }
+.n-th::before { content: '◆ '; font-size: 0.8em; color: var(--gold); margin-right: 8px; }
+.n-th-content { padding: 20px 5px; animation: slideDown 0.4s ease-out; }
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ──── FIX CARD E GRIGLIA (Migliorato) ──── */
+.cgrid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:20px;margin:25px 0;
+}
+.lcard{
