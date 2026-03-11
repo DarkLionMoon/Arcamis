@@ -1,892 +1,1126 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Arcamis</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style-base.css">
-<link rel="stylesheet" href="style-page.css">
-</head>
-<body>
-<!-- ═══ LOADER ═══ -->
-<div id="site-loader">
-  <div class="loader-rune">⚔</div>
-  <div class="loader-sub">Arcamis</div>
-  <div class="loader-dots">
-    <div class="loader-dot"></div>
-    <div class="loader-dot"></div>
-    <div class="loader-dot"></div>
-  </div>
-</div>
-
-<!-- ptr + scroll top -->
-<div id="ptr-indicator">↓ Rilascia per aggiornare</div>
-<div id="scroll-top-btn" onclick="goToTop()">▲</div>
-
-<!-- ═══ TOPBAR ═══ -->
-<div id="progress-bar"></div>
-<div id="topbar">
-  <div id="tlogo" onclick="showHome()">
-    <div id="liw"><img id="li" alt=""/><span id="lf">⚔</span></div>
-    <span id="tlt">ARCAMIS</span>
-  </div>
-  <nav id="tnav">
-    <div class="tn ta" data-v="home" onclick="showHome();closeDd()">Home</div>
-
-    <!-- ── Regole ▾ ── -->
-    <div class="tn-drop" id="dd-regole">
-      <div class="tn" onclick="toggleDd('dd-regole')">Regole</div>
-      <div class="tn-menu">
-        <div class="tn-menu-label">Regolamento</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')"><span class="tn-ii">⚔️</span>Gameplay</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')"><span class="tn-ii">📜</span>Regole generali</div>
-        <div class="tn-item" onclick="closeDd();gp('3130274fdc1c807eb61fde24e8236659','Materiale approvato','📋')"><span class="tn-ii">📋</span>Materiale approvato</div>
-      </div>
-    </div>
-
-    <!-- ── Personaggio ▾ ── -->
-    <div class="tn-drop" id="dd-pg">
-      <div class="tn" onclick="toggleDd('dd-pg')">Personaggio</div>
-      <div class="tn-menu">
-        <div class="tn-menu-label">Il tuo PG</div>
-        <div class="tn-item" onclick="closeDd();gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')"><span class="tn-ii">🌟</span>Come si inizia</div>
-        <div class="tn-item" onclick="closeDd();gp('5cea525d149f4acb9c59007bf6b3d5ff','Andando avanti','📈')"><span class="tn-ii">📈</span>Andando avanti</div>
-        <div class="tn-item" onclick="closeDd();gp('2fd0274fdc1c80d8b948c4133f874f28','Galleria PG','🖼️')"><span class="tn-ii">🖼️</span>Galleria PG</div>
-        <div class="tn-div"></div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c80e78ad7ce985007b7c6','Homebrew','⚗️')"><span class="tn-ii">⚗️</span>Homebrew</div>
-      </div>
-    </div>
-
-    <!-- ── Lavori ▾ ── -->
-    <div class="tn-drop" id="dd-lavori">
-      <div class="tn" onclick="toggleDd('dd-lavori')">Lavori</div>
-      <div class="tn-menu">
-        <div class="tn-menu-label">Gilde &amp; Mestieri</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️')"><span class="tn-ii">🗡️</span>Gilda avventurieri</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')"><span class="tn-ii">🍺</span>Locanda</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')"><span class="tn-ii">🔥</span>Forgia</div>
-        <div class="tn-div"></div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c8089bfe6c24434d53b67','Biblioteca','📚')"><span class="tn-ii">📚</span>Biblioteca</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801c9697e75caa8d5f13','Bottega farmaceutica','💊')"><span class="tn-ii">💊</span>Bottega farmaceutica</div>
-        <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c80688dd6c2b293a1f626','Caserma','🛡️')"><span class="tn-ii">🛡️</span>Caserma</div>
-        <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c80769a4ae243f22f0582','Corporazione costruttori','🔨')"><span class="tn-ii">🔨</span>Corporazione dei costruttori</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')"><span class="tn-ii">⚕️</span>Ospedale</div>
-        <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c8035bad4f0b6ab705192','Sartoria','🧵')"><span class="tn-ii">🧵</span>Sartoria</div>
-      </div>
-    </div>
-
-    <!-- ── Lore ▾ ── -->
-    <div class="tn-drop" id="dd-lore">
-      <div class="tn" onclick="toggleDd('dd-lore')">Lore</div>
-      <div class="tn-menu">
-        <div class="tn-menu-label">Il Mondo</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📖')"><span class="tn-ii">📖</span>Storia del mondo</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')"><span class="tn-ii">🛐</span>Pantheon</div>
-        <div class="tn-item" onclick="closeDd();gp('2f10274fdc1c80489f23c49164747770','Mappe','🗺️')"><span class="tn-ii">🗺️</span>Mappe</div>
-        <div class="tn-div"></div>
-        <div class="tn-menu-label">Luoghi</div>
-        <div class="tn-div"></div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c802a9babd4239d97a319','Maestria / Titoli','🏅')"><span class="tn-ii">🏅</span>Maestria / Titoli</div>
-        <div class="tn-item" onclick="closeDd();gp('3000274fdc1c8033a214c44a1aa7f01f','Changelog','📝')"><span class="tn-ii">📝</span>Changelog</div>
-      </div>
-    </div>
-  </nav>
-  <div id="tr">
-    <div id="sw">
-      <span id="si">⌕</span>
-      <input id="ts" type="text" placeholder="Cerca nella wiki…" autocomplete="off"
-        oninput="hsearch(this.value)" onblur="setTimeout(csearch,200)"/>
-      <div id="sr"></div>
-    </div>
-    <div id="ovbtn" onclick="ovo()">Menu<span class="kbd">⇧Tab</span></div>
-    <div id="font-controls">
-      <div class="font-btn" onclick="fontDown()" title="Testo più piccolo">A−</div>
-      <div class="font-btn" onclick="fontUp()" title="Testo più grande">A+</div>
-    </div>
-    <button id="theme-toggle" onclick="toggleTheme()" title="Cambia tema">☀️</button>
-    <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" id="dcbtn">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-      Discord
-    </a>
-    <!-- Hamburger (visibile solo mobile) -->
-    <div id="hamburger" onclick="toggleMobileNav()" aria-label="Menu" role="button">
-      <div class="hbr-bar"></div>
-      <div class="hbr-bar"></div>
-      <div class="hbr-bar"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ MOBILE NAV DRAWER ═══ -->
-<div id="mobile-nav">
-  <div class="mn-section">
-    <div class="mn-item" onclick="closeMobileNav();showHome()"><span class="mn-ii">🏠</span>Home</div>
-  </div>
-  <div class="mn-section">
-    <div class="mn-label">Regolamento</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')"><span class="mn-ii">⚔️</span>Gameplay</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')"><span class="mn-ii">📜</span>Regole generali</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('3130274fdc1c807eb61fde24e8236659','Materiale approvato','📋')"><span class="mn-ii">📋</span>Materiale approvato</div>
-  </div>
-  <div class="mn-section">
-    <div class="mn-label">Il tuo PG</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')"><span class="mn-ii">🌟</span>Come si inizia</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('5cea525d149f4acb9c59007bf6b3d5ff','Andando avanti','📈')"><span class="mn-ii">📈</span>Andando avanti</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c802a9babd4239d97a319','Maestria / Titoli','🏅')"><span class="mn-ii">🏅</span>Maestria / Titoli</div>
-  </div>
-  <div class="mn-section">
-    <div class="mn-label">Lavori</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️')"><span class="mn-ii">🗡️</span>Gilda avventurieri</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')"><span class="mn-ii">🍺</span>Locanda</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')"><span class="mn-ii">🔥</span>Forgia</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2ff0274fdc1c80688dd6c2b293a1f626','Caserma','🛡️')"><span class="mn-ii">🛡️</span>Caserma</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')"><span class="mn-ii">⚕️</span>Ospedale</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2ff0274fdc1c8035bad4f0b6ab705192','Sartoria','🧵')"><span class="mn-ii">🧵</span>Sartoria</div>
-  </div>
-  <div class="mn-section">
-    <div class="mn-label">Lore &amp; Mondo</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📖')"><span class="mn-ii">📖</span>Storia del mondo</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')"><span class="mn-ii">🛐</span>Pantheon</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f10274fdc1c80489f23c49164747770','Mappe','🗺️')"><span class="mn-ii">🗺️</span>Mappe</div>
-    <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c80e78ad7ce985007b7c6','Homebrew','⚗️')"><span class="mn-ii">⚗️</span>Homebrew</div>
-  </div>
-  <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="mn-discord">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-    ENTRA NEL DISCORD
-  </a>
-</div>
-
-<!-- ═══ MAIN ═══ -->
-<div id="main">
-
-  <!-- HOME VIEW -->
-  <div id="hv" class="vp" style="display:block">
-
-    <!-- ═══ HERO CAROUSEL ═══ -->
-    <div id="carousel-wrap">
-      <div class="cnav" id="cprev" onclick="changeSlide(-1)">&#10094;</div>
-      <div class="cnav" id="cnext" onclick="changeSlide(1)">&#10095;</div>
-      <!-- Floating particles (spawned via JS) -->
-      <div id="hero-particles" aria-hidden="true"></div>
-      <div id="ctrack">
-        <!-- SLIDE 1 — Arcamis porto (usa cover.png) -->
-        <div class="slide active" style="background-image:url('cover.png');background-size:cover;background-position:center 40%">
-          <div class="scnt">
-            <div class="stag">Città Portuale — Marche di Arcamis</div>
-            <div class="stit">ARCAMIS</div>
-            <p class="sdesc">Città portuale delle Marche di Arcamis, porta d'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.</p>
-            <div style="display:flex;gap:14px;flex-wrap:wrap">
-              <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="sbtn">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-                Entra nel Discord
-              </a>
-              <div class="sbtn" onclick="document.getElementById('main').scrollTo({top:window.innerHeight,behavior:'smooth'})" style="cursor:pointer">Scopri la città ↓</div>
-            </div>
-          </div>
-        </div>
-        <!-- SLIDE 2 — Pantheon: cielo notturno stellato -->
-        <div class="slide" style="background:radial-gradient(ellipse 80% 60% at 60% 30%,#1a0840 0%,#080220 45%,#030112 100%)">
-          <div id="star-field"></div>
-          <div class="scnt">
-            <div class="stag">Pantheon di Arcamis</div>
-            <div class="stit">LE DIVINITÀ<br>DI ARCAMIS</div>
-            <p class="sdesc">Ogni dio ha lasciato il proprio segno sulla terra. Scopri il Pantheon e i culti che plasmano il mondo.</p>
-            <div class="sbtn" onclick="gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')" style="cursor:pointer">Scopri il Pantheon →</div>
-          </div>
-        </div>
-        <!-- SLIDE 3 — Personaggio: atmosfera oro/avventura -->
-        <div class="slide" style="background:radial-gradient(ellipse 90% 70% at 40% 60%,#281400 0%,#120900 45%,#060400 100%)">
-          <div class="scnt">
-            <div class="stag">Crea il tuo eroe</div>
-            <div class="stit">CREA IL TUO<br>PERSONAGGIO</div>
-            <p class="sdesc">Scegli la tua classe, forgia la tua storia. Il tuo personaggio esiste solo su Arcamis.</p>
-            <div class="sbtn" onclick="gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')" style="cursor:pointer">Come si inizia →</div>
-          </div>
-        </div>
-      </div><!-- /ctrack -->
-      <div class="cdots">
-        <div class="cdot ca" onclick="jumpToSlide(0)"></div>
-        <div class="cdot" onclick="jumpToSlide(1)"></div>
-        <div class="cdot" onclick="jumpToSlide(2)"></div>
-      </div>
-      <div class="scroll-ind" onclick="document.getElementById('main').scrollTo({top:window.innerHeight,behavior:'smooth'})">
-        <span>SCORRI</span><span>↓</span>
-      </div>
-      <!-- Wave transition to sections below -->
-      <div id="hero-wave" aria-hidden="true">
-        <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0,40 C180,70 360,10 540,42 C720,74 900,8 1080,40 C1260,72 1380,14 1440,38 L1440,80 L0,80 Z" fill="rgba(8,10,14,.9)"/>
-          <path d="M720,38 C900,68 1080,12 1260,42 C1440,72 1620,6 1800,38 C1980,70 2160,12 2160,38 L2160,80 L720,80 Z" fill="rgba(8,10,14,.9)"/>
-        </svg>
-      </div>
-    </div><!-- /carousel -->
-
-    <!-- ═══ MARCHE DI ARCAMIS ═══ -->
-    <div class="gold-sep"></div>
-    <div class="hsec fade-in">
-      <div class="sec-eyebrow">Regione Esplorabile</div>
-      <div class="sec-h">MARCHE DI ARCAMIS</div>
-      <p class="sec-p">La città portuale di Arcamis e i territori circostanti. Un piccolo angolo di un regno molto più vasto, ancora in gran parte sconosciuto.</p>
-      <!-- ── MAPPA INTERATTIVA ── -->
-      <div class="map-container" id="arcamis-map" style="border-radius:2px;position:relative;overflow:hidden;background:#030608;line-height:0">
-        <img src="mappa.png" alt="Mappa delle Marche di Arcamis" style="width:100%;display:block;pointer-events:none" draggable="false"/>
-
-        <!-- ── HOTSPOT assoluti in % ── -->
-
-        <!-- ARCAMIS -->
-        <div class="mpin t-city" id="mpin-arcamis" style="left:87.76%;top:28.53%"
-          data-id="3090274fdc1c80e1a365ce1c36873455" data-name="Arcamis"
-          data-desc="Città portuale delle Marche. Porto, commercio, avventura." data-sub="">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- SELVA FOGLIABRUNA -->
-        <div class="mpin t-forest" id="mpin-selvafoglia" style="left:78.58%;top:24.05%"
-          data-id="30d0274fdc1c800999feeb0ca6669b22" data-name="Selva Fogliabruna"
-          data-desc="Alberi troppo vecchi. Chi entra non sempre torna." data-sub="foglia">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- FORESTA DELLO SMARRIMENTO -->
-        <div class="mpin t-fog" id="mpin-forestasmari" style="left:86.74%;top:41.99%"
-          data-id="30d0274fdc1c8016b113d5c2d7662d8f" data-name="Foresta dello Smarrimento"
-          data-desc="Non ci sono mappe. I sentieri cambiano. Rune violacee compaiono di notte." data-sub="smari">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- VOLONX -->
-        <div class="mpin t-village" id="mpin-volonx" style="left:93.13%;top:35.69%"
-          data-id="30d0274fdc1c804b9cb7e366f02bd635" data-name="Volonx"
-          data-desc="Insediamento ai margini. Chi ci abita, raramente se ne va." data-sub="">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- VIGILIUS -->
-        <div class="mpin t-city" id="mpin-vigilius" style="left:78.74%;top:51.15%"
-          data-id="31f0274fdc1c8059a923c73da185a0e3" data-name="Vigilius"
-          data-desc="Città interna delle Marche. Centro politico e militare." data-sub="">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- GALETON -->
-        <div class="mpin t-village" id="mpin-galeton" style="left:86.21%;top:69.47%"
-          data-id="31f0274fdc1c8019945af2b26306462f" data-name="Galeton"
-          data-desc="Crocevia commerciale. Molte strade si incontrano qui." data-sub="">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- LAGO DI GROMOT -->
-        <div class="mpin t-water" id="mpin-lagogromot" style="left:92.65%;top:51.72%"
-          data-id="30d0274fdc1c803387c4fda013b857e9" data-name="Lago di Gromot"
-          data-desc="Acque scure e profonde. Nessuno sa quanto è fondo." data-sub="">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- FORTE VIGILUS -->
-        <div class="mpin t-fort" id="mpin-fortevigilius" style="left:20.99%;top:33.02%"
-          data-id="30d0274fdc1c8090aee7ed0430170414" data-name="Forte Vigilus"
-          data-desc="Avamposto militare sulle alture. Controlla i passi verso est." data-sub="">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- RIVA DI FERRO -->
-        <div class="mpin t-village" id="mpin-rivadifero" style="left:20.45%;top:66.99%"
-          data-id="31f0274fdc1c8075b0dec2e2a6bc359e" data-name="Riva di Ferro"
-          data-desc="Porto minore. Pescatori, contrabbandieri, qualche avventuriero di passaggio." data-sub="">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- FUMOFOSCO -->
-        <div class="mpin t-village" id="mpin-fumofosco" style="left:43.48%;top:52.48%"
-          data-id="31f0274fdc1c805b89b8f0678463e615" data-name="Fumofosco"
-          data-desc="Un villaggio avvolto da strane nebbie. I locali non parlano molto." data-sub="">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- ROVINE DI KALDUR -->
-        <div class="mpin t-ruin" id="mpin-kaldur" style="left:48.09%;top:69.85%"
-          data-id="31f0274fdc1c808191abe4df86d176e6" data-name="Rovine di Kaldur"
-          data-desc="Una civiltà è finita qui. Le pietre bruciano ancora." data-sub="">
-          <div class="mpin-ring"></div><div class="mpin-dot"></div>
-        </div>
-
-        <!-- Tooltip -->
-        <div class="map-tip" id="map-tip">
-          <div class="map-tip-name" id="mt-name">—</div>
-          <div class="map-tip-desc" id="mt-desc">—</div>
-          <div class="map-tip-hint" id="mt-hint">Clicca per aprire</div>
-        </div>
-
-        <!-- Selva Fogliabruna panel -->
-        <div class="sub-map-panel" id="sub-foglia">
-          <div class="smp-header">
-            <div class="smp-title"><span>🌲</span><span>SELVA FOGLIABRUNA — Luoghi esplorati</span></div>
-            <div class="smp-close" onclick="closeSubMap('sub-foglia')">✕</div>
-          </div>
-          <div class="smp-body">
-            <svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;max-height:100%;cursor:crosshair">
-              <rect width="500" height="300" fill="#030a06"/>
-              <path d="M50,100 Q150,60 250,80 Q350,60 450,100 Q480,150 450,220 Q350,280 250,290 Q150,280 50,220 Q20,170 50,100 Z" fill="rgba(15,45,20,0.6)" stroke="rgba(30,90,35,0.3)" stroke-width="1"/>
-              <g class="mloc t-water" data-id="31e0274fdc1c80f3a3cee348f59cede0" data-name="Rivorosso" data-desc="Un ruscello dai riflessi rossastri." data-type="luogo" data-sub="">
-                <path d="M185,200 Q215,190 250,200 Q285,210 315,200" stroke="rgba(200,60,40,0.6)" stroke-width="2.5" fill="none"/>
-                <circle cx="250" cy="200" r="14" fill="rgba(180,40,30,0.1)" stroke="rgba(200,60,40,0.5)" stroke-width="1.5" class="mc"/>
-                <text x="250" y="225" font-size="9" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(220,80,60,0.6)" class="ml">RIVOROSSO</text>
-              </g>
-              <rect x="1" y="1" width="498" height="298" fill="none" stroke="rgba(40,100,50,0.2)" stroke-width="1"/>
-            </svg>
-          </div>
-        </div>
-
-        <!-- Foresta Smarrimento panel -->
-        <div class="sub-map-panel" id="sub-smari">
-          <div class="smp-header">
-            <div class="smp-title"><span>🌑</span><span>FORESTA DELLO SMARRIMENTO — Luoghi noti</span></div>
-            <div class="smp-close" onclick="closeSubMap('sub-smari')">✕</div>
-          </div>
-          <div class="smp-body">
-            <svg viewBox="0 0 600 350" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;max-height:100%;cursor:crosshair">
-              <rect width="600" height="350" fill="#07060f"/>
-              <path d="M60,80 Q180,40 300,60 Q420,40 540,80 Q580,130 560,240 Q500,320 300,340 Q100,320 40,240 Q20,170 60,80 Z" fill="rgba(12,8,35,0.7)" stroke="rgba(80,50,160,0.2)" stroke-width="1"/>
-              <text x="300" y="75" font-size="13" text-anchor="middle" fill="rgba(130,80,220,0.2)" font-family="serif">ᚠ ᚢ ᚦ ᚨ ᚱ</text>
-              <g class="mloc t-ruin" data-id="30d0274fdc1c80038beec3f444e45f8b" data-name="Circolo dello Smarrimento" data-desc="Un cerchio di pietre sconosciute. Chi entra perde il senso del tempo." data-type="luogo" data-sub="">
-                <circle cx="300" cy="175" r="30" fill="none" stroke="rgba(120,70,200,0.2)" stroke-width="1" stroke-dasharray="5,3"/>
-                <circle cx="300" cy="175" r="10" fill="rgba(8,6,18,0.9)" stroke="rgba(140,80,240,0.6)" stroke-width="1.5" class="mc"><animate attributeName="stroke-opacity" values="0.6;1;0.3;0.6" dur="3s" repeatCount="indefinite"/></circle>
-                <text x="300" y="215" font-size="8" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(150,80,230,0.55)" class="ml">CIRCOLO DELLO SMARRIMENTO</text>
-              </g>
-              <g class="mloc t-forest" data-id="30d0274fdc1c80cf8cdaf328e339dfc7" data-name="Dimora degli Ursidi" data-desc="Abitato da creature enormi. Non si avvicina nessuno." data-type="luogo" data-sub="">
-                <circle cx="150" cy="240" r="10" fill="rgba(20,14,24,0.9)" stroke="rgba(80,120,50,0.55)" stroke-width="1.5" class="mc"/>
-                <text x="150" y="262" font-size="7.5" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(80,150,60,0.55)" class="ml">DIMORA DEGLI URSIDI</text>
-              </g>
-              <g class="mloc t-ruin" data-id="3130274fdc1c80848fe5dfd7d2610c06" data-name="La Caverna delle Talpe" data-desc="Gallerie immense. Buio completo, rumori indefiniti." data-type="luogo" data-sub="">
-                <circle cx="450" cy="250" r="10" fill="rgba(14,10,20,0.9)" stroke="rgba(140,100,60,0.55)" stroke-width="1.5" class="mc"/>
-                <text x="450" y="272" font-size="7.5" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(150,110,60,0.55)" class="ml">CAVERNA DELLE TALPE</text>
-              </g>
-              <g class="mloc t-ruin" data-id="31e0274fdc1c80f581f4f9cd7284bff0" data-name="Miniera Bruciascoria" data-desc="Abbandonata dopo un incendio. Fuma ancora, a volte." data-type="luogo" data-sub="">
-                <circle cx="420" cy="130" r="10" fill="rgba(18,8,8,0.9)" stroke="rgba(200,90,40,0.55)" stroke-width="1.5" class="mc"/>
-                <text x="420" y="152" font-size="7.5" text-anchor="middle" font-family="Cinzel,serif" fill="rgba(200,90,40,0.55)" class="ml">MINIERA BRUCIASCORIA</text>
-              </g>
-              <rect x="1" y="1" width="598" height="348" fill="none" stroke="rgba(80,50,160,0.15)" stroke-width="1"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-      <p class="map-or">— oppure esplora per scheda —</p>
-
-
-
-      <div class="loc-wrap">
-        <div class="la la-prev" onclick="locSlide(-1)">&#10094;</div>
-        <div class="loc-track-outer">
-          <div class="loc-track" id="loc-track">
-            <!-- Porto -->
-            <div class="loc-card" style="background:radial-gradient(ellipse 90% 60% at 50% 70%,#0a2040 0%,#061428 45%,#03080e 100%)" onclick="gp('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')">
-              <!-- Simulated sea horizon overlay -->
-              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,18,40,.3) 0%,rgba(3,10,22,.6) 55%,rgba(2,6,14,.96) 100%);z-index:1"></div>
-              <div style="position:absolute;top:30%;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(40,100,180,.3),rgba(60,140,220,.18),transparent);z-index:2"></div>
-              <div class="loc-ov" style="z-index:3">
-                <span class="loc-badge explored">⚓ Esplorato</span>
-                <div class="loc-name">Porto di Arcamis</div>
-                <div class="loc-sub">Piccolo centro commerciale e porto di frontiera. Punto d'arrivo per chiunque entri nelle Marche.</div>
-                <div class="loc-cta">Esplora →</div>
-                <div class="loc-tip">La locanda è proprio qui vicino. Ogni avventuriero degno di questo nome ha dormito tra queste mura almeno una volta.</div>
-              </div>
-            </div>
-            <!-- Città -->
-            <div class="loc-card" style="background:radial-gradient(ellipse 90% 70% at 40% 80%,#201808 0%,#120f06 45%,#080600 100%)" onclick="gp('2f00274fdc1c801a9b39d8d69800f7a8','Arcamis','⚔️')">
-              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,12,4,.2) 0%,rgba(8,7,2,.65) 55%,rgba(4,4,1,.97) 100%);z-index:1"></div>
-              <div class="loc-ov" style="z-index:3">
-                <span class="loc-badge explored">🏙️ Esplorato</span>
-                <div class="loc-name">Città di Arcamis</div>
-                <div class="loc-sub">Il cuore pulsante delle Marche. Mercati, gilde e intrighi politici in ogni vicolo.</div>
-                <div class="loc-cta">Esplora →</div>
-                <div class="loc-tip">Tre distretti, una dozzina di gilde, e qualcuno che ti osserva sempre da una finestra buia.</div>
-              </div>
-            </div>
-            <!-- Gilda -->
-            <div class="loc-card" style="background:radial-gradient(ellipse 80% 60% at 50% 80%,#0c1a10 0%,#081208 45%,#030604 100%)" onclick="gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️')">
-              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,14,8,.2) 0%,rgba(4,8,5,.65) 55%,rgba(2,4,2,.97) 100%);z-index:1"></div>
-              <div class="loc-ov" style="z-index:3">
-                <span class="loc-badge explored">⚔️ Esplorato</span>
-                <div class="loc-name">Gilda degli Avventurieri</div>
-                <div class="loc-sub">Base operativa per chi cerca fama, fortune e contratti pericolosi.</div>
-                <div class="loc-cta">Esplora →</div>
-                <div class="loc-tip">Le bacheche sono piene. Il lavoro non manca mai, ma nemmeno i rischi. Porta qualcuno di fidato.</div>
-              </div>
-            </div>
-            <!-- Forgia -->
-            <div class="loc-card" style="background:radial-gradient(ellipse 70% 50% at 50% 90%,#3a0a04 0%,#220604 50%,#0a0302 100%)" onclick="gp('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')">
-              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,4,2,.2) 0%,rgba(12,3,1,.65) 50%,rgba(6,2,1,.98) 100%);z-index:1"></div>
-              <!-- Lava/ember glow at bottom -->
-              <div style="position:absolute;bottom:0;left:0;right:0;height:40%;background:radial-gradient(ellipse 80% 100% at 50% 100%,rgba(200,80,20,.12),transparent);z-index:2"></div>
-              <div class="loc-ov" style="z-index:3">
-                <span class="loc-badge explored">🔥 Esplorato</span>
-                <div class="loc-name">Quartiere della Forgia</div>
-                <div class="loc-sub">L'odore di metallo fuso riempie l'aria. Armi e armature tra le migliori del regno.</div>
-                <div class="loc-cta">Esplora →</div>
-                <div class="loc-tip">Il maestro fabbro non dorme. O almeno nessuno lo ha mai visto farlo. Il fumo non si spegne mai.</div>
-              </div>
-            </div>
-            <!-- Volonx -->
-            <div class="loc-card" style="background:radial-gradient(ellipse 80% 65% at 45% 75%,#0e1420 0%,#080c16 45%,#040608 100%)" onclick="gp('30d0274fdc1c804b9cb7e366f02bd635','Volonx','🏘️')">
-              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,10,20,.25) 0%,rgba(5,7,14,.65) 55%,rgba(2,4,8,.97) 100%);z-index:1"></div>
-              <div style="position:absolute;top:20%;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(80,120,200,.15),rgba(100,140,220,.1),transparent);z-index:2"></div>
-              <div class="loc-ov" style="z-index:3">
-                <span class="loc-badge explored">🏘️ Esplorato</span>
-                <div class="loc-name">Volonx</div>
-                <div class="loc-sub">Insediamento ai margini delle Marche. Poco conosciuto, molto vissuto. Chi ci abita, raramente se ne va.</div>
-                <div class="loc-cta">Esplora →</div>
-                <div class="loc-tip">Le strade non sono segnate sulle mappe ufficiali. Ma chi sa dove guardare trova sempre qualcosa.</div>
-              </div>
-            </div>
-            <!-- Colline — mistero -->
-            <div class="loc-card loc-mystery-card" style="background:radial-gradient(ellipse 80% 60% at 50% 60%,#0e0d12 0%,#080810 45%,#040408 100%)">
-              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,8,16,.2) 0%,rgba(4,4,10,.7) 55%,rgba(2,2,6,.98) 100%);z-index:1"></div>
-              <div class="loc-ov" style="z-index:3">
-                <span class="loc-badge mystery">??? Inesplorato</span>
-                <div class="loc-name mys-blur">Le Colline</div>
-                <div class="loc-sub">Qualcosa si muove oltre le mura della città, nelle colline che nessuno ha ancora attraversato.</div>
-              </div>
-            </div>
-            <!-- Boschi — mistero -->
-            <div class="loc-card loc-mystery-card" style="background:radial-gradient(ellipse 80% 70% at 40% 50%,#04100a 0%,#030a06 45%,#010402 100%)">
-              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,8,4,.3) 0%,rgba(2,6,3,.7) 55%,rgba(1,3,2,.98) 100%);z-index:1"></div>
-              <div class="loc-ov" style="z-index:3">
-                <span class="loc-badge mystery">??? Inesplorato</span>
-                <div class="loc-name mys-blur">I Boschi Oscuri</div>
-                <div class="loc-sub">Gli anziani non ne parlano volentieri. Dicono che i boschi a nord ricordano tutto.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="la la-next" onclick="locSlide(1)">&#10095;</div>
-      </div>
-    </div>
-
-    <!-- ═══ ARCADIA ═══ -->
-    <div class="gold-sep"></div>
-    <div class="arcadia-sec fade-in">
-      <div class="arcadia-inner">
-        <div>
-          <div class="sec-eyebrow">Il Regno</div>
-          <div class="sec-h">ARCADIA</div>
-          <p class="sec-p">Le Marche di Arcamis sono solo l'avamposto di un regno antico e misterioso. Gilde, fazioni e poteri si contendono l'influenza. Altri territori restano inesplorati, oltre i confini conosciuti.</p>
-          <div class="faction-grid">
-            <div class="fpill" onclick="gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda degli avventurieri','🗡️')">
-              <span class="fp-i">🗡️</span><div><span class="fp-n">Gilda degli Avventurieri</span><div class="fp-d">Contratti e missioni</div></div>
-            </div>
-            <div class="fpill" onclick="gp('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')">
-              <span class="fp-i">🍺</span><div><span class="fp-n">La Locanda</span><div class="fp-d">Rifugio e punto d'incontro</div></div>
-            </div>
-            <div class="fpill" onclick="gp('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')">
-              <span class="fp-i">🔥</span><div><span class="fp-n">Forgia</span><div class="fp-d">Armi e crafting</div></div>
-            </div>
-            <div class="fpill" onclick="gp('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')">
-              <span class="fp-i">⚕️</span><div><span class="fp-n">Ospedale</span><div class="fp-d">Cura e alchimia</div></div>
-            </div>
-            <div class="fpill" onclick="gp('2ff0274fdc1c80769a4ae243f22f0582','Corporazione costruttori','🔨')">
-              <span class="fp-i">🔨</span><div><span class="fp-n">Corporazione dei Costruttori</span><div class="fp-d">Costruzione e ingegneria</div></div>
-            </div>
-            <div class="fpill" style="opacity:.5;cursor:default">
-              <span class="fp-i">⚓</span><div><span class="fp-n">Marina</span><div class="fp-d">Flotta e commercio marittimo</div></div>
-            </div>
-          </div>
-
-          <!-- Gilde principali -->
-          <div class="sec-eyebrow" style="margin-top:36px">Le Grandi Gilde</div>
-          <div class="guild-grid">
-
-            <!-- Gilda dei Mercanti -->
-            <div class="guild-card" style="--gbar:rgba(200,155,60,.6)">
-              <div class="guild-bar"></div>
-              <div class="guild-body">
-                <div class="guild-head">
-                  <span class="guild-icon">🪙</span>
-                  <div class="guild-name">Gilda dei Mercanti</div>
-                </div>
-                <div class="guild-desc">Il commercio è potere. Ogni rotta, ogni contratto, ogni segreto ha un prezzo — e loro lo conoscono.</div>
-                <div class="guild-divider"></div>
-                <div class="guild-subs">
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">🛤️</span>
-                    <span class="guild-sub-n">Commercianti Terrestri</span>
-                    <span class="guild-sub-d">Rotte interne, carovane, mercati locali</span>
-                  </div>
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">⚓</span>
-                    <span class="guild-sub-n">Marinai & Portuali</span>
-                    <span class="guild-sub-d">Traffici via mare, scarico merci, dogana</span>
-                  </div>
-                  <div class="guild-sub locked">
-                    <span class="guild-sub-i">🗝️</span>
-                    <span class="guild-sub-n">Rotte Segrete</span>
-                    <span class="guild-sub-d">Contrabbando, accordi nell'ombra</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Gilda dei Lavoratori -->
-            <div class="guild-card" style="--gbar:rgba(180,110,40,.7)">
-              <div class="guild-bar"></div>
-              <div class="guild-body">
-                <div class="guild-head">
-                  <span class="guild-icon">⚒️</span>
-                  <div class="guild-name">Gilda dei Lavoratori</div>
-                </div>
-                <div class="guild-desc">Ogni pietra posata, ogni lama forgiata, ogni tessuto porta il loro marchio. Senza di loro, Arcamis non esiste.</div>
-                <div class="guild-divider"></div>
-                <div class="guild-subs">
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">🔨</span>
-                    <span class="guild-sub-n">Fabbri & Forgiatori</span>
-                    <span class="guild-sub-d">Metallo, armi, strumenti da lavoro</span>
-                  </div>
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">🪚</span>
-                    <span class="guild-sub-n">Falegnami & Costruttori</span>
-                    <span class="guild-sub-d">Strutture, navi, infrastrutture</span>
-                  </div>
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">🧵</span>
-                    <span class="guild-sub-n">Tessitori & Artigiani</span>
-                    <span class="guild-sub-d">Abbigliamento, manufatti, commercio</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Gilda dei Guerrieri -->
-            <div class="guild-card" style="--gbar:rgba(160,60,60,.7)">
-              <div class="guild-bar"></div>
-              <div class="guild-body">
-                <div class="guild-head">
-                  <span class="guild-icon">⚔️</span>
-                  <div class="guild-name">Gilda dei Guerrieri</div>
-                </div>
-                <div class="guild-desc">Ordine e protezione — o così dicono. Chi tiene davvero le redini della sicurezza è una domanda che pochi osano fare ad alta voce.</div>
-                <div class="guild-divider"></div>
-                <div class="guild-subs">
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">🛡️</span>
-                    <span class="guild-sub-n">Soldati & Guardie</span>
-                    <span class="guild-sub-d">Pattuglie, ordine pubblico, difesa civile</span>
-                  </div>
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">🐴</span>
-                    <span class="guild-sub-n">Cavalieri</span>
-                    <span class="guild-sub-d">Élite militare, scorte nobiliari, tornei</span>
-                  </div>
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">⚓</span>
-                    <span class="guild-sub-n">Milizia Portuale</span>
-                    <span class="guild-sub-d">Sicurezza del porto, controllo navi</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Gilda degli Avventurieri -->
-            <div class="guild-card" style="--gbar:rgba(80,130,200,.7);cursor:pointer" onclick="gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda degli Avventurieri','🗡️')">
-              <div class="guild-bar"></div>
-              <div class="guild-body">
-                <div class="guild-head">
-                  <span class="guild-icon">🗡️</span>
-                  <div class="guild-name">Gilda degli Avventurieri</div>
-                </div>
-                <div class="guild-desc">Contratti, missioni, gloria — e qualche cicatrice di troppo. L'unico posto dove un forestiero può diventare qualcuno nelle Marche.</div>
-                <div class="guild-divider"></div>
-                <div class="guild-subs">
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">📋</span>
-                    <span class="guild-sub-n">Contratti & Missioni</span>
-                    <span class="guild-sub-d">Taglie, scorte, esplorazione — ogni lavoro ha il suo rischio</span>
-                  </div>
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">🏅</span>
-                    <span class="guild-sub-n">Ranghi & Reputazione</span>
-                    <span class="guild-sub-d">Dalla matricola al veterano — ogni gesta lascia il segno</span>
-                  </div>
-                  <div class="guild-sub">
-                    <span class="guild-sub-i">🤝</span>
-                    <span class="guild-sub-n">Iscrizione</span>
-                    <span class="guild-sub-d">Obbligatoria per tutti i nuovi avventurieri</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ MISTERI ═══ -->
-    <div class="hsec fade-in">
-      <div class="sec-eyebrow">Foreshadowing</div>
-      <div class="sec-h">MISTERI DEL REGNO</div>
-      <p class="sec-p">Vecchie leggende parlano di luoghi dimenticati e forze antiche, ben oltre i confini delle Marche. Il mondo è più grande di quanto sembri.</p>
-      <div class="mys-cin-grid">
-
-        <!-- Card 1: Maree -->
-        <div class="mys-cin" style="--mg:rgba(40,100,200,.12)">
-          <div class="mys-cin-bg" style="background:radial-gradient(ellipse 110% 90% at 50% 80%,#0a1e3a 0%,#060f1e 40%,#020810 100%)">
-            <!-- onde animate -->
-            <svg style="position:absolute;bottom:0;left:0;width:100%;opacity:.25" viewBox="0 0 400 80" preserveAspectRatio="none">
-              <path d="M0,40 Q50,20 100,40 Q150,60 200,40 Q250,20 300,40 Q350,60 400,40 L400,80 L0,80 Z" fill="rgba(40,100,200,0.6)">
-                <animate attributeName="d" values="M0,40 Q50,20 100,40 Q150,60 200,40 Q250,20 300,40 Q350,60 400,40 L400,80 L0,80 Z;M0,48 Q50,28 100,48 Q150,68 200,48 Q250,28 300,48 Q350,68 400,48 L400,80 L0,80 Z;M0,40 Q50,20 100,40 Q150,60 200,40 Q250,20 300,40 Q350,60 400,40 L400,80 L0,80 Z" dur="3.5s" repeatCount="indefinite"/>
-              </path>
-              <path d="M0,55 Q60,38 120,55 Q180,72 240,55 Q300,38 360,55 Q380,63 400,55 L400,80 L0,80 Z" fill="rgba(40,100,200,0.4)">
-                <animate attributeName="d" values="M0,55 Q60,38 120,55 Q180,72 240,55 Q300,38 360,55 Q380,63 400,55 L400,80 L0,80 Z;M0,62 Q60,45 120,62 Q180,79 240,62 Q300,45 360,62 Q380,70 400,62 L400,80 L0,80 Z;M0,55 Q60,38 120,55 Q180,72 240,55 Q300,38 360,55 Q380,63 400,55 L400,80 L0,80 Z" dur="2.8s" repeatCount="indefinite"/>
-              </path>
-            </svg>
-            <!-- bagliore lunare sull'acqua -->
-            <div style="position:absolute;bottom:30%;left:50%;transform:translateX(-50%);width:3px;height:40%;background:linear-gradient(to top,rgba(120,180,255,.25),transparent);filter:blur(3px)"></div>
-          </div>
-          <div class="mys-cin-overlay" style="background:linear-gradient(0deg,rgba(4,8,20,.97) 0%,rgba(4,8,20,.7) 45%,rgba(6,12,28,.2) 100%)"></div>
-          <div class="mys-cin-body">
-            <span class="mys-cin-icon" style="--ci:rgba(80,150,240,.7)">🌊</span>
-            <div class="mys-cin-name">Le Acque del Porto</div>
-            <div class="mys-cin-txt">Le coste delle Marche respingono ogni nave che tenti di attraccare altrove. Solo il porto di Arcamis sembra consentirlo. Nessuno ha una spiegazione. I marinai più vecchi non ci provano nemmeno più.</div>
-          </div>
-        </div>
-
-        <!-- Card 2: Guerra antica -->
-        <div class="mys-cin" style="--mg:rgba(180,100,40,.1)">
-          <div class="mys-cin-bg" style="background:radial-gradient(ellipse 100% 80% at 30% 60%,#1a0c06 0%,#100806 35%,#060404 100%)">
-            <!-- silhouette astratta guerra -->
-            <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.18" viewBox="0 0 400 280" preserveAspectRatio="xMidYMid slice">
-              <!-- rovine stilizzate -->
-              <rect x="40" y="160" width="18" height="80" fill="#c87840" opacity=".7"/>
-              <rect x="38" y="155" width="22" height="8" fill="#c87840"/>
-              <rect x="80" y="140" width="14" height="100" fill="#c87840" opacity=".5"/>
-              <rect x="260" y="150" width="20" height="90" fill="#c87840" opacity=".6"/>
-              <rect x="300" y="170" width="12" height="70" fill="#c87840" opacity=".4"/>
-              <!-- fumo -->
-              <ellipse cx="100" cy="140" rx="30" ry="20" fill="rgba(200,120,40,.15)">
-                <animate attributeName="cy" values="140;120;140" dur="5s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" values="0.5;0.2;0.5" dur="5s" repeatCount="indefinite"/>
-              </ellipse>
-              <ellipse cx="280" cy="130" rx="35" ry="25" fill="rgba(200,120,40,.12)">
-                <animate attributeName="cy" values="130;108;130" dur="6s" repeatCount="indefinite"/>
-              </ellipse>
-            </svg>
-          </div>
-          <div class="mys-cin-overlay" style="background:linear-gradient(0deg,rgba(10,5,3,.97) 0%,rgba(10,5,3,.75) 45%,rgba(14,8,4,.15) 100%)"></div>
-          <div class="mys-cin-body">
-            <span class="mys-cin-icon" style="--ci:rgba(220,140,50,.7)">⚔️</span>
-            <div class="mys-cin-name">Leggende di un Conflitto</div>
-            <div class="mys-cin-txt">Vecchi racconti parlano di una guerra che ha cambiato Arcadia per sempre. I dettagli si sono persi col tempo — restano solo ombre di battaglie lontane, confini che nessuno osa attraversare, e silenzi che durano da generazioni.</div>
-          </div>
-        </div>
-
-        <!-- Card 3: Folklore -->
-        <div class="mys-cin" style="--mg:rgba(100,60,180,.1)">
-          <div class="mys-cin-bg" style="background:radial-gradient(ellipse 100% 80% at 70% 40%,#0a0618 0%,#070412 40%,#030208 100%)">
-            <!-- stelle e luna -->
-            <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.45" viewBox="0 0 400 280">
-              <circle cx="320" cy="60" r="22" fill="none" stroke="rgba(200,180,255,.2)" stroke-width="1"/>
-              <circle cx="320" cy="60" r="18" fill="rgba(180,160,240,.08)"/>
-              <circle cx="340" cy="40" r="18" fill="rgba(8,4,18,1)"/>
-              <!-- stelle -->
-              <g fill="rgba(200,180,255,.5)">
-                <circle cx="50" cy="40" r="1"/><circle cx="80" cy="25" r="1.2"/><circle cx="120" cy="55" r="0.8"/>
-                <circle cx="200" cy="30" r="1"/><circle cx="160" cy="70" r="1.3"/><circle cx="250" cy="50" r="0.9"/>
-                <circle cx="350" cy="90" r="1"/><circle cx="30" cy="80" r="1.1"/><circle cx="380" cy="35" r="0.8"/>
-              </g>
-              <!-- riflesso luna sull'acqua -->
-              <path d="M280,240 Q310,220 340,240 Q310,260 280,240 Z" fill="rgba(200,180,255,.08)"/>
-            </svg>
-          </div>
-          <div class="mys-cin-overlay" style="background:linear-gradient(0deg,rgba(6,3,16,.97) 0%,rgba(6,3,16,.75) 45%,rgba(8,4,20,.1) 100%)"></div>
-          <div class="mys-cin-body">
-            <span class="mys-cin-icon" style="--ci:rgba(160,120,240,.7)">🌙</span>
-            <div class="mys-cin-name">Voci del Regno</div>
-            <div class="mys-cin-txt">Nelle notti senza luna, dicono, si odono canti provenire dall'acqua. I marinai più anziani giurano di averli sentiti. Quelli più giovani ridono — finché non li sentono anche loro.</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ═══ COME INIZIARE ═══ -->
-    <div class="gold-sep"></div>
-    <div class="hsec start-sec fade-in">
-      <div class="sec-eyebrow">Guida rapida</div>
-      <div class="sec-h">CREA IL TUO PERSONAGGIO<br>E PARTI ALL'AVVENTURA</div>
-      <p class="sec-p">Per iniziare ti servono tre cose: una <strong style="color:var(--gold2)">Specie</strong>, una <strong style="color:var(--gold2)">Classe</strong> e un <strong style="color:var(--gold2)">Background</strong>. Tutti gli avventurieri delle Marche appartengono alla <strong style="color:var(--gold2)">Gilda degli Avventurieri</strong> — è il punto di partenza obbligatorio per chiunque cerchi fama o fortune nel regno.</p>
-      <div class="steps" style="grid-template-columns:repeat(3,1fr)">
-        <div class="step">
-          <div class="step-n">1</div>
-          <div class="step-icon">💬</div>
-          <div class="step-title">Entra nel Discord</div>
-          <div class="step-desc">Il server è il cuore del gioco. Leggi le regole, presentati e inizia a respirare l'aria di Arcamis.</div>
-        </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <div class="step-icon">🎭</div>
-          <div class="step-title">Crea il tuo PG</div>
-          <div class="step-desc">Scegli <em>specie</em>, <em>classe</em> e <em>background</em>. Segui la guida alla creazione e forgia la tua storia unica.</div>
-        </div>
-        <div class="step">
-          <div class="step-n">3</div>
-          <div class="step-icon">🗡️</div>
-          <div class="step-title">Unisciti alla Gilda</div>
-          <div class="step-desc">Ogni avventuriero delle Marche si registra alla Gilda. Da lì inizia tutto: missioni, contratti, e la tua leggenda.</div>
-        </div>
-      </div>
-      <div class="cta-row" style="margin-top:32px">
-        <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="sbtn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-          Entra nel Discord — è gratis
-        </a>
-        <div class="sbtn" onclick="gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')" style="cursor:pointer">Guida creazione PG →</div>
-      </div>
-    </div>
-
-    <!-- ═══ WIKI COMPLETA (nascosta) ═══ -->
-    <div class="hsec wiki-sec fade-in" id="wiki-wrap" style="display:none">
-      <div class="wiki-toggle-btn" onclick="toggleWiki()">
-        <div class="shead-gem"></div>
-        <span style="font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2)">Wiki Completa</span>
-        <span class="wiki-arrow" id="wiki-arrow">▶</span>
-      </div>
-      <div class="wiki-content" id="wiki-content">
-        <div class="shead" style="margin-top:8px"><div class="shead-gem"></div>Regolamento</div>
-        <div class="cgrid">
-          <div class="lcard" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#140804,#221408)"><span>⚔️</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Gameplay</div><div class="csub">Regole di gioco</div><div class="ctags"><span class="ctag">Regolamento</span></div></div></div>
-          <div class="lcard" onclick="gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#08101c,#101828)"><span>📜</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Regole</div><div class="csub">Codice di condotta</div><div class="ctags"><span class="ctag">Obbligatorio</span></div></div></div>
-          <div class="lcard" onclick="gp('3130274fdc1c807eb61fde24e8236659','Materiale approvato','📋')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#081408,#101e10)"><span>📋</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Materiale approvato</div><div class="csub">Manuali consentiti</div><div class="ctags"><span class="ctag-g ctag">WIP</span></div></div></div>
-        </div>
-        <div class="shead"><div class="shead-gem"></div>Personaggio</div>
-        <div class="cgrid">
-          <div class="lcard" onclick="gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#181200,#241c00)"><span>🌟</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Come si inizia</div><div class="csub">Creazione PG</div></div></div>
-          <div class="lcard" onclick="gp('5cea525d149f4acb9c59007bf6b3d5ff','Andando avanti','📈')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#0c0a18,#161422)"><span>📈</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Andando avanti</div><div class="csub">Progressione</div></div></div>
-          <div class="lcard" onclick="gp('3130274fdc1c807eb61fde24e8236659','Materiale approvato','📋')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#140a14,#200e1e)"><span>📋</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Materiale approvato</div><div class="csub">Classi e specie</div></div></div>
-          <div class="lcard" onclick="gp('2fd0274fdc1c80d8b948c4133f874f28','Galleria PG','🖼️')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#0a0e14,#12161e)"><span>🖼️</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Galleria PG</div><div class="csub">I personaggi</div></div></div>
-        </div>
-        <div class="shead"><div class="shead-gem"></div>Lavori</div>
-        <div class="cgrid">
-          <div class="lcard" onclick="gp('2f00274fdc1c8089bfe6c24434d53b67','Biblioteca','📚')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#120800,#1c1008)"><span>📚</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Biblioteca</div><div class="ctags"><span class="ctag">INT</span><span class="ctag">CHA</span></div></div></div>
-          <div class="lcard" onclick="gp('2f00274fdc1c801c9697e75caa8d5f13','Bottega farmaceutica','💊')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#041208,#081c10)"><span>💊</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Bottega farmaceutica</div><div class="ctags"><span class="ctag">INT</span><span class="ctag">WIS</span></div></div></div>
-          <div class="lcard" onclick="gp('2ff0274fdc1c80688dd6c2b293a1f626','Caserma','🛡️')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#0e0606,#180c0c)"><span>🛡️</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Caserma</div><div class="ctags"><span class="ctag">STR</span><span class="ctag">CON</span></div></div></div>
-          <div class="lcard" onclick="gp('2ff0274fdc1c80769a4ae243f22f0582','Corporazione costruttori','🔨')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#100a04,#1a1208)"><span>🔨</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Corporazione</div><div class="ctags"><span class="ctag">STR</span><span class="ctag">DEX</span></div></div></div>
-          <div class="lcard" onclick="gp('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#1c0402,#2c0604)"><span>🔥</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Forgia</div><div class="ctags"><span class="ctag">STR</span><span class="ctag">CON</span></div></div></div>
-          <div class="lcard" onclick="gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#080814,#10101e)"><span>🗡️</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Gilda avventurieri</div><div class="ctags"><span class="ctag">STR</span><span class="ctag">DEX</span></div></div></div>
-          <div class="lcard" onclick="gp('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#140c02,#1e1406)"><span>🍺</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Locanda</div><div class="ctags"><span class="ctag">CHA</span><span class="ctag">WIS</span></div></div></div>
-          <div class="lcard" onclick="gp('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#040e14,#08161e)"><span>⚕️</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Ospedale</div><div class="ctags"><span class="ctag">WIS</span><span class="ctag">INT</span></div></div></div>
-          <div class="lcard" onclick="gp('2ff0274fdc1c8035bad4f0b6ab705192','Sartoria','🧵')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#12060e,#1c0e18)"><span>🧵</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Sartoria</div><div class="ctags"><span class="ctag">DEX</span><span class="ctag">CHA</span></div></div></div>
-        </div>
-        <div class="shead"><div class="shead-gem"></div>Altro</div>
-        <div class="cgrid">
-          <div class="lcard" onclick="gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#0a0814,#14101e)"><span>🛐</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Pantheon</div><div class="csub">Divinità di Arcamis</div></div></div>
-          <div class="lcard" onclick="gp('3000274fdc1c8033a214c44a1aa7f01f','Changelog','📝');markChangelogSeen()"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#080808,#121212)"><span>📝</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Changelog<span class="changelog-badge bnav-badge" style="position:static;display:inline-block;margin-left:5px;vertical-align:middle"></span></div><div class="csub">Aggiornamenti</div></div></div>
-        </div>
-        <div class="shead"><div class="shead-gem"></div>In-game</div>
-        <div class="cgrid">
-          <div class="lcard" onclick="gp('2f00274fdc1c802a9babd4239d97a319','Maestria / Titoli ed altro','🔨')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#100a04,#1a1208)"><span>🔨</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Maestria / Titoli</div><div class="csub">ed altro</div><div class="ctags"><span class="ctag-g ctag">WIP</span></div></div></div>
-          <div class="lcard" onclick="gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📚')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#120800,#1c1008)"><span>📚</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Lore</div><div class="csub">Storia del mondo</div></div></div>
-          <div class="lcard" onclick="gp('2f00274fdc1c80e78ad7ce985007b7c6','Homebrew','❓')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#0a0814,#141020)"><span>❓</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Homebrew</div><div class="csub">Regole aggiuntive</div></div></div>
-          <div class="lcard" onclick="gp('2f10274fdc1c80489f23c49164747770','Mappe','🗺️')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#04100a,#081a10)"><span>🗺️</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Mappe</div><div class="csub">Cartografia di Arcamis</div></div></div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /home view -->
-
-  <!-- PAGE VIEW -->
-  <div id="pv" class="vp" style="display:none">
-    <div id="page-hero">
-      <div class="ph-covbg" id="ph-covbg"></div>
-      <div class="ph-overlay" id="ph-overlay"></div>
-      <div class="ph-bg"></div>
-      <div class="ph-topline"></div>
-      <div class="ph-btmline"></div>
-      <span class="ph-icon" id="ph-icon"></span>
-      <div class="ph-inner">
-        <div class="ph-crumb" id="ph-crumb"></div>
-        <div class="ph-eyebrow" id="ph-eyebrow"></div>
-        <div class="ph-title" id="ph-title"></div>
-        <div class="ph-sub" id="ph-sub"></div>
-        <div class="ph-divider"><div class="ph-divider-line"></div><div class="ph-divider-gem">◆</div></div>
-      </div>
-    </div>
-    <div id="pbody"></div>
-  </div>
-
-</div><!-- /main -->
-
-<!-- ═══ OVERLAY (Discord live) ═══ -->
-<div id="overlay">
-  <div id="ovp">
-    <span class="rune-tl">✦ ᛟ</span>
-    <span class="rune-tr">ᚹ ✦</span>
-    <span class="rune-bl">ᛉ ✦</span>
-    <span class="rune-br">✦ ᚷ</span>
-    <div class="portal-particles" id="portal-pts"></div>
-    <div class="portal-header">
-      <div class="portal-title">
-        <span class="portal-title-rune">⚜</span>
-        PORTALE DI ARCAMIS
-        <span class="portal-title-rune" style="animation-delay:.9s">⚜</span>
-      </div>
-      <div class="portal-close" onclick="cv()">✕</div>
-    </div>
-    <div class="portal-body">
-      <div>
-        <!-- Recenti -->
-        <div id="ov-recenti"></div>
-        <div class="portal-sh">Avventurieri Online <span id="avv-count" style="margin-left:6px;color:var(--gold3);font-style:italic;font-family:'Crimson Pro',serif;letter-spacing:0;font-weight:400;opacity:1"></span></div>
-        <div id="ovdw">
-          <div id="roster-list">
-            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-style:italic;font-size:13px;padding:30px">In ascolto dei cancelli…</div>
-          </div>
-        </div>
-      </div>
-      <div class="portal-join-wrap">
-        <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="portal-join-btn" id="portal-join-btn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-          JOIN DISCORD
-        </a>
-        <div class="portal-quote">
-          "Siediti accanto al fuoco e racconta la tua storia.<br>La locanda di Arcamis non dorme mai."
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ BOTTOM NAV (mobile) ═══ -->
-<nav id="bottom-nav">
-  <div class="bnav-item active" data-k="home" onclick="showHome();setBnavActive('home')">
-    <span>🏰</span><span class="bnav-label">Home</span>
-  </div>
-  <div class="bnav-item" data-k="regole" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️');setBnavActive('regole')">
-    <span>⚔️</span><span class="bnav-label">Regole</span>
-  </div>
-  <div class="bnav-item" data-k="lore" onclick="gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📖');setBnavActive('lore')">
-    <span>📖</span><span class="bnav-label">Lore</span>
-  </div>
-  <div class="bnav-item" data-k="lavori" onclick="toggleMobileNav()">
-    <span>🗡️</span><span class="bnav-label">Lavori</span>
-  </div>
-  <div class="bnav-item" data-k="menu" onclick="ovo()">
-    <span>☰</span><span class="bnav-label">Menu</span>
-    <div class="bnav-badge changelog-badge"></div>
-  </div>
-</nav>
-
-<script src="data.js" defer></script>
-<script src="notion-render.js" defer></script>
-<script src="fx.js" defer></script>
-<script src="app.js" defer></script>
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){
-    navigator.serviceWorker.register('/sw.js').catch(function(){});
-  });
+#page-hero{
+  min-height:260px;position:relative;overflow:hidden;
+  background:#06080e;display:flex;align-items:flex-end;
 }
-</script>
-</body>
-</html>
+.ph-covbg{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  filter:saturate(.6) brightness(.45);
+  transition:opacity .5s;
+}
+.ph-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(4,6,12,.97) 0%,rgba(4,6,12,.65) 50%,rgba(4,6,12,.2) 100%);
+}
+.ph-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 45% 110% at 12% 60%,rgba(200,155,60,.06),transparent),
+    repeating-linear-gradient(90deg,transparent,transparent 79px,rgba(200,155,60,.018) 80px),
+    repeating-linear-gradient(0deg,transparent,transparent 49px,rgba(200,155,60,.014) 50px);
+}
+.ph-btmline{
+  position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.25),transparent);
+}
+.ph-icon{position:absolute;right:44px;top:50%;transform:translateY(-50%);font-size:100px;opacity:.05;pointer-events:none;user-select:none}
+.ph-inner{position:relative;padding:24px 44px 30px;z-index:2;width:100%}
+.ph-crumb{display:flex;align-items:center;gap:5px;margin-bottom:14px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:var(--text3)}
+.ph-bc{cursor:pointer;transition:.15s}
+.ph-bc:hover{color:var(--gold)}
+.ph-sep{opacity:.3;padding:0 2px}
+.ph-cur{color:rgba(200,155,60,.55);cursor:default}
+.ph-eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.35em;color:var(--gold);opacity:.7;text-transform:uppercase;margin-bottom:8px}
+.ph-title{font-family:'Cinzel',serif;font-size:34px;font-weight:700;color:var(--white);letter-spacing:.04em;text-shadow:0 2px 20px rgba(0,0,0,.95),0 0 60px rgba(200,155,60,.12);line-height:1.15}
+.ph-sub{font-family:'Crimson Pro',serif;font-size:15px;color:rgba(196,168,98,.7);font-style:italic;margin-top:8px;letter-spacing:.02em}
+.ph-divider{margin-top:18px;display:flex;align-items:center;gap:10px}
+.ph-divider-line{flex:1;max-width:120px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);opacity:.5}
+.ph-divider-gem{color:var(--gold);font-size:8px;opacity:.6}
+/* page body */
+#pbody{padding:36px 44px 60px;max-width:860px;margin:0 auto;width:100%}
+/* ── Notion block rendering ── */
+.nc>*+*{margin-top:.7em}
+.n-p{font-size:16px;line-height:1.85;color:var(--text)}
+/* Headings with fantasy treatment */
+.n-h1{
+  font-family:'Cinzel',serif;font-size:22px;font-weight:700;
+  color:var(--gold3);letter-spacing:.06em;
+  display:flex;align-items:center;gap:10px;
+  padding-bottom:10px;margin-top:40px!important;margin-bottom:4px;
+  border-bottom:1px solid rgba(200,155,60,.15);
+}
+.n-h1::before{content:'◈';color:var(--gold);font-size:14px;opacity:.8;flex-shrink:0}
+.n-h2::before{content:'✦';color:var(--gold);font-size:10px;opacity:.7;flex-shrink:0}
+/* Fancy divider */
+.n-divider{
+  border:none;margin:32px 0;position:relative;height:18px;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+}
+.n-divider-gem{color:var(--gold);font-size:9px;opacity:.7;flex-shrink:0}
+/* Callout */
+.n-callout{
+  display:flex;gap:14px;align-items:flex-start;
+  border-left:3px solid var(--callout-c,rgba(200,155,60,.5));
+  background:var(--callout-bg,rgba(200,155,60,.04));
+  padding:14px 18px;margin:16px 0;
+}
+/* Quote */
+.n-quote{
+  border-left:3px solid rgba(200,155,60,.35);
+  padding:10px 20px;margin:16px 0;
+  font-family:'Crimson Pro',serif;font-size:18px;
+  color:rgba(196,168,98,.75);font-style:italic;line-height:1.6;
+}
+/* Page footer */
+.n-page-footer{
+  margin-top:56px;padding-top:28px;text-align:center;
+  border-top:1px solid rgba(200,155,60,.12);
+}
+.n-page-footer-gems{
+  font-family:'Cinzel',serif;font-size:11px;color:rgba(200,155,60,.35);
+  letter-spacing:.4em;margin-bottom:8px;
+}
+.n-page-footer-text{
+  font-family:'Crimson Pro',serif;font-size:12px;
+  color:rgba(200,155,60,.2);font-style:italic;letter-spacing:.06em;
+}
+.n-p:empty{min-height:.7em}
+.n-h1::after{content:'';position:absolute;bottom:-1px;left:0;width:55px;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+.n-h2{font-family:'Cinzel',serif;font-size:15.5px;font-weight:700;color:var(--gold2);margin-top:1.5em!important;margin-bottom:.3em;letter-spacing:.06em}
+.n-h3{font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--parch);margin-top:1.2em!important;margin-bottom:.2em;text-transform:uppercase;letter-spacing:.14em;opacity:.75}
+.n-ul{list-style:none;padding-left:0}
+.n-ul>li{position:relative;padding:3px 0 3px 20px;font-size:16px;line-height:1.8}
+.n-ul>li::before{content:'◆';position:absolute;left:3px;color:var(--gold);font-size:6.5px;top:9px}
+.n-ol{padding-left:20px;font-size:16px}
+.n-ol>li{margin-bottom:.3em;padding-left:4px;line-height:1.8}
+.n-ol>li::marker{color:var(--gold);font-family:'Cinzel',serif;font-weight:700}
+.n-quote{
+  border-left:3px solid var(--gold);padding:12px 18px;margin:12px 0;
+  background:rgba(200,155,60,.04);color:var(--parch);font-style:italic;font-size:16px;line-height:1.8;
+}
+.n-divider{border:none;margin:24px 0;position:relative;height:14px}
+.n-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--bdr2),var(--gold),var(--bdr2),transparent)}
+.n-callout-icon{flex-shrink:0;font-size:19px;margin-top:2px}
+.n-callout-body{flex:1;font-size:16px;line-height:1.75}
+details{margin:5px 0}
+details>.n-ts{list-style:none;display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;font-size:16px;font-weight:600;color:var(--parch);padding:9px 15px;background:rgba(200,155,60,.04);border:1px solid var(--bdr);transition:.15s}
+details>.n-ts::before{content:'▶';font-size:8px;color:var(--gold);transition:.2s;flex-shrink:0}
+details[open]>.n-ts{background:rgba(200,155,60,.08);border-color:var(--bdr2);color:var(--gold2)}
+details[open]>.n-ts::before{transform:rotate(90deg)}
+.n-tc{padding:10px 14px 6px 22px;border-left:2px solid rgba(200,155,60,.16);margin-left:11px;margin-top:4px}
+.n-code{background:rgba(0,0,0,.5);border:1px solid var(--bdr2);padding:13px 16px;overflow-x:auto;font-family:'Courier New',monospace;font-size:13px;color:var(--gold3);line-height:1.6}
+.n-image{margin:16px 0;text-align:center}
+.n-image figcaption{margin-top:7px;font-size:12px;color:var(--text3);font-style:italic}
+/* ── child_page card grid ── */
+.n-cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin:20px 0}
+.n-cp{
+  position:relative;overflow:hidden;cursor:pointer;
+  background:linear-gradient(160deg,rgba(16,20,30,.97),rgba(8,10,18,.99));
+  border:1px solid rgba(200,155,60,.14);
+  padding:0;transition:transform .25s,border-color .25s,box-shadow .25s;
+  display:flex;flex-direction:column;
+}
+.n-cp::after{
+  content:'';position:absolute;top:0;left:-80%;width:55%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.09),transparent);
+  transform:skewX(-18deg);transition:left .45s;pointer-events:none;z-index:3;
+}
+.n-cp:hover::after{left:130%}
+.n-cp-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(8,10,18,.8))}
+.n-cp-info{padding:10px 14px 12px;flex:1}
+.n-cp-title{font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--parch);letter-spacing:.06em;margin-bottom:3px;line-height:1.3;transition:.18s}
+.n-cp:hover .n-cp-title{color:var(--gold3)}
+.n-cp-cta{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.12em;color:var(--text3);opacity:.6;transition:.18s}
+.n-cp:hover .n-cp-cta{color:var(--gold);opacity:1}
+.n-twrap{overflow-x:auto;margin:14px 0}
+table.n-tbl{width:100%;border-collapse:collapse;font-size:15px}
+table.n-tbl th{background:rgba(0,0,0,.4);color:var(--gold2);font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.12em;padding:9px 13px;border:1px solid var(--bdr2);text-align:left;text-transform:uppercase}
+table.n-tbl td{padding:8px 13px;border:1px solid var(--bdr);color:var(--text)}
+table.n-tbl tr:nth-child(odd) td{background:rgba(200,155,60,.02)}
+table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
+.n-cols{display:grid;gap:18px;margin:12px 0}
+.n-bkm{display:flex;gap:12px;border:1px solid var(--bdr);padding:13px 16px;background:var(--bg3);margin:8px 0;text-decoration:none;color:var(--text);transition:border-color .2s}
+/* rich text */
+.rb{font-weight:700;color:var(--parch)}
+.ri{font-style:italic}
+.rs{text-decoration:line-through;opacity:.6}
+.ru{text-decoration:underline}
+.rc{font-family:'Courier New',monospace;font-size:.85em;background:rgba(0,0,0,.3);border:1px solid var(--bdr2);padding:1px 5px;color:var(--gold3)}
+.rl{color:var(--gold2);text-decoration:none;border-bottom:1px dotted rgba(200,155,60,.35);cursor:pointer;transition:.15s}
+.rl:hover{color:var(--gold3)}
+.rg{color:var(--text3)}
+.rr{color:#b84030}
+.ro{color:#a86020}
+.ry{color:var(--gold3)}
+.rge{color:#608030}
+.rbl{color:#5080a8}
+.rp{color:#8055a0}
+/* loading */
+.ldwrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px;gap:14px;color:var(--text3)}
+.spin{width:32px;height:32px;border:2px solid var(--bdr2);border-top-color:var(--gold);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.errbox{background:rgba(90,15,8,.2);border:1px solid #5a1a10;padding:14px 18px;color:#c06050;font-size:14px;margin:20px 0}
+/* ════════════════════════════════════
+   OVERLAY (Discord live)
+════════════════════════════════════ */
+/* ════════════════════════════════════
+   HAMBURGER MOBILE
+════════════════════════════════════ */
+#hamburger{
+  display:none;flex-direction:column;justify-content:center;gap:5px;
+  width:40px;height:var(--topbar-h);padding:0 10px;cursor:pointer;
+  flex-shrink:0;background:none;border:none;
+}
+.hbr-bar{
+  width:22px;height:2px;background:var(--gold);
+  transition:transform .22s,opacity .22s,background .2s;transform-origin:center;
+}
+#hamburger.open .hbr-bar:nth-child(1){transform:translateY(7px) rotate(45deg)}
+#hamburger.open .hbr-bar:nth-child(2){opacity:0;transform:scaleX(0)}
+#hamburger.open .hbr-bar:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+/* Mobile nav drawer */
+#mobile-nav{
+  position:fixed;top:var(--topbar-h);left:0;right:0;
+  background:rgba(4,5,12,.98);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:2px solid var(--gold);
+  z-index:190;display:none;
+  max-height:calc(100vh - var(--topbar-h));overflow-y:auto;
+}
+#mobile-nav.open{display:block;animation:mnopen .22s ease forwards}
+@keyframes mnopen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.mn-section{padding:6px 0}
+.mn-section+.mn-section{border-top:1px solid rgba(200,155,60,.08)}
+.mn-label{
+  font-family:'Cinzel',serif;font-size:7.5px;font-weight:700;letter-spacing:.3em;
+  color:var(--gold);text-transform:uppercase;padding:10px 24px 5px;opacity:.55;
+}
+.mn-item{
+  display:flex;align-items:center;gap:12px;padding:12px 24px;
+  font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.07em;
+  color:var(--text2);cursor:pointer;transition:background .1s,color .1s;
+}
+.mn-item:hover{background:rgba(200,155,60,.06);color:var(--gold2)}
+.mn-ii{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.mn-discord{
+  margin:12px 16px 16px;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(135deg,rgba(50,55,168,.7),rgba(88,101,242,.6));
+  border:1px solid rgba(255,255,255,.15);color:#e0e8ff;padding:13px 20px;
+  font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.12em;
+  text-decoration:none;
+}
+/* ════════════════════════════════════
+   DISCORD — PORTALE MAGICO v2
+════════════════════════════════════ */
+#overlay{
+  position:fixed;inset:0;z-index:9999;display:none;
+  background:rgba(2,3,8,.75);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+}
+@keyframes ovin{from{opacity:0}to{opacity:1}}
+@keyframes ovout{from{opacity:1}to{opacity:0}}
+#overlay.ovopen{display:block;animation:ovin .2s ease forwards}
+#overlay.ovclose{display:block;animation:ovout .16s ease forwards}
+#ovp{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(540px,94vw);max-height:92vh;
+  background:rgba(4,5,14,.96);
+  border:1px solid rgba(200,155,60,.28);
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:
+    0 0 0 1px rgba(200,155,60,.07),
+    0 0 60px rgba(200,155,60,.08),
+    0 40px 100px rgba(0,0,0,.95);
+}
+@keyframes pnlin{from{opacity:0;transform:translate(-50%,-46%) scale(.95)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+#overlay.ovopen #ovp{animation:pnlin .3s cubic-bezier(.16,1,.3,1) forwards}
+/* Glow border animation */
+#ovp::before{
+  content:'';position:absolute;inset:-1px;z-index:-1;pointer-events:none;
+  background:conic-gradient(from var(--a,0deg),rgba(200,155,60,.4),transparent 40%,transparent 60%,rgba(200,155,60,.3));
+  animation:border-spin 6s linear infinite;
+}
+@property --a{syntax:'<angle>';inherits:false;initial-value:0deg;}
+@keyframes border-spin{to{--a:360deg}}
+/* Rune corners */
+#ovp .rune-tl,#ovp .rune-tr,#ovp .rune-bl,#ovp .rune-br{
+  position:absolute;font-size:9px;color:rgba(200,155,60,.28);
+  pointer-events:none;animation:runeflicker 3s ease-in-out infinite;line-height:1;
+}
+#ovp .rune-tl{top:8px;left:10px}
+#ovp .rune-tr{top:8px;right:10px;animation-delay:.7s}
+#ovp .rune-bl{bottom:8px;left:10px;animation-delay:1.4s}
+#ovp .rune-br{bottom:8px;right:10px;animation-delay:2.1s}
+/* Portal header */
+.portal-header{
+  padding:18px 24px 16px;
+  background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(200,155,60,.04),rgba(0,0,0,.5));
+  border-bottom:1px solid rgba(200,155,60,.15);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+  position:relative;overflow:hidden;
+}
+.portal-header::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.6) 50%,transparent);
+}
+.portal-title{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Cinzel',serif;font-size:12px;font-weight:900;
+  letter-spacing:.24em;color:var(--gold3);text-shadow:0 0 20px rgba(200,155,60,.4);
+}
+.portal-title-rune{font-size:15px;opacity:.6;animation:runeflicker 2.8s ease-in-out infinite}
+.portal-close{
+  width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(200,155,60,.18);background:rgba(255,255,255,.02);
+  cursor:pointer;color:var(--text3);font-size:12px;transition:.15s;flex-shrink:0;
+}
+.portal-close:hover{background:rgba(180,20,10,.18);border-color:#c03030;color:#ff6060}
+/* Single column body */
+.portal-body{
+  flex:1;min-height:0;overflow-y:auto;
+  display:flex;flex-direction:column;align-items:stretch;padding:28px 32px;gap:22px;
+}
+/* Particles canvas area */
+.portal-particles{
+  position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;
+}
+.portal-p{
+  position:absolute;border-radius:50%;
+  background:var(--gold);opacity:0;
+  animation:pp-drift var(--pd) ease-in-out infinite;
+}
+@keyframes pp-drift{
+  0%{opacity:0;transform:translateY(0) scale(0)}
+  20%{opacity:var(--po)}
+  80%{opacity:var(--po)}
+  100%{opacity:0;transform:translateY(-60px) scale(1.5)}
+}
+/* Roster section */
+.portal-sh{
+  font-family:'Cinzel',serif;font-size:8.5px;font-weight:700;letter-spacing:.22em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:10px;opacity:.65;
+  display:flex;align-items:center;gap:8px;
+}
+.portal-sh::before{content:'◆';font-size:5px}
+#roster-wrap,#ovdw{
+  background:rgba(0,0,0,.35);border:1px solid rgba(200,155,60,.1);
+  height:200px;overflow-y:auto;
+}
+.roster-member{
+  display:flex;align-items:center;gap:12px;padding:9px 13px;
+  border-bottom:1px solid rgba(200,155,60,.05);transition:.12s;
+}
+.roster-member:hover{background:rgba(200,155,60,.04)}
+.roster-avatar{width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(200,155,60,.2);object-fit:cover;flex-shrink:0}
+.roster-name{font-family:'Cinzel',serif;font-size:11px;color:var(--parch);letter-spacing:.03em}
+.roster-game{font-size:11px;color:var(--text3);font-style:italic;margin-top:1px}
+/* Center JOIN button */
+.portal-join-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;z-index:1;
+}
+.portal-join-btn{
+  position:relative;display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:18px 28px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(50,55,180,.7),rgba(88,101,242,.6));
+  border:1px solid rgba(130,145,255,.55);
+  color:#e8ecff;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.22em;
+  text-decoration:none;transition:.25s;
+  box-shadow:0 0 30px rgba(88,101,242,.22),inset 0 1px 0 rgba(255,255,255,.1);
+  text-transform:uppercase;
+}
+.portal-join-btn::before{
+  content:'';position:absolute;top:0;left:-100%;width:70%;height:100%;
+  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.14) 50%,transparent 70%);
+  transition:left .45s ease;pointer-events:none;
+}
+.portal-join-btn:hover::before{left:130%}
+.portal-join-btn:hover{
+  background:linear-gradient(135deg,rgba(60,65,210,.85),rgba(100,120,255,.7));
+  border-color:rgba(180,190,255,.75);
+  box-shadow:0 0 44px rgba(88,101,242,.4),0 6px 22px rgba(0,0,0,.45);
+  transform:translateY(-3px);color:#fff;
+}
+/* Ripple */
+.portal-join-btn .ripple{
+  position:absolute;border-radius:50%;background:rgba(255,255,255,.18);
+  transform:scale(0);animation:btn-ripple .6s linear;pointer-events:none;
+}
+@keyframes btn-ripple{to{transform:scale(4);opacity:0}}
+.portal-quote{
+  font-size:14px;font-style:italic;color:var(--text2);line-height:1.8;
+  text-align:center;padding:12px 12px 0;
+  border-top:1px solid rgba(200,155,60,.08);width:100%;
+}
+.online-dot{width:7px;height:7px;border-radius:50%;background:#57f287;box-shadow:0 0 8px #57f287;animation:lp 2s infinite;flex-shrink:0}
+/* ════════════════════════════════════
+   MAPPA INTERATTIVA — pin assoluti
+════════════════════════════════════ */
+.map-container{position:relative;overflow:hidden;margin-top:24px;line-height:0}
+.map-tip{
+  position:absolute;z-index:100;pointer-events:none;
+  background:rgba(4,5,14,.96);border:1px solid rgba(200,155,60,.35);
+  padding:10px 14px;min-width:155px;max-width:210px;
+  opacity:0;transition:opacity .15s;
+  box-shadow:0 8px 28px rgba(0,0,0,.75),0 0 18px rgba(200,155,60,.08);
+  top:0;left:0;
+}
+.map-tip.vis{opacity:1}
+.map-tip-name{font-family:'Cinzel',serif;font-size:10.5px;font-weight:700;color:var(--gold3);letter-spacing:.1em;margin-bottom:3px}
+.map-tip-desc{font-size:11.5px;color:var(--parch);font-style:italic;line-height:1.5;margin-bottom:4px}
+.map-tip-hint{font-family:'Cinzel',serif;font-size:8px;color:var(--gold);letter-spacing:.1em;opacity:.65}
+.map-tip-hint.sub{color:rgba(80,200,110,.75)}
+/* pin */
+.mpin{
+  position:absolute;transform:translate(-50%,-50%);
+  width:28px;height:28px;cursor:pointer;z-index:10;
+  display:flex;align-items:center;justify-content:center;
+}
+.mpin-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--pc,rgba(200,155,60,.9));
+  box-shadow:0 0 8px var(--pg,rgba(200,155,60,.7));
+  transition:transform .2s,box-shadow .2s;z-index:2;
+}
+.mpin-ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:1.5px solid var(--pc,rgba(200,155,60,.5));
+  animation:pinpulse 2.5s ease-out infinite;
+}
+@keyframes pinpulse{
+  0%{transform:scale(.6);opacity:.9}
+  100%{transform:scale(2.2);opacity:0}
+}
+.mpin:hover .mpin-dot{transform:scale(1.5);box-shadow:0 0 16px var(--pg,rgba(200,155,60,.9))}
+/* colori per tipo */
+.mpin.t-city{--pc:rgba(220,175,60,.95);--pg:rgba(220,175,60,.8)}
+.mpin.t-village{--pc:rgba(200,155,60,.85);--pg:rgba(200,155,60,.65)}
+.mpin.t-fort{--pc:rgba(190,130,50,.85);--pg:rgba(190,130,50,.65)}
+.mpin.t-forest{--pc:rgba(60,200,80,.85);--pg:rgba(60,200,80,.65)}
+.mpin.t-water{--pc:rgba(80,160,240,.85);--pg:rgba(80,160,240,.65)}
+.mpin.t-ruin{--pc:rgba(150,80,240,.85);--pg:rgba(150,80,240,.7);animation-duration:3.5s}
+.mpin.t-fog{--pc:rgba(140,100,240,.85);--pg:rgba(140,100,240,.7)}
+/* sub-map panels */
+.sub-map-panel{
+  display:none;position:absolute;inset:0;z-index:40;
+  background:rgba(4,5,14,.97);backdrop-filter:blur(6px);flex-direction:column;
+}
+.sub-map-panel.open{display:flex}
+.smp-header{
+  padding:14px 20px;border-bottom:1px solid rgba(200,155,60,.18);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.smp-title{font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:var(--gold3);letter-spacing:.2em;display:flex;align-items:center;gap:10px}
+.smp-close{
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--bdr);cursor:pointer;color:var(--text3);font-size:12px;transition:.15s;
+}
+.smp-close:hover{color:#ff6060;border-color:#c03030}
+.smp-body{flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:16px}
+.map-or{text-align:center;margin-top:18px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.3em;color:var(--text3);opacity:.5;text-transform:uppercase}
+/* mloc per sub-SVG panels */
+.mloc{cursor:pointer}
+.mloc .mc{transition:filter .2s}
+.mloc:hover .mc{filter:drop-shadow(0 0 7px rgba(200,155,60,.8))}
+.mloc .ml{font-family:'Cinzel',serif;fill:rgba(200,155,60,.6);font-weight:700;letter-spacing:.05em;pointer-events:none;transition:fill .2s}
+.mloc:hover .ml{fill:rgba(220,175,60,.9)}
+@media(max-width:768px){
+  nav#tnav{display:none}
+  #sw,#ovbtn{display:none}
+  /* nasconde anche discord e font controls nel topbar per evitare overflow */
+  #dcbtn{display:none}
+  #font-controls{display:none}
+  #hamburger{display:flex}
+  #tr{padding:0 6px;gap:6px}
+  /* topbar logo ridotto */
+  #tlogo{padding:0 12px;gap:8px}
+  #tlt{font-size:11px;letter-spacing:.10em}
+  /* theme toggle rimane ma più piccolo */
+  #theme-toggle{padding:0 6px;font-size:15px}
+  /* mobile nav drawer: touch targets generosi */
+  #mobile-nav{z-index:9000}
+  .mn-item{padding:14px 20px;font-size:12px;min-height:48px;gap:14px}
+  .mn-ii{font-size:18px;width:24px}
+  .mn-label{padding:12px 20px 4px;font-size:8px}
+  /* hero */
+  .stit{font-size:38px}
+  .scnt{padding:0 20px 60px}
+  .sdesc{font-size:14px}
+  .hero-cta,.scnt>div:last-child{flex-direction:column;gap:10px}
+  /* sezioni */
+  .hsec{padding:36px 16px 0}
+  .arcadia-sec{padding:36px 16px}
+  .wiki-toggle-btn{padding:16px 18px}
+  .wiki-content{padding:0 16px 36px}
+  .steps{grid-template-columns:1fr}
+  /* cards carosello */
+  .loc-card{flex:0 0 200px;height:270px}
+  /* frecce carousel nascoste su mobile (swipe manuale) */
+  .la{display:none!important}
+  /* pagina interna */
+  .nc{padding:24px 16px 40px}
+  .ph-title{font-size:clamp(22px,6vw,40px)}
+  /* immagini */
+  .n-image img{width:100%!important;height:auto!important;max-width:100%!important}
+  figure.n-image{margin:16px 0}
+  /* tabelle scroll orizzontale */
+  .n-twrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .n-tbl{min-width:400px}
+  /* codice */
+  .n-code{overflow-x:auto;-webkit-overflow-scrolling:touch;font-size:12px}
+  /* paragrafi: word-break per lingue senza spazi */
+  .n-p,.n-ul,.n-ol,.n-tc,.n-callout-body{
+    word-break:break-word;overflow-wrap:break-word;
+    font-size:calc(15px * var(--font-scale,1))!important
+  }
+  /* DB carousel interno alle pagine */
+  .n-db-lc-wrap .loc-card{flex:0 0 180px;height:250px}
+  /* glossario tooltip: sopra il termine invece di sotto su schermi piccoli */
+  .gterm::after{max-width:180px;font-size:11px}
+}
+/* ─── iPhone SE e schermi ≤390px ─── */
+@media(max-width:390px){
+  #tlt{font-size:10px;letter-spacing:.06em}
+  .mn-item{padding:12px 16px;font-size:11.5px}
+  .stit{font-size:30px}
+  .loc-card{flex:0 0 170px;height:240px}
+  .n-db-lc-wrap .loc-card{flex:0 0 160px;height:230px}
+  .cgrid{grid-template-columns:1fr 1fr}
+  .lcard{min-width:0}
+}
+/* ════════════════════════════════════
+   HOME NEW SECTIONS
+════════════════════════════════════ */
+@keyframes bounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,9px)}}
+.scroll-ind{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);z-index:10;color:rgba(200,155,60,.5);font-size:20px;animation:bounce 2.2s ease-in-out infinite;cursor:pointer;user-select:none;letter-spacing:.1em;font-family:'Cinzel',serif;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.hsec{padding:64px 64px 0}
+.hsec+.hsec{padding-top:56px}
+#hv>div:last-child{padding-bottom:72px}
+.sec-eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.35em;color:var(--violet3);text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:10px}
+.sec-eyebrow::before{content:'';width:28px;height:1px;background:var(--violet3);opacity:.55}
+.sec-h{font-family:'Cinzel',serif;font-size:26px;font-weight:900;color:var(--white);letter-spacing:.07em;margin-bottom:10px;text-shadow:0 2px 16px rgba(0,0,0,.6)}
+.sec-p{font-size:16px;color:var(--parch);line-height:1.75;max-width:640px;margin-bottom:28px;opacity:.82}
+/* ── Location carousel ── */
+.loc-wrap{position:relative;margin:0 -10px}
+.loc-track-outer{overflow:hidden;padding:10px 10px 14px}
+.loc-track{display:flex;gap:16px;transition:transform .55s cubic-bezier(.4,0,.2,1);will-change:transform}
+.loc-card{
+  flex:0 0 260px;height:340px;position:relative;overflow:hidden;cursor:pointer;
+  border:1px solid rgba(255,255,255,.06);background-size:cover;background-position:center;
+  transition:transform .28s cubic-bezier(.22,1,.36,1),box-shadow .28s,border-color .28s;
+}
+.loc-card:hover{
+  transform:translateY(-8px) scale(1.018);
+  box-shadow:0 22px 55px rgba(0,0,0,.85),0 0 35px rgba(200,155,60,.18),0 0 0 1px rgba(200,155,60,.2);
+  border-color:rgba(200,155,60,.38);
+}
+.loc-ov{position:absolute;inset:0;background:linear-gradient(0deg,rgba(4,5,14,.97) 0%,rgba(4,5,14,.6) 45%,rgba(4,5,14,.08) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:20px 18px;transition:background .3s}
+.loc-card:hover .loc-ov{background:linear-gradient(0deg,rgba(4,5,14,1) 0%,rgba(4,5,14,.82) 55%,rgba(20,10,40,.25) 100%)}
+.loc-badge{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--violet3);background:rgba(100,68,170,.2);border:1px solid rgba(100,68,170,.3);padding:3px 9px;display:inline-block;margin-bottom:8px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.loc-badge.explored{color:var(--gold2);background:rgba(200,155,60,.1);border-color:rgba(200,155,60,.25)}
+.loc-badge.mystery{color:var(--text3);background:rgba(0,0,0,.3);border-color:rgba(100,100,120,.15)}
+.loc-name{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:6px;line-height:1.25}
+.loc-mystery-card .loc-name{color:var(--text3);letter-spacing:.2em;filter:blur(.5px)}
+.loc-sub{font-size:13px;color:var(--parch);line-height:1.5;opacity:0;max-height:0;overflow:hidden;transition:max-height .32s ease,opacity .32s ease;margin-bottom:0}
+.loc-card:hover .loc-sub{opacity:.88;max-height:60px;margin-bottom:8px}
+.loc-cta{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;color:var(--gold2);opacity:0;transform:translateY(6px);transition:.3s;display:inline-flex;align-items:center;gap:5px}
+.loc-card:hover .loc-cta{opacity:1;transform:translateY(0)}
+.loc-mystery-card .loc-cta{display:none}
+.la{position:absolute;top:50%;transform:translateY(-50%);z-index:10;width:40px;height:56px;display:flex;align-items:center;justify-content:center;background:rgba(4,5,14,.75);border:1px solid rgba(200,155,60,.15);color:var(--gold);font-size:16px;cursor:pointer;transition:.2s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.la:hover{background:rgba(100,68,170,.3);border-color:var(--violet3);color:var(--violet3);box-shadow:var(--vglow)}
+.la-prev{left:0}
+.la-next{right:0}
+/* ── Arcadia section ── */
+.arcadia-sec{
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,rgba(10,6,22,.97),rgba(6,8,20,.99));
+  border-top:1px solid rgba(100,68,170,.12);border-bottom:1px solid rgba(100,68,170,.12);
+  margin-top:56px;padding:64px;
+}
+.arcadia-sec::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 85% 50%,rgba(80,50,140,.1) 0%,transparent 65%);pointer-events:none}
+.arcadia-inner{display:block;position:relative}
+.arcadia-crest{font-size:90px;opacity:.55;filter:drop-shadow(0 0 40px rgba(120,80,200,.45));user-select:none}
+.faction-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+.fpill{
+  display:flex;align-items:center;gap:12px;padding:13px 16px;
+  background:rgba(8,6,18,.6);border:1px solid rgba(100,68,170,.18);
+  cursor:pointer;transition:.25s cubic-bezier(.22,1,.36,1);
+  position:relative;overflow:hidden;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.fpill::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(200,155,60,.07),transparent);
+  opacity:0;transition:.25s;pointer-events:none;
+}
+.fpill:hover{
+  border-color:rgba(200,155,60,.4);
+  background:rgba(16,12,4,.75);
+  transform:translateY(-4px);
+  box-shadow:0 8px 28px rgba(0,0,0,.5),0 0 20px rgba(200,155,60,.12);
+}
+.fpill:hover::after{opacity:1}
+.fp-i{font-size:18px;flex-shrink:0}
+.fp-n{font-family:'Cinzel',serif;font-size:10px;color:var(--parch);font-weight:700;display:block}
+.fp-d{font-size:11px;color:var(--text3);margin-top:2px}
+/* ── Mystery section ── */
+.mys-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.mys-card{
+  position:relative;padding:28px 22px 22px;overflow:hidden;cursor:default;
+  background:linear-gradient(160deg,rgba(8,5,20,.92),rgba(4,3,12,.96));
+  border:1px solid rgba(80,60,130,.22);
+  transition:transform .28s cubic-bezier(.22,1,.36,1),box-shadow .28s,border-color .28s;
+}
+/* Fog layer */
+.mys-card::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%,rgba(60,40,100,.15),transparent 60%),
+    radial-gradient(ellipse 70% 40% at 30% 100%,rgba(40,25,80,.1),transparent 50%);
+}
+/* Scanning mist line */
+.mys-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(140,100,220,.25),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.mys-card:hover{
+  transform:translateY(-6px) scale(1.01);
+  border-color:rgba(140,100,220,.42);
+  box-shadow:0 16px 44px rgba(0,0,0,.7),0 0 28px rgba(80,50,140,.2);
+}
+.mys-card:hover::after{opacity:1}
+.mys-icon{
+  font-size:28px;margin-bottom:12px;display:block;transition:filter .3s,transform .3s;
+}
+.mys-card:hover .mys-icon{
+  filter:drop-shadow(0 0 12px rgba(140,100,220,.7));
+  transform:scale(1.1);
+}
+.mys-name{
+  font-family:'Cinzel',serif;font-size:13px;color:var(--text);
+  margin-bottom:8px;transition:color .25s;letter-spacing:.04em;
+}
+.mys-card:hover .mys-name{color:var(--violet3)}
+.mys-txt{
+  font-size:13px;color:rgba(160,140,200,.55);font-style:italic;
+  line-height:1.65;max-height:0;overflow:hidden;opacity:0;
+  transition:max-height .4s,opacity .4s;
+}
+.mys-card:hover .mys-txt{max-height:90px;opacity:1}
+/* ── GUILD CARDS — 2×2 large ── */
+.guild-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:32px}
+.guild-card{
+  position:relative;overflow:hidden;
+  border:1px solid rgba(200,155,60,.14);
+  background:linear-gradient(160deg,rgba(14,18,28,.97),rgba(8,10,18,.99));
+  display:grid;grid-template-columns:auto 1fr;gap:0;
+  transition:transform .3s,border-color .3s,box-shadow .3s;
+}
+/* shine sweep */
+.guild-card::after{
+  content:'';position:absolute;top:0;left:-80%;width:50%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.08),transparent);
+  transform:skewX(-18deg);transition:left .5s ease;pointer-events:none;z-index:3;
+}
+.guild-card:hover{transform:translateY(-5px);border-color:rgba(200,155,60,.4);box-shadow:0 14px 44px rgba(0,0,0,.55),0 0 28px rgba(200,155,60,.09)}
+.guild-card:hover::after{left:130%}
+/* accent bar laterale colorato per gilda */
+.guild-bar{width:4px;background:var(--gbar,rgba(200,155,60,.5));flex-shrink:0;align-self:stretch;transition:background .3s}
+.guild-body{padding:28px 26px}
+.guild-head{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.guild-icon{font-size:30px;filter:drop-shadow(0 0 10px var(--gbar,rgba(200,155,60,.5)));flex-shrink:0}
+.guild-name{font-family:'Cinzel',serif;font-size:14px;font-weight:700;letter-spacing:.14em;color:var(--gold3);line-height:1.2}
+.guild-desc{font-size:12.5px;color:var(--text3);font-style:italic;line-height:1.6;margin-bottom:20px;padding-left:2px}
+.guild-divider{height:1px;background:linear-gradient(90deg,rgba(200,155,60,.18),transparent);margin-bottom:16px}
+.guild-subs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.guild-sub{
+  display:flex;flex-direction:column;gap:6px;padding:12px 12px 14px;
+  background:rgba(200,155,60,.03);border:1px solid rgba(200,155,60,.08);
+  transition:.2s;position:relative;overflow:hidden;
+}
+.guild-sub:hover{background:rgba(200,155,60,.07);border-color:rgba(200,155,60,.22)}
+.guild-sub-i{font-size:20px;margin-bottom:2px;filter:drop-shadow(0 0 6px var(--gbar,rgba(200,155,60,.4)))}
+.guild-sub-n{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--gold2);display:block;margin-bottom:4px;line-height:1.3}
+.guild-sub-d{font-size:11px;color:rgba(180,165,130,.6);line-height:1.45}
+.guild-sub.locked{opacity:.38;cursor:default}
+.guild-sub.locked .guild-sub-n::after{content:' ·  presto';color:rgba(200,155,60,.4);font-size:8px;letter-spacing:.05em}
+@media(max-width:600px){.guild-subs{grid-template-columns:1fr}}
+/* ── MYS CARDS CINEMATIC (v2) ── */
+.mys-cin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:8px}
+.mys-cin{
+  position:relative;overflow:hidden;border:1px solid rgba(200,155,60,.12);
+  min-height:280px;cursor:default;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  transition:transform .3s,border-color .3s,box-shadow .3s;
+}
+.mys-cin-bg{position:absolute;inset:0;z-index:0;transition:transform .6s ease}
+.mys-cin:hover .mys-cin-bg{transform:scale(1.04)}
+.mys-cin-overlay{position:absolute;inset:0;z-index:1}
+.mys-cin-body{position:relative;z-index:2;padding:22px 20px 20px}
+.mys-cin-icon{font-size:28px;margin-bottom:10px;display:block;filter:drop-shadow(0 0 10px var(--ci,rgba(200,155,60,.6)))}
+.mys-cin-name{font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:.12em;color:var(--gold3);margin-bottom:8px}
+.mys-cin-txt{font-size:12.5px;color:var(--text3);line-height:1.6;font-style:italic}
+/* hover particles per mys-cin */
+.mys-cin:hover{transform:translateY(-5px);border-color:rgba(200,155,60,.3);box-shadow:0 16px 48px rgba(0,0,0,.6),0 0 24px var(--mg,rgba(200,155,60,.08))}
+@media(max-width:900px){.mys-cin-grid{grid-template-columns:1fr}}
+.mys-blur{filter:blur(2.5px);user-select:none}
+/* ── Come iniziare ── */
+.start-sec{border-top:1px solid rgba(200,155,60,.07)}
+/* ── WIP badge animato ── */
+@keyframes wip-pulse{0%,100%{box-shadow:0 0 0 0 rgba(100,160,32,.35)}60%{box-shadow:0 0 0 5px rgba(100,160,32,0)}}
+@keyframes wip-shine{0%{background-position:-200% center}100%{background-position:200% center}}
+.ctag-g{
+  background:linear-gradient(90deg,rgba(100,160,32,.12),rgba(140,200,50,.22),rgba(100,160,32,.12));
+  background-size:200% auto;
+  color:#8ab840;border-color:rgba(100,160,32,.35);
+  animation:wip-pulse 2.2s ease-in-out infinite,wip-shine 3s linear infinite;
+  font-weight:900;letter-spacing:.08em;
+}
+/* ── Separatore dorato animato ── */
+.gold-sep{
+  height:20px;position:relative;margin:0;overflow:visible;
+  display:flex;align-items:center;justify-content:center;
+}
+.gold-sep::before{
+  content:'';position:absolute;top:50%;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.12) 15%,rgba(200,155,60,.35) 45%,rgba(200,155,60,.35) 55%,rgba(200,155,60,.12) 85%,transparent);
+  transform:translateY(-50%);
+}
+/* gemma centrale rotante */
+.gold-sep::after{
+  content:'◆';font-size:8px;color:var(--gold);position:relative;z-index:2;
+  animation:gem-spin 8s linear infinite;
+  filter:drop-shadow(0 0 6px rgba(200,155,60,.7));
+  text-shadow:0 0 8px rgba(200,155,60,.5);
+}
+@keyframes gem-spin{0%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.35)}100%{transform:rotate(360deg) scale(1)}}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
+.step{position:relative;padding:24px 18px 20px;background:rgba(255,255,255,.022);border:1px solid rgba(200,155,60,.09);transition:.22s;overflow:hidden}
+.step::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,155,60,.04),transparent);opacity:0;transition:.22s;pointer-events:none}
+.step:hover{border-color:rgba(200,155,60,.28);background:rgba(200,155,60,.04);transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.5)}
+.step:hover::before{opacity:1}
+.step-n{font-family:'Cinzel',serif;font-size:38px;font-weight:900;color:rgba(200,155,60,.1);position:absolute;top:10px;right:14px;line-height:1}
+.step-icon{font-size:26px;margin-bottom:12px}
+.step-title{font-family:'Cinzel',serif;font-size:12px;color:var(--gold2);margin-bottom:6px;font-weight:700;letter-spacing:.05em}
+.step-desc{font-size:14px;color:var(--text);line-height:1.65}
+.cta-row{margin-top:28px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+/* ── Wiki collapsible ── */
+.wiki-sec{border-top:1px solid rgba(200,155,60,.06);padding-top:0!important}
+.wiki-toggle-btn{display:flex;align-items:center;gap:12px;cursor:pointer;padding:22px 64px;user-select:none;transition:background .2s}
+.wiki-toggle-btn:hover{background:rgba(200,155,60,.03)}
+.wiki-arrow{font-size:10px;color:var(--text3);transition:transform .22s;margin-left:auto}
+.wiki-open .wiki-arrow{transform:rotate(90deg)}
+.wiki-content{padding:0 64px 64px;display:none}
+.wiki-open .wiki-content{display:block}
+@media(max-width:960px){.arcadia-inner{grid-template-columns:1fr}.arcadia-crest{display:none}.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.hsec,.arcadia-sec{padding:40px 20px!important}.steps{grid-template-columns:1fr}.wiki-toggle-btn{padding:16px 20px}.wiki-content{padding:0 20px 40px}.faction-grid{grid-template-columns:1fr}.loc-card{flex:0 0 210px;height:280px}}
+/* ════════════════════════════════════
+   NUOVI STILI AUTO-RENDERER
+════════════════════════════════════ */
+
+/* ── Intro block (primo callout) ── */
+.n-intro{
+  display:flex;gap:18px;align-items:flex-start;
+  border-left:4px solid rgba(200,155,60,.6);
+  background:rgba(200,155,60,.05);
+  padding:20px 22px;margin:0 0 28px;
+  position:relative;overflow:hidden;
+}
+.n-intro::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(200,155,60,.03),transparent 60%);
+  pointer-events:none;
+}
+.n-intro-icon{font-size:26px;flex-shrink:0;margin-top:2px;position:relative;z-index:1}
+.n-intro-body{flex:1;font-family:'Crimson Pro',serif;font-size:17px;line-height:1.8;color:var(--parch);font-style:italic;position:relative;z-index:1}
+/* ── Immagini cinematiche ── */
+.n-image{margin:24px 0;position:relative;overflow:hidden}
+.n-image img{
+  width:100%;display:block;
+  border:1px solid rgba(200,155,60,.15);
+  box-shadow:0 12px 40px rgba(0,0,0,.75);
+  transition:transform .4s ease;
+}
+.n-image:hover img{transform:scale(1.01)}
+.n-figcap{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:8px 14px;
+  background:linear-gradient(0deg,rgba(4,5,14,.9),transparent);
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;
+  color:rgba(200,155,60,.7);text-transform:uppercase;
+}
+/* ── Pagina vuota styled ── */
+.n-empty{
+  text-align:center;padding:60px 20px;
+}
+.n-empty-icon{font-size:52px;margin-bottom:18px;opacity:.35}
+.n-empty-title{font-family:'Cinzel',serif;font-size:18px;color:rgba(200,155,60,.4);letter-spacing:.1em;margin-bottom:10px}
+.n-empty-msg{font-size:14px;color:var(--text3);font-style:italic;opacity:.6}
+/* ── Hero accent color ── */
+#page-hero{border-bottom:1px solid var(--ph-acc,rgba(200,155,60,.2))}
+.ph-topline{background:linear-gradient(90deg,transparent,var(--ph-acc,var(--gold3)),transparent)!important;opacity:.6!important}
+.n-h1{color:var(--ph-acc,var(--white))!important}
+/* ── DB gallery upgrade ── */
+.n-db-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.n-db-card{
+  cursor:pointer;overflow:hidden;
+  background:rgba(8,10,18,.99);
+  border:1px solid rgba(200,155,60,.12);
+  transition:transform .25s,border-color .25s,box-shadow .25s;
+}
+.n-db-card:hover{transform:translateY(-4px);border-color:rgba(200,155,60,.35);box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.n-db-cover-wrap{position:relative;height:110px;overflow:hidden;background:rgba(14,18,28,.8)}
+.n-db-cover{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
+.n-db-card:hover .n-db-cover{transform:scale(1.05)}
+.n-db-cover-fade{position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,10,18,.7),transparent)}
+.n-db-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:36px;opacity:.6}
+.n-db-name{
+  padding:9px 12px 11px;
+  font-family:'Cinzel',serif;font-size:11px;color:var(--parch);line-height:1.3;
+  border-top:2px solid rgba(200,155,60,.2);
+  transition:color .18s;
+}
+.n-db-card:hover .n-db-name{color:var(--gold3)}
+/* ── child_page card: accent border on hover ── */
+.n-cp{border-color:rgba(200,155,60,.12)}
+.n-cp:hover{border-color:var(--cpacc,rgba(200,155,60,.4))!important}
+.n-cp-thumb{border-bottom:1px solid rgba(200,155,60,.07)}
+/* ── Code block con lang label ── */
+.n-code{position:relative;padding-top:32px!important}
+.n-code-lang{
+  position:absolute;top:8px;right:12px;
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:.15em;
+  color:rgba(200,155,60,.4);text-transform:uppercase;
+}
+/* ── To-do ── */
+.n-todo{display:flex;gap:10px;align-items:flex-start;margin:4px 0;font-size:16px;line-height:1.8}
+.n-todo-box{flex-shrink:0;width:18px;text-align:center}
+/* ── Bookmark upgrade ── */
+.n-bkm{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(200,155,60,.04);border:1px solid rgba(200,155,60,.14);
+  padding:12px 16px;margin:10px 0;transition:.2s;text-decoration:none;
+}
+.n-bkm:hover{border-color:rgba(200,155,60,.35);background:rgba(200,155,60,.07)}
+.n-bkm-body{flex:1}
+.n-bkm-label{font-family:'Cinzel',serif;font-size:12px;color:var(--parch);margin-bottom:3px}
+.n-bkm-url{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.n-bkm-arr{color:var(--gold);font-size:14px;flex-shrink:0;transition:.2s}
+.n-bkm:hover .n-bkm-arr{transform:translateX(4px)}
+/* ── Divider e callout override ── */
+.n-divider{
+  border:none!important;margin:32px 0!important;height:18px!important;
+  position:static!important;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+}
+.n-divider::before,.n-divider::after{
+  content:''!important;flex:1;max-width:200px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.3))!important;
+  position:static!important;transform:none!important;top:auto!important;left:auto!important;
+}
+.n-divider::after{background:linear-gradient(270deg,transparent,rgba(200,155,60,.3))!important}
+.n-callout{
+  display:flex!important;background:var(--callout-bg,rgba(200,155,60,.04))!important;
+  border:none!important;border-left:3px solid var(--callout-c,rgba(200,155,60,.5))!important;
+  padding:14px 18px!important;margin:14px 0!important;
+}
+
+
+/* ════════════════════════════════════
+   TOGGLE ANIMATION
+════════════════════════════════════ */
+@keyframes toggleOpen{
+  from{opacity:0;transform:translateY(-8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+details.n-toggle{margin:6px 0}
+details.n-toggle>.n-ts{
+  list-style:none;display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;
+  font-size:16px;font-weight:600;color:var(--parch);padding:9px 15px;
+  background:rgba(200,155,60,.04);border:1px solid var(--bdr);transition:background .15s,border-color .15s;
+}
+details.n-toggle>.n-ts::before{content:'▶';font-size:8px;color:var(--gold);transition:transform .22s;flex-shrink:0}
+details.n-toggle[open]>.n-ts{background:rgba(200,155,60,.09);border-color:var(--bdr2);color:var(--gold2)}
+details.n-toggle[open]>.n-ts::before{transform:rotate(90deg)}
+details.n-toggle>.n-tc{padding:10px 14px 8px 22px;border-left:2px solid rgba(200,155,60,.16);margin-left:11px;margin-top:4px}
+details.n-toggle[open]>.n-tc{animation:toggleOpen .2s ease forwards}
+/* toggle su heading (n-th) — stile titolo dorato */
+details.n-th{margin:20px 0 12px}
+details.n-th>.n-tsum{
+  list-style:none;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;
+  background:none;border:none;padding:0;font-family:'Cinzel',serif;
+  color:var(--gold2);text-transform:uppercase;letter-spacing:.08em;
+}
+details.n-th>.n-tsum.n-h1{font-size:1.45em}
+details.n-th>.n-tsum.n-h2{font-size:1.2em}
+details.n-th>.n-tsum.n-h3{font-size:1em}
+details.n-th>.n-tsum::before{content:'◆';font-size:.5em;color:var(--gold);transition:transform .22s;flex-shrink:0}
+details.n-th[open]>.n-tsum{color:var(--gold3)}
+details.n-th[open]>.n-tsum::before{content:'◆';transform:rotate(45deg)}
+details.n-th>.n-tc{padding:12px 0 8px 0;margin-top:8px}
+
+/* ════════════════════════════════════
+   RESPONSIVE COLUMNS
+════════════════════════════════════ */
+@media(max-width:700px){
+  .n-cols{grid-template-columns:1fr!important;gap:0!important}
+  .n-cols>div+div{margin-top:8px}
+  .n-cp-grid{grid-template-columns:1fr!important}
+  .n-db-grid{grid-template-columns:repeat(2,1fr)!important}
+}
+
+/* ════════════════════════════════════
+   BREADCRUMB BACK LINK
+════════════════════════════════════ */
+.ph-bc-mid{
+  color:var(--parch);opacity:.55;cursor:pointer;
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.07em;
+  transition:opacity .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;
+}
+.ph-bc-mid:hover{opacity:.9;color:var(--gold3)}
+
+/* ════════════════════════════════════
+   BLOCCHI MANCANTI
+════════════════════════════════════ */
+/* embed */
+.n-embed{
+  margin:16px 0;border:1px solid rgba(200,155,60,.12);
+  background:rgba(8,10,18,.8);padding:14px 16px;
+  display:flex;align-items:center;gap:12px;
+}
+.n-embed-icon{font-size:20px;flex-shrink:0;opacity:.5}
+.n-embed-body{flex:1;min-width:0}
+.n-embed-url{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:3px}
+.n-embed-open{font-family:'Cinzel',serif;font-size:9px;color:var(--gold3);opacity:.6;flex-shrink:0;letter-spacing:.1em;transition:.15s}
+.n-embed:hover .n-embed-open{opacity:1}
+
+/* video */
+.n-video{margin:20px 0;position:relative}
+.n-video video,.n-video iframe{width:100%;display:block;border:1px solid rgba(200,155,60,.12);background:#000}
+.n-video iframe{aspect-ratio:16/9;border:0}
+
+/* pdf link */
+.n-pdf{
+  display:flex;align-items:center;gap:12px;
+  margin:12px 0;padding:12px 16px;
+  background:rgba(200,155,60,.04);border:1px solid rgba(200,155,60,.12);
+  text-decoration:none;transition:.2s;
+}
+.n-pdf:hover{border-color:rgba(200,155,60,.3);background:rgba(200,155,60,.07)}
+.n-pdf-icon{font-size:22px;flex-shrink:0}
+.n-pdf-label{font-family:'Cinzel',serif;font-size:11px;color:var(--parch);letter-spacing:.05em}
+.n-pdf-hint{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ════════════════════════════════════
+   DB CAROUSEL (loc-card style)
+════════════════════════════════════ */
+.n-db-lc-wrap{
+  margin:20px 0 32px;
+  position:relative;
+}
+.n-db-lc-wrap .n-db-title{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;
+  color:var(--gold3);text-transform:uppercase;
+  margin-bottom:14px;opacity:.7;
+}
+.n-db-lc-wrap .loc-wrap{
+  /* usa la stessa struttura del carousel homepage */
+}
+.n-db-lc-wrap .loc-card{
+  flex:0 0 220px;
+  height:300px;
+}
+@media(max-width:700px){
+  .n-db-lc-wrap .loc-card{flex:0 0 180px;height:260px}
+}
+
+/* ════════════════════════════════════
+   LOADER INIZIALE
+════════════════════════════════════ */
+#site-loader{
+  position:fixed;inset:0;z-index:9999;background:#04050e;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  transition:opacity .5s ease,visibility .5s ease;
+}
+#site-loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.loader-rune{font-size:52px;animation:runeGlow 1.8s ease-in-out infinite alternate}
+.loader-sub{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.45em;color:rgba(200,155,60,.3);text-transform:uppercase}
+.loader-dots{display:flex;gap:9px}
+.loader-dot{width:5px;height:5px;border-radius:50%;background:rgba(200,155,60,.35);animation:ldot 1.3s ease-in-out infinite}
+.loader-dot:nth-child(2){animation-delay:.18s}
+.loader-dot:nth-child(3){animation-delay:.36s}
+@keyframes runeGlow{from{text-shadow:0 0 18px rgba(200,155,60,.2)}to{text-shadow:0 0 40px rgba(200,155,60,.75),0 0 80px rgba(200,155,60,.2)}}
+@keyframes ldot{0%,100%{transform:scale(1);opacity:.35}50%{transform:scale(1.5);opacity:1}}
+
+/* ════════════════════════════════════
+   PROGRESS BAR
+════════════════════════════════════ */
+#progress-bar{
+  position:fixed;top:var(--topbar-h,50px);left:0;height:2px;width:0%;z-index:200;
+  background:linear-gradient(90deg,var(--gold),rgba(200,155,60,.4));
+  transition:width .12s linear;pointer-events:none;
+}
+
+/* ════════════════════════════════════
+   SCROLL-TOP BUTTON
+════════════════════════════════════ */
+#scroll-top-btn{
+  position:fixed;bottom:76px;right:18px;z-index:180;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(4,5,14,.92);border:1px solid rgba(200,155,60,.28);
+  color:var(--gold);font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translateY(10px);pointer-events:none;
+  transition:opacity .25s,transform .25s,border-color .2s;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+#scroll-top-btn.vis{opacity:1;transform:translateY(0);pointer-events:all}
+#scroll-top-btn:hover{border-color:var(--gold);box-shadow:var(--glow)}
+/* Tasto audio runa */
+#audio-runa{
+  position:fixed;bottom:122px;right:18px;z-index:180;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(4,5,14,.92);border:1px solid rgba(200,155,60,.18);
+  color:var(--text3);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .2s,color .2s,box-shadow .2s;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+#audio-runa:hover{border-color:rgba(200,155,60,.4);color:var(--gold)}
+#audio-runa.ara-on{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow);animation:arapulse 2.2s ease-in-out infinite}
+@keyframes arapulse{0%,100%{box-shadow:var(--glow)}50%{box-shadow:0 0 18px rgba(200,155,60,.5)}}
+@media(max-width:768px){#audio-runa{bottom:168px}}
+
+/* ════════════════════════════════════
+   FONT SIZE CONTROLS
+════════════════════════════════════ */
+.font-btn{
+  width:26px;height:26px;border:1px solid rgba(200,155,60,.18);
+  background:rgba(200,155,60,.04);color:var(--gold3);
+  font-size:12px;font-weight:700;cursor:pointer;user-select:none;
+  display:flex;align-items:center;justify-content:center;transition:.15s;
+}
+.font-btn:hover{background:rgba(200,155,60,.12);border-color:rgba(200,155,60,.4)}
+#font-controls{display:flex;align-items:center;gap:3px;margin-left:6px}
+
+/* ════════════════════════════════════
+   THEME TOGGLE
+════════════════════════════════════ */
+#theme-toggle{
+  width:30px;height:30px;border:1px solid rgba(200,155,60,.18);
+  background:rgba(200,155,60,.04);color:var(--gold3);font-size:14px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:.15s;margin-left:4px;flex-shrink:0;border-radius:2px;
+}
+#theme-toggle:hover{background:rgba(200,155,60,.12);border-color:rgba(200,155,60,.4)}
+
+/* ════════════════════════════════════
+   BOTTOM NAV (mobile)
+════════════════════════════════════ */
+#bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:180;
+  height:54px;background:rgba(4,5,14,.97);
+  border-top:1px solid rgba(200,155,60,.1);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  grid-template-columns:repeat(5,1fr);
+}
+.bnav-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;height:100%;cursor:pointer;color:rgba(200,155,60,.32);
+  font-size:19px;transition:color .15s;position:relative;
+}
+.bnav-item.active,.bnav-item:active{color:var(--gold2)}
+.bnav-label{font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.07em;text-transform:uppercase;opacity:.7}
+.bnav-badge{
+  position:absolute;top:7px;right:calc(50% - 13px);
+  width:7px;height:7px;border-radius:50%;
+  background:var(--gold);border:1.5px solid #04050e;display:none;
+}
+.bnav-badge.vis{display:block}
+@media(max-width:768px){
+  #bottom-nav{display:grid}
+  #main{padding-bottom:54px}
+  #scroll-top-btn{bottom:70px}
+}
+
+/* ════════════════════════════════════
+   RECENTI nell'overlay
+════════════════════════════════════ */
+#ov-recenti{margin-bottom:12px;display:none}
+.ov-rec-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.25em;color:var(--gold3);text-transform:uppercase;margin-bottom:7px;opacity:.55}
+.ov-rec-item{
+  display:flex;align-items:center;gap:10px;padding:7px 10px;cursor:pointer;
+  transition:.15s;border-left:2px solid transparent;font-size:13.5px;color:var(--text);
+}
+.ov-rec-item:hover{background:rgba(200,155,60,.05);border-left-color:var(--gold3);color:var(--parch)}
+.ov-rec-icon{flex-shrink:0;font-size:15px}
+
+/* ════════════════════════════════════
+   GLOSSARIO — tooltip termini
+════════════════════════════════════ */
+.gterm{
+  border-bottom:1px dashed rgba(200,155,60,.4);cursor:help;position:relative;
+}
+.gterm::after{
+  content:attr(data-def);position:absolute;bottom:calc(100% + 8px);left:50%;
+  transform:translateX(-50%);background:rgba(6,8,18,.98);
+  border:1px solid rgba(200,155,60,.25);color:var(--parch);
+  font-size:12px;font-style:normal;padding:7px 12px;
+  white-space:normal;max-width:220px;text-align:center;line-height:1.55;
+  pointer-events:none;opacity:0;transition:opacity .18s;z-index:120;
+  font-family:'Crimson Pro',serif;
+}
+.gterm:hover::after{opacity:1}
+
+/* ════════════════════════════════════
+   LIGHT THEME
+════════════════════════════════════ */
+body.light{
+  --bg:#f2eddf;--bg2:#ebe5d5;--bg3:#e2dbc8;--bg4:#d8d0bb;
+  --text:#2a2114;--text2:#3d3120;--text3:#6b5a3c;
+  --white:#1a1408;--parch:#2a2114;
+  --bdr:rgba(120,88,36,.18);--bdr2:rgba(120,88,36,.3);
+  --gold:#7a5015;--gold2:#9a6820;--gold3:#b07a28;
+  --glow:0 0 18px rgba(122,80,21,.2);
+}
+body.light #topbar{background:rgba(242,237,223,.97)!important;border-bottom:1px solid rgba(120,88,36,.18)!important}
+body.light #main,body.light body{background:var(--bg)!important}
+body.light #page-hero,body.light .ph-bg{background:#e5dfc8!important}
+body.light #overlay{background:rgba(242,237,223,.65)}
+body.light #ovp{background:rgba(238,232,218,.99)!important;border-color:rgba(120,88,36,.28)!important}
+body.light #site-loader{background:#f2eddf}
+body.light .n-code{background:rgba(200,180,140,.12);color:var(--text)}
+body.light .n-image img{border-color:rgba(120,88,36,.2)}
+body.light .lcard{background:linear-gradient(160deg,rgba(235,229,215,.97),rgba(225,218,200,.99))!important;border-color:rgba(120,88,36,.15)}
+body.light .lcard:hover{box-shadow:0 14px 40px rgba(100,70,20,.15)!important}
+
+/* ════════════════════════════════════
+   FONT SCALE
+════════════════════════════════════ */
+.n-p,.n-ul,.n-ol,.n-quote,.n-callout-body,.n-intro-body,.n-tc{
+  font-size:calc(16px * var(--font-scale,1))!important;
+}
+.n-h1{font-size:calc(20px * var(--font-scale,1))!important}
+.n-h2{font-size:calc(15.5px * var(--font-scale,1))!important}
+.n-h3{font-size:calc(11.5px * var(--font-scale,1))!important}
+
+/* ════════════════════════════════════
+   PULL TO REFRESH
+════════════════════════════════════ */
+#ptr-indicator{
+  position:fixed;top:var(--topbar-h,50px);left:50%;transform:translateX(-50%);
+  z-index:190;padding:7px 18px;
+  background:rgba(8,10,20,.96);border:1px solid rgba(200,155,60,.22);
+  font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.2em;
+  color:var(--gold3);text-transform:uppercase;
+  opacity:0;transition:opacity .2s;pointer-events:none;
+}
+#ptr-indicator.vis{opacity:1}
+
+/* ════════════════════════════════════
+   NOVITÀ PILL sulle lcard
+════════════════════════════════════ */
+.ctag-new{
+  background:rgba(200,155,60,.12);color:var(--gold2);
+  border:1px solid rgba(200,155,60,.28);
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:.1em;padding:2px 6px;
+  display:inline-block;
+}
