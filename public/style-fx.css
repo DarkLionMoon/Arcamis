@@ -10,10 +10,11 @@
     rgba(0,0,0,.38) 70%,
     rgba(0,0,0,.62) 100%
   );
-  transition:opacity .4s;
+  opacity:0;transition:opacity .5s;
 }
-/* su mobile disattiva (non c'è cursore) */
-@media(hover:none){#candlelight-overlay{display:none}}
+#candlelight-overlay.cl-on{opacity:1}
+/* su mobile nasconde il pulsante (nessun cursore) */
+@media(hover:none){#candle-toggle{display:none!important}}
 
 /* ════════════════════════════════════
    ECO DELLE RUNE — decifrazione titoli
@@ -111,3 +112,17 @@
   transition:border-color .2s,color .2s,background .2s;
 }
 .ph-copy-btn:hover{border-color:rgba(200,155,60,.5);color:var(--gold2);background:rgba(200,155,60,.06)}
+/* ── Pulsante Lume di Candela ── */
+#candle-toggle{
+  position:fixed;bottom:168px;right:18px;z-index:180;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(4,5,14,.92);border:1px solid rgba(200,155,60,.18);
+  color:var(--text3);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .2s,color .2s,box-shadow .2s;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  title:'Lume di candela';
+}
+#candle-toggle:hover{border-color:rgba(200,155,60,.4);color:rgba(200,155,60,.7)}
+#candle-toggle.cl-on{border-color:var(--gold);color:var(--gold2);box-shadow:0 0 12px rgba(200,155,60,.3)}
+@media(max-width:768px){#candle-toggle{display:none}}
