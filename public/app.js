@@ -140,14 +140,44 @@ window.addEventListener('popstate',function(e){
   _gpRender(e.state.id,e.state.label,e.state.icon);
 });
 
-/* ── ricerca rapida ── */
+/* ── ricerca full-text (Notion API + fallback locale) ── */
+var _searchTimer=null;
 function hsearch(q){
-  var el=document.getElementById('sr'),qq=q.toLowerCase().trim();
+  var el=document.getElementById('sr');
+  var qq=q.trim();
   if(!qq){el.classList.remove('open');return;}
-  var res=pages.filter(function(p){return p.l.toLowerCase().includes(qq);});
-  if(!res.length){el.classList.remove('open');return;}
-  el.innerHTML=res.slice(0,8).map(function(p){return'<div class="sri" onmousedown="gp(\''+p.id+'\',\''+p.l.replace(/'/g,"\\'")+'\',\''+p.i+'\')">'+'<span class="si2">'+p.i+'</span><span class="sl">'+p.l+'</span></div>';}).join('');
-  el.classList.add('open');
+  /* feedback immediato con risultati locali */
+  var local=pages.filter(function(p){return p.l.toLowerCase().includes(qq.toLowerCase());});
+  if(local.length){
+    el.innerHTML=local.slice(0,5).map(function(p){
+      return'<div class="sri" onmousedown="gp(\''+p.id+'\',\''+p.l.replace(/'/g,"\\'")+'\',\''+p.i+'\')">'
+        +'<span class="si2">'+p.i+'</span><span class="sl">'+p.l+'</span>'
+        +'<span class="sri-tag">nome</span></div>';
+    }).join('');
+    el.classList.add('open');
+  }
+  /* debounce: chiama Notion search dopo 350ms di pausa */
+  clearTimeout(_searchTimer);
+  _searchTimer=setTimeout(function(){_searchFull(qq);},350);
+}
+async function _searchFull(qq){
+  var el=document.getElementById('sr');
+  try{
+    var r=await fetch('/api/notion?q='+encodeURIComponent(qq));
+    if(!r.ok)return;
+    var d=await r.json();
+    if(!d.results||!d.results.length){
+      /* nessun risultato dall'API — tieni quelli locali */
+      return;
+    }
+    el.innerHTML=d.results.slice(0,10).map(function(p){
+      var safe=p.title.replace(/'/g,"\\'");
+      return'<div class="sri" onmousedown="gp(\''+p.id+'\',\''+safe+'\',\''+p.icon+'\')">'
+        +'<span class="si2">'+p.icon+'</span><span class="sl">'+p.title+'</span>'
+        +'</div>';
+    }).join('');
+    el.classList.add('open');
+  }catch(e){/* mantieni risultati locali in caso di errore */}
 }
 function csearch(){document.getElementById('sr').classList.remove('open');}
 
