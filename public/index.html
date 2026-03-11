@@ -23,7 +23,7 @@
 
 <!-- ptr + scroll top -->
 <div id="ptr-indicator">↓ Rilascia per aggiornare</div>
-<div id="scroll-top-btn" onclick="scrollTop()">▲</div>
+<div id="scroll-top-btn" onclick="goToTop()">▲</div>
 
 <!-- ═══ TOPBAR ═══ -->
 <div id="progress-bar"></div>
@@ -872,8 +872,9 @@
   <div class="bnav-item" data-k="lore" onclick="gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📖');setBnavActive('lore')">
     <span>📖</span><span class="bnav-label">Lore</span>
   </div>
-  <div class="bnav-item" data-k="lavori" onclick="gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️');setBnavActive('lavori')">
+  <div class="bnav-item" data-k="lavori" onclick="toggleMobileNav()">
     <span>🗡️</span><span class="bnav-label">Lavori</span>
+  </div>
   </div>
   <div class="bnav-item" data-k="menu" onclick="ovo()">
     <span>☰</span><span class="bnav-label">Menu</span>
