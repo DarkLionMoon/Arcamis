@@ -132,6 +132,16 @@ function closeDd(){document.querySelectorAll('.tn-drop.open').forEach(function(d
 document.addEventListener('click',function(e){if(!e.target.closest('.tn-drop'))closeDd();});
 document.querySelectorAll('.tn-drop').forEach(function(d){d.addEventListener('click',function(e){e.stopPropagation();});});
 
+/* ── Hover prefetch sui link di navigazione: precarichia la pagina al mouseover ── */
+document.addEventListener('mouseover',function(e){
+  var item=e.target.closest('.tn-item,.mn-item,.lcard,.loc-card,.ov-ql-item');
+  if(!item)return;
+  /* estrai pageId dall'onclick */
+  var oc=item.getAttribute('onclick')||'';
+  var m=oc.match(/gp\(['"]([a-f0-9]{32})['"]/);
+  if(m)prefetchPage(m[1]);
+},{passive:true});
+
 /* ── setNav + showHome ── */
 function setNav(v){document.querySelectorAll('.tn').forEach(function(el){el.classList.toggle('ta',el.dataset.v===v);});}
 function showHome(fromPop){
@@ -320,6 +330,31 @@ function prefetchPage(id){
     }).catch(function(){});
 }
 window.addEventListener('load',function(){setTimeout(function(){PREFETCH_IDS.forEach(prefetchPage);},2500);});
+
+/* ── Prefetch automatico delle child_page visibili nel viewport ── */
+var _pfObserver=new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if(!en.isIntersecting)return;
+    var oc=en.target.getAttribute('onclick')||'';
+    var m=oc.match(/gp\(['"]([a-f0-9]{32})['"]/);
+    if(m)prefetchPage(m[1]);
+    _pfObserver.unobserve(en.target);
+  });
+},{rootMargin:'100px'});
+
+/* hook nel render delle pagine per osservare le card */
+var _origInitFadeIn=window.initFadeIn;
+document.addEventListener('DOMContentLoaded',function(){
+  var pbody=document.getElementById('pbody');
+  if(!pbody)return;
+  var _mo=new MutationObserver(function(){
+    pbody.querySelectorAll('.loc-card[onclick]:not([data-pf])').forEach(function(card){
+      card.setAttribute('data-pf','1');
+      _pfObserver.observe(card);
+    });
+  });
+  _mo.observe(pbody,{childList:true,subtree:true});
+});
 
 /* ════ BOTTOM NAV ════ */
 function setBnavActive(key){
