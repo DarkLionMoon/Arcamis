@@ -30,11 +30,15 @@ async function fetchAllBlocks(blockId, token, depth) {
     cursor = data.has_more ? data.next_cursor : undefined;
   } while (cursor);
 
-  for (var i = 0; i < blocks.length; i++) {
-    var block = blocks[i];
-    if (block.has_children && block.type !== 'child_page' && block.type !== 'child_database') {
-      block.children = await fetchAllBlocks(block.id, token, depth + 1);
-    }
+  /* ── Parallelizza il fetch dei figli invece di aspettare uno alla volta ── */
+  var withChildren = blocks.filter(function(b) {
+    return b.has_children && b.type !== 'child_page' && b.type !== 'child_database';
+  });
+  if (withChildren.length > 0) {
+    var childResults = await Promise.all(
+      withChildren.map(function(b) { return fetchAllBlocks(b.id, token, depth + 1); })
+    );
+    withChildren.forEach(function(b, i) { b.children = childResults[i]; });
   }
 
   return blocks;
@@ -59,7 +63,7 @@ async function proxyImage(url, res) {
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+  res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
