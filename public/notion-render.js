@@ -217,30 +217,40 @@ function renderBlocks(blocks,isRoot){
         break;
 
       case'child_page':
+        /* skip if already processed in a previous carousel */
+        if(b._cpDone){break;}
+        /* ── Raccoglie TUTTE le child_page dell'intera lista blocchi in un unico carousel ──
+           Salta le map pages, le pagine senza contenuto ("Classi"), e raggruppa tutto. */
         var cpCards='';
         var cpUid='cp-'+Math.random().toString(36).slice(2,8);
-        while(i<blocks.length&&blocks[i].type==='child_page'){
-          var cpb=blocks[i],cpd=cpb[cpb.type]||{};
-          var cpid=cpb.id.replace(/-/g,'');
-          /* salta pagine presenti nella mappa interattiva */
-          if(mapPageIds.has(cpid)){i++;continue;}
-          var cpni=pages.find(function(n){return n.id===cpid});
-          var cpicon=cpni?cpni.i:'📄';
-          var cptitle=cpd.title||'Pagina';
-          var cpacc=iconAccent(cpicon);
-          var cpbg=iconGradient(cpicon);
-          var cptitleSafe=cptitle.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-          cpCards+='<div class="loc-card" style="'+cpbg+'" onclick="gp(\''+cpid+'\',\''+cptitleSafe+'\',\''+cpicon+'\')">'
-            +'<div class="loc-ov"><div class="loc-badge explored">'+cpicon+'</div>'
-            +'<div class="loc-name">'+cptitle+'</div>'
-            +'<div class="loc-sub" style="color:'+cpacc.c+'">Apri \u2192</div>'
-            +'<div class="loc-cta">APRI \u25c6</div></div></div>';
-          i++;
+        /* Scansiona in avanti raccogliendo child_page anche se interleaved con altri blocchi */
+        var cpScan=i;
+        while(cpScan<blocks.length){
+          if(blocks[cpScan].type==='child_page'){
+            var cpb=blocks[cpScan],cpd=cpb[cpb.type]||{};
+            var cpid=cpb.id.replace(/-/g,'');
+            var cptitle=cpd.title||'Pagina';
+            /* salta pagine nella mappa interattiva o senza contenuto utile */
+            if(!mapPageIds.has(cpid)&&cptitle.toLowerCase()!=='classi'){
+              var cpni=pages.find(function(n){return n.id===cpid});
+              var cpicon=cpni?cpni.i:'📄';
+              var cpacc=iconAccent(cpicon);
+              var cpbg=iconGradient(cpicon);
+              var cptitleSafe=cptitle.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+              cpCards+='<div class="loc-card" style="'+cpbg+'" onclick="gp(\''+cpid+'\',\''+cptitleSafe+'\',\''+cpicon+'\')">'
+                +'<div class="loc-ov"><div class="loc-badge explored">'+cpicon+'</div>'
+                +'<div class="loc-name">'+cptitle+'</div>'
+                +'<div class="loc-sub" style="color:'+cpacc.c+'">Apri \u2192</div>'
+                +'<div class="loc-cta">APRI \u25c6</div></div></div>';
+            }
+            /* marca questo blocco come già processato */
+            blocks[cpScan]._cpDone=true;
+          }
+          cpScan++;
         }
         if(cpCards){
-          h+='<div class="n-db-lc-wrap" id="'+cpUid+'"><div class="loc-wrap" style="margin:0"><div class="loc-track-outer"><div class="loc-track" data-idx="0" style="gap:16px">'+cpCards+'</div></div><div class="la la-prev" onclick="dbLocNav(this,-1)">&#8249;</div><div class="la la-next" onclick="dbLocNav(this,1)">&#8250;</div></div></div>';
+          h+='<div class="n-db-lc-wrap" id="'+cpUid+'"><div class="loc-wrap" style="margin:0"><div class="loc-track-outer"><div class="loc-track" data-idx="0" style="gap:16px;transform:translateX(0)">'+cpCards+'</div></div><div class="la la-prev" onclick="dbLocNav(this,-1)">&#8249;</div><div class="la la-next" onclick="dbLocNav(this,1)">&#8250;</div></div></div>';
         }
-        i--;
         break;
 
       case'child_database':
@@ -318,9 +328,10 @@ function iconGradient(emoji){
 
 /* navigazione generica per qualsiasi loc-track nel renderer */
 function _dbArrows(wrap,idx,maxIdx){
+  /* Carousel infinito: frecce sempre attive */
   var prev=wrap.querySelector('.la-prev'),next=wrap.querySelector('.la-next');
-  if(prev){prev.style.opacity=idx<=0?'0.2':'1';prev.style.pointerEvents=idx<=0?'none':'auto';}
-  if(next){next.style.opacity=idx>=maxIdx?'0.2':'1';next.style.pointerEvents=idx>=maxIdx?'none':'auto';}
+  if(prev){prev.style.opacity='1';prev.style.pointerEvents='auto';}
+  if(next){next.style.opacity='1';next.style.pointerEvents='auto';}
 }
 function dbLocNav(btn, dir){
   var wrap=btn.closest('.n-db-lc-wrap,.loc-wrap');
@@ -334,12 +345,15 @@ function dbLocNav(btn, dir){
   var step=cardW+gap;
   var trackW=cards.length*step-gap;
   var outerW=(outer?outer.getBoundingClientRect().width:600)||600;
-  /* ceil + 1px tolerance: evita che l'errore floating-point tenga attiva la freccia */
   var maxIdx=Math.max(0,Math.ceil((trackW-outerW+1)/step));
-  var idx=Math.min(maxIdx,Math.max(0,parseInt(track.getAttribute('data-idx')||'0',10)+dir));
+  var curIdx=parseInt(track.getAttribute('data-idx')||'0',10);
+  /* ── Infinite loop: avvolgi agli estremi ── */
+  var idx=curIdx+dir;
+  if(idx>maxIdx)idx=0;
+  if(idx<0)idx=maxIdx;
   track.setAttribute('data-idx',idx);
   track.style.transform='translateX(-'+(idx*step)+'px)';
-  /* aggiorna frecce — cerca nel contenitore corretto */
+  /* frecce sempre visibili nel carousel infinito */
   var arrowWrap=wrap.classList.contains('n-db-lc-wrap')?wrap:wrap.closest('.n-db-lc-wrap');
   if(arrowWrap)_dbArrows(arrowWrap,idx,maxIdx);
 }
@@ -351,16 +365,9 @@ function _initCarouselArrows(container){
     if(!track||!outer)return;
     var cards=track.querySelectorAll('.loc-card');
     if(!cards.length)return;
-    /* aspetta che il layout sia pronto */
-    requestAnimationFrame(function(){
-      var cardW=cards[0].getBoundingClientRect().width||240;
-      var step=cardW+16;
-      var trackW=cards.length*step-16;
-      var outerW=outer.getBoundingClientRect().width||600;
-      var maxIdx=Math.max(0,Math.ceil((trackW-outerW+1)/step));
-      var root=wrap.classList.contains('n-db-lc-wrap')?wrap:(wrap.closest('.n-db-lc-wrap')||wrap);
-      _dbArrows(root,0,maxIdx);
-    });
+    /* frecce sempre abilitate (carousel infinito) */
+    var root=wrap.classList.contains('n-db-lc-wrap')?wrap:(wrap.closest('.n-db-lc-wrap')||wrap);
+    _dbArrows(root,0,999);
   });
 }
 
@@ -414,11 +421,16 @@ async function _loadSingleDb(grid){
           +titleHtml
           +'<div class="loc-wrap" style="margin:0">'
           +'<div class="loc-track-outer">'
-          +'<div class="loc-track" data-idx="0" style="gap:16px">'+cardsHtml+'</div>'
+          +'<div class="loc-track" data-idx="0" style="gap:16px;transform:translateX(0)">'+cardsHtml+'</div>'
           +'</div>'
           +'<div class="la la-prev" onclick="dbLocNav(this,-1)">‹</div>'
           +'<div class="la la-next" onclick="dbLocNav(this,1)">›</div>'
           +'</div></div>';
+        /* init arrows on newly injected carousel */
+        setTimeout(function(){
+          var newWrap=document.getElementById(uid);
+          if(newWrap)_dbArrows(newWrap,0,999);
+        },50);
       }else{
         /* fallback: grid rimpiazzata inline */
         grid.outerHTML='<div class="loc-track" data-idx="0" style="gap:16px;display:flex">'+cardsHtml+'</div>';
