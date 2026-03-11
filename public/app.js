@@ -83,7 +83,7 @@ if(_mainEl){
     var stBtn=document.getElementById('scroll-top-btn');if(stBtn)stBtn.classList.toggle('vis',s>300);
   });
 }
-function scrollTop(){if(_mainEl)_mainEl.scrollTo({top:0,behavior:'smooth'});}
+function goToTop(){if(_mainEl)_mainEl.scrollTo({top:0,behavior:'smooth'});}
 
 /* ════ NAV — xfade ════ */
 var _busy=false;
