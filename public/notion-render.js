@@ -525,14 +525,32 @@ async function _gpRender(id,label,icon){
   if(!data){try{var _ss=sessionStorage.getItem(cacheKey);if(_ss)data=JSON.parse(_ss);}catch(e){}}
   if(data)_memCache[cacheKey]=data; /* warm up memory cache */
 
+  /* ── fetchWithRetry: timeout 12s, 1 retry automatico in caso di errore ── */
+  async function fetchWithRetry(url,attempt){
+    attempt=attempt||0;
+    var ctrl=new AbortController();
+    var timer=setTimeout(function(){ctrl.abort();},12000);
+    try{
+      var r=await fetch(url,{signal:ctrl.signal});
+      clearTimeout(timer);
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      return await r.json();
+    }catch(e){
+      clearTimeout(timer);
+      if(attempt<1){
+        /* attendi 800ms e riprova una volta */
+        await new Promise(function(res){setTimeout(res,800);});
+        return fetchWithRetry(url,attempt+1);
+      }
+      throw e;
+    }
+  }
+
   try{
     if(!data){
-      var timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('Timeout'))},25000)});
-      var r=await Promise.race([fetch('/api/notion?pageId='+id),timeout]);
-      if(!r.ok)throw new Error('HTTP '+r.status);
-      data=await r.json();
-      _memCache[cacheKey]=data; /* sempre in memoria */
-      try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){} /* best-effort */
+      data=await fetchWithRetry('/api/notion?pageId='+id);
+      _memCache[cacheKey]=data;
+      try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){}
     }
     var pg=data.page,bl=data.blocks;
     var ta=pg.properties&&pg.properties.title&&pg.properties.title.title||[];
@@ -615,7 +633,19 @@ async function _gpRender(id,label,icon){
     /* bottom nav active */
     if(typeof setBnavActive==='function')setBnavActive('');
   }catch(e){
-    document.getElementById('pbody').innerHTML='<div class="errbox">⚠️ '+e.message+'</div>';
+    var isTimeout=e.name==='AbortError'||e.message.indexOf('Timeout')>-1||e.message.indexOf('abort')>-1;
+    var errMsg=isTimeout?'La pagina ha impiegato troppo tempo a caricarsi.':'Errore: '+e.message;
+    document.getElementById('pbody').innerHTML=
+      '<div class="errbox">'
+      +'<div style="font-size:28px;margin-bottom:12px">⚠️</div>'
+      +'<div style="margin-bottom:8px">'+errMsg+'</div>'
+      +'<button onclick="(function(){'
+        +'try{sessionStorage.removeItem(\'pg_'+id+'\');}catch(ex){}'
+        +'delete _memCache[\'pg_'+id+'\'];'
+        +'document.getElementById(\'pbody\').innerHTML=\'<div class=\\\"ldwrap\\\"><div class=\\\"spin\\\"></div></div>\';'
+        +'_gpRender(\''+id+'\',\''+label.replace(/'/g,"\\'").replace(/"/g,'\\"')+'\',\''+icon+'\');'
+      +'})()" style="margin-top:12px;padding:8px 20px;background:rgba(200,155,60,.12);border:1px solid rgba(200,155,60,.3);color:var(--gold2);font-family:\'Cinzel\',serif;font-size:11px;letter-spacing:.1em;cursor:pointer;">↺ RIPROVA</button>'
+      +'</div>';
   }
 }
 
