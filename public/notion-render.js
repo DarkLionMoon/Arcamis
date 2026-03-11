@@ -4,6 +4,26 @@
 
 var navStack = []; /* navigation history [{id,label,icon},...] */
 
+/* ID pagine presenti nella mappa interattiva — non mostrare come child_page link */
+var mapPageIds = new Set([
+  '3090274fdc1c80e1a365ce1c36873455', /* Arcamis */
+  '30d0274fdc1c800999feeb0ca6669b22', /* Selva Fogliabruna */
+  '30d0274fdc1c8016b113d5c2d7662d8f', /* Foresta dello Smarrimento */
+  '30d0274fdc1c804b9cb7e366f02bd635', /* Volonx */
+  '31f0274fdc1c8059a923c73da185a0e3', /* Vigilius */
+  '31f0274fdc1c8019945af2b26306462f', /* Galeton */
+  '30d0274fdc1c803387c4fda013b857e9', /* Lago di Gromot */
+  '30d0274fdc1c8090aee7ed0430170414', /* Forte Vigilus */
+  '31f0274fdc1c8075b0dec2e2a6bc359e', /* Riva di Ferro */
+  '31f0274fdc1c805b89b8f0678463e615', /* Fumofosco */
+  '31f0274fdc1c808191abe4df86d176e6', /* Rovine di Kaldur */
+  '31e0274fdc1c80f3a3cee348f59cede0', /* Rivorosso */
+  '30d0274fdc1c80038beec3f444e45f8b', /* Circolo dello Smarrimento */
+  '30d0274fdc1c80cf8cdaf328e339dfc7', /* Dimora degli Ursidi */
+  '3130274fdc1c80848fe5dfd7d2610c06', /* La Caverna delle Talpe */
+  '31e0274fdc1c80f581f4f9cd7284bff0', /* Miniera Bruciascoria */
+]);
+
 /* ── Accent color dall'icona ── */
 function iconAccent(emoji){
   if(!emoji)return{c:'rgba(200,155,60,.7)',bg:'rgba(200,155,60,.06)'};
@@ -187,33 +207,23 @@ function renderBlocks(blocks,isRoot){
 
       case'child_page':
         var cpCards='';
-        while(i<blocks.length&&blocks[i].type==='child_page'){
-          var cpb=blocks[i],cpd=cpb[cpb.type]||{};
-          var cpid=cpb.id.replace(/-/g,'');
-          var cpni=pages.find(function(n){return n.id===cpid});
-          var cpicon=cpni?cpni.i:'📄';
-          var cptitle=cpd.title||'Pagina';
-          var cpacc=iconAccent(cpicon);
-          cpCards+='<div class="n-cp" style="--cpacc:'+cpacc.c+';--cpaccbg:'+cpacc.bg+'" onclick="gp(\''+cpid+'\',\''+cptitle.replace(/'/g,"\\'")+'\',\''+cpicon+'\')">'
-            +'<div class="n-cp-thumb" style="background:'+cpacc.bg+'">'+cpicon+'</div>'
-            +'<div class="n-cp-info"><div class="n-cp-title">'+cptitle+'</div>'
-            +'<div class="n-cp-cta">Apri →</div></div></div>';
-          i++;
-      case'child_page':
-        var cpCards='';
         var cpUid='cp-'+Math.random().toString(36).slice(2,8);
         while(i<blocks.length&&blocks[i].type==='child_page'){
           var cpb=blocks[i],cpd=cpb[cpb.type]||{};
           var cpid=cpb.id.replace(/-/g,'');
+          /* salta pagine presenti nella mappa interattiva */
+          if(mapPageIds.has(cpid)){i++;continue;}
           var cpni=pages.find(function(n){return n.id===cpid});
           var cpicon=cpni?cpni.i:'📄';
           var cptitle=cpd.title||'Pagina';
           var cpacc=iconAccent(cpicon);
           var cpbg=iconGradient(cpicon);
-          cpCards+='<div class="loc-card" style="'+cpbg+'" onclick="gp(\''+cpid+'\',\''+cptitle.replace(/'/g,"\\'")+'\',\''+cpicon+'\')"><div class="loc-ov"><div class="loc-badge explored">'+cpicon+'</div><div class="loc-name">'+cptitle+'</div><div class="loc-sub" style="color:'+cpacc.c+'">Apri \u2192</div><div class="loc-cta">APRI \u25c6</div></div></div>';
+          cpCards+='<div class="loc-card" style="'+cpbg+'" onclick="gp(''+cpid+'',''+cptitle.replace(/'/g,"\'")+'',''+cpicon+'')"><div class="loc-ov"><div class="loc-badge explored">'+cpicon+'</div><div class="loc-name">'+cptitle+'</div><div class="loc-sub" style="color:'+cpacc.c+'">Apri →</div><div class="loc-cta">APRI ◆</div></div></div>';
           i++;
         }
-        h+='<div class="n-db-lc-wrap" id="'+cpUid+'"><div class="loc-wrap" style="margin:0"><div class="loc-track-outer"><div class="loc-track" data-idx="0" style="gap:16px">'+cpCards+'</div></div><div class="la la-prev" onclick="dbLocNav(this,-1)">&#8249;</div><div class="la la-next" onclick="dbLocNav(this,1)">&#8250;</div></div></div>';
+        if(cpCards){
+          h+='<div class="n-db-lc-wrap" id="'+cpUid+'"><div class="loc-wrap" style="margin:0"><div class="loc-track-outer"><div class="loc-track" data-idx="0" style="gap:16px">'+cpCards+'</div></div><div class="la la-prev" onclick="dbLocNav(this,-1)">&#8249;</div><div class="la la-next" onclick="dbLocNav(this,1)">&#8250;</div></div></div>';
+        }
         i--;
         break;
 
