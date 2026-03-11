@@ -968,10 +968,30 @@ details[open]>.n-ts::before{transform:rotate(90deg)}
 .n-image{margin:16px 0;text-align:center}
 .n-image img{max-width:100%;border:1px solid var(--bdr2);box-shadow:0 8px 28px rgba(0,0,0,.7)}
 .n-image figcaption{margin-top:7px;font-size:12px;color:var(--text3);font-style:italic}
-.n-cp{display:inline-flex;align-items:center;gap:11px;padding:10px 16px;background:var(--bg3);border:1px solid var(--bdr);color:var(--parch);cursor:pointer;font-size:15px;transition:all .15s;margin:3px 0}
-.n-cp:hover{background:var(--bg4);border-color:var(--gold);color:var(--gold3);transform:translateX(4px);box-shadow:var(--glow2)}
-.n-cp .cpa{margin-left:auto;color:var(--text3);font-size:10px;transition:.15s}
-.n-cp:hover .cpa{color:var(--gold)}
+/* ── child_page card grid ── */
+.n-cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin:20px 0}
+.n-cp{
+  position:relative;overflow:hidden;cursor:pointer;
+  background:linear-gradient(160deg,rgba(16,20,30,.97),rgba(8,10,18,.99));
+  border:1px solid rgba(200,155,60,.14);
+  padding:0;transition:transform .25s,border-color .25s,box-shadow .25s;
+  display:flex;flex-direction:column;
+}
+.n-cp::after{
+  content:'';position:absolute;top:0;left:-80%;width:55%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(200,155,60,.09),transparent);
+  transform:skewX(-18deg);transition:left .45s;pointer-events:none;z-index:3;
+}
+.n-cp:hover{transform:translateY(-4px);border-color:rgba(200,155,60,.38);box-shadow:0 10px 36px rgba(0,0,0,.5),0 0 22px rgba(200,155,60,.08)}
+.n-cp:hover::after{left:130%}
+.n-cp-thumb{height:80px;display:flex;align-items:center;justify-content:center;font-size:38px;background:rgba(200,155,60,.04);position:relative;overflow:hidden}
+.n-cp-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(8,10,18,.8))}
+.n-cp-info{padding:10px 14px 12px;flex:1}
+.n-cp-title{font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--parch);letter-spacing:.06em;margin-bottom:3px;line-height:1.3;transition:.18s}
+.n-cp:hover .n-cp-title{color:var(--gold3)}
+.n-cp-cta{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.12em;color:var(--text3);opacity:.6;transition:.18s}
+.n-cp:hover .n-cp-cta{color:var(--gold);opacity:1}
+@media(max-width:600px){.n-cp-grid{grid-template-columns:1fr 1fr}}
 .n-twrap{overflow-x:auto;margin:14px 0}
 table.n-tbl{width:100%;border-collapse:collapse;font-size:15px}
 table.n-tbl th{background:rgba(0,0,0,.4);color:var(--gold2);font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.12em;padding:9px 13px;border:1px solid var(--bdr2);text-align:left;text-transform:uppercase}
@@ -2585,7 +2605,26 @@ function renderBlocks(blocks){
       case'toggle':h+='<details><summary class="n-ts">'+rt(d.rich_text)+'</summary><div class="n-tc">'+(b.children?renderBlocks(b.children):'')+'</div></details>';break;
       case'code':h+='<pre class="n-code"><code>'+(d.rich_text||[]).map(function(r){return r.plain_text}).join('').replace(/</g,'&lt;')+'</code></pre>';break;
       case'image':var src=d.type==='external'?(d.external&&d.external.url):(d.file&&d.file.url);if(src)h+='<figure class="n-image"><img src="'+src+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'"/>'+(d.caption&&d.caption.length?'<figcaption>'+rt(d.caption)+'</figcaption>':'')+'</figure>';break;
-      case'child_page':var pid=b.id.replace(/-/g,'');var ni=pages.find(function(n){return n.id===pid});h+='<div class="n-cp" onclick="gp(\''+pid+'\',\''+(d.title||'').replace(/'/g,"\\'")+'\',\''+(ni?ni.i:'📄')+'\')">'+(ni?ni.i:'📄')+' '+(d.title||'Pagina')+'<span class="cpa">▶</span></div>';break;
+      case'child_page':
+        /* group consecutive child_pages into a card grid */
+        var cpStart=i;
+        var cpCards='';
+        while(i<blocks.length&&blocks[i].type==='child_page'){
+          var cpb=blocks[i],cpd=cpb[cpb.type]||{};
+          var cpid=cpb.id.replace(/-/g,'');
+          var cpni=pages.find(function(n){return n.id===cpid});
+          var cpicon=cpni?cpni.i:'📄';
+          var cptitle=cpd.title||'Pagina';
+          cpCards+='<div class="n-cp" onclick="gp(\''+cpid+'\',\''+cptitle.replace(/'/g,"\\'")+'\',\''+cpicon+'\')">'
+            +'<div class="n-cp-thumb">'+cpicon+'</div>'
+            +'<div class="n-cp-info"><div class="n-cp-title">'+cptitle+'</div>'
+            +'<div class="n-cp-cta">Apri →</div></div>'
+            +'</div>';
+          i++;
+        }
+        h+='<div class="n-cp-grid">'+cpCards+'</div>';
+        i--; /* compensate for loop i++ */
+        break;
       case'child_database':
         var dbRawId=b.id.replace(/-/g,'');
         h+='<div class="n-db-wrap"><div class="n-db-title">'+(d.title||'Database')+'</div>'
