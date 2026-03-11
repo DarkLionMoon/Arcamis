@@ -5,6 +5,16 @@
 var navStack = []; /* navigation history [{id,label,icon},...] */
 
 /* ID pagine presenti nella mappa interattiva — non mostrare come child_page link */
+/* ── Cover URL: usa proxy per URL S3 Notion che scadono ── */
+function safeCoverUrl(url){
+  if(!url)return null;
+  /* URL S3 Notion → passa per proxy /api/notion?img= */
+  if(url.indexOf('s3.us-west')>-1||url.indexOf('prod-files-secure')>-1){
+    return'/api/notion?img='+encodeURIComponent(url);
+  }
+  return url;
+}
+
 var mapPageIds = new Set([
   '3090274fdc1c80e1a365ce1c36873455', /* Arcamis */
   '30d0274fdc1c800999feeb0ca6669b22', /* Selva Fogliabruna */
@@ -89,17 +99,17 @@ function renderBlocks(blocks,isRoot){
         if(d.is_toggleable&&b.children){
           h+='<details class="n-toggle n-th"><summary class="n-h1 n-tsum">'+rt(d.rich_text)+'</summary>'
             +'<div class="n-tc">'+renderBlocks(b.children)+'</div></details>';
-        }else{h+='<h2 class="n-h1">'+rt(d.rich_text)+'</h2>';}break;
+        }else{h+='<h2 class="n-h1 rr">'+rt(d.rich_text)+'</h2>';}break;
       case'heading_2':
         if(d.is_toggleable&&b.children){
           h+='<details class="n-toggle n-th"><summary class="n-h2 n-tsum">'+rt(d.rich_text)+'</summary>'
             +'<div class="n-tc">'+renderBlocks(b.children)+'</div></details>';
-        }else{h+='<h3 class="n-h2">'+rt(d.rich_text)+'</h3>';}break;
+        }else{h+='<h3 class="n-h2 rr">'+rt(d.rich_text)+'</h3>';}break;
       case'heading_3':
         if(d.is_toggleable&&b.children){
           h+='<details class="n-toggle n-th"><summary class="n-h3 n-tsum">'+rt(d.rich_text)+'</summary>'
             +'<div class="n-tc">'+renderBlocks(b.children)+'</div></details>';
-        }else{h+='<h4 class="n-h3">'+rt(d.rich_text)+'</h4>';}break;
+        }else{h+='<h4 class="n-h3 rr">'+rt(d.rich_text)+'</h4>';}break;
 
       case'bulleted_list_item':
         h+='<ul class="n-ul"><li>'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</li></ul>';break;
@@ -306,23 +316,51 @@ function iconGradient(emoji){
 }
 
 /* navigazione generica per qualsiasi loc-track nel renderer */
+function _dbArrows(wrap,idx,maxIdx){
+  var prev=wrap.querySelector('.la-prev'),next=wrap.querySelector('.la-next');
+  if(prev){prev.style.opacity=idx<=0?'0.2':'1';prev.style.pointerEvents=idx<=0?'none':'auto';}
+  if(next){next.style.opacity=idx>=maxIdx?'0.2':'1';next.style.pointerEvents=idx>=maxIdx?'none':'auto';}
+}
 function dbLocNav(btn, dir){
-  var wrap=btn.closest('.n-db-lc-wrap');
+  var wrap=btn.closest('.n-db-lc-wrap,.loc-wrap');
   if(!wrap)return;
   var track=wrap.querySelector('.loc-track');
+  var outer=wrap.querySelector('.loc-track-outer');
   var cards=track?track.querySelectorAll('.loc-card'):[];
   if(!cards.length)return;
-  var idx=parseInt(track.getAttribute('data-idx')||'0',10)+dir;
   var cardW=cards[0].getBoundingClientRect().width||240;
   var gap=16;
   var step=cardW+gap;
   var trackW=cards.length*step-gap;
-  var outerW=wrap.querySelector('.loc-track-outer').getBoundingClientRect().width||600;
-  var maxPx=Math.max(0,trackW-outerW);
-  var maxIdx=Math.floor(maxPx/step);
-  if(idx<0)idx=0;if(idx>maxIdx)idx=maxIdx;
+  var outerW=(outer?outer.getBoundingClientRect().width:600)||600;
+  /* ceil + 1px tolerance: evita che l'errore floating-point tenga attiva la freccia */
+  var maxIdx=Math.max(0,Math.ceil((trackW-outerW+1)/step));
+  var idx=Math.min(maxIdx,Math.max(0,parseInt(track.getAttribute('data-idx')||'0',10)+dir));
   track.setAttribute('data-idx',idx);
   track.style.transform='translateX(-'+(idx*step)+'px)';
+  /* aggiorna frecce — cerca nel contenitore corretto */
+  var arrowWrap=wrap.classList.contains('n-db-lc-wrap')?wrap:wrap.closest('.n-db-lc-wrap');
+  if(arrowWrap)_dbArrows(arrowWrap,idx,maxIdx);
+}
+/* inizializza frecce dopo che un carosello viene iniettato nel DOM */
+function _initCarouselArrows(container){
+  container.querySelectorAll('.n-db-lc-wrap,.loc-wrap').forEach(function(wrap){
+    var track=wrap.querySelector('.loc-track');
+    var outer=wrap.querySelector('.loc-track-outer');
+    if(!track||!outer)return;
+    var cards=track.querySelectorAll('.loc-card');
+    if(!cards.length)return;
+    /* aspetta che il layout sia pronto */
+    requestAnimationFrame(function(){
+      var cardW=cards[0].getBoundingClientRect().width||240;
+      var step=cardW+16;
+      var trackW=cards.length*step-16;
+      var outerW=outer.getBoundingClientRect().width||600;
+      var maxIdx=Math.max(0,Math.ceil((trackW-outerW+1)/step));
+      var root=wrap.classList.contains('n-db-lc-wrap')?wrap:(wrap.closest('.n-db-lc-wrap')||wrap);
+      _dbArrows(root,0,maxIdx);
+    });
+  });
 }
 
 async function loadDbGalleries(container){
@@ -350,8 +388,9 @@ async function _loadSingleDb(grid){
       var cardsHtml=data.pages.map(function(p){
         var icon=p.icon||'📄';
         var acc=iconAccent(icon);
-        var bg=p.cover
-          ?'background-image:url("'+p.cover+'");background-size:cover;background-position:center'
+        var coverSafe=safeCoverUrl(p.cover);
+        var bg=coverSafe
+          ?'background-image:url("'+coverSafe+'");background-size:cover;background-position:center'
           :'background:'+iconGradient(icon);
         var title=p.title.replace(/'/g,"\\'").replace(/"/g,'&quot;');
         return'<div class="loc-card" style="'+bg+'" onclick="gp(\''+p.id+'\',\''+title+'\',\''+icon+'\')">'
@@ -438,11 +477,22 @@ async function gp(id,label,icon,_fromPop){
   phHero.style.removeProperty('--ph-acc');
   phHero.style.removeProperty('--ph-accbg');
   phCrumb.innerHTML=buildCrumb(label);
-  document.getElementById('pbody').innerHTML='<div class="ldwrap"><div class="spin"></div></div>';
+  var _pb=document.getElementById('pbody');
   document.title=label+' — Arcamis';
-  if(hv.style.display==='block')xfade(hv,pv);
-  else pv.style.display='block';
-  document.getElementById('main').scrollTo({top:0});
+  if(hv.style.display==='block'){
+    _pb.innerHTML='<div class="ldwrap"><div class="spin"></div></div>';
+    xfade(hv,pv);
+  } else {
+    /* fade pv→pv: dissolvenza breve prima di mostrare il loader */
+    _pb.style.opacity='0';_pb.style.transform='translateY(6px)';
+    _pb.style.transition='opacity .15s ease,transform .15s ease';
+    setTimeout(function(){
+      _pb.innerHTML='<div class="ldwrap"><div class="spin"></div></div>';
+      _pb.style.opacity='1';_pb.style.transform='';
+    },150);
+    pv.style.display='block';
+  }
+  document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
   await _gpRender(id,label,icon);
 }
 
@@ -543,6 +593,8 @@ async function _gpRender(id,label,icon){
       },{once:true});
     });
     initFadeIn(pbody);
+    /* whisper sidebar + toast hook */
+    setTimeout(function(){if(window.buildWhisperNav)window.buildWhisperNav();_initCarouselArrows(pbody);},200);
     /* registra nei recenti */
     if(typeof addRecente==='function')addRecente(id,ptitle,picon);
     /* bottom nav active */
