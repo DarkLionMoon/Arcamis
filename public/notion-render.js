@@ -386,9 +386,18 @@ async function loadDbGalleries(container){
 async function _loadSingleDb(grid){
     var dbId=grid.id.replace('db-','');
     try{
-      var r=await fetch('/api/notion?dbId='+dbId);
-      if(!r.ok)throw new Error('HTTP '+r.status);
-      var data=await r.json();
+      /* ── Prima prova il file statico ── */
+      var data=null;
+      try{
+        var sr=await fetch('/data/db/'+dbId+'.json');
+        if(sr.ok)data=await sr.json();
+      }catch(se){}
+      /* ── Fallback all'API live ── */
+      if(!data){
+        var r=await fetch('/api/notion?dbId='+dbId);
+        if(!r.ok)throw new Error('HTTP '+r.status);
+        data=await r.json();
+      }
       if(!data.pages||!data.pages.length){
         grid.innerHTML='<div class="n-db-loading">Nessun elemento trovato.</div>';return;
       }
@@ -525,7 +534,7 @@ async function _gpRender(id,label,icon){
   if(!data){try{var _ss=sessionStorage.getItem(cacheKey);if(_ss)data=JSON.parse(_ss);}catch(e){}}
   if(data)_memCache[cacheKey]=data; /* warm up memory cache */
 
-  /* ── fetchWithRetry: timeout 12s, 1 retry automatico in caso di errore ── */
+  /* ── fetchWithRetry: prova prima il file statico, poi l'API come fallback ── */
   async function fetchWithRetry(url,attempt){
     attempt=attempt||0;
     var ctrl=new AbortController();
@@ -538,7 +547,6 @@ async function _gpRender(id,label,icon){
     }catch(e){
       clearTimeout(timer);
       if(attempt<1){
-        /* attendi 800ms e riprova una volta */
         await new Promise(function(res){setTimeout(res,800);});
         return fetchWithRetry(url,attempt+1);
       }
@@ -548,7 +556,19 @@ async function _gpRender(id,label,icon){
 
   try{
     if(!data){
-      data=await fetchWithRetry('/api/notion?pageId='+id);
+      /* ── Prova prima il file statico (build-time) — istantaneo ── */
+      var staticUrl='/data/pages/'+id+'.json';
+      var liveUrl='/api/notion?pageId='+id;
+      try{
+        var sr=await fetch(staticUrl);
+        if(sr.ok){
+          data=await sr.json();
+        }
+      }catch(se){}
+      /* ── Fallback all'API live se il file statico non esiste ── */
+      if(!data){
+        data=await fetchWithRetry(liveUrl);
+      }
       _memCache[cacheKey]=data;
       try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){}
     }
