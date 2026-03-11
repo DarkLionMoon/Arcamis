@@ -83,7 +83,18 @@ if(_mainEl){
     var stBtn=document.getElementById('scroll-top-btn');if(stBtn)stBtn.classList.toggle('vis',s>300);
   });
 }
-function goToTop(){if(_mainEl)_mainEl.scrollTo({top:0,behavior:'smooth'});}
+function goToTop(){
+  var m=document.getElementById('main');
+  if(!m)return;
+  /* scrollTo con smooth non funziona su iOS Safari — uso scrollTop diretto */
+  try{m.scrollTo({top:0,behavior:'smooth'});}catch(e){}
+  m.scrollTop=0;
+}
+/* bind via JS per essere indipendenti dalla versione HTML in cache */
+document.addEventListener('DOMContentLoaded',function(){
+  var btn=document.getElementById('scroll-top-btn');
+  if(btn)btn.onclick=function(){goToTop();};
+});
 
 /* ════ NAV — xfade ════ */
 var _busy=false;
@@ -262,6 +273,11 @@ window.addEventListener('load',function(){setTimeout(function(){PREFETCH_IDS.for
 function setBnavActive(key){
   document.querySelectorAll('.bnav-item').forEach(function(el){el.classList.toggle('active',el.dataset.k===key);});
 }
+/* forza il binding del bottom nav lavori via JS, indipendente dall'HTML in cache */
+document.addEventListener('DOMContentLoaded',function(){
+  var lavoriBtn=document.querySelector('.bnav-item[data-k="lavori"]');
+  if(lavoriBtn)lavoriBtn.onclick=function(){toggleMobileNav();};
+});
 
 /* ════ MAPPA INTERATTIVA ════ */
 (function(){
