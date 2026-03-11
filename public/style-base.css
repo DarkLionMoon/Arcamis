@@ -184,7 +184,7 @@ nav#tnav{display:flex;align-items:stretch}
 /* ════════════════════════════════════
    MAIN
 ════════════════════════════════════ */
-#main{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;z-index:1}
+#main{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;z-index:1;-webkit-overflow-scrolling:touch}
 
 /* ── Cross-fade transitions ── */
 .vp{transition:opacity .17s ease,transform .17s ease}
