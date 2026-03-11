@@ -11,7 +11,6 @@ var pages=[
   {k:'materiale',  l:'Materiale approvato',      i:'📋', id:'3130274fdc1c807eb61fde24e8236659'},
   {k:'inizia',     l:'Come si inizia',           i:'🌟', id:'2dd222f22ef8413f8cb48f03bbb4f4b0'},
   {k:'avanti',     l:'Andando avanti',           i:'📈', id:'5cea525d149f4acb9c59007bf6b3d5ff'},
-  {k:'classi',     l:'Classi',                  i:'🎭', id:'30a0274fdc1c804ab56bd3943add26d2'},
   {k:'galleria',   l:'Galleria PG',             i:'🖼️', id:'2fd0274fdc1c80d8b948c4133f874f28'},
   {k:'biblioteca', l:'Biblioteca',              i:'📚', id:'2f00274fdc1c8089bfe6c24434d53b67'},
   {k:'bottega',    l:'Bottega farmaceutica',    i:'💊', id:'2f00274fdc1c801c9697e75caa8d5f13'},
