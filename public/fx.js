@@ -274,19 +274,22 @@ initFadeIn();
     })(i);
   }
 })();
-/* ── Lume di Candela — vignette radiale che segue il cursore ── */
+/* ── Lume di Candela — vignette radiale che segue il cursore (OFF di default) ── */
 (function(){
   var ov=document.getElementById('candlelight-overlay');
   if(!ov)return;
-  var cx=50,cy=50; /* percentuale iniziale */
-  var tx=50,ty=50; /* target (lerp) */
-  var enabled=true;
-  /* toggle con doppio click su #candlelight-toggle (se presente) */
+  var cx=50,cy=50;
+  var tx=50,ty=50;
+  var enabled=false; /* OFF di default */
   window.toggleCandlelight=function(){
     enabled=!enabled;
-    ov.style.opacity=enabled?'1':'0';
+    ov.classList.toggle('cl-on',enabled);
+    var btn=document.getElementById('candle-toggle');
+    if(btn){
+      btn.classList.toggle('cl-on',enabled);
+      btn.title=enabled?'Spegni lume di candela':'Lume di candela';
+    }
   };
-  /* lerp fluido del gradiente */
   function tick(){
     cx+=(tx-cx)*0.08;
     cy+=(ty-cy)*0.08;
@@ -298,7 +301,6 @@ initFadeIn();
     tx=(e.clientX/window.innerWidth)*100;
     ty=(e.clientY/window.innerHeight)*100;
   });
-  /* su mobile: sposta verso centro */
   document.addEventListener('touchmove',function(e){
     var t=e.touches[0];
     tx=(t.clientX/window.innerWidth)*100;
