@@ -39,7 +39,7 @@
 
     <!-- ── Regole ▾ ── -->
     <div class="tn-drop" id="dd-regole">
-      <div class="tn" onclick=\"toggleDd('dd-regole',event)\">Regole</div>
+      <div class="tn" onclick="toggleDd('dd-regole',event)">Regole</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Regolamento</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')"><span class="tn-ii">⚔️</span>Gameplay</div>
@@ -50,7 +50,7 @@
 
     <!-- ── Personaggio ▾ ── -->
     <div class="tn-drop" id="dd-pg">
-      <div class="tn" onclick=\"toggleDd('dd-pg',event)\">Personaggio</div>
+      <div class="tn" onclick="toggleDd('dd-pg',event)">Personaggio</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Il tuo PG</div>
         <div class="tn-item" onclick="closeDd();gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')"><span class="tn-ii">🌟</span>Come si inizia</div>
@@ -63,7 +63,7 @@
 
     <!-- ── Lavori ▾ ── -->
     <div class="tn-drop" id="dd-lavori">
-      <div class="tn" onclick=\"toggleDd('dd-lavori',event)\">Lavori</div>
+      <div class="tn" onclick="toggleDd('dd-lavori',event)">Lavori</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Gilde &amp; Mestieri</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️')"><span class="tn-ii">🗡️</span>Gilda avventurieri</div>
@@ -81,7 +81,7 @@
 
     <!-- ── Lore ▾ ── -->
     <div class="tn-drop" id="dd-lore">
-      <div class="tn" onclick=\"toggleDd('dd-lore',event)\">Lore</div>
+      <div class="tn" onclick="toggleDd('dd-lore',event)">Lore</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Il Mondo</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📖')"><span class="tn-ii">📖</span>Storia del mondo</div>
@@ -803,5 +803,6 @@ if('serviceWorker' in navigator){
 </script>
 <div id="dust-vfx"></div>
 <div id="candlelight-overlay"></div>
+<button id="candle-toggle" onclick="toggleCandlelight()" title="Lume di candela">🕯</button>
 </body>
 </html>
