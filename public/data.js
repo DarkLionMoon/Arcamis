@@ -31,12 +31,12 @@ var pages=[
 
 /* ID da prefetchare all'avvio */
 var PREFETCH_IDS=[
-  '2f00274fdc1c8065a11ff45192aa5dcb', /* Gameplay      */
-  '2f00274fdc1c800b9d8fc366e8e40c5c', /* Regole        */
-  '2f00274fdc1c801b8c13cefd9e15694e', /* Gilda         */
-  '2f00274fdc1c80faa99eda064ef0fabc', /* Locanda       */
-  '2f00274fdc1c80679bd3c3df8a1fa040', /* Pantheon      */
-  '2f00274fdc1c806f8f17dbc6532d2211', /* Lore          */
+  '2f00274fdc1c8065a11ff45192aa5dcb', /* Gameplay         */
+  '2f00274fdc1c800b9d8fc366e8e40c5c', /* Regole           */
+  '2dd222f22ef8413f8cb48f03bbb4f4b0', /* Come si inizia   */
+  '5cea525d149f4acb9c59007bf6b3d5ff', /* Andando avanti   */
+  '2f00274fdc1c801b8c13cefd9e15694e', /* Gilda            */
+  '2f00274fdc1c80faa99eda064ef0fabc', /* Locanda          */
 ];
 
 var CHANGELOG_ID='3000274fdc1c8033a214c44a1aa7f01f';
