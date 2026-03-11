@@ -4,88 +4,51 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Arcamis</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Pro:wght@300;400;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style-base.css">
 <link rel="stylesheet" href="style-page.css">
 </head>
 <body>
-<div id="site-loader">
-  <div class="loader-rune">⚔</div>
-  <div class="loader-sub">Arcamis</div>
-  <div class="loader-dots">
-    <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
-  </div>
-</div>
-
-<div id="ptr-indicator">↓ Rilascia per aggiornare</div>
-<div id="scroll-top-btn" onclick="goToTop()">▲</div>
-
+<div id="site-loader"><div class="loader-rune">⚔</div></div>
 <div id="topbar">
-  <div id="tlogo" onclick="showHome()">
-    <div id="liw"><img src="https://fontmeme.com/permalink/240212/8e80653634e56598c92a9b360b372f5d.png" alt="Arcamis"></div>
-  </div>
-  
+  <div id="tlogo" onclick="showHome()"><div id="liw"><img src="https://fontmeme.com/permalink/240212/8e80653634e56598c92a9b360b372f5d.png"></div></div>
   <div id="nav-desktop">
-    <div class="nav-item has-drop">
-      Personaggio ▾
+    <div class="nav-item has-drop">Personaggio ▾
       <div class="nav-drop">
         <a href="#" onclick="gp('2f00274fdc1c801a9b39d8d69800f7a8','Il tuo Eroe','🛡️')">Scheda Personaggio</a>
         <a href="#" onclick="gp('3130274fdc1c807eb61fde24e8236659','Materiale Approvato','📋')">Materiale Approvato</a>
         <a href="#" onclick="gp('2f00274fdc1c80679bd3c3df8a1fa040','Pantheon','🛐')">Divinità e Culti</a>
       </div>
     </div>
-    <div class="nav-item has-drop">
-      Luoghi ▾
+    <div class="nav-item has-drop">Luoghi ▾
       <div class="nav-drop">
         <a href="#" onclick="showHome();document.getElementById('map-sec').scrollIntoView();">🗺️ Mappa Interattiva</a>
       </div>
     </div>
   </div>
-
   <div id="t-actions">
     <button id="theme-toggle" onclick="toggleTheme()">☀️</button>
     <button id="menu-btn" onclick="ovo()">☰</button>
   </div>
 </div>
-
 <div id="home-page">
   <div id="hero">
-    <div id="hero-bg"></div>
     <div id="hero-content">
       <h1 class="cinzel">Arcamis</h1>
-      <p>Cronache dell'Età del Bronzo</p>
       <div class="hero-btns">
-        <button class="btn-gold" onclick="gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Inizia Qui','🌟')">INIZIA L'AVVENTURA</button>
-        <button class="btn-outline" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Regolamento','⚔️')">REGOLE DI GIOCO</button>
+        <button class="btn-gold" onclick="gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Inizia Qui','🌟')">INIZIA</button>
       </div>
     </div>
   </div>
-
-  <div id="map-sec" class="hsec">
-    <h2 class="cinzel-title">Mappa di Arcamis</h2>
-    <div class="map-container">
-      <img src="mappa.png" id="arcamis-map" alt="Mappa">
-    </div>
-  </div>
+  <div id="map-sec" class="hsec"><div class="map-container"><img src="mappa.png" id="arcamis-map"></div></div>
 </div>
-
 <div id="dynamic-page" class="hidden">
   <div id="page-hero">
     <div class="ph-covbg" id="p-cover"></div>
-    <div class="ph-overlay"></div>
-    <div class="ph-content">
-      <div id="p-icon"></div>
-      <h1 id="p-title" class="cinzel"></h1>
-      <div id="p-breadcrumb"></div>
-    </div>
+    <div class="ph-content"><h1 id="p-title" class="cinzel"></h1></div>
   </div>
   <div id="p-body"></div>
 </div>
-
-<script src="data.js"></script>
-<script src="fx.js"></script>
-<script src="notion-render.js"></script>
-<script src="app.js"></script>
+<script src="data.js"></script><script src="fx.js"></script><script src="notion-render.js"></script><script src="app.js"></script>
 </body>
 </html>
