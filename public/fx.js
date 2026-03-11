@@ -231,10 +231,16 @@ initFadeIn();
 (function(){
   var _aud=null,_on=false;
   window.toggleArcAudio=function(){
+    var btn=document.getElementById('audio-runa');
     if(!_aud){
-      /* usa un audio ambientale da URL pubblico — dark ambient loop */
-      _aud=new Audio('https://cdn.freesound.org/previews/459/459977_4921277-lq.mp3');
+      /* Metti un file 'ambient.mp3' nella cartella public/ del tuo repo Vercel */
+      _aud=new Audio('/ambient.mp3');
       _aud.loop=true;_aud.volume=0.18;
+      _aud.onerror=function(){
+        _aud=null;_on=false;
+        if(btn){btn.classList.remove('ara-on');btn.title='Audio non trovato — aggiungi ambient.mp3 in public/';}
+      };
+    }
     }
     if(_on){
       _aud.pause();_on=false;
