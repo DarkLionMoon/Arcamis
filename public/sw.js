@@ -9,8 +9,10 @@ var STATIC=[
   '/index.html',
   '/style-base.css',
   '/style-page.css',
-  '/app.js',
+  '/data.js',
   '/notion-render.js',
+  '/fx.js',
+  '/app.js',
   '/mappa.png'
 ];
 
