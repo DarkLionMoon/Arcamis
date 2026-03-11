@@ -25,8 +25,8 @@ export default async function handler(req, res) {
         const titleProp = Object.values(p.properties).find(v => v.type === 'title');
         const title = titleProp ? titleProp.title.map(t => t.plain_text).join('') : 'Senza titolo';
         
-        // LOGICA FOTO: Cerca prima in una proprietà "Files" (es. Foto), poi nella Cover
         let cover = null;
+        // Cerca prima in una proprietà "Files" (es. Foto), poi nella Cover della pagina
         const fileProp = Object.values(p.properties).find(v => v.type === 'files' && v.files.length > 0);
         if (fileProp) {
           const f = fileProp.files[0];
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       const page = await notionFetch('/pages/' + pageId, token);
       const blocksData = await notionFetch('/blocks/' + pageId + '/children', token);
       
-      // Caricamento ricorsivo figli (per i toggle del Pantheon)
+      // Caricamento figli per i toggle (fondamentale per il Pantheon)
       for (let b of blocksData.results) {
         if (b.has_children) {
           const children = await notionFetch('/blocks/' + b.id + '/children', token);
