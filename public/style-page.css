@@ -2,99 +2,38 @@
    ARCAMIS — style-page.css
 ════════════════════════════════════ */
 
-#page-hero {
-  min-height: 280px; position: relative; overflow: hidden;
-  background: #06080e; display: flex; align-items: flex-end;
-}
-.ph-covbg {
-  position: absolute; inset: 0;
-  background-size: cover; background-position: center;
-  filter: saturate(.6) brightness(.45); transition: opacity .5s;
-}
-.ph-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(0deg, rgba(4,6,12,1) 0%, rgba(4,6,12,.5) 100%);
-}
-.ph-content {
-  position: relative; z-index: 5; padding: 0 30px 40px; 
-  width: 100%; max-width: 900px; margin: 0 auto;
-}
+#page-hero { min-height: 280px; position: relative; overflow: hidden; background: #06080e; display: flex; align-items: flex-end; }
+.ph-covbg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: saturate(.6) brightness(.45); transition: opacity .5s; }
+.ph-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(4,6,12,1) 0%, rgba(4,6,12,.4) 100%); }
+.ph-content { position: relative; z-index: 5; padding: 0 30px 40px; width: 100%; max-width: 900px; margin: 0 auto; }
 #p-icon { font-size: 48px; margin-bottom: 10px; }
-#p-title {
-  font-size: 38px; color: var(--white); margin: 0; 
-  font-family: 'Cinzel', serif; text-shadow: 0 2px 15px #000;
-}
+#p-title { font-size: 38px; color: var(--white); margin: 0; font-family: 'Cinzel', serif; text-shadow: 0 2px 15px #000; }
+#p-body { max-width: 900px; margin: 0 auto; padding: 40px 20px 100px; line-height: 1.8; color: var(--text); font-family: 'Crimson Pro', serif; }
 
-#p-body {
-  max-width: 900px; margin: 0 auto; padding: 40px 20px 100px;
-  line-height: 1.8; color: var(--text); font-family: 'Crimson Pro', serif;
-}
+/* IMMAGINI FIX */
+.n-image { margin: 30px 0; text-align: center; }
+.n-image img { max-width: 100%; max-height: 550px; border-radius: 8px; border: 1px solid var(--bdr2); object-fit: contain; }
 
-/* ──── FIX IMMAGINI (Il problema del bug) ──── */
-.n-image {
-  margin: 30px 0; text-align: center; width: 100%;
-}
-.n-image img {
-  max-width: 100%; 
-  max-height: 70vh; /* Impedisce all'immagine di occupare tutto lo schermo in altezza */
-  height: auto;
-  border-radius: 8px;
-  border: 1px solid var(--bdr2);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  display: block;
-  margin: 0 auto;
-  object-fit: contain;
-}
-
-/* ──── CAROSELLI ──── */
-.carousel-container {
-  position: relative; margin: 30px 0;
-  width: 100%; overflow: visible;
-}
-.carousel-track {
-  display: flex; gap: 16px; overflow-x: auto; scroll-behavior: smooth;
-  padding: 10px 5px; scrollbar-width: none;
-}
+/* CAROUSEL & CARDS */
+.carousel-container { position: relative; margin: 25px 0; width: 100%; }
+.carousel-track { display: flex; gap: 16px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
 .carousel-track::-webkit-scrollbar { display: none; }
-.carousel-track .lcard {
-  flex: 0 0 240px; height: 150px;
-}
+.carousel-track .lcard { flex: 0 0 240px; height: 150px; }
+.single-card { margin: 15px 0; width: 100%; max-width: 350px; height: 120px; }
 
 .car-btn {
   position: absolute; top: 50%; transform: translateY(-50%);
-  background: rgba(12, 15, 21, 0.9); border: 1px solid var(--gold);
-  color: var(--gold); width: 40px; height: 40px; border-radius: 50%;
-  cursor: pointer; z-index: 10; font-size: 20px;
-  display: flex; align-items: center; justify-content: center;
-  transition: 0.3s; backdrop-filter: blur(4px);
+  background: rgba(12, 15, 21, 0.9); border: 1px solid var(--gold); color: var(--gold);
+  width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 10;
 }
-.car-btn:hover { background: var(--gold); color: #000; }
 .car-btn.left { left: -20px; }
 .car-btn.right { right: -20px; }
 
-/* ──── TOGGLE PANTHEON ──── */
-.n-th-wrapper { margin-bottom: 15px; border-bottom: 1px solid var(--bdr2); }
-.n-th {
-  font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.3rem;
-  padding: 15px 0; cursor: pointer; list-style: none; outline: none;
-}
-.n-th::before { content: '◆ '; font-size: 0.8em; margin-right: 10px; }
-.n-th-content { padding: 15px 5px; }
-
-/* ──── NOTION BLOCKS ──── */
+/* BLOCCHI NOTION */
 .n-p { margin-bottom: 1.5em; font-size: 1.15rem; }
-.n-h1 { font-family: 'Cinzel'; color: var(--gold); margin: 2em 0 1em; border-bottom: 1px solid var(--bdr2); padding-bottom: 5px; }
-.n-callout {
-  display: flex; gap: 15px; padding: 20px; border-radius: 6px;
-  border-left: 4px solid var(--gold); margin: 2em 0; background: rgba(200,155,60,0.05);
-}
+.n-h1 { font-family: 'Cinzel'; color: var(--gold); margin: 2em 0 1em; border-bottom: 1px solid var(--bdr2); }
+.n-callout { display: flex; gap: 15px; padding: 20px; border-radius: 6px; border-left: 4px solid var(--gold); background: rgba(200,155,60,0.05); margin: 20px 0; }
+.n-ul { margin-left: 20px; margin-bottom: 1.5em; color: var(--text); }
 
-/* ──── FONT SCALE ──── */
-.n-p, .n-callout-body { font-size: calc(16px * var(--font-scale, 1)) !important; }
-
-@media (max-width: 768px) {
-  .car-btn { display: none; }
-  .carousel-container { margin: 20px -10px; }
-  .carousel-track { padding: 10px 20px; }
-  #p-title { font-size: 28px; }
-}
+/* FONT SCALE */
+.n-p, .n-callout-body, .n-ul li { font-size: calc(16px * var(--font-scale, 1)) !important; }
