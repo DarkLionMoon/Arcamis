@@ -86,9 +86,17 @@ module.exports = async function handler(req, res) {
       var pages = (data.results || []).map(function(p) {
         var titleProp = Object.values(p.properties || {}).find(function(v){ return v.type === 'title'; });
         var title = titleProp && titleProp.title ? titleProp.title.map(function(t){ return t.plain_text; }).join('') : 'Senza titolo';
+        // cover: prima il page cover, poi la prima proprietà Files con un file
         var cover = null;
         if (p.cover) {
           cover = p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url);
+        }
+        if (!cover) {
+          var fileProp = Object.values(p.properties || {}).find(function(v){ return v.type === 'files' && v.files && v.files.length; });
+          if (fileProp) {
+            var f = fileProp.files[0];
+            cover = f.type === 'external' ? f.external.url : (f.file && f.file.url);
+          }
         }
         var icon = p.icon && p.icon.type === 'emoji' ? p.icon.emoji : null;
         return { id: p.id.replace(/-/g,''), title: title, cover: cover, icon: icon };
