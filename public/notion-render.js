@@ -287,7 +287,17 @@ function dbLocNav(btn, dir){
 
 async function loadDbGalleries(container){
   var grids=container.querySelectorAll('.n-db-grid[id^="db-"]');
-  grids.forEach(async function(grid){
+  /* lazy load: carica il DB solo quando entra nel viewport */
+  var io=new IntersectionObserver(function(entries,obs){
+    entries.forEach(function(en){
+      if(!en.isIntersecting)return;
+      obs.unobserve(en.target);
+      _loadSingleDb(en.target);
+    });
+  },{rootMargin:'200px'});
+  grids.forEach(function(g){io.observe(g);});
+}
+async function _loadSingleDb(grid){
     var dbId=grid.id.replace('db-','');
     try{
       var r=await fetch('/api/notion?dbId='+dbId);
@@ -336,7 +346,6 @@ async function loadDbGalleries(container){
     }catch(e){
       grid.innerHTML='<div class="n-db-loading">⚠️ Errore caricamento.</div>';
     }
-  });
 }
 
 /* ════════════════════════════════════
@@ -474,10 +483,68 @@ async function _gpRender(id,label,icon){
     var footer='<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
       +'<div class="n-page-footer-text">Archivi di Arcamis — '+ptitle+'</div></div>';
     pbody.innerHTML='<div class="nc" style="animation:fi .22s ease forwards">'+(html||emptyHtml)+footer+'</div>';
+    /* glossario inline */
+    applyGlossary(pbody);
+    /* retry immagini scadute (URL S3 firmati scadono) */
+    pbody.querySelectorAll('img').forEach(function(img){
+      img.addEventListener('error',function(){
+        if(img.dataset.retried)return;
+        img.dataset.retried='1';
+        /* invalida cache e ricarica dati pagina */
+        try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
+      },{once:true});
+    });
     attachShine(pbody);
     loadDbGalleries(pbody);
     initFadeIn(pbody);
+    /* registra nei recenti */
+    if(typeof addRecente==='function')addRecente(id,ptitle,picon);
+    /* bottom nav active */
+    if(typeof setBnavActive==='function')setBnavActive('');
   }catch(e){
     document.getElementById('pbody').innerHTML='<div class="errbox">⚠️ '+e.message+'</div>';
   }
+}
+
+/* ════════════════════════════════════
+   GLOSSARIO AUTOMATICO
+════════════════════════════════════ */
+var _glossary={
+  'gp':'Pezzi d\'oro — valuta principale di Arcamis',
+  'mo':'Monete d\'oro — stessa cosa di gp',
+  'sp':'Pezzi d\'argento — 1/10 di gp',
+  'cp':'Pezzi di rame — 1/100 di gp',
+  'PG':'Personaggio Giocante',
+  'DM':'Dungeon Master — il narratore',
+  'CA':'Classe Armatura — quanto sei difficile da colpire',
+  'TS':'Tiro Salvezza',
+  'STR':'Forza — caratteristica fisica',
+  'DEX':'Destrezza — agilità e riflessi',
+  'CON':'Costituzione — resistenza fisica',
+  'INT':'Intelligenza — ragionamento e magia',
+  'WIS':'Saggezza — percezione e intuito',
+  'CHA':'Carisma — persuasione e leadership',
+  'hp':'Hit Points — punti ferita',
+  'PF':'Punti Ferita — quanto danno puoi assorbire',
+  'XP':'Punti Esperienza',
+  'LV':'Livello del personaggio',
+  'CD':'Classe Difficoltà — il numero da raggiungere nel dado'
+};
+function applyGlossary(root){
+  var terms=Object.keys(_glossary);
+  /* applica solo ai nodi testo dentro .n-p, .n-callout-body, .n-intro-body */
+  root.querySelectorAll('.n-p,.n-callout-body,.n-intro-body').forEach(function(el){
+    /* semplice replace testuale — non tocca HTML già presente */
+    var html=el.innerHTML;
+    terms.forEach(function(term){
+      var def=_glossary[term];
+      var safe=def.replace(/'/g,'&#39;');
+      /* sostituisce solo occorrenze non già in un tag */
+      html=html.replace(
+        new RegExp('(?<![\\w>])'+term+'(?![\\w<])','g'),
+        '<span class="gterm" data-def="'+safe+'">'+term+'</span>'
+      );
+    });
+    el.innerHTML=html;
+  });
 }
