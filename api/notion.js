@@ -1,6 +1,6 @@
 const NOTION_VERSION = '2022-06-28';
 
-async function notionFetch(path, token, method) {
+async function notionFetch(path, token, method, body) {
   var res = await fetch('https://api.notion.com/v1' + path, {
     method: method || 'GET',
     headers: {
@@ -8,7 +8,7 @@ async function notionFetch(path, token, method) {
       'Notion-Version': NOTION_VERSION,
       'Content-Type': 'application/json',
     },
-    body: method === 'POST' ? JSON.stringify({ page_size: 100 }) : undefined,
+    body: (method === 'POST') ? JSON.stringify(body || { page_size: 100 }) : undefined,
   });
   if (!res.ok) {
     var err = await res.json().catch(function() { return {}; });
@@ -53,21 +53,43 @@ module.exports = async function handler(req, res) {
 
   var pageId = req.query.pageId;
   var dbId   = req.query.dbId;
+  var q      = req.query.q;
 
   try {
+
+    // ── Ricerca full-text Notion ─────────────────────────────────────
+    if (q) {
+      var data = await notionFetch('/search', token, 'POST', {
+        query: q,
+        filter: { value: 'page', property: 'object' },
+        sort: { direction: 'descending', timestamp: 'last_edited_time' },
+        page_size: 12,
+      });
+      var results = (data.results || []).map(function(p) {
+        // titolo
+        var titleProp = p.properties && Object.values(p.properties).find(function(v){ return v.type === 'title'; });
+        var title = titleProp && titleProp.title
+          ? titleProp.title.map(function(t){ return t.plain_text; }).join('')
+          : (p.title ? p.title.map(function(t){ return t.plain_text; }).join('') : 'Senza titolo');
+        // icona
+        var icon = p.icon && p.icon.type === 'emoji' ? p.icon.emoji : '📄';
+        // ID pulito
+        var id = p.id.replace(/-/g, '');
+        return { id: id, title: title, icon: icon };
+      }).filter(function(r){ return r.title && r.title !== 'Senza titolo'; });
+      return res.status(200).json({ results: results });
+    }
+
     // ── Database query (gallery cards) ──────────────────────────────
     if (dbId) {
       var data = await notionFetch('/databases/' + dbId + '/query', token, 'POST');
       var pages = (data.results || []).map(function(p) {
-        // title
         var titleProp = Object.values(p.properties || {}).find(function(v){ return v.type === 'title'; });
         var title = titleProp && titleProp.title ? titleProp.title.map(function(t){ return t.plain_text; }).join('') : 'Senza titolo';
-        // cover
         var cover = null;
         if (p.cover) {
           cover = p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url);
         }
-        // icon
         var icon = p.icon && p.icon.type === 'emoji' ? p.icon.emoji : null;
         return { id: p.id.replace(/-/g,''), title: title, cover: cover, icon: icon };
       });
@@ -75,12 +97,13 @@ module.exports = async function handler(req, res) {
     }
 
     // ── Page fetch ───────────────────────────────────────────────────
-    if (!pageId) return res.status(400).json({ error: 'pageId o dbId mancante' });
+    if (!pageId) return res.status(400).json({ error: 'pageId, dbId o q mancante' });
     var results = await Promise.all([
       notionFetch('/pages/' + pageId, token),
       fetchAllBlocks(pageId, token, 0),
     ]);
     return res.status(200).json({ page: results[0], blocks: results[1] });
+
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: err.message });
