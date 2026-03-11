@@ -1,5 +1,3 @@
 {
-  "buildCommand": "node scripts/fetch-notion.js",
-  "outputDirectory": "public",
   "cleanUrls": true
 }
