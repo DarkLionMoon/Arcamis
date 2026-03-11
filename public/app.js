@@ -166,11 +166,31 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDd()});
 function setNav(v){
   document.querySelectorAll('.tn').forEach(function(el){el.classList.toggle('ta',el.dataset.v===v)});
 }
-function showHome(){
+function showHome(fromPop){
   var hv=document.getElementById('hv'),pv=document.getElementById('pv');
+  navStack=[];
+  if(!fromPop)history.pushState({home:true},'',location.pathname);
   if(hv.style.display==='block'){document.getElementById('main').scrollTo({top:0,behavior:'smooth'});return}
   xfade(pv,hv);setNav('home');document.title='Arcamis';
 }
+
+/* ── Popstate (browser back/forward) ── */
+window.addEventListener('popstate',function(e){
+  if(!e.state||e.state.home){showHome(true);return;}
+  navStack=e.state.stack||[];
+  _gpRender(e.state.id,e.state.label,e.state.icon);
+  /* mostra page view se serve */
+  var hv=document.getElementById('hv'),pv=document.getElementById('pv');
+  if(hv.style.display==='block'){
+    hv.style.display='none';pv.style.display='block';
+  }
+  document.getElementById('pbody').innerHTML='<div class="ldwrap"><div class="spin"></div></div>';
+  document.getElementById('main').scrollTo({top:0});
+  /* rebuild crumb */
+  var phCrumb=document.getElementById('ph-crumb');
+  if(phCrumb)phCrumb.innerHTML=buildCrumb(e.state.label);
+  document.title=(e.state.label||'Pagina')+' — Arcamis';
+});
 function hsearch(q){
   var el=document.getElementById('sr');var qq=q.toLowerCase().trim();
   if(!qq){el.classList.remove('open');return}
@@ -548,4 +568,11 @@ initFadeIn();/* ═════════════════════�
     var id=el.getAttribute('data-id')||'';
     el.addEventListener('click',function(){if(id)gp(id,nm,'📍');});
   });
+})();
+/* ── Deep-link: apri pagina da URL ?p=<id> ── */
+(function(){
+  var p=new URLSearchParams(location.search).get('p');
+  if(!p)return;
+  var pg=pages.find(function(x){return x.id===p});
+  gp(p,pg?pg.l:'Pagina',pg?pg.i:'📄');
 })();
