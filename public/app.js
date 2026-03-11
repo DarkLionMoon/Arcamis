@@ -29,7 +29,11 @@ function toggleTheme(){applyTheme(_theme==='dark'?'light':'dark');}
 /* ════ LOGO ════ */
 (async function(){
   try{
-    var r=await fetch('/api/notion?pageId='+ROOT);if(!r.ok)return;
+    /* prova prima il file statico */
+    var rootUrl='/data/pages/'+ROOT+'.json';
+    var r=await fetch(rootUrl);
+    if(!r.ok)r=await fetch('/api/notion?pageId='+ROOT);
+    if(!r.ok)return;
     var d=await r.json();var icon=d.page&&d.page.icon;if(!icon)return;
     var url=icon.type==='file'?icon.file&&icon.file.url:icon.external&&icon.external.url;
     if(!url)return;
@@ -318,16 +322,18 @@ function markChangelogSeen(){
 /* ════ PREFETCH ════ */
 function prefetchPage(id){
   var key='pg_'+id;
-  /* salta se già in memoria o sessionStorage */
   if(window._memCache&&_memCache[key])return;
   try{if(sessionStorage.getItem(key))return;}catch(e){}
-  fetch('/api/notion?pageId='+id).then(function(r){return r.ok?r.json():null;})
-    .then(function(d){
-      if(!d)return;
-      /* salva in entrambi i livelli */
-      if(window._memCache)_memCache[key]=d;
-      try{sessionStorage.setItem(key,JSON.stringify(d));}catch(e){}
-    }).catch(function(){});
+  /* prova prima il file statico — molto più veloce */
+  fetch('/data/pages/'+id+'.json').then(function(r){
+    if(r.ok)return r.json();
+    /* fallback all'API */
+    return fetch('/api/notion?pageId='+id).then(function(r2){return r2.ok?r2.json():null;});
+  }).then(function(d){
+    if(!d)return;
+    if(window._memCache)_memCache[key]=d;
+    try{sessionStorage.setItem(key,JSON.stringify(d));}catch(e){}
+  }).catch(function(){});
 }
 window.addEventListener('load',function(){setTimeout(function(){PREFETCH_IDS.forEach(prefetchPage);},2500);});
 
