@@ -249,3 +249,60 @@ initFadeIn();
     }
   };
 })();
+/* ── Dust VFX — particelle atmosferiche dorate ── */
+(function(){
+  var wrap=document.getElementById('dust-vfx');
+  if(!wrap)return;
+  var N=18; /* numero particelle */
+  for(var i=0;i<N;i++){
+    (function(idx){
+      var p=document.createElement('div');
+      p.className='dp';
+      var sz=Math.random()*2+1; /* 1–3px */
+      var dur=Math.random()*22+14; /* 14–36s */
+      var delay=Math.random()*dur*-1; /* start offset */
+      var left=Math.random()*100;
+      var dx=(Math.random()-0.5)*120; /* spostamento orizzontale */
+      p.style.cssText=
+        'width:'+sz+'px;height:'+sz+'px;'
+        +'left:'+left+'%;bottom:0;'
+        +'--dx:'+dx+'px;'
+        +'animation-duration:'+dur+'s;'
+        +'animation-delay:'+delay+'s;'
+        +'opacity:0;';
+      wrap.appendChild(p);
+    })(i);
+  }
+})();
+/* ── Lume di Candela — vignette radiale che segue il cursore ── */
+(function(){
+  var ov=document.getElementById('candlelight-overlay');
+  if(!ov)return;
+  var cx=50,cy=50; /* percentuale iniziale */
+  var tx=50,ty=50; /* target (lerp) */
+  var enabled=true;
+  /* toggle con doppio click su #candlelight-toggle (se presente) */
+  window.toggleCandlelight=function(){
+    enabled=!enabled;
+    ov.style.opacity=enabled?'1':'0';
+  };
+  /* lerp fluido del gradiente */
+  function tick(){
+    cx+=(tx-cx)*0.08;
+    cy+=(ty-cy)*0.08;
+    ov.style.setProperty('--clx',cx.toFixed(2)+'%');
+    ov.style.setProperty('--cly',cy.toFixed(2)+'%');
+    requestAnimationFrame(tick);
+  }
+  document.addEventListener('mousemove',function(e){
+    tx=(e.clientX/window.innerWidth)*100;
+    ty=(e.clientY/window.innerHeight)*100;
+  });
+  /* su mobile: sposta verso centro */
+  document.addEventListener('touchmove',function(e){
+    var t=e.touches[0];
+    tx=(t.clientX/window.innerWidth)*100;
+    ty=(t.clientY/window.innerHeight)*100;
+  },{passive:true});
+  tick();
+})();
