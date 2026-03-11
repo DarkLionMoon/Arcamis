@@ -61,16 +61,30 @@ showSlide(0);resetTimer();
 var _locIdx=0;
 var _locTrack=document.getElementById('loc-track');
 var _locCards=_locTrack?_locTrack.querySelectorAll('.loc-card'):[];
+function _locArrows(){
+  var wrap=_locTrack?_locTrack.closest('.loc-wrap'):null;
+  if(!wrap)return;
+  var prev=wrap.querySelector('.la-prev'),next=wrap.querySelector('.la-next');
+  if(prev){prev.style.opacity=_locIdx<=0?'0.2':'1';prev.style.pointerEvents=_locIdx<=0?'none':'auto';}
+  /* calcola maxIdx in tempo reale per evitare errori di arrotondamento */
+  var cardW=_locCards.length?(_locCards[0].getBoundingClientRect().width||260):260,gap=16,step=cardW+gap;
+  var trackW=_locCards.length*step-gap;
+  var outerW=_locTrack?(_locTrack.parentElement.getBoundingClientRect().width||840)-20:840;
+  var maxIdx=Math.max(0,Math.ceil((trackW-outerW)/step));
+  if(next){next.style.opacity=_locIdx>=maxIdx?'0.2':'1';next.style.pointerEvents=_locIdx>=maxIdx?'none':'auto';}
+}
 function locSlide(dir){
   if(!_locTrack||!_locCards.length)return;
-  _locIdx+=dir;
   var cardW=(_locCards[0].getBoundingClientRect().width)||260,gap=16,step=cardW+gap;
-  var trackW=_locCards.length*cardW+(_locCards.length-1)*gap;
+  var trackW=_locCards.length*step-gap;
   var outerW=(_locTrack.parentElement.getBoundingClientRect().width||840)-20;
-  var maxIdx=Math.floor(Math.max(0,trackW-outerW)/step);
-  if(_locIdx<0)_locIdx=0;if(_locIdx>maxIdx)_locIdx=maxIdx;
+  var maxIdx=Math.max(0,Math.ceil((trackW-outerW)/step));
+  _locIdx=Math.min(maxIdx,Math.max(0,_locIdx+dir));
   _locTrack.style.transform='translateX(-'+(_locIdx*step)+'px)';
+  _locArrows();
 }
+/* stato iniziale frecce dopo DOM ready */
+document.addEventListener('DOMContentLoaded',function(){setTimeout(_locArrows,200);});
 
 /* ════ PROGRESS BAR + TOPBAR SOLID + SCROLL-TOP ════ */
 var _pb=document.getElementById('progress-bar');
@@ -113,10 +127,11 @@ function toggleMobileNav(){var mn=document.getElementById('mobile-nav'),hb=docum
 function closeMobileNav(){var mn=document.getElementById('mobile-nav'),hb=document.getElementById('hamburger');mn.classList.remove('open');hb.classList.remove('open');}
 window.addEventListener('resize',function(){if(window.innerWidth>768)closeMobileNav();});
 
-/* ── dropdown ── */
-function toggleDd(id){var el=document.getElementById(id),wasOpen=el.classList.contains('open');closeDd();if(!wasOpen)el.classList.add('open');}
+/* ── dropdown — stopPropagation garantisce che i tn-item siano sempre cliccabili ── */
+function toggleDd(id,ev){if(ev)ev.stopPropagation();var el=document.getElementById(id),wasOpen=el.classList.contains('open');closeDd();if(!wasOpen)el.classList.add('open');}
 function closeDd(){document.querySelectorAll('.tn-drop.open').forEach(function(d){d.classList.remove('open');});}
 document.addEventListener('click',function(e){if(!e.target.closest('.tn-drop'))closeDd();});
+document.querySelectorAll('.tn-drop').forEach(function(d){d.addEventListener('click',function(e){e.stopPropagation();});});
 
 /* ── setNav + showHome ── */
 function setNav(v){document.querySelectorAll('.tn').forEach(function(el){el.classList.toggle('ta',el.dataset.v===v);});}
@@ -231,7 +246,7 @@ document.addEventListener('keydown',function(e){
     if(ov&&ov.style.display==='block'){cv();return;}
     closeDd();var pv2=document.getElementById('pv');if(pv2&&pv2.style.display!=='none')showHome();return;
   }
-  if(e.key==='/'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();var si=document.querySelector('#search-input,input[type=search],.search-input');if(si)si.focus();return;}
+  if((e.key==='/'&&!e.ctrlKey&&!e.metaKey)||(e.key==='k'&&(e.ctrlKey||e.metaKey))){e.preventDefault();var si=document.getElementById('ts');if(si){si.focus();si.select();}return;}
   if(e.key==='ArrowLeft'&&e.altKey)history.back();
   if(e.key==='ArrowRight'&&e.altKey)history.forward();
 });
@@ -344,3 +359,79 @@ document.addEventListener('DOMContentLoaded',function(){
     el.addEventListener('click',function(){if(id)gp(id,nm,'📍');});
   });
 })();
+/* ════ TOAST — Notifiche del Destino ════ */
+(function(){
+  var _wrap=null;
+  function ensureWrap(){
+    if(_wrap)return _wrap;
+    _wrap=document.createElement('div');
+    _wrap.id='toast-wrap';
+    document.body.appendChild(_wrap);
+    return _wrap;
+  }
+  window.showToast=function(msg,icon,dur){
+    var w=ensureWrap();
+    var t=document.createElement('div');
+    t.className='arc-toast';
+    t.innerHTML='<span class="arc-toast-icon">'+(icon||'✦')+'</span><span class="arc-toast-msg">'+msg+'</span>';
+    w.appendChild(t);
+    requestAnimationFrame(function(){t.classList.add('in');});
+    setTimeout(function(){
+      t.classList.remove('in');t.classList.add('out');
+      setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},400);
+    },dur||2800);
+  };
+})();
+
+/* ════ WHISPER SIDEBAR — indice sezioni rapido ════ */
+function buildWhisperNav(){
+  var existing=document.getElementById('whisper-nav');
+  if(existing)existing.remove();
+  var pb=document.getElementById('pbody');
+  if(!pb||document.getElementById('pv').style.display==='none')return;
+  var heads=pb.querySelectorAll('.n-h1,.n-h2');
+  if(heads.length<2)return;
+  var nav=document.createElement('nav');
+  nav.id='whisper-nav';
+  /* assegna ID agli heading se mancano */
+  heads.forEach(function(h,i){
+    if(!h.id)h.id='wsec-'+i;
+    var dot=document.createElement('a');
+    dot.className='wn-dot';
+    dot.href='#';
+    dot.setAttribute('data-label',h.textContent.trim().slice(0,32));
+    dot.addEventListener('click',function(e){
+      e.preventDefault();
+      h.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    nav.appendChild(dot);
+  });
+  document.body.appendChild(nav);
+}
+/* rebuilda ogni volta che si naviga */
+var _origGpRender=window._gpRenderDone;
+/* hook sul completamento della pagina */
+(function(){
+  var _origAfter=window.afterPageRender;
+  window.afterPageRender=function(){
+    if(_origAfter)_origAfter();
+    setTimeout(buildWhisperNav,300);
+  };
+})();
+/* ════ COPY LINK ════ */
+window.copyPageLink=function(){
+  var url=location.href;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(function(){
+      showToast('Link copiato','🔗',2400);
+    }).catch(function(){fallbackCopy(url);});
+  }else{fallbackCopy(url);}
+};
+function fallbackCopy(text){
+  var ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');showToast('Link copiato','🔗',2400);}
+  catch(e){showToast('Impossibile copiare','⚠️',2400);}
+  document.body.removeChild(ta);
+}
