@@ -1,310 +1,128 @@
 /* ════════════════════════════════════
-   ARCAMIS — fx.js
-   Effetti visivi puri (nessuna logica
-   di navigazione o dati)
+   LUME DI CANDELA — cursor vignette
 ════════════════════════════════════ */
-
-/* ── Glossy shine sulle lcard ── */
-function attachShine(root){
-  (root||document).querySelectorAll('.lcard').forEach(function(card){
-    var shine=card.querySelector('.shine');if(!shine)return;
-    card.addEventListener('mousemove',function(e){
-      var rc=card.getBoundingClientRect();
-      var x=((e.clientX-rc.left)/rc.width)*100;
-      var y=((e.clientY-rc.top)/rc.height)*100;
-      shine.style.background='radial-gradient(circle at '+x+'% '+y+'%,rgba(255,255,255,.11) 0%,rgba(255,255,255,.04) 26%,transparent 58%)';
-    });
-    card.addEventListener('mouseleave',function(){
-      shine.style.background='radial-gradient(circle at 50% 50%,rgba(255,255,255,.07) 0%,transparent 58%)';
-    });
-  });
-}
-attachShine();
-
-/* ── Micro sparkle sulle lcard ── */
-(function(){
-  document.querySelectorAll('.lcard').forEach(function(card){
-    card.addEventListener('mouseenter',function(e){ spawnSparks(card,e); });
-  });
-  function spawnSparks(card){
-    var r=card.getBoundingClientRect();
-    var n=5+Math.floor(Math.random()*4);
-    for(var i=0;i<n;i++){
-      (function(idx){
-        var sp=document.createElement('div');
-        sp.className='spark';
-        var ox=Math.random()*r.width;
-        var oy=(Math.random()*r.height*0.5)+r.height*0.2;
-        var sx=(Math.random()-0.5)*40;
-        var sy=-(20+Math.random()*30);
-        var sz=(0.6+Math.random()*0.8);
-        var hue=Math.random()<0.3?'rgba(255,220,80,'+sz+')':'rgba(200,155,60,'+sz+')';
-        sp.style.cssText='left:'+ox+'px;top:'+oy+'px;'
-          +'--sx:'+sx+'px;--sy:'+sy+'px;'
-          +'background:'+hue+';box-shadow:0 0 4px '+hue+';'
-          +'animation-delay:'+(idx*80)+'ms;'
-          +'animation-duration:'+(500+Math.random()*300)+'ms;';
-        card.appendChild(sp);
-        setTimeout(function(){sp.remove();},900+idx*80);
-      })(i);
-    }
-  }
-})();
-
-/* ── Sparkle sulle mys-card ── */
-(function(){
-  document.querySelectorAll('.mys-card').forEach(function(card){
-    card.addEventListener('mouseenter',function(){
-      var n=4+Math.floor(Math.random()*3);
-      for(var i=0;i<n;i++){
-        (function(idx){
-          var sp=document.createElement('div');
-          sp.className='spark';
-          var r=card.getBoundingClientRect();
-          var ox=Math.random()*r.width;
-          var oy=Math.random()*r.height*0.6;
-          var sx=(Math.random()-0.5)*35;
-          var sy=-(15+Math.random()*28);
-          var bri=(0.5+Math.random()*0.5);
-          sp.style.cssText='left:'+ox+'px;top:'+oy+'px;'
-            +'--sx:'+sx+'px;--sy:'+sy+'px;'
-            +'background:rgba(140,100,220,'+bri+');'
-            +'box-shadow:0 0 5px rgba(140,100,220,'+bri+');'
-            +'animation-delay:'+(idx*90)+'ms;'
-            +'animation-duration:'+(450+Math.random()*250)+'ms;';
-          card.appendChild(sp);
-          setTimeout(function(){sp.remove();},800+idx*90);
-        })(i);
-      }
-    });
-  });
-})();
-
-/* ── Hero particles ── */
-(function(){
-  var hp=document.getElementById('hero-particles');
-  if(!hp)return;
-  for(var i=0;i<18;i++){
-    var p=document.createElement('div');
-    p.className='particle';
-    var sz=Math.random()<0.3?3:Math.random()<0.7?2:1;
-    p.style.cssText='left:'+Math.random()*100+'%;bottom:'+(Math.random()*40)+'%;'
-      +'animation-duration:'+(5+Math.random()*8)+'s;'
-      +'animation-delay:-'+Math.random()*7+'s;'
-      +'--dx:'+((Math.random()-0.5)*60)+'px;'
-      +'width:'+sz+'px;height:'+sz+'px;'
-      +'opacity:'+(0.2+Math.random()*0.5);
-    hp.appendChild(p);
-  }
-})();
-
-/* ── Portal particles ── */
-(function(){
-  var pts=document.getElementById('portal-pts');
-  if(!pts)return;
-  for(var i=0;i<18;i++){
-    var p=document.createElement('div');
-    p.className='portal-p';
-    var sz=(1.5+Math.random()*2.5);
-    p.style.cssText='width:'+sz+'px;height:'+sz+'px;'
-      +'left:'+Math.random()*100+'%;'
-      +'bottom:'+(Math.random()*30)+'%;'
-      +'--pd:'+(3+Math.random()*5).toFixed(1)+'s;'
-      +'--po:'+(0.15+Math.random()*0.3).toFixed(2)+';'
-      +'animation-delay:'+(Math.random()*6).toFixed(1)+'s;';
-    pts.appendChild(p);
-  }
-})();
-
-/* ── Starfield (slide Pantheon) ── */
-(function(){
-  var sf=document.getElementById('star-field');
-  if(!sf)return;
-  for(var i=0;i<110;i++){
-    var s=document.createElement('div');
-    s.className='star';
-    var size=(Math.random()<0.15)?2.5:(Math.random()<0.4)?1.5:1;
-    s.style.cssText='left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;'
-      +'width:'+size+'px;height:'+size+'px;'
-      +'--tw:'+(2+Math.random()*4).toFixed(1)+'s;'
-      +'--tb:'+(0.3+Math.random()*0.65).toFixed(2)+';'
-      +'animation-delay:'+(Math.random()*5).toFixed(1)+'s;';
-    sf.appendChild(s);
-  }
-  ['60% 20%','30% 65%','80% 75%'].forEach(function(pos,idx){
-    var b=document.createElement('div');
-    b.style.cssText='position:absolute;border-radius:50%;pointer-events:none;'
-      +'width:'+(120+idx*60)+'px;height:'+(80+idx*40)+'px;'
-      +'left:'+pos.split(' ')[0]+';top:'+pos.split(' ')[1]+';'
-      +'transform:translate(-50%,-50%);'
-      +'background:radial-gradient(ellipse,rgba('+(idx===1?'100,40,180':'60,20,140')+','+(0.06+idx*0.02)+'),transparent);'
-      +'animation:nebula-pulse '+(6+idx*2)+'s ease-in-out infinite alternate;';
-    sf.appendChild(b);
-  });
-})();
-
-/* ── Nebula pulse keyframe (iniettato una volta) ── */
-(function(){
-  if(!document.querySelector('style[data-nebula]')){
-    var s=document.createElement('style');
-    s.setAttribute('data-nebula','1');
-    s.textContent='@keyframes nebula-pulse{0%{opacity:.7;transform:translate(-50%,-50%) scale(1)}100%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}';
-    document.head.appendChild(s);
-  }
-})();
-
-/* ── Mouse parallax sul carousel ── */
-(function(){
-  var cw=document.getElementById('carousel-wrap');
-  if(!cw)return;
-  cw.addEventListener('mousemove',function(e){
-    var r=cw.getBoundingClientRect();
-    var xp=(e.clientX-r.left)/r.width-.5;
-    var yp=(e.clientY-r.top)/r.height-.5;
-    var slide=document.querySelector('.slide.active');
-    if(slide)slide.style.backgroundPosition='calc(center + '+(-xp*18)+'px) calc(45% + '+(-yp*12)+'px)';
-  });
-  cw.addEventListener('mouseleave',function(){
-    var slide=document.querySelector('.slide.active');
-    if(slide)slide.style.backgroundPosition='center 45%';
-  });
-})();
-
-/* ── Ripple sui .sbtn ── */
-document.addEventListener('click',function(e){
-  var btn=e.target.closest('.sbtn');
-  if(!btn)return;
-  var r=btn.getBoundingClientRect();
-  var rpl=document.createElement('span');
-  var sz=Math.max(r.width,r.height);
-  rpl.className='ripple';
-  rpl.style.cssText='width:'+sz+'px;height:'+sz+'px;'
-    +'left:'+(e.clientX-r.left-sz/2)+'px;'
-    +'top:'+(e.clientY-r.top-sz/2)+'px';
-  btn.appendChild(rpl);
-  setTimeout(function(){rpl.remove();},500);
-});
-
-/* ── Ripple sul bottone JOIN portale ── */
-(function(){
-  var btn=document.getElementById('portal-join-btn');
-  if(!btn)return;
-  btn.addEventListener('click',function(e){
-    var r=btn.getBoundingClientRect();
-    var rp=document.createElement('span');
-    var sz=Math.max(r.width,r.height)*1.2;
-    rp.className='ripple';
-    rp.style.cssText='width:'+sz+'px;height:'+sz+'px;'
-      +'left:'+(e.clientX-r.left-sz/2)+'px;'
-      +'top:'+(e.clientY-r.top-sz/2)+'px;';
-    btn.appendChild(rp);
-    setTimeout(function(){rp.remove();},700);
-  });
-})();
-
-/* ── Fade-in con IntersectionObserver e stagger ── */
-var _fio=new IntersectionObserver(function(entries){
-  entries.forEach(function(en){
-    if(en.isIntersecting){en.target.classList.add('visible');_fio.unobserve(en.target);}
-  });
-},{threshold:.1,rootMargin:'0px 0px -30px 0px'});
-
-function initFadeIn(root){
-  var els=(root||document).querySelectorAll(
-    '.shead,.cgrid,.lcard,.n-db-wrap,.hsec,.arcadia-sec,.fade-in,.mys-card,.step,.fpill'
+#candlelight-overlay{
+  position:fixed;inset:0;pointer-events:none;z-index:9;
+  background:radial-gradient(
+    circle 240px at var(--clx,50%) var(--cly,50%),
+    transparent 0%,
+    rgba(0,0,0,.0) 35%,
+    rgba(0,0,0,.38) 70%,
+    rgba(0,0,0,.62) 100%
   );
-  els.forEach(function(el,i){
-    if(!el.classList.contains('fade-in'))el.classList.add('fade-in');
-    var delay=0;
-    if(el.classList.contains('mys-card')||el.classList.contains('fpill')||el.classList.contains('step')){
-      var siblings=el.parentElement?el.parentElement.children:[];
-      for(var j=0;j<siblings.length;j++){if(siblings[j]===el){delay=j*80;break;}}
-      el.style.transitionDelay=delay+'ms';
-    }
-    _fio.observe(el);
-  });
+  opacity:0;transition:opacity .5s;
+}
+#candlelight-overlay.cl-on{opacity:1}
+/* su mobile nasconde il pulsante (nessun cursore) */
+@media(hover:none){#candle-toggle{display:none!important}}
+
+/* ════════════════════════════════════
+   ECO DELLE RUNE — decifrazione titoli
+════════════════════════════════════ */
+@keyframes runeDecrypt{
+  0%{
+    filter:blur(4px);opacity:.15;
+    letter-spacing:.35em;color:rgba(200,155,60,.35);
+  }
+  45%{filter:blur(2px);opacity:.55;letter-spacing:.12em}
+  80%{filter:blur(.5px);opacity:.9;letter-spacing:.06em}
+  100%{filter:blur(0);opacity:1;letter-spacing:inherit;color:inherit}
+}
+.rr{animation:runeDecrypt 1.1s cubic-bezier(.4,0,.2,1) forwards}
+
+/* ════════════════════════════════════
+   FOG OF WAR — nebbia su mpin inesplorati
+════════════════════════════════════ */
+.mpin[data-explored="false"]{
+  filter:grayscale(1) brightness(.45) sepia(.3);
+  opacity:.6;
+  transition:filter .6s ease,opacity .6s ease;
+}
+.mpin[data-explored="false"]:hover{
+  filter:grayscale(.4) brightness(.7);
+  opacity:.8;
+}
+.mpin[data-explored="true"]{
+  filter:none;opacity:1;
+  transition:filter .6s ease,opacity .6s ease;
 }
 
-initFadeIn();
+/* ════════════════════════════════════
+   TOAST — Notifiche del Destino
+════════════════════════════════════ */
+#toast-wrap{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  z-index:9200;display:flex;flex-direction:column;align-items:center;gap:8px;
+  pointer-events:none;
+}
+.arc-toast{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(4,5,14,.97);border:1px solid rgba(200,155,60,.35);
+  color:var(--parch);font-family:'Cinzel',serif;font-size:10px;
+  letter-spacing:.1em;padding:9px 18px;
+  box-shadow:0 4px 24px rgba(0,0,0,.7),0 0 0 1px rgba(200,155,60,.07),var(--glow);
+  opacity:0;transform:translateY(14px);
+  transition:opacity .28s ease,transform .28s ease;
+  white-space:nowrap;
+}
+.arc-toast.in{opacity:1;transform:translateY(0)}
+.arc-toast.out{opacity:0;transform:translateY(-8px)}
+.arc-toast-icon{font-size:14px;color:var(--gold);flex-shrink:0}
+.arc-toast-msg{color:var(--parch)}
+@media(max-width:768px){#toast-wrap{bottom:72px;left:16px;right:16px;transform:none;}
+  .arc-toast{font-size:9.5px;padding:8px 14px;white-space:normal}}
 
-/* ── Tasto Runa Audio ── */
-(function(){
-  var _aud=null,_on=false;
-  window.toggleArcAudio=function(){
-    var btn=document.getElementById('audio-runa');
-    if(!_aud){
-      _aud=new Audio('/ambient.mp3');
-      _aud.loop=true;_aud.volume=0.18;
-      _aud.onerror=function(){
-        _aud=null;_on=false;
-        if(btn){btn.classList.remove('ara-on');btn.title='Audio non trovato — aggiungi ambient.mp3 in public/';}
-      };
-    }
-    if(_on){
-      _aud.pause();_on=false;
-      if(btn)btn.classList.remove('ara-on');
-    }else{
-      _aud.play().catch(function(){});_on=true;
-      if(btn)btn.classList.add('ara-on');
-    }
-  };
-})();
-/* ── Dust VFX — particelle atmosferiche dorate ── */
-(function(){
-  var wrap=document.getElementById('dust-vfx');
-  if(!wrap)return;
-  var N=18; /* numero particelle */
-  for(var i=0;i<N;i++){
-    (function(idx){
-      var p=document.createElement('div');
-      p.className='dp';
-      var sz=Math.random()*2+1; /* 1–3px */
-      var dur=Math.random()*22+14; /* 14–36s */
-      var delay=Math.random()*dur*-1; /* start offset */
-      var left=Math.random()*100;
-      var dx=(Math.random()-0.5)*120; /* spostamento orizzontale */
-      p.style.cssText=
-        'width:'+sz+'px;height:'+sz+'px;'
-        +'left:'+left+'%;bottom:0;'
-        +'--dx:'+dx+'px;'
-        +'animation-duration:'+dur+'s;'
-        +'animation-delay:'+delay+'s;'
-        +'opacity:0;';
-      wrap.appendChild(p);
-    })(i);
-  }
-})();
-/* ── Lume di Candela — vignette radiale che segue il cursore (OFF di default) ── */
-(function(){
-  var ov=document.getElementById('candlelight-overlay');
-  if(!ov)return;
-  var cx=50,cy=50;
-  var tx=50,ty=50;
-  var enabled=false; /* OFF di default */
-  window.toggleCandlelight=function(){
-    enabled=!enabled;
-    ov.classList.toggle('cl-on',enabled);
-    var btn=document.getElementById('candle-toggle');
-    if(btn){
-      btn.classList.toggle('cl-on',enabled);
-      btn.title=enabled?'Spegni lume di candela':'Lume di candela';
-    }
-  };
-  function tick(){
-    cx+=(tx-cx)*0.08;
-    cy+=(ty-cy)*0.08;
-    ov.style.setProperty('--clx',cx.toFixed(2)+'%');
-    ov.style.setProperty('--cly',cy.toFixed(2)+'%');
-    requestAnimationFrame(tick);
-  }
-  document.addEventListener('mousemove',function(e){
-    tx=(e.clientX/window.innerWidth)*100;
-    ty=(e.clientY/window.innerHeight)*100;
-  });
-  document.addEventListener('touchmove',function(e){
-    var t=e.touches[0];
-    tx=(t.clientX/window.innerWidth)*100;
-    ty=(t.clientY/window.innerHeight)*100;
-  },{passive:true});
-  tick();
-})();
+/* ════════════════════════════════════
+   WHISPER SIDEBAR — indice sezioni
+════════════════════════════════════ */
+#whisper-nav{
+  position:fixed;right:10px;top:50%;transform:translateY(-50%);
+  z-index:170;display:flex;flex-direction:column;gap:10px;
+  pointer-events:auto;
+}
+.wn-dot{
+  display:block;width:7px;height:7px;border-radius:50%;
+  background:rgba(200,155,60,.25);border:1px solid rgba(200,155,60,.2);
+  position:relative;cursor:pointer;
+  transition:background .2s,transform .2s,box-shadow .2s;
+}
+.wn-dot::after{
+  content:attr(data-label);
+  position:absolute;right:calc(100% + 10px);top:50%;transform:translateY(-50%);
+  background:rgba(4,5,14,.97);border:1px solid rgba(200,155,60,.25);
+  color:var(--parch);font-family:'Cinzel',serif;font-size:8.5px;
+  letter-spacing:.08em;padding:5px 10px;white-space:nowrap;
+  opacity:0;pointer-events:none;
+  transition:opacity .18s;
+}
+.wn-dot:hover{
+  background:rgba(200,155,60,.7);
+  transform:scale(1.6);
+  box-shadow:0 0 8px rgba(200,155,60,.4);
+}
+.wn-dot:hover::after{opacity:1}
+@media(max-width:768px){#whisper-nav{display:none}}
+/* ── Copy link button nel page-hero ── */
+.ph-copy-btn{
+  margin-top:12px;
+  display:inline-flex;align-items:center;gap:6px;
+  background:transparent;border:1px solid rgba(200,155,60,.2);
+  color:rgba(200,155,60,.45);font-family:'Cinzel',serif;font-size:8px;
+  letter-spacing:.15em;padding:5px 12px;cursor:pointer;
+  transition:border-color .2s,color .2s,background .2s;
+}
+.ph-copy-btn:hover{border-color:rgba(200,155,60,.5);color:var(--gold2);background:rgba(200,155,60,.06)}
+/* ── Pulsante Lume di Candela ── */
+#candle-toggle{
+  position:fixed;bottom:168px;right:18px;z-index:180;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(4,5,14,.92);border:1px solid rgba(200,155,60,.18);
+  color:var(--text3);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .2s,color .2s,box-shadow .2s;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  title:'Lume di candela';
+}
+#candle-toggle:hover{border-color:rgba(200,155,60,.4);color:rgba(200,155,60,.7)}
+#candle-toggle.cl-on{border-color:var(--gold);color:var(--gold2);box-shadow:0 0 12px rgba(200,155,60,.3)}
+@media(max-width:768px){#candle-toggle{display:none}}
