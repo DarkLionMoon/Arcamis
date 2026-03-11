@@ -3,6 +3,7 @@
 ════════════════════════════════════ */
 
 var navStack = []; /* navigation history [{id,label,icon},...] */
+var _memCache = {}; /* cache in-memory pagine già caricate (nessun limite di quota) */
 
 /* ID pagine presenti nella mappa interattiva — non mostrare come child_page link */
 /* ── Cover URL: usa proxy per URL S3 Notion che scadono ── */
@@ -506,18 +507,20 @@ async function _gpRender(id,label,icon){
   var phHero=document.getElementById('page-hero');
   var phCrumb=document.getElementById('ph-crumb');
 
-  /* cache check */
+  /* cache check — livello 0: memoria, livello 1: sessionStorage, livello 2: network */
   var cacheKey='pg_'+id;
-  var data=null;
-  try{var c=sessionStorage.getItem(cacheKey);if(c)data=JSON.parse(c);}catch(e){}
+  var data=_memCache[cacheKey]||null;
+  if(!data){try{var _ss=sessionStorage.getItem(cacheKey);if(_ss)data=JSON.parse(_ss);}catch(e){}}
+  if(data)_memCache[cacheKey]=data; /* warm up memory cache */
 
   try{
     if(!data){
-      var timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('Timeout'))},15000)});
+      var timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('Timeout'))},25000)});
       var r=await Promise.race([fetch('/api/notion?pageId='+id),timeout]);
       if(!r.ok)throw new Error('HTTP '+r.status);
       data=await r.json();
-      try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){}
+      _memCache[cacheKey]=data; /* sempre in memoria */
+      try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){} /* best-effort */
     }
     var pg=data.page,bl=data.blocks;
     var ta=pg.properties&&pg.properties.title&&pg.properties.title.title||[];
