@@ -846,3 +846,26 @@ details.n-toggle[open]>.n-tc{animation:toggleOpen .2s ease forwards}
 .n-pdf-icon{font-size:22px;flex-shrink:0}
 .n-pdf-label{font-family:'Cinzel',serif;font-size:11px;color:var(--parch);letter-spacing:.05em}
 .n-pdf-hint{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ════════════════════════════════════
+   DB CAROUSEL (loc-card style)
+════════════════════════════════════ */
+.n-db-lc-wrap{
+  margin:20px 0 32px;
+  position:relative;
+}
+.n-db-lc-wrap .n-db-title{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;
+  color:var(--gold3);text-transform:uppercase;
+  margin-bottom:14px;opacity:.7;
+}
+.n-db-lc-wrap .loc-wrap{
+  /* usa la stessa struttura del carousel homepage */
+}
+.n-db-lc-wrap .loc-card{
+  flex:0 0 220px;
+  height:300px;
+}
+@media(max-width:700px){
+  .n-db-lc-wrap .loc-card{flex:0 0 180px;height:260px}
+}
