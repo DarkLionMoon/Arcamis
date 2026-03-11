@@ -65,9 +65,21 @@ function renderBlocks(blocks,isRoot){
         h+='<p class="n-p">'+(rt(d.rich_text)||'<br>')+'</p>';
         break;
 
-      case'heading_1':h+='<h2 class="n-h1">'+rt(d.rich_text)+'</h2>';break;
-      case'heading_2':h+='<h3 class="n-h2">'+rt(d.rich_text)+'</h3>';break;
-      case'heading_3':h+='<h4 class="n-h3">'+rt(d.rich_text)+'</h4>';break;
+      case'heading_1':
+        if(d.is_toggleable&&b.children){
+          h+='<details class="n-toggle n-th"><summary class="n-h1 n-tsum">'+rt(d.rich_text)+'</summary>'
+            +'<div class="n-tc">'+renderBlocks(b.children)+'</div></details>';
+        }else{h+='<h2 class="n-h1">'+rt(d.rich_text)+'</h2>';}break;
+      case'heading_2':
+        if(d.is_toggleable&&b.children){
+          h+='<details class="n-toggle n-th"><summary class="n-h2 n-tsum">'+rt(d.rich_text)+'</summary>'
+            +'<div class="n-tc">'+renderBlocks(b.children)+'</div></details>';
+        }else{h+='<h3 class="n-h2">'+rt(d.rich_text)+'</h3>';}break;
+      case'heading_3':
+        if(d.is_toggleable&&b.children){
+          h+='<details class="n-toggle n-th"><summary class="n-h3 n-tsum">'+rt(d.rich_text)+'</summary>'
+            +'<div class="n-tc">'+renderBlocks(b.children)+'</div></details>';
+        }else{h+='<h4 class="n-h3">'+rt(d.rich_text)+'</h4>';}break;
 
       case'bulleted_list_item':
         h+='<ul class="n-ul"><li>'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</li></ul>';break;
@@ -187,8 +199,21 @@ function renderBlocks(blocks,isRoot){
             +'<div class="n-cp-info"><div class="n-cp-title">'+cptitle+'</div>'
             +'<div class="n-cp-cta">Apri →</div></div></div>';
           i++;
+      case'child_page':
+        var cpCards='';
+        var cpUid='cp-'+Math.random().toString(36).slice(2,8);
+        while(i<blocks.length&&blocks[i].type==='child_page'){
+          var cpb=blocks[i],cpd=cpb[cpb.type]||{};
+          var cpid=cpb.id.replace(/-/g,'');
+          var cpni=pages.find(function(n){return n.id===cpid});
+          var cpicon=cpni?cpni.i:'📄';
+          var cptitle=cpd.title||'Pagina';
+          var cpacc=iconAccent(cpicon);
+          var cpbg=iconGradient(cpicon);
+          cpCards+='<div class="loc-card" style="'+cpbg+'" onclick="gp(\''+cpid+'\',\''+cptitle.replace(/'/g,"\\'")+'\',\''+cpicon+'\')"><div class="loc-ov"><div class="loc-badge explored">'+cpicon+'</div><div class="loc-name">'+cptitle+'</div><div class="loc-sub" style="color:'+cpacc.c+'">Apri \u2192</div><div class="loc-cta">APRI \u25c6</div></div></div>';
+          i++;
         }
-        h+='<div class="n-cp-grid">'+cpCards+'</div>';
+        h+='<div class="n-db-lc-wrap" id="'+cpUid+'"><div class="loc-wrap" style="margin:0"><div class="loc-track-outer"><div class="loc-track" data-idx="0" style="gap:16px">'+cpCards+'</div></div><div class="la la-prev" onclick="dbLocNav(this,-1)">&#8249;</div><div class="la la-next" onclick="dbLocNav(this,1)">&#8250;</div></div></div>';
         i--;
         break;
 
@@ -496,6 +521,12 @@ async function _gpRender(id,label,icon){
     });
     attachShine(pbody);
     loadDbGalleries(pbody);
+    /* carica DB dentro i toggle quando vengono aperti */
+    pbody.querySelectorAll('details.n-toggle').forEach(function(det){
+      det.addEventListener('toggle',function(){
+        if(det.open){loadDbGalleries(det);}
+      },{once:true});
+    });
     initFadeIn(pbody);
     /* registra nei recenti */
     if(typeof addRecente==='function')addRecente(id,ptitle,picon);
