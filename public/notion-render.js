@@ -242,8 +242,49 @@ function renderBlocks(blocks,isRoot){
 }
 
 /* ════════════════════════════════════
-   DATABASE GALLERY LOADER
+   DATABASE GALLERY — loc-card carousel
 ════════════════════════════════════ */
+
+/* gradient di sfondo dall'icona (usato quando non c'è cover) */
+function iconGradient(emoji){
+  var e=emoji||'';
+  if(['🔥','⚔️','🗡️','⚠️','🛡️','⚡','🐉','💀'].indexOf(e)>-1)
+    return'radial-gradient(ellipse 90% 60% at 50% 80%,#300a06 0%,#180402 50%,#080100 100%)';
+  if(['📚','📜','📖','🗒️','🏛️','📋'].indexOf(e)>-1)
+    return'radial-gradient(ellipse 90% 60% at 50% 80%,#201408 0%,#120c04 50%,#060400 100%)';
+  if(['🌊','💧','🌙','🐋','🚢','⚓','🌐'].indexOf(e)>-1)
+    return'radial-gradient(ellipse 90% 60% at 50% 80%,#081c30 0%,#041016 50%,#020608 100%)';
+  if(['🌿','🌱','🍃','🌲','🌳','🌾','🍀'].indexOf(e)>-1)
+    return'radial-gradient(ellipse 90% 60% at 50% 80%,#0a1e0c 0%,#061008 50%,#020602 100%)';
+  if(['🔮','💜','🌑','👁️','🧿','✨','🌌'].indexOf(e)>-1)
+    return'radial-gradient(ellipse 90% 60% at 50% 80%,#14083c 0%,#0a0420 50%,#04020e 100%)';
+  if(['🍺','🍻','🥂','🍖','🍴'].indexOf(e)>-1)
+    return'radial-gradient(ellipse 90% 60% at 50% 80%,#1e1006 0%,#100804 50%,#060200 100%)';
+  if(['💊','⚕️','🏥','🌡️','🩺'].indexOf(e)>-1)
+    return'radial-gradient(ellipse 90% 60% at 50% 80%,#061c1a 0%,#040e0e 50%,#020606 100%)';
+  return'radial-gradient(ellipse 90% 60% at 50% 80%,#0e0c04 0%,#080602 50%,#040200 100%)';
+}
+
+/* navigazione generica per qualsiasi loc-track nel renderer */
+function dbLocNav(btn, dir){
+  var wrap=btn.closest('.n-db-lc-wrap');
+  if(!wrap)return;
+  var track=wrap.querySelector('.loc-track');
+  var cards=track?track.querySelectorAll('.loc-card'):[];
+  if(!cards.length)return;
+  var idx=parseInt(track.getAttribute('data-idx')||'0',10)+dir;
+  var cardW=cards[0].getBoundingClientRect().width||240;
+  var gap=16;
+  var step=cardW+gap;
+  var trackW=cards.length*step-gap;
+  var outerW=wrap.querySelector('.loc-track-outer').getBoundingClientRect().width||600;
+  var maxPx=Math.max(0,trackW-outerW);
+  var maxIdx=Math.floor(maxPx/step);
+  if(idx<0)idx=0;if(idx>maxIdx)idx=maxIdx;
+  track.setAttribute('data-idx',idx);
+  track.style.transform='translateX(-'+(idx*step)+'px)';
+}
+
 async function loadDbGalleries(container){
   var grids=container.querySelectorAll('.n-db-grid[id^="db-"]');
   grids.forEach(async function(grid){
@@ -255,16 +296,43 @@ async function loadDbGalleries(container){
       if(!data.pages||!data.pages.length){
         grid.innerHTML='<div class="n-db-loading">Nessun elemento trovato.</div>';return;
       }
-      grid.innerHTML=data.pages.map(function(p){
-        var acc=iconAccent(p.icon);
-        var coverHtml=p.cover
-          ?'<div class="n-db-cover-wrap"><img class="n-db-cover" src="'+p.cover+'" loading="lazy" onerror="this.parentElement.style.background=\''+acc.bg+'\'"><div class="n-db-cover-fade"></div></div>'
-          :'<div class="n-db-cover-wrap" style="background:'+acc.bg+'"><div class="n-db-icon">'+(p.icon||'📄')+'</div></div>';
-        return'<div class="n-db-card" onclick="gp(\''+p.id+'\',\''+p.title.replace(/'/g,"\\'")+'\',\''+(p.icon||'📄')+'\')">'
-          +coverHtml
-          +'<div class="n-db-name" style="border-top-color:'+acc.c+'">'+(p.icon?p.icon+' ':'')+p.title+'</div>'
-          +'</div>';
+      /* costruisci loc-card per ogni pagina */
+      var cardsHtml=data.pages.map(function(p){
+        var icon=p.icon||'📄';
+        var acc=iconAccent(icon);
+        var bg=p.cover
+          ?'background-image:url("'+p.cover+'");background-size:cover;background-position:center'
+          :'background:'+iconGradient(icon);
+        var title=p.title.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+        return'<div class="loc-card" style="'+bg+'" onclick="gp(\''+p.id+'\',\''+title+'\',\''+icon+'\')">'
+          +'<div class="loc-ov">'
+          +'<div class="loc-badge explored">'+icon+'</div>'
+          +'<div class="loc-name">'+p.title+'</div>'
+          +'<div class="loc-sub" style="color:'+acc.c+'">Scopri →</div>'
+          +'<div class="loc-cta">APRI ◆</div>'
+          +'</div></div>';
       }).join('');
+      /* rimpiazza il grid con un carosello loc-card */
+      var wrap=grid.closest('.n-db-wrap');
+      if(wrap){
+        /* sostituisce tutta la .n-db-wrap con il carosello */
+        var titleEl=wrap.querySelector('.n-db-title');
+        var titleHtml=titleEl?'<div class="n-db-title">'+titleEl.textContent+'</div>':'';
+        var uid='dblc-'+dbId;
+        wrap.outerHTML=
+          '<div class="n-db-lc-wrap" id="'+uid+'">'
+          +titleHtml
+          +'<div class="loc-wrap" style="margin:0">'
+          +'<div class="loc-track-outer">'
+          +'<div class="loc-track" data-idx="0" style="gap:16px">'+cardsHtml+'</div>'
+          +'</div>'
+          +'<div class="la la-prev" onclick="dbLocNav(this,-1)">‹</div>'
+          +'<div class="la la-next" onclick="dbLocNav(this,1)">›</div>'
+          +'</div></div>';
+      }else{
+        /* fallback: grid rimpiazzata inline */
+        grid.outerHTML='<div class="loc-track" data-idx="0" style="gap:16px;display:flex">'+cardsHtml+'</div>';
+      }
     }catch(e){
       grid.innerHTML='<div class="n-db-loading">⚠️ Errore caricamento.</div>';
     }
