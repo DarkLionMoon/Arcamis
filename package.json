@@ -6,7 +6,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "dev": "vercel dev"
+    "dev": "vercel dev",
+    "build": "node scripts/fetch-notion.js"
   },
   "devDependencies": {
     "vercel": "^33.0.0"
