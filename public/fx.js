@@ -226,3 +226,22 @@ function initFadeIn(root){
 }
 
 initFadeIn();
+
+/* ── Tasto Runa Audio ── */
+(function(){
+  var _aud=null,_on=false;
+  window.toggleArcAudio=function(){
+    if(!_aud){
+      /* usa un audio ambientale da URL pubblico — dark ambient loop */
+      _aud=new Audio('https://cdn.freesound.org/previews/459/459977_4921277-lq.mp3');
+      _aud.loop=true;_aud.volume=0.18;
+    }
+    if(_on){
+      _aud.pause();_on=false;
+      document.getElementById('audio-runa').classList.remove('ara-on');
+    }else{
+      _aud.play().catch(function(){});_on=true;
+      document.getElementById('audio-runa').classList.add('ara-on');
+    }
+  };
+})();
