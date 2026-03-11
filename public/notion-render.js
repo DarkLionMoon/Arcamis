@@ -218,7 +218,12 @@ function renderBlocks(blocks,isRoot){
           var cptitle=cpd.title||'Pagina';
           var cpacc=iconAccent(cpicon);
           var cpbg=iconGradient(cpicon);
-          cpCards+='<div class="loc-card" style="'+cpbg+'" onclick="gp(''+cpid+'',''+cptitle.replace(/'/g,"\'")+'',''+cpicon+'')"><div class="loc-ov"><div class="loc-badge explored">'+cpicon+'</div><div class="loc-name">'+cptitle+'</div><div class="loc-sub" style="color:'+cpacc.c+'">Apri →</div><div class="loc-cta">APRI ◆</div></div></div>';
+          var cptitleSafe=cptitle.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+          cpCards+='<div class="loc-card" style="'+cpbg+'" onclick="gp(\''+cpid+'\',\''+cptitleSafe+'\',\''+cpicon+'\')">'
+            +'<div class="loc-ov"><div class="loc-badge explored">'+cpicon+'</div>'
+            +'<div class="loc-name">'+cptitle+'</div>'
+            +'<div class="loc-sub" style="color:'+cpacc.c+'">Apri \u2192</div>'
+            +'<div class="loc-cta">APRI \u25c6</div></div></div>';
           i++;
         }
         if(cpCards){
