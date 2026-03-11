@@ -233,7 +233,6 @@ initFadeIn();
   window.toggleArcAudio=function(){
     var btn=document.getElementById('audio-runa');
     if(!_aud){
-      /* Metti un file 'ambient.mp3' nella cartella public/ del tuo repo Vercel */
       _aud=new Audio('/ambient.mp3');
       _aud.loop=true;_aud.volume=0.18;
       _aud.onerror=function(){
@@ -241,13 +240,12 @@ initFadeIn();
         if(btn){btn.classList.remove('ara-on');btn.title='Audio non trovato — aggiungi ambient.mp3 in public/';}
       };
     }
-    }
     if(_on){
       _aud.pause();_on=false;
-      document.getElementById('audio-runa').classList.remove('ara-on');
+      if(btn)btn.classList.remove('ara-on');
     }else{
       _aud.play().catch(function(){});_on=true;
-      document.getElementById('audio-runa').classList.add('ara-on');
+      if(btn)btn.classList.add('ara-on');
     }
   };
 })();
