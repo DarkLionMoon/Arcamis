@@ -2,103 +2,89 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
     <title>Arcamis</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:wght@300;400;600&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="style-base.css">
     <link rel="stylesheet" href="style-page.css">
     <link rel="stylesheet" href="style-fx.css">
 </head>
-<body>
-
-<div id="site-loader">
+<body class="dark-theme"> <div id="site-loader">
   <div class="loader-rune">⚔</div>
   <div class="loader-sub">Arcamis</div>
-  <div class="loader-dots">
-    <div class="loader-dot"></div>
-    <div class="loader-dot"></div>
-    <div class="loader-dot"></div>
-  </div>
 </div>
 
-<div id="ptr-indicator">↓ Rilascia per aggiornare</div>
-<div id="scroll-top-btn" onclick="goToTop()">▲</div>
-<button id="audio-runa" onclick="toggleArcAudio()" title="Audio ambientale">♪</button>
-
-<div id="progress-bar"></div>
 <div id="topbar">
   <div id="tlogo" onclick="showHome()">
-    <div id="liw"><img id="li" alt=""/><span id="lf">⚔</span></div>
+    <div id="liw"><span id="lf">⚔</span></div>
     <span id="tlt">ARCAMIS</span>
   </div>
+  
   <nav id="tnav">
-    <div class="tn ta" data-v="home" onclick="showHome();closeDd()">Home</div>
+    <div class="tn ta" onclick="showHome()">Home</div>
 
     <div class="tn-drop" id="dd-regole">
-      <div class="tn" onclick="toggleDd('dd-regole',event)">Regole</div>
+      <div class="tn" onclick="toggleDd('dd-regole',event)">Regole ▾</div>
       <div class="tn-menu">
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')">Gameplay</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')">Regole generali</div>
+        <div class="tn-item" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')">Gameplay</div>
+        <div class="tn-item" onclick="gp('2f00274fdc1c800b9d8fc366e8e40c5c','Regole','📜')">Regole generali</div>
       </div>
     </div>
 
     <div class="tn-drop" id="dd-lavori">
-      <div class="tn" onclick="toggleDd('dd-lavori',event)">Lavori</div>
+      <div class="tn" onclick="toggleDd('dd-lavori',event)">Lavori ▾</div>
       <div class="tn-menu">
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801c9697e75caa8d5f13','Bottega farmaceutica','💊')">Bottega farmaceutica</div>
+        <div class="tn-item" onclick="gp('2f00274fdc1c801c9697e75caa8d5f13','Bottega farmaceutica','💊')">Bottega farmaceutica</div>
       </div>
     </div>
   </nav>
 
   <div id="tr">
-    <div id="sw">
-      <input id="ts" type="text" placeholder="Cerca..." oninput="hsearch(this.value)"/>
-      <div id="sr"></div>
-    </div>
-    <div id="ovbtn" onclick="ovo()">Menu</div>
     <button id="theme-toggle" onclick="toggleTheme()">☀️</button>
+    <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" class="dc-btn">Discord</a>
   </div>
 </div>
 
 <div id="main">
-  
   <div id="hv" class="vp" style="display:block">
     <div id="carousel-wrap">
-       <div class="slide active" style="background-image:url('cover.png'); height: 100vh;">
-          <div class="scnt">
-            <div class="stit">ARCAMIS</div>
-          </div>
-       </div>
+      <div class="slide active" style="background-image:linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('cover.png');">
+        <div class="scnt">
+          <div class="stit">ARCAMIS</div>
+          <p class="sdesc">Benvenuto nelle Marche di Arcamis.</p>
+        </div>
+      </div>
     </div>
   </div>
 
   <div id="pv" class="vp" style="display:none">
-    <div id="pc">
-        </div>
+    <div id="pc"></div>
   </div>
-
 </div>
 
 <script>
-  // Funzione per gestire i menu a tendina se app.js non la carica correttamente
-  function toggleDd(id, event) {
-    event.stopPropagation();
+  // Script di emergenza per i menu se app.js tarda a caricare
+  function toggleDd(id, e) {
+    if(e) e.stopPropagation();
     const el = document.getElementById(id);
-    const wasActive = el.classList.contains('active');
-    closeDd(); // Chiude gli altri
-    if (!wasActive) el.classList.add('active');
-  }
-
-  function closeDd() {
+    const isOpen = el.classList.contains('active');
     document.querySelectorAll('.tn-drop').forEach(d => d.classList.remove('active'));
+    if(!isOpen) el.classList.add('active');
   }
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.tn-drop').forEach(d => d.classList.remove('active'));
+  });
 
-  window.onclick = closeDd;
+  // Mostra Home / Pagine
+  function showHome() {
+    document.getElementById('hv').style.display = 'block';
+    document.getElementById('pv').style.display = 'none';
+    document.querySelectorAll('.tn').forEach(t => t.classList.remove('ta'));
+  }
 </script>
 
 <script src="app.js"></script>
 <script src="notion-render.js"></script>
-
 </body>
 </html>
