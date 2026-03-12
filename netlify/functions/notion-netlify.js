@@ -25,6 +25,7 @@ async function notionFetch(path, method, body) {
   return res.json();
 }
 
+/* ── Recupera tutti i blocchi (con paginazione + figli in parallelo) ── */
 async function fetchAllBlocks(blockId, depth) {
   depth = depth || 0;
   if (depth > 5) return [];
@@ -48,33 +49,36 @@ async function fetchAllBlocks(blockId, depth) {
   return blocks;
 }
 
+/* ── Helper risposta JSON ── */
+function json(statusCode, data, extraHeaders) {
+  return {
+    statusCode,
+    headers: Object.assign({ 'Content-Type': 'application/json' }, extraHeaders || {}),
+    body: JSON.stringify(data),
+  };
+}
+
 exports.handler = async function(event) {
   if (!TOKEN) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'NOTION_TOKEN non configurato' }),
-    };
+    return json(500, { error: 'NOTION_TOKEN non configurato' });
   }
 
   const params = event.queryStringParameters || {};
   const { pageId, dbId, img, q } = params;
 
   try {
-    /* ── Proxy immagini S3 Notion ── */
+    /* ── Proxy immagini S3 Notion (URL firmati scadono) ── */
     if (img) {
       const ALLOWED_IMG = ['s3.us-west', 'prod-files-secure', 'secure.notion-static', 'images.unsplash'];
       const isAllowed = ALLOWED_IMG.some(function(d){ return img.indexOf(d) > -1; });
-      if (!isAllowed) {
-        return { statusCode: 403, body: JSON.stringify({ error: 'URL non consentito' }) };
-      }
+      if (!isAllowed) return json(403, { error: 'URL non consentito' });
       const r = await fetch(img);
       if (!r.ok) return { statusCode: r.status, body: '' };
-      const contentType = r.headers.get('content-type') || 'image/webp';
       const buf = await r.arrayBuffer();
       return {
         statusCode: 200,
         headers: {
-          'Content-Type': contentType,
+          'Content-Type': r.headers.get('content-type') || 'image/webp',
           'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
         },
         body: Buffer.from(buf).toString('base64'),
@@ -88,41 +92,31 @@ exports.handler = async function(event) {
         notionFetch('/pages/' + pageId),
         fetchAllBlocks(pageId),
       ]);
-      return {
-        statusCode: 200,
-        headers: { 'Cache-Control': CACHE, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ page, blocks }),
-      };
+      return json(200, { page, blocks }, { 'Cache-Control': CACHE });
     }
 
-    /* ── Database ── */
+    /* ── Database (gallerie, locazioni) ── */
     if (dbId) {
       const data = await notionFetch('/databases/' + dbId + '/query', 'POST', {
         page_size: 100,
         sorts: [{ timestamp: 'created_time', direction: 'ascending' }],
       });
-      const pages = await Promise.all(
-        (data.results || []).map(async (p) => {
-          const titleProp = Object.values(p.properties || {})
-            .find(prop => prop.type === 'title');
-          const title = titleProp
-            ? (titleProp.title || []).map(t => t.plain_text).join('')
-            : 'Senza titolo';
-          const icon = p.icon?.emoji || '📄';
-          let coverUrl = null;
-          if (p.cover) {
-            coverUrl = p.cover.type === 'external'
-              ? p.cover.external?.url
-              : p.cover.file?.url;
-          }
-          return { id: p.id.replace(/-/g, ''), title, icon, cover: coverUrl };
-        })
-      );
-      return {
-        statusCode: 200,
-        headers: { 'Cache-Control': CACHE, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pages }),
-      };
+      const pages = (data.results || []).map(function(p) {
+        const titleProp = Object.values(p.properties || {})
+          .find(function(prop){ return prop.type === 'title'; });
+        const title = titleProp
+          ? (titleProp.title || []).map(function(t){ return t.plain_text; }).join('')
+          : 'Senza titolo';
+        const icon = (p.icon && p.icon.emoji) || '📄';
+        let coverUrl = null;
+        if (p.cover) {
+          coverUrl = p.cover.type === 'external'
+            ? (p.cover.external && p.cover.external.url)
+            : (p.cover.file && p.cover.file.url);
+        }
+        return { id: p.id.replace(/-/g, ''), title, icon, cover: coverUrl };
+      });
+      return json(200, { pages }, { 'Cache-Control': CACHE });
     }
 
     /* ── Ricerca ── */
@@ -132,31 +126,21 @@ exports.handler = async function(event) {
         filter: { property: 'object', value: 'page' },
         page_size: 8,
       });
-      const results = (data.results || []).map(p => {
+      const results = (data.results || []).map(function(p) {
         const titleProp = Object.values(p.properties || {})
-          .find(prop => prop.type === 'title');
+          .find(function(prop){ return prop.type === 'title'; });
         const title = titleProp
-          ? (titleProp.title || []).map(t => t.plain_text).join('')
+          ? (titleProp.title || []).map(function(t){ return t.plain_text; }).join('')
           : 'Senza titolo';
-        return { id: p.id.replace(/-/g, ''), title, icon: p.icon?.emoji || '📄' };
+        return { id: p.id.replace(/-/g, ''), title, icon: (p.icon && p.icon.emoji) || '📄' };
       });
-      return {
-        statusCode: 200,
-        headers: { 'Cache-Control': 'public, s-maxage=300', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ results }),
-      };
+      return json(200, { results }, { 'Cache-Control': 'public, s-maxage=300' });
     }
 
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Parametro mancante: pageId, dbId, img o q' }),
-    };
+    return json(400, { error: 'Parametro mancante: pageId, dbId, img o q' });
 
   } catch (e) {
     console.error('Notion API error:', e.message);
-    return {
-      statusCode: 502,
-      body: JSON.stringify({ error: e.message }),
-    };
+    return json(502, { error: e.message });
   }
 };
