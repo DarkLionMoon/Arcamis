@@ -381,7 +381,10 @@ async function loadDbGalleries(container){
 async function _loadSingleDb(grid){
     var dbId=grid.id.replace('db-','');
     try{
-      var r=await fetch('/api/notion?dbId='+dbId);
+      /* prova prima il file statico pre-generato */
+      var dbStaticR=null;
+      try{dbStaticR=await fetch('/data/db/'+dbId+'.json');if(!dbStaticR.ok)dbStaticR=null;}catch(e){dbStaticR=null;}
+      var r=dbStaticR||await fetch('/api/notion?dbId='+dbId);
       if(!r.ok)throw new Error('HTTP '+r.status);
       var data=await r.json();
       if(!data.pages||!data.pages.length){
@@ -518,7 +521,11 @@ async function _gpRender(id,label,icon){
   try{
     if(!data){
       var timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('Timeout'))},25000)});
-      var r=await Promise.race([fetch('/api/notion?pageId='+id),timeout]);
+      /* prova prima il file statico pre-generato */
+      var staticUrl='/data/pages/'+id+'.json';
+      var staticR=null;
+      try{staticR=await fetch(staticUrl);if(!staticR.ok)staticR=null;}catch(e){staticR=null;}
+      var r=staticR||await Promise.race([fetch('/api/notion?pageId='+id),timeout]);
       if(!r.ok)throw new Error('HTTP '+r.status);
       data=await r.json();
       _memCache[cacheKey]=data; /* sempre in memoria */
