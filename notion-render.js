@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════════
-   NOTION RENDER — ULTRA-RECOVERY (Deep Scanning + Media Fix)
+   NOTION RENDER — FINAL STABLE VERSION (Deep Content + Click Fix)
    ════════════════════════════════════════════════════════════════════════════ */
 
 var navStack = []; 
@@ -20,7 +20,7 @@ function rt(arr){
     let inner = cls.length ? `<span class="${cls.join(' ')}">${t}</span>` : t;
     if(r.href){
       const m = r.href.match(/([a-f0-9]{32})(?:[?#]|$)/);
-      if(m) return `<a class="rl" onclick="gp('${m[1]}','Pagina','📄')">${inner}</a>`;
+      if(m) return `<a class="rl" href="javascript:void(0)" onclick="gp('${m[1]}','Pagina','📄')">${inner}</a>`;
       return `<a href="${r.href}" target="_blank" rel="noopener" class="rl">${inner}</a>`;
     }
     return inner;
@@ -54,16 +54,11 @@ async function _gpRender(id, label, icon){
     const r = await fetch(`/api/notion?pageId=${id}`);
     if(!r.ok) throw new Error(`Status ${r.status}`);
     const data = await r.json();
-    
-    // Scansione profonda dei blocchi
     const html = renderBlocks(data.blocks || [], true);
     
-    if(!html || html.trim() === ""){
-        pbody.innerHTML = `<div class="errbox">📭 Contenuto non trovato. Verifica la condivisione su Notion.</div>`;
-    } else {
-        pbody.innerHTML = `<div class="nc" style="animation:fi .3s ease forwards">${html}</div>`;
-    }
+    pbody.innerHTML = html ? `<div class="nc" style="animation:fi .3s ease forwards">${html}</div>` : `<div class="errbox">📭 Pagina vuota.</div>`;
     
+    // Attivazione moduli post-render
     applyGlossary(pbody);
     if(window.loadDbGalleries) window.loadDbGalleries(pbody);
   } catch(e) {
@@ -71,7 +66,7 @@ async function _gpRender(id, label, icon){
   }
 }
 
-/* ── RENDERING RICORSIVO (Fondamentale per colonne e sync) ── */
+/* ── RENDERING RICORSIVO ── */
 function renderBlocks(blocks, isRoot){
   if(!blocks || !Array.isArray(blocks)) return '';
   let h = '';
@@ -82,8 +77,7 @@ function renderBlocks(blocks, isRoot){
     const d = b[type];
     if(!d) continue;
 
-    // Se il blocco ha figli (es. colonne, elenchi annidati), li processiamo subito
-    let children = (b.children && b.children.length) ? renderBlocks(b.children, false) : '';
+    let children = (b.has_children && b.children) ? renderBlocks(b.children, false) : '';
 
     switch(type){
       case 'paragraph': h += `<p class="n-p">${rt(d.rich_text)}${children}</p>`; break;
@@ -92,48 +86,49 @@ function renderBlocks(blocks, isRoot){
       case 'heading_3': h += `<h4 class="n-h3">${rt(d.rich_text)}</h4>${children}`; break;
       case 'bulleted_list_item': h += `<ul class="n-ul"><li>${rt(d.rich_text)}${children}</li></ul>`; break;
       case 'numbered_list_item': h += `<ol class="n-ol"><li>${rt(d.rich_text)}${children}</li></ol>`; break;
-      case 'quote': h += `<blockquote class="n-quote">${rt(d.rich_text)}${children}</blockquote>`; break;
       case 'callout':
-        const ic = d.icon?.emoji || '💡';
-        h += `<div class="n-callout"><div class="n-callout-icon">${ic}</div><div class="n-callout-body">${rt(d.rich_text)}${children}</div></div>`;
+        h += `<div class="n-callout"><div class="n-callout-icon">${d.icon?.emoji || '💡'}</div><div class="n-callout-body">${rt(d.rich_text)}${children}</div></div>`;
         break;
       case 'image': 
         const imgUrl = d.type === 'external' ? d.external.url : d.file.url;
         h += `<figure class="n-image"><img src="${imgUrl}" loading="lazy"></figure>`;
         break;
-      case 'child_database':
-        h += `<div class="n-db-wrap"><div class="n-db-grid" id="db-${b.id.replace(/-/g,'')}">⏳ Caricamento Database...</div></div>`;
-        break;
       case 'child_page':
         const subId = b.id.replace(/-/g,'');
         if(!mapPageIds.has(subId)){
-          h += `<div class="loc-card" onclick="gp('${subId}','${d.title.replace(/'/g,"\\'")}','📄')">
-            <div class="loc-ov"><div class="loc-badge">📄</div><div class="loc-name">${d.title}</div><div class="loc-cta">APRI ◆</div></div>
+          const cleanTitle = d.title.replace(/'/g, "\\'");
+          // FIX CLICK: Aggiunto href e cursore pointer esplicito
+          h += `<div class="loc-card" style="cursor:pointer" onclick="gp('${subId}','${cleanTitle}','📄')">
+            <div class="loc-ov"><div class="loc-badge">📄</div><div class="loc-name">${d.title}</div><div class="loc-cta">VEDI TUTTO ◆</div></div>
           </div>`;
         }
         break;
-      // Blocchi contenitore: passano semplicemente il contenuto dei figli
-      case 'column_list':
-      case 'column':
-      case 'synced_block':
-      case 'toggle':
-        h += `<div class="n-container-${type}">${children}</div>`;
+      case 'child_database':
+        h += `<div class="n-db-wrap"><div class="n-db-grid" id="db-${b.id.replace(/-/g,'')}"></div></div>`;
         break;
+      case 'column_list': h += `<div class="n-columns">${children}</div>`; break;
+      case 'column': h += `<div class="n-col">${children}</div>`; break;
+      case 'synced_block':
+      case 'toggle': h += children; break;
       case 'divider': h += `<div class="n-divider">✦</div>`; break;
     }
   }
   return h;
 }
 
-/* ── MODULI ACCESSORI ── */
-var _glossary = { 'gp':'Pezzi d\'oro', 'PG':'Personaggio Giocante', 'DM':'Dungeon Master' };
+/* ── MODULI ── */
 function applyGlossary(root){
+  const dict = { 'gp':'Monete d\'oro', 'PG':'Personaggio Giocante', 'DM':'Dungeon Master' };
   root.querySelectorAll('.n-p, .n-callout-body').forEach(el => {
     let html = el.innerHTML;
-    Object.keys(_glossary).forEach(term => {
-      const regex = new RegExp('(?<![\\w>])' + term + '(?![\\w<])', 'g');
-      html = html.replace(regex, `<span class="gterm" data-def="${_glossary[term]}">${term}</span>`);
+    Object.keys(dict).forEach(term => {
+      const regex = new RegExp('\\b' + term + '\\b', 'g');
+      html = html.replace(regex, `<span class="gterm" title="${dict[term]}">${term}</span>`);
     });
     el.innerHTML = html;
   });
 }
+
+window.addEventListener('popstate', (e) => {
+  if(e.state && e.state.id) gp(e.state.id, e.state.label, e.state.icon, true);
+});
