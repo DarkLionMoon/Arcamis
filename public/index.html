@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Arcamis</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style-base.css">
-<link rel="stylesheet" href="style-page.css">
-<link rel="stylesheet" href="style-fx.css">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Arcamis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/style-base.css">
+    <link rel="stylesheet" href="/style-page.css">
+    <link rel="stylesheet" href="/style-fx.css">
 </head>
 <body>
 
@@ -29,7 +29,7 @@
 <div id="progress-bar"></div>
 <div id="topbar">
   <div id="tlogo" onclick="showHome()">
-    <div id="liw"><img id="li" alt=""/><span id="lf">⚔</span></div>
+    <div id="liw"><img id="li" src="/mappa.png" alt="" style="display:none"/><span id="lf">⚔</span></div>
     <span id="tlt">ARCAMIS</span>
   </div>
   <nav id="tnav">
@@ -105,21 +105,20 @@
 </div>
 
 <div id="main">
-
   <div id="hv" class="vp" style="display:block">
 
     <div class="gold-sep"></div>
     <div class="hsec fade-in">
       <div class="sec-eyebrow">Regione Esplorabile</div>
       <div class="sec-h">MARCHE DI ARCAMIS</div>
-      <p class="sec-p">La città portuale di Arcamis e i territori circostanti. Un piccolo angolo di un regno molto più vasto, ancora in gran parte sconosciuto.</p>
+      <p class="sec-p">La città portuale di Arcamis e i territori circostanti.</p>
       
       <div class="map-container" id="arcamis-map" style="border-radius:2px;position:relative;overflow:hidden;background:#030608;line-height:0">
-        <img src="mappa.png" alt="Mappa delle Marche di Arcamis" style="width:100%;display:block;pointer-events:none" draggable="false"/>
+        <img src="/mappa.png" alt="Mappa delle Marche di Arcamis" style="width:100%;display:block;pointer-events:none" draggable="false"/>
 
         <div class="mpin t-city" id="mpin-arcamis" data-explored="true" style="left:87.76%;top:28.53%" data-id="3090274fdc1c80e1a365ce1c36873455" data-name="Arcamis" data-desc="Città portuale delle Marche."><div class="mpin-ring"></div><div class="mpin-dot"></div></div>
-        <div class="mpin t-forest" id="mpin-selvafoglia" data-explored="true" style="left:78.58%;top:24.05%" data-id="30d0274fdc1c800999feeb0ca6669b22" data-name="Selva Fogliabruna" data-desc="Alberi troppo vecchi." data-sub="foglia"><div class="mpin-ring"></div><div class="mpin-dot"></div></div>
-        <div class="mpin t-fog" id="mpin-forestasmari" data-explored="false" style="left:86.74%;top:41.99%" data-id="30d0274fdc1c8016b113d5c2d7662d8f" data-name="Foresta dello Smarrimento" data-desc="I sentieri cambiano." data-sub="smari"><div class="mpin-ring"></div><div class="mpin-dot"></div></div>
+        <div class="mpin t-forest" id="mpin-selvafoglia" data-explored="true" style="left:78.58%;top:24.05%" data-id="30d0274fdc1c800999feeb0ca6669b22" data-name="Selva Fogliabruna" data-desc="Alberi troppo vecchi."><div class="mpin-ring"></div><div class="mpin-dot"></div></div>
+        <div class="mpin t-fog" id="mpin-forestasmari" data-explored="false" style="left:86.74%;top:41.99%" data-id="30d0274fdc1c8016b113d5c2d7662d8f" data-name="Foresta dello Smarrimento" data-desc="I sentieri cambiano."><div class="mpin-ring"></div><div class="mpin-dot"></div></div>
         <div class="mpin t-village" id="mpin-volonx" data-explored="true" style="left:93.13%;top:35.69%" data-id="30d0274fdc1c804b9cb7e366f02bd635" data-name="Volonx" data-desc="Insediamento ai margini."><div class="mpin-ring"></div><div class="mpin-dot"></div></div>
         <div class="mpin t-city" id="mpin-vigilius" data-explored="true" style="left:78.74%;top:51.15%" data-id="31f0274fdc1c8059a923c73da185a0e3" data-name="Vigilius" data-desc="Centro politico e militare."><div class="mpin-ring"></div><div class="mpin-dot"></div></div>
         <div class="mpin t-village" id="mpin-galeton" data-explored="true" style="left:86.21%;top:69.47%" data-id="31f0274fdc1c8019945af2b26306462f" data-name="Galeton" data-desc="Crocevia commerciale."><div class="mpin-ring"></div><div class="mpin-dot"></div></div>
@@ -138,27 +137,10 @@
     </div>
 
     <div class="gold-sep"></div>
-    <div class="arcadia-sec fade-in">
-      <div class="arcadia-inner">
-        <div>
-          <div class="sec-eyebrow">Il Regno</div>
-          <div class="sec-h">ARCADIA</div>
-          <p class="sec-p">Le Marche di Arcamis sono solo l'avamposto di un regno antico e misterioso. Gilde, fazioni e poteri si contendono l'influenza.</p>
-          <div class="faction-grid">
-            <div class="fpill" onclick="gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda degli avventurieri','🗡️')"><span class="fp-i">🗡️</span><div><span class="fp-n">Gilda degli Avventurieri</span></div></div>
-            <div class="fpill" onclick="gp('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')"><span class="fp-i">🍺</span><div><span class="fp-n">La Locanda</span></div></div>
-            <div class="fpill" onclick="gp('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')"><span class="fp-i">🔥</span><div><span class="fp-n">Forgia</span></div></div>
-            <div class="fpill" onclick="gp('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')"><span class="fp-i">⚕️</span><div><span class="fp-n">Ospedale</span></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="gold-sep"></div>
     <div class="hsec fade-in">
       <div class="sec-eyebrow">Foreshadowing</div>
       <div class="sec-h">MISTERI DEL REGNO</div>
-      <p class="sec-p">Vecchie leggende parlano di luoghi dimenticati e forze antiche, ben oltre i confini delle Marche.</p>
+      <p class="sec-p">Vecchie leggende parlano di luoghi dimenticati ben oltre i confini delle Marche.</p>
       <div class="mys-cin-grid">
         <div class="mys-cin" style="--mg:rgba(40,100,200,.12)">
           <div class="mys-cin-bg" style="background:radial-gradient(ellipse 110% 90% at 50% 80%,#0a1e3a 0%,#060f1e 40%,#020810 100%)">
@@ -171,7 +153,7 @@
           <div class="mys-cin-content">
             <div class="mys-cin-tag">Leggenda</div>
             <div class="mys-cin-title">L'Eco delle Maree</div>
-            <div class="mys-cin-desc">I marinai più anziani parlano di un'isola che appare solo durante le eclissi.</div>
+            <div class="mys-cin-desc">Un'isola che appare solo durante le eclissi di Arcamis.</div>
           </div>
         </div>
       </div>
@@ -181,10 +163,10 @@
   <div id="pv" class="vp" style="display:none"><div id="pcont"></div></div>
 </div>
 
-<script src="data.js"></script>
-<script src="app.js"></script>
-<script src="notion-render.js"></script>
-<script src="fx.js"></script>
+<script src="/data.js"></script>
+<script src="/app.js"></script>
+<script src="/notion-render.js"></script>
+<script src="/fx.js"></script>
 
 </body>
 </html>
