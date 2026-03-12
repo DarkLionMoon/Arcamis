@@ -283,13 +283,11 @@ function prefetchPage(id){
   var key='pg_'+id;
   if(window._memCache&&_memCache[key])return;
   try{if(sessionStorage.getItem(key))return;}catch(e){}
-  /* prova prima file statico */
-  fetch('/data/pages/'+id+'.json').then(function(r){return r.ok?r.json():null;})
+  fetch('/api/notion?pageId='+id).then(function(r){return r.ok?r.json():null;})
     .then(function(d){
       if(!d)return;
-      var normalized=window.normalizePageData?normalizePageData(d):d;
-      if(window._memCache)_memCache[key]=normalized;
-      try{sessionStorage.setItem(key,JSON.stringify(normalized));}catch(e){}
+      if(window._memCache)_memCache[key]=d;
+      try{sessionStorage.setItem(key,JSON.stringify(d));}catch(e){}
     }).catch(function(){});
 }
 window.addEventListener('load',function(){setTimeout(function(){PREFETCH_IDS.forEach(prefetchPage);},2500);});
