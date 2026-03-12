@@ -3,9 +3,15 @@ export async function onRequest(context) {
   const pageId = url.searchParams.get('pageId');
   const dbId = url.searchParams.get('dbId');
   const imgUrl = url.searchParams.get('img');
+  const purge = url.searchParams.get('purge');
+  const purgeKey = url.searchParams.get('key');
   const TOKEN = context.env.NOTION_TOKEN;
+  const KV = context.env.ARCAMIS_CACHE;
 
-  const headers = {
+  const PURGE_SECRET = context.env.PURGE_SECRET || 'arcamis-purge';
+  const CACHE_TTL = 3600; /* secondi — 1 ora */
+
+  const notionHeaders = {
     'Authorization': 'Bearer ' + TOKEN,
     'Notion-Version': '2022-06-28',
     'Content-Type': 'application/json'
@@ -13,12 +19,29 @@ export async function onRequest(context) {
 
   const cors = {
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'public, max-age=300, stale-while-revalidate=600'
+    'Cache-Control': 'public, max-age=60, stale-while-revalidate=300'
   };
 
   try {
 
-    /* ── Proxy immagini S3 Notion (URL firmati che scadono) ── */
+    /* ── Purge cache ── */
+    if (purge && purgeKey === PURGE_SECRET) {
+      const id = pageId || dbId;
+      if (id) {
+        await KV.delete('pg_' + id.replace(/-/g, ''));
+        return new Response(JSON.stringify({ purged: id }), {
+          headers: { 'Content-Type': 'application/json', ...cors }
+        });
+      }
+      /* purge tutto */
+      const list = await KV.list();
+      await Promise.all(list.keys.map(k => KV.delete(k.name)));
+      return new Response(JSON.stringify({ purged: 'all', count: list.keys.length }), {
+        headers: { 'Content-Type': 'application/json', ...cors }
+      });
+    }
+
+    /* ── Proxy immagini S3 Notion ── */
     if (imgUrl) {
       const img = await fetch(decodeURIComponent(imgUrl));
       const ct = img.headers.get('content-type') || 'image/jpeg';
@@ -30,11 +53,24 @@ export async function onRequest(context) {
     /* ── Carica pagina singola ── */
     if (pageId) {
       const cleanId = pageId.replace(/-/g, '');
+      const cacheKey = 'pg_' + cleanId;
 
-      /* Pagina e primo livello di blocks in parallelo */
+      /* 1. Controlla KV cache */
+      const cached = await KV.get(cacheKey);
+      if (cached) {
+        return new Response(cached, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Cache': 'HIT',
+            ...cors
+          }
+        });
+      }
+
+      /* 2. Cache miss → chiama Notion */
       const [pageRes, blocksRes] = await Promise.all([
-        fetch('https://api.notion.com/v1/pages/' + cleanId, { headers }),
-        fetch('https://api.notion.com/v1/blocks/' + cleanId + '/children?page_size=100', { headers })
+        fetch('https://api.notion.com/v1/pages/' + cleanId, { headers: notionHeaders }),
+        fetch('https://api.notion.com/v1/blocks/' + cleanId + '/children?page_size=100', { headers: notionHeaders })
       ]);
 
       if (!pageRes.ok) throw new Error('Notion page error: ' + pageRes.status);
@@ -42,31 +78,52 @@ export async function onRequest(context) {
 
       const page = await pageRes.json();
       const blocksData = await blocksRes.json();
+      const blocks = await loadChildren(blocksData.results, notionHeaders);
 
-      /* Carica tutti i children in parallelo (ricorsivo) */
-      const blocks = await loadChildren(blocksData.results, headers);
+      const payload = JSON.stringify({ page, blocks });
 
-      return new Response(JSON.stringify({ page, blocks }), {
-        headers: { 'Content-Type': 'application/json', ...cors }
+      /* 3. Salva in KV */
+      await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+
+      return new Response(payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Cache': 'MISS',
+          ...cors
+        }
       });
     }
 
     /* ── Carica database ── */
     if (dbId) {
-      const res = await fetch('https://api.notion.com/v1/databases/' + dbId + '/query', {
+      const cleanId = dbId.replace(/-/g, '');
+      const cacheKey = 'db_' + cleanId;
+
+      /* 1. Controlla KV cache */
+      const cached = await KV.get(cacheKey);
+      if (cached) {
+        return new Response(cached, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Cache': 'HIT',
+            ...cors
+          }
+        });
+      }
+
+      /* 2. Cache miss → chiama Notion */
+      const res = await fetch('https://api.notion.com/v1/databases/' + cleanId + '/query', {
         method: 'POST',
-        headers,
+        headers: notionHeaders,
         body: JSON.stringify({ page_size: 50 })
       });
       if (!res.ok) throw new Error('Notion DB error: ' + res.status);
       const data = await res.json();
 
       const pages = data.results.map(function(p) {
-        const titleProp = Object.values(p.properties || {}).find(function(v) {
-          return v.type === 'title';
-        });
+        const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
         const title = titleProp
-          ? (titleProp.title || []).map(function(t) { return t.plain_text; }).join('')
+          ? (titleProp.title || []).map(t => t.plain_text).join('')
           : 'Senza titolo';
         const icon = p.icon && p.icon.emoji ? p.icon.emoji : '📄';
         const cover = p.cover
@@ -77,8 +134,17 @@ export async function onRequest(context) {
         return { id: p.id.replace(/-/g, ''), title, icon, cover };
       });
 
-      return new Response(JSON.stringify({ pages }), {
-        headers: { 'Content-Type': 'application/json', ...cors }
+      const payload = JSON.stringify({ pages });
+
+      /* 3. Salva in KV */
+      await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+
+      return new Response(payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Cache': 'HIT',
+          ...cors
+        }
       });
     }
 
@@ -95,11 +161,8 @@ export async function onRequest(context) {
   }
 }
 
-/* ════════════════════════════════════
-   loadChildren — parallelo + ricorsivo
-════════════════════════════════════ */
+/* ════ loadChildren — parallelo + ricorsivo ════ */
 async function loadChildren(blocks, headers) {
-  /* Fetch tutti i children in parallelo */
   const childResults = await Promise.all(
     blocks.map(async function(block) {
       if (!block.has_children) return { id: block.id, children: null };
@@ -110,7 +173,6 @@ async function loadChildren(blocks, headers) {
         );
         if (!res.ok) return { id: block.id, children: [] };
         const data = await res.json();
-        /* Ricorsione in parallelo */
         const children = await loadChildren(data.results, headers);
         return { id: block.id, children };
       } catch(e) {
@@ -119,7 +181,6 @@ async function loadChildren(blocks, headers) {
     })
   );
 
-  /* Mappa i children sui blocchi originali */
   const childMap = {};
   childResults.forEach(function(r) {
     if (r.children !== null) childMap[r.id] = r.children;
