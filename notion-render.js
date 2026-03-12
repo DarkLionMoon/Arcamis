@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════════
-   NOTION RENDER — FULL ENGINE (No Cache + Subpage Fix)
+   NOTION RENDER — FULL ENGINE (FINAL FIX: Glossary + Subpages)
    ════════════════════════════════════════════════════════════════════════════ */
 
 var navStack = []; 
@@ -30,9 +30,6 @@ function iconAccent(emoji){
 }
 
 function iconGradient(emoji){
-  const e = emoji || '';
-  if(['🔥','⚔️','🗡️','⚠️','🛡️','⚡','🐉','💀'].includes(e)) return 'radial-gradient(ellipse 90% 60% at 50% 80%,#300a06 0%,#180402 50%,#080100 100%)';
-  if(['📚','📜','📖','🗒️','🏛️','📋'].includes(e)) return 'radial-gradient(ellipse 90% 60% at 50% 80%,#201408 0%,#120c04 50%,#060400 100%)';
   return 'radial-gradient(ellipse 90% 60% at 50% 80%,#0e0c04 0%,#080602 50%,#040200 100%)';
 }
 
@@ -54,7 +51,7 @@ function rt(arr){
   }).join('');
 }
 
-/* ── CAROSELLI E NAVIGAZIONE DB ── */
+/* ── CAROSELLI ── */
 function dbLocNav(btn, dir){
   const wrap = btn.closest('.n-db-lc-wrap');
   const track = wrap.querySelector('.loc-track');
@@ -71,94 +68,72 @@ function dbLocNav(btn, dir){
   track.style.transform = `translateX(-${curIdx * step}px)`;
 }
 
-/* ── FUNZIONE APERTURA PAGINA (gp) ── */
+/* ── NAVIGAZIONE (gp) ── */
 async function gp(id, label, icon, _fromPop){
   if(isRendering) return; 
   isRendering = true;
-
   try {
     const cleanId = id.replace(/-/g, '');
     if(!_fromPop){
       navStack.push({id: cleanId, label, icon});
       history.pushState({id: cleanId, label, icon, stack: navStack.slice(0,-1)}, '', `?p=${cleanId}`);
     }
-
     const hv = document.getElementById('hv'), pv = document.getElementById('pv');
     const pbody = document.getElementById('pbody');
-    
     document.getElementById('ph-title').textContent = label;
     document.getElementById('ph-icon').textContent = icon;
     document.getElementById('main').scrollTo({top:0, behavior:'smooth'});
-
     if(hv.style.display !== 'none') xfade(hv, pv);
     pbody.innerHTML = '<div class="ldwrap"><div class="spin"></div></div>';
-
     await _gpRender(cleanId, label, icon);
   } finally {
     isRendering = false;
   }
 }
 
-/* ── ENGINE RENDERING ── */
 async function _gpRender(id, label, icon){
   const pbody = document.getElementById('pbody');
   try {
     const r = await fetch(`/api/notion?pageId=${id}`);
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
     const data = await r.json();
-    
     const html = renderBlocks(data.blocks, true);
-    const footer = `<div class="n-page-footer">✦ &nbsp; Archivi di Arcamis &nbsp; ✦</div>`;
+    pbody.innerHTML = `<div class="nc" style="animation:fi .3s ease forwards">${html}</div>`;
     
-    pbody.innerHTML = `<div class="nc" style="animation:fi .3s ease forwards">${html}${footer}</div>`;
-    
+    // Ora queste funzioni esistono!
     applyGlossary(pbody);
-    loadDbGalleries(pbody);
-    if(window.buildWhisperNav) window.buildWhisperNav();
-    
+    if(window.loadDbGalleries) window.loadDbGalleries(pbody);
   } catch(e) {
     pbody.innerHTML = `<div class="errbox">⚠️ Pergamena illeggibile.<br><small>${e.message}</small></div>`;
   }
 }
 
-/* ── LOGICA BLOCCHI (Con ripristino Sottopagine) ── */
 function renderBlocks(blocks, isRoot){
   if(!blocks) return '';
   let h = '';
-  
   for(let i=0; i<blocks.length; i++){
     const b = blocks[i];
     const d = b[b.type];
     if(!d) continue;
-
     switch(b.type){
       case 'paragraph': h += `<p class="n-p">${rt(d.rich_text) || '<br>'}</p>`; break;
       case 'heading_1': h += `<h2 class="n-h1">${rt(d.rich_text)}</h2>`; break;
       case 'heading_2': h += `<h3 class="n-h2">${rt(d.rich_text)}</h3>`; break;
-      case 'heading_3': h += `<h4 class="n-h3">${rt(d.rich_text)}</h4>`; break;
       case 'divider': h += `<div class="n-divider">✦</div>`; break;
-      case 'image': 
-        const imgUrl = d.type === 'external' ? d.external.url : d.file.url;
-        h += `<figure class="n-image"><img src="${imgUrl}" loading="lazy"></figure>`;
-        break;
       case 'callout':
         const ic = d.icon?.emoji || '💡';
         h += `<div class="n-callout"><div class="n-callout-icon">${ic}</div><div class="n-callout-body">${rt(d.rich_text)}</div></div>`;
         break;
-      
-      /* RIPRISTINO SOTTOPAGINE COME CAROSELLO */
       case 'child_page':
         if(b._done) break;
         let cards = '';
         let j = i;
         while(j < blocks.length && blocks[j].type === 'child_page'){
           const sub = blocks[j];
-          const subD = sub.child_page;
           const subId = sub.id.replace(/-/g,'');
           if(!mapPageIds.has(subId)){
-            const subTitle = subD.title.replace(/'/g,"\\'");
-            cards += `<div class="loc-card" style="${iconGradient('📄')}" onclick="gp('${subId}','${subTitle}','📄')">
-              <div class="loc-ov"><div class="loc-badge">📄</div><div class="loc-name">${subD.title}</div><div class="loc-cta">APRI ◆</div></div>
+            cards += `<div class="loc-card" onclick="gp('${subId}','${sub.child_page.title}','📄')">
+              <div class="loc-ov"><div class="loc-badge">📄</div><div class="loc-name">${sub.child_page.title}</div><div class="loc-cta">APRI ◆</div></div>
             </div>`;
           }
           blocks[j]._done = true;
@@ -167,21 +142,19 @@ function renderBlocks(blocks, isRoot){
         h += `<div class="n-db-lc-wrap"><div class="loc-wrap"><div class="loc-track-outer"><div class="loc-track" style="gap:16px;display:flex">${cards}</div></div>
               <div class="la la-prev" onclick="dbLocNav(this,-1)">‹</div><div class="la la-next" onclick="dbLocNav(this,1)">›</div></div></div>`;
         break;
-        
-      case 'child_database':
-        h += `<div class="n-db-wrap"><div class="n-db-grid" id="db-${b.id.replace(/-/g,'')}">⏳ Caricamento database...</div></div>`;
-        break;
     }
   }
   return h;
 }
 
-/* ── MODALITÀ MUSICA E CANDELA ── */
-function toggleCandleMode() {
-  document.body.classList.toggle('candle-lit');
+/* ── GLOSSARIO (REINSERITO) ── */
+var _glossary = { 'gp':'Monete d\'oro', 'PG':'Personaggio Giocante', 'DM':'Dungeon Master' };
+function applyGlossary(root){
+  root.querySelectorAll('.n-p, .n-callout-body').forEach(el => {
+    let html = el.innerHTML;
+    Object.keys(_glossary).forEach(term => {
+      html = html.replace(new RegExp('\\b'+term+'\\b','g'), `<span class="gterm" title="${_glossary[term]}">${term}</span>`);
+    });
+    el.innerHTML = html;
+  });
 }
-
-/* ── INIZIALIZZAZIONE ── */
-window.addEventListener('popstate', (e) => {
-  if(e.state && e.state.id) gp(e.state.id, e.state.label, e.state.icon, true);
-});
