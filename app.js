@@ -1,8 +1,6 @@
 /* ════════════════════════════════════
    ARCAMIS — app.js
-   Logica applicazione (Versione Statica)
 ════════════════════════════════════ */
-
 window.addEventListener('load', function(){
   setTimeout(function(){
     var l = document.getElementById('site-loader');
@@ -35,16 +33,16 @@ function toggleTheme(){ applyTheme(_theme === 'dark' ? 'light' : 'dark'); }
 
 /* ════ UI NAVIGATION ════ */
 function showHome(){
-  document.getElementById('home-screen').style.display = 'block';
-  document.getElementById('page-screen').style.display = 'none';
+  document.getElementById('hv').style.display = 'block';   // era 'home-screen'
+  document.getElementById('pv').style.display = 'none';    // era 'page-screen'
   document.body.classList.remove('page-open');
-  // Reset cover
   var cv = document.querySelector('.ph-covbg');
   if(cv) cv.style.opacity = '0';
 }
 
-function ovo(){ /* Open View Overlay (Menu) */
-  document.getElementById('mobile-menu').classList.toggle('open');
+function ovo(){
+  var overlay = document.getElementById('overlay');        // era 'mobile-menu'
+  if(overlay) overlay.classList.toggle('open');
 }
 
 function showToast(txt, icon, dur){
@@ -52,18 +50,16 @@ function showToast(txt, icon, dur){
   t.className = 'toast';
   t.innerHTML = '<span>'+icon+'</span>'+txt;
   document.body.appendChild(t);
-  setTimeout(()=> t.classList.add('vis'), 10);
-  setTimeout(()=> { t.classList.remove('vis'); setTimeout(()=>t.remove(),400); }, dur || 3000);
+  setTimeout(function(){ t.classList.add('vis'); }, 10);
+  setTimeout(function(){ t.classList.remove('vis'); setTimeout(function(){ t.remove(); }, 400); }, dur || 3000);
 }
 
-/* ════ WHISPER NAV (Puntini laterali) ════ */
+/* ════ WHISPER NAV ════ */
 function buildWhisperNav(){
   var old = document.getElementById('whisper-nav');
   if(old) old.remove();
-  
   var heads = document.querySelectorAll('.nc h2, .nc h3');
   if(heads.length < 2) return;
-  
   var nav = document.createElement('nav');
   nav.id = 'whisper-nav';
   heads.forEach(function(h, i){
@@ -86,9 +82,8 @@ function buildWhisperNav(){
   var _origAfter = window.afterPageRender;
   window.afterPageRender = function(){
     if(_origAfter) _origAfter();
-    // Nascondi home quando carichi una pagina
-    document.getElementById('home-screen').style.display = 'none';
-    document.getElementById('page-screen').style.display = 'block';
+    document.getElementById('hv').style.display = 'none';   // era 'home-screen'
+    document.getElementById('pv').style.display = 'block';  // era 'page-screen'
     document.body.classList.add('page-open');
     setTimeout(buildWhisperNav, 300);
   };
@@ -98,7 +93,7 @@ function buildWhisperNav(){
 window.copyPageLink = function(){
   var url = location.href;
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(() => {
+    navigator.clipboard.writeText(url).then(function(){
       showToast('Link copiato', '🔗', 2400);
     });
   }
