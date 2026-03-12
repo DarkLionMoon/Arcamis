@@ -1,3 +1,6 @@
+[build]
+  ignore = "exit 1"
+
 [[redirects]]
   from = "/api/notion"
   to = "/.netlify/functions/notion"
