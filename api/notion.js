@@ -60,6 +60,9 @@ module.exports = async function handler(req, res) {
   try {
     /* ── Proxy immagini S3 Notion (URL firmati scadono) ── */
     if (img) {
+      const ALLOWED_IMG = ['s3.us-west', 'prod-files-secure', 'secure.notion-static', 'images.unsplash'];
+      const isAllowed = ALLOWED_IMG.some(function(d){ return img.indexOf(d) > -1; });
+      if (!isAllowed) return res.status(403).json({ error: 'URL non consentito' });
       const r = await fetch(img);
       if (!r.ok) return res.status(r.status).end();
       res.setHeader('Content-Type', r.headers.get('content-type') || 'image/webp');
