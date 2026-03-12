@@ -3,7 +3,6 @@
 ════════════════════════════════════ */
 
 var navStack = []; /* navigation history [{id,label,icon},...] */
-var _memCache = {}; /* cache in-memory pagine già caricate (nessun limite di quota) */
 
 /* ID pagine presenti nella mappa interattiva — non mostrare come child_page link */
 /* ── Cover URL: usa proxy per URL S3 Notion che scadono ── */
@@ -217,20 +216,15 @@ function renderBlocks(blocks,isRoot){
         break;
 
       case'child_page':
-        /* skip if already processed in a previous carousel */
         if(b._cpDone){break;}
-        /* ── Raccoglie TUTTE le child_page dell'intera lista blocchi in un unico carousel ──
-            Salta le map pages, le pagine senza contenuto ("Classi"), e raggruppa tutto. */
         var cpCards='';
         var cpUid='cp-'+Math.random().toString(36).slice(2,8);
-        /* Scansiona in avanti raccogliendo child_page anche se interleaved con altri blocchi */
         var cpScan=i;
         while(cpScan<blocks.length){
           if(blocks[cpScan].type==='child_page'){
             var cpb=blocks[cpScan],cpd=cpb[cpb.type]||{};
             var cpid=cpb.id.replace(/-/g,'');
             var cptitle=cpd.title||'Pagina';
-            /* salta pagine nella mappa interattiva o senza contenuto utile */
             if(!mapPageIds.has(cpid)&&cptitle.toLowerCase()!=='classi'){
               var cpni=pages.find(function(n){return n.id===cpid});
               var cpicon=cpni?cpni.i:'📄';
@@ -243,7 +237,6 @@ function renderBlocks(blocks,isRoot){
                 +'<div class="loc-sub" style="color:'+cpacc.c+'">Apri \u2192</div>'
                 +'<div class="loc-cta">APRI \u25c6</div></div></div>';
             }
-            /* marca questo blocco come già processato */
             blocks[cpScan]._cpDone=true;
           }
           cpScan++;
@@ -306,7 +299,6 @@ function renderBlocks(blocks,isRoot){
     DATABASE GALLERY — loc-card carousel
 ════════════════════════════════════ */
 
-/* gradient di sfondo dall'icona (usato quando non c'è cover) */
 function iconGradient(emoji){
   var e=emoji||'';
   if(['🔥','⚔️','🗡️','⚠️','🛡️','⚡','🐉','💀'].indexOf(e)>-1)
@@ -326,9 +318,7 @@ function iconGradient(emoji){
   return'radial-gradient(ellipse 90% 60% at 50% 80%,#0e0c04 0%,#080602 50%,#040200 100%)';
 }
 
-/* navigazione generica per qualsiasi loc-track nel renderer */
 function _dbArrows(wrap,idx,maxIdx){
-  /* Carousel infinito: frecce sempre attive */
   var prev=wrap.querySelector('.la-prev'),next=wrap.querySelector('.la-next');
   if(prev){prev.style.opacity='1';prev.style.pointerEvents='auto';}
   if(next){next.style.opacity='1';next.style.pointerEvents='auto';}
@@ -347,17 +337,14 @@ function dbLocNav(btn, dir){
   var outerW=(outer?outer.getBoundingClientRect().width:600)||600;
   var maxIdx=Math.max(0,Math.ceil((trackW-outerW+1)/step));
   var curIdx=parseInt(track.getAttribute('data-idx')||'0',10);
-  /* ── Infinite loop: avvolgi agli estremi ── */
   var idx=curIdx+dir;
   if(idx>maxIdx)idx=0;
   if(idx<0)idx=maxIdx;
   track.setAttribute('data-idx',idx);
   track.style.transform='translateX(-'+(idx*step)+'px)';
-  /* frecce sempre visibili nel carousel infinito */
   var arrowWrap=wrap.classList.contains('n-db-lc-wrap')?wrap:wrap.closest('.n-db-lc-wrap');
   if(arrowWrap)_dbArrows(arrowWrap,idx,maxIdx);
 }
-/* inizializza frecce dopo che un carosello viene iniettato nel DOM */
 function _initCarouselArrows(container){
   container.querySelectorAll('.n-db-lc-wrap,.loc-wrap').forEach(function(wrap){
     var track=wrap.querySelector('.loc-track');
@@ -365,7 +352,6 @@ function _initCarouselArrows(container){
     if(!track||!outer)return;
     var cards=track.querySelectorAll('.loc-card');
     if(!cards.length)return;
-    /* frecce sempre abilitate (carousel infinito) */
     var root=wrap.classList.contains('n-db-lc-wrap')?wrap:(wrap.closest('.n-db-lc-wrap')||wrap);
     _dbArrows(root,0,999);
   });
@@ -373,7 +359,6 @@ function _initCarouselArrows(container){
 
 async function loadDbGalleries(container){
   var grids=container.querySelectorAll('.n-db-grid[id^="db-"]');
-  /* lazy load: carica il DB solo quando entra nel viewport */
   var io=new IntersectionObserver(function(entries,obs){
     entries.forEach(function(en){
       if(!en.isIntersecting)return;
@@ -395,7 +380,6 @@ async function _loadSingleDb(grid){
       if(!data.pages||!data.pages.length){
         grid.innerHTML='<div class="n-db-loading">Nessun elemento trovato.</div>';return;
       }
-      /* costruisci loc-card per ogni pagina */
       var cardsHtml=data.pages.map(function(p){
         var icon=p.icon||'📄';
         var acc=iconAccent(icon);
@@ -412,10 +396,8 @@ async function _loadSingleDb(grid){
           +'<div class="loc-cta">APRI ◆</div>'
           +'</div></div>';
       }).join('');
-      /* rimpiazza il grid con un carosello loc-card */
       var wrap=grid.closest('.n-db-wrap');
       if(wrap){
-        /* sostituisce tutta la .n-db-wrap con il carosello */
         var titleEl=wrap.querySelector('.n-db-title');
         var titleHtml=titleEl?'<div class="n-db-title">'+titleEl.textContent+'</div>':'';
         var uid='dblc-'+dbId;
@@ -429,13 +411,11 @@ async function _loadSingleDb(grid){
           +'<div class="la la-prev" onclick="dbLocNav(this,-1)">‹</div>'
           +'<div class="la la-next" onclick="dbLocNav(this,1)">›</div>'
           +'</div></div>';
-        /* init arrows on newly injected carousel */
         setTimeout(function(){
           var newWrap=document.getElementById(uid);
           if(newWrap)_dbArrows(newWrap,0,999);
         },50);
       }else{
-        /* fallback: grid rimpiazzata inline */
         grid.outerHTML='<div class="loc-track" data-idx="0" style="gap:16px;display:flex">'+cardsHtml+'</div>';
       }
     }catch(e){
@@ -454,7 +434,6 @@ function gpBack(stackIdx){
   _gpRender(item.id,item.label,item.icon);
 }
 
-/* ── Build breadcrumb HTML ── */
 function buildCrumb(currentLabel){
   var h='<span class="ph-bc" onclick="showHome()">🏰 Home</span>';
   for(var ci=0;ci<navStack.length-1;ci++){
@@ -499,7 +478,6 @@ async function gp(id,label,icon,_fromPop){
     _pb.innerHTML='<div class="ldwrap"><div class="spin"></div></div>';
     xfade(hv,pv);
   } else {
-    /* fade pv→pv: dissolvenza breve prima di mostrare il loader */
     _pb.style.opacity='0';_pb.style.transform='translateY(6px)';
     _pb.style.transition='opacity .15s ease,transform .15s ease';
     setTimeout(function(){
@@ -512,8 +490,11 @@ async function gp(id,label,icon,_fromPop){
   await _gpRender(id,label,icon);
 }
 
+/* ════════════════════════════════════
+    RENDER ENGINE — NO CACHE VERSION
+════════════════════════════════════ */
 async function _gpRender(id,label,icon){
-  /* FIX: Sanitizzazione ID per evitare loop da ID diversi (con/senza trattini) */
+  /* Sanitizzazione ID per coerenza tra url e database */
   id = id.replace(/-/g, '');
 
   var phTitle=document.getElementById('ph-title');
@@ -525,13 +506,9 @@ async function _gpRender(id,label,icon){
   var phHero=document.getElementById('page-hero');
   var phCrumb=document.getElementById('ph-crumb');
 
-  /* cache check — livello 0: memoria, livello 1: sessionStorage, livello 2: network */
-  var cacheKey='pg_'+id;
-  var data=_memCache[cacheKey]||null;
-  if(!data){try{var _ss=sessionStorage.getItem(cacheKey);if(_ss)data=JSON.parse(_ss);}catch(e){}}
-  if(data)_memCache[cacheKey]=data; /* warm up memory cache */
+  /* Rimozione logica di cache sessionStorage e _memCache */
+  var data = null;
 
-  /* ── fetchWithRetry: prova prima il file statico, poi l'API come fallback ── */
   async function fetchWithRetry(url,attempt){
     attempt=attempt||0;
     var ctrl=new AbortController();
@@ -543,7 +520,6 @@ async function _gpRender(id,label,icon){
       return await r.json();
     }catch(e){
       clearTimeout(timer);
-      /* riprova solo su errori di rete, non su 4xx (pagina non trovata, forbidden…) */
       if(attempt<1 && !e.message.includes('HTTP 4')){
         await new Promise(function(res){setTimeout(res,800);});
         return fetchWithRetry(url,attempt+1);
@@ -553,15 +529,10 @@ async function _gpRender(id,label,icon){
   }
 
   try{
-    if(!data){
-      /* ── Prova prima il file statico (build-time) — istantaneo ── */
-      var liveUrl='/api/notion?pageId='+id;
-      data=await fetchWithRetry(liveUrl);
-      _memCache[cacheKey]=data;
-      try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){
-        try{sessionStorage.clear();sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e2){}
-      }
-    }
+    /* Fetch diretta sempre richiesta */
+    var liveUrl='/api/notion?pageId='+id;
+    data = await fetchWithRetry(liveUrl);
+
     var pg=data.page,bl=data.blocks;
     var ta=pg.properties&&pg.properties.title&&pg.properties.title.title||[];
     var ptitle=ta.map(function(t){return t.plain_text}).join('')||label;
@@ -570,15 +541,12 @@ async function _gpRender(id,label,icon){
     phIcon.textContent=picon;
     phEyebrow.textContent='Archivi di Arcamis';
     document.title=ptitle+' — Arcamis';
-    /* update crumb with real title */
     phCrumb.innerHTML=buildCrumb(ptitle);
 
-    /* accent color */
     var acc=iconAccent(picon);
     phHero.style.setProperty('--ph-acc',acc.c);
     phHero.style.setProperty('--ph-accbg',acc.bg);
 
-    /* cover: Notion cover → prima immagine della pagina */
     var coverUrl=null;
     if(pg.cover){
       coverUrl=pg.cover.type==='external'?pg.cover.external.url:(pg.cover.file&&pg.cover.file.url);
@@ -597,7 +565,6 @@ async function _gpRender(id,label,icon){
       phIcon.style.opacity='0.06';
     }
 
-    /* subtitle: primo callout o primo paragrafo */
     var firstSub=bl.find(function(blk){
       if(blk.type==='callout')return true;
       return blk.type==='paragraph'&&blk.paragraph&&blk.paragraph.rich_text&&blk.paragraph.rich_text.length>0;
@@ -616,34 +583,20 @@ async function _gpRender(id,label,icon){
     var footer='<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
       +'<div class="n-page-footer-text">Archivi di Arcamis — '+ptitle+'</div></div>';
     pbody.innerHTML='<div class="nc" style="animation:fi .22s ease forwards">'+(html||emptyHtml)+footer+'</div>';
-    /* glossario inline */
+    
     applyGlossary(pbody);
-    /* retry immagini scadute (URL S3 firmati scadono) */
-    pbody.querySelectorAll('img').forEach(function(img){
-      img.addEventListener('error',function(){
-        if(img.dataset.retried)return;
-        img.dataset.retried='1';
-        /* invalida cache e ricarica dati pagina */
-        try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
-      },{once:true});
-    });
     attachShine(pbody);
     loadDbGalleries(pbody);
-    /* carica DB dentro i toggle quando vengono aperti */
     pbody.querySelectorAll('details.n-toggle').forEach(function(det){
       det.addEventListener('toggle',function(){
         if(det.open){loadDbGalleries(det);}
       },{once:true});
     });
     initFadeIn(pbody);
-    /* whisper sidebar + toast hook */
     setTimeout(function(){if(window.buildWhisperNav)window.buildWhisperNav();_initCarouselArrows(pbody);},200);
-    /* registra nei recenti */
     if(typeof addRecente==='function')addRecente(id,ptitle,picon);
-    /* bottom nav active */
     if(typeof setBnavActive==='function')setBnavActive('');
   }catch(e){
-    /* FAIL-SAFE: Se c'è un errore o timeout, non lasciamo il loader. Mostriamo errore e tasto Ripristino */
     var isTimeout=e.name==='AbortError'||e.message.indexOf('Timeout')>-1||e.message.indexOf('abort')>-1;
     var errMsg=isTimeout?'La pagina ha impiegato troppo tempo a caricarsi.':'Errore: '+e.message;
     document.getElementById('pbody').innerHTML=
@@ -651,8 +604,6 @@ async function _gpRender(id,label,icon){
       +'<div style="font-size:28px;margin-bottom:12px">⚠️</div>'
       +'<div style="margin-bottom:8px">'+errMsg+'</div>'
       +'<button onclick="(function(){'
-        +'try{sessionStorage.removeItem(\'pg_'+id+'\');}catch(ex){}'
-        +'delete _memCache[\'pg_'+id+'\'];'
         +'document.getElementById(\'pbody\').innerHTML=\'<div class=\\\"ldwrap\\\"><div class=\\\"spin\\\"></div></div>\';'
         +'_gpRender(\''+id+'\',\''+label.replace(/'/g,"\\'").replace(/"/g,'\\"')+'\',\''+icon+'\');'
       +'})()" style="margin-top:12px;padding:8px 20px;background:rgba(200,155,60,.12);border:1px solid rgba(200,155,60,.3);color:var(--gold2);font-family:\'Cinzel\',serif;font-size:11px;letter-spacing:.1em;cursor:pointer;">↺ RIPROVA</button>'
@@ -686,14 +637,11 @@ var _glossary={
 };
 function applyGlossary(root){
   var terms=Object.keys(_glossary);
-  /* applica solo ai nodi testo dentro .n-p, .n-callout-body, .n-intro-body */
   root.querySelectorAll('.n-p,.n-callout-body,.n-intro-body').forEach(function(el){
-    /* semplice replace testuale — non tocca HTML già presente */
     var html=el.innerHTML;
     terms.forEach(function(term){
       var def=_glossary[term];
       var safe=def.replace(/'/g,'&#39;');
-      /* sostituisce solo occorrenze non già in un tag */
       html=html.replace(
         new RegExp('(?<![\\w>])'+term+'(?![\\w<])','g'),
         '<span class="gterm" data-def="'+safe+'">'+term+'</span>'
