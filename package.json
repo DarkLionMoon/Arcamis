@@ -1,11 +1,5 @@
 {
-  "name": "arcamis-wiki",
+  "name": "arcamis",
   "version": "1.0.0",
-  "description": "Wiki del server TTRPG Arcamis",
-  "engines": {
-    "node": ">=18"
-  },
-  "devDependencies": {
-    "vercel": "^33.0.0"
-  }
+  "private": true
 }
