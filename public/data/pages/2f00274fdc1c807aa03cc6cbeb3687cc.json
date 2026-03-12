@@ -1,0 +1,606 @@
+{
+  "id": "2f00274fdc1c807aa03cc6cbeb3687cc",
+  "properties": {
+    "title": {
+      "id": "title",
+      "type": "title",
+      "title": [
+        {
+          "type": "text",
+          "text": {
+            "content": "Ospedale",
+            "link": null
+          },
+          "annotations": {
+            "bold": false,
+            "italic": false,
+            "strikethrough": false,
+            "underline": false,
+            "code": false,
+            "color": "default"
+          },
+          "plain_text": "Ospedale",
+          "href": null
+        }
+      ]
+    }
+  },
+  "cover": null,
+  "icon": {
+    "type": "emoji",
+    "emoji": "🌿"
+  },
+  "blocks": [
+    {
+      "object": "block",
+      "id": "2f00274f-dc1c-8074-ad0c-f2b9c63a98f1",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-01-22T17:56:00.000Z",
+      "last_edited_time": "2026-01-22T17:56:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "\"Chiunque ha bisogno di cure, specialmente gli avventurieri che rischiano la vita, ogni giorno, durante le loro esplorazioni\"",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "\"Chiunque ha bisogno di cure, specialmente gli avventurieri che rischiano la vita, ogni giorno, durante le loro esplorazioni\"",
+            "href": null
+          }
+        ],
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "2f00274f-dc1c-8071-97c4-eee95de1a085",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-01-22T17:56:00.000Z",
+      "last_edited_time": "2026-01-22T17:56:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Come Curatore, puoi occuparti dei malati ed assistere i curatori specializzati nel loro lavoro.",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "Come Curatore, puoi occuparti dei malati ed assistere i curatori specializzati nel loro lavoro.",
+            "href": null
+          }
+        ],
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "2f00274f-dc1c-80fd-ae09-c4e6776c333b",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-01-22T17:56:00.000Z",
+      "last_edited_time": "2026-03-01T16:28:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Stipendio\n",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "Stipendio\n",
+            "href": null
+          }
+        ],
+        "is_toggleable": false,
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "2f00274f-dc1c-8033-ae3e-e0234b199c9f",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-01-22T17:56:00.000Z",
+      "last_edited_time": "2026-03-01T16:28:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Lo stipendio dipende da:\n",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "Lo stipendio dipende da:\n",
+            "href": null
+          }
+        ],
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "3160274f-dc1c-80e1-89ad-e0de4544a3a8",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-03-01T16:28:00.000Z",
+      "last_edited_time": "2026-03-01T16:28:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "A) Livello del PG",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "A) Livello del PG",
+            "href": null
+          }
+        ],
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "3160274f-dc1c-80bc-bca4-e2f8e8baa930",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-03-01T16:28:00.000Z",
+      "last_edited_time": "2026-03-01T16:28:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "quote",
+      "quote": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "• Apprendista (Livelli 1-5) = 15 mo base\n• Professionista (Livelli 6-12) = 25 mo base\n• Mastro (Livelli 13-20) = 35 mo base",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "• Apprendista (Livelli 1-5) = 15 mo base\n• Professionista (Livelli 6-12) = 25 mo base\n• Mastro (Livelli 13-20) = 35 mo base",
+            "href": null
+          }
+        ],
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "3160274f-dc1c-80c8-96f9-f293cff13662",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-03-01T16:28:00.000Z",
+      "last_edited_time": "2026-03-01T16:28:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "B) Giorni di lavoro",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "B) Giorni di lavoro",
+            "href": null
+          }
+        ],
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "3160274f-dc1c-8075-837b-ebcd8318fe90",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-03-01T16:28:00.000Z",
+      "last_edited_time": "2026-03-01T16:28:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "quote",
+      "quote": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "• I primi 5 giorni, avrete lo stipendio base descritto nella variabile A (Chi fa meno di 5 giorni, non viene pagato);\n• Successivamente, avrete stipendio extra, in base dagli stock bonus completati (5 giorni per stock, per un massimo di 4 stock bonus)",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "• I primi 5 giorni, avrete lo stipendio base descritto nella variabile A (Chi fa meno di 5 giorni, non viene pagato);\n• Successivamente, avrete stipendio extra, in base dagli stock bonus completati (5 giorni per stock, per un massimo di 4 stock bonus)",
+            "href": null
+          }
+        ],
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "3160274f-dc1c-8074-9c4c-d892fa66ebb2",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-03-01T16:28:00.000Z",
+      "last_edited_time": "2026-03-01T16:28:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "C) Modificatore caratteristica del lavoro",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "C) Modificatore caratteristica del lavoro",
+            "href": null
+          }
+        ],
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "3160274f-dc1c-8099-b06b-c4e596c19727",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-03-01T16:28:00.000Z",
+      "last_edited_time": "2026-03-01T16:29:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "quote",
+      "quote": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "• Ogni lavoro ha due modificatori caratteristica tra cui scegliere, che aumenteranno il vostro stipendio.\n• Per questo lavoro, sono ",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "• Ogni lavoro ha due modificatori caratteristica tra cui scegliere, che aumenteranno il vostro stipendio.\n• Per questo lavoro, sono ",
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "Intelligenza",
+              "link": null
+            },
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "Intelligenza",
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " (INT) o ",
+              "link": null
+            },
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": " (INT) o ",
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "Saggezza (WIS).",
+              "link": null
+            },
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "plain_text": "Saggezza (WIS).",
+            "href": null
+          }
+        ],
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "2f00274f-dc1c-8025-a836-f9880b2ce2cc",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-01-22T17:56:00.000Z",
+      "last_edited_time": "2026-01-22T17:56:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [],
+        "color": "default"
+      },
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "2f00274f-dc1c-8072-8a1b-f981ff29c181",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-01-22T17:56:00.000Z",
+      "last_edited_time": "2026-01-22T17:56:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "divider",
+      "divider": {},
+      "archived": false
+    },
+    {
+      "object": "block",
+      "id": "2f00274f-dc1c-8015-8ae3-ef0b11540337",
+      "parent": {
+        "type": "page_id",
+        "page_id": "2f00274f-dc1c-807a-a03c-c6cbeb3687cc"
+      },
+      "created_time": "2026-01-22T17:57:00.000Z",
+      "last_edited_time": "2026-01-22T17:57:00.000Z",
+      "created_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "last_edited_by": {
+        "object": "user",
+        "id": "2d5d872b-594c-816a-8ed6-000268598302"
+      },
+      "has_children": false,
+      "in_trash": false,
+      "type": "image",
+      "image": {
+        "caption": [],
+        "type": "file",
+        "file": {
+          "url": "https://prod-files-secure.s3.us-west-2.amazonaws.com/fba0274f-dc1c-8128-a70c-0003af9f37a4/6438073b-3651-4b0e-8afd-2751792e26ed/df0a09aa-1108-4487-9ad7-57b18235ca07.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4664THUSJYL%2F20260311%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260311T235849Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEJ%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLXdlc3QtMiJHMEUCIQCvV9TwLvY8tlZCpPo08gIZ5nXulY5IBMPbLudoKiFZlAIgRbg0CBsZELRtipui6VdTbJbnNcLfjwk1HSjGUu3V6Qgq%2FwMIaBAAGgw2Mzc0MjMxODM4MDUiDEb998Ze%2BzTMrkJQFSrcA9Tkvp1TsZw2iOyJr9j5WkLy%2BaewDxzxW7MSSkdUATYjfxrVe4hcwDW1RTdeJ52TreMAgb9A1ygAMWP%2B1RtO7eUT8ulq9adPfBx49e9FYQd49fMDzWey5NN0oacaEuaa88b2u3NANFW3510LorZ3h6tTiIXCCd8PzMCNz2LedYHXRDXSV5QGk0B%2BkvC%2Bkop27dNJezkBEaF6g2cOgnqVYfu2BDjJac%2BMgcvpudQizJcEnqxiCMHGPleIpIDCK4yMx5xQkvXv6W%2BE0uvvNPiETBLE8u6HIizPposLJX2l4We68Vnb0ErJpOUt7hUi18%2BzvJfbLWvpVAmE9MlndhFyOBIfiwa3n9K90OybUlQOJnxqySpjwjmQ%2B6pwL1iLOzVYlVr6km529RNkZ%2F0cBG4MXLC4YwDPD3jVbEapX%2FJChP%2FxuJNeV7rWopFmlqjDmvDh%2FzTGXuqyDoYQSqTuMPLICcJrCK4rjcR%2F31xw9iBHfJHyfZR%2BAMRvHEGskvUzmhPTiOblpY0tTrc%2FMMsxNNHqZtIuOLOgTJ0%2FMT%2FNzfXzN3eaxVtExNXyBOWl9AHwomj4nhD9bKFjQDsoMV7sClXbivo%2BafrodBPJ9zmMDbq8I39ZyAACwBAaCCVx44yAMKnXx80GOqUB6sie68btvIkpg8Ph3%2F%2FuvxhL3EE%2BXHWUHE81DX2C%2F4Uu3nW0azLMXeopu3J375NNkuKrnY3eI34mz6pBJQ63c5aQqODDnXNN%2BhxITuPz7d5yUXxWEItk1UihCYND2UmAOGB6etD%2F%2BNN7hpgqfixxiW7w1pGMk6akHCar0%2B3U0DNQsH7ssjIp5YMnwfCU%2Fgr7JCFp3opXDxSfrURYVMtkgUjdJYol&X-Amz-Signature=b7fb4ea438f52d18bb964af906ea2673c2604bf7dc356bc33d0e5ad6fcef529b&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+          "expiry_time": "2026-03-12T00:58:49.397Z"
+        }
+      },
+      "archived": false
+    }
+  ]
+}
