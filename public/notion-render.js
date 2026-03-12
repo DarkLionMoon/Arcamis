@@ -9,11 +9,26 @@ var _memCache = {}; /* cache in-memory pagine già caricate (nessun limite di qu
 /* ── Cover URL: usa proxy per URL S3 Notion che scadono ── */
 function safeCoverUrl(url){
   if(!url)return null;
-  /* URL S3 Notion → passa per proxy /api/notion?img= */
-  if(url.indexOf('s3.us-west')>-1||url.indexOf('prod-files-secure')>-1){
-    return'/api/notion?img='+encodeURIComponent(url);
-  }
-  return url;
+  return url; /* restituisce URL diretto — S3 URLs validi ~1h dal build */
+}
+
+/* ── Normalizza formato JSON statico → formato atteso dal renderer ──
+   File statici: {id, properties, cover, icon, blocks}
+   Formato atteso: {page:{properties,cover,icon}, blocks}
+── */
+function normalizePageData(data){
+  if(!data)return null;
+  if(data.page)return data; /* già nel formato corretto (risposta API) */
+  /* formato statico — wrappa in {page, blocks} */
+  return{
+    page:{
+      id:data.id||'',
+      properties:data.properties||{},
+      cover:data.cover||null,
+      icon:data.icon||null,
+    },
+    blocks:data.blocks||[]
+  };
 }
 
 var mapPageIds = new Set([
@@ -392,12 +407,14 @@ async function _loadSingleDb(grid){
         var sr=await fetch('/data/db/'+dbId+'.json');
         if(sr.ok)data=await sr.json();
       }catch(se){}
-      /* ── Fallback all'API live ── */
+      /* ── Fallback all'API live (opzionale in modalità statica) ── */
       if(!data){
-        var r=await fetch('/api/notion?dbId='+dbId);
-        if(!r.ok)throw new Error('HTTP '+r.status);
-        data=await r.json();
+        try{
+          var r=await fetch('/api/notion?dbId='+dbId);
+          if(r.ok)data=await r.json();
+        }catch(ae){}
       }
+      if(!data)throw new Error('DB non disponibile — aggiungi /data/db/'+dbId+'.json');
       if(!data.pages||!data.pages.length){
         grid.innerHTML='<div class="n-db-loading">Nessun elemento trovato.</div>';return;
       }
@@ -562,12 +579,12 @@ async function _gpRender(id,label,icon){
       try{
         var sr=await fetch(staticUrl);
         if(sr.ok){
-          data=await sr.json();
+          data=normalizePageData(await sr.json());
         }
       }catch(se){}
       /* ── Fallback all'API live se il file statico non esiste ── */
       if(!data){
-        data=await fetchWithRetry(liveUrl);
+        data=normalizePageData(await fetchWithRetry(liveUrl));
       }
       _memCache[cacheKey]=data;
       try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){}
