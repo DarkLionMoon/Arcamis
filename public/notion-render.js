@@ -9,26 +9,11 @@ var _memCache = {}; /* cache in-memory pagine già caricate (nessun limite di qu
 /* ── Cover URL: usa proxy per URL S3 Notion che scadono ── */
 function safeCoverUrl(url){
   if(!url)return null;
-  return url; /* restituisce URL diretto — S3 URLs validi ~1h dal build */
-}
-
-/* ── Normalizza formato JSON statico → formato atteso dal renderer ──
-   File statici: {id, properties, cover, icon, blocks}
-   Formato atteso: {page:{properties,cover,icon}, blocks}
-── */
-function normalizePageData(data){
-  if(!data)return null;
-  if(data.page)return data; /* già nel formato corretto (risposta API) */
-  /* formato statico — wrappa in {page, blocks} */
-  return{
-    page:{
-      id:data.id||'',
-      properties:data.properties||{},
-      cover:data.cover||null,
-      icon:data.icon||null,
-    },
-    blocks:data.blocks||[]
-  };
+  /* URL S3 Notion firmati → passa per proxy che li serve con cache */
+  if(url.indexOf('s3.us-west')>-1||url.indexOf('prod-files-secure')>-1){
+    return'/api/notion?img='+encodeURIComponent(url);
+  }
+  return url;
 }
 
 var mapPageIds = new Set([
@@ -574,18 +559,8 @@ async function _gpRender(id,label,icon){
   try{
     if(!data){
       /* ── Prova prima il file statico (build-time) — istantaneo ── */
-      var staticUrl='/data/pages/'+id+'.json';
       var liveUrl='/api/notion?pageId='+id;
-      try{
-        var sr=await fetch(staticUrl);
-        if(sr.ok){
-          data=normalizePageData(await sr.json());
-        }
-      }catch(se){}
-      /* ── Fallback all'API live se il file statico non esiste ── */
-      if(!data){
-        data=normalizePageData(await fetchWithRetry(liveUrl));
-      }
+      data=await fetchWithRetry(liveUrl);
       _memCache[cacheKey]=data;
       try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){}
     }
