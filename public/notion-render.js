@@ -386,20 +386,12 @@ async function loadDbGalleries(container){
 async function _loadSingleDb(grid){
     var dbId=grid.id.replace('db-','');
     try{
-      /* ── Prima prova il file statico ── */
       var data=null;
       try{
-        var sr=await fetch('/data/db/'+dbId+'.json');
-        if(sr.ok)data=await sr.json();
-      }catch(se){}
-      /* ── Fallback all'API live (opzionale in modalità statica) ── */
-      if(!data){
-        try{
-          var r=await fetch('/api/notion?dbId='+dbId);
-          if(r.ok)data=await r.json();
-        }catch(ae){}
-      }
-      if(!data)throw new Error('DB non disponibile — aggiungi /data/db/'+dbId+'.json');
+        var r=await fetch('/api/notion?dbId='+dbId);
+        if(r.ok)data=await r.json();
+      }catch(ae){}
+      if(!data)throw new Error('DB non disponibile');
       if(!data.pages||!data.pages.length){
         grid.innerHTML='<div class="n-db-loading">Nessun elemento trovato.</div>';return;
       }
