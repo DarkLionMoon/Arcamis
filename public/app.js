@@ -287,7 +287,9 @@ function prefetchPage(id){
     .then(function(d){
       if(!d)return;
       if(window._memCache)_memCache[key]=d;
-      try{sessionStorage.setItem(key,JSON.stringify(d));}catch(e){}
+      try{sessionStorage.setItem(key,JSON.stringify(d));}catch(e){
+        try{sessionStorage.clear();sessionStorage.setItem(key,JSON.stringify(d));}catch(e2){}
+      }
     }).catch(function(){});
 }
 window.addEventListener('load',function(){setTimeout(function(){PREFETCH_IDS.forEach(prefetchPage);},2500);});
