@@ -540,7 +540,8 @@ async function _gpRender(id,label,icon){
       return await r.json();
     }catch(e){
       clearTimeout(timer);
-      if(attempt<1){
+      /* riprova solo su errori di rete, non su 4xx (pagina non trovata, forbidden…) */
+      if(attempt<1 && !e.message.includes('HTTP 4')){
         await new Promise(function(res){setTimeout(res,800);});
         return fetchWithRetry(url,attempt+1);
       }
@@ -554,7 +555,9 @@ async function _gpRender(id,label,icon){
       var liveUrl='/api/notion?pageId='+id;
       data=await fetchWithRetry(liveUrl);
       _memCache[cacheKey]=data;
-      try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){}
+      try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){
+        try{sessionStorage.clear();sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e2){}
+      }
     }
     var pg=data.page,bl=data.blocks;
     var ta=pg.properties&&pg.properties.title&&pg.properties.title.title||[];
