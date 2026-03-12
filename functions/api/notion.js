@@ -31,7 +31,7 @@ export async function onRequest(context) {
     if (pageId) {
       const cleanId = pageId.replace(/-/g, '');
 
-      // Dati pagina
+      /* Pagina e primo livello di blocks in parallelo */
       const [pageRes, blocksRes] = await Promise.all([
         fetch('https://api.notion.com/v1/pages/' + cleanId, { headers }),
         fetch('https://api.notion.com/v1/blocks/' + cleanId + '/children?page_size=100', { headers })
@@ -43,7 +43,7 @@ export async function onRequest(context) {
       const page = await pageRes.json();
       const blocksData = await blocksRes.json();
 
-      // Carica i children di ogni blocco che ne ha
+      /* Carica tutti i children in parallelo (ricorsivo) */
       const blocks = await loadChildren(blocksData.results, headers);
 
       return new Response(JSON.stringify({ page, blocks }), {
@@ -70,7 +70,9 @@ export async function onRequest(context) {
           : 'Senza titolo';
         const icon = p.icon && p.icon.emoji ? p.icon.emoji : '📄';
         const cover = p.cover
-          ? (p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url))
+          ? (p.cover.type === 'external'
+              ? p.cover.external.url
+              : (p.cover.file && p.cover.file.url))
           : null;
         return { id: p.id.replace(/-/g, ''), title, icon, cover };
       });
@@ -93,26 +95,40 @@ export async function onRequest(context) {
   }
 }
 
-/* ── Carica ricorsivamente i children dei blocchi ── */
+/* ════════════════════════════════════
+   loadChildren — parallelo + ricorsivo
+════════════════════════════════════ */
 async function loadChildren(blocks, headers) {
-  const result = [];
-  for (const block of blocks) {
-    const b = { ...block };
-    if (b.has_children) {
+  /* Fetch tutti i children in parallelo */
+  const childResults = await Promise.all(
+    blocks.map(async function(block) {
+      if (!block.has_children) return { id: block.id, children: null };
       try {
         const res = await fetch(
-          'https://api.notion.com/v1/blocks/' + b.id + '/children?page_size=100',
+          'https://api.notion.com/v1/blocks/' + block.id + '/children?page_size=100',
           { headers }
         );
-        if (res.ok) {
-          const data = await res.json();
-          b.children = await loadChildren(data.results, headers);
-        }
-      } catch (e) {
-        b.children = [];
+        if (!res.ok) return { id: block.id, children: [] };
+        const data = await res.json();
+        /* Ricorsione in parallelo */
+        const children = await loadChildren(data.results, headers);
+        return { id: block.id, children };
+      } catch(e) {
+        return { id: block.id, children: [] };
       }
+    })
+  );
+
+  /* Mappa i children sui blocchi originali */
+  const childMap = {};
+  childResults.forEach(function(r) {
+    if (r.children !== null) childMap[r.id] = r.children;
+  });
+
+  return blocks.map(function(block) {
+    if (block.has_children && childMap[block.id] !== undefined) {
+      return Object.assign({}, block, { children: childMap[block.id] });
     }
-    result.push(b);
-  }
-  return result;
+    return block;
+  });
 }
