@@ -5,11 +5,9 @@
 var navStack = []; /* navigation history [{id,label,icon},...] */
 var _memCache = {}; /* cache in-memory pagine già caricate (nessun limite di quota) */
 
-/* ID pagine presenti nella mappa interattiva — non mostrare come child_page link */
 /* ── Cover URL: usa proxy per URL S3 Notion che scadono ── */
 function safeCoverUrl(url){
   if(!url)return null;
-  /* URL S3 Notion → passa per proxy /api/notion?img= */
   if(url.indexOf('s3.us-west')>-1||url.indexOf('prod-files-secure')>-1){
     return'/api/notion?img='+encodeURIComponent(url);
   }
@@ -222,7 +220,6 @@ function renderBlocks(blocks,isRoot){
         while(i<blocks.length&&blocks[i].type==='child_page'){
           var cpb=blocks[i],cpd=cpb[cpb.type]||{};
           var cpid=cpb.id.replace(/-/g,'');
-          /* salta pagine presenti nella mappa interattiva */
           if(mapPageIds.has(cpid)){i++;continue;}
           var cpni=pages.find(function(n){return n.id===cpid});
           var cpicon=cpni?cpni.i:'📄';
@@ -296,7 +293,6 @@ function renderBlocks(blocks,isRoot){
    DATABASE GALLERY — loc-card carousel
 ════════════════════════════════════ */
 
-/* gradient di sfondo dall'icona (usato quando non c'è cover) */
 function iconGradient(emoji){
   var e=emoji||'';
   if(['🔥','⚔️','🗡️','⚠️','🛡️','⚡','🐉','💀'].indexOf(e)>-1)
@@ -316,7 +312,6 @@ function iconGradient(emoji){
   return'radial-gradient(ellipse 90% 60% at 50% 80%,#0e0c04 0%,#080602 50%,#040200 100%)';
 }
 
-/* navigazione generica per qualsiasi loc-track nel renderer */
 function _dbArrows(wrap,idx,maxIdx){
   var prev=wrap.querySelector('.la-prev'),next=wrap.querySelector('.la-next');
   if(prev){prev.style.opacity=idx<=0?'0.2':'1';prev.style.pointerEvents=idx<=0?'none':'auto';}
@@ -334,16 +329,13 @@ function dbLocNav(btn, dir){
   var step=cardW+gap;
   var trackW=cards.length*step-gap;
   var outerW=(outer?outer.getBoundingClientRect().width:600)||600;
-  /* ceil + 1px tolerance: evita che l'errore floating-point tenga attiva la freccia */
   var maxIdx=Math.max(0,Math.ceil((trackW-outerW+1)/step));
   var idx=Math.min(maxIdx,Math.max(0,parseInt(track.getAttribute('data-idx')||'0',10)+dir));
   track.setAttribute('data-idx',idx);
   track.style.transform='translateX(-'+(idx*step)+'px)';
-  /* aggiorna frecce — cerca nel contenitore corretto */
   var arrowWrap=wrap.classList.contains('n-db-lc-wrap')?wrap:wrap.closest('.n-db-lc-wrap');
   if(arrowWrap)_dbArrows(arrowWrap,idx,maxIdx);
 }
-/* inizializza frecce dopo che un carosello viene iniettato nel DOM */
 function _initCarouselArrows(container){
   container.querySelectorAll('.n-db-lc-wrap,.loc-wrap').forEach(function(wrap){
     var track=wrap.querySelector('.loc-track');
@@ -351,7 +343,6 @@ function _initCarouselArrows(container){
     if(!track||!outer)return;
     var cards=track.querySelectorAll('.loc-card');
     if(!cards.length)return;
-    /* aspetta che il layout sia pronto */
     requestAnimationFrame(function(){
       var cardW=cards[0].getBoundingClientRect().width||240;
       var step=cardW+16;
@@ -366,7 +357,6 @@ function _initCarouselArrows(container){
 
 async function loadDbGalleries(container){
   var grids=container.querySelectorAll('.n-db-grid[id^="db-"]');
-  /* lazy load: carica il DB solo quando entra nel viewport */
   var io=new IntersectionObserver(function(entries,obs){
     entries.forEach(function(en){
       if(!en.isIntersecting)return;
@@ -385,7 +375,6 @@ async function _loadSingleDb(grid){
       if(!data.pages||!data.pages.length){
         grid.innerHTML='<div class="n-db-loading">Nessun elemento trovato.</div>';return;
       }
-      /* costruisci loc-card per ogni pagina */
       var cardsHtml=data.pages.map(function(p){
         var icon=p.icon||'📄';
         var acc=iconAccent(icon);
@@ -402,10 +391,8 @@ async function _loadSingleDb(grid){
           +'<div class="loc-cta">APRI ◆</div>'
           +'</div></div>';
       }).join('');
-      /* rimpiazza il grid con un carosello loc-card */
       var wrap=grid.closest('.n-db-wrap');
       if(wrap){
-        /* sostituisce tutta la .n-db-wrap con il carosello */
         var titleEl=wrap.querySelector('.n-db-title');
         var titleHtml=titleEl?'<div class="n-db-title">'+titleEl.textContent+'</div>':'';
         var uid='dblc-'+dbId;
@@ -420,7 +407,6 @@ async function _loadSingleDb(grid){
           +'<div class="la la-next" onclick="dbLocNav(this,1)">›</div>'
           +'</div></div>';
       }else{
-        /* fallback: grid rimpiazzata inline */
         grid.outerHTML='<div class="loc-track" data-idx="0" style="gap:16px;display:flex">'+cardsHtml+'</div>';
       }
     }catch(e){
@@ -439,7 +425,6 @@ function gpBack(stackIdx){
   _gpRender(item.id,item.label,item.icon);
 }
 
-/* ── Build breadcrumb HTML ── */
 function buildCrumb(currentLabel){
   var h='<span class="ph-bc" onclick="showHome()">🏰 Home</span>';
   for(var ci=0;ci<navStack.length-1;ci++){
@@ -484,7 +469,6 @@ async function gp(id,label,icon,_fromPop){
     _pb.innerHTML='<div class="ldwrap"><div class="spin"></div></div>';
     xfade(hv,pv);
   } else {
-    /* fade pv→pv: dissolvenza breve prima di mostrare il loader */
     _pb.style.opacity='0';_pb.style.transform='translateY(6px)';
     _pb.style.transition='opacity .15s ease,transform .15s ease';
     setTimeout(function(){
@@ -507,11 +491,10 @@ async function _gpRender(id,label,icon){
   var phHero=document.getElementById('page-hero');
   var phCrumb=document.getElementById('ph-crumb');
 
-  /* cache check — livello 0: memoria, livello 1: sessionStorage, livello 2: network */
   var cacheKey='pg_'+id;
   var data=_memCache[cacheKey]||null;
   if(!data){try{var _ss=sessionStorage.getItem(cacheKey);if(_ss)data=JSON.parse(_ss);}catch(e){}}
-  if(data)_memCache[cacheKey]=data; /* warm up memory cache */
+  if(data)_memCache[cacheKey]=data;
 
   try{
     if(!data){
@@ -519,8 +502,8 @@ async function _gpRender(id,label,icon){
       var r=await Promise.race([fetch('/api/notion?pageId='+id),timeout]);
       if(!r.ok)throw new Error('HTTP '+r.status);
       data=await r.json();
-      _memCache[cacheKey]=data; /* sempre in memoria */
-      try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){} /* best-effort */
+      _memCache[cacheKey]=data;
+      try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){}
     }
     var pg=data.page,bl=data.blocks;
     var ta=pg.properties&&pg.properties.title&&pg.properties.title.title||[];
@@ -530,15 +513,12 @@ async function _gpRender(id,label,icon){
     phIcon.textContent=picon;
     phEyebrow.textContent='Archivi di Arcamis';
     document.title=ptitle+' — Arcamis';
-    /* update crumb with real title */
     phCrumb.innerHTML=buildCrumb(ptitle);
 
-    /* accent color */
     var acc=iconAccent(picon);
     phHero.style.setProperty('--ph-acc',acc.c);
     phHero.style.setProperty('--ph-accbg',acc.bg);
 
-    /* cover: Notion cover → prima immagine della pagina */
     var coverUrl=null;
     if(pg.cover){
       coverUrl=pg.cover.type==='external'?pg.cover.external.url:(pg.cover.file&&pg.cover.file.url);
@@ -557,7 +537,6 @@ async function _gpRender(id,label,icon){
       phIcon.style.opacity='0.06';
     }
 
-    /* subtitle: primo callout o primo paragrafo */
     var firstSub=bl.find(function(blk){
       if(blk.type==='callout')return true;
       return blk.type==='paragraph'&&blk.paragraph&&blk.paragraph.rich_text&&blk.paragraph.rich_text.length>0;
@@ -576,34 +555,30 @@ async function _gpRender(id,label,icon){
     var footer='<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
       +'<div class="n-page-footer-text">Archivi di Arcamis — '+ptitle+'</div></div>';
     pbody.innerHTML='<div class="nc" style="animation:fi .22s ease forwards">'+(html||emptyHtml)+footer+'</div>';
-    /* glossario inline */
     applyGlossary(pbody);
-    /* retry immagini scadute (URL S3 firmati scadono) */
     pbody.querySelectorAll('img').forEach(function(img){
       img.addEventListener('error',function(){
         if(img.dataset.retried)return;
         img.dataset.retried='1';
-        /* invalida cache e ricarica dati pagina */
         try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
       },{once:true});
     });
     attachShine(pbody);
     loadDbGalleries(pbody);
-    /* carica DB dentro i toggle quando vengono aperti */
     pbody.querySelectorAll('details.n-toggle').forEach(function(det){
       det.addEventListener('toggle',function(){
         if(det.open){loadDbGalleries(det);}
       },{once:true});
     });
     initFadeIn(pbody);
-    /* whisper sidebar + toast hook */
     setTimeout(function(){if(window.buildWhisperNav)window.buildWhisperNav();_initCarouselArrows(pbody);},200);
-    /* registra nei recenti */
     if(typeof addRecente==='function')addRecente(id,ptitle,picon);
-    /* bottom nav active */
     if(typeof setBnavActive==='function')setBnavActive('');
+    /* FIX: notifica app.js che il rendering è completo → rimuove spinner */
+    if(typeof afterPageRender==='function')afterPageRender();
   }catch(e){
     document.getElementById('pbody').innerHTML='<div class="errbox">⚠️ '+e.message+'</div>';
+    if(typeof afterPageRender==='function')afterPageRender();
   }
 }
 
@@ -633,14 +608,11 @@ var _glossary={
 };
 function applyGlossary(root){
   var terms=Object.keys(_glossary);
-  /* applica solo ai nodi testo dentro .n-p, .n-callout-body, .n-intro-body */
   root.querySelectorAll('.n-p,.n-callout-body,.n-intro-body').forEach(function(el){
-    /* semplice replace testuale — non tocca HTML già presente */
     var html=el.innerHTML;
     terms.forEach(function(term){
       var def=_glossary[term];
       var safe=def.replace(/'/g,'&#39;');
-      /* sostituisce solo occorrenze non già in un tag */
       html=html.replace(
         new RegExp('(?<![\\w>])'+term+'(?![\\w<])','g'),
         '<span class="gterm" data-def="'+safe+'">'+term+'</span>'
@@ -649,4 +621,3 @@ function applyGlossary(root){
     el.innerHTML=html;
   });
 }
-
