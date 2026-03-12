@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════════
-   NOTION RENDER — FULL ENGINE (FINAL FIX: Glossary + Subpages)
+   NOTION RENDER — COMPLETE & STABLE (No Cache / Full Content)
    ════════════════════════════════════════════════════════════════════════════ */
 
 var navStack = []; 
@@ -17,22 +17,7 @@ var mapPageIds = new Set([
   '3130274fdc1c80848fe5dfd7d2610c06', '31e0274fdc1c80f581f4f9cd7284bff0'
 ]);
 
-/* ── UTILS ESTETICHE ── */
-function iconAccent(emoji){
-  if(!emoji) return {c:'rgba(200,155,60,.7)', bg:'rgba(200,155,60,.06)'};
-  const e = emoji;
-  if(['🔥','⚔️','🗡️','⚠️','🛡️','⚡','🐉','💀'].includes(e)) return {c:'rgba(220,70,50,.75)', bg:'rgba(180,50,40,.06)'};
-  if(['📚','📜','📖','🗒️','🏛️','📋'].includes(e)) return {c:'rgba(190,140,60,.75)', bg:'rgba(150,110,40,.06)'};
-  if(['🌊','💧','🌙','🐋','🚢','⚓','🌐'].includes(e)) return {c:'rgba(60,120,220,.75)', bg:'rgba(40,80,180,.06)'};
-  if(['🌿','🌱','🍃','🌲','🌳','🌾','🍀'].includes(e)) return {c:'rgba(50,160,80,.75)', bg:'rgba(30,120,50,.06)'};
-  if(['🔮','💜','🌑','👁️','🧿','✨','🌌'].includes(e)) return {c:'rgba(140,80,240,.75)', bg:'rgba(100,50,200,.06)'};
-  return {c:'rgba(200,155,60,.7)', bg:'rgba(200,155,60,.06)'};
-}
-
-function iconGradient(emoji){
-  return 'radial-gradient(ellipse 90% 60% at 50% 80%,#0e0c04 0%,#080602 50%,#040200 100%)';
-}
-
+/* ── UTILS RICH TEXT ── */
 function rt(arr){
   if(!arr || !arr.length) return '';
   return arr.map(r => {
@@ -49,23 +34,6 @@ function rt(arr){
     }
     return inner;
   }).join('');
-}
-
-/* ── CAROSELLI ── */
-function dbLocNav(btn, dir){
-  const wrap = btn.closest('.n-db-lc-wrap');
-  const track = wrap.querySelector('.loc-track');
-  const outer = wrap.querySelector('.loc-track-outer');
-  const cards = track.querySelectorAll('.loc-card');
-  if(!cards.length) return;
-  const step = (cards[0].getBoundingClientRect().width || 240) + 16;
-  const trackW = cards.length * step - 16;
-  const outerW = outer.getBoundingClientRect().width;
-  const maxIdx = Math.max(0, Math.ceil((trackW - outerW) / step));
-  let curIdx = parseInt(track.getAttribute('data-idx') || '0', 10);
-  curIdx = (curIdx + dir + (maxIdx + 1)) % (maxIdx + 1);
-  track.setAttribute('data-idx', curIdx);
-  track.style.transform = `translateX(-${curIdx * step}px)`;
 }
 
 /* ── NAVIGAZIONE (gp) ── */
@@ -100,14 +68,16 @@ async function _gpRender(id, label, icon){
     const html = renderBlocks(data.blocks, true);
     pbody.innerHTML = `<div class="nc" style="animation:fi .3s ease forwards">${html}</div>`;
     
-    // Ora queste funzioni esistono!
+    // Inizializzazione moduli
     applyGlossary(pbody);
     if(window.loadDbGalleries) window.loadDbGalleries(pbody);
+    if(window.buildWhisperNav) window.buildWhisperNav();
   } catch(e) {
-    pbody.innerHTML = `<div class="errbox">⚠️ Pergamena illeggibile.<br><small>${e.message}</small></div>`;
+    pbody.innerHTML = `<div class="errbox">⚠️ Errore critico nel recupero dati.<br><small>${e.message}</small></div>`;
   }
 }
 
+/* ── IL CUORE DEL RENDERING (TUTTI I BLOCCHI) ── */
 function renderBlocks(blocks, isRoot){
   if(!blocks) return '';
   let h = '';
@@ -115,14 +85,34 @@ function renderBlocks(blocks, isRoot){
     const b = blocks[i];
     const d = b[b.type];
     if(!d) continue;
+
     switch(b.type){
       case 'paragraph': h += `<p class="n-p">${rt(d.rich_text) || '<br>'}</p>`; break;
       case 'heading_1': h += `<h2 class="n-h1">${rt(d.rich_text)}</h2>`; break;
       case 'heading_2': h += `<h3 class="n-h2">${rt(d.rich_text)}</h3>`; break;
+      case 'heading_3': h += `<h4 class="n-h3">${rt(d.rich_text)}</h4>`; break;
+      case 'bulleted_list_item': h += `<ul class="n-ul"><li>${rt(d.rich_text)}</li></ul>`; break;
+      case 'numbered_list_item': h += `<ol class="n-ol"><li>${rt(d.rich_text)}</li></ol>`; break;
       case 'divider': h += `<div class="n-divider">✦</div>`; break;
+      case 'quote': h += `<blockquote class="n-quote">${rt(d.rich_text)}</blockquote>`; break;
       case 'callout':
         const ic = d.icon?.emoji || '💡';
         h += `<div class="n-callout"><div class="n-callout-icon">${ic}</div><div class="n-callout-body">${rt(d.rich_text)}</div></div>`;
+        break;
+      case 'image': 
+        const imgUrl = d.type === 'external' ? d.external.url : d.file.url;
+        h += `<figure class="n-image"><img src="${imgUrl}" loading="lazy"></figure>`;
+        break;
+      case 'video':
+        const vUrl = d.type === 'external' ? d.external.url : d.file.url;
+        h += `<div class="n-video"><iframe src="${vUrl.replace('watch?v=', 'embed/')}" allowfullscreen></iframe></div>`;
+        break;
+      case 'table':
+        h += `<div class="n-twrap"><table class="n-tbl"><tbody>`;
+        if(b.children) b.children.forEach(row => {
+          h += `<tr>${row.table_row.cells.map(c => `<td>${rt(c)}</td>`).join('')}</tr>`;
+        });
+        h += `</tbody></table></div>`;
         break;
       case 'child_page':
         if(b._done) break;
@@ -132,29 +122,36 @@ function renderBlocks(blocks, isRoot){
           const sub = blocks[j];
           const subId = sub.id.replace(/-/g,'');
           if(!mapPageIds.has(subId)){
-            cards += `<div class="loc-card" onclick="gp('${subId}','${sub.child_page.title}','📄')">
+            cards += `<div class="loc-card" onclick="gp('${subId}','${sub.child_page.title.replace(/'/g,"\\'")}','📄')">
               <div class="loc-ov"><div class="loc-badge">📄</div><div class="loc-name">${sub.child_page.title}</div><div class="loc-cta">APRI ◆</div></div>
             </div>`;
           }
           blocks[j]._done = true;
           j++;
         }
-        h += `<div class="n-db-lc-wrap"><div class="loc-wrap"><div class="loc-track-outer"><div class="loc-track" style="gap:16px;display:flex">${cards}</div></div>
-              <div class="la la-prev" onclick="dbLocNav(this,-1)">‹</div><div class="la la-next" onclick="dbLocNav(this,1)">›</div></div></div>`;
+        h += `<div class="n-db-lc-wrap"><div class="loc-wrap"><div class="loc-track-outer"><div class="loc-track" style="gap:16px;display:flex">${cards}</div></div></div></div>`;
+        break;
+      case 'synced_block':
+        if(b.children) h += renderBlocks(b.children, false);
         break;
     }
   }
   return h;
 }
 
-/* ── GLOSSARIO (REINSERITO) ── */
-var _glossary = { 'gp':'Monete d\'oro', 'PG':'Personaggio Giocante', 'DM':'Dungeon Master' };
+/* ── MODULI ACCESSORI ── */
+var _glossary = { 'gp':'Pezzi d\'oro', 'PG':'Personaggio Giocante', 'DM':'Dungeon Master', 'CA':'Classe Armatura' };
 function applyGlossary(root){
   root.querySelectorAll('.n-p, .n-callout-body').forEach(el => {
     let html = el.innerHTML;
     Object.keys(_glossary).forEach(term => {
-      html = html.replace(new RegExp('\\b'+term+'\\b','g'), `<span class="gterm" title="${_glossary[term]}">${term}</span>`);
+      const regex = new RegExp('(?<![\\w>])' + term + '(?![\\w<])', 'g');
+      html = html.replace(regex, `<span class="gterm" data-def="${_glossary[term]}">${term}</span>`);
     });
     el.innerHTML = html;
   });
 }
+
+window.addEventListener('popstate', (e) => {
+  if(e.state && e.state.id) gp(e.state.id, e.state.label, e.state.icon, true);
+});
