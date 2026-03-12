@@ -220,7 +220,7 @@ function renderBlocks(blocks,isRoot){
         /* skip if already processed in a previous carousel */
         if(b._cpDone){break;}
         /* ── Raccoglie TUTTE le child_page dell'intera lista blocchi in un unico carousel ──
-           Salta le map pages, le pagine senza contenuto ("Classi"), e raggruppa tutto. */
+            Salta le map pages, le pagine senza contenuto ("Classi"), e raggruppa tutto. */
         var cpCards='';
         var cpUid='cp-'+Math.random().toString(36).slice(2,8);
         /* Scansiona in avanti raccogliendo child_page anche se interleaved con altri blocchi */
@@ -303,7 +303,7 @@ function renderBlocks(blocks,isRoot){
 }
 
 /* ════════════════════════════════════
-   DATABASE GALLERY — loc-card carousel
+    DATABASE GALLERY — loc-card carousel
 ════════════════════════════════════ */
 
 /* gradient di sfondo dall'icona (usato quando non c'è cover) */
@@ -444,7 +444,7 @@ async function _loadSingleDb(grid){
 }
 
 /* ════════════════════════════════════
-   BACK NAVIGATION
+    BACK NAVIGATION
 ════════════════════════════════════ */
 function gpBack(stackIdx){
   var item=navStack[stackIdx];
@@ -467,7 +467,7 @@ function buildCrumb(currentLabel){
 }
 
 /* ════════════════════════════════════
-   OPEN PAGE — gp()
+    OPEN PAGE — gp()
 ════════════════════════════════════ */
 async function gp(id,label,icon,_fromPop){
   if(!_fromPop){
@@ -513,6 +513,9 @@ async function gp(id,label,icon,_fromPop){
 }
 
 async function _gpRender(id,label,icon){
+  /* FIX: Sanitizzazione ID per evitare loop da ID diversi (con/senza trattini) */
+  id = id.replace(/-/g, '');
+
   var phTitle=document.getElementById('ph-title');
   var phIcon=document.getElementById('ph-icon');
   var phCovbg=document.getElementById('ph-covbg');
@@ -640,6 +643,7 @@ async function _gpRender(id,label,icon){
     /* bottom nav active */
     if(typeof setBnavActive==='function')setBnavActive('');
   }catch(e){
+    /* FAIL-SAFE: Se c'è un errore o timeout, non lasciamo il loader. Mostriamo errore e tasto Ripristino */
     var isTimeout=e.name==='AbortError'||e.message.indexOf('Timeout')>-1||e.message.indexOf('abort')>-1;
     var errMsg=isTimeout?'La pagina ha impiegato troppo tempo a caricarsi.':'Errore: '+e.message;
     document.getElementById('pbody').innerHTML=
@@ -657,7 +661,7 @@ async function _gpRender(id,label,icon){
 }
 
 /* ════════════════════════════════════
-   GLOSSARIO AUTOMATICO
+    GLOSSARIO AUTOMATICO
 ════════════════════════════════════ */
 var _glossary={
   'gp':'Pezzi d\'oro — valuta principale di Arcamis',
