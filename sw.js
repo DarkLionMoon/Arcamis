@@ -3,7 +3,7 @@
    Cache-first per asset statici,
    network-first per API Notion
 ════════════════════════════════════ */
-var CACHE='arcamis-v2';
+var CACHE='arcamis-v3';
 var STATIC=[
   '/',
   '/index.html',
