@@ -220,6 +220,8 @@ function renderBlocks(blocks,isRoot){
         while(i<blocks.length&&blocks[i].type==='child_page'){
           var cpb=blocks[i],cpd=cpb[cpb.type]||{};
           var cpid=cpb.id.replace(/-/g,'');
+          /* FIX: salta se id non valido */
+          if(!cpid||cpid==='undefined'){i++;continue;}
           if(mapPageIds.has(cpid)){i++;continue;}
           var cpni=pages.find(function(n){return n.id===cpid});
           var cpicon=cpni?cpni.i:'📄';
@@ -440,6 +442,9 @@ function buildCrumb(currentLabel){
    OPEN PAGE — gp()
 ════════════════════════════════════ */
 async function gp(id,label,icon,_fromPop){
+  /* FIX: blocca chiamate con id non valido */
+  if(!id||id==='undefined'||id==='null')return;
+
   if(!_fromPop){
     navStack.push({id:id,label:label,icon:icon});
     history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'',location.pathname+'?p='+id);
@@ -482,6 +487,12 @@ async function gp(id,label,icon,_fromPop){
 }
 
 async function _gpRender(id,label,icon){
+  /* FIX: blocca id non valido */
+  if(!id||id==='undefined'||id==='null'){
+    if(typeof afterPageRender==='function')afterPageRender();
+    return;
+  }
+
   var phTitle=document.getElementById('ph-title');
   var phIcon=document.getElementById('ph-icon');
   var phCovbg=document.getElementById('ph-covbg');
@@ -574,7 +585,7 @@ async function _gpRender(id,label,icon){
     setTimeout(function(){if(window.buildWhisperNav)window.buildWhisperNav();_initCarouselArrows(pbody);},200);
     if(typeof addRecente==='function')addRecente(id,ptitle,picon);
     if(typeof setBnavActive==='function')setBnavActive('');
-    /* FIX: notifica app.js che il rendering è completo → rimuove spinner */
+    /* notifica app.js che il rendering è completo → rimuove spinner */
     if(typeof afterPageRender==='function')afterPageRender();
   }catch(e){
     document.getElementById('pbody').innerHTML='<div class="errbox">⚠️ '+e.message+'</div>';
