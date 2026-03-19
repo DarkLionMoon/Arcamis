@@ -37,7 +37,7 @@
 .ph-divider-line{flex:1;max-width:120px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);opacity:.5}
 .ph-divider-gem{color:var(--gold);font-size:8px;opacity:.6}
 /* page body */
-#pbody{padding:36px 44px 60px;max-width:860px;margin:0 auto;width:100%}
+#pbody{padding:36px 44px 60px;max-width:1100px;margin:0 auto;width:100%}
 /* ── Notion block rendering ── */
 .nc>*+*{margin-top:.7em}
 .n-p{font-size:16px;line-height:1.85;color:var(--text)}
