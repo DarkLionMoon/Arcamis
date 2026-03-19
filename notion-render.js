@@ -580,12 +580,14 @@ async function _gpRender(id,label,icon){
     });
     attachShine(pbody);
     loadDbGalleries(pbody);
+    pbody.querySelectorAll('.gs-container').forEach(function(c){if(window.loadGallery)loadGallery(c);});
     pbody.querySelectorAll('details.n-toggle').forEach(function(det){
       det.addEventListener('toggle',function(){
         if(det.open){loadDbGalleries(det);}
       },{once:true});
     });
     initFadeIn(pbody);
+     
     setTimeout(function(){if(window.buildWhisperNav)window.buildWhisperNav();_initCarouselArrows(pbody);},200);
     if(typeof addRecente==='function')addRecente(id,ptitle,picon);
     if(typeof setBnavActive==='function')setBnavActive('');
