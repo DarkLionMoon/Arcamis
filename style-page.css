@@ -1166,3 +1166,7 @@ body.light .lcard:hover{box-shadow:0 14px 40px rgba(100,70,20,.15)!important}
   85%{opacity:.6}
   100%{transform:translate(var(--dx,30px),-110vh) scale(.6);opacity:0}
 }
+/* ── Pagine con DB carousel: allarga pbody ── */
+#pbody:has(.n-db-lc-wrap){
+  max-width:1200px;
+}
