@@ -819,3 +819,24 @@ nav#tnav{display:flex;align-items:stretch}
 /* ════════════════════════════════════
    PAGE VIEW
 ════════════════════════════════════ */
+
+/* ════ ARCADIA DECO LATERALI ════ */
+.arc-deco{
+  position:absolute;top:0;bottom:0;width:40px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;pointer-events:none;z-index:1;
+}
+.arc-deco-l{left:12px;}
+.arc-deco-r{right:12px;}
+.arc-deco-line{
+  flex:1;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(200,155,60,.3) 30%,rgba(200,155,60,.3) 70%,transparent);
+  max-height:120px;
+}
+.arc-deco-runes{
+  font-size:10px;line-height:2;text-align:center;
+  color:rgba(200,155,60,.22);letter-spacing:.05em;
+  animation:runeflicker 4s ease-in-out infinite;
+}
+.arc-deco-r .arc-deco-runes{animation-delay:1.8s;}
+@media(max-width:768px){.arc-deco{display:none;}}
