@@ -2,6 +2,7 @@
    NOTION RENDER — auto-styling engine
 ════════════════════════════════════ */
 
+var GALLERY_DB_ID = '2fd0274fdc1c80d8b948c4133f874f28';
 var navStack = []; /* navigation history [{id,label,icon},...] */
 var _memCache = {}; /* cache in-memory pagine già caricate (nessun limite di quota) */
 
@@ -242,11 +243,15 @@ function renderBlocks(blocks,isRoot){
         break;
 
       case'child_database':
-        var dbRawId=b.id.replace(/-/g,'');
-        h+='<div class="n-db-wrap">'
-          +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
-          +'<div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
-        break;
+  var dbRawId=b.id.replace(/-/g,'');
+  if(dbRawId===GALLERY_DB_ID){
+    h+='<div class="gs-container" id="gs-'+dbRawId+'"></div>';
+  }else{
+    h+='<div class="n-db-wrap">'
+      +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
+      +'<div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
+  }
+  break;
 
       case'table':
         var rows=b.children||[],hasH=d.has_column_header,hasR=d.has_row_header;
