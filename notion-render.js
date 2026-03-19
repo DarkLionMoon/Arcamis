@@ -220,7 +220,6 @@ function renderBlocks(blocks,isRoot){
         while(i<blocks.length&&blocks[i].type==='child_page'){
           var cpb=blocks[i],cpd=cpb[cpb.type]||{};
           var cpid=cpb.id.replace(/-/g,'');
-          /* FIX: salta se id non valido */
           if(!cpid||cpid==='undefined'){i++;continue;}
           if(mapPageIds.has(cpid)){i++;continue;}
           var cpni=pages.find(function(n){return n.id===cpid});
@@ -460,30 +459,31 @@ async function gp(id,label,icon,_fromPop){
   var phSub=document.getElementById('ph-sub');
   var phHero=document.getElementById('page-hero');
 
-  phTitle.textContent=label;
-  phIcon.textContent=icon;
+  phTitle.textContent=label||'';
+  phIcon.textContent=icon||'';
   phCovbg.style.backgroundImage='';
   phEyebrow.textContent='';
   phSub.textContent='';
   phHero.style.removeProperty('--ph-acc');
   phHero.style.removeProperty('--ph-accbg');
-  phCrumb.innerHTML=buildCrumb(label);
+  phCrumb.innerHTML=buildCrumb(label||'');
   var _pb=document.getElementById('pbody');
-  document.title=label+' — Arcamis';
+  document.title=(label||'Pagina')+' — Arcamis';
+
   if(hv.style.display==='block'){
+    /* home → pagina: xfade poi render */
     _pb.innerHTML='<div class="ldwrap"><div class="spin"></div></div>';
     xfade(hv,pv);
+    document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
+    await _gpRender(id,label,icon);
   } else {
-    _pb.style.opacity='0';_pb.style.transform='translateY(6px)';
-    _pb.style.transition='opacity .15s ease,transform .15s ease';
-    setTimeout(function(){
-      _pb.innerHTML='<div class="ldwrap"><div class="spin"></div></div>';
-      _pb.style.opacity='1';_pb.style.transform='';
-    },150);
-    pv.style.display='block';
+    /* pagina → pagina: FIX — aspetta il render PRIMA di mostrare lo spinner */
+    document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
+    _pb.style.opacity='0';
+    _pb.style.transition='opacity .15s ease';
+    await _gpRender(id,label,icon);
+    _pb.style.opacity='1';
   }
-  document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
-  await _gpRender(id,label,icon);
 }
 
 async function _gpRender(id,label,icon){
@@ -518,8 +518,8 @@ async function _gpRender(id,label,icon){
     }
     var pg=data.page,bl=data.blocks;
     var ta=pg.properties&&pg.properties.title&&pg.properties.title.title||[];
-    var ptitle=ta.map(function(t){return t.plain_text}).join('')||label;
-    var picon=pg.icon&&pg.icon.emoji?pg.icon.emoji:icon;
+    var ptitle=ta.map(function(t){return t.plain_text}).join('')||label||'Pagina';
+    var picon=pg.icon&&pg.icon.emoji?pg.icon.emoji:(icon||'📄');
     phTitle.textContent=ptitle;
     phIcon.textContent=picon;
     phEyebrow.textContent='Archivi di Arcamis';
@@ -585,7 +585,6 @@ async function _gpRender(id,label,icon){
     setTimeout(function(){if(window.buildWhisperNav)window.buildWhisperNav();_initCarouselArrows(pbody);},200);
     if(typeof addRecente==='function')addRecente(id,ptitle,picon);
     if(typeof setBnavActive==='function')setBnavActive('');
-    /* notifica app.js che il rendering è completo → rimuove spinner */
     if(typeof afterPageRender==='function')afterPageRender();
   }catch(e){
     document.getElementById('pbody').innerHTML='<div class="errbox">⚠️ '+e.message+'</div>';
