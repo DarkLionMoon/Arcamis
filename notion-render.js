@@ -472,7 +472,6 @@ async function gp(id,label,icon,_fromPop){
 
   if(hv.style.display==='block'){
     /* home → pagina: xfade poi render */
-    _pb.innerHTML='<div class="ldwrap"><div class="spin"></div></div>';
     xfade(hv,pv);
     document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
     await _gpRender(id,label,icon);
