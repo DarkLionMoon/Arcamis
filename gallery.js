@@ -267,7 +267,8 @@ window.gsSelect = function(id, name) {
   detail.style.setProperty('--gs-glow', col.glow);
 
   var tagsHtml = (p.tags||[]).map(function(t) {
-    return '<div class="gs-detail-tag" style="--gs-acc:'+col.c+'">'+t+'</div>';
+    var tc = _getClassColor([t]);
+    return '<div class="gs-detail-tag" style="--gs-acc:'+tc.c+'">'+t+'</div>';
 }).join('');
    
   detail.innerHTML =
