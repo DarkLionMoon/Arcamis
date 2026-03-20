@@ -43,10 +43,24 @@ export async function onRequest(context) {
 
     /* ── Proxy immagini S3 Notion ── */
     if (imgUrl) {
-      const img = await fetch(decodeURIComponent(imgUrl));
-      const ct = img.headers.get('content-type') || 'image/jpeg';
+      const decoded = decodeURIComponent(imgUrl);
+      const img = await fetch(decoded);
+      const ct = img.headers.get('content-type') || '';
+
+      /* Se S3 risponde con XML = URL scaduto → 404 */
+      if (!ct.startsWith('image/')) {
+        return new Response('Image expired or unavailable', {
+          status: 404,
+          headers: { 'Content-Type': 'text/plain', ...cors }
+        });
+      }
+
       return new Response(img.body, {
-        headers: { 'Content-Type': ct, ...cors }
+        headers: {
+          'Content-Type': ct,
+          'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
+          ...cors
+        }
       });
     }
 
@@ -142,7 +156,7 @@ export async function onRequest(context) {
       return new Response(payload, {
         headers: {
           'Content-Type': 'application/json',
-          'X-Cache': 'HIT',
+          'X-Cache': 'MISS',
           ...cors
         }
       });
