@@ -1,0 +1,507 @@
+/* ════════════════════════════════════
+   ARCAMIS — admin-overlay.js
+   Attivo solo se sessionStorage ha arcadmin=1
+   (impostato dal login su /admin)
+════════════════════════════════════ */
+(function(){
+  if(sessionStorage.getItem('arcadmin') !== '1') return;
+
+  /* ── CSS overlay ── */
+  var style = document.createElement('style');
+  style.textContent = `
+    /* Barra admin in cima */
+    #arc-admin-bar {
+      position:fixed;top:0;left:0;right:0;z-index:9999;height:36px;
+      background:linear-gradient(90deg,rgba(100,70,200,.95),rgba(60,40,160,.95));
+      border-bottom:1px solid rgba(180,150,255,.4);
+      display:flex;align-items:center;padding:0 18px;gap:16px;
+      font-family:'Cinzel',serif;font-size:9px;letter-spacing:.15em;
+      backdrop-filter:blur(12px);
+    }
+    #arc-admin-bar .ab-logo { color:rgba(220,200,255,.9);font-weight:700; }
+    #arc-admin-bar .ab-badge {
+      padding:2px 10px;background:rgba(255,255,255,.1);
+      border:1px solid rgba(180,150,255,.3);color:rgba(200,180,255,.8);font-size:7px;
+    }
+    #arc-admin-bar .ab-sep { flex:1; }
+    #arc-admin-bar .ab-exit {
+      padding:4px 14px;border:1px solid rgba(255,100,100,.3);
+      background:rgba(180,40,30,.15);color:rgba(255,120,120,.8);
+      cursor:pointer;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.12em;
+      transition:.2s;
+    }
+    #arc-admin-bar .ab-exit:hover { background:rgba(180,40,30,.35);color:#ff8080; }
+    body { padding-top:36px !important; }
+
+    /* Bottone edit generico */
+    .arc-edit-btn {
+      position:absolute;z-index:500;
+      background:rgba(100,70,200,.85);border:1px solid rgba(180,150,255,.5);
+      color:#fff;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;
+      padding:4px 10px;cursor:pointer;
+      backdrop-filter:blur(6px);transition:.18s;white-space:nowrap;
+      display:flex;align-items:center;gap:5px;
+    }
+    .arc-edit-btn:hover { background:rgba(130,100,240,.95);box-shadow:0 0 16px rgba(100,70,200,.5); }
+    .arc-edit-btn .aeb-icon { font-size:11px; }
+
+    /* Pannello laterale */
+    #arc-edit-panel {
+      position:fixed;top:36px;right:0;bottom:0;width:360px;z-index:9998;
+      background:rgba(8,6,20,.97);border-left:1px solid rgba(140,110,255,.25);
+      display:flex;flex-direction:column;
+      transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+      font-family:'Crimson Pro',serif;
+    }
+    #arc-edit-panel.open { transform:translateX(0); }
+    #arc-panel-header {
+      padding:16px 20px;border-bottom:1px solid rgba(140,110,255,.15);
+      display:flex;align-items:center;gap:10px;flex-shrink:0;
+    }
+    #arc-panel-title {
+      font-family:'Cinzel',serif;font-size:11px;font-weight:700;
+      letter-spacing:.15em;color:rgba(200,180,255,.9);flex:1;
+    }
+    #arc-panel-close {
+      width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+      color:rgba(200,180,255,.5);cursor:pointer;font-size:16px;transition:.15s;
+    }
+    #arc-panel-close:hover { color:rgba(200,180,255,.9); }
+    #arc-panel-body {
+      flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px;
+    }
+    #arc-panel-body::-webkit-scrollbar{width:3px}
+    #arc-panel-body::-webkit-scrollbar-thumb{background:rgba(140,110,255,.3)}
+
+    /* Campi del pannello */
+    .ap-field { display:flex;flex-direction:column;gap:5px; }
+    .ap-label {
+      font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.2em;
+      color:rgba(160,130,255,.6);text-transform:uppercase;
+    }
+    .ap-input, .ap-textarea {
+      background:rgba(0,0,0,.4);border:1px solid rgba(140,110,255,.2);
+      color:#f0e6d2;font-family:'Crimson Pro',serif;font-size:13px;
+      padding:7px 10px;outline:none;transition:.18s;width:100%;
+    }
+    .ap-input:focus, .ap-textarea:focus { border-color:rgba(180,150,255,.6); }
+    .ap-input::placeholder, .ap-textarea::placeholder { color:rgba(140,110,255,.3);font-style:italic; }
+    .ap-textarea { resize:vertical;min-height:60px; }
+    .ap-sep {
+      height:1px;background:linear-gradient(90deg,transparent,rgba(140,110,255,.2),transparent);
+      margin:4px 0;
+    }
+    .ap-section-label {
+      font-family:'Cinzel',serif;font-size:8px;letter-spacing:.2em;
+      color:rgba(200,155,60,.6);text-transform:uppercase;
+      display:flex;align-items:center;gap:8px;
+    }
+    .ap-section-label::before { content:'◆';font-size:6px; }
+
+    /* Upload zone nel pannello */
+    .ap-upload {
+      border:1px dashed rgba(140,110,255,.2);padding:10px;text-align:center;
+      cursor:pointer;position:relative;background:rgba(140,110,255,.03);transition:.2s;
+    }
+    .ap-upload:hover { border-color:rgba(180,150,255,.4);background:rgba(140,110,255,.07); }
+    .ap-upload input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+    .ap-upload-txt {
+      font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;
+      color:rgba(140,110,255,.5);text-transform:uppercase;
+    }
+    .ap-or {
+      display:flex;align-items:center;gap:8px;
+      font-family:'Cinzel',serif;font-size:7px;letter-spacing:.15em;
+      color:rgba(140,110,255,.3);
+    }
+    .ap-or::before,.ap-or::after{content:'';flex:1;height:1px;background:rgba(140,110,255,.15)}
+
+    /* Preview immagine */
+    .ap-preview {
+      width:100%;height:100px;background-size:cover;background-position:center;
+      background-color:rgba(0,0,0,.3);border:1px solid rgba(140,110,255,.15);
+      display:flex;align-items:center;justify-content:center;
+      color:rgba(140,110,255,.3);font-size:11px;font-style:italic;
+    }
+
+    /* Bottoni azione */
+    .ap-actions { display:flex;gap:8px;margin-top:4px; }
+    .ap-btn-save {
+      flex:1;padding:9px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.12em;
+      background:rgba(100,70,200,.2);border:1px solid rgba(140,110,255,.4);
+      color:rgba(180,150,255,.9);cursor:pointer;transition:.18s;text-transform:uppercase;
+    }
+    .ap-btn-save:hover { background:rgba(100,70,200,.35);border-color:rgba(180,150,255,.6); }
+    .ap-btn-save:disabled { opacity:.4;cursor:not-allowed; }
+    .ap-status { font-size:11px;font-style:italic;height:14px;transition:.2s; }
+    .ap-status.ok { color:#6dca7a; }
+    .ap-status.err { color:#ff7060; }
+
+    /* Highlight elementi editabili */
+    .arc-editable {
+      outline:1px dashed rgba(140,110,255,.25);
+      outline-offset:2px;
+      position:relative;
+    }
+    .arc-editable:hover { outline-color:rgba(180,150,255,.5); }
+  `;
+  document.head.appendChild(style);
+
+  /* ── Barra admin ── */
+  var bar = document.createElement('div');
+  bar.id = 'arc-admin-bar';
+  bar.innerHTML = `
+    <span class="ab-logo">⚔ ARCAMIS</span>
+    <span class="ab-badge">MODALITÀ ADMIN</span>
+    <span class="ab-sep"></span>
+    <button class="ab-exit" onclick="arcAdminExit()">✕ Esci da admin</button>
+  `;
+  document.body.appendChild(bar);
+
+  /* ── Pannello laterale ── */
+  var panel = document.createElement('div');
+  panel.id = 'arc-edit-panel';
+  panel.innerHTML = `
+    <div id="arc-panel-header">
+      <div id="arc-panel-title">Editor</div>
+      <div id="arc-panel-close" onclick="arcClosePanel()">✕</div>
+    </div>
+    <div id="arc-panel-body"></div>
+  `;
+  document.body.appendChild(panel);
+
+  /* ── Toast ── */
+  function arcToast(msg, ok){
+    var t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);'
+      +'background:rgba(8,6,20,.98);border:1px solid rgba(140,110,255,.35);'
+      +'color:'+(ok?'#6dca7a':'#ff7060')+';font-family:Cinzel,serif;font-size:9px;'
+      +'letter-spacing:.12em;padding:9px 22px;z-index:99999;opacity:0;transition:opacity .25s;white-space:nowrap;';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){ t.style.opacity='1'; },10);
+    setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); },300); },2500);
+  }
+
+  /* ── Apri/chiudi pannello ── */
+  window.arcClosePanel = function(){
+    document.getElementById('arc-edit-panel').classList.remove('open');
+  };
+  window.arcAdminExit = function(){
+    sessionStorage.removeItem('arcadmin');
+    location.reload();
+  };
+
+  function arcOpenPanel(title, bodyHtml){
+    document.getElementById('arc-panel-title').textContent = title;
+    document.getElementById('arc-panel-body').innerHTML = bodyHtml;
+    document.getElementById('arc-edit-panel').classList.add('open');
+  }
+
+  /* ── Utility: compressione immagine ── */
+  function compressImg(dataUrl, cb){
+    var img = new Image();
+    img.onload = function(){
+      var MAX=900, w=img.width, h=img.height;
+      if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+      if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+      var c=document.createElement('canvas');
+      c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      cb(c.toDataURL('image/jpeg',0.82));
+    };
+    img.src = dataUrl;
+  }
+
+  /* ── Utility: salva su KV ── */
+  async function arcSave(key, value){
+    var r = await fetch('/api/admin?action=set_cover',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({pageId:key, coverUrl:value})
+    });
+    return (await r.json()).ok;
+  }
+
+  /* ── Utility: leggi covers ── */
+  async function arcGetCovers(){
+    var r = await fetch('/api/admin?action=get_covers');
+    return (await r.json()).covers || {};
+  }
+
+  function escH(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  /* ════════════════════════════════
+     EDITOR CAROUSEL HOMEPAGE
+  ════════════════════════════════ */
+  var SLIDES_DEF = [
+    { key:'carousel_0', label:'Slide 1 — Arcamis Porto',  defTag:'Città Portuale — Marche di Arcamis', defTit:'ARCAMIS',
+      btns:[{defLabel:'Entra nel Discord',defHref:'https://discord.gg/JZPnXZbXEJ'},{defLabel:'Scopri la città ↓',defHref:''}] },
+    { key:'carousel_1', label:'Slide 2 — Pantheon',        defTag:'Pantheon di Arcamis',               defTit:'LE DIVINITÀ DI ARCAMIS',
+      btns:[{defLabel:'Scopri il Pantheon →',defHref:''}] },
+    { key:'carousel_2', label:'Slide 3 — Personaggio',     defTag:'Crea il tuo eroe',                  defTit:'CREA IL TUO PERSONAGGIO',
+      btns:[{defLabel:'Come si inizia →',defHref:''}] }
+  ];
+
+  async function injectCarouselHomeButtons(){
+    var covers = await arcGetCovers();
+    var slides = document.querySelectorAll('.slide');
+    slides.forEach(function(slide, i){
+      if(!SLIDES_DEF[i]) return;
+      slide.style.position = 'relative';
+      slide.classList.add('arc-editable');
+      var btn = document.createElement('button');
+      btn.className = 'arc-edit-btn';
+      btn.style.cssText = 'top:60px;right:20px;';
+      btn.innerHTML = '<span class="aeb-icon">✏️</span> Modifica slide';
+      btn.onclick = function(e){ e.stopPropagation(); arcOpenSlideEditor(i, covers); };
+      slide.appendChild(btn);
+    });
+  }
+
+  async function arcOpenSlideEditor(idx, covers){
+    var sl = SLIDES_DEF[idx];
+    var meta = {}; try{ meta=JSON.parse(covers[sl.key+'_meta']||'{}'); }catch(e){}
+    var btns = []; try{ btns=JSON.parse(covers[sl.key+'_btns']||'[]'); }catch(e){}
+    var curImg = covers[sl.key]||'';
+
+    var btnsHtml = sl.btns.map(function(b,bi){
+      var sv = btns[bi]||{};
+      return '<div class="ap-section-label" style="margin-top:8px">Bottone '+(bi+1)+'</div>'
+        +'<div class="ap-field"><div class="ap-label">Testo</div>'
+        +'<input class="ap-input" id="asl-btl-'+idx+'-'+bi+'" value="'+escH(sv.label||b.defLabel)+'" placeholder="Testo…"/></div>'
+        +'<div class="ap-field"><div class="ap-label">Link / onclick</div>'
+        +'<input class="ap-input" id="asl-bth-'+idx+'-'+bi+'" value="'+escH(sv.href||b.defHref)+'" placeholder="https://… o onclick…"/></div>';
+    }).join('');
+
+    arcOpenPanel(sl.label, `
+      <div class="ap-section-label">Sfondo</div>
+      <div class="ap-preview" id="asl-prev-${idx}" style="${curImg?'background-image:url(\''+curImg+'\')':''}">
+        ${curImg?'':'Nessuna immagine'}
+      </div>
+      <div class="ap-upload">
+        <input type="file" accept="image/*" onchange="arcSlideUpload(event,${idx})"/>
+        <div class="ap-upload-txt">🖼 Carica dal PC</div>
+      </div>
+      <div class="ap-or">oppure URL</div>
+      <div class="ap-field">
+        <input class="ap-input" id="asl-url-${idx}" type="url" placeholder="https://…" value="${escH(curImg)}" oninput="document.getElementById('asl-prev-${idx}').style.backgroundImage=this.value?'url('+this.value+')':''"/>
+      </div>
+      <div class="ap-actions">
+        <button class="ap-btn-save" onclick="arcSaveSlideImg(${idx})">Salva sfondo</button>
+        <button class="ap-btn-save" style="flex:0;padding:9px 12px;background:rgba(180,40,30,.1);border-color:rgba(180,40,30,.3);color:#ff8888" onclick="arcRemoveSlideImg(${idx})">✕</button>
+      </div>
+      <div class="ap-status" id="asl-img-status-${idx}"></div>
+      <div class="ap-sep"></div>
+      <div class="ap-section-label">Testi slide</div>
+      <div class="ap-field"><div class="ap-label">Tag (piccolo sopra)</div>
+        <input class="ap-input" id="asl-tag-${idx}" value="${escH(meta.tag||sl.defTag)}" placeholder="es. Città Portuale…"/>
+      </div>
+      <div class="ap-field"><div class="ap-label">Titolo (grande)</div>
+        <input class="ap-input" id="asl-tit-${idx}" value="${escH(meta.tit||sl.defTit)}" placeholder="es. ARCAMIS"/>
+      </div>
+      <div class="ap-actions">
+        <button class="ap-btn-save" onclick="arcSaveSlideText(${idx})">Salva testi</button>
+      </div>
+      <div class="ap-status" id="asl-txt-status-${idx}"></div>
+      <div class="ap-sep"></div>
+      <div class="ap-section-label">Bottoni CTA</div>
+      ${btnsHtml}
+      <div class="ap-actions">
+        <button class="ap-btn-save" onclick="arcSlideSaveBtns(${idx},${sl.btns.length})">Salva bottoni</button>
+      </div>
+      <div class="ap-status" id="asl-btn-status-${idx}"></div>
+    `);
+  }
+
+  /* Upload sfondo slide */
+  window.arcSlideUpload = function(event, idx){
+    var file = event.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      compressImg(e.target.result, function(b64){
+        var prev = document.getElementById('asl-prev-'+idx);
+        var urlI = document.getElementById('asl-url-'+idx);
+        if(prev){ prev.style.backgroundImage='url(\''+b64+'\')'; prev.textContent=''; }
+        if(urlI) urlI.value = '';
+        /* salva subito */
+        arcSaveSlideImgVal(idx, b64);
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.arcSaveSlideImg = async function(idx){
+    var val = (document.getElementById('asl-url-'+idx)||{}).value||'';
+    if(!val){ arcToast('Nessuna immagine da salvare', false); return; }
+    arcSaveSlideImgVal(idx, val);
+  };
+  window.arcRemoveSlideImg = async function(idx){
+    var key = SLIDES_DEF[idx].key;
+    var ok = await arcSave(key, '');
+    var prev = document.getElementById('asl-prev-'+idx);
+    if(prev){ prev.style.backgroundImage=''; prev.textContent='Nessuna immagine'; }
+    var slide = document.querySelectorAll('.slide')[idx];
+    if(slide){ slide.style.backgroundImage=''; }
+    setApStatus('asl-img-status-'+idx, ok?'✓ Rimossa':'✕ Errore', ok?'ok':'err');
+    arcToast(ok?'Sfondo rimosso':'Errore', ok);
+  };
+  async function arcSaveSlideImgVal(idx, val){
+    var key = SLIDES_DEF[idx].key;
+    setApStatus('asl-img-status-'+idx,'Salvataggio…','');
+    var ok = await arcSave(key, val);
+    /* aggiorna slide live */
+    var slide = document.querySelectorAll('.slide')[idx];
+    if(slide && ok){ slide.style.backgroundImage='url(\''+val+'\')'; slide.style.backgroundSize='cover'; slide.style.backgroundPosition='center 40%'; }
+    setApStatus('asl-img-status-'+idx, ok?'✓ Salvato':'✕ Errore', ok?'ok':'err');
+    arcToast(ok?'Sfondo salvato ✓':'Errore salvataggio', ok);
+  }
+
+  window.arcSaveSlideText = async function(idx){
+    var key = SLIDES_DEF[idx].key;
+    var tag = (document.getElementById('asl-tag-'+idx)||{}).value||'';
+    var tit = (document.getElementById('asl-tit-'+idx)||{}).value||'';
+    setApStatus('asl-txt-status-'+idx,'Salvataggio…','');
+    var ok = await arcSave(key+'_meta', JSON.stringify({tag:tag,tit:tit}));
+    /* aggiorna live */
+    var slide = document.querySelectorAll('.slide')[idx];
+    if(slide && ok){
+      var tagEl = slide.querySelector('.stag');
+      var titEl = slide.querySelector('.stit');
+      if(tagEl) tagEl.lastChild.textContent = tag;
+      if(titEl) titEl.innerHTML = tit.replace(/\n/g,'<br>');
+    }
+    setApStatus('asl-txt-status-'+idx, ok?'✓ Salvati':'✕ Errore', ok?'ok':'err');
+    arcToast(ok?'Testi salvati ✓':'Errore', ok);
+  };
+
+  window.arcSlideSaveBtns = async function(idx, count){
+    var key = SLIDES_DEF[idx].key;
+    var btns = [];
+    for(var i=0;i<count;i++){
+      btns.push({
+        label:(document.getElementById('asl-btl-'+idx+'-'+i)||{}).value||'',
+        href: (document.getElementById('asl-bth-'+idx+'-'+i)||{}).value||''
+      });
+    }
+    setApStatus('asl-btn-status-'+idx,'Salvataggio…','');
+    var ok = await arcSave(key+'_btns', JSON.stringify(btns));
+    setApStatus('asl-btn-status-'+idx, ok?'✓ Salvati':'✕ Errore', ok?'ok':'err');
+    arcToast(ok?'Bottoni salvati ✓':'Errore', ok);
+  };
+
+  /* ════════════════════════════════
+     EDITOR CAROSELLI NELLE PAGINE
+  ════════════════════════════════ */
+  function injectPageCarouselButtons(){
+    /* Cerca tutti i caroselli renderizzati nelle pagine Notion */
+    var carousels = document.querySelectorAll('#pbody .notion-carousel, #pbody [class*="carousel"], #pbody .car-wrap, #pbody .ncar');
+    if(!carousels.length){
+      /* fallback: cerca img dentro section di tipo galleria/carousel */
+      carousels = document.querySelectorAll('#pbody .img-grid, #pbody .gallery-grid');
+    }
+    carousels.forEach(function(car, ci){
+      car.style.position = 'relative';
+      car.classList.add('arc-editable');
+      var btn = document.createElement('button');
+      btn.className = 'arc-edit-btn';
+      btn.style.cssText = 'top:8px;right:8px;';
+      btn.innerHTML = '<span class="aeb-icon">🖼</span> Foto carosello';
+      btn.onclick = function(e){ e.stopPropagation(); arcOpenPageCarouselEditor(car, ci); };
+      car.appendChild(btn);
+    });
+  }
+
+  function arcOpenPageCarouselEditor(carEl, ci){
+    /* Trova tutte le immagini nel carosello */
+    var imgs = carEl.querySelectorAll('img, [style*="background-image"]');
+    var pageId = (window._currentPageId||'unknown').replace(/-/g,'');
+
+    var imgsHtml = Array.from(imgs).map(function(el, ii){
+      var cur = el.tagName==='IMG' ? el.src : (el.style.backgroundImage||'').replace(/url\(['"]?/,'').replace(/['"]?\)$/,'');
+      return `<div class="ap-section-label">Immagine ${ii+1}</div>
+        <div class="ap-preview" id="apci-prev-${ci}-${ii}" style="${cur?'background-image:url(\''+cur+'\')':''}">
+          ${cur?'':'Nessuna'}
+        </div>
+        <div class="ap-upload">
+          <input type="file" accept="image/*" onchange="arcPageCarImg(event,'${pageId}','car${ci}_img${ii}',${ci},${ii})"/>
+          <div class="ap-upload-txt">🖼 Carica</div>
+        </div>
+        <div class="ap-or">oppure URL</div>
+        <input class="ap-input" id="apci-url-${ci}-${ii}" type="url" value="${escH(cur)}" placeholder="https://…"
+          oninput="document.getElementById('apci-prev-${ci}-${ii}').style.backgroundImage=this.value?'url('+this.value+')':''"/>
+        <div class="ap-actions">
+          <button class="ap-btn-save" onclick="arcSavePageCarImg('${pageId}','car${ci}_img${ii}',${ci},${ii})">Salva</button>
+        </div>
+        <div class="ap-status" id="apci-status-${ci}-${ii}"></div>
+        <div class="ap-sep"></div>`;
+    }).join('');
+
+    arcOpenPanel('Carosello pagina', imgsHtml || '<div style="color:rgba(200,155,60,.4);font-style:italic;font-size:13px;padding:20px 0">Nessuna immagine trovata in questo carosello.</div>');
+  }
+
+  window.arcPageCarImg = function(event, pageId, key, ci, ii){
+    var file = event.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      compressImg(e.target.result, function(b64){
+        var prev = document.getElementById('apci-prev-'+ci+'-'+ii);
+        var urlI = document.getElementById('apci-url-'+ci+'-'+ii);
+        if(prev){ prev.style.backgroundImage='url(\''+b64+'\')'; prev.textContent=''; }
+        if(urlI) urlI.value='';
+        arcSavePageCarImgVal(pageId, key, b64, ci, ii);
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.arcSavePageCarImg = async function(pageId, key, ci, ii){
+    var val = (document.getElementById('apci-url-'+ci+'-'+ii)||{}).value||'';
+    if(!val){ arcToast('Inserisci un URL o carica un file', false); return; }
+    arcSavePageCarImgVal(pageId, key, val, ci, ii);
+  };
+
+  async function arcSavePageCarImgVal(pageId, key, val, ci, ii){
+    var fullKey = 'page_'+pageId+'_'+key;
+    setApStatus('apci-status-'+ci+'-'+ii,'Salvataggio…','');
+    var ok = await arcSave(fullKey, val);
+    setApStatus('apci-status-'+ci+'-'+ii, ok?'✓ Salvata':'✕ Errore', ok?'ok':'err');
+    arcToast(ok?'Immagine salvata ✓':'Errore salvataggio', ok);
+  }
+
+  /* ── Helper status ── */
+  function setApStatus(id, msg, cls){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.textContent = msg;
+    el.className = 'ap-status'+(cls?' '+cls:'');
+    if(msg) setTimeout(function(){ if(el) el.textContent=''; el.className='ap-status'; }, 3000);
+  }
+
+  /* ════════════════════════════════
+     INIT — aggancia hooks
+  ════════════════════════════════ */
+  /* Carousel homepage: inietta dopo load */
+  window.addEventListener('load', function(){
+    setTimeout(injectCarouselHomeButtons, 800);
+  });
+
+  /* Caroselli pagine: inietta dopo ogni render */
+  var _origAfterPage = window.afterPageRender;
+  window.afterPageRender = function(){
+    if(_origAfterPage) _origAfterPage();
+    setTimeout(function(){
+      injectPageCarouselButtons();
+    }, 400);
+  };
+
+  /* Traccia pagina corrente per le chiavi KV */
+  var _origGp = window.gp;
+  if(_origGp) window.gp = function(id, label, icon, fromPop){
+    window._currentPageId = id;
+    return _origGp(id, label, icon, fromPop);
+  };
+
+})();
