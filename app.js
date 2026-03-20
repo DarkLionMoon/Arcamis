@@ -253,11 +253,11 @@ function updateDots(){
 
 function _resetCarTimer(){
   if(_carTimer) clearInterval(_carTimer);
-  _carTimer = setInterval(function(){ changeSlide(1); }, 6000);
+  _carTimer = setInterval(function(){ if(!window._carouselPaused) changeSlide(1); }, 6000);
 }
 
 /* Auto-avanzamento — verso destra (slide successiva) */
-_carTimer = setInterval(function(){ changeSlide(1); }, 6000);
+_carTimer = setInterval(function(){ if(!window._carouselPaused) changeSlide(1); }, 6000);
 
 /* Applicazione dinamica sfondo e bottoni CTA da KV */
 var _cachedCovers = null;
