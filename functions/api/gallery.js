@@ -1,7 +1,7 @@
 export async function onRequest(context) {
   const TOKEN = context.env.NOTION_TOKEN;
   const KV = context.env.ARCAMIS_CACHE;
-  const DB_ID = '2fd0274fdc1c80d8b948c4133f874f28';
+  var GALLERY_DB_ID = '2fd0274fdc1c80038889fc072a360bae';
   const CACHE_TTL = 3600;
 
   const cors = {
