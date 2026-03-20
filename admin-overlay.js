@@ -398,24 +398,42 @@
     /* Evita di iniettare due volte */
     document.querySelectorAll('#pbody .arc-edit-btn').forEach(function(b){ b.remove(); });
 
-    /* Griglia di card con immagine (.n-db-grid) */
-    var grids = document.querySelectorAll('#pbody .n-db-grid');
-    grids.forEach(function(grid, gi){
-      /* Bottone sulla griglia intera */
+    /* ── .loc-card — card con sfondo (child_page e database) ── */
+    document.querySelectorAll('#pbody .loc-card').forEach(function(card){
+      if(card.querySelector('.arc-edit-btn')) return;
+      /* Estrai pageId dall'onclick: gp('ID',...) */
+      var onclick = card.getAttribute('onclick') || '';
+      var m = onclick.match(/gp\(['"]([a-f0-9]{32})['"]/);
+      if(!m) return;
+      var pageId = m[1];
+      card.style.position = 'relative';
+      var btn = document.createElement('button');
+      btn.className = 'arc-edit-btn';
+      btn.style.cssText = 'top:4px;left:4px;right:auto;font-size:7px;padding:3px 8px;z-index:20;';
+      btn.innerHTML = '🖼';
+      btn.onclick = function(e){
+        e.stopPropagation();
+        arcOpenLocCardEditor(card, pageId);
+      };
+      card.appendChild(btn);
+    });
+
+    /* ── .n-db-grid — griglia card Notion database ── */
+    document.querySelectorAll('#pbody .n-db-grid').forEach(function(grid, gi){
       var wrap = grid.closest('.n-db-wrap') || grid.parentElement;
       if(!wrap || wrap.querySelector('.arc-grid-edit-btn')) return;
       wrap.style.position = 'relative';
       var btn = document.createElement('button');
       btn.className = 'arc-edit-btn arc-grid-edit-btn';
       btn.style.cssText = 'position:relative;display:inline-flex;margin-bottom:10px;';
-      btn.innerHTML = '<span class="aeb-icon">🖼</span> Modifica immagini griglia';
+      btn.innerHTML = '<span class="aeb-icon">🖼</span> Modifica immagini';
       btn.onclick = function(e){ e.stopPropagation(); arcOpenGridEditor(grid, gi); };
       wrap.insertBefore(btn, grid);
     });
 
-    /* Card singole con immagine fuori da griglia */
+    /* ── .n-db-card singole fuori da griglia ── */
     document.querySelectorAll('#pbody .n-db-card').forEach(function(card, ci){
-      if(card.closest('.n-db-grid')) return; /* già gestite dalla griglia */
+      if(card.closest('.n-db-grid')) return;
       if(card.querySelector('.arc-edit-btn')) return;
       card.style.position = 'relative';
       var btn = document.createElement('button');
@@ -425,6 +443,75 @@
       btn.onclick = function(e){ e.stopPropagation(); arcOpenSingleCardEditor(card, ci); };
       card.appendChild(btn);
     });
+  }
+
+  function arcOpenLocCardEditor(card, pageId){
+    /* Lo sfondo è nello style inline della card stessa */
+    var curStyle = card.getAttribute('style') || '';
+    var m = curStyle.match(/background-image:url\(["']?([^"')]+)["']?\)/);
+    var cur = m ? m[1] : '';
+    /* Prova anche dal KV già salvato */
+    var name = (card.querySelector('.loc-name')||{}).textContent || pageId;
+    var key = pageId; /* stessa chiave usata dall'admin classico */
+
+    var html = '<div class="ap-section-label" style="margin-bottom:8px">'+name+'</div>'
+      +'<div class="ap-preview" id="aploc-prev" style="'+(cur?'background-image:url(\''+cur+'\')':'')+'">'+(cur?'':'Nessuna immagine')+'</div>'
+      +'<div class="ap-upload"><input type="file" accept="image/*" onchange="arcLocCardUpload(event,\''+pageId+'\')"/>'
+      +'<div class="ap-upload-txt">🖼 Carica dal PC</div></div>'
+      +'<div class="ap-or">oppure URL</div>'
+      +'<input class="ap-input" id="aploc-url" type="url" value="'+escH(cur)+'" placeholder="https://…" '
+      +'oninput="document.getElementById(\'aploc-prev\').style.backgroundImage=this.value?\'url(\'+this.value+\')\':\'\'" />'
+      +'<div class="ap-actions">'
+      +'<button class="ap-btn-save" onclick="arcSaveLocCard(\''+pageId+'\')">Salva</button>'
+      +'<button class="ap-btn-save" style="flex:0;padding:9px 12px;background:rgba(180,40,30,.1);border-color:rgba(180,40,30,.3);color:#ff8888" onclick="arcRemoveLocCard(\''+pageId+'\')">✕</button>'
+      +'</div>'
+      +'<div class="ap-status" id="aploc-status"></div>';
+    arcOpenPanel('Sfondo card — '+name, html);
+    window._arcEditLocCard = card;
+  }
+
+  window.arcLocCardUpload = function(event, pageId){
+    var file = event.target.files[0]; if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){ compressImg(e.target.result, function(b64){
+      var prev = document.getElementById('aploc-prev');
+      var urlI = document.getElementById('aploc-url');
+      if(prev){ prev.style.backgroundImage='url(\''+b64+'\')'; prev.textContent=''; }
+      if(urlI) urlI.value='';
+      arcSaveLocCardVal(pageId, b64);
+    });};
+    reader.readAsDataURL(file);
+  };
+
+  window.arcSaveLocCard = async function(pageId){
+    var val = (document.getElementById('aploc-url')||{}).value||'';
+    if(!val){ arcToast('Inserisci URL o carica file', false); return; }
+    arcSaveLocCardVal(pageId, val);
+  };
+
+  window.arcRemoveLocCard = async function(pageId){
+    setApStatus('aploc-status','Rimozione…','');
+    var ok = await arcSave(pageId, '');
+    if(ok && window._arcEditLocCard){
+      /* ripristina sfondo originale rimuovendo background-image dallo style */
+      var s = window._arcEditLocCard.getAttribute('style')||'';
+      window._arcEditLocCard.setAttribute('style', s.replace(/background-image:[^;]+;?/,''));
+    }
+    setApStatus('aploc-status', ok?'✓ Rimosso':'✕ Errore', ok?'ok':'err');
+    arcToast(ok?'Sfondo rimosso':'Errore', ok);
+  };
+
+  async function arcSaveLocCardVal(pageId, val){
+    setApStatus('aploc-status','Salvataggio…','');
+    var ok = await arcSave(pageId, val);
+    if(ok && window._arcEditLocCard){
+      var s = window._arcEditLocCard.getAttribute('style')||'';
+      /* rimuovi eventuale background-image precedente e aggiungi il nuovo */
+      s = s.replace(/background-image:[^;]+;?/g,'');
+      window._arcEditLocCard.setAttribute('style', s+'background-image:url(\''+val+'\');background-size:cover;background-position:center;');
+    }
+    setApStatus('aploc-status', ok?'✓ Salvato':'✕ Errore', ok?'ok':'err');
+    arcToast(ok?'Sfondo salvato ✓':'Errore', ok);
   }
 
   function arcOpenGridEditor(gridEl, gi){
@@ -656,7 +743,6 @@
   if(typeof _origLoadGallery === 'function'){
     window.loadGallery = function(container){
       var result = _origLoadGallery(container);
-      /* Aspetta che il render finisca */
       var _obs = new MutationObserver(function(){
         if(container.querySelector('.gs-card')){
           _obs.disconnect();
@@ -666,6 +752,25 @@
       _obs.observe(container, {childList:true, subtree:true});
       return result;
     };
+  }
+
+  /* Osserva #pbody per loc-card caricate async da _loadSingleDb */
+  var _injectDebounce = null;
+  var _pbodyObs = new MutationObserver(function(mutations){
+    /* Ignora mutazioni dentro il pannello admin stesso */
+    for(var i=0;i<mutations.length;i++){
+      var t = mutations[i].target;
+      if(t.closest && t.closest('#arc-edit-panel')) return;
+    }
+    clearTimeout(_injectDebounce);
+    _injectDebounce = setTimeout(function(){
+      injectPageCarouselButtons();
+      injectGalleryButtons();
+    }, 500);
+  });
+  var _pbodyEl = document.getElementById('pbody');
+  if(_pbodyEl){
+    _pbodyObs.observe(_pbodyEl, {childList:true, subtree:true});
   }
 
   /* Traccia pagina corrente per le chiavi KV */
