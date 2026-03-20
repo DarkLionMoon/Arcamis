@@ -457,6 +457,42 @@
     }
     setApStatus('asl-btn-status-'+idx,'Salvataggio…','');
     var ok = await arcSave(key+'_btns', JSON.stringify(btns));
+
+    /* ── Aggiorna bottoni live nel DOM ── */
+    if (ok) {
+      var slide = document.querySelectorAll('.slide')[idx];
+      if (slide) {
+        var btnEls = slide.querySelectorAll('.sbtn');
+        btns.forEach(function(btn, bi) {
+          var el = btnEls[bi];
+          if (!el) return;
+
+          /* Testo — preserva icona SVG se presente */
+          if (btn.label) {
+            var svgEl = el.querySelector('svg');
+            el.textContent = btn.label;
+            if (svgEl) el.insertBefore(svgEl, el.firstChild);
+          }
+
+          /* Link o onclick */
+          if (btn.href) {
+            if (btn.href.startsWith('http')) {
+              el.href = btn.href;
+              el.setAttribute('target', '_blank');
+              el.setAttribute('rel', 'noopener');
+              el.removeAttribute('onclick');
+              el.style.cursor = 'pointer';
+            } else if (btn.href.trim()) {
+              /* tratta come onclick, es. "gp('...')" o scroll */
+              el.removeAttribute('href');
+              el.setAttribute('onclick', btn.href);
+              el.style.cursor = 'pointer';
+            }
+          }
+        });
+      }
+    }
+
     setApStatus('asl-btn-status-'+idx, ok?'✓ Salvati':'✕ Errore', ok?'ok':'err');
     arcToast(ok?'Bottoni salvati ✓':'Errore', ok);
   };
