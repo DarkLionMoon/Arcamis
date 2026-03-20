@@ -33,15 +33,15 @@ function toggleTheme(){ applyTheme(_theme === 'dark' ? 'light' : 'dark'); }
 
 /* ════ UI NAVIGATION ════ */
 function showHome(){
-  document.getElementById('hv').style.display = 'block';   // era 'home-screen'
-  document.getElementById('pv').style.display = 'none';    // era 'page-screen'
+  document.getElementById('hv').style.display = 'block';
+  document.getElementById('pv').style.display = 'none';
   document.body.classList.remove('page-open');
   var cv = document.querySelector('.ph-covbg');
   if(cv) cv.style.opacity = '0';
 }
 
 function ovo(){
-  var overlay = document.getElementById('overlay');        // era 'mobile-menu'
+  var overlay = document.getElementById('overlay');
   if(overlay) overlay.classList.toggle('open');
 }
 
@@ -82,8 +82,8 @@ function buildWhisperNav(){
   var _origAfter = window.afterPageRender;
   window.afterPageRender = function(){
     if(_origAfter) _origAfter();
-    document.getElementById('hv').style.display = 'none';   // era 'home-screen'
-    document.getElementById('pv').style.display = 'block';  // era 'page-screen'
+    document.getElementById('hv').style.display = 'none';
+    document.getElementById('pv').style.display = 'block';
     document.body.classList.add('page-open');
     setTimeout(buildWhisperNav, 300);
   };
@@ -98,6 +98,7 @@ window.copyPageLink = function(){
     });
   }
 };
+
 /* ════ DROPDOWN TOPBAR ════ */
 function toggleDd(id, e){
   if(e) e.stopPropagation();
@@ -155,7 +156,7 @@ function csearch(){
   if(ts) ts.value='';
 }
 
-/* ════ XFADE (transizione home→pagina) ════ */
+/* ════ XFADE ════ */
 function xfade(from, to){
   from.style.transition = 'opacity .2s ease';
   from.style.opacity = '0';
@@ -208,7 +209,6 @@ function markChangelogSeen(){
   document.querySelectorAll('.changelog-badge').forEach(function(b){ b.style.display='none'; });
 }
 (function(){
-  /* mostra badge se non visto nelle ultime 48h */
   var seen = parseInt(localStorage.getItem('arc_cl_seen')||'0');
   if(Date.now() - seen > 48*3600*1000){
     document.querySelectorAll('.changelog-badge').forEach(function(b){ b.style.display='block'; });
@@ -217,34 +217,91 @@ function markChangelogSeen(){
 
 /* ════ CAROUSEL HOME ════ */
 var _slideIdx = 0;
+var _carTimer = null;
+
+function _applySlide(){
+  var track = document.getElementById('ctrack');
+  if(track) track.style.transform = 'translateX(-' + (_slideIdx * 33.3333) + '%)';
+  updateDots();
+}
+
 function changeSlide(dir){
   var slides = document.querySelectorAll('.slide');
   if(!slides.length) return;
+  slides[_slideIdx].classList.remove('active');
   _slideIdx = (_slideIdx + dir + slides.length) % slides.length;
+  slides[_slideIdx].classList.add('active');
   _applySlide();
+  _resetCarTimer();
 }
+
 function jumpToSlide(idx){
   var slides = document.querySelectorAll('.slide');
   if(!slides.length) return;
+  slides[_slideIdx].classList.remove('active');
   _slideIdx = idx;
+  slides[_slideIdx].classList.add('active');
   _applySlide();
+  _resetCarTimer();
 }
-function _applySlide(){
-  var track = document.getElementById('ctrack');
-  if(track) track.style.transform = 'translateX(-'+(_slideIdx * 33.3333)+'%)';
-  document.querySelectorAll('.slide').forEach(function(s,i){
-    s.classList.toggle('active', i === _slideIdx);
-  });
-  updateDots();
-}
+
 function updateDots(){
   document.querySelectorAll('.cdot').forEach(function(d,i){
     d.classList.toggle('ca', i === _slideIdx);
   });
 }
-setInterval(function(){ changeSlide(1); }, 6000);
-/* Auto-avanzamento carousel */
-setInterval(function(){ changeSlide(1); }, 6000);
+
+function _resetCarTimer(){
+  if(_carTimer) clearInterval(_carTimer);
+  _carTimer = setInterval(function(){ changeSlide(1); }, 6000);
+}
+
+/* Auto-avanzamento — verso destra (slide successiva) */
+_carTimer = setInterval(function(){ changeSlide(1); }, 6000);
+
+/* Applicazione dinamica sfondo e bottoni CTA da KV */
+(function(){
+  fetch('/api/admin?action=get_covers')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var covers = d.covers || {};
+
+      /* ── Sfondi ── */
+      var slideEls = document.querySelectorAll('.slide');
+      ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
+        if(covers[key] && slideEls[i]){
+          slideEls[i].style.backgroundImage = 'url(\'' + covers[key] + '\')';
+          slideEls[i].style.backgroundSize = 'cover';
+          slideEls[i].style.backgroundPosition = 'center 40%';
+        }
+      });
+
+      /* ── Bottoni CTA ── */
+      ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
+        var btnsKey = key + '_btns';
+        if(!covers[btnsKey] || !slideEls[i]) return;
+        try {
+          var btns = JSON.parse(covers[btnsKey]);
+          var row = slideEls[i].querySelector('.scnt > div, .scnt > a');
+          /* trova il contenitore dei bottoni (div con .sbtn) */
+          var btnRow = slideEls[i].querySelector('[style*="display:flex"][style*="gap"]');
+          if(!btnRow) btnRow = slideEls[i].querySelector('.scnt > div:last-of-type');
+          if(!btnRow) return;
+          /* sostituisce solo i bottoni che hanno dati salvati */
+          var btnEls = btnRow.querySelectorAll('.sbtn');
+          btns.forEach(function(b, bi){
+            if(!btnEls[bi]) return;
+            if(b.label) btnEls[bi].innerHTML = (btnEls[bi].querySelector('svg') ? btnEls[bi].querySelector('svg').outerHTML + ' ' : '') + b.label;
+            if(b.href){
+              btnEls[bi].setAttribute('href', b.href);
+              btnEls[bi].tagName !== 'A' && (btnEls[bi].onclick = function(){ window.open(b.href,'_blank'); });
+            }
+          });
+        } catch(e){}
+      });
+    })
+    .catch(function(){});
+})();
 
 /* ════ MAPPA INTERATTIVA ════ */
 (function(){
@@ -258,7 +315,6 @@ setInterval(function(){ changeSlide(1); }, 6000);
       var hint = document.getElementById('mt-hint');
       if(hint) hint.textContent = explored ? 'Clicca per aprire' : 'Inesplorato';
       tip.classList.add('visible');
-      /* posiziona il tooltip vicino al pin */
       var map = document.getElementById('arcamis-map');
       var pr = pin.getBoundingClientRect();
       var mr = map ? map.getBoundingClientRect() : {left:0,top:0};
@@ -273,7 +329,6 @@ setInterval(function(){ changeSlide(1); }, 6000);
       var name = pin.getAttribute('data-name');
       var sub  = pin.getAttribute('data-sub');
       if(sub){
-        /* apri pannello sub-mappa */
         closeSubMap(null);
         var panel = document.getElementById('sub-'+sub);
         if(panel) panel.classList.add('open');
@@ -282,7 +337,6 @@ setInterval(function(){ changeSlide(1); }, 6000);
       if(id) gp(id, name, pin.querySelector('.mpin-dot') ? '📍' : '📄');
     });
   });
-  /* click sui location nella sub-mappa */
   document.querySelectorAll('.mloc').forEach(function(loc){
     loc.addEventListener('click', function(){
       var id   = loc.getAttribute('data-id');
@@ -317,7 +371,7 @@ function closeSubMap(id){
   });
 })();
 
-/* ════ POPSTATE (back/forward browser) ════ */
+/* ════ POPSTATE ════ */
 window.addEventListener('popstate', function(e){
   if(e.state && e.state.id){
     if(e.state.stack) navStack = e.state.stack;
@@ -327,7 +381,7 @@ window.addEventListener('popstate', function(e){
   }
 });
 
-/* ════ DEEP LINK (carica pagina da URL al primo caricamento) ════ */
+/* ════ DEEP LINK ════ */
 (function(){
   var params = new URLSearchParams(location.search);
   var pid = params.get('p');
@@ -348,7 +402,7 @@ function toggleWiki(){
   if(wrap) wrap.style.display = 'block';
 }
 
-/* ════ CLOSE OVERLAY (cv) ════ */
+/* ════ CLOSE OVERLAY ════ */
 function cv(){
   var overlay = document.getElementById('overlay');
   if(overlay) overlay.classList.remove('open');
