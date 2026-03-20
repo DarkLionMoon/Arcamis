@@ -183,9 +183,38 @@
     setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); },300); },2500);
   }
 
+  /* ── Pausa / ripresa carousel ── */
+  function arcPauseCarousel() {
+    /* Imposta flag globale letto da app.js nel setInterval */
+    window._carouselPaused = true;
+    /* Rimuove anche l'animazione ken-burns dalla slide attiva */
+    document.querySelectorAll('.slide.active').forEach(function(s) {
+      s.style.animationPlayState = 'paused';
+    });
+    /* Mostra indicatore visivo */
+    var bar = document.getElementById('arc-admin-bar');
+    if (bar && !document.getElementById('arc-carousel-paused-badge')) {
+      var badge = document.createElement('span');
+      badge.id = 'arc-carousel-paused-badge';
+      badge.style.cssText = 'padding:2px 10px;background:rgba(200,155,60,.15);border:1px solid rgba(200,155,60,.3);color:rgba(200,155,60,.8);font-size:7px;letter-spacing:.1em;';
+      badge.textContent = '⏸ Carousel in pausa';
+      bar.insertBefore(badge, bar.querySelector('.ab-sep'));
+    }
+  }
+
+  function arcResumeCarousel() {
+    window._carouselPaused = false;
+    document.querySelectorAll('.slide').forEach(function(s) {
+      s.style.animationPlayState = '';
+    });
+    var badge = document.getElementById('arc-carousel-paused-badge');
+    if (badge) badge.remove();
+  }
+
   /* ── Apri/chiudi pannello ── */
   window.arcClosePanel = function(){
     document.getElementById('arc-edit-panel').classList.remove('open');
+    arcResumeCarousel();
   };
   window.arcAdminExit = function(){
     sessionStorage.removeItem('arcadmin');
@@ -282,6 +311,12 @@
   }
 
   async function arcOpenSlideEditor(idx, covers){
+    arcPauseCarousel();
+    /* Vai alla slide corretta se non è già attiva */
+    var slides = document.querySelectorAll('.slide');
+    if (slides[idx] && !slides[idx].classList.contains('active')) {
+      if (typeof jumpToSlide === 'function') jumpToSlide(idx);
+    }
     var sl = SLIDES_DEF[idx];
     var meta = {}; try{ meta=JSON.parse(covers[sl.key+'_meta']||'{}'); }catch(e){}
     var btns = []; try{ btns=JSON.parse(covers[sl.key+'_btns']||'[]'); }catch(e){}
