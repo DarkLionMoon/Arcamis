@@ -372,52 +372,69 @@ async function loadDbGalleries(container){
   },{rootMargin:'200px'});
   grids.forEach(function(g){io.observe(g);});
 }
+
 async function _loadSingleDb(grid){
-    var dbId=grid.id.replace('db-','');
-    try{
-      var r=await fetch('/api/notion?dbId='+dbId);
-      if(!r.ok)throw new Error('HTTP '+r.status);
-      var data=await r.json();
-      if(!data.pages||!data.pages.length){
-        grid.innerHTML='<div class="n-db-loading">Nessun elemento trovato.</div>';return;
-      }
-      var cardsHtml=data.pages.map(function(p){
-        var icon=p.icon||'📄';
-        var acc=iconAccent(icon);
-        var coverSafe=safeCoverUrl(p.cover);
-        var bg=coverSafe
-          ?'background-image:url("'+coverSafe+'");background-size:cover;background-position:center'
-          :'background:'+iconGradient(icon);
-        var title=p.title.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-        return'<div class="loc-card" style="'+bg+'" onclick="gp(\''+p.id+'\',\''+title+'\',\''+icon+'\')">'
-          +'<div class="loc-ov">'
-          +'<div class="loc-badge explored">'+icon+'</div>'
-          +'<div class="loc-name">'+p.title+'</div>'
-          +'<div class="loc-sub" style="color:'+acc.c+'">Scopri →</div>'
-          +'<div class="loc-cta">APRI ◆</div>'
-          +'</div></div>';
-      }).join('');
-      var wrap=grid.closest('.n-db-wrap');
-      if(wrap){
-        var titleEl=wrap.querySelector('.n-db-title');
-        var titleHtml=titleEl?'<div class="n-db-title">'+titleEl.textContent+'</div>':'';
-        var uid='dblc-'+dbId;
-        wrap.outerHTML=
-          '<div class="n-db-lc-wrap" id="'+uid+'">'
-          +titleHtml
-          +'<div class="loc-wrap" style="margin:0">'
-          +'<div class="loc-track-outer">'
-          +'<div class="loc-track" data-idx="0" style="gap:16px">'+cardsHtml+'</div>'
-          +'</div>'
-          +'<div class="la la-prev" onclick="dbLocNav(this,-1)">‹</div>'
-          +'<div class="la la-next" onclick="dbLocNav(this,1)">›</div>'
-          +'</div></div>';
-      }else{
-        grid.outerHTML='<div class="loc-track" data-idx="0" style="gap:16px;display:flex">'+cardsHtml+'</div>';
-      }
-    }catch(e){
-      grid.innerHTML='<div class="n-db-loading">⚠️ Errore caricamento.</div>';
+  var dbId=grid.id.replace('db-','');
+  try{
+    var r=await fetch('/api/notion?dbId='+dbId);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    var data=await r.json();
+    if(!data.pages||!data.pages.length){
+      grid.innerHTML='<div class="n-db-loading">Nessun elemento trovato.</div>';return;
     }
+
+    var cardsHtml=data.pages.map(function(p){
+      var icon=p.icon||'📄';
+      var acc=iconAccent(icon);
+      var coverSafe=safeCoverUrl(p.cover);
+      var bg=coverSafe
+        ?'background-image:url("'+coverSafe+'");background-size:cover;background-position:center'
+        :'background:'+iconGradient(icon);
+      var title=p.title.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      return'<div class="loc-card" style="'+bg+'" onclick="gp(\''+p.id+'\',\''+title+'\',\''+icon+'\')">'
+        +'<div class="loc-ov">'
+        +'<div class="loc-badge explored">'+icon+'</div>'
+        +'<div class="loc-name">'+p.title+'</div>'
+        +'<div class="loc-sub" style="color:'+acc.c+'">Scopri →</div>'
+        +'<div class="loc-cta">APRI ◆</div>'
+        +'</div></div>';
+    }).join('');
+
+    var wrap=grid.closest('.n-db-wrap');
+    var titleEl=wrap?wrap.querySelector('.n-db-title'):null;
+    var titleHtml=titleEl?'<div class="n-db-title">'+titleEl.textContent+'</div>':'';
+    var uid='dblc-'+dbId;
+
+    /* ── Card singola: niente carosello, solo la card ── */
+    if(data.pages.length===1){
+      var singleHtml=titleHtml
+        +'<div class="n-db-single">'+cardsHtml+'</div>';
+      if(wrap){
+        wrap.outerHTML='<div class="n-db-lc-wrap n-db-single-wrap" id="'+uid+'">'+singleHtml+'</div>';
+      }else{
+        grid.outerHTML='<div class="n-db-single">'+cardsHtml+'</div>';
+      }
+      return;
+    }
+
+    /* ── Più card: carosello normale ── */
+    if(wrap){
+      wrap.outerHTML=
+        '<div class="n-db-lc-wrap" id="'+uid+'">'
+        +titleHtml
+        +'<div class="loc-wrap" style="margin:0">'
+        +'<div class="loc-track-outer">'
+        +'<div class="loc-track" data-idx="0" style="gap:16px">'+cardsHtml+'</div>'
+        +'</div>'
+        +'<div class="la la-prev" onclick="dbLocNav(this,-1)">‹</div>'
+        +'<div class="la la-next" onclick="dbLocNav(this,1)">›</div>'
+        +'</div></div>';
+    }else{
+      grid.outerHTML='<div class="loc-track" data-idx="0" style="gap:16px;display:flex">'+cardsHtml+'</div>';
+    }
+  }catch(e){
+    grid.innerHTML='<div class="n-db-loading">⚠️ Errore caricamento.</div>';
+  }
 }
 
 /* ════════════════════════════════════
@@ -446,7 +463,6 @@ function buildCrumb(currentLabel){
    OPEN PAGE — gp()
 ════════════════════════════════════ */
 async function gp(id,label,icon,_fromPop){
-  /* FIX: blocca chiamate con id non valido */
   if(!id||id==='undefined'||id==='null')return;
 
   if(!_fromPop){
@@ -476,12 +492,10 @@ async function gp(id,label,icon,_fromPop){
   document.title=(label||'Pagina')+' — Arcamis';
 
   if(hv.style.display==='block'){
-    /* home → pagina: xfade poi render */
     xfade(hv,pv);
     document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
     await _gpRender(id,label,icon);
   } else {
-    /* pagina → pagina: FIX — aspetta il render PRIMA di mostrare lo spinner */
     document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
     _pb.style.opacity='0';
     _pb.style.transition='opacity .15s ease';
@@ -491,7 +505,6 @@ async function gp(id,label,icon,_fromPop){
 }
 
 async function _gpRender(id,label,icon){
-  /* FIX: blocca id non valido */
   if(!id||id==='undefined'||id==='null'){
     if(typeof afterPageRender==='function')afterPageRender();
     return;
