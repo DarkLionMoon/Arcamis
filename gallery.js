@@ -226,7 +226,7 @@ function renderGallery(container, pages) {
   pages.forEach(function(p) {
     var cover = _safeCover(p.cover);
     var col = _getClassColor(p.tags);
-    var tagLabel = p.tags && p.tags.length ? p.tags[0] : '';
+    var tagLabel = p.tags && p.tags.length ? p.tags.join(' / ') : '';
     var nameSafe = p.title.replace(/'/g, "\\'");
     gridHtml += '<div class="gs-card" id="gsc-'+p.id+'"'
       + ' style="--gs-c:'+col.c+';--gs-glow:'+col.glow+'"'
@@ -268,8 +268,8 @@ window.gsSelect = function(id, name) {
 
   var tagsHtml = (p.tags||[]).map(function(t) {
     return '<div class="gs-detail-tag" style="--gs-acc:'+col.c+'">'+t+'</div>';
-  }).join('');
-
+}).join('');
+   
   detail.innerHTML =
     '<div class="gs-detail-cover">'
     + (cover ? '<div class="gs-detail-cover-img" style="background-image:url(\''+cover+'\')"></div>' : '<div class="gs-detail-cover-img" style="background:'+col.bg+'"></div>')
