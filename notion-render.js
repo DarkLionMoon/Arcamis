@@ -2,6 +2,7 @@
    NOTION RENDER — auto-styling engine
 ════════════════════════════════════ */
 
+var GALLERY_DB_ID = '2fd0274fdc1c80038889fc072a360bae'; /* ID database Galleria PG */
 var navStack = []; /* navigation history [{id,label,icon},...] */
 var _memCache = {}; /* cache in-memory pagine già caricate (nessun limite di quota) */
 
@@ -243,9 +244,13 @@ function renderBlocks(blocks,isRoot){
 
       case'child_database':
         var dbRawId=b.id.replace(/-/g,'');
-        h+='<div class="n-db-wrap">'
-          +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
-          +'<div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
+        if(dbRawId===GALLERY_DB_ID){
+          h+='<div class="gs-container" id="gs-'+dbRawId+'"></div>';
+        }else{
+          h+='<div class="n-db-wrap">'
+            +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
+            +'<div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
+        }
         break;
 
       case'table':
@@ -575,6 +580,7 @@ async function _gpRender(id,label,icon){
     });
     attachShine(pbody);
     loadDbGalleries(pbody);
+    pbody.querySelectorAll('.gs-container').forEach(function(c){if(window.loadGallery)loadGallery(c);});
     pbody.querySelectorAll('details.n-toggle').forEach(function(det){
       det.addEventListener('toggle',function(){
         if(det.open){loadDbGalleries(det);}
