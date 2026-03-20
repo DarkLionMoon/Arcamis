@@ -6,7 +6,6 @@
 var _galleryData = null;
 var _gallerySelected = null;
 var _galleryFilter = 'all';
-var GALLERY_DB_ID = '2fd0274fdc1c80d8b948c4133f874f28';
 
 /* Colori per classe */
 var _classColors = {
