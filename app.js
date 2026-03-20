@@ -220,17 +220,21 @@ var _slideIdx = 0;
 function changeSlide(dir){
   var slides = document.querySelectorAll('.slide');
   if(!slides.length) return;
-  slides[_slideIdx].classList.remove('active');
   _slideIdx = (_slideIdx + dir + slides.length) % slides.length;
-  slides[_slideIdx].classList.add('active');
-  updateDots();
+  _applySlide();
 }
 function jumpToSlide(idx){
   var slides = document.querySelectorAll('.slide');
   if(!slides.length) return;
-  slides[_slideIdx].classList.remove('active');
   _slideIdx = idx;
-  slides[_slideIdx].classList.add('active');
+  _applySlide();
+}
+function _applySlide(){
+  var track = document.getElementById('ctrack');
+  if(track) track.style.transform = 'translateX(-'+(_slideIdx * 33.3333)+'%)';
+  document.querySelectorAll('.slide').forEach(function(s,i){
+    s.classList.toggle('active', i === _slideIdx);
+  });
   updateDots();
 }
 function updateDots(){
@@ -238,6 +242,7 @@ function updateDots(){
     d.classList.toggle('ca', i === _slideIdx);
   });
 }
+setInterval(function(){ changeSlide(1); }, 6000);
 /* Auto-avanzamento carousel */
 setInterval(function(){ changeSlide(1); }, 6000);
 
