@@ -86,7 +86,7 @@
     }
     .ap-input:focus, .ap-textarea:focus { border-color:rgba(180,150,255,.6); }
     .ap-input::placeholder, .ap-textarea::placeholder { color:rgba(140,110,255,.3);font-style:italic; }
-    .ap-textarea { resize:vertical;min-height:60px; }
+    .ap-textarea { resize:vertical;min-height:80px;line-height:1.6; }
     .ap-sep {
       height:1px;background:linear-gradient(90deg,transparent,rgba(140,110,255,.2),transparent);
       margin:4px 0;
@@ -235,12 +235,34 @@
      EDITOR CAROUSEL HOMEPAGE
   ════════════════════════════════ */
   var SLIDES_DEF = [
-    { key:'carousel_0', label:'Slide 1 — Arcamis Porto',  defTag:'Città Portuale — Marche di Arcamis', defTit:'ARCAMIS',
-      btns:[{defLabel:'Entra nel Discord',defHref:'https://discord.gg/JZPnXZbXEJ'},{defLabel:'Scopri la città ↓',defHref:''}] },
-    { key:'carousel_1', label:'Slide 2 — Pantheon',        defTag:'Pantheon di Arcamis',               defTit:'LE DIVINITÀ DI ARCAMIS',
-      btns:[{defLabel:'Scopri il Pantheon →',defHref:''}] },
-    { key:'carousel_2', label:'Slide 3 — Personaggio',     defTag:'Crea il tuo eroe',                  defTit:'CREA IL TUO PERSONAGGIO',
-      btns:[{defLabel:'Come si inizia →',defHref:''}] }
+    {
+      key:'carousel_0', label:'Slide 1 — Arcamis Porto',
+      defTag:'Città Portuale — Marche di Arcamis',
+      defTit:'ARCAMIS',
+      defDesc:'Città portuale delle Marche di Arcamis, porta d\'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.',
+      btns:[
+        {defLabel:'Entra nel Discord', defHref:'https://discord.gg/JZPnXZbXEJ'},
+        {defLabel:'Scopri la città ↓', defHref:''}
+      ]
+    },
+    {
+      key:'carousel_1', label:'Slide 2 — Pantheon',
+      defTag:'Pantheon di Arcamis',
+      defTit:'LE DIVINITÀ DI ARCAMIS',
+      defDesc:'Ogni dio ha lasciato il proprio segno sulla terra. Scopri il Pantheon e i culti che plasmano il mondo.',
+      btns:[
+        {defLabel:'Scopri il Pantheon →', defHref:''}
+      ]
+    },
+    {
+      key:'carousel_2', label:'Slide 3 — Personaggio',
+      defTag:'Crea il tuo eroe',
+      defTit:'CREA IL TUO PERSONAGGIO',
+      defDesc:'Scegli la tua classe, forgia la tua storia. Il tuo personaggio esiste solo su Arcamis.',
+      btns:[
+        {defLabel:'Come si inizia →', defHref:''}
+      ]
+    }
   ];
 
   async function injectCarouselHomeButtons(){
@@ -264,6 +286,11 @@
     var meta = {}; try{ meta=JSON.parse(covers[sl.key+'_meta']||'{}'); }catch(e){}
     var btns = []; try{ btns=JSON.parse(covers[sl.key+'_btns']||'[]'); }catch(e){}
     var curImg = covers[sl.key]||'';
+
+    /* Valori correnti con fallback ai default */
+    var curTag  = meta.tag  || sl.defTag  || '';
+    var curTit  = meta.tit  || sl.defTit  || '';
+    var curDesc = meta.desc || sl.defDesc || '';
 
     var btnsHtml = sl.btns.map(function(b,bi){
       var sv = btns[bi]||{};
@@ -294,11 +321,17 @@
       <div class="ap-status" id="asl-img-status-${idx}"></div>
       <div class="ap-sep"></div>
       <div class="ap-section-label">Testi slide</div>
-      <div class="ap-field"><div class="ap-label">Tag (piccolo sopra)</div>
-        <input class="ap-input" id="asl-tag-${idx}" value="${escH(meta.tag||sl.defTag)}" placeholder="es. Città Portuale…"/>
+      <div class="ap-field">
+        <div class="ap-label">Tag (piccolo sopra)</div>
+        <input class="ap-input" id="asl-tag-${idx}" value="${escH(curTag)}" placeholder="es. Città Portuale…"/>
       </div>
-      <div class="ap-field"><div class="ap-label">Titolo (grande)</div>
-        <input class="ap-input" id="asl-tit-${idx}" value="${escH(meta.tit||sl.defTit)}" placeholder="es. ARCAMIS"/>
+      <div class="ap-field">
+        <div class="ap-label">Titolo (grande)</div>
+        <input class="ap-input" id="asl-tit-${idx}" value="${escH(curTit)}" placeholder="es. ARCAMIS"/>
+      </div>
+      <div class="ap-field">
+        <div class="ap-label">Descrizione (paragrafo sotto il titolo)</div>
+        <textarea class="ap-textarea" id="asl-desc-${idx}" placeholder="Testo descrittivo…">${escH(curDesc)}</textarea>
       </div>
       <div class="ap-actions">
         <button class="ap-btn-save" onclick="arcSaveSlideText(${idx})">Salva testi</button>
@@ -325,7 +358,6 @@
         var urlI = document.getElementById('asl-url-'+idx);
         if(prev){ prev.style.backgroundImage='url(\''+b64+'\')'; prev.textContent=''; }
         if(urlI) urlI.value = '';
-        /* salva subito */
         arcSaveSlideImgVal(idx, b64);
       });
     };
@@ -351,26 +383,29 @@
     var key = SLIDES_DEF[idx].key;
     setApStatus('asl-img-status-'+idx,'Salvataggio…','');
     var ok = await arcSave(key, val);
-    /* aggiorna slide live */
     var slide = document.querySelectorAll('.slide')[idx];
     if(slide && ok){ slide.style.backgroundImage='url(\''+val+'\')'; slide.style.backgroundSize='cover'; slide.style.backgroundPosition='center 40%'; }
     setApStatus('asl-img-status-'+idx, ok?'✓ Salvato':'✕ Errore', ok?'ok':'err');
     arcToast(ok?'Sfondo salvato ✓':'Errore salvataggio', ok);
   }
 
+  /* ── Salva testi slide (tag + titolo + descrizione) ── */
   window.arcSaveSlideText = async function(idx){
-    var key = SLIDES_DEF[idx].key;
-    var tag = (document.getElementById('asl-tag-'+idx)||{}).value||'';
-    var tit = (document.getElementById('asl-tit-'+idx)||{}).value||'';
+    var key  = SLIDES_DEF[idx].key;
+    var tag  = (document.getElementById('asl-tag-'+idx)||{}).value||'';
+    var tit  = (document.getElementById('asl-tit-'+idx)||{}).value||'';
+    var desc = (document.getElementById('asl-desc-'+idx)||{}).value||'';
     setApStatus('asl-txt-status-'+idx,'Salvataggio…','');
-    var ok = await arcSave(key+'_meta', JSON.stringify({tag:tag,tit:tit}));
-    /* aggiorna live */
+    var ok = await arcSave(key+'_meta', JSON.stringify({tag:tag, tit:tit, desc:desc}));
+    /* aggiorna live nel DOM */
     var slide = document.querySelectorAll('.slide')[idx];
     if(slide && ok){
-      var tagEl = slide.querySelector('.stag');
-      var titEl = slide.querySelector('.stit');
-      if(tagEl) tagEl.textContent = tag;
-      if(titEl) titEl.innerHTML = tit.replace(/\n/g,'<br>');
+      var tagEl  = slide.querySelector('.stag');
+      var titEl  = slide.querySelector('.stit');
+      var descEl = slide.querySelector('.sdesc');
+      if(tagEl)  tagEl.textContent  = tag;
+      if(titEl)  titEl.innerHTML    = tit.replace(/\n/g,'<br>');
+      if(descEl) descEl.textContent = desc;
     }
     setApStatus('asl-txt-status-'+idx, ok?'✓ Salvati':'✕ Errore', ok?'ok':'err');
     arcToast(ok?'Testi salvati ✓':'Errore', ok);
@@ -395,13 +430,10 @@
      EDITOR CARD NELLE PAGINE
   ════════════════════════════════ */
   function injectPageCarouselButtons(){
-    /* Evita di iniettare due volte */
     document.querySelectorAll('#pbody .arc-edit-btn').forEach(function(b){ b.remove(); });
 
-    /* ── .loc-card — card con sfondo (child_page e database) ── */
     document.querySelectorAll('#pbody .loc-card').forEach(function(card){
       if(card.querySelector('.arc-edit-btn')) return;
-      /* Estrai pageId dall'onclick: gp('ID',...) */
       var onclick = card.getAttribute('onclick') || '';
       var m = onclick.match(/gp\(['"]([a-f0-9]{32})['"]/);
       if(!m) return;
@@ -418,7 +450,6 @@
       card.appendChild(btn);
     });
 
-    /* ── .n-db-grid — griglia card Notion database ── */
     document.querySelectorAll('#pbody .n-db-grid').forEach(function(grid, gi){
       var wrap = grid.closest('.n-db-wrap') || grid.parentElement;
       if(!wrap || wrap.querySelector('.arc-grid-edit-btn')) return;
@@ -431,7 +462,6 @@
       wrap.insertBefore(btn, grid);
     });
 
-    /* ── .n-db-card singole fuori da griglia ── */
     document.querySelectorAll('#pbody .n-db-card').forEach(function(card, ci){
       if(card.closest('.n-db-grid')) return;
       if(card.querySelector('.arc-edit-btn')) return;
@@ -446,13 +476,11 @@
   }
 
   function arcOpenLocCardEditor(card, pageId){
-    /* Lo sfondo è nello style inline della card stessa */
     var curStyle = card.getAttribute('style') || '';
     var m = curStyle.match(/background-image:url\(["']?([^"')]+)["']?\)/);
     var cur = m ? m[1] : '';
-    /* Prova anche dal KV già salvato */
     var name = (card.querySelector('.loc-name')||{}).textContent || pageId;
-    var key = pageId; /* stessa chiave usata dall'admin classico */
+    var key = pageId;
 
     var html = '<div class="ap-section-label" style="margin-bottom:8px">'+name+'</div>'
       +'<div class="ap-preview" id="aploc-prev" style="'+(cur?'background-image:url(\''+cur+'\')':'')+'">'+(cur?'':'Nessuna immagine')+'</div>'
@@ -493,7 +521,6 @@
     setApStatus('aploc-status','Rimozione…','');
     var ok = await arcSave(pageId, '');
     if(ok && window._arcEditLocCard){
-      /* ripristina sfondo originale rimuovendo background-image dallo style */
       var s = window._arcEditLocCard.getAttribute('style')||'';
       window._arcEditLocCard.setAttribute('style', s.replace(/background-image:[^;]+;?/,''));
     }
@@ -506,7 +533,6 @@
     var ok = await arcSave(pageId, val);
     if(ok && window._arcEditLocCard){
       var s = window._arcEditLocCard.getAttribute('style')||'';
-      /* rimuovi eventuale background-image precedente e aggiungi il nuovo */
       s = s.replace(/background-image:[^;]+;?/g,'');
       window._arcEditLocCard.setAttribute('style', s+'background-image:url(\''+val+'\');background-size:cover;background-position:center;');
     }
@@ -520,7 +546,6 @@
 
     var html = Array.from(cards).map(function(card, ci){
       var coverEl = card.querySelector('.n-db-cover');
-      var placeholderEl = card.querySelector('.n-db-cover-placeholder');
       var nameEl = card.querySelector('.n-db-name');
       var cur = coverEl ? coverEl.src : '';
       var name = nameEl ? nameEl.textContent.trim() : ('Card '+(ci+1));
@@ -538,7 +563,6 @@
     }).join('');
 
     arcOpenPanel('Griglia immagini', html || '<div style="color:rgba(200,155,60,.4);font-style:italic;font-size:13px;padding:20px 0">Nessuna card trovata.</div>');
-    /* Salva riferimento griglia per aggiornamento live */
     window._arcEditGrid = {el: gridEl, gi: gi};
   }
 
@@ -559,7 +583,6 @@
     window._arcEditCard = {el: card, ci: ci};
   }
 
-  /* Upload griglia */
   window.arcGridCardUpload = function(event, key, gi, ci){
     var file = event.target.files[0]; if(!file) return;
     var reader = new FileReader();
@@ -580,7 +603,6 @@
   async function arcSaveGridCardVal(key, val, gi, ci){
     setApStatus('apg-status-'+gi+'-'+ci,'Salvataggio…','');
     var ok = await arcSave(key, val);
-    /* aggiorna live */
     if(ok && window._arcEditGrid){
       var cards = window._arcEditGrid.el.querySelectorAll('.n-db-card');
       var coverEl = cards[ci] ? cards[ci].querySelector('.n-db-cover') : null;
@@ -591,7 +613,6 @@
     arcToast(ok?'Immagine salvata ✓':'Errore', ok);
   }
 
-  /* Upload card singola */
   window.arcSingleCardUpload = function(event, key, ci){
     var file = event.target.files[0]; if(!file) return;
     var reader = new FileReader();
@@ -627,7 +648,6 @@
   function injectGalleryButtons(){
     document.querySelectorAll('.gs-card').forEach(function(card){
       if(card.querySelector('.arc-edit-btn')) return;
-      /* Estrai pageId dall'id dell'elemento: "gsc-{id}" */
       var pageId = card.id.replace('gsc-','');
       if(!pageId) return;
       card.style.position = 'relative';
@@ -696,11 +716,9 @@
   async function arcSaveGalleryCardVal(pageId, val){
     setApStatus('apgal-status','Salvataggio…','');
     var ok = await arcSave(pageId, val);
-    /* aggiorna live la card */
     if(ok && window._arcEditGalCard){
       var bgEl = window._arcEditGalCard.querySelector('.gs-card-bg');
       if(bgEl) bgEl.style.backgroundImage = 'url(\''+val+'\')';
-      /* aggiorna anche il pannello dettaglio se aperto */
       var detCover = document.querySelector('.gs-detail-cover-img');
       if(detCover && window._arcEditGalCard.classList.contains('selected')){
         detCover.style.backgroundImage = 'url(\''+val+'\')';
@@ -716,19 +734,17 @@
     if(!el) return;
     el.textContent = msg;
     el.className = 'ap-status'+(cls?' '+cls:'');
-    if(msg) setTimeout(function(){ if(el) el.textContent=''; el.className='ap-status'; }, 3000);
+    if(msg) setTimeout(function(){ if(el){ el.textContent=''; el.className='ap-status'; } }, 3000);
   }
 
   /* ════════════════════════════════
      INIT — aggancia hooks
   ════════════════════════════════ */
-  /* Carousel homepage: inietta dopo load */
   window.addEventListener('load', function(){
     setTimeout(injectCarouselHomeButtons, 800);
     setTimeout(injectGalleryButtons, 1200);
   });
 
-  /* Card pagine e galleria: inietta dopo ogni render */
   var _origAfterPage = window.afterPageRender;
   window.afterPageRender = function(){
     if(_origAfterPage) _origAfterPage();
@@ -738,7 +754,6 @@
     }, 400);
   };
 
-  /* Re-inietta galleria quando viene caricata (loadGallery è async) */
   var _origLoadGallery = window.loadGallery;
   if(typeof _origLoadGallery === 'function'){
     window.loadGallery = function(container){
@@ -754,10 +769,8 @@
     };
   }
 
-  /* Osserva #pbody per loc-card caricate async da _loadSingleDb */
   var _injectDebounce = null;
   var _pbodyObs = new MutationObserver(function(mutations){
-    /* Ignora mutazioni dentro il pannello admin stesso */
     for(var i=0;i<mutations.length;i++){
       var t = mutations[i].target;
       if(t.closest && t.closest('#arc-edit-panel')) return;
@@ -773,7 +786,6 @@
     _pbodyObs.observe(_pbodyEl, {childList:true, subtree:true});
   }
 
-  /* Traccia pagina corrente per le chiavi KV */
   var _origGp = window.gp;
   if(_origGp) window.gp = function(id, label, icon, fromPop){
     window._currentPageId = id;
