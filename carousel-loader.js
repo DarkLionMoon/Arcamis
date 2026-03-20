@@ -1,96 +1,76 @@
-/* ════ CAROUSEL DINAMICO DA ADMIN ════
-   Carica configurazione da /api/carousel e applica
-   override su sfondo, testi e bottoni CTA di ogni slide.
-   Se non ci sono override, le slide rimangono invariate.
+/* ════════════════════════════════════════════════════════
+   ARCAMIS — carousel-loader.js
+   Carica la configurazione del carousel da /api/carousel
+   e la applica al DOM: sfondo, tag, titolo, descrizione, bottoni.
+   Se non ci sono override in KV, le slide restano invariate.
 ════════════════════════════════════════════════════════ */
 (function() {
 
-  /* Definizione delle slide: indice → selettori DOM */
-  var SLIDE_DEFS = [
-    {
-      /* Slide 0 — Arcamis Porto */
-      slideEl:  function() { return document.querySelectorAll('.slide')[0]; },
-      tagEl:    function(s) { return s && s.querySelector('.stag'); },
-      titEl:    function(s) { return s && s.querySelector('.stit'); },
-      btnsEl:   function(s) { return s && s.querySelectorAll('.sbtn'); }
-    },
-    {
-      /* Slide 1 — Pantheon */
-      slideEl:  function() { return document.querySelectorAll('.slide')[1]; },
-      tagEl:    function(s) { return s && s.querySelector('.stag'); },
-      titEl:    function(s) { return s && s.querySelector('.stit'); },
-      btnsEl:   function(s) { return s && s.querySelectorAll('.sbtn'); }
-    },
-    {
-      /* Slide 2 — Personaggio */
-      slideEl:  function() { return document.querySelectorAll('.slide')[2]; },
-      tagEl:    function(s) { return s && s.querySelector('.stag'); },
-      titEl:    function(s) { return s && s.querySelector('.stit'); },
-      btnsEl:   function(s) { return s && s.querySelectorAll('.sbtn'); }
-    }
-  ];
-
   function applyCarouselConfig(slides) {
-    slides.forEach(function(data, idx) {
-      var def = SLIDE_DEFS[idx];
-      if (!def) return;
+    var slideEls = document.querySelectorAll('.slide');
 
-      var slideEl = def.slideEl();
+    slides.forEach(function(data, idx) {
+      var slideEl = slideEls[idx];
       if (!slideEl) return;
 
       /* ── Sfondo ── */
       if (data.img) {
-        slideEl.style.backgroundImage = 'url(\'' + data.img + '\')';
-        slideEl.style.backgroundSize = 'cover';
+        slideEl.style.backgroundImage    = 'url(\'' + data.img + '\')';
+        slideEl.style.backgroundSize     = 'cover';
         slideEl.style.backgroundPosition = 'center 40%';
       }
 
-      /* ── Testi (tag + titolo) ── */
       if (data.meta) {
+        /* ── Tag (testo piccolo sopra) ── */
         if (data.meta.tag) {
-          var tagEl = def.tagEl(slideEl);
-          /* Il tag ha un ::before decorativo — manteniamo solo il testo */
+          var tagEl = slideEl.querySelector('.stag');
           if (tagEl) {
-            /* Trova il nodo testo (l'ultimo nodo figlio di tipo testo) */
-            var textNode = null;
+            /* Preserva eventuali elementi figli (::before decorativo) —
+               sovrascrive solo il nodo testo finale */
+            var lastText = null;
             tagEl.childNodes.forEach(function(n) {
-              if (n.nodeType === Node.TEXT_NODE) textNode = n;
+              if (n.nodeType === Node.TEXT_NODE) lastText = n;
             });
-            if (textNode) {
-              textNode.textContent = data.meta.tag;
-            } else {
-              tagEl.textContent = data.meta.tag;
-            }
+            if (lastText) lastText.textContent = data.meta.tag;
+            else tagEl.textContent = data.meta.tag;
           }
         }
+
+        /* ── Titolo (grande) ── */
         if (data.meta.tit) {
-          var titEl = def.titEl(slideEl);
-          if (titEl) titEl.innerHTML = data.meta.tit;
+          var titEl = slideEl.querySelector('.stit');
+          if (titEl) titEl.innerHTML = data.meta.tit.replace(/\n/g, '<br>');
+        }
+
+        /* ── Descrizione (paragrafo .sdesc) ── */
+        if (data.meta.desc) {
+          var descEl = slideEl.querySelector('.sdesc');
+          if (descEl) descEl.textContent = data.meta.desc;
         }
       }
 
       /* ── Bottoni CTA ── */
       if (data.btns && data.btns.length) {
-        var btnsEl = def.btnsEl(slideEl);
+        var btnsEl = slideEl.querySelectorAll('.sbtn');
         data.btns.forEach(function(btn, bi) {
-          var el = btnsEl && btnsEl[bi];
+          var el = btnsEl[bi];
           if (!el) return;
-          /* Testo */
+
+          /* Testo — preserva icone SVG eventuali */
           if (btn.label) {
-            /* Mantieni eventuali icone SVG figli */
             var svgEl = el.querySelector('svg');
             el.textContent = btn.label;
             if (svgEl) el.insertBefore(svgEl, el.firstChild);
           }
-          /* Href o onclick */
+
+          /* Link o onclick */
           if (btn.href) {
             if (btn.href.startsWith('http')) {
               el.href = btn.href;
               el.setAttribute('target', '_blank');
               el.setAttribute('rel', 'noopener');
               el.removeAttribute('onclick');
-            } else if (btn.href) {
-              /* Tratta come onclick inline (es. "gp(...)" o scroll) */
+            } else {
               el.removeAttribute('href');
               el.setAttribute('onclick', btn.href);
             }
@@ -100,7 +80,6 @@
     });
   }
 
-  /* Esegui dopo che il DOM è pronto */
   function loadCarousel() {
     fetch('/api/carousel')
       .then(function(r) { return r.json(); })
