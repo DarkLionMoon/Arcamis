@@ -77,8 +77,9 @@ body{display:flex;flex-direction:column;min-height:100vh}
 .filter-btn.active{border-color:rgba(200,155,60,.5);background:rgba(200,155,60,.08);color:var(--gold2)}
 .filter-count{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;color:var(--text3);margin-left:auto}
 
-/* GRID */
-#gallery-grid,#carousel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+/* GRIDS */
+#gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+#carousel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
 
 /* CARD */
 .pg-card{background:var(--panel);border:1px solid var(--bdr);overflow:hidden;transition:border-color .2s;display:flex;flex-direction:column}
@@ -121,6 +122,46 @@ body{display:flex;flex-direction:column;min-height:100vh}
 .card-status{font-size:11px;height:15px;font-style:italic;transition:opacity .3s}
 .card-status.ok{color:#6dca7a}
 .card-status.err{color:#ff7060}
+
+/* CTA EDITOR */
+.cta-section{margin-top:4px;border-top:1px solid var(--bdr);padding-top:12px}
+.cta-section-label{
+  font-family:'Cinzel',serif;font-size:7.5px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.cta-section-label::before{content:'◈';font-size:9px}
+.cta-row{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.cta-btn-block{
+  background:rgba(200,155,60,.04);border:1px solid rgba(200,155,60,.1);
+  padding:10px 12px;display:flex;flex-direction:column;gap:6px;position:relative;
+}
+.cta-btn-label{
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:.18em;color:var(--text3);
+  text-transform:uppercase;margin-bottom:2px;
+}
+.cta-input-row{display:flex;gap:6px;align-items:center}
+.cta-tag{
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:.08em;
+  padding:2px 8px;border:1px solid var(--bdr);color:var(--text3);background:transparent;
+  white-space:nowrap;flex-shrink:0;
+}
+.cta-text-input,.cta-href-input{
+  flex:1;padding:5px 8px;background:rgba(0,0,0,.3);border:1px solid var(--bdr);
+  color:var(--white);font-family:'Crimson Pro',serif;font-size:12px;outline:none;transition:.18s;
+  min-width:0;
+}
+.cta-text-input:focus,.cta-href-input:focus{border-color:var(--gold)}
+.cta-text-input::placeholder,.cta-href-input::placeholder{color:var(--text3);font-style:italic;font-size:11px}
+.btn-save-cta{
+  width:100%;padding:7px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;
+  background:rgba(100,70,200,.12);border:1px solid rgba(140,110,255,.3);
+  color:rgba(180,150,255,.8);cursor:pointer;transition:.18s;text-transform:uppercase;
+}
+.btn-save-cta:hover{background:rgba(100,70,200,.22);border-color:rgba(180,150,255,.5);color:rgba(210,190,255,1)}
+
+/* SECTION DIVIDER */
+.card-divider{height:1px;background:linear-gradient(90deg,transparent,var(--bdr),transparent);margin:4px 0}
 
 /* LOADING */
 .loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px;gap:16px}
@@ -176,8 +217,8 @@ body{display:flex;flex-direction:column;min-height:100vh}
 
     <!-- TAB CAROUSEL -->
     <div class="section" id="sec-carousel">
-      <div class="section-title">Immagini Carousel Home</div>
-      <div class="section-sub">Modifica le immagini di sfondo delle slide nella homepage.</div>
+      <div class="section-title">Carousel Home</div>
+      <div class="section-sub">Modifica sfondo e bottoni CTA di ogni slide della homepage.</div>
       <div id="carousel-grid"><div class="loading-wrap"><div class="spin"></div><div class="loading-txt">Caricamento…</div></div></div>
     </div>
   </div>
@@ -190,10 +231,33 @@ var _pages  = [];
 var _covers = {};
 var _carLoaded = false;
 
+/* Definizione slide con i bottoni di default estratti dall'HTML */
 var SLIDES = [
-  { key:'carousel_0', label:'Slide 1 — Arcamis Porto',  def:'cover.png' },
-  { key:'carousel_1', label:'Slide 2 — Pantheon',       def:'' },
-  { key:'carousel_2', label:'Slide 3 — Personaggio',    def:'' },
+  {
+    key: 'carousel_0',
+    label: 'Slide 1 — Arcamis Porto',
+    def: 'cover.png',
+    btns: [
+      { tag: 'Bottone 1', defLabel: 'Entra nel Discord', defHref: 'https://discord.gg/JZPnXZbXEJ' },
+      { tag: 'Bottone 2', defLabel: 'Scopri la città ↓', defHref: '' }
+    ]
+  },
+  {
+    key: 'carousel_1',
+    label: 'Slide 2 — Pantheon',
+    def: '',
+    btns: [
+      { tag: 'Bottone 1', defLabel: 'Scopri il Pantheon →', defHref: '' }
+    ]
+  },
+  {
+    key: 'carousel_2',
+    label: 'Slide 3 — Personaggio',
+    def: '',
+    btns: [
+      { tag: 'Bottone 1', defLabel: 'Come si inizia →', defHref: '' }
+    ]
+  }
 ];
 
 /* INIT */
@@ -396,39 +460,76 @@ async function doSave(id,value,onDone){
   setTimeout(function(){setStatus(id,'','');},3000);
 }
 
-/* CAROUSEL */
+/* ══════════════════════════
+   CAROUSEL
+══════════════════════════ */
 async function renderCarousel(){
   var grid=document.getElementById('carousel-grid');
   var r=await fetch('/api/admin?action=get_covers');
   var covers=(await r.json()).covers||{};
-  grid.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px">'+SLIDES.map(function(sl){
+
+  grid.innerHTML=SLIDES.map(function(sl){
     var cover=covers[sl.key]||'';
     var preview=cover||(sl.def?sl.def:'');
+
+    /* Bottoni salvati */
+    var savedBtns=[];
+    try{ savedBtns=JSON.parse(covers[sl.key+'_btns']||'[]'); }catch(e){}
+
+    /* Build CTA blocks */
+    var ctaBlocks=sl.btns.map(function(b,bi){
+      var sv=savedBtns[bi]||{};
+      var labelVal=sv.label||b.defLabel;
+      var hrefVal=sv.href||b.defHref;
+      return '<div class="cta-btn-block">'
+        +'<div class="cta-btn-label">'+b.tag+'</div>'
+        +'<div class="cta-input-row">'
+        +'<span class="cta-tag">Testo</span>'
+        +'<input class="cta-text-input" id="cta-label-'+sl.key+'-'+bi+'" type="text" value="'+escHtml(labelVal)+'" placeholder="Testo bottone…"/>'
+        +'</div>'
+        +'<div class="cta-input-row">'
+        +'<span class="cta-tag">Link</span>'
+        +'<input class="cta-href-input" id="cta-href-'+sl.key+'-'+bi+'" type="text" value="'+escHtml(hrefVal)+'" placeholder="https://… oppure onclick…"/>'
+        +'</div>'
+        +'</div>';
+    }).join('');
+
     return '<div class="pg-card" id="pgcard-'+sl.key+'">'
+      /* PREVIEW */
       +'<div class="pg-preview" style="background:#06080e">'
-      +'<div class="pg-preview-bg" id="prev-'+sl.key+'" style="'+(preview?'background-image:url(\''+preview+'\')':'')+'" ></div>'
+      +'<div class="pg-preview-bg" id="prev-'+sl.key+'" style="'+(preview?'background-image:url(\''+preview+'\')':'')+';background-size:cover;background-position:center 40%"></div>'
       +'<div class="pg-preview-overlay"></div>'
       +'<div class="pg-custom-pill'+(cover?' on':'')+'" id="pill-'+sl.key+'">✓ Custom</div>'
       +'</div>'
+      /* BODY */
       +'<div class="pg-body">'
       +'<div class="pg-name">'+sl.label+'</div>'
+      /* Sfondo */
       +'<div class="upload-zone">'
       +'<input type="file" accept="image/*" onchange="handleCarUpload(event,\''+sl.key+'\')" id="carfile-'+sl.key+'"/>'
       +'<span class="upload-zone-icon">🖼</span>'
-      +'<div class="upload-zone-txt">Carica dal PC</div>'
+      +'<div class="upload-zone-txt">Carica sfondo dal PC</div>'
       +'<div class="upload-zone-sub">JPG · PNG · WEBP — max 5MB</div>'
       +'</div>'
       +'<div class="upload-progress" id="prog-'+sl.key+'"><div class="upload-progress-bar" id="progbar-'+sl.key+'"></div></div>'
-      +'<div class="or-sep">oppure URL esterno</div>'
+      +'<div class="or-sep">oppure URL sfondo</div>'
       +'<input class="url-input" id="url-'+sl.key+'" type="url" placeholder="https://…" oninput="previewUrl(\''+sl.key+'\')" />'
       +'<div class="card-actions">'
-      +'<button class="btn-save" onclick="saveUrl(\''+sl.key+'\')">Salva URL</button>'
+      +'<button class="btn-save" onclick="saveUrl(\''+sl.key+'\')">Salva sfondo</button>'
       +'<button class="btn-remove" onclick="removeCover(\''+sl.key+'\')">✕ Rimuovi</button>'
       +'</div>'
       +'<div class="card-status" id="status-'+sl.key+'"></div>'
+      /* Bottoni CTA */
+      +'<div class="card-divider"></div>'
+      +'<div class="cta-section">'
+      +'<div class="cta-section-label">Bottoni CTA</div>'
+      +'<div class="cta-row">'+ctaBlocks+'</div>'
+      +'<button class="btn-save-cta" onclick="saveCtaBtns(\''+sl.key+'\','+sl.btns.length+')">Salva bottoni</button>'
+      +'<div class="card-status" id="cta-status-'+sl.key+'"></div>'
+      +'</div>'
       +'</div>'
       +'</div>';
-  }).join('')+'</div>';
+  }).join('');
 }
 
 function handleCarUpload(event,key){
@@ -455,12 +556,48 @@ function handleCarUpload(event,key){
   reader.readAsDataURL(file);
 }
 
+/* Salva bottoni CTA */
+async function saveCtaBtns(key, count){
+  var btns=[];
+  for(var i=0;i<count;i++){
+    var labelEl=document.getElementById('cta-label-'+key+'-'+i);
+    var hrefEl=document.getElementById('cta-href-'+key+'-'+i);
+    btns.push({
+      label: labelEl?labelEl.value.trim():'',
+      href:  hrefEl?hrefEl.value.trim():''
+    });
+  }
+  var statusEl=document.getElementById('cta-status-'+key);
+  if(statusEl){statusEl.textContent='Salvataggio…';statusEl.className='card-status';}
+  try{
+    var r=await fetch('/api/admin?action=set_cover',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({pageId:key+'_btns', coverUrl:JSON.stringify(btns)})
+    });
+    var d=await r.json();
+    if(d.ok){
+      if(statusEl){statusEl.textContent='✓ Bottoni salvati';statusEl.className='card-status ok';}
+      showToast('Bottoni CTA salvati ✓');
+    }else{
+      if(statusEl){statusEl.textContent='✕ Errore';statusEl.className='card-status err';}
+    }
+  }catch(e){
+    if(statusEl){statusEl.textContent='✕ Errore rete';statusEl.className='card-status err';}
+  }
+  setTimeout(function(){if(statusEl)statusEl.textContent='';},3000);
+}
+
 /* HELPERS */
 function setStatus(id,msg,cls){
   var el=document.getElementById('status-'+id);
   if(!el)return;
   el.textContent=msg;
   el.className='card-status'+(cls?' '+cls:'');
+}
+
+function escHtml(s){
+  return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function showToast(msg){
