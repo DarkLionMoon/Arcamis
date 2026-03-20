@@ -2,7 +2,7 @@ export async function onRequest(context) {
   const TOKEN = context.env.NOTION_TOKEN;
   const KV = context.env.ARCAMIS_CACHE;
   const DB_ID = '2fd0274fdc1c80038889fc072a360bae';
-  const CACHE_TTL = 1500; /* 25 minuti */
+  const CACHE_TTL = 1800; /* 30 minuti */
 
   const cors = {
     'Access-Control-Allow-Origin': '*',
@@ -15,57 +15,17 @@ export async function onRequest(context) {
     'Content-Type': 'application/json'
   };
 
-  function isS3(url) {
-    return url && (url.indexOf('s3.us-west') > -1 || url.indexOf('prod-files-secure') > -1);
-  }
-
-  /* Prende la prima immagine dai blocchi di una pagina */
-  async function getFirstPageImage(pageId) {
-    try {
-      const res = await fetch(
-        'https://api.notion.com/v1/blocks/' + pageId + '/children?page_size=50',
-        { headers: notionHeaders }
-      );
-      if (!res.ok) return null;
-      const data = await res.json();
-
-      for (const block of data.results) {
-        /* Immagine diretta */
-        if (block.type === 'image') {
-          const img = block.image;
-          if (img.type === 'external') return img.external.url;
-          if (img.type === 'file') return img.file.url;
-        }
-        /* Cerca un livello dentro (callout, column, toggle...) */
-        if (block.has_children) {
-          const childRes = await fetch(
-            'https://api.notion.com/v1/blocks/' + block.id + '/children?page_size=20',
-            { headers: notionHeaders }
-          );
-          if (childRes.ok) {
-            const childData = await childRes.json();
-            for (const child of childData.results) {
-              if (child.type === 'image') {
-                const img = child.image;
-                if (img.type === 'external') return img.external.url;
-                if (img.type === 'file') return img.file.url;
-              }
-            }
-          }
-        }
-      }
-    } catch (e) {}
-    return null;
-  }
-
   try {
-    const cacheKey = 'gallery_pg';
+    const cacheKey = 'gallery_pg_v2';
 
     /* 1. Cache KV */
     if (KV) {
       const cached = await KV.get(cacheKey);
       if (cached) {
-        return new Response(cached, {
+        /* Inietta cover custom fresche sopra la cache */
+        const data = JSON.parse(cached);
+        await injectCustomCovers(data.pages, KV);
+        return new Response(JSON.stringify(data), {
           headers: { 'Content-Type': 'application/json', 'X-Cache': 'HIT', ...cors }
         });
       }
@@ -80,8 +40,8 @@ export async function onRequest(context) {
     if (!res.ok) throw new Error('Notion DB error: ' + res.status);
     const data = await res.json();
 
-    /* 3. Risolve cover per ogni PG in parallelo */
-    const pages = await Promise.all(data.results.map(async function(p) {
+    /* 3. Estrae metadati — niente URL S3 che scadono */
+    const pages = data.results.map(function(p) {
       const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
       const title = titleProp
         ? (titleProp.title || []).map(t => t.plain_text).join('')
@@ -89,18 +49,6 @@ export async function onRequest(context) {
 
       const icon = p.icon && p.icon.emoji ? p.icon.emoji : '📄';
 
-      /* Cover: preferisce URL esterni stabili, altrimenti cerca nella pagina */
-      let cover = null;
-      if (p.cover && p.cover.type === 'external') {
-        cover = p.cover.external.url;
-      }
-      /* Se cover è S3 o assente, prende la prima immagine della pagina */
-      if (!cover) {
-        const pageId = p.id.replace(/-/g, '');
-        cover = await getFirstPageImage(pageId);
-      }
-
-      /* Tags */
       const tagProp = p.properties && (
         p.properties['Tags'] || p.properties['tags'] ||
         p.properties['Classe'] || p.properties['classe']
@@ -112,17 +60,22 @@ export async function onRequest(context) {
         tags = [tagProp.select.name];
       }
 
-      return { id: p.id.replace(/-/g, ''), title, icon, cover, tags };
-    }));
+      /* cover null — viene sovrascritta dalle cover admin se presenti */
+      return { id: p.id.replace(/-/g, ''), title, icon, cover: null, tags };
+    });
 
-    const payload = JSON.stringify({ pages });
+    /* 4. Inietta cover custom admin */
+    await injectCustomCovers(pages, KV);
 
-    /* 4. Salva in KV */
+    const payload = { pages };
+
+    /* 5. Salva in KV (senza cover, quelle vengono iniettate live) */
+    const cachePayload = { pages: pages.map(p => Object.assign({}, p, { cover: null })) };
     if (KV) {
-      await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+      await KV.put(cacheKey, JSON.stringify(cachePayload), { expirationTtl: CACHE_TTL });
     }
 
-    return new Response(payload, {
+    return new Response(JSON.stringify(payload), {
       headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
     });
 
@@ -132,4 +85,15 @@ export async function onRequest(context) {
       headers: { 'Content-Type': 'application/json', ...cors }
     });
   }
+}
+
+/* ── Inietta cover custom da KV sulle pagine ── */
+async function injectCustomCovers(pages, KV) {
+  if (!KV || !pages || !pages.length) return;
+  await Promise.all(pages.map(async function(p) {
+    try {
+      const customCover = await KV.get('admin_cover_' + p.id);
+      if (customCover) p.cover = customCover;
+    } catch (e) {}
+  }));
 }
