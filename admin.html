@@ -237,6 +237,8 @@ var SLIDES = [
     key: 'carousel_0',
     label: 'Slide 1 — Arcamis Porto',
     def: 'cover.png',
+    defTag: 'Città Portuale — Marche di Arcamis',
+    defTit: 'ARCAMIS',
     btns: [
       { tag: 'Bottone 1', defLabel: 'Entra nel Discord', defHref: 'https://discord.gg/JZPnXZbXEJ' },
       { tag: 'Bottone 2', defLabel: 'Scopri la città ↓', defHref: '' }
@@ -246,6 +248,8 @@ var SLIDES = [
     key: 'carousel_1',
     label: 'Slide 2 — Pantheon',
     def: '',
+    defTag: 'Pantheon di Arcamis',
+    defTit: 'LE DIVINITÀ DI ARCAMIS',
     btns: [
       { tag: 'Bottone 1', defLabel: 'Scopri il Pantheon →', defHref: '' }
     ]
@@ -254,6 +258,8 @@ var SLIDES = [
     key: 'carousel_2',
     label: 'Slide 3 — Personaggio',
     def: '',
+    defTag: 'Crea il tuo eroe',
+    defTit: 'CREA IL TUO PERSONAGGIO',
     btns: [
       { tag: 'Bottone 1', defLabel: 'Come si inizia →', defHref: '' }
     ]
@@ -277,7 +283,7 @@ async function doLogin(){
   try{
     var r=await fetch('/api/admin?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
     var d=await r.json();
-    if(d.ok){showPanel();}
+    if(d.ok){sessionStorage.setItem('arcadmin','1');window.location.href='/?arcadmin=1';}
     else{err.style.display='block';btn.disabled=false;btn.textContent='Accedi al pannello';}
   }catch(e){
     err.textContent='Errore di rete.';err.style.display='block';
@@ -472,6 +478,12 @@ async function renderCarousel(){
     var cover=covers[sl.key]||'';
     var preview=cover||(sl.def?sl.def:'');
 
+    /* Meta salvata (tag + titolo) */
+    var savedMeta={};
+    try{ savedMeta=JSON.parse(covers[sl.key+'_meta']||'{}'); }catch(e){}
+    var tagVal=savedMeta.tag||sl.defTag;
+    var titVal=savedMeta.tit||sl.defTit;
+
     /* Bottoni salvati */
     var savedBtns=[];
     try{ savedBtns=JSON.parse(covers[sl.key+'_btns']||'[]'); }catch(e){}
@@ -519,6 +531,19 @@ async function renderCarousel(){
       +'<button class="btn-remove" onclick="removeCover(\''+sl.key+'\')">✕ Rimuovi</button>'
       +'</div>'
       +'<div class="card-status" id="status-'+sl.key+'"></div>'
+      /* Testi slide */
+      +'<div class="card-divider"></div>'
+      +'<div class="cta-section">'
+      +'<div class="cta-section-label">Testi slide</div>'
+      +'<div class="cta-btn-block">'
+      +'<div class="cta-btn-label">Tag (testo piccolo sopra)</div>'
+      +'<input class="cta-text-input" id="meta-tag-'+sl.key+'" type="text" value="'+escHtml(tagVal)+'" placeholder="es. Città Portuale — Marche di Arcamis"/>'
+      +'<div class="cta-btn-label" style="margin-top:8px">Titolo (testo grande)</div>'
+      +'<input class="cta-text-input" id="meta-tit-'+sl.key+'" type="text" value="'+escHtml(titVal)+'" placeholder="es. ARCAMIS"/>'
+      +'</div>'
+      +'<button class="btn-save-cta" onclick="saveMetaTesti(\''+sl.key+'\')">Salva testi</button>'
+      +'<div class="card-status" id="meta-status-'+sl.key+'"></div>'
+      +'</div>'
       /* Bottoni CTA */
       +'<div class="card-divider"></div>'
       +'<div class="cta-section">'
@@ -554,6 +579,32 @@ function handleCarUpload(event,key){
     });
   };
   reader.readAsDataURL(file);
+}
+
+/* Salva meta testi (tag + titolo) */
+async function saveMetaTesti(key){
+  var tagEl=document.getElementById('meta-tag-'+key);
+  var titEl=document.getElementById('meta-tit-'+key);
+  var meta={tag:tagEl?tagEl.value.trim():'', tit:titEl?titEl.value.trim():''};
+  var statusEl=document.getElementById('meta-status-'+key);
+  if(statusEl){statusEl.textContent='Salvataggio…';statusEl.className='card-status';}
+  try{
+    var r=await fetch('/api/admin?action=set_cover',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({pageId:key+'_meta', coverUrl:JSON.stringify(meta)})
+    });
+    var d=await r.json();
+    if(d.ok){
+      if(statusEl){statusEl.textContent='✓ Testi salvati';statusEl.className='card-status ok';}
+      showToast('Testi slide salvati ✓');
+    }else{
+      if(statusEl){statusEl.textContent='✕ Errore';statusEl.className='card-status err';}
+    }
+  }catch(e){
+    if(statusEl){statusEl.textContent='✕ Errore rete';statusEl.className='card-status err';}
+  }
+  setTimeout(function(){if(statusEl)statusEl.textContent='';},3000);
 }
 
 /* Salva bottoni CTA */
