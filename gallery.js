@@ -116,10 +116,6 @@ function _injectGalleryCSS() {
   background:rgba(0,0,0,.6);color:var(--gs-c,rgba(200,155,60,.8));
   backdrop-filter:blur(4px);
 }
-.gs-card-icon{
-  position:absolute;top:5px;right:5px;font-size:14px;
-  text-shadow:0 2px 8px rgba(0,0,0,.8);
-}
 /* Pannello dettaglio */
 .gs-detail{
   display:grid;grid-template-columns:280px 1fr;gap:0;
@@ -239,7 +235,6 @@ function renderGallery(container, pages) {
       + (cover ? '<div class="gs-card-bg" style="background-image:url(\''+cover+'\')"></div>' : '<div class="gs-card-bg" style="background:'+col.bg+'"></div>')
       + '<div class="gs-card-overlay"></div>'
       + (tagLabel ? '<div class="gs-card-tag" style="--gs-c:'+col.c+'">'+tagLabel+'</div>' : '')
-      + '<div class="gs-card-icon">'+p.icon+'</div>'
       + '<div class="gs-card-name">'+p.title+'</div>'
       + '</div>';
   });
