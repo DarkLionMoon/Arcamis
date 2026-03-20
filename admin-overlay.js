@@ -475,13 +475,22 @@
           }
 
           /* Link o onclick */
-          if (btn.href) {
-            if (btn.href.startsWith('http')) {
-              el.href = btn.href;
-              el.setAttribute('target', '_blank');
-              el.setAttribute('rel', 'noopener');
-              el.removeAttribute('onclick');
-              el.style.cursor = 'pointer';
+          if ('href' in btn) {
+  if (btn.href && btn.href.startsWith('http')) {
+    el.href = btn.href;
+    el.setAttribute('target', '_blank');
+    el.setAttribute('rel', 'noopener');
+    el.removeAttribute('onclick');
+    el.style.cursor = 'pointer';
+  } else if (btn.href && btn.href.trim()) {
+    el.removeAttribute('href');
+    el.setAttribute('onclick', btn.href);
+    el.style.cursor = 'pointer';
+  } else {
+    el.removeAttribute('href');
+    el.removeAttribute('onclick');
+  }
+}
             } else if (btn.href.trim()) {
               /* tratta come onclick, es. "gp('...')" o scroll */
               el.removeAttribute('href');
