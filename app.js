@@ -260,47 +260,103 @@ function _resetCarTimer(){
 _carTimer = setInterval(function(){ changeSlide(1); }, 6000);
 
 /* Applicazione dinamica sfondo e bottoni CTA da KV */
+var _cachedCovers = null;
+
+function _applyCovers(covers){
+  _cachedCovers = covers;
+
+  /* ── Carousel homepage: sfondi ── */
+  var slideEls = document.querySelectorAll('.slide');
+  ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
+    if(covers[key] && slideEls[i]){
+      slideEls[i].style.backgroundImage = 'url(\'' + covers[key] + '\')';
+      slideEls[i].style.backgroundSize = 'cover';
+      slideEls[i].style.backgroundPosition = 'center 40%';
+    }
+  });
+
+  /* ── Carousel homepage: tag e titolo ── */
+  ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
+    if(!covers[key+'_meta'] || !slideEls[i]) return;
+    try {
+      var meta = JSON.parse(covers[key+'_meta']);
+      if(meta.tag){ var tagEl = slideEls[i].querySelector('.stag'); if(tagEl) tagEl.textContent = meta.tag; }
+      if(meta.tit){ var titEl = slideEls[i].querySelector('.stit'); if(titEl) titEl.innerHTML = meta.tit.replace(/\n/g,'<br>'); }
+    } catch(e){}
+  });
+
+  /* ── Carousel homepage: bottoni CTA ── */
+  ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
+    if(!covers[key+'_btns'] || !slideEls[i]) return;
+    try {
+      var btns = JSON.parse(covers[key+'_btns']);
+      var btnRow = slideEls[i].querySelector('[style*="display:flex"][style*="gap"]');
+      if(!btnRow) btnRow = slideEls[i].querySelector('.scnt > div:last-of-type');
+      if(!btnRow) return;
+      var btnEls = btnRow.querySelectorAll('.sbtn');
+      btns.forEach(function(b, bi){
+        if(!btnEls[bi]) return;
+        if(b.label) btnEls[bi].innerHTML = (btnEls[bi].querySelector('svg') ? btnEls[bi].querySelector('svg').outerHTML + ' ' : '') + b.label;
+        if(b.href){
+          btnEls[bi].setAttribute('href', b.href);
+          if(btnEls[bi].tagName !== 'A') btnEls[bi].onclick = function(){ window.open(b.href,'_blank'); };
+        }
+      });
+    } catch(e){}
+  });
+
+  /* ── loc-card nelle pagine ── */
+  document.querySelectorAll('#pbody .loc-card').forEach(function(card){
+    var onclick = card.getAttribute('onclick') || '';
+    var m = onclick.match(/gp\(['"]([a-f0-9]{32})['"]/);
+    if(!m) return;
+    var pageId = m[1];
+    if(!covers[pageId]) return;
+    card.style.backgroundImage = 'url(\'' + covers[pageId] + '\')';
+    card.style.backgroundSize = 'cover';
+    card.style.backgroundPosition = 'center';
+  });
+
+  /* ── galleria PG (.gs-card) ── */
+  document.querySelectorAll('.gs-card').forEach(function(card){
+    var pageId = card.id.replace('gsc-','');
+    if(!pageId || !covers[pageId]) return;
+    var bgEl = card.querySelector('.gs-card-bg');
+    if(bgEl) bgEl.style.backgroundImage = 'url(\'' + covers[pageId] + '\')';
+  });
+}
+
+/* Fetch covers una volta sola, poi riapplica ad ogni render pagina */
 (function(){
   fetch('/api/admin?action=get_covers')
     .then(function(r){ return r.json(); })
-    .then(function(d){
-      var covers = d.covers || {};
-
-      /* ── Sfondi ── */
-      var slideEls = document.querySelectorAll('.slide');
-      ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
-        if(covers[key] && slideEls[i]){
-          slideEls[i].style.backgroundImage = 'url(\'' + covers[key] + '\')';
-          slideEls[i].style.backgroundSize = 'cover';
-          slideEls[i].style.backgroundPosition = 'center 40%';
-        }
-      });
-
-      /* ── Bottoni CTA ── */
-      ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
-        var btnsKey = key + '_btns';
-        if(!covers[btnsKey] || !slideEls[i]) return;
-        try {
-          var btns = JSON.parse(covers[btnsKey]);
-          var row = slideEls[i].querySelector('.scnt > div, .scnt > a');
-          /* trova il contenitore dei bottoni (div con .sbtn) */
-          var btnRow = slideEls[i].querySelector('[style*="display:flex"][style*="gap"]');
-          if(!btnRow) btnRow = slideEls[i].querySelector('.scnt > div:last-of-type');
-          if(!btnRow) return;
-          /* sostituisce solo i bottoni che hanno dati salvati */
-          var btnEls = btnRow.querySelectorAll('.sbtn');
-          btns.forEach(function(b, bi){
-            if(!btnEls[bi]) return;
-            if(b.label) btnEls[bi].innerHTML = (btnEls[bi].querySelector('svg') ? btnEls[bi].querySelector('svg').outerHTML + ' ' : '') + b.label;
-            if(b.href){
-              btnEls[bi].setAttribute('href', b.href);
-              btnEls[bi].tagName !== 'A' && (btnEls[bi].onclick = function(){ window.open(b.href,'_blank'); });
-            }
-          });
-        } catch(e){}
-      });
-    })
+    .then(function(d){ _applyCovers(d.covers || {}); })
     .catch(function(){});
+})();
+
+/* Hook afterPageRender — riapplica covers sulle nuove card dopo ogni navigazione */
+(function(){
+  var _origAfter = window.afterPageRender;
+  window.afterPageRender = function(){
+    if(_origAfter) _origAfter();
+    if(_cachedCovers){
+      setTimeout(function(){ _applyCovers(_cachedCovers); }, 300);
+      setTimeout(function(){ _applyCovers(_cachedCovers); }, 1200);
+    }
+  };
+})();
+
+/* MutationObserver su #pbody — riapplica covers quando _loadSingleDb inserisce card lazy */
+(function(){
+  var _debounce = null;
+  var pbody = document.getElementById('pbody');
+  if(!pbody) return;
+  var obs = new MutationObserver(function(){
+    if(!_cachedCovers) return;
+    clearTimeout(_debounce);
+    _debounce = setTimeout(function(){ _applyCovers(_cachedCovers); }, 400);
+  });
+  obs.observe(pbody, {childList:true, subtree:true});
 })();
 
 /* ════ MAPPA INTERATTIVA ════ */
