@@ -369,7 +369,7 @@
     if(slide && ok){
       var tagEl = slide.querySelector('.stag');
       var titEl = slide.querySelector('.stit');
-      if(tagEl) tagEl.lastChild.textContent = tag;
+      if(tagEl) tagEl.textContent = tag;
       if(titEl) titEl.innerHTML = tit.replace(/\n/g,'<br>');
     }
     setApStatus('asl-txt-status-'+idx, ok?'✓ Salvati':'✕ Errore', ok?'ok':'err');
@@ -392,83 +392,146 @@
   };
 
   /* ════════════════════════════════
-     EDITOR CAROSELLI NELLE PAGINE
+     EDITOR CARD NELLE PAGINE
   ════════════════════════════════ */
   function injectPageCarouselButtons(){
-    /* Cerca tutti i caroselli renderizzati nelle pagine Notion */
-    var carousels = document.querySelectorAll('#pbody .notion-carousel, #pbody [class*="carousel"], #pbody .car-wrap, #pbody .ncar');
-    if(!carousels.length){
-      /* fallback: cerca img dentro section di tipo galleria/carousel */
-      carousels = document.querySelectorAll('#pbody .img-grid, #pbody .gallery-grid');
-    }
-    carousels.forEach(function(car, ci){
-      car.style.position = 'relative';
-      car.classList.add('arc-editable');
+    /* Evita di iniettare due volte */
+    document.querySelectorAll('#pbody .arc-edit-btn').forEach(function(b){ b.remove(); });
+
+    /* Griglia di card con immagine (.n-db-grid) */
+    var grids = document.querySelectorAll('#pbody .n-db-grid');
+    grids.forEach(function(grid, gi){
+      /* Bottone sulla griglia intera */
+      var wrap = grid.closest('.n-db-wrap') || grid.parentElement;
+      if(!wrap || wrap.querySelector('.arc-grid-edit-btn')) return;
+      wrap.style.position = 'relative';
+      var btn = document.createElement('button');
+      btn.className = 'arc-edit-btn arc-grid-edit-btn';
+      btn.style.cssText = 'position:relative;display:inline-flex;margin-bottom:10px;';
+      btn.innerHTML = '<span class="aeb-icon">🖼</span> Modifica immagini griglia';
+      btn.onclick = function(e){ e.stopPropagation(); arcOpenGridEditor(grid, gi); };
+      wrap.insertBefore(btn, grid);
+    });
+
+    /* Card singole con immagine fuori da griglia */
+    document.querySelectorAll('#pbody .n-db-card').forEach(function(card, ci){
+      if(card.closest('.n-db-grid')) return; /* già gestite dalla griglia */
+      if(card.querySelector('.arc-edit-btn')) return;
+      card.style.position = 'relative';
       var btn = document.createElement('button');
       btn.className = 'arc-edit-btn';
-      btn.style.cssText = 'top:8px;right:8px;';
-      btn.innerHTML = '<span class="aeb-icon">🖼</span> Foto carosello';
-      btn.onclick = function(e){ e.stopPropagation(); arcOpenPageCarouselEditor(car, ci); };
-      car.appendChild(btn);
+      btn.style.cssText = 'top:4px;right:4px;font-size:7px;padding:3px 7px;';
+      btn.innerHTML = '🖼';
+      btn.onclick = function(e){ e.stopPropagation(); arcOpenSingleCardEditor(card, ci); };
+      card.appendChild(btn);
     });
   }
 
-  function arcOpenPageCarouselEditor(carEl, ci){
-    /* Trova tutte le immagini nel carosello */
-    var imgs = carEl.querySelectorAll('img, [style*="background-image"]');
+  function arcOpenGridEditor(gridEl, gi){
+    var cards = gridEl.querySelectorAll('.n-db-card');
     var pageId = (window._currentPageId||'unknown').replace(/-/g,'');
 
-    var imgsHtml = Array.from(imgs).map(function(el, ii){
-      var cur = el.tagName==='IMG' ? el.src : (el.style.backgroundImage||'').replace(/url\(['"]?/,'').replace(/['"]?\)$/,'');
-      return `<div class="ap-section-label">Immagine ${ii+1}</div>
-        <div class="ap-preview" id="apci-prev-${ci}-${ii}" style="${cur?'background-image:url(\''+cur+'\')':''}">
-          ${cur?'':'Nessuna'}
-        </div>
-        <div class="ap-upload">
-          <input type="file" accept="image/*" onchange="arcPageCarImg(event,'${pageId}','car${ci}_img${ii}',${ci},${ii})"/>
-          <div class="ap-upload-txt">🖼 Carica</div>
-        </div>
-        <div class="ap-or">oppure URL</div>
-        <input class="ap-input" id="apci-url-${ci}-${ii}" type="url" value="${escH(cur)}" placeholder="https://…"
-          oninput="document.getElementById('apci-prev-${ci}-${ii}').style.backgroundImage=this.value?'url('+this.value+')':''"/>
-        <div class="ap-actions">
-          <button class="ap-btn-save" onclick="arcSavePageCarImg('${pageId}','car${ci}_img${ii}',${ci},${ii})">Salva</button>
-        </div>
-        <div class="ap-status" id="apci-status-${ci}-${ii}"></div>
-        <div class="ap-sep"></div>`;
+    var html = Array.from(cards).map(function(card, ci){
+      var coverEl = card.querySelector('.n-db-cover');
+      var placeholderEl = card.querySelector('.n-db-cover-placeholder');
+      var nameEl = card.querySelector('.n-db-name');
+      var cur = coverEl ? coverEl.src : '';
+      var name = nameEl ? nameEl.textContent.trim() : ('Card '+(ci+1));
+      var key = 'page_'+pageId+'_grid'+gi+'_card'+ci;
+      return '<div class="ap-section-label" style="margin-top:'+(ci?'12px':'0')+'px">'+name+'</div>'
+        +'<div class="ap-preview" id="apg-prev-'+gi+'-'+ci+'" style="'+(cur?'background-image:url(\''+cur+'\')':'')+'">'+(cur?'':'Nessuna')+'</div>'
+        +'<div class="ap-upload"><input type="file" accept="image/*" onchange="arcGridCardUpload(event,\''+key+'\','+gi+','+ci+')"/>'
+        +'<div class="ap-upload-txt">🖼 Carica</div></div>'
+        +'<div class="ap-or">oppure URL</div>'
+        +'<input class="ap-input" id="apg-url-'+gi+'-'+ci+'" type="url" value="'+escH(cur)+'" placeholder="https://…" '
+        +'oninput="document.getElementById(\'apg-prev-'+gi+'-'+ci+'\').style.backgroundImage=this.value?\'url(\'+this.value+\')\':\'\'" />'
+        +'<div class="ap-actions"><button class="ap-btn-save" onclick="arcSaveGridCard(\''+key+'\','+gi+','+ci+')">Salva</button></div>'
+        +'<div class="ap-status" id="apg-status-'+gi+'-'+ci+'"></div>'
+        +'<div class="ap-sep"></div>';
     }).join('');
 
-    arcOpenPanel('Carosello pagina', imgsHtml || '<div style="color:rgba(200,155,60,.4);font-style:italic;font-size:13px;padding:20px 0">Nessuna immagine trovata in questo carosello.</div>');
+    arcOpenPanel('Griglia immagini', html || '<div style="color:rgba(200,155,60,.4);font-style:italic;font-size:13px;padding:20px 0">Nessuna card trovata.</div>');
+    /* Salva riferimento griglia per aggiornamento live */
+    window._arcEditGrid = {el: gridEl, gi: gi};
   }
 
-  window.arcPageCarImg = function(event, pageId, key, ci, ii){
-    var file = event.target.files[0];
-    if(!file) return;
+  function arcOpenSingleCardEditor(card, ci){
+    var coverEl = card.querySelector('.n-db-cover');
+    var cur = coverEl ? coverEl.src : '';
+    var pageId = (window._currentPageId||'unknown').replace(/-/g,'');
+    var key = 'page_'+pageId+'_card'+ci;
+    var html = '<div class="ap-preview" id="aps-prev-'+ci+'" style="'+(cur?'background-image:url(\''+cur+'\')':'')+'">'+(cur?'':'Nessuna')+'</div>'
+      +'<div class="ap-upload"><input type="file" accept="image/*" onchange="arcSingleCardUpload(event,\''+key+'\','+ci+')"/>'
+      +'<div class="ap-upload-txt">🖼 Carica</div></div>'
+      +'<div class="ap-or">oppure URL</div>'
+      +'<input class="ap-input" id="aps-url-'+ci+'" type="url" value="'+escH(cur)+'" placeholder="https://…" '
+      +'oninput="document.getElementById(\'aps-prev-'+ci+'\').style.backgroundImage=this.value?\'url(\'+this.value+\')\':\'\'" />'
+      +'<div class="ap-actions"><button class="ap-btn-save" onclick="arcSaveSingleCard(\''+key+'\','+ci+')">Salva</button></div>'
+      +'<div class="ap-status" id="aps-status-'+ci+'"></div>';
+    arcOpenPanel('Immagine card', html);
+    window._arcEditCard = {el: card, ci: ci};
+  }
+
+  /* Upload griglia */
+  window.arcGridCardUpload = function(event, key, gi, ci){
+    var file = event.target.files[0]; if(!file) return;
     var reader = new FileReader();
-    reader.onload = function(e){
-      compressImg(e.target.result, function(b64){
-        var prev = document.getElementById('apci-prev-'+ci+'-'+ii);
-        var urlI = document.getElementById('apci-url-'+ci+'-'+ii);
-        if(prev){ prev.style.backgroundImage='url(\''+b64+'\')'; prev.textContent=''; }
-        if(urlI) urlI.value='';
-        arcSavePageCarImgVal(pageId, key, b64, ci, ii);
-      });
-    };
+    reader.onload = function(e){ compressImg(e.target.result, function(b64){
+      var prev = document.getElementById('apg-prev-'+gi+'-'+ci);
+      var urlI = document.getElementById('apg-url-'+gi+'-'+ci);
+      if(prev){ prev.style.backgroundImage='url(\''+b64+'\')'; prev.textContent=''; }
+      if(urlI) urlI.value='';
+      arcSaveGridCardVal(key, b64, gi, ci);
+    });};
     reader.readAsDataURL(file);
   };
-
-  window.arcSavePageCarImg = async function(pageId, key, ci, ii){
-    var val = (document.getElementById('apci-url-'+ci+'-'+ii)||{}).value||'';
-    if(!val){ arcToast('Inserisci un URL o carica un file', false); return; }
-    arcSavePageCarImgVal(pageId, key, val, ci, ii);
+  window.arcSaveGridCard = async function(key, gi, ci){
+    var val = (document.getElementById('apg-url-'+gi+'-'+ci)||{}).value||'';
+    if(!val){ arcToast('Inserisci URL o carica file', false); return; }
+    arcSaveGridCardVal(key, val, gi, ci);
   };
+  async function arcSaveGridCardVal(key, val, gi, ci){
+    setApStatus('apg-status-'+gi+'-'+ci,'Salvataggio…','');
+    var ok = await arcSave(key, val);
+    /* aggiorna live */
+    if(ok && window._arcEditGrid){
+      var cards = window._arcEditGrid.el.querySelectorAll('.n-db-card');
+      var coverEl = cards[ci] ? cards[ci].querySelector('.n-db-cover') : null;
+      var placeholderEl = cards[ci] ? cards[ci].querySelector('.n-db-cover-placeholder') : null;
+      if(coverEl){ coverEl.src = val; coverEl.style.display='block'; if(placeholderEl) placeholderEl.style.display='none'; }
+    }
+    setApStatus('apg-status-'+gi+'-'+ci, ok?'✓ Salvata':'✕ Errore', ok?'ok':'err');
+    arcToast(ok?'Immagine salvata ✓':'Errore', ok);
+  }
 
-  async function arcSavePageCarImgVal(pageId, key, val, ci, ii){
-    var fullKey = 'page_'+pageId+'_'+key;
-    setApStatus('apci-status-'+ci+'-'+ii,'Salvataggio…','');
-    var ok = await arcSave(fullKey, val);
-    setApStatus('apci-status-'+ci+'-'+ii, ok?'✓ Salvata':'✕ Errore', ok?'ok':'err');
-    arcToast(ok?'Immagine salvata ✓':'Errore salvataggio', ok);
+  /* Upload card singola */
+  window.arcSingleCardUpload = function(event, key, ci){
+    var file = event.target.files[0]; if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){ compressImg(e.target.result, function(b64){
+      var prev = document.getElementById('aps-prev-'+ci);
+      var urlI = document.getElementById('aps-url-'+ci);
+      if(prev){ prev.style.backgroundImage='url(\''+b64+'\')'; prev.textContent=''; }
+      if(urlI) urlI.value='';
+      arcSaveSingleCardVal(key, b64, ci);
+    });};
+    reader.readAsDataURL(file);
+  };
+  window.arcSaveSingleCard = async function(key, ci){
+    var val = (document.getElementById('aps-url-'+ci)||{}).value||'';
+    if(!val){ arcToast('Inserisci URL o carica file', false); return; }
+    arcSaveSingleCardVal(key, val, ci);
+  };
+  async function arcSaveSingleCardVal(key, val, ci){
+    setApStatus('aps-status-'+ci,'Salvataggio…','');
+    var ok = await arcSave(key, val);
+    if(ok && window._arcEditCard){
+      var coverEl = window._arcEditCard.el.querySelector('.n-db-cover');
+      var placeholderEl = window._arcEditCard.el.querySelector('.n-db-cover-placeholder');
+      if(coverEl){ coverEl.src=val; coverEl.style.display='block'; if(placeholderEl) placeholderEl.style.display='none'; }
+    }
+    setApStatus('aps-status-'+ci, ok?'✓ Salvata':'✕ Errore', ok?'ok':'err');
+    arcToast(ok?'Immagine salvata ✓':'Errore', ok);
   }
 
   /* ── Helper status ── */
