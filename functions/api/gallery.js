@@ -2,7 +2,8 @@ export async function onRequest(context) {
   const TOKEN = context.env.NOTION_TOKEN;
   const KV = context.env.ARCAMIS_CACHE;
   const DB_ID = '2fd0274fdc1c80038889fc072a360bae';
-  const CACHE_TTL = 3600;
+  /* TTL ridotto: gli URL S3 di Notion scadono dopo ~1h, usiamo 25 minuti */
+  const CACHE_TTL = 1500;
 
   const cors = {
     'Access-Control-Allow-Origin': '*',
@@ -48,10 +49,15 @@ export async function onRequest(context) {
       /* Icona */
       const icon = p.icon && p.icon.emoji ? p.icon.emoji : '📄';
 
-      /* Cover */
-      const cover = p.cover
-        ? (p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url))
-        : null;
+      /* Cover — preferisce URL esterni (non scadono) rispetto a S3 */
+      let cover = null;
+      if (p.cover) {
+        if (p.cover.type === 'external') {
+          cover = p.cover.external.url;
+        } else if (p.cover.file && p.cover.file.url) {
+          cover = p.cover.file.url;
+        }
+      }
 
       /* Tags (classe) */
       const tagProp = p.properties && (p.properties['Tags'] || p.properties['tags'] || p.properties['Classe'] || p.properties['classe']);
@@ -73,7 +79,7 @@ export async function onRequest(context) {
 
     const payload = JSON.stringify({ pages });
 
-    /* 3. Salva in KV */
+    /* 3. Salva in KV con TTL breve */
     if (KV) {
       await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
     }
