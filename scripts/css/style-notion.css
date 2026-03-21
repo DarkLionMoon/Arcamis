@@ -264,3 +264,78 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
   .n-db-lc-wrap .loc-card{flex:0 0 180px;height:250px}
   .gterm::after{max-width:180px;font-size:11px}
 }
+/* Layout Sottoclassi Homebrew (Stile 5e Tools) */
+.hb-subclass-container {
+    display: grid;
+    grid-template-columns: 260px 1fr; /* Sidebar a sinistra, contenuto a destra */
+    gap: 30px;
+    margin-top: 2rem;
+    min-height: 600px;
+    align-items: start;
+}
+
+/* Sidebar con la lista delle classi */
+.hb-sidebar {
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.3); /* Bordo dorato leggero */
+    border-radius: 8px;
+    padding: 15px;
+    position: sticky;
+    top: 100px;
+}
+
+.hb-class-group {
+    margin-bottom: 15px;
+}
+
+.hb-class-name {
+    font-family: 'Cinzel', serif; /* O il font che usi per i titoli */
+    color: #d4af37;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+}
+
+.hb-subclass-link {
+    display: block;
+    padding: 6px 10px;
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.hb-subclass-link:hover {
+    background: rgba(212, 175, 55, 0.1);
+    color: #fff;
+}
+
+.hb-subclass-link.active {
+    background: #d4af37;
+    color: #000;
+    font-weight: bold;
+}
+
+/* Area Contenuto a destra */
+.hb-content {
+    background: #121212;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #222;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Responsive: su mobile metti uno sopra l'altro */
+@media (max-width: 850px) {
+    .hb-subclass-container {
+        grid-template-columns: 1fr;
+    }
+    .hb-sidebar {
+        position: relative;
+        top: 0;
+    }
+}
