@@ -446,7 +446,7 @@
     arcToast(ok?'Testi salvati ✓':'Errore', ok);
   };
 
-  window.arcSlideSaveBtns = async function(idx, count){
+ window.arcSlideSaveBtns = async function(idx, count){
     var key = SLIDES_DEF[idx].key;
     var btns = [];
     for(var i=0;i<count;i++){
@@ -476,26 +476,19 @@
 
           /* Link o onclick */
           if ('href' in btn) {
-  if (btn.href && btn.href.startsWith('http')) {
-    el.href = btn.href;
-    el.setAttribute('target', '_blank');
-    el.setAttribute('rel', 'noopener');
-    el.removeAttribute('onclick');
-    el.style.cursor = 'pointer';
-  } else if (btn.href && btn.href.trim()) {
-    el.removeAttribute('href');
-    el.setAttribute('onclick', btn.href);
-    el.style.cursor = 'pointer';
-  } else {
-    el.removeAttribute('href');
-    el.removeAttribute('onclick');
-  }
-}
-            } else if (btn.href.trim()) {
-              /* tratta come onclick, es. "gp('...')" o scroll */
+            if (btn.href && btn.href.startsWith('http')) {
+              el.href = btn.href;
+              el.setAttribute('target', '_blank');
+              el.setAttribute('rel', 'noopener');
+              el.removeAttribute('onclick');
+              el.style.cursor = 'pointer';
+            } else if (btn.href && btn.href.trim()) {
               el.removeAttribute('href');
               el.setAttribute('onclick', btn.href);
               el.style.cursor = 'pointer';
+            } else {
+              el.removeAttribute('href');
+              el.removeAttribute('onclick');
             }
           }
         });
