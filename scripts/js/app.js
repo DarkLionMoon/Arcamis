@@ -186,28 +186,6 @@ window.addEventListener('scroll', function(){
   if(btn) btn.classList.toggle('visible', window.scrollY > 400);
 }, {passive:true});
 
-/* ════ SEARCH ════ */
-function hsearch(val){
-  var sr = document.getElementById('sr');
-  if(!val || val.length < 2){ if(sr) sr.innerHTML=''; return; }
-  var q = val.toLowerCase();
-  var res = pages.filter(function(p){
-    return p.l.toLowerCase().indexOf(q) > -1 || p.k.toLowerCase().indexOf(q) > -1;
-  });
-  if(!sr) return;
-  if(!res.length){ sr.innerHTML='<div class="sr-empty">Nessun risultato</div>'; return; }
-  sr.innerHTML = res.map(function(p){
-    return '<div class="sr-item" onclick="csearch();gp(\''+p.id+'\',\''+p.l+'\',\''+p.i+'\')">'
-      +'<span>'+p.i+'</span> '+p.l+'</div>';
-  }).join('');
-}
-function csearch(){
-  var sr = document.getElementById('sr');
-  var ts = document.getElementById('ts');
-  if(sr) sr.innerHTML='';
-  if(ts) ts.value='';
-}
-
 /* ════ XFADE ════ */
 function xfade(from, to){
   from.style.transition = 'opacity .2s ease';
