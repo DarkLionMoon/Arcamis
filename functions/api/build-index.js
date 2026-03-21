@@ -86,12 +86,40 @@ export async function onRequest(context) {
 
   /* ── Fetch figli ricorsivi (solo child_page) ── */
   async function fetchChildPages(pageId) {
-    const blocks = await fetchBlocks(pageId);
-    return blocks.filter(b => b.type === 'child_page').map(b => ({
-      id: b.id.replace(/-/g, ''),
-      title: (b.child_page && b.child_page.title) || 'Pagina',
-    }));
+  const blocks = await fetchBlocks(pageId);
+  const children = [];
+  for (const b of blocks) {
+    if (b.type === 'child_page') {
+      children.push({
+        id: b.id.replace(/-/g, ''),
+        title: (b.child_page && b.child_page.title) || 'Pagina'
+      });
+    } else if (b.type === 'link_to_page' && b.link_to_page && b.link_to_page.page_id) {
+      children.push({
+        id: b.link_to_page.page_id.replace(/-/g, ''),
+        title: 'Pagina'
+      });
+    } else if (b.type === 'child_database') {
+      /* Fetch pagine del database */
+      try {
+        const dbId = b.id.replace(/-/g, '');
+        const r = await fetch(
+          'https://api.notion.com/v1/databases/' + dbId + '/query',
+          { method: 'POST', headers: notionHeaders, body: JSON.stringify({ page_size: 100 }) }
+        );
+        if (r.ok) {
+          const data = await r.json();
+          for (const p of data.results || []) {
+            const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
+            const title = titleProp ? (titleProp.title || []).map(t => t.plain_text).join('') : 'Pagina';
+            children.push({ id: p.id.replace(/-/g, ''), title });
+          }
+        }
+      } catch (e) {}
+    }
   }
+  return children;
+}
 
   /* ── Fetch titolo e icona di una pagina ── */
   async function fetchPageMeta(pageId) {
