@@ -153,7 +153,7 @@ export async function onRequest(context) {
 Poi fai purge della cache del database sottoclassi visitando:
 ```
 https://arcamis.pages.dev/api/notion?purge=true&dbId=2f70274fdc1c803ca5cafa97ca1817cd&key=Hermes
-      });
+      );
 
       const payload = JSON.stringify({ pages });
 
