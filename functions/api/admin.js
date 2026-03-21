@@ -80,11 +80,26 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ ok }), { headers: cors });
   }
 
-  /* ── Da qui in poi richiede sessione valida ── */
-  const authed = await checkSession();
-  if (!authed) {
-    return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+/* ════ LEGGI TUTTE LE COVER ADMIN — pubblica ════ */
+if (action === 'get_covers') {
+  try {
+    const list = await KV.list({ prefix: 'admin_cover_' });
+    const covers = {};
+    await Promise.all(list.keys.map(async function(k) {
+      const pageId = k.name.replace('admin_cover_', '');
+      covers[pageId] = await KV.get(k.name);
+    }));
+    return new Response(JSON.stringify({ covers }), { headers: cors });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
   }
+}
+
+/* ── Da qui in poi richiede sessione valida ── */
+const authed = await checkSession();
+if (!authed) {
+  return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+}
 
   /* ════ SALVA COVER ════ */
   if (action === 'set_cover' && request.method === 'POST') {
@@ -108,21 +123,3 @@ export async function onRequest(context) {
     try { await KV.delete('gallery_pg_v2'); } catch (e) {}
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
-
-  /* ════ LEGGI TUTTE LE COVER ADMIN ════ */
-  if (action === 'get_covers') {
-    try {
-      const list = await KV.list({ prefix: 'admin_cover_' });
-      const covers = {};
-      await Promise.all(list.keys.map(async function(k) {
-        const pageId = k.name.replace('admin_cover_', '');
-        covers[pageId] = await KV.get(k.name);
-      }));
-      return new Response(JSON.stringify({ covers }), { headers: cors });
-    } catch (e) {
-      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
-    }
-  }
-
-  return new Response(JSON.stringify({ error: 'Azione non valida' }), { status: 400, headers: cors });
-}
