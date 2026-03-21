@@ -4,7 +4,7 @@ export async function onRequest(context) {
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
-    'Cache-Control': 'public, max-age=30, stale-while-revalidate=60'
+    'Cache-Control': 'no-store'
   };
 
   const SLIDE_KEYS = ['carousel_0', 'carousel_1', 'carousel_2'];
