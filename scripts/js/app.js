@@ -485,8 +485,16 @@ document.getElementById('overlay') && document.getElementById('overlay').addEven
         var list = document.getElementById('roster-list');
         var count = document.getElementById('avv-count');
         if(!list) return;
-        var BOT_IDS = ['475744554910351370','437808476106784770','235148962103951360','302050872383242240','792842038332358656','411916947773587446','412347257233604609','450127943012712448','458276816071950337','557628352828014614','513423712582762502','431544605209788416','472911936951156740'];
-        var members = (data.members || []).filter(function(m){ return BOT_IDS.indexOf(m.id) === -1; });
+        var BOTS = [
+         {u:'Apollo',d:'5552'},{u:'Arcane',d:'7800'},{u:'Carl-bot',d:'1536'},
+         {u:'DISBOARD',d:'2760'},{u:'Discohook Utils',d:'4333'},{u:'Jockie Music',d:'8158'},
+         {u:'Jockie Music (1)',d:'6951'},{u:'MogiBot',d:'6973'},{u:'ServerStats',d:'0197'},
+         {u:'Ticket Tool',d:'4843'},{u:'TTS Bot',d:'3590'},{u:'Tupperbox',d:'4754'},
+         {u:'VoiceMaster',d:'9351'}
+];
+       var members = (data.members || []).filter(function(m){
+         return !BOTS.some(function(b){ return b.u === m.username && b.d === m.discriminator; });
+});
         if(count) count.textContent = members.length ? '(' + members.length + ' online)' : '';
         if(!members.length){
           list.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-style:italic;font-size:13px;padding:30px">Nessun avventuriero online</div>';
