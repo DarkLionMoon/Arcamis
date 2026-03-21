@@ -283,7 +283,11 @@ async function doLogin(){
   try{
     var r=await fetch('/api/admin?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
     var d=await r.json();
-    if(d.ok){sessionStorage.setItem('arcadmin','1');window.location.href='/?arcadmin=1';}
+    if(d.ok){
+  sessionStorage.setItem('arcadmin','1');
+  console.log('SET arcadmin:', sessionStorage.getItem('arcadmin'));
+  window.location.href='/?arcadmin=1';
+}
     else{err.style.display='block';btn.disabled=false;btn.textContent='Accedi al pannello';}
   }catch(e){
     err.textContent='Errore di rete.';err.style.display='block';
