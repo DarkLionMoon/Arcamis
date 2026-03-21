@@ -186,7 +186,6 @@ async function _gpRender(id,label,icon){
     });
     initFadeIn(pbody);
     setTimeout(function(){
-      if(window.buildWhisperNav)window.buildWhisperNav();
       _initCarouselArrows(pbody);
     },200);
 
