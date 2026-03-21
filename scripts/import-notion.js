@@ -28,7 +28,7 @@ if(!fs.existsSync(EXPORT_DIR)){
 fs.mkdirSync(OUT_DIR,{recursive:true});
 
 /* ── ID mapping: legge data.js per sapere quali ID aspettarsi ── */
-const dataJs = fs.readFileSync(path.join(__dirname,'..','data.js'),'utf8');
+const dataJs = fs.readFileSync(path.join(__dirname,'js','data.js'),'utf8');
 const idMap  = {};
 const idRx   = /id:'([a-f0-9]{32})'/g;
 let m;
