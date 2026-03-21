@@ -467,7 +467,10 @@ function toggleWiki(){
 /* ════ CLOSE OVERLAY ════ */
 function cv(){
   var overlay = document.getElementById('overlay');
-  if(overlay) overlay.classList.remove('open');
+  if(!overlay) return;
+  overlay.classList.remove('ovopen');
+  overlay.classList.add('ovclose');
+  setTimeout(function(){ overlay.classList.remove('ovclose'); }, 160);
 }
 document.getElementById('overlay') && document.getElementById('overlay').addEventListener('click', function(e){
   if(e.target === this) cv();
