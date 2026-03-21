@@ -145,7 +145,10 @@ export async function onRequest(context) {
               ? p.cover.external.url
               : (p.cover.file && p.cover.file.url))
           : null;
-       const classeProp = p.properties && (p.properties['Classe'] || p.properties['classe']);
+       const classeProp = p.properties && (
+          p.properties['Classe'] || p.properties['classe'] ||
+          p.properties['Class'] || p.properties['class']
+        );
         const classe = classeProp && classeProp.select ? classeProp.select.name : null;
         return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
 ```
