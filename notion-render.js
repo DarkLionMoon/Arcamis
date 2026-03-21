@@ -148,16 +148,16 @@ function renderBlocks(blocks,isRoot){
           +(d.rich_text||[]).map(function(r){return r.plain_text}).join('').replace(/</g,'&lt;')
           +'</code></pre>';break;
 
-      case'image':
-        var src=d.type==='external'?(d.external&&d.external.url):(d.file&&d.file.url);
-        if(src){
-          var cap=d.caption&&d.caption.length?rt(d.caption):'';
-          h+='<figure class="n-image">'
-            +'<img src="'+src+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'"/>'
-            +(cap?'<figcaption class="n-figcap">'+cap+'</figcaption>':'')
-            +'</figure>';
-        }
-        break;
+    case 'image':
+  var src = d.type==='external'?(d.external&&d.external.url):(d.file&&d.file.url);
+  if(src){
+    var cap = d.caption&&d.caption.length?rt(d.caption):'';
+    h+='<figure class="n-image">'
+      +'<img src="'+src+'" loading="lazy" class="n-zoomable" onclick="arcZoom(\''+src+'\')" onerror="this.parentElement.style.display=\'none\'"/>'
+      +(cap?'<figcaption class="n-figcap">'+cap+'</figcaption>':'')
+      +'</figure>';
+  }
+  break;
 
       case'video':
         var vsrc=d.type==='external'?d.external&&d.external.url:d.file&&d.file.url;
