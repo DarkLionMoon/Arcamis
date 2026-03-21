@@ -475,3 +475,40 @@ function cv(){
 document.getElementById('overlay') && document.getElementById('overlay').addEventListener('click', function(e){
   if(e.target === this) cv();
 });
+
+/* ════ DISCORD WIDGET ════ */
+(function(){
+  function loadRoster(){
+    fetch('https://discord.com/api/guilds/1348723468157456425/widget.json')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var list = document.getElementById('roster-list');
+        var count = document.getElementById('avv-count');
+        if(!list) return;
+        var members = data.members || [];
+        if(count) count.textContent = members.length ? '(' + members.length + ' online)' : '';
+        if(!members.length){
+          list.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-style:italic;font-size:13px;padding:30px">Nessun avventuriero online</div>';
+          return;
+        }
+        list.innerHTML = members.map(function(m){
+          return '<div class="roster-member">'
+            +'<img class="roster-avatar" src="'+m.avatar_url+'" alt="'+m.username+'" onerror="this.style.display=\'none\'">'
+            +'<div>'
+              +'<div class="roster-name">'+m.username+'</div>'
+              +(m.game ? '<div class="roster-game">'+m.game.name+'</div>' : '')
+            +'</div>'
+            +'</div>';
+        }).join('');
+      })
+      .catch(function(){
+        var list = document.getElementById('roster-list');
+        if(list) list.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-style:italic;font-size:13px;padding:30px">Impossibile caricare</div>';
+      });
+  }
+
+  var ovbtn = document.getElementById('ovbtn');
+  if(ovbtn) ovbtn.addEventListener('click', loadRoster);
+  var bnav = document.querySelector('.bnav-item[data-k="menu"]');
+  if(bnav) bnav.addEventListener('click', loadRoster);
+})();
