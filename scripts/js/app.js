@@ -485,7 +485,8 @@ document.getElementById('overlay') && document.getElementById('overlay').addEven
         var list = document.getElementById('roster-list');
         var count = document.getElementById('avv-count');
         if(!list) return;
-        var members = data.members || [];
+        var BOT_IDS = ['475744554910351370','437808476106784770','235148962103951360','302050872383242240','792842038332358656','411916947773587446','412347257233604609','450127943012712448','458276816071950337','557628352828014614','513423712582762502','431544605209788416','472911936951156740'];
+        var members = (data.members || []).filter(function(m){ return BOT_IDS.indexOf(m.id) === -1; });
         if(count) count.textContent = members.length ? '(' + members.length + ' online)' : '';
         if(!members.length){
           list.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-style:italic;font-size:13px;padding:30px">Nessun avventuriero online</div>';
