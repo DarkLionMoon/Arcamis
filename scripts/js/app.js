@@ -42,7 +42,13 @@ function showHome(){
 
 function ovo(){
   var overlay = document.getElementById('overlay');
-  if(overlay) overlay.classList.toggle('open');
+  if(!overlay) return;
+  if(overlay.classList.contains('ovopen')){
+    cv();
+  } else {
+    overlay.classList.remove('ovclose');
+    overlay.classList.add('ovopen');
+  }
 }
 
 function showToast(txt, icon, dur){
