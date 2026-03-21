@@ -185,13 +185,10 @@
 
   /* ── Pausa / ripresa carousel ── */
   function arcPauseCarousel() {
-    /* Imposta flag globale letto da app.js nel setInterval */
     window._carouselPaused = true;
-    /* Rimuove anche l'animazione ken-burns dalla slide attiva */
     document.querySelectorAll('.slide.active').forEach(function(s) {
       s.style.animationPlayState = 'paused';
     });
-    /* Mostra indicatore visivo */
     var bar = document.getElementById('arc-admin-bar');
     if (bar && !document.getElementById('arc-carousel-paused-badge')) {
       var badge = document.createElement('span');
@@ -260,7 +257,8 @@
   }
 
   function escH(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-   function arcApplyBtnHref(el, href) {
+
+  function arcApplyBtnHref(el, href) {
     if (href && href.startsWith('http')) {
       if (el.tagName === 'A') {
         el.href = href;
@@ -333,7 +331,6 @@
 
   async function arcOpenSlideEditor(idx, covers){
     arcPauseCarousel();
-    /* Vai alla slide corretta se non è già attiva */
     var slides = document.querySelectorAll('.slide');
     if (slides[idx] && !slides[idx].classList.contains('active')) {
       if (typeof jumpToSlide === 'function') jumpToSlide(idx);
@@ -343,7 +340,6 @@
     var btns = []; try{ btns=JSON.parse(covers[sl.key+'_btns']||'[]'); }catch(e){}
     var curImg = covers[sl.key]||'';
 
-    /* Valori correnti con fallback ai default */
     var curTag  = meta.tag  || sl.defTag  || '';
     var curTit  = meta.tit  || sl.defTit  || '';
     var curDesc = meta.desc || sl.defDesc || '';
@@ -425,6 +421,7 @@
     if(!val){ arcToast('Nessuna immagine da salvare', false); return; }
     arcSaveSlideImgVal(idx, val);
   };
+
   window.arcRemoveSlideImg = async function(idx){
     var key = SLIDES_DEF[idx].key;
     var ok = await arcSave(key, '');
@@ -435,6 +432,7 @@
     setApStatus('asl-img-status-'+idx, ok?'✓ Rimossa':'✕ Errore', ok?'ok':'err');
     arcToast(ok?'Sfondo rimosso':'Errore', ok);
   };
+
   async function arcSaveSlideImgVal(idx, val){
     var key = SLIDES_DEF[idx].key;
     setApStatus('asl-img-status-'+idx,'Salvataggio…','');
@@ -453,7 +451,6 @@
     var desc = (document.getElementById('asl-desc-'+idx)||{}).value||'';
     setApStatus('asl-txt-status-'+idx,'Salvataggio…','');
     var ok = await arcSave(key+'_meta', JSON.stringify({tag:tag, tit:tit, desc:desc}));
-    /* aggiorna live nel DOM */
     var slide = document.querySelectorAll('.slide')[idx];
     if(slide && ok){
       var tagEl  = slide.querySelector('.stag');
@@ -467,7 +464,8 @@
     arcToast(ok?'Testi salvati ✓':'Errore', ok);
   };
 
- window.arcSlideSaveBtns = async function(idx, count){
+  /* ── Salva bottoni slide ── */
+  window.arcSlideSaveBtns = async function(idx, count){
     var key = SLIDES_DEF[idx].key;
     var btns = [];
     for(var i=0;i<count;i++){
@@ -479,7 +477,7 @@
     setApStatus('asl-btn-status-'+idx,'Salvataggio…','');
     var ok = await arcSave(key+'_btns', JSON.stringify(btns));
 
- /* ── Aggiorna bottoni live nel DOM ── */
+    /* ── Aggiorna bottoni live nel DOM ── */
     if (ok) {
       var slide = document.querySelectorAll('.slide')[idx];
       if (slide) {
@@ -494,34 +492,6 @@
           }
           if ('href' in btn) {
             arcApplyBtnHref(el, btn.href);
-          }
-        });
-      }
-    }
-
-          /* Testo — preserva icona SVG se presente */
-          if (btn.label) {
-            var svgEl = el.querySelector('svg');
-            el.textContent = btn.label;
-            if (svgEl) el.insertBefore(svgEl, el.firstChild);
-          }
-
-          /* Link o onclick */
-          if ('href' in btn) {
-            if (btn.href && btn.href.startsWith('http')) {
-              el.href = btn.href;
-              el.setAttribute('target', '_blank');
-              el.setAttribute('rel', 'noopener');
-              el.removeAttribute('onclick');
-              el.style.cursor = 'pointer';
-            } else if (btn.href && btn.href.trim()) {
-              el.removeAttribute('href');
-              el.setAttribute('onclick', btn.href);
-              el.style.cursor = 'pointer';
-            } else {
-              el.removeAttribute('href');
-              el.removeAttribute('onclick');
-            }
           }
         });
       }
@@ -585,7 +555,6 @@
     var m = curStyle.match(/background-image:url\(["']?([^"')]+)["']?\)/);
     var cur = m ? m[1] : '';
     var name = (card.querySelector('.loc-name')||{}).textContent || pageId;
-    var key = pageId;
 
     var html = '<div class="ap-section-label" style="margin-bottom:8px">'+name+'</div>'
       +'<div class="ap-preview" id="aploc-prev" style="'+(cur?'background-image:url(\''+cur+'\')':'')+'">'+(cur?'':'Nessuna immagine')+'</div>'
@@ -700,11 +669,13 @@
     });};
     reader.readAsDataURL(file);
   };
+
   window.arcSaveGridCard = async function(key, gi, ci){
     var val = (document.getElementById('apg-url-'+gi+'-'+ci)||{}).value||'';
     if(!val){ arcToast('Inserisci URL o carica file', false); return; }
     arcSaveGridCardVal(key, val, gi, ci);
   };
+
   async function arcSaveGridCardVal(key, val, gi, ci){
     setApStatus('apg-status-'+gi+'-'+ci,'Salvataggio…','');
     var ok = await arcSave(key, val);
@@ -730,11 +701,13 @@
     });};
     reader.readAsDataURL(file);
   };
+
   window.arcSaveSingleCard = async function(key, ci){
     var val = (document.getElementById('aps-url-'+ci)||{}).value||'';
     if(!val){ arcToast('Inserisci URL o carica file', false); return; }
     arcSaveSingleCardVal(key, val, ci);
   };
+
   async function arcSaveSingleCardVal(key, val, ci){
     setApStatus('aps-status-'+ci,'Salvataggio…','');
     var ok = await arcSave(key, val);
