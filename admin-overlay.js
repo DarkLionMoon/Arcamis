@@ -246,6 +246,7 @@
   async function arcSave(key, value){
     var r = await fetch('/api/admin?action=set_cover',{
       method:'POST',
+      credentials:'include',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({pageId:key, coverUrl:value})
     });
@@ -254,7 +255,7 @@
 
   /* ── Utility: leggi covers ── */
   async function arcGetCovers(){
-    var r = await fetch('/api/admin?action=get_covers');
+    var r = await fetch('/api/admin?action=get_covers', {credentials:'include'});
     return (await r.json()).covers || {};
   }
 
