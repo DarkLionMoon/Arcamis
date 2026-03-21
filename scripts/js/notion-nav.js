@@ -178,6 +178,9 @@ async function _gpRender(id,label,icon){
 
     attachShine(pbody);
     loadDbGalleries(pbody);
+   pbody.querySelectorAll('.hb-subclass-container').forEach(function(c){
+  if(window.loadSubclassGallery) loadSubclassGallery(c);
+});
     pbody.querySelectorAll('.gs-container').forEach(function(c){if(window.loadGallery)loadGallery(c);});
     pbody.querySelectorAll('details.n-toggle').forEach(function(det){
       det.addEventListener('toggle',function(){
