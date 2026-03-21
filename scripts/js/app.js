@@ -60,29 +60,6 @@ function showToast(txt, icon, dur){
   setTimeout(function(){ t.classList.remove('vis'); setTimeout(function(){ t.remove(); }, 400); }, dur || 3000);
 }
 
-/* ════ WHISPER NAV ════ */
-function buildWhisperNav(){
-  var old = document.getElementById('whisper-nav');
-  if(old) old.remove();
-  var heads = document.querySelectorAll('.nc h2, .nc h3');
-  if(heads.length < 2) return;
-  var nav = document.createElement('nav');
-  nav.id = 'whisper-nav';
-  heads.forEach(function(h, i){
-    if(!h.id) h.id = 'wsec-' + i;
-    var dot = document.createElement('a');
-    dot.className = 'wn-dot';
-    dot.href = '#';
-    dot.setAttribute('data-label', h.textContent.trim().slice(0,32));
-    dot.addEventListener('click', function(e){
-      e.preventDefault();
-      h.scrollIntoView({behavior:'smooth', block:'start'});
-    });
-    nav.appendChild(dot);
-  });
-  document.body.appendChild(nav);
-}
-
 /* ════ HOOKS ════ */
 (function(){
   var _origAfter = window.afterPageRender;
@@ -91,7 +68,6 @@ function buildWhisperNav(){
     document.getElementById('hv').style.display = 'none';
     document.getElementById('pv').style.display = 'block';
     document.body.classList.add('page-open');
-    setTimeout(buildWhisperNav, 300);
   };
 })();
 
