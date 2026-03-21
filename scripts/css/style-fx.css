@@ -72,36 +72,6 @@
 @media(max-width:768px){#toast-wrap{bottom:72px;left:16px;right:16px;transform:none;}
   .arc-toast{font-size:9.5px;padding:8px 14px;white-space:normal}}
 
-/* ════════════════════════════════════
-   WHISPER SIDEBAR — indice sezioni
-════════════════════════════════════ */
-#whisper-nav{
-  position:fixed;right:10px;top:50%;transform:translateY(-50%);
-  z-index:170;display:flex;flex-direction:column;gap:10px;
-  pointer-events:auto;
-}
-.wn-dot{
-  display:block;width:7px;height:7px;border-radius:50%;
-  background:rgba(200,155,60,.25);border:1px solid rgba(200,155,60,.2);
-  position:relative;cursor:pointer;
-  transition:background .2s,transform .2s,box-shadow .2s;
-}
-.wn-dot::after{
-  content:attr(data-label);
-  position:absolute;right:calc(100% + 10px);top:50%;transform:translateY(-50%);
-  background:rgba(4,5,14,.97);border:1px solid rgba(200,155,60,.25);
-  color:var(--parch);font-family:'Cinzel',serif;font-size:8.5px;
-  letter-spacing:.08em;padding:5px 10px;white-space:nowrap;
-  opacity:0;pointer-events:none;
-  transition:opacity .18s;
-}
-.wn-dot:hover{
-  background:rgba(200,155,60,.7);
-  transform:scale(1.6);
-  box-shadow:0 0 8px rgba(200,155,60,.4);
-}
-.wn-dot:hover::after{opacity:1}
-@media(max-width:768px){#whisper-nav{display:none}}
 /* ── Copy link button nel page-hero ── */
 .ph-copy-btn{
   margin-top:12px;
