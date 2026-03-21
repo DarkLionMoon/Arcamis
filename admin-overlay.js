@@ -260,6 +260,26 @@
   }
 
   function escH(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+   function arcApplyBtnHref(el, href) {
+    if (href && href.startsWith('http')) {
+      if (el.tagName === 'A') {
+        el.href = href;
+        el.setAttribute('target', '_blank');
+        el.setAttribute('rel', 'noopener');
+        el.removeAttribute('onclick');
+      } else {
+        el.setAttribute('onclick', "window.open('" + href + "','_blank','noopener')");
+      }
+      el.style.cursor = 'pointer';
+    } else if (href && href.trim()) {
+      if (el.tagName === 'A') el.removeAttribute('href');
+      el.setAttribute('onclick', href);
+      el.style.cursor = 'pointer';
+    } else {
+      if (el.tagName === 'A') el.removeAttribute('href');
+      el.removeAttribute('onclick');
+    }
+  }
 
   /* ════════════════════════════════
      EDITOR CAROUSEL HOMEPAGE
@@ -459,7 +479,7 @@
     setApStatus('asl-btn-status-'+idx,'Salvataggio…','');
     var ok = await arcSave(key+'_btns', JSON.stringify(btns));
 
-    /* ── Aggiorna bottoni live nel DOM ── */
+ /* ── Aggiorna bottoni live nel DOM ── */
     if (ok) {
       var slide = document.querySelectorAll('.slide')[idx];
       if (slide) {
@@ -467,6 +487,17 @@
         btns.forEach(function(btn, bi) {
           var el = btnEls[bi];
           if (!el) return;
+          if (btn.label) {
+            var svgEl = el.querySelector('svg');
+            el.textContent = btn.label;
+            if (svgEl) el.insertBefore(svgEl, el.firstChild);
+          }
+          if ('href' in btn) {
+            arcApplyBtnHref(el, btn.href);
+          }
+        });
+      }
+    }
 
           /* Testo — preserva icona SVG se presente */
           if (btn.label) {
