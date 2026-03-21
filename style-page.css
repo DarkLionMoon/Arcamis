@@ -1171,6 +1171,28 @@ body.light .lcard:hover{box-shadow:0 14px 40px rgba(100,70,20,.15)!important}
   85%{opacity:.6}
   100%{transform:translate(var(--dx,30px),-110vh) scale(.6);opacity:0}
 }
+/* ════════════════════════════════════
+   LIGHTBOX IMMAGINI
+════════════════════════════════════ */
+.n-zoomable { cursor: zoom-in; }
+.n-image:hover img { transform: none; } /* disabilita il scale esistente quando c'è zoom */
+
+#arc-lightbox {
+  display: none; position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,.88); cursor: zoom-out;
+  align-items: center; justify-content: center;
+}
+#arc-lightbox.open { display: flex; }
+#arc-lightbox img {
+  max-width: 92vw; max-height: 92vh;
+  border: 1px solid rgba(200,155,60,.25);
+  box-shadow: 0 8px 60px rgba(0,0,0,.9), 0 0 30px rgba(200,155,60,.08);
+  animation: arcZoomIn .18s ease;
+}
+@keyframes arcZoomIn {
+  from { transform: scale(.92); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
 /* ── Pagine con DB carousel: allarga pbody ── */
 #pbody:has(.n-db-lc-wrap){
   max-width:1200px;
