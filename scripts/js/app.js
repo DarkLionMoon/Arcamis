@@ -130,7 +130,53 @@ function closeMobileNav(){
   document.getElementById('mobile-nav').classList.remove('open');
   document.body.classList.remove('nav-open');
 }
+/* ════ SEARCH ════ */
+var _searchDebounce = null;
 
+function hsearch(val){
+  var sr = document.getElementById('sr');
+  if(!val || val.length < 2){
+    if(sr) sr.innerHTML = '';
+    return;
+  }
+  clearTimeout(_searchDebounce);
+  _searchDebounce = setTimeout(function(){
+    if(sr) sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic">Ricerca...</div>';
+    fetch('/api/search?q=' + encodeURIComponent(val))
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if(!sr) return;
+        if(data.stale){
+          sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic">Indice non ancora costruito</div>';
+          return;
+        }
+        var res = data.results || [];
+        if(!res.length){
+          sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Nessun risultato</div>';
+          return;
+        }
+        sr.innerHTML = res.map(function(p){
+          var sub = p.parentTitle ? '<span class="sri-tag">'+p.parentTitle+'</span>' : '';
+          return '<div class="sri" onclick="csearch();gp(\''+p.id+'\',\''+p.title+'\',\''+p.icon+'\')">'
+            +'<span class="si2">'+p.icon+'</span>'
+            +'<span class="sl">'+p.title+'</span>'
+            +sub+'</div>';
+        }).join('');
+        sr.classList.add('open');
+      })
+      .catch(function(){
+        if(sr) sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Errore ricerca</div>';
+      });
+  }, 280);
+}
+
+function csearch(){
+  var sr = document.getElementById('sr');
+  var ts = document.getElementById('ts');
+  if(sr){ sr.innerHTML = ''; sr.classList.remove('open'); }
+  if(ts) ts.value = '';
+  clearTimeout(_searchDebounce);
+}
 /* ════ SCROLL TOP ════ */
 function goToTop(){
   document.getElementById('main').scrollTo({top:0, behavior:'smooth'});
