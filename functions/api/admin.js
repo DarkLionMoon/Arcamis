@@ -122,3 +122,5 @@ if (!authed) {
     /* Invalida cache galleria */
     try { await KV.delete('gallery_pg_v2'); } catch (e) {}
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
+  }
+}
