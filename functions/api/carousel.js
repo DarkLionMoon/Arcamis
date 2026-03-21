@@ -1,6 +1,9 @@
+/* ════════════════════════════════════════════════════════
+   ARCAMIS — functions/api/carousel.js
+   Endpoint pubblico: legge config carousel da KV e la restituisce.
+════════════════════════════════════════════════════════ */
 export async function onRequest(context) {
   const KV = context.env.ARCAMIS_CACHE;
-
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
