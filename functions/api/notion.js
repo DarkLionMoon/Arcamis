@@ -109,66 +109,60 @@ export async function onRequest(context) {
     }
 
     /* ── Carica database ── */
-if (dbId) {
-  const cleanId = dbId.replace(/-/g, '');
-  const cacheKey = 'db_' + cleanId;
+    if (dbId) {
+      const cleanId = dbId.replace(/-/g, '');
+      const cacheKey = 'db_' + cleanId;
 
-  /* 1. Controlla KV cache */
-  const cached = await KV.get(cacheKey);
-  if (cached) {
-    return new Response(cached, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Cache': 'HIT',
-        ...cors
+      /* 1. Controlla KV cache */
+      const cached = await KV.get(cacheKey);
+      if (cached) {
+        return new Response(cached, {
+          headers: { 'Content-Type': 'application/json', 'X-Cache': 'HIT', ...cors }
+        });
       }
-    });
-  }
 
-  /* 2. Cache miss → chiama Notion */
-  const res = await fetch('https://api.notion.com/v1/databases/' + cleanId + '/query', {
-    method: 'POST',
-    headers: notionHeaders,
-    body: JSON.stringify({ page_size: 50 })
-  });
-  
-  if (!res.ok) throw new Error('Notion DB error: ' + res.status);
-  const data = await res.json();
+      /* 2. Cache miss → chiama Notion */
+      const res = await fetch('https://api.notion.com/v1/databases/' + cleanId + '/query', {
+        method: 'POST',
+        headers: notionHeaders,
+        body: JSON.stringify({ page_size: 100 })
+      });
+      
+      if (!res.ok) throw new Error('Notion DB error: ' + res.status);
+      const data = await res.json();
 
-  // FIX: Ensure this is just a normal map unless you need to fetch more data inside it
-  const pages = data.results.map(p => {
-    const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
-    const title = titleProp
-      ? (titleProp.title || []).map(t => t.plain_text).join('')
-      : 'Senza titolo';
-    const icon = p.icon && p.icon.emoji ? p.icon.emoji : '📄';
-    const cover = p.cover
-      ? (p.cover.type === 'external'
-          ? p.cover.external.url
-          : (p.cover.file && p.cover.file.url))
-      : null;
-    const classeProp = p.properties && (
-      p.properties['Classe'] || p.properties['classe'] ||
-      p.properties['Class'] || p.properties['class']
-    );
-    const classe = classeProp && classeProp.select ? classeProp.select.name : null;
-    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
-  });
+      // Mappatura pulita dei risultati
+      const pages = data.results.map(p => {
+        const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
+        const title = titleProp
+          ? (titleProp.title || []).map(t => t.plain_text).join('')
+          : 'Senza titolo';
+        
+        const icon = p.icon && p.icon.emoji ? p.icon.emoji : '📄';
+        
+        const cover = p.cover
+          ? (p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url))
+          : null;
 
-  const payload = JSON.stringify({ pages });
+        const classeProp = p.properties && (
+          p.properties['Classe'] || p.properties['classe'] ||
+          p.properties['Class'] || p.properties['class']
+        );
+        const classe = (classeProp && classeProp.select) ? classeProp.select.name : null;
+        
+        return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
+      });
 
-  /* 3. Salva in KV */
-  // The error happened here because the code above it wasn't closed properly
-  await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+      const payload = JSON.stringify({ pages });
 
-  return new Response(payload, {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Cache': 'MISS',
-      ...cors
+      /* 3. Salva in KV */
+      // Ora questo await funzionerà perché la funzione onRequest è async
+      await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+
+      return new Response(payload, {
+        headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
+      });
     }
-  });
-}
 
     return new Response(JSON.stringify({ error: 'Parametro mancante' }), {
       status: 400,
