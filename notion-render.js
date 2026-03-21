@@ -52,8 +52,7 @@ function iconAccent(emoji){
 function rt(arr){
   if(!arr||!arr.length)return'';
   return arr.map(function(r){
-    var t=(r.plain_text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/
-/g,'<br>');
+    var t=(r.plain_text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     var a=r.annotations||{},cls=[];
     if(a.bold)cls.push('rb');if(a.italic)cls.push('ri');if(a.strikethrough)cls.push('rs');
     if(a.underline)cls.push('ru');if(a.code)cls.push('rc');
