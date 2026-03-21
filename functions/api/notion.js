@@ -145,7 +145,17 @@ export async function onRequest(context) {
               ? p.cover.external.url
               : (p.cover.file && p.cover.file.url))
           : null;
-        return { id: p.id.replace(/-/g, ''), title, icon, cover };
+       const classeProp = p.properties && (
+  p.properties['Classe'] || p.properties['classe'] ||
+  p.properties['Class'] || p.properties['class']
+);
+const classe = classeProp && classeProp.select ? classeProp.select.name : null;
+return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
+```
+
+Poi fai purge della cache del database sottoclassi visitando:
+```
+https://arcamis.pages.dev/api/notion?purge=true&dbId=2f70274fdc1c803ca5cafa97ca1817cd&key=Hermes
       });
 
       const payload = JSON.stringify({ pages });
