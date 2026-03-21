@@ -308,3 +308,12 @@ initFadeIn();
   },{passive:true});
   tick();
 })();
+window.arcZoom = function(src) {
+  var lb = document.getElementById('arc-lightbox');
+  document.getElementById('arc-lightbox-img').src = src;
+  lb.classList.add('open');
+  var onKey = function(e) {
+    if(e.key==='Escape'){ lb.classList.remove('open'); document.removeEventListener('keydown',onKey); }
+  };
+  document.addEventListener('keydown', onKey);
+};
