@@ -277,16 +277,19 @@ function renderBlocks(blocks,isRoot){
         i--;
         break;
 
-      case'child_database':
-        var dbRawId=b.id.replace(/-/g,'');
-        if(dbRawId===GALLERY_DB_ID){
-          h+='<div class="gs-container" id="gs-'+dbRawId+'"></div>';
-        }else{
-          h+='<div class="n-db-wrap">'
-            +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
-            +'<div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
-        }
-        break;
+case 'child_database':
+  var dbRawId = b.id.replace(/-/g, '');
+  if (dbRawId === GALLERY_DB_ID) {
+    h += '<div class="gs-container" id="gs-' + dbRawId + '"></div>';
+  } else if (dbRawId === '2f70274fdc1c803ca5cafa97ca1817cd') {
+    /* Sottoclassi Homebrew — layout sidebar+content */
+    h += '<div class="hb-subclass-container" id="hbsc-' + dbRawId + '"></div>';
+  } else {
+    h += '<div class="n-db-wrap">'
+      + (d.title ? '<div class="n-db-title">' + d.title + '</div>' : '')
+      + '<div class="n-db-grid" id="db-' + dbRawId + '"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
+  }
+  break;
 
       case'table':
         var rows=b.children||[],hasH=d.has_column_header,hasR=d.has_row_header;
