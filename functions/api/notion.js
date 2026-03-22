@@ -207,7 +207,7 @@ async function loadChildren(blocks, headers) {
   });
 }
     return new Response(JSON.stringify(data), { headers: sharedHeaders });
-   } catch (e) { // <-- L'ERRORE È QUI (una graffa di troppo)
+    catch (e) { // <-- L'ERRORE È QUI (una graffa di troppo)
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: sharedHeaders });
   }
 }
