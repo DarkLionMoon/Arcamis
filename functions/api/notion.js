@@ -172,7 +172,7 @@ export async function onRequest(context) {
       });
     }
 
-    finally new Response(JSON.stringify({ error: 'Parametro mancante' }), {
+    finally { Response(JSON.stringify({ error: 'Parametro mancante' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json', ...cors }
     });
