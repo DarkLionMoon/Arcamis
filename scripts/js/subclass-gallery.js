@@ -48,14 +48,15 @@ function _renderHbLayout(container, pages) {
     pages.forEach(p => {
         const classe = p.classe || 'Generica';
         const card = document.createElement('div');
-        card.className = 'lcard fade-in';
+        card.className = 'lcard dnd-5e fade-in';
         card.setAttribute('data-class', classe);
-        card.innerHTML = `
-            <div class="lcard-body">
-                <div class="lcard-meta">${classe}</div>
-                <div class="lcard-title">${p.title}</div>
-            </div>
-        `;
+        // Nuova struttura stile 5e
+card.innerHTML = `
+    <div class="lcard-body">
+        <div class="lcard-title">${p.title}</div>
+        <div class="lcard-meta">${classe}</div>
+    </div>
+`;
         // Usa la tua funzione gp() per aprire la pagina della sottoclasse
         card.onclick = () => window.gp(p.id, p.title, p.icon?.emoji || '📜');
         grid.appendChild(card);
