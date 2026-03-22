@@ -434,48 +434,48 @@ body.light .lcard:hover{box-shadow:0 14px 40px rgba(100,70,20,.15)!important}
     border-bottom: 2px solid var(--gold);
   }
 }
-/* ════════════════════════════════════
-   STILE MANUALE 5E - OVERRIDE TOTALE
-════════════════════════════════════ */
+/* ════════════════════════════════════════════════
+   OVERRIDE TOTALE E AGGRESSIVO - STILE 5E
+   Uso selettori concatenati per forzare la priorità
+   ════════════════════════════════════════════════ */
 
-/* Selettore ultra-specifico per battere le regole dell'index */
-body .wiki-layout .dnd-grid .lcard.dnd-5e {
-    background-color: #fdf1dc !important;
-    background-image: url('https://www.transparenttextures.com/patterns/parchment.png') !important; /* Effetto grana carta */
+/* Colpisce la card solo quando ha ENTRAMBE le classi e si trova nella griglia */
+html body .wiki-layout .dnd-grid .lcard.dnd-5e {
+    background: #fdf1dc !important; /* Pergamena */
     border: 1px solid #c9ad6a !important;
-    border-left: 5px solid #58180d !important; /* Tipica barra laterale rossa 5e */
-    border-radius: 0 !important;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.2) !important;
-    padding: 16px !important;
-    transition: all 0.2s ease-in-out !important;
+    border-left: 5px solid #58180d !important; /* Barra rossa laterale */
+    border-radius: 0px !important; /* Rimuove arrotondamento */
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3) !important;
+    padding: 18px !important;
+    height: auto !important;
 }
 
-body .wiki-layout .dnd-grid .lcard.dnd-5e:hover {
-    transform: translateX(5px) !important;
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.3) !important;
-    background-color: #f7e9c8 !important;
-}
-
-/* Titolo: Rosso PHB, Font Cinzel */
-body .wiki-layout .dnd-grid .lcard.dnd-5e .lcard-title {
-    font-family: 'Cinzel', serif !important;
+/* Titolo Rosso D&D */
+html body .wiki-layout .dnd-grid .lcard.dnd-5e .lcard-title {
     color: #58180d !important;
-    font-size: 1.25rem !important;
-    font-weight: 700 !important;
+    font-family: 'Cinzel', serif !important;
+    font-weight: 800 !important;
     text-transform: uppercase !important;
     border-bottom: 1px solid #c9ad6a !important;
-    margin-bottom: 4px !important;
-    padding-bottom: 2px !important;
-    letter-spacing: 0.5px !important;
+    margin-bottom: 5px !important;
+    font-size: 1.15rem !important;
+    background: none !important; /* Rimuove eventuali gradienti di fondo */
 }
 
-/* Sottotitolo: Italico elegante */
-body .wiki-layout .dnd-grid .lcard.dnd-5e .lcard-meta {
-    font-family: 'Crimson Pro', serif !important;
+/* Sottotitolo Classe (es. Guerriero) */
+html body .wiki-layout .dnd-grid .lcard.dnd-5e .lcard-meta {
     color: #1a1a1a !important;
+    font-family: 'Crimson Pro', serif !important;
     font-style: italic !important;
-    font-size: 0.9rem !important;
+    font-size: 0.95rem !important;
     font-weight: 600 !important;
+    opacity: 1 !important;
     text-transform: none !important;
-    opacity: 0.8 !important;
+}
+
+/* Effetto Hover pergamena */
+html body .wiki-layout .dnd-grid .lcard.dnd-5e:hover {
+    background-color: #f7e9c8 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 4px 4px 15px rgba(0,0,0,0.4) !important;
 }
