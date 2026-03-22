@@ -35,6 +35,22 @@ function buildCrumb(currentLabel){
 ════════════════════════════════════ */
 async function gp(id,label,icon,_fromPop){
   if(!id||id==='undefined'||id==='null')return;
+   if (id === '2f70274fdc1c803ca5cafa97ca1817cd') {
+        const container = document.getElementById('page-content'); 
+        if (container && window.loadSubclassGallery) {
+            window.loadSubclassGallery(container);
+            
+            if(!_fromPop){
+                navStack.push({id:id, label:label, icon:icon});
+                history.pushState({id:id, label:label, icon:icon, stack:navStack.slice(0,-1)}, '', location.pathname+'?p='+id);
+            }
+            
+            // Pulisce l'header della pagina per far spazio alla galleria
+            document.getElementById('ph-title').textContent = label || 'Sottoclassi';
+            if(window.cv) window.cv(); 
+            return; // Blocca il caricamento standard di Notion
+        }
+    }
 
   if(!_fromPop){
     navStack.push({id:id,label:label,icon:icon});
