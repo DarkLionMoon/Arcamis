@@ -434,4 +434,74 @@ body.light .lcard:hover{box-shadow:0 14px 40px rgba(100,70,20,.15)!important}
     border-bottom: 2px solid var(--gold);
   }
 }
+/* ════════════════════════════════════
+   STILE MANUALE D&D 5E (FORZATO)
+   Applicato tramite classe .dnd-5e
+════════════════════════════════════ */
 
+/* La Card come pergamena */
+.dnd-grid .lcard.dnd-5e {
+    background: #fdf1dc !important; /* Colore pergamena classica */
+    border: 2px solid #58180d !important; /* Rosso scuro tipico 5e */
+    border-image: none !important;
+    border-radius: 0 !important; /* Via i bordi tondi moderni */
+    box-shadow: 4px 4px 15px rgba(0,0,0,0.3), inset 0 0 40px rgba(180,130,40,0.1) !important;
+    padding: 18px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+/* Hover: leggero sollevamento */
+.dnd-grid .lcard.dnd-5e:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 6px 6px 20px rgba(0,0,0,0.4) !important;
+    background: #f9eccd !important;
+}
+
+/* Titolo della Sottoclasse */
+.dnd-grid .lcard.dnd-5e .lcard-title {
+    font-family: 'Cinzel', serif !important;
+    color: #58180d !important; /* Rosso PHB */
+    font-size: 1.3rem !important;
+    font-weight: 800 !important;
+    border-bottom: 1px solid #58180d !important;
+    margin-bottom: 6px !important;
+    padding-bottom: 4px !important;
+    text-transform: capitalize !important;
+    letter-spacing: 0px !important;
+}
+
+/* Nome della Classe (es. Guerriero) */
+.dnd-grid .lcard.dnd-5e .lcard-meta {
+    font-family: 'Crimson Pro', 'Georgia', serif !important;
+    color: #1a1a1a !important; /* Testo quasi nero per contrasto su crema */
+    font-style: italic !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0.5px !important;
+    opacity: 0.9 !important;
+}
+
+/* Decorazione ad angolo (triangolino rosso tipico dei box 5e) */
+.dnd-grid .lcard.dnd-5e::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 15px 15px 0 0;
+    border-color: #58180d transparent transparent transparent;
+    opacity: 0.8;
+}
+
+/* Fix per Mobile: Griglia Paper */
+@media (max-width: 768px) {
+    .dnd-grid .lcard.dnd-5e {
+        min-height: 80px !important;
+    }
+}
