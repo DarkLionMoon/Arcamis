@@ -271,3 +271,108 @@ body.light .lcard:hover{box-shadow:0 14px 40px rgba(100,70,20,.15)!important}
   #tlt{font-size:10px;letter-spacing:.06em}
   .mn-item{padding:12px 16px;font-size:11.5px}
 }
+/* ════════════════════════════════════
+   WIKI & SOTTOCLASSI SECTION
+════════════════════════════════════ */
+.wiki-layout {
+  display: flex;
+  gap: 40px;
+  margin-top: 40px;
+  text-align: left;
+  align-items: flex-start;
+}
+
+.wiki-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 100px; /* Si blocca durante lo scroll */
+  padding-right: 20px;
+  border-right: 1px solid rgba(200, 155, 60, 0.15);
+}
+
+.sidebar-label {
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+#class-filter {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.f-item {
+  padding: 12px 18px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 2px solid transparent;
+  margin-bottom: 4px;
+}
+
+.f-item:hover {
+  color: var(--gold2);
+  background: rgba(200, 155, 60, 0.05);
+  border-left-color: rgba(200, 155, 60, 0.3);
+}
+
+.f-item.active {
+  color: var(--gold);
+  background: rgba(200, 155, 60, 0.08);
+  border-left-color: var(--gold);
+  font-weight: 700;
+  box-shadow: inset 10px 0 20px -10px rgba(200, 155, 60, 0.1);
+}
+
+/* Griglia Card */
+.dnd-grid {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  min-height: 400px;
+}
+
+/* Responsive per Mobile */
+@media (max-width: 900px) {
+  .wiki-layout {
+    flex-direction: column;
+  }
+  .wiki-sidebar {
+    width: 100%;
+    position: relative;
+    top: 0;
+    border-right: none;
+    border-bottom: 1px solid rgba(200, 155, 60, 0.15);
+    padding-right: 0;
+    padding-bottom: 20px;
+  }
+  #class-filter {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 10px;
+    scrollbar-width: none; /* Nasconde scrollbar su Firefox */
+  }
+  #class-filter::-webkit-scrollbar { display: none; } /* Nasconde scrollbar su Chrome/Safari */
+  .f-item {
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    padding: 8px 15px;
+  }
+  .f-item.active {
+    border-left: none;
+    border-bottom: 2px solid var(--gold);
+  }
+}
