@@ -108,12 +108,11 @@ export async function onRequest(context) {
       });
     }
 
-    /* ── Carica database ── */
+   /* ── Carica database ── */
     if (dbId) {
       const cleanId = dbId.replace(/-/g, '');
       const cacheKey = 'db_' + cleanId;
 
-      /* 1. Controlla KV cache */
       const cached = await KV.get(cacheKey);
       if (cached) {
         return new Response(cached, {
@@ -121,7 +120,6 @@ export async function onRequest(context) {
         });
       }
 
-      /* 2. Cache miss → chiama Notion */
       const res = await fetch('https://api.notion.com/v1/databases/' + cleanId + '/query', {
         method: 'POST',
         headers: notionHeaders,
@@ -131,7 +129,7 @@ export async function onRequest(context) {
       if (!res.ok) throw new Error('Notion DB error: ' + res.status);
       const data = await res.json();
 
-      // Mappatura pulita dei risultati
+      // FIXED: Cleaned up the mapping logic here
       const pages = data.results.map(p => {
         const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
         const title = titleProp
@@ -143,28 +141,17 @@ export async function onRequest(context) {
         const cover = p.cover
           ? (p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url))
           : null;
-        const classeProp = p.properties && (
-    p.properties['Classe'] || p.properties['classe'] || 
-    p.properties['Class'] || p.properties['class']
-  );
-  const classe = (classeProp && classeProp.select) ? classeProp.select.name : null;
-  
-  return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
-});
 
         const classeProp = p.properties && (
-          p.properties['Classe'] || p.properties['classe'] ||
+          p.properties['Classe'] || p.properties['classe'] || 
           p.properties['Class'] || p.properties['class']
         );
         const classe = (classeProp && classeProp.select) ? classeProp.select.name : null;
         
         return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
-      };
+      });
 
       const payload = JSON.stringify({ pages });
-
-      /* 3. Salva in KV */
-      // Ora questo await funzionerà perché la funzione onRequest è async
       await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
 
       return new Response(payload, {
@@ -172,12 +159,14 @@ export async function onRequest(context) {
       });
     }
 
-    finally { Response(JSON.stringify({ error: 'Parametro mancante' }), {
+    /* ── Fallback if no parameters match ── */
+    return new Response(JSON.stringify({ error: 'Parametro mancante' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json', ...cors }
     });
 
   } catch (e) {
+    /* ── Global Error Handler ── */
     return new Response(JSON.stringify({ error: e.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', ...cors }
