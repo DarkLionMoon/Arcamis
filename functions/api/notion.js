@@ -159,7 +159,7 @@ export async function onRequest(context) {
         const classe = (classeProp && classeProp.select) ? classeProp.select.name : null;
         
         return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
-      });
+      };
 
       const payload = JSON.stringify({ pages });
 
