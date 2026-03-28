@@ -426,7 +426,7 @@ async function _loadSingleDb(grid){
         +'</div></div>';
     }).join('');
      /* ── SPECIE HOMEBREW: layout sidebar + content ── */
-var SPECIE_DB = '2f00274fdc1c81a1bc4ddbf500704b80';
+var SPECIE_DB = '2f60274fdc1c80fba671c588ba93b116';
 if(dbId === SPECIE_DB){
   var specieHtml = '<div class="sp-layout">'
     + '<div class="sp-sidebar"><div class="sp-sidebar-title">Specie</div><ul class="sp-list">'
