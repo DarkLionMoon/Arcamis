@@ -5,8 +5,12 @@ var HB_SUBCLASS_DB_ID = '2f70274fdc1c80e3bdc7f95f81eb9cc0';
    Layout: sidebar classi | tab bar sottoclassi | contenuto
 ════════════════════════════════════ */
 
-window.loadSubclassGallery = function(container) {
-  container.innerHTML = '<div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div>';
+window.loadSubclassGallery = function(container, pages) {
+  if (pages && pages.length) {
+    _renderHbLayout(container, pages);
+    return;
+  }
+  container.innerHTML = '<div class="loader-dots">...';
   fetch('/api/notion?dbId=' + HB_SUBCLASS_DB_ID)
     .then(function(r){ return r.json(); })
     .then(function(data){ _renderHbLayout(container, data.pages || []); })
@@ -47,6 +51,15 @@ function _renderHbLayout(container, pages) {
         '</div>'+
       '</div>'+
     '</div>';
+    /* ── Salva i dati sul layout ── */
+  var layout = container.querySelector('.hbsc-layout');
+  if(layout) layout._hbscData = grouped;
+
+  /* ── Seleziona la prima classe automaticamente ── */
+  if(classi.length){
+    var firstItem = container.querySelector('.hbsc-class-item');
+    if(firstItem) hbscSelectClass(firstItem, classi[0]);
+  }
 
   /* ── Salva i dati raggruppati nel container per accesso globale ── */
   container._hbscData = grouped;
