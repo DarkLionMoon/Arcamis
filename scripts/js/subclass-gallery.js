@@ -66,7 +66,7 @@ window.hbscSelectClass = function(el, classe) {
   el.classList.add('active');
 
   /* Trova i dati */
-  var container = el.closest('.hb-subclass-container');
+  var container = el.closest('.hbsc-layout').parentElement;
   if(!container || !container._hbscData) return;
   var sottoclassi = container._hbscData[classe] || [];
 
