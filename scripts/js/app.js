@@ -38,6 +38,7 @@ function showHome(){
   document.body.classList.remove('page-open');
   var cv = document.querySelector('.ph-covbg');
   if(cv) cv.style.opacity = '0';
+  history.replaceState(null, '', location.pathname);
 }
 
 function ovo(){
