@@ -401,7 +401,6 @@ async function loadDbGalleries(container){
 
 async function _loadSingleDb(grid){
   var dbId=grid.id.replace('db-','');
-   console.log('dbId:', dbId);
   try{
     var r=await fetch('/api/notion?dbId='+dbId);
     if(!r.ok)throw new Error('HTTP '+r.status);
@@ -409,7 +408,32 @@ async function _loadSingleDb(grid){
     if(!data.pages||!data.pages.length){
       grid.innerHTML='<div class="n-db-loading">Nessun elemento trovato.</div>';return;
     }
-    var cardsHtml=sortedPages.map(function(p){
+
+    /* ── SPECIE HOMEBREW: layout sidebar + content ── */
+    var SPECIE_DB='2f60274fdc1c80fba671c588ba93b116';
+    if(dbId===SPECIE_DB){
+      var sortedPages=data.pages.slice().sort(function(a,b){return a.title.localeCompare(b.title,'it');});
+      var specieHtml='<div class="sp-layout">'
+        +'<div class="sp-sidebar"><div class="sp-sidebar-title">Specie</div><ul class="sp-list">'
+        +sortedPages.map(function(p){
+          var icon=p.icon||'📄';
+          var title=p.title.replace(/'/g,"\\'");
+          return'<li class="sp-item" onclick="spSelect(this,\''+p.id+'\',\''+title+'\',\''+icon+'\')">'+p.title+'</li>';
+        }).join('')
+        +'</ul></div>'
+        +'<div class="sp-content" id="sp-content"><div class="sp-placeholder">← Seleziona una specie</div></div>'
+        +'</div>';
+      var wrap=grid.closest('.n-db-wrap');
+      var titleEl=wrap?wrap.querySelector('.n-db-title'):null;
+      var titleHtml=titleEl?'<div class="n-db-title">'+titleEl.textContent+'</div>':'';
+      var uid='dblc-'+dbId;
+      if(wrap){wrap.outerHTML='<div class="n-db-lc-wrap" id="'+uid+'">'+titleHtml+specieHtml+'</div>';}
+      else{grid.outerHTML='<div>'+specieHtml+'</div>';}
+      _injectSpecieCSS();
+      return;
+    }
+
+    var cardsHtml=data.pages.map(function(p){
       var icon=p.icon||'📄';
       var acc=iconAccent(icon);
       var coverSafe=safeCoverUrl(p.cover);
@@ -425,24 +449,6 @@ async function _loadSingleDb(grid){
         +'<div class="loc-cta">APRI ◆</div>'
         +'</div></div>';
     }).join('');
-     /* ── SPECIE HOMEBREW: layout sidebar + content ── */
-var SPECIE_DB = '2f60274fdc1c80fba671c588ba93b116';
-if(dbId === SPECIE_DB){
-  var specieHtml = '<div class="sp-layout">'
-    + '<div class="sp-sidebar"><div class="sp-sidebar-title">Specie</div><ul class="sp-list">'
-    var sortedPages = data.pages.slice().sort(function(a,b){ return a.title.localeCompare(b.title,'it'); });
-        var icon = p.icon||'📄';
-        var title = p.title.replace(/'/g,"\\'");
-        return '<li class="sp-item" onclick="spSelect(this,\''+p.id+'\',\''+title+'\',\''+icon+'\')">'+p.title+'</li>';
-      }).join('')
-    + '</ul></div>'
-    + '<div class="sp-content" id="sp-content"><div class="sp-placeholder">← Seleziona una specie</div></div>'
-    + '</div>';
-  if(wrap){ wrap.outerHTML='<div class="n-db-lc-wrap" id="'+uid+'">'+titleHtml+specieHtml+'</div>'; }
-  else{ grid.outerHTML='<div>'+specieHtml+'</div>'; }
-  _injectSpecieCSS();
-  return;
-}
     var wrap=grid.closest('.n-db-wrap');
     var titleEl=wrap?wrap.querySelector('.n-db-title'):null;
     var titleHtml=titleEl?'<div class="n-db-title">'+titleEl.textContent+'</div>':'';
@@ -471,30 +477,6 @@ if(dbId === SPECIE_DB){
     grid.innerHTML='<div class="n-db-loading">⚠️ Errore caricamento.</div>';
   }
 }
-window.spSelect = function(el, id, title, icon){
-  document.querySelectorAll('.sp-item').forEach(function(i){ i.classList.remove('active'); });
-  el.classList.add('active');
-  var content = document.getElementById('sp-content');
-  if(!content) return;
-  content.innerHTML = '<div class="sp-loading"><div class="gs-loading-spin"></div></div>';
-  
-  fetch('/api/notion?pageId=' + id)
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(!data.blocks) throw new Error('no blocks');
-      var html = renderBlocks(data.blocks, true);
-      content.innerHTML = '<div class="n-body">'
-        + '<div class="sp-content-title">'
-        + (icon && icon !== '📄' ? '<span style="font-size:1.4em;margin-right:10px">'+icon+'</span>' : '')
-        + title
-        + '</div>'
-        + html
-        + '</div>';
-    })
-    .catch(function(){
-      content.innerHTML = '<div style="color:rgba(200,155,60,.4);font-family:Cinzel,serif;font-size:11px;padding:40px;text-align:center">Errore caricamento</div>';
-    });
-};
 
 function _injectSpecieCSS(){
   if(document.getElementById('specie-css')) return;
