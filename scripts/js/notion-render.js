@@ -279,12 +279,8 @@ function renderBlocks(blocks,isRoot){
 
 case 'child_database':
   var dbRawId = b.id.replace(/-/g, '');
-  console.log('child_database id:', dbRawId);
   if (dbRawId === GALLERY_DB_ID) {
     h += '<div class="gs-container" id="gs-' + dbRawId + '"></div>';
-  } else if (dbRawId === '2f70274fdc1c80e3bdc7f95f81eb9cc0') {
-    /* Sottoclassi Homebrew — layout sidebar+content */
-    h += '<div class="hb-subclass-container" id="hbsc-' + dbRawId + '"></div>';
   } else {
     h += '<div class="n-db-wrap">'
       + (d.title ? '<div class="n-db-title">' + d.title + '</div>' : '')
@@ -433,6 +429,21 @@ async function _loadSingleDb(grid){
       _injectSpecieCSS();
       return;
     }
+     var SUBCLASS_DB = '2f70274fdc1c80e3bdc7f95f81eb9cc0';
+  if (dbId === SUBCLASS_DB) {
+    var wrap = grid.closest('.n-db-wrap');
+    var titleEl = wrap ? wrap.querySelector('.n-db-title') : null;
+    var titleHtml = titleEl ? '<div class="n-db-title">' + titleEl.textContent + '</div>' : '';
+    var uid = 'dblc-' + dbId;
+    if (wrap) {
+      wrap.outerHTML = '<div class="n-db-lc-wrap" id="' + uid + '"><div id="hbsc-inner-' + dbId + '"></div></div>';
+    }
+    var innerEl = document.getElementById('hbsc-inner-' + dbId);
+    if (innerEl && window.loadSubclassGallery) {
+      window.loadSubclassGallery(innerEl, data.pages);
+    }
+    return;
+  }
 
     var cardsHtml=data.pages.map(function(p){
       var icon=p.icon||'📄';
