@@ -532,3 +532,26 @@ function _injectSpecieCSS(){
   `;
   document.head.appendChild(s);
 }
+window.spSelect = function(el, id, title, icon){
+  document.querySelectorAll('.sp-item').forEach(function(i){ i.classList.remove('active'); });
+  el.classList.add('active');
+  var content = document.getElementById('sp-content');
+  if(!content) return;
+  content.innerHTML = '<div class="sp-loading"><div class="gs-loading-spin"></div></div>';
+  fetch('/api/notion?pageId=' + id)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.blocks) throw new Error('no blocks');
+      var html = renderBlocks(data.blocks, true);
+      content.innerHTML = '<div class="n-body">'
+        + '<div class="sp-content-title">'
+        + (icon && icon !== '📄' ? '<span style="font-size:1.4em;margin-right:10px">'+icon+'</span>' : '')
+        + title
+        + '</div>'
+        + html
+        + '</div>';
+    })
+    .catch(function(){
+      content.innerHTML = '<div style="color:rgba(200,155,60,.4);font-family:Cinzel,serif;font-size:11px;padding:40px;text-align:center">Errore caricamento</div>';
+    });
+};
