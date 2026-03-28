@@ -93,10 +93,23 @@ window.tlCloseModal = function() {
 };
 
 function _tlOpenModal(ev) {
-  document.getElementById('tl-m-year').textContent = ev.title;
-  document.getElementById('tl-m-title').textContent = ev.description || '';
   var bg = document.getElementById('tl-modal-bg');
-  if (bg) bg.classList.add('open');
+  if (!bg) return;
+  document.getElementById('tl-m-year').textContent = ev.title;
+  document.getElementById('tl-m-title').textContent = '';
+  document.getElementById('tl-m-content').innerHTML = '<div class="tl-modal-loading"><div class="gs-loading-spin"></div></div>';
+  bg.classList.add('open');
+
+  fetch('/api/notion?pageId=' + ev.id)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.blocks) throw new Error('no blocks');
+      var html = renderBlocks(data.blocks, true);
+      document.getElementById('tl-m-content').innerHTML = '<div class="n-body">' + html + '</div>';
+    })
+    .catch(function(){
+      document.getElementById('tl-m-content').innerHTML = '<div class="tl-modal-error">Errore caricamento</div>';
+    });
 }
 
 function _injectTimelineCSS() {
