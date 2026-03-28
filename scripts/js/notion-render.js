@@ -279,6 +279,7 @@ function renderBlocks(blocks,isRoot){
 
 case 'child_database':
   var dbRawId = b.id.replace(/-/g, '');
+  console.log('child_database id:', dbRawId);
   if (dbRawId === GALLERY_DB_ID) {
     h += '<div class="gs-container" id="gs-' + dbRawId + '"></div>';
   } else if (dbRawId === '2f70274fdc1c803ca5cafa97ca1817cd') {
