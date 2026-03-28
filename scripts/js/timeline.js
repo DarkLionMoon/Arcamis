@@ -63,12 +63,13 @@ window.renderTimeline = function(container, pages) {
     var modalBg = document.createElement('div');
     modalBg.className = 'tl-modal-bg';
     modalBg.id = 'tl-modal-bg';
-    modalBg.innerHTML =
-      '<div class="tl-modal">' +
-        '<div class="tl-modal-close" onclick="tlCloseModal()">✕ CHIUDI</div>' +
-        '<div class="tl-modal-year" id="tl-m-year"></div>' +
-        '<div class="tl-modal-title" id="tl-m-title"></div>' +
-      '</div>';
+   modalBg.innerHTML =
+  '<div class="tl-modal">' +
+    '<div class="tl-modal-close" onclick="tlCloseModal()">✕ CHIUDI</div>' +
+    '<div class="tl-modal-year" id="tl-m-year"></div>' +
+    '<div class="tl-modal-title" id="tl-m-title"></div>' +
+    '<div class="tl-modal-content" id="tl-m-content"></div>' +
+  '</div>';
     modalBg.addEventListener('click', function(e) { if (e.target === modalBg) tlCloseModal(); });
     document.body.appendChild(modalBg);
   }
