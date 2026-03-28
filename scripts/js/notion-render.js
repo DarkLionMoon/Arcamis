@@ -428,6 +428,23 @@ async function _loadSingleDb(grid){
       else{grid.outerHTML='<div>'+specieHtml+'</div>';}
       _injectSpecieCSS();
       return;
+      return;
+}
+
+/* ── TIMELINE AETHERION ── */
+var TIMELINE_DB = '2fc0274fdc1c800f8ac0d6d03b255cad';
+if (dbId === TIMELINE_DB) {
+  var wrap = grid.closest('.n-db-wrap');
+  var uid = 'tl-' + dbId;
+  if (wrap) {
+    wrap.outerHTML = '<div class="n-db-lc-wrap" id="' + uid + '"></div>';
+  }
+  var tlContainer = document.getElementById(uid);
+  if (tlContainer && window.renderTimeline) {
+    window.renderTimeline(tlContainer, data.pages);
+  }
+  return;
+}
     }
      var SUBCLASS_DB = '2f70274fdc1c80e3bdc7f95f81eb9cc0';
   if (dbId === SUBCLASS_DB) {
