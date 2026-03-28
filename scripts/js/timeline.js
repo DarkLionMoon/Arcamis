@@ -118,6 +118,9 @@ function _injectTimelineCSS() {
   var s = document.createElement('style');
   s.id = 'tl-css';
   s.textContent = `
+.tl-modal-content{margin-top:12px;max-height:60vh;overflow-y:auto;}
+.tl-modal-loading{display:flex;justify-content:center;padding:40px 0;}
+.tl-modal-error{color:rgba(200,155,60,.4);font-family:'Cinzel',serif;font-size:11px;padding:20px;text-align:center;}
 .tl-wrap{width:100%;overflow-x:auto;overflow-y:visible;padding:20px 0 24px;cursor:grab;user-select:none}
 .tl-wrap.grabbing{cursor:grabbing}
 .tl-inner{position:relative;display:inline-flex;align-items:center;min-width:max-content;padding:140px 60px}
