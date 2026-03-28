@@ -1,4 +1,4 @@
-var HB_SUBCLASS_DB_ID = '2f70274fdc1c803ca5cafa97ca1817cd';
+var HB_SUBCLASS_DB_ID = '2f70274fdc1c80e3bdc7f95f81eb9cc0';
 
 /* ════════════════════════════════════
    SUBCLASS GALLERY
