@@ -29,6 +29,7 @@ export async function onRequest(context) {
       const id = pageId || dbId;
       if (id) {
         await KV.delete('pg_' + id.replace(/-/g, ''));
+        await KV.delete('db_' + id.replace(/-/g, ''));
         return new Response(JSON.stringify({ purged: id }), {
           headers: { 'Content-Type': 'application/json', ...cors }
         });
