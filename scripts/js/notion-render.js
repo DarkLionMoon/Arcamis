@@ -36,7 +36,7 @@ var mapPageIds = new Set([
 ]);
 
 /* ── Accent color dall'icona ── */
-function iconAccent(emoji){
+window.iconAccent = function(emoji){
   if(!emoji)return{c:'rgba(200,155,60,.7)',bg:'rgba(200,155,60,.06)'};
   var e=emoji;
   if(['🔥','⚔️','🗡️','⚠️','🛡️','⚡','🐉','💀'].indexOf(e)>-1)return{c:'rgba(220,70,50,.75)',bg:'rgba(180,50,40,.06)'};
