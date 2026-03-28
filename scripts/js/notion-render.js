@@ -401,6 +401,7 @@ async function loadDbGalleries(container){
 
 async function _loadSingleDb(grid){
   var dbId=grid.id.replace('db-','');
+   console.log('dbId:', dbId);
   try{
     var r=await fetch('/api/notion?dbId='+dbId);
     if(!r.ok)throw new Error('HTTP '+r.status);
