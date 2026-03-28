@@ -109,38 +109,64 @@ export async function onRequest(context) {
     }
 
    /* ── Carica database ── */
-    if (dbId) {
-      const cleanId = dbId.replace(/-/g, '');
-      const cacheKey = 'db_' + cleanId;
+if (dbId) {
+  const cleanId = dbId.replace(/-/g, '');
+  const cacheKey = 'db_' + cleanId;
 
-      const cached = await KV.get(cacheKey);
-      if (cached) {
-        return new Response(cached, {
-          headers: { 'Content-Type': 'application/json', 'X-Cache': 'HIT', ...cors }
-        });
-      }
+  const cached = await KV.get(cacheKey);
+  if (cached) {
+    return new Response(cached, {
+      headers: { 'Content-Type': 'application/json', 'X-Cache': 'HIT', ...cors }
+    });
+  }
 
-      const res = await fetch('https://api.notion.com/v1/databases/' + cleanId + '/query', {
-        method: 'POST',
-        headers: notionHeaders,
-        body: JSON.stringify({ page_size: 100 })
-      });
-      
-      if (!res.ok) throw new Error('Notion DB error: ' + res.status);
-      const data = await res.json();
+  const TIMELINE_DB = '2fc0274fdc1c800f8ac0d6d03b255cad';
 
-      // FIXED: Cleaned up the mapping logic here
-      const pages = data.results.map(p => {
-        ...
-      });
+  const queryBody = cleanId === TIMELINE_DB.replace(/-/g, '')
+    ? { page_size: 100, sorts: [{ property: 'Order', direction: 'ascending' }] }
+    : { page_size: 100 };
 
-      const payload = JSON.stringify({ pages });
-      await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+  const res = await fetch('https://api.notion.com/v1/databases/' + cleanId + '/query', {
+    method: 'POST',
+    headers: notionHeaders,
+    body: JSON.stringify(queryBody)
+  });
 
-      return new Response(payload, {
-        headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
-      });
-    }
+  if (!res.ok) throw new Error('Notion DB error: ' + res.status);
+  const data = await res.json();
+
+  const pages = data.results.map(p => {
+    const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
+    const title = titleProp
+      ? (titleProp.title || []).map(t => t.plain_text).join('')
+      : 'Senza titolo';
+
+    const icon = p.icon && p.icon.emoji ? p.icon.emoji : '📄';
+
+    const cover = p.cover
+      ? (p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url))
+      : null;
+
+    const classeProp = p.properties && (
+      p.properties['Classe'] || p.properties['classe'] ||
+      p.properties['Class'] || p.properties['class']
+    );
+    const classe = classeProp
+      ? (classeProp.type === 'multi_select' && classeProp.multi_select.length)
+        ? classeProp.multi_select.map(function(s){ return s.name; }).join(', ')
+        : (classeProp.select ? classeProp.select.name : null)
+      : null;
+
+    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
+  });
+
+  const payload = JSON.stringify({ pages });
+  await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+
+  return new Response(payload, {
+    headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
+  });
+}
 
     /* ── Fallback if no parameters match ── */
     return new Response(JSON.stringify({ error: 'Parametro mancante' }), {
