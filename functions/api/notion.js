@@ -131,28 +131,7 @@ export async function onRequest(context) {
 
       // FIXED: Cleaned up the mapping logic here
       const pages = data.results.map(p => {
-        const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
-        const title = titleProp
-          ? (titleProp.title || []).map(t => t.plain_text).join('')
-          : 'Senza titolo';
-        
-        const icon = p.icon && p.icon.emoji ? p.icon.emoji : '📄';
-        
-        const cover = p.cover
-          ? (p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url))
-          : null;
-
-        const classeProp = p.properties && (
-          p.properties['Classe'] || p.properties['classe'] || 
-          p.properties['Class'] || p.properties['class']
-        );
-        const classe = classeProp
-  ? (classeProp.type === 'multi_select' && classeProp.multi_select.length)
-    ? classeProp.multi_select.map(function(s){ return s.name; }).join(', ')
-    : (classeProp.select ? classeProp.select.name : null)
-  : null;
-        
-        return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
+        ...
       });
 
       const payload = JSON.stringify({ pages });
