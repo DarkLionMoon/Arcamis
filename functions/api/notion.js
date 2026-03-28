@@ -146,7 +146,11 @@ export async function onRequest(context) {
           p.properties['Classe'] || p.properties['classe'] || 
           p.properties['Class'] || p.properties['class']
         );
-        const classe = (classeProp && classeProp.select) ? classeProp.select.name : null;
+        const classe = classeProp
+  ? (classeProp.type === 'multi_select' && classeProp.multi_select.length)
+    ? classeProp.multi_select.map(function(s){ return s.name; }).join(', ')
+    : (classeProp.select ? classeProp.select.name : null)
+  : null;
         
         return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
       });
