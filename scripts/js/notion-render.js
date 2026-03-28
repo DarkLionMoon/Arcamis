@@ -477,7 +477,23 @@ window.spSelect = function(el, id, title, icon){
   var content = document.getElementById('sp-content');
   if(!content) return;
   content.innerHTML = '<div class="sp-loading"><div class="gs-loading-spin"></div></div>';
-  gp(id, title, icon, true);
+  
+  fetch('/api/notion?pageId=' + id)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.blocks) throw new Error('no blocks');
+      var html = renderBlocks(data.blocks, true);
+      content.innerHTML = '<div class="n-body">'
+        + '<div class="sp-content-title">'
+        + (icon && icon !== '📄' ? '<span style="font-size:1.4em;margin-right:10px">'+icon+'</span>' : '')
+        + title
+        + '</div>'
+        + html
+        + '</div>';
+    })
+    .catch(function(){
+      content.innerHTML = '<div style="color:rgba(200,155,60,.4);font-family:Cinzel,serif;font-size:11px;padding:40px;text-align:center">Errore caricamento</div>';
+    });
 };
 
 function _injectSpecieCSS(){
@@ -523,6 +539,13 @@ function _injectSpecieCSS(){
 @media(max-width:600px){
   .sp-layout{grid-template-columns:1fr;}
   .sp-sidebar{border-right:none;border-bottom:1px solid rgba(200,155,60,.15);max-height:200px;}
+}
+.sp-content-title{
+  font-family:'Cinzel',serif;font-size:22px;font-weight:700;
+  color:var(--gold2,#c89b3c);letter-spacing:.06em;
+  margin-bottom:24px;padding-bottom:16px;
+  border-bottom:1px solid rgba(200,155,60,.2);
+  display:flex;align-items:center;
 }
   `;
   document.head.appendChild(s);
