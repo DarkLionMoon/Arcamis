@@ -487,7 +487,8 @@ function _injectSpecieCSS(){
   s.textContent = `
 .sp-layout{
   display:grid;grid-template-columns:240px 1fr;gap:0;
-  min-height:500px;border:1px solid rgba(200,155,60,.15);
+  min-height:600px;border:1px solid rgba(200,155,60,.15);
+  width:100%;max-width:100%;
 }
 .sp-sidebar{
   border-right:1px solid rgba(200,155,60,.15);
@@ -512,7 +513,7 @@ function _injectSpecieCSS(){
 }
 .sp-content{
   padding:28px 32px;background:rgba(6,8,18,.4);
-  overflow-y:auto;max-height:80vh;
+  overflow-y:auto;max-height:90vh;
 }
 .sp-placeholder{
   font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;
