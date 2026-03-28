@@ -1,81 +1,271 @@
 var HB_SUBCLASS_DB_ID = '2f70274fdc1c803ca5cafa97ca1817cd';
 
-// Questa è la funzione principale che devi chiamare
-window.loadSubclassGallery = function(container) {
-    container.innerHTML = '<div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div>';
+/* ════════════════════════════════════
+   SUBCLASS GALLERY
+   Layout: sidebar classi | tab bar sottoclassi | contenuto
+════════════════════════════════════ */
 
-    fetch('/api/notion?dbId=' + HB_SUBCLASS_DB_ID)
-        .then(r => r.json())
-        .then(data => {
-            _renderHbLayout(container, data.pages || []);
-        })
-        .catch(err => {
-            container.innerHTML = '<p class="sec-p">Errore nel risveglio delle pergamene.</p>';
-            console.error(err);
-        });
+window.loadSubclassGallery = function(container) {
+  container.innerHTML = '<div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div>';
+  fetch('/api/notion?dbId=' + HB_SUBCLASS_DB_ID)
+    .then(function(r){ return r.json(); })
+    .then(function(data){ _renderHbLayout(container, data.pages || []); })
+    .catch(function(err){
+      container.innerHTML = '<p class="sec-p">Errore nel risveglio delle pergamene.</p>';
+      console.error(err);
+    });
 };
 
 function _renderHbLayout(container, pages) {
-    // 1. Creiamo la struttura Wiki (Sidebar + Griglia)
-    container.innerHTML = `
-        <div class="wiki-layout">
-            <aside class="wiki-sidebar">
-                <div class="sidebar-label">Filtra Classi</div>
-                <ul id="class-filter">
-                    <li class="f-item active" data-class="all">Tutte</li>
-                    <li class="f-item" data-class="Guerriero">Guerriero</li>
-                    <li class="f-item" data-class="Mago">Mago</li>
-                    <li class="f-item" data-class="Ladro">Ladro</li>
-                    <li class="f-item" data-class="Chierico">Chierico</li>
-                    <li class="f-item" data-class="Barbaro">Barbaro</li>
-                    <li class="f-item" data-class="Bardo">Bardo</li>
-                    <li class="f-item" data-class="Druido">Druido</li>
-                    <li class="f-item" data-class="Monaco">Monaco</li>
-                    <li class="f-item" data-class="Paladino">Paladino</li>
-                    <li class="f-item" data-class="Ranger">Ranger</li>
-                    <li class="f-item" data-class="Stregone">Stregone</li>
-                    <li class="f-item" data-class="Warlock">Warlock</li>
-                </ul>
-            </aside>
-            <main class="dnd-grid" id="hb-gallery-grid">
-                </main>
-        </div>
-    `;
+  /* ── Raggruppa per classe, ordina classi e sottoclassi ── */
+  var grouped = {};
+  pages.forEach(function(p){
+    var cl = p.classe || 'Altra';
+    if(!grouped[cl]) grouped[cl] = [];
+    grouped[cl].push(p);
+  });
+  var classi = Object.keys(grouped).sort(function(a,b){ return a.localeCompare(b,'it'); });
+  classi.forEach(function(cl){
+    grouped[cl].sort(function(a,b){ return a.title.localeCompare(b.title,'it'); });
+  });
 
-    const grid = document.getElementById('hb-gallery-grid');
+  /* ── Struttura HTML ── */
+  var sidebarItems = classi.map(function(cl){
+    return '<li class="hbsc-class-item" data-classe="'+cl+'" onclick="hbscSelectClass(this,\''+cl+'\')">'+cl+'</li>';
+  }).join('');
 
-    // 2. Generiamo le card nere (lcard)
-    pages.forEach(p => {
-        const classe = p.classe || 'Generica';
-        const card = document.createElement('div');
-        card.className = 'lcard dnd-5e fade-in';
-        card.setAttribute('data-class', classe);
-        // Nuova struttura stile 5e
-card.innerHTML = `
-    <div class="lcard-body">
-        <div class="lcard-title">${p.title}</div>
-        <div class="lcard-meta">${classe}</div>
-    </div>
-`;
-        // Usa la tua funzione gp() per aprire la pagina della sottoclasse
-        card.onclick = () => window.gp(p.id, p.title, p.icon?.emoji || '📜');
-        grid.appendChild(card);
+  container.innerHTML =
+    '<div class="hbsc-layout">'+
+      '<aside class="hbsc-sidebar">'+
+        '<div class="hbsc-sidebar-title">Classi</div>'+
+        '<ul class="hbsc-class-list">'+sidebarItems+'</ul>'+
+      '</aside>'+
+      '<div class="hbsc-main">'+
+        '<div class="hbsc-tabs" id="hbsc-tabs"></div>'+
+        '<div class="hbsc-content" id="hbsc-content">'+
+          '<div class="hbsc-placeholder">← Seleziona una classe</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+
+  /* ── Salva i dati raggruppati nel container per accesso globale ── */
+  container._hbscData = grouped;
+
+  /* ── Seleziona la prima classe automaticamente ── */
+  if(classi.length){
+    var firstItem = container.querySelector('.hbsc-class-item');
+    if(firstItem) hbscSelectClass(firstItem, classi[0]);
+  }
+
+  _injectHbscCSS();
+}
+
+window.hbscSelectClass = function(el, classe) {
+  /* Aggiorna sidebar active */
+  document.querySelectorAll('.hbsc-class-item').forEach(function(i){ i.classList.remove('active'); });
+  el.classList.add('active');
+
+  /* Trova i dati */
+  var container = el.closest('.hb-subclass-container');
+  if(!container || !container._hbscData) return;
+  var sottoclassi = container._hbscData[classe] || [];
+
+  /* Renderizza tab bar */
+  var tabsEl = document.getElementById('hbsc-tabs');
+  var contentEl = document.getElementById('hbsc-content');
+  if(!tabsEl || !contentEl) return;
+
+  tabsEl.innerHTML = sottoclassi.map(function(p, i){
+    var titleSafe = p.title.replace(/'/g, "\\'");
+    return '<div class="hbsc-tab" data-id="'+p.id+'" data-title="'+titleSafe+'" onclick="hbscSelectTab(this,\''+p.id+'\',\''+titleSafe+'\')">'+p.title+'</div>';
+  }).join('');
+
+  contentEl.innerHTML = '<div class="hbsc-placeholder">↑ Seleziona una sottoclasse</div>';
+
+  /* Seleziona automaticamente la prima tab */
+  if(sottoclassi.length){
+    var firstTab = tabsEl.querySelector('.hbsc-tab');
+    if(firstTab) hbscSelectTab(firstTab, sottoclassi[0].id, sottoclassi[0].title);
+  }
+};
+
+window.hbscSelectTab = function(el, pageId, title) {
+  /* Aggiorna tab active */
+  document.querySelectorAll('.hbsc-tab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+
+  var contentEl = document.getElementById('hbsc-content');
+  if(!contentEl) return;
+
+  contentEl.innerHTML = '<div class="hbsc-loading"><div class="gs-loading-spin"></div></div>';
+
+  fetch('/api/notion?pageId=' + pageId)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.blocks) throw new Error('no blocks');
+      var html = renderBlocks(data.blocks, true);
+      contentEl.innerHTML =
+        '<div class="n-body">'+
+          '<div class="hbsc-content-title">'+title+'</div>'+
+          html+
+        '</div>';
+    })
+    .catch(function(){
+      contentEl.innerHTML = '<div class="hbsc-error">Errore caricamento</div>';
     });
+};
 
-    // 3. Colleghiamo i filtri della sidebar
-    document.querySelectorAll('.f-item').forEach(btn => {
-        btn.onclick = function() {
-            const filter = this.getAttribute('data-class');
-            
-            // UI Update: sposta la classe active
-            document.querySelectorAll('.f-item').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
+function _injectHbscCSS(){
+  if(document.getElementById('hbsc-css')) return;
+  var s = document.createElement('style');
+  s.id = 'hbsc-css';
+  s.textContent = `
+/* ── Layout principale ── */
+.hbsc-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 600px;
+  border: 1px solid rgba(200,155,60,.15);
+  width: 100%;
+}
 
-            // Nascondi/Mostra le card
-            document.querySelectorAll('.lcard').forEach(card => {
-                const cardClass = card.getAttribute('data-class');
-                card.style.display = (filter === 'all' || cardClass === filter) ? 'flex' : 'none';
-            });
-        };
-    });
+/* ── Sidebar classi ── */
+.hbsc-sidebar {
+  border-right: 1px solid rgba(200,155,60,.15);
+  background: rgba(4,6,14,.6);
+  overflow-y: auto;
+}
+.hbsc-sidebar-title {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .25em;
+  color: rgba(200,155,60,.5);
+  padding: 16px 18px 10px;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(200,155,60,.1);
+}
+.hbsc-class-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+.hbsc-class-item {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: rgba(240,230,200,.6);
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: .15s;
+  border-left: 2px solid transparent;
+}
+.hbsc-class-item:hover {
+  color: rgba(240,230,200,.95);
+  background: rgba(200,155,60,.06);
+}
+.hbsc-class-item.active {
+  color: var(--gold2, #c89b3c);
+  background: rgba(200,155,60,.1);
+  border-left-color: rgba(200,155,60,.7);
+}
+
+/* ── Area destra ── */
+.hbsc-main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Tab bar sottoclassi ── */
+.hbsc-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 12px 16px 0;
+  border-bottom: 1px solid rgba(200,155,60,.15);
+  background: rgba(4,6,14,.4);
+}
+.hbsc-tab {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: .06em;
+  color: rgba(240,230,200,.5);
+  padding: 7px 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  transition: .15s;
+  margin-bottom: -1px;
+  position: relative;
+}
+.hbsc-tab:hover {
+  color: rgba(240,230,200,.85);
+  background: rgba(200,155,60,.06);
+  border-color: rgba(200,155,60,.15);
+}
+.hbsc-tab.active {
+  color: var(--gold2, #c89b3c);
+  background: rgba(6,8,18,.9);
+  border-color: rgba(200,155,60,.3);
+  border-bottom-color: rgba(6,8,18,.9);
+}
+
+/* ── Contenuto pagina ── */
+.hbsc-content {
+  flex: 1;
+  padding: 28px 32px;
+  background: rgba(6,8,18,.4);
+  overflow-y: auto;
+  max-height: 80vh;
+}
+.hbsc-placeholder {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: .1em;
+  color: rgba(200,155,60,.25);
+  padding: 60px 0;
+  text-align: center;
+}
+.hbsc-loading {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+.hbsc-error {
+  color: rgba(200,155,60,.4);
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  padding: 40px;
+  text-align: center;
+}
+.hbsc-content-title {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold2, #c89b3c);
+  letter-spacing: .06em;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(200,155,60,.2);
+}
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .hbsc-layout {
+    grid-template-columns: 1fr;
+  }
+  .hbsc-sidebar {
+    border-right: none;
+    border-bottom: 1px solid rgba(200,155,60,.15);
+    max-height: 180px;
+  }
+  .hbsc-content {
+    padding: 20px 16px;
+    max-height: none;
+  }
+}
+  `;
+  document.head.appendChild(s);
 }
