@@ -282,7 +282,7 @@ case 'child_database':
   console.log('child_database id:', dbRawId);
   if (dbRawId === GALLERY_DB_ID) {
     h += '<div class="gs-container" id="gs-' + dbRawId + '"></div>';
-  } else if (dbRawId === '2f70274fdc1c803ca5cafa97ca1817cd') {
+  } else if (dbRawId === '2f70274fdc1c80e3bdc7f95f81eb9cc0') {
     /* Sottoclassi Homebrew — layout sidebar+content */
     h += '<div class="hb-subclass-container" id="hbsc-' + dbRawId + '"></div>';
   } else {
