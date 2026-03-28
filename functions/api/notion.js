@@ -134,6 +134,15 @@ if (dbId) {
 
   if (!res.ok) throw new Error('Notion DB error: ' + res.status);
   const data = await res.json();
+  if (cleanId === TIMELINE_DB.replace(/-/g, '')) {
+  data.results.sort(function(a, b) {
+    const getOrder = function(p) {
+      const prop = p.properties && (p.properties['Order'] || p.properties['Ordine'] || p.properties['order']);
+      return (prop && prop.number != null) ? prop.number : 9999;
+    };
+    return getOrder(a) - getOrder(b);
+  });
+}
 
   const pages = data.results.map(p => {
     const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
