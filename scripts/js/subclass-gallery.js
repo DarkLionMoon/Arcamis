@@ -79,9 +79,9 @@ window.hbscSelectClass = function(el, classe) {
   el.classList.add('active');
 
   /* Trova i dati */
-  var container = el.closest('.hbsc-layout').parentElement;
-  if(!container || !container._hbscData) return;
-  var sottoclassi = container._hbscData[classe] || [];
+  var layout = el.closest('.hbsc-layout');
+if(!layout || !layout._hbscData) return;
+var sottoclassi = layout._hbscData[classe] || [];
 
   /* Renderizza tab bar */
   var tabsEl = document.getElementById('hbsc-tabs');
