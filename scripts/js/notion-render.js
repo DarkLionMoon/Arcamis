@@ -424,6 +424,24 @@ async function _loadSingleDb(grid){
         +'<div class="loc-cta">APRI ◆</div>'
         +'</div></div>';
     }).join('');
+     /* ── SPECIE HOMEBREW: layout sidebar + content ── */
+var SPECIE_DB = '2f00274fdc1c81a1bc4ddbf500704b80';
+if(dbId === SPECIE_DB){
+  var specieHtml = '<div class="sp-layout">'
+    + '<div class="sp-sidebar"><div class="sp-sidebar-title">Specie</div><ul class="sp-list">'
+    + data.pages.map(function(p){
+        var icon = p.icon||'📄';
+        var title = p.title.replace(/'/g,"\\'");
+        return '<li class="sp-item" onclick="spSelect(this,\''+p.id+'\',\''+title+'\',\''+icon+'\')">'+p.title+'</li>';
+      }).join('')
+    + '</ul></div>'
+    + '<div class="sp-content" id="sp-content"><div class="sp-placeholder">← Seleziona una specie</div></div>'
+    + '</div>';
+  if(wrap){ wrap.outerHTML='<div class="n-db-lc-wrap" id="'+uid+'">'+titleHtml+specieHtml+'</div>'; }
+  else{ grid.outerHTML='<div>'+specieHtml+'</div>'; }
+  _injectSpecieCSS();
+  return;
+}
     var wrap=grid.closest('.n-db-wrap');
     var titleEl=wrap?wrap.querySelector('.n-db-title'):null;
     var titleHtml=titleEl?'<div class="n-db-title">'+titleEl.textContent+'</div>':'';
@@ -451,4 +469,59 @@ async function _loadSingleDb(grid){
   }catch(e){
     grid.innerHTML='<div class="n-db-loading">⚠️ Errore caricamento.</div>';
   }
+}
+window.spSelect = function(el, id, title, icon){
+  document.querySelectorAll('.sp-item').forEach(function(i){ i.classList.remove('active'); });
+  el.classList.add('active');
+  var content = document.getElementById('sp-content');
+  if(!content) return;
+  content.innerHTML = '<div class="sp-loading"><div class="gs-loading-spin"></div></div>';
+  gp(id, title, icon, true);
+};
+
+function _injectSpecieCSS(){
+  if(document.getElementById('specie-css')) return;
+  var s = document.createElement('style');
+  s.id = 'specie-css';
+  s.textContent = `
+.sp-layout{
+  display:grid;grid-template-columns:240px 1fr;gap:0;
+  min-height:500px;border:1px solid rgba(200,155,60,.15);
+}
+.sp-sidebar{
+  border-right:1px solid rgba(200,155,60,.15);
+  background:rgba(4,6,14,.6);overflow-y:auto;
+}
+.sp-sidebar-title{
+  font-family:'Cinzel',serif;font-size:8px;font-weight:700;
+  letter-spacing:.25em;color:rgba(200,155,60,.5);
+  padding:16px 18px 10px;text-transform:uppercase;
+  border-bottom:1px solid rgba(200,155,60,.1);
+}
+.sp-list{list-style:none;margin:0;padding:8px 0;}
+.sp-item{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:.04em;
+  color:rgba(240,230,200,.6);padding:9px 18px;cursor:pointer;
+  transition:.15s;border-left:2px solid transparent;
+}
+.sp-item:hover{color:rgba(240,230,200,.95);background:rgba(200,155,60,.06);}
+.sp-item.active{
+  color:var(--gold2,#c89b3c);background:rgba(200,155,60,.1);
+  border-left-color:rgba(200,155,60,.7);
+}
+.sp-content{
+  padding:28px 32px;background:rgba(6,8,18,.4);
+  overflow-y:auto;max-height:80vh;
+}
+.sp-placeholder{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;
+  color:rgba(200,155,60,.25);padding:40px 0;text-align:center;
+}
+.sp-loading{display:flex;justify-content:center;padding:60px 0;}
+@media(max-width:600px){
+  .sp-layout{grid-template-columns:1fr;}
+  .sp-sidebar{border-right:none;border-bottom:1px solid rgba(200,155,60,.15);max-height:200px;}
+}
+  `;
+  document.head.appendChild(s);
 }
