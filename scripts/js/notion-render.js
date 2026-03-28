@@ -409,7 +409,7 @@ async function _loadSingleDb(grid){
     if(!data.pages||!data.pages.length){
       grid.innerHTML='<div class="n-db-loading">Nessun elemento trovato.</div>';return;
     }
-    var cardsHtml=data.pages.map(function(p){
+    var cardsHtml=sortedPages.map(function(p){
       var icon=p.icon||'📄';
       var acc=iconAccent(icon);
       var coverSafe=safeCoverUrl(p.cover);
@@ -430,7 +430,7 @@ var SPECIE_DB = '2f60274fdc1c80fba671c588ba93b116';
 if(dbId === SPECIE_DB){
   var specieHtml = '<div class="sp-layout">'
     + '<div class="sp-sidebar"><div class="sp-sidebar-title">Specie</div><ul class="sp-list">'
-    + data.pages.map(function(p){
+    var sortedPages = data.pages.slice().sort(function(a,b){ return a.title.localeCompare(b.title,'it'); });
         var icon = p.icon||'📄';
         var title = p.title.replace(/'/g,"\\'");
         return '<li class="sp-item" onclick="spSelect(this,\''+p.id+'\',\''+title+'\',\''+icon+'\')">'+p.title+'</li>';
