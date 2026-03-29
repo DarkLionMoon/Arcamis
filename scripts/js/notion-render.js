@@ -272,18 +272,19 @@ function renderBlocks(blocks,isRoot){
         break;
 
       case'child_database':
-        var dbRawId=b.id.replace(/-/g,'');
-        if(dbRawId===GALLERY_DB_ID){
-          h+='<div class="gs-container" id="gs-'+dbRawId+'"></div>';
-         } else if (dbRawId === '3040274fdc1c80e0a0dccfa9761bff55') {
-  h += '<div class="hb-library-container" id="hblib-' + dbRawId + '"></div>';
-}
-        }else{
-          h+='<div class="n-db-wrap">'
-            +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
-            +'<div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
-        }
-        break;
+  var dbRawId=b.id.replace(/-/g,'');
+  if(dbRawId===GALLERY_DB_ID){
+    h+='<div class="gs-container" id="gs-'+dbRawId+'"></div>';
+  }else if(dbRawId==='3040274fdc1c80e0a0dccfa9761bff55'){
+    h+='<div class="hb-library-container" id="hblib-'+dbRawId+'"></div>';
+  }else if(dbRawId==='2f70274fdc1c80e3bdc7f95f81eb9cc0'){
+    h+='<div class="hb-subclass-container" id="hbsc-'+dbRawId+'"></div>';
+  }else{
+    h+='<div class="n-db-wrap">'
+      +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
+      +'<div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
+  }
+  break;
 
       case'table':
         var rows=b.children||[],hasH=d.has_column_header,hasR=d.has_row_header;
