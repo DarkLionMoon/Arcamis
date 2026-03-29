@@ -134,12 +134,20 @@ function _injectHbscCSS(){
   s.id = 'hbsc-css';
   s.textContent = `
 /* ── Layout principale ── */
+.hb-subclass-container {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
 .hbsc-layout {
   display: grid;
   grid-template-columns: 220px 1fr;
   min-height: 600px;
   border: 1px solid rgba(200,155,60,.15);
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* ── Sidebar classi ── */
