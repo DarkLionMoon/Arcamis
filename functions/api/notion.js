@@ -190,7 +190,27 @@ if (dbId) {
       ? (argProp.multi_select || []).map(s => ({ name: s.name, color: s.color }))
       : [];
 
-    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti };
+    const loreProp = p.properties && (
+      p.properties['Lore'] || p.properties['lore']
+    );
+    const lore = loreProp
+      ? loreProp.type === 'select' && loreProp.select
+        ? loreProp.select.name
+        : loreProp.type === 'multi_select' && loreProp.multi_select.length
+          ? loreProp.multi_select.map(s => s.name).join(', ')
+          : null
+      : null;
+
+    const importanzaProp = p.properties && (
+      p.properties['Importanza'] || p.properties['importanza']
+    );
+    const importanza = importanzaProp
+      ? importanzaProp.type === 'select' && importanzaProp.select
+        ? importanzaProp.select.name
+        : null
+      : null;
+
+    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti, lore, importanza };
   });
 
   const payload = JSON.stringify({ pages });
