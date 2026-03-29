@@ -202,6 +202,7 @@ if (dbId) {
       : null;
 
     const importanzaProp = p.properties && (
+      console.log('IMP RAW:', JSON.stringify(p.properties['Importanza']));
       p.properties['Importanza'] || p.properties['importanza']
     );
     const importanza = importanzaProp
