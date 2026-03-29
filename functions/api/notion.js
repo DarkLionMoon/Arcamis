@@ -163,7 +163,7 @@ if (dbId) {
     );
     const classe = classeProp
       ? (classeProp.type === 'multi_select' && classeProp.multi_select.length)
-        ? classeProp.multi_select.map(function(s){ return s.name; }):join(', ')
+        ? classeProp.multi_select.map(function(s){ return s.name; }).join(', ')
         : (classeProp.select ? classeProp.select.name : null)
       : null;
 
