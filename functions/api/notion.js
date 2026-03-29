@@ -145,7 +145,7 @@ if (dbId) {
   });
 }
 
-  const pages = data.results.map(p => {
+  const pages = await Promise.all(data.results.map(async p => {
     const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
     const title = titleProp
       ? (titleProp.title || []).map(t => t.plain_text).join('')
@@ -163,7 +163,7 @@ if (dbId) {
     );
     const classe = classeProp
       ? (classeProp.type === 'multi_select' && classeProp.multi_select.length)
-        ? classeProp.multi_select.map(function(s){ return s.name; }).join(', ')
+        ? classeProp.multi_select.map(function(s){ return s.name; }));join(', ')
         : (classeProp.select ? classeProp.select.name : null)
       : null;
 
