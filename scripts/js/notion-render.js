@@ -275,6 +275,9 @@ function renderBlocks(blocks,isRoot){
         var dbRawId=b.id.replace(/-/g,'');
         if(dbRawId===GALLERY_DB_ID){
           h+='<div class="gs-container" id="gs-'+dbRawId+'"></div>';
+         } else if (dbRawId === '3040274fdc1c80e0a0dccfa9761bff55') {
+  h += '<div class="hb-library-container" id="hblib-' + dbRawId + '"></div>';
+}
         }else{
           h+='<div class="n-db-wrap">'
             +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
