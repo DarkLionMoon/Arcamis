@@ -194,6 +194,9 @@ async function _gpRender(id,label,icon){
 
     attachShine(pbody);
     loadDbGalleries(pbody);
+    pbody.querySelectorAll('.npc-gallery-container').forEach(function(c) {
+  if (window.loadNpcGallery) loadNpcGallery(c);
+});
    pbody.querySelectorAll('.hb-library-container').forEach(function(c){
   if(window.loadLibraryGallery) loadLibraryGallery(c);
 });
