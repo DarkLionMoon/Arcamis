@@ -1,10 +1,11 @@
 /* ════════════════════════════════════
    library-gallery.js
    Biblioteca interattiva fantasy
-   Scaffale 3D + filtri + animazione apertura libro
+   Multi-scaffale + filtri + pannello info
 ════════════════════════════════════ */
 
 var BIBLIO_DB_ID = '3040274fdc1c80e0a0dccfa9761bff55';
+var BOOKS_PER_SHELF = 8;
 
 /* Mappa colori Notion → CSS */
 var _notionColors = {
@@ -56,19 +57,15 @@ window.loadLibraryGallery = function(container) {
 };
 
 function _renderLibrary(container, pages) {
-  /* Raccogli tutti gli argomenti unici */
   var allArgs = {};
   pages.forEach(function(p) {
     (p.argomenti || []).forEach(function(a) { allArgs[a.name] = a.color; });
   });
-  /* Salva sul container per accesso da libOpenBook */
   container._libAllArgs = allArgs;
   var argKeys = Object.keys(allArgs).sort();
 
-  /* HTML struttura */
   container.innerHTML =
     '<div class="lib-wrap">'+
-      /* Filtri */
       '<div class="lib-filters">'+
         '<button class="lib-filter active" data-filter="all" onclick="libFilter(this,\'all\')">Tutti</button>'+
         argKeys.map(function(k) {
@@ -76,16 +73,13 @@ function _renderLibrary(container, pages) {
           return '<button class="lib-filter" data-filter="'+k+'" onclick="libFilter(this,\''+k+'\')" style="--fc:'+col+'">'+k+'</button>';
         }).join('')+
       '</div>'+
-      /* Scaffale */
-      '<div class="lib-shelf-wrap">'+
-        '<div class="lib-shelf" id="lib-shelf">'+
-          _renderShelf(pages)+
+      '<div class="lib-body">'+
+        '<div class="lib-shelves" id="lib-shelves">'+
+          _renderShelves(pages)+
         '</div>'+
-        '<div class="lib-shelf-base"></div>'+
-      '</div>'+
-      /* Info pannello */
-      '<div class="lib-info" id="lib-info">'+
-        '<div class="lib-info-placeholder">📖 Seleziona un libro</div>'+
+        '<div class="lib-info" id="lib-info">'+
+          '<div class="lib-info-placeholder">📖 Seleziona un libro</div>'+
+        '</div>'+
       '</div>'+
     '</div>';
 
@@ -93,29 +87,39 @@ function _renderLibrary(container, pages) {
   _injectLibCSS();
 }
 
-function _renderShelf(pages) {
-  return pages.map(function(p, i) {
-    var sc = _getSpineColor(p.argomenti);
-    var titleSafe = p.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    var argStr = (p.argomenti||[]).map(function(a){return a.name;}).join(',');
-    /* Altezza variabile per realismo */
-    var h = 140 + Math.abs((_hash(p.id) % 40));
-    /* Spessore variabile */
-    var w = 28 + Math.abs((_hash(p.id + '1') % 18));
-    /* Inclinazione lieve */
-    var tilt = (_hash(p.id + '2') % 5) - 2;
-
-    return '<div class="lib-book" data-id="'+p.id+'" data-title="'+titleSafe+'" data-args="'+argStr+'" '+
-      'style="--sc-bg:'+sc.bg+';--sc-acc:'+sc.accent+';--sc-txt:'+sc.text+';--bh:'+h+'px;--bw:'+w+'px;--btilt:'+tilt+'deg" '+
-      'onclick="libOpenBook(this)" onmouseenter="libHoverBook(this)" onmouseleave="libLeaveBook(this)">'+
-      '<div class="lib-spine">'+
-        '<div class="lib-spine-title">'+p.title+'</div>'+
-        '<div class="lib-spine-deco"></div>'+
+function _renderShelves(pages) {
+  var rows = [];
+  for (var i = 0; i < pages.length; i += BOOKS_PER_SHELF) {
+    rows.push(pages.slice(i, i + BOOKS_PER_SHELF));
+  }
+  return rows.map(function(row) {
+    return '<div class="lib-shelf-row">'+
+      '<div class="lib-shelf-books">'+
+        row.map(function(p) { return _renderBook(p); }).join('')+
       '</div>'+
-      '<div class="lib-book-top"></div>'+
-      '<div class="lib-book-side"></div>'+
+      '<div class="lib-shelf-base"></div>'+
     '</div>';
   }).join('');
+}
+
+function _renderBook(p) {
+  var sc = _getSpineColor(p.argomenti);
+  var titleSafe = p.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  var argStr = (p.argomenti||[]).map(function(a){return a.name;}).join(',');
+  var h = 140 + Math.abs((_hash(p.id) % 40));
+  var w = 28 + Math.abs((_hash(p.id + '1') % 18));
+  var tilt = (_hash(p.id + '2') % 5) - 2;
+
+  return '<div class="lib-book" data-id="'+p.id+'" data-title="'+titleSafe+'" data-args="'+argStr+'" '+
+    'style="--sc-bg:'+sc.bg+';--sc-acc:'+sc.accent+';--sc-txt:'+sc.text+';--bh:'+h+'px;--bw:'+w+'px;--btilt:'+tilt+'deg" '+
+    'onclick="libOpenBook(this)" onmouseenter="libHoverBook(this)" onmouseleave="libLeaveBook(this)">'+
+    '<div class="lib-spine">'+
+      '<div class="lib-spine-title">'+p.title+'</div>'+
+      '<div class="lib-spine-deco"></div>'+
+    '</div>'+
+    '<div class="lib-book-top"></div>'+
+    '<div class="lib-book-side"></div>'+
+  '</div>';
 }
 
 function _hash(str) {
@@ -130,9 +134,9 @@ window.libFilter = function(btn, filter) {
   document.querySelectorAll('.lib-book').forEach(function(book) {
     var args = book.getAttribute('data-args') || '';
     var show = filter === 'all' || args.split(',').indexOf(filter) > -1;
-    book.style.opacity = show ? '1' : '0.15';
+    book.style.opacity = show ? '1' : '0.12';
     book.style.pointerEvents = show ? 'auto' : 'none';
-    book.style.transform = show ? '' : 'scaleY(0.92)';
+    book.style.transform = show ? '' : 'scaleY(0.9)';
   });
 };
 
@@ -150,32 +154,25 @@ window.libOpenBook = function(el) {
   var id = el.getAttribute('data-id');
   var title = el.getAttribute('data-title');
 
-  /* Evidenzia libro selezionato */
   document.querySelectorAll('.lib-book').forEach(function(b){ b.classList.remove('selected'); b.style.transform = ''; });
   el.classList.add('selected');
   el.style.transform = 'translateY(-18px) rotate(var(--btilt)) scale(1.08)';
 
-  /* Pannello info — loading */
   var info = document.getElementById('lib-info');
   if (!info) return;
   info.innerHTML = '<div class="lib-info-loading"><div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div></div>';
   info.classList.add('open');
 
-  /* Cerca i dati della pagina */
-  var container = el.closest('.lib-container, .hb-library-container, [class*="lib"]');
-  /* Fetch pagina Notion */
   fetch('/api/notion?pageId=' + id)
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (!data.blocks) throw new Error('no blocks');
 
-      /* Trova argomenti dal libro selezionato */
       var argStr = el.getAttribute('data-args') || '';
       var argomenti = argStr ? argStr.split(',').filter(Boolean) : [];
       var sc = _getSpineColor(argomenti.map(function(a){ return {name:a}; }));
 
-      /* Leggi mappa colori dal container più vicino */
-      var libContainer = el.closest('[class*="lib"]');
+      var libContainer = el.closest('.hb-library-container');
       var allArgsSaved = (libContainer && libContainer._libAllArgs) || {};
       var tagsHtml = argomenti.map(function(a) {
         var col = _notionColors[allArgsSaved[a]] || '#888';
@@ -208,33 +205,32 @@ function _injectLibCSS() {
   var s = document.createElement('style');
   s.id = 'lib-css';
   s.textContent = `
-/* ── Wrapper generale ── */
-.lib-wrap {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  grid-template-columns: 1fr 340px;
-  grid-template-areas: "filters filters" "shelf info";
-  gap: 0;
-  min-height: 520px;
-  border: 1px solid rgba(200,155,60,.15);
-  background: #06080e;
-  box-sizing: border-box;
-width: 100%;
-}
+/* ── Container ── */
 .hb-library-container {
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
+  display: block;
+}
+.lib-wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(200,155,60,.15);
+  background: #06080e;
 }
 
 /* ── Filtri ── */
 .lib-filters {
-  grid-area: filters;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   padding: 14px 20px;
   border-bottom: 1px solid rgba(200,155,60,.12);
   background: rgba(4,6,12,.8);
+  flex-shrink: 0;
 }
 .lib-filter {
   font-family: 'Cinzel', serif;
@@ -259,35 +255,46 @@ width: 100%;
   color: var(--fc, rgba(200,155,60,.9));
 }
 
-/* ── Scaffale ── */
-.lib-shelf-wrap {
-  grid-area: shelf;
+/* ── Body (scaffali + pannello info) ── */
+.lib-body {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 340px;
+  flex: 1;
+}
+
+/* ── Scaffali ── */
+.lib-shelves {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 40px 24px 0;
+  padding: 24px 24px 0;
   background:
-    radial-gradient(ellipse 80% 40% at 50% 100%, rgba(60,40,10,.4) 0%, transparent 70%),
-    linear-gradient(180deg, #06080e 0%, #0c0e14 100%);
-  min-height: 300px;
-  position: relative;
-  overflow-x: auto;
-  overflow-y: visible;
+    radial-gradient(ellipse 80% 30% at 50% 100%, rgba(60,40,10,.3) 0%, transparent 70%),
+    linear-gradient(180deg, #06080e 0%, #0a0c12 100%);
+  overflow: hidden;
 }
-.lib-shelf {
+
+/* ── Singola riga scaffale ── */
+.lib-shelf-row {
+  display: flex;
+  flex-direction: column;
+}
+.lib-shelf-books {
   display: flex;
   align-items: flex-end;
   gap: 4px;
-  padding: 0 8px 0;
-  min-height: 200px;
+  padding: 0 8px;
+  padding-top: 28px;
 }
 .lib-shelf-base {
   height: 14px;
   background: linear-gradient(180deg, #3a2a10 0%, #2a1c08 60%, #1a1006 100%);
   border-top: 2px solid rgba(200,155,60,.4);
-  box-shadow: 0 4px 20px rgba(0,0,0,.6);
+  box-shadow: 0 4px 16px rgba(0,0,0,.7), inset 0 1px 0 rgba(200,155,60,.15);
   margin: 0 -24px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Singolo libro ── */
@@ -301,12 +308,12 @@ width: 100%;
   transform-origin: bottom center;
   transition: transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s;
   filter: drop-shadow(2px 0 4px rgba(0,0,0,.5));
+  z-index: 2;
 }
 .lib-book.selected {
   filter: drop-shadow(0 0 12px rgba(200,155,60,.4)) drop-shadow(2px 0 4px rgba(0,0,0,.5));
+  z-index: 3;
 }
-
-/* Dorso */
 .lib-spine {
   position: absolute;
   inset: 0;
@@ -354,20 +361,15 @@ width: 100%;
   content: '';
   position: absolute;
   bottom: -8px;
-  left: 0;
-  right: 0;
+  left: 0; right: 0;
   height: 1px;
   background: var(--sc-acc);
   opacity: .4;
   top: auto;
 }
-
-/* Parte superiore libro */
 .lib-book-top {
   position: absolute;
-  top: -5px;
-  left: 2px;
-  right: -4px;
+  top: -5px; left: 2px; right: -4px;
   height: 5px;
   background: linear-gradient(90deg,
     color-mix(in srgb, var(--sc-bg) 90%, #fff 10%) 0%,
@@ -377,13 +379,9 @@ width: 100%;
   transform: skewX(-45deg);
   transform-origin: left bottom;
 }
-
-/* Lato destro libro */
 .lib-book-side {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  bottom: 0;
+  top: -4px; right: -4px; bottom: 0;
   width: 4px;
   background: linear-gradient(180deg,
     color-mix(in srgb, var(--sc-bg) 60%, #fff 10%) 0%,
@@ -395,20 +393,15 @@ width: 100%;
 
 /* ── Pannello info ── */
 .lib-info {
-  grid-area: info;
   border-left: 1px solid rgba(200,155,60,.12);
   background: rgba(4,6,12,.95);
   overflow-y: auto;
-  max-height: 100%;
-  transition: opacity .2s;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 300px;
 }
-.lib-info.open {
-  align-items: flex-start;
-}
+.lib-info.open { align-items: flex-start; }
 .lib-info-placeholder {
   font-family: 'Cinzel', serif;
   font-size: 11px;
@@ -417,108 +410,42 @@ width: 100%;
   text-align: center;
   padding: 40px 20px;
 }
-.lib-info-loading {
-  display: flex;
-  justify-content: center;
-  padding: 60px;
-}
-.lib-info-err {
-  color: rgba(200,60,60,.5);
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  padding: 40px;
-  text-align: center;
-}
-.lib-info-inner {
-  width: 100%;
-}
+.lib-info-loading { display:flex; justify-content:center; padding:60px; }
+.lib-info-err { color:rgba(200,60,60,.5); font-family:'Cinzel',serif; font-size:11px; padding:40px; text-align:center; }
+.lib-info-inner { width: 100%; }
 .lib-info-header {
   padding: 20px 20px 14px;
   border-bottom: 1px solid rgba(200,155,60,.1);
   background: linear-gradient(135deg, var(--sc-bg, #0c0e14) 0%, rgba(4,6,12,.9) 100%);
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  display: flex; gap: 12px; align-items: flex-start;
 }
-.lib-info-icon {
-  font-size: 28px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
+.lib-info-icon { font-size:28px; flex-shrink:0; margin-top:2px; }
 .lib-info-title {
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
-  font-weight: 700;
-  color: rgba(240,220,180,.95);
-  letter-spacing: .04em;
-  line-height: 1.4;
-  margin-bottom: 8px;
+  font-family:'Cinzel',serif; font-size:14px; font-weight:700;
+  color:rgba(240,220,180,.95); letter-spacing:.04em; line-height:1.4; margin-bottom:8px;
 }
-.lib-info-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
+.lib-info-tags { display:flex; flex-wrap:wrap; gap:4px; }
 .lib-tag {
-  font-family: 'Cinzel', serif;
-  font-size: 8px;
-  letter-spacing: .1em;
-  padding: 2px 7px;
-  border: 1px solid;
-  border-radius: 2px;
-  text-transform: uppercase;
+  font-family:'Cinzel',serif; font-size:8px; letter-spacing:.1em;
+  padding:2px 7px; border:1px solid; border-radius:2px; text-transform:uppercase;
 }
-.lib-info-body {
-  padding: 16px 20px;
-  font-size: 13px;
-  max-height: 340px;
-  overflow-y: auto;
-}
-.lib-info-footer {
-  padding: 12px 20px 20px;
-  border-top: 1px solid rgba(200,155,60,.1);
-}
+.lib-info-body { padding:16px 20px; font-size:13px; max-height:400px; overflow-y:auto; }
+.lib-info-footer { padding:12px 20px 20px; border-top:1px solid rgba(200,155,60,.1); }
 .lib-open-btn {
-  font-family: 'Cinzel', serif;
-  font-size: 9px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  padding: 8px 16px;
-  border: 1px solid rgba(200,155,60,.4);
-  background: rgba(200,155,60,.06);
-  color: rgba(200,155,60,.8);
-  cursor: pointer;
-  transition: .15s;
-  width: 100%;
+  font-family:'Cinzel',serif; font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+  padding:8px 16px; border:1px solid rgba(200,155,60,.4); background:rgba(200,155,60,.06);
+  color:rgba(200,155,60,.8); cursor:pointer; transition:.15s; width:100%;
 }
-.lib-open-btn:hover {
-  background: rgba(200,155,60,.15);
-  color: rgba(200,155,60,1);
-  border-color: rgba(200,155,60,.7);
-}
+.lib-open-btn:hover { background:rgba(200,155,60,.15); color:rgba(200,155,60,1); border-color:rgba(200,155,60,.7); }
 
 /* ── Loader ── */
-.lib-loader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 80px;
-}
+.lib-loader { display:flex; justify-content:center; align-items:center; padding:80px; }
 
 /* ── Mobile ── */
-@media (max-width: 640px) {
-  .lib-wrap {
-    grid-template-columns: 1fr;
-    grid-template-areas: "filters" "shelf" "info";
-  }
-  .lib-info {
-    border-left: none;
-    border-top: 1px solid rgba(200,155,60,.12);
-    min-height: 200px;
-  }
-  .lib-shelf-wrap {
-    padding: 24px 12px 0;
-  }
+@media (max-width:640px) {
+  .lib-body { grid-template-columns:1fr; }
+  .lib-info { border-left:none; border-top:1px solid rgba(200,155,60,.12); min-height:200px; }
+  .lib-shelves { padding:20px 12px 0; }
 }
   `;
   document.head.appendChild(s);
