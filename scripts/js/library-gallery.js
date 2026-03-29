@@ -218,6 +218,12 @@ function _injectLibCSS() {
   min-height: 520px;
   border: 1px solid rgba(200,155,60,.15);
   background: #06080e;
+  box-sizing: border-box;
+width: 100%;
+}
+.hb-library-container {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── Filtri ── */
