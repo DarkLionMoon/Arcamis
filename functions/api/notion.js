@@ -211,6 +211,7 @@ if (dbId) {
       : null;
 
     return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti, lore, importanza, _impRaw: p.properties['Importanza'] };
+    }));
 
   const payload = JSON.stringify({ pages });
   await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
