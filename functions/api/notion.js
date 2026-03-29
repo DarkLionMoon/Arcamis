@@ -202,7 +202,6 @@ if (dbId) {
       : null;
 
     const importanzaProp = p.properties && (
-      console.log('IMP RAW:', JSON.stringify(p.properties['Importanza']));
       p.properties['Importanza'] || p.properties['importanza']
     );
     const importanza = importanzaProp
@@ -211,8 +210,7 @@ if (dbId) {
         : null
       : null;
 
-    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti, lore, importanza };
-  });
+    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti, lore, importanza, _impRaw: p.properties['Importanza'] };
 
   const payload = JSON.stringify({ pages });
   await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
