@@ -167,7 +167,30 @@ if (dbId) {
         : (classeProp.select ? classeProp.select.name : null)
       : null;
 
-    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe };
+    /* ── Dove trovarlo (rich_text o select) ── */
+    const doveProp = p.properties && (
+      p.properties['Dove trovarlo'] || p.properties['dove_trovarlo'] ||
+      p.properties['Dove Trovarlo'] || p.properties['location']
+    );
+    const dove = doveProp
+      ? doveProp.type === 'rich_text'
+        ? (doveProp.rich_text || []).map(t => t.plain_text).join('')
+        : doveProp.type === 'select' && doveProp.select
+          ? doveProp.select.name
+          : null
+      : null;
+
+    /* ── Macro-argomento (multi_select) ── */
+    const argProp = p.properties && (
+      p.properties['Macro-argomento'] || p.properties['macro_argomento'] ||
+      p.properties['Argomento'] || p.properties['argomento'] ||
+      p.properties['Tags'] || p.properties['tags']
+    );
+    const argomenti = argProp && argProp.type === 'multi_select'
+      ? (argProp.multi_select || []).map(s => ({ name: s.name, color: s.color }))
+      : [];
+
+    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti };
   });
 
   const payload = JSON.stringify({ pages });
@@ -225,4 +248,3 @@ async function loadChildren(blocks, headers) {
     return block;
   });
 }
-    
