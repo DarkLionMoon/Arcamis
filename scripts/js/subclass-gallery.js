@@ -138,16 +138,24 @@ function _injectHbscCSS(){
   width: 100%;
   max-width: 100%;
   overflow: hidden;
+  box-sizing: border-box;
+  display: block;
 }
 .hbsc-layout {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 220px minmax(0, 1fr);  /* ← minmax(0,1fr) invece di 1fr */
   min-height: 600px;
   border: 1px solid rgba(200,155,60,.15);
   width: 100%;
   max-width: 100%;
   overflow: hidden;
   box-sizing: border-box;
+}
+.hbsc-main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;  /* ← fondamentale per grid */
 }
 
 /* ── Sidebar classi ── */
