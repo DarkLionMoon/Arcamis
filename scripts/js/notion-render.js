@@ -279,6 +279,9 @@ function renderBlocks(blocks,isRoot){
     h+='<div class="hb-library-container" id="hblib-'+dbRawId+'"></div>';
   }else if(dbRawId==='2f70274fdc1c80e3bdc7f95f81eb9cc0'){
     h+='<div class="hb-subclass-container" id="hbsc-'+dbRawId+'"></div>';
+  } else if (dbRawId === NPC_PARENT_DB.replace(/-/g,'')) {
+  h += '<div class="npc-gallery-container" id="npcg-' + dbRawId + '"></div>';
+}
   }else{
     h+='<div class="n-db-wrap">'
       +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
