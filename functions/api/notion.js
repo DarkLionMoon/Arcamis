@@ -205,10 +205,12 @@ if (dbId) {
       p.properties['Importanza'] || p.properties['importanza']
     );
     const importanza = importanzaProp
-      ? importanzaProp.type === 'select' && importanzaProp.select
-        ? importanzaProp.select.name
-        : null
-      : null;
+  ? importanzaProp.type === 'multi_select' && importanzaProp.multi_select.length
+    ? importanzaProp.multi_select[0].name
+    : importanzaProp.type === 'select' && importanzaProp.select
+      ? importanzaProp.select.name
+      : null
+  : null;
 
     return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti, lore, importanza, _impRaw: p.properties['Importanza'] };
     }));
