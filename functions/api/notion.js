@@ -212,7 +212,7 @@ if (dbId) {
       : null
   : null;
 
-    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti, lore, importanza, _impRaw: p.properties['Importanza'] };
+    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti, lore, importanza };
     }));
 
   const payload = JSON.stringify({ pages });
