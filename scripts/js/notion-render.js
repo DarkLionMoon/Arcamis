@@ -457,21 +457,31 @@ async function _loadSingleDb(grid){
     }
 
     /* ── CAROUSEL GENERICO ── */
+    var allBanners=data.pages.every(function(p){return!safeCoverUrl(p.cover);});
     var cardsHtml=data.pages.map(function(p){
       var icon=p.icon||'📄';
       var acc=iconAccent(icon);
       var coverSafe=safeCoverUrl(p.cover);
-      var bg=coverSafe
-        ?'background-image:url("'+coverSafe+'");background-size:cover;background-position:center'
-        :'background:'+iconGradient(icon);
       var title=p.title.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      return'<div class="loc-card" style="'+bg+'" onclick="gp(\''+p.id+'\',\''+title+'\',\''+icon+'\')">'
-        +'<div class="loc-ov">'
-        +'<div class="loc-badge explored">'+icon+'</div>'
-        +'<div class="loc-name">'+p.title+'</div>'
-        +'<div class="loc-sub" style="color:'+acc.c+'">Scopri →</div>'
-        +'<div class="loc-cta">APRI ◆</div>'
-        +'</div></div>';
+      if(coverSafe){
+        return'<div class="loc-card" style="background-image:url(\"'+coverSafe+'\");background-size:cover;background-position:center" onclick="gp(\''+p.id+'\',\''+title+'\',\''+icon+'\')">'
+          +'<div class="loc-ov">'
+          +'<div class="loc-badge explored">'+icon+'</div>'
+          +'<div class="loc-name">'+p.title+'</div>'
+          +'<div class="loc-sub" style="color:'+acc.c+'">Scopri →</div>'
+          +'<div class="loc-cta">APRI ◆</div>'
+          +'</div></div>';
+      }else{
+        return'<div class="loc-banner" style="'+iconGradient(icon)+'" onclick="gp(\''+p.id+'\',\''+title+'\',\''+icon+'\')">'
+          +'<div class="loc-banner-accent" style="background:'+acc.c+'"></div>'
+          +'<div class="loc-banner-icon" style="color:'+acc.c+'">'+icon+'</div>'
+          +'<div class="loc-banner-body">'
+          +'<div class="loc-banner-title">'+p.title+'</div>'
+          +'<div class="loc-banner-sub" style="color:'+acc.c+'">Scopri →</div>'
+          +'</div>'
+          +'<div class="loc-banner-arr" style="color:'+acc.c+'">◆</div>'
+          +'</div>';
+      }
     }).join('');
     var wrap=grid.closest('.n-db-wrap');
     var titleEl=wrap?wrap.querySelector('.n-db-title'):null;
@@ -483,19 +493,27 @@ async function _loadSingleDb(grid){
       else{grid.outerHTML='<div class="n-db-single">'+cardsHtml+'</div>';}
       return;
     }
-    if(wrap){
-      wrap.outerHTML=
-        '<div class="n-db-lc-wrap" id="'+uid+'">'
-        +titleHtml
-        +'<div class="loc-wrap" style="margin:0">'
-        +'<div class="loc-track-outer">'
-        +'<div class="loc-track" data-idx="0" style="gap:16px">'+cardsHtml+'</div>'
-        +'</div>'
-        +'<div class="la la-prev" onclick="dbLocNav(this,-1)">‹</div>'
-        +'<div class="la la-next" onclick="dbLocNav(this,1)">›</div>'
-        +'</div></div>';
+    if(allBanners){
+      if(wrap){
+        wrap.outerHTML='<div class="n-db-lc-wrap" id="'+uid+'">'+titleHtml+'<div class="loc-banner-grid">'+cardsHtml+'</div></div>';
+      }else{
+        grid.outerHTML='<div class="loc-banner-grid">'+cardsHtml+'</div>';
+      }
     }else{
-      grid.outerHTML='<div class="loc-track" data-idx="0" style="gap:16px;display:flex">'+cardsHtml+'</div>';
+      if(wrap){
+        wrap.outerHTML=
+          '<div class="n-db-lc-wrap" id="'+uid+'">'
+          +titleHtml
+          +'<div class="loc-wrap" style="margin:0">'
+          +'<div class="loc-track-outer">'
+          +'<div class="loc-track" data-idx="0" style="gap:16px">'+cardsHtml+'</div>'
+          +'</div>'
+          +'<div class="la la-prev" onclick="dbLocNav(this,-1)">‹</div>'
+          +'<div class="la la-next" onclick="dbLocNav(this,1)">›</div>'
+          +'</div></div>';
+      }else{
+        grid.outerHTML='<div class="loc-track" data-idx="0" style="gap:16px;display:flex">'+cardsHtml+'</div>';
+      }
     }
   }catch(e){
     grid.innerHTML='<div class="n-db-loading">⚠️ Errore caricamento.</div>';
