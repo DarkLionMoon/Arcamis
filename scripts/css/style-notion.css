@@ -339,3 +339,13 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
         top: 0;
     }
 }
+.n-cp-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 0;
+}
+.n-cp-grid .loc-card {
+  flex: 1 1 240px;
+  max-width: 320px;
+}
