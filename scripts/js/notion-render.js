@@ -258,11 +258,25 @@ function renderBlocks(blocks,isRoot){
           var cpacc=iconAccent(cpicon);
           var cpbg=iconGradient(cpicon);
           var cptitleSafe=cptitle.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-          cpCards+='<div class="loc-card" style="'+cpbg+'" onclick="gp(\''+cpid+'\',\''+cptitleSafe+'\',\''+cpicon+'\')">'
-            +'<div class="loc-ov"><div class="loc-badge explored">'+cpicon+'</div>'
-            +'<div class="loc-name">'+cptitle+'</div>'
-            +'<div class="loc-sub" style="color:'+cpacc.c+'">Apri \u2192</div>'
-            +'<div class="loc-cta">APRI \u25c6</div></div></div>';
+          var cpCoverNi=cpni?cpni.cover:null;
+var cpCoverSafe=safeCoverUrl(cpCoverNi);
+if(cpCoverSafe){
+  cpCards+='<div class="loc-card" style="background-image:url(\''+cpCoverSafe+'\');background-size:cover;background-position:center" onclick="gp(\''+cpid+'\',\''+cptitleSafe+'\',\''+cpicon+'\')">'
+    +'<div class="loc-ov"><div class="loc-badge explored">'+cpicon+'</div>'
+    +'<div class="loc-name">'+cptitle+'</div>'
+    +'<div class="loc-sub" style="color:'+cpacc.c+'">Apri \u2192</div>'
+    +'<div class="loc-cta">APRI \u25c6</div></div></div>';
+}else{
+  cpCards+='<div class="loc-banner" style="'+cpbg+'" onclick="gp(\''+cpid+'\',\''+cptitleSafe+'\',\''+cpicon+'\')">'
+    +'<div class="loc-banner-accent" style="background:'+cpacc.c+'"></div>'
+    +'<div class="loc-banner-icon" style="color:'+cpacc.c+'">'+cpicon+'</div>'
+    +'<div class="loc-banner-body">'
+    +'<div class="loc-banner-title">'+cptitle+'</div>'
+    +'<div class="loc-banner-sub" style="color:'+cpacc.c+'">Apri \u2192</div>'
+    +'</div>'
+    +'<div class="loc-banner-arr" style="color:'+cpacc.c+'">\u25c6</div>'
+    +'</div>';
+}
           i++;
         }
         if(cpCards){
