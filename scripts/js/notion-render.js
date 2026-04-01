@@ -273,7 +273,6 @@ function renderBlocks(blocks,isRoot){
     h+='<div class="n-db-lc-wrap" id="'+cpUid+'"><div class="loc-wrap" style="margin:0"><div class="loc-track-outer"><div class="loc-track" data-idx="0" style="gap:16px">'+cpCards+'</div></div><div class="la la-prev" onclick="dbLocNav(this,-1)">&#8249;</div><div class="la la-next" onclick="dbLocNav(this,1)">&#8250;</div></div></div>';
   }
 }
-        }
         i--;
         break;
 
