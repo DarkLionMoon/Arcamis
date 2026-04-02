@@ -107,6 +107,16 @@ async function _loadSingleDb(grid){
       if(innerEl&&window.loadSubclassGallery){window.loadSubclassGallery(innerEl,data.pages);}
       return;
     }
+    var GALLERY_PG_DB = '2fd0274fdc1c80038889fc072a360bae';
+if (dbId === GALLERY_PG_DB) {
+  var wrap = grid.closest('.n-db-wrap');
+  var uid = 'dblc-' + dbId;
+  if (wrap) { wrap.outerHTML = '<div class="n-db-lc-wrap" id="' + uid + '"><div id="gspg-inner-' + dbId + '"></div></div>'; }
+  var innerEl = document.getElementById('gspg-inner-' + dbId);
+  if (innerEl && window.loadGallery) { window.loadGallery(innerEl); }
+  return;
+}
+
 
     var cardsHtml=data.pages.map(function(p){
       var icon=p.icon||'📄';
