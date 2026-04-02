@@ -427,3 +427,76 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
   .loc-banner { padding: 14px 16px; gap: 14px; }
   .loc-banner-title { font-size: 12px; }
 }
+/* ── INDEX CARD (child_page senza cover) ── */
+.cp-icard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.cp-icard {
+  position: relative;
+  padding: 28px 20px 22px;
+  border: 1px solid rgba(200,155,60,.15);
+  border-radius: 4px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color .2s, transform .15s;
+}
+
+.cp-icard:hover {
+  border-color: rgba(200,155,60,.4);
+  transform: translateY(-2px);
+}
+
+.cp-icard-accent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.cp-icard-icon {
+  font-size: 30px;
+  display: block;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.cp-icard-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(240,230,200,.88);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.cp-icard-sub {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  opacity: .65;
+}
+
+.cp-icard-arr {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  font-size: 13px;
+  opacity: .3;
+  transition: opacity .2s, transform .2s;
+}
+
+.cp-icard:hover .cp-icard-arr {
+  opacity: .85;
+  transform: scale(1.15);
+}
+
+@media (max-width: 600px) {
+  .cp-icard-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cp-icard { padding: 20px 14px 18px; }
+}
