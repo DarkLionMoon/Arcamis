@@ -261,11 +261,13 @@ function renderBlocks(blocks,isRoot){
           var cpCoverNi=cpni?cpni.cover:null;
 var cpCoverSafe=safeCoverUrl(cpCoverNi);
 if(cpCoverSafe){
-  cpCards+='<div class="loc-card" style="background-image:url(\''+cpCoverSafe+'\');background-size:cover;background-position:center" onclick="gp(\''+cpid+'\',\''+cptitleSafe+'\',\''+cpicon+'\')">'
-    +'<div class="loc-ov"><div class="loc-badge explored">'+cpicon+'</div>'
-    +'<div class="loc-name">'+cptitle+'</div>'
-    +'<div class="loc-sub" style="color:'+cpacc.c+'">Apri \u2192</div>'
-    +'<div class="loc-cta">APRI \u25c6</div></div></div>';
+  cpCards+='<div class="cp-icard" style="'+cpbg+'" onclick="gp(\''+cpid+'\',\''+cptitleSafe+'\',\''+cpicon+'\')">'
+  +'<div class="cp-icard-accent" style="background:linear-gradient(90deg,'+cpacc.c+',transparent)"></div>'
+  +'<div class="cp-icard-icon" style="color:'+cpacc.c+'">'+cpicon+'</div>'
+  +'<div class="cp-icard-title">'+cptitle+'</div>'
+  +'<div class="cp-icard-sub" style="color:'+cpacc.c+'">Apri \u2192</div>'
+  +'<div class="cp-icard-arr" style="color:'+cpacc.c+'">\u25c6</div>'
+  +'</div>';
 }else{
   cpCards+='<div class="loc-banner" style="'+cpbg+'" onclick="gp(\''+cpid+'\',\''+cptitleSafe+'\',\''+cpicon+'\')">'
     +'<div class="loc-banner-accent" style="background:'+cpacc.c+'"></div>'
@@ -280,16 +282,7 @@ if(cpCoverSafe){
           i++;
         }
         if(cpCards){
-  var cpCount=(cpCards.match(/class="loc-card"/g)||[]).length;
-  var cpBannerCount=(cpCards.match(/class="loc-banner"/g)||[]).length;
-  var cpAllBanners=(cpBannerCount>0&&cpCount===0);
-  if(cpAllBanners){
-    h+='<div class="loc-banner-grid">'+cpCards+'</div>';
-  }else if(cpCount<=2){
-    h+='<div class="n-cp-grid">'+cpCards+'</div>';
-  }else{
-    h+='<div class="n-db-lc-wrap" id="'+cpUid+'"><div class="loc-wrap" style="margin:0"><div class="loc-track-outer"><div class="loc-track" data-idx="0" style="gap:16px">'+cpCards+'</div></div><div class="la la-prev" onclick="dbLocNav(this,-1)">&#8249;</div><div class="la la-next" onclick="dbLocNav(this,1)">&#8250;</div></div></div>';
-  }
+  h+='<div class="cp-icard-grid">'+cpCards+'</div>';
 }
         i--;
         break;
