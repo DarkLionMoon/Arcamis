@@ -8,7 +8,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="scripts/css/style-base.css">
 <link rel="stylesheet" href="scripts/css/style-home.css">
-<link rel="stylesheet" href="scripts/css/style-notion.css">
+<link rel="stylesheet" href="scripts/css/pages/notion-blocks/style.css">
+<link rel="stylesheet" href="scripts/css/pages/notion-blocks/style-cards.css">
+<link rel="stylesheet" href="scripts/css/pages/galleria-pg/style.css">
+<link rel="stylesheet" href="scripts/css/pages/biblioteca/style.css">
+<link rel="stylesheet" href="scripts/css/pages/sottoclassi/style.css">
+<link rel="stylesheet" href="scripts/css/pages/npc/style.css">
+<link rel="stylesheet" href="scripts/css/pages/timeline/style.css">
 <link rel="stylesheet" href="scripts/css/style-page.css">
 <link rel="stylesheet" href="scripts/css/style-fx.css">
 <link rel="stylesheet" href="scripts/css/style-ui.css">
@@ -472,13 +478,19 @@
 
 <!-- ═══ SCRIPT ═══ -->
 <script src="scripts/js/data.js" defer></script>
-<script src="scripts/js/notion-render.js" defer></script>
+<script src="scripts/js/notion-core/render-helpers.js" defer></script>
+<script src="scripts/js/notion-core/render-blocks.js" defer></script>
+<script src="scripts/js/notion-core/render-db.js" defer></script>
 <script src="scripts/js/notion-nav.js" defer></script>
 <script src="scripts/js/fx.js" defer></script>
 <script src="scripts/js/app.js" defer></script>
-<script src="scripts/js/gallery.js" defer></script>
 <script src="scripts/js/carousel-loader.js" defer></script>
 <script src="scripts/js/admin-overlay.js" defer></script>
+<script src="scripts/js/pages/galleria-pg/script.js" defer></script>
+<script src="scripts/js/pages/sottoclassi/script.js" defer></script>
+<script src="scripts/js/pages/biblioteca/script.js" defer></script>
+<script src="scripts/js/pages/timeline/script.js" defer></script>
+<script src="scripts/js/pages/npc/script.js" defer></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
@@ -486,9 +498,5 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="scripts/js/subclass-gallery.js" defer></script>
-<script src="/scripts/js/library-gallery.js"></script>
-<script src="scripts/js/timeline.js" defer></script>
-<script src="/scripts/js/npc-gallery.js"></script>
 </body>
 </html>
