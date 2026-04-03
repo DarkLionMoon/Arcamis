@@ -212,7 +212,16 @@ if (dbId) {
       : null
   : null;
 
-    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti, lore, importanza };
+    const specieProp = p.properties && (
+  p.properties['Specie'] || p.properties['specie']
+);
+const specie = specieProp
+  ? (specieProp.type === 'multi_select' && specieProp.multi_select.length)
+    ? specieProp.multi_select.map(function(s){ return s.name; }).join(', ')
+    : (specieProp.select ? specieProp.select.name : null)
+  : null;
+
+return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, specie, dove, argomenti, lore, importanza };
     }));
 
   const payload = JSON.stringify({ pages });
