@@ -422,28 +422,56 @@ async function _loadSingleDb(grid){
     }
 
     /* ── SPECIE HOMEBREW ── */
-    var SPECIE_DB='2f60274fdc1c80fba671c588ba93b116';
-    if(dbId===SPECIE_DB){
-      var sortedPages=data.pages.slice().sort(function(a,b){return a.title.localeCompare(b.title,'it');});
-      var specieHtml='<div class="sp-layout">'
-        +'<div class="sp-sidebar"><div class="sp-sidebar-title">Specie</div><ul class="sp-list">'
-        +sortedPages.map(function(p){
-          var icon=p.icon||'📄';
-          var title=p.title.replace(/'/g,"\\'");
-          return'<li class="sp-item" onclick="spSelect(this,\''+p.id+'\',\''+title+'\',\''+icon+'\')">'+p.title+'</li>';
-        }).join('')
-        +'</ul></div>'
-        +'<div class="sp-content" id="sp-content"><div class="sp-placeholder">← Seleziona una specie</div></div>'
-        +'</div>';
-      var wrap=grid.closest('.n-db-wrap');
-      var titleEl=wrap?wrap.querySelector('.n-db-title'):null;
-      var titleHtml=titleEl?'<div class="n-db-title">'+titleEl.textContent+'</div>':'';
-      var uid='dblc-'+dbId;
-      if(wrap){wrap.outerHTML='<div class="n-db-lc-wrap" id="'+uid+'">'+titleHtml+specieHtml+'</div>';}
-      else{grid.outerHTML='<div>'+specieHtml+'</div>';}
-      _injectSpecieCSS();
-      return;
-    }
+   var SPECIE_DB='2f60274fdc1c80fba671c588ba93b116';
+if(dbId===SPECIE_DB){
+  /* Raggruppa per specie, ordina */
+  var grouped={};
+  data.pages.forEach(function(p){
+    var gr=p.specie||'Altra';
+    if(!grouped[gr])grouped[gr]=[];
+    grouped[gr].push(p);
+  });
+  var gruppi=Object.keys(grouped).sort(function(a,b){return a.localeCompare(b,'it');});
+  gruppi.forEach(function(gr){
+    grouped[gr].sort(function(a,b){return a.title.localeCompare(b.title,'it');});
+  });
+
+  var sidebarItems=gruppi.map(function(gr){
+    return'<li class="sp-class-item" data-specie="'+gr+'" onclick="spSelectGroup(this,\''+gr+'\')">'+gr+'</li>';
+  }).join('');
+
+  var specieHtml=
+    '<div class="sp-layout">'+
+      '<aside class="sp-sidebar">'+
+        '<div class="sp-sidebar-title">Specie</div>'+
+        '<ul class="sp-class-list">'+sidebarItems+'</ul>'+
+      '</aside>'+
+      '<div class="sp-main">'+
+        '<div class="sp-tabs" id="sp-tabs"></div>'+
+        '<div class="sp-content" id="sp-content">'+
+          '<div class="sp-placeholder">← Seleziona una specie</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+
+  var wrap=grid.closest('.n-db-wrap');
+  var uid='dblc-'+dbId;
+  if(wrap){wrap.outerHTML='<div class="n-db-lc-wrap" id="'+uid+'">'+specieHtml+'</div>';}
+  else{grid.outerHTML='<div>'+specieHtml+'</div>';}
+
+  /* Salva dati raggruppati */
+  var layoutEl=document.querySelector('#'+uid+' .sp-layout');
+  if(layoutEl)layoutEl._spData=grouped;
+
+  /* Seleziona primo gruppo automaticamente */
+  if(gruppi.length){
+    var firstItem=document.querySelector('.sp-class-item');
+    if(firstItem)spSelectGroup(firstItem,gruppi[0]);
+  }
+
+  _injectSpecieCSS();
+  return;
+}
 
     /* ── TIMELINE AETHERION ── */
     var TIMELINE_DB='2fc0274fdc1c800f8ac0d6d03b255cad';
