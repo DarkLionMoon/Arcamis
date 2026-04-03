@@ -1,0 +1,272 @@
+export async function onRequest(context) {
+  const url = new URL(context.request.url);
+  const pageId = url.searchParams.get('pageId');
+  const dbId = url.searchParams.get('dbId');
+  const imgUrl = url.searchParams.get('img');
+  const purge = url.searchParams.get('purge');
+  const purgeKey = url.searchParams.get('key');
+  const TOKEN = context.env.NOTION_TOKEN;
+  const KV = context.env.ARCAMIS_CACHE;
+
+  const PURGE_SECRET = context.env.PURGE_SECRET || 'arcamis-purge';
+  const CACHE_TTL = 3600; /* secondi — 1 ora */
+
+  const notionHeaders = {
+    'Authorization': 'Bearer ' + TOKEN,
+    'Notion-Version': '2022-06-28',
+    'Content-Type': 'application/json'
+  };
+
+  const cors = {
+    'Access-Control-Allow-Origin': '*',
+    'Cache-Control': 'public, max-age=60, stale-while-revalidate=300'
+  };
+
+  try {
+
+    /* ── Purge cache ── */
+    if (purge && purgeKey === PURGE_SECRET) {
+      const id = pageId || dbId;
+      if (id) {
+        await KV.delete('pg_' + id.replace(/-/g, ''));
+        await KV.delete('db_' + id.replace(/-/g, ''));
+        return new Response(JSON.stringify({ purged: id }), {
+          headers: { 'Content-Type': 'application/json', ...cors }
+        });
+      }
+      /* purge tutto */
+      const list = await KV.list();
+      await Promise.all(list.keys.map(k => KV.delete(k.name)));
+      return new Response(JSON.stringify({ purged: 'all', count: list.keys.length }), {
+        headers: { 'Content-Type': 'application/json', ...cors }
+      });
+    }
+
+    /* ── Proxy immagini S3 Notion ── */
+    if (imgUrl) {
+      const decoded = decodeURIComponent(imgUrl);
+      const img = await fetch(decoded);
+      const ct = img.headers.get('content-type') || '';
+
+      /* Se S3 risponde con XML = URL scaduto → 404 */
+      if (!ct.startsWith('image/')) {
+        return new Response('Image expired or unavailable', {
+          status: 404,
+          headers: { 'Content-Type': 'text/plain', ...cors }
+        });
+      }
+
+      return new Response(img.body, {
+        headers: {
+          'Content-Type': ct,
+          'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
+          ...cors
+        }
+      });
+    }
+
+    /* ── Carica pagina singola ── */
+    if (pageId) {
+      const cleanId = pageId.replace(/-/g, '');
+      const cacheKey = 'pg_' + cleanId;
+
+      /* 1. Controlla KV cache */
+      const cached = await KV.get(cacheKey);
+      if (cached) {
+        return new Response(cached, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Cache': 'HIT',
+            ...cors
+          }
+        });
+      }
+
+      /* 2. Cache miss → chiama Notion */
+      const [pageRes, blocksRes] = await Promise.all([
+        fetch('https://api.notion.com/v1/pages/' + cleanId, { headers: notionHeaders }),
+        fetch('https://api.notion.com/v1/blocks/' + cleanId + '/children?page_size=100', { headers: notionHeaders })
+      ]);
+
+      if (!pageRes.ok) throw new Error('Notion page error: ' + pageRes.status);
+      if (!blocksRes.ok) throw new Error('Notion blocks error: ' + blocksRes.status);
+
+      const page = await pageRes.json();
+      const blocksData = await blocksRes.json();
+      const blocks = await loadChildren(blocksData.results, notionHeaders);
+
+      const payload = JSON.stringify({ page, blocks });
+
+      /* 3. Salva in KV */
+      await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+
+      return new Response(payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Cache': 'MISS',
+          ...cors
+        }
+      });
+    }
+
+   /* ── Carica database ── */
+if (dbId) {
+  const cleanId = dbId.replace(/-/g, '');
+  const cacheKey = 'db_' + cleanId;
+
+  const cached = await KV.get(cacheKey);
+  if (cached) {
+    return new Response(cached, {
+      headers: { 'Content-Type': 'application/json', 'X-Cache': 'HIT', ...cors }
+    });
+  }
+
+  const TIMELINE_DB = '2fc0274fdc1c800f8ac0d6d03b255cad';
+
+  const queryBody = cleanId === TIMELINE_DB.replace(/-/g, '')
+    ? { page_size: 100, sorts: [{ property: 'Order', direction: 'ascending' }] }
+    : { page_size: 100 };
+
+  const res = await fetch('https://api.notion.com/v1/databases/' + cleanId + '/query', {
+    method: 'POST',
+    headers: notionHeaders,
+    body: JSON.stringify(queryBody)
+  });
+
+  if (!res.ok) throw new Error('Notion DB error: ' + res.status);
+  const data = await res.json();
+  if (cleanId === TIMELINE_DB.replace(/-/g, '')) {
+  data.results.sort(function(a, b) {
+    const getOrder = function(p) {
+      const prop = p.properties && (p.properties['Order'] || p.properties['Ordine'] || p.properties['order']);
+      return (prop && prop.number != null) ? prop.number : 9999;
+    };
+    return getOrder(a) - getOrder(b);
+  });
+}
+
+  const pages = await Promise.all(data.results.map(async p => {
+    const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
+    const title = titleProp
+      ? (titleProp.title || []).map(t => t.plain_text).join('')
+      : 'Senza titolo';
+
+    const icon = p.icon && p.icon.emoji ? p.icon.emoji : '📄';
+
+    const cover = p.cover
+      ? (p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url))
+      : null;
+
+    const classeProp = p.properties && (
+      p.properties['Classe'] || p.properties['classe'] ||
+      p.properties['Class'] || p.properties['class']
+    );
+    const classe = classeProp
+      ? (classeProp.type === 'multi_select' && classeProp.multi_select.length)
+        ? classeProp.multi_select.map(function(s){ return s.name; }).join(', ')
+        : (classeProp.select ? classeProp.select.name : null)
+      : null;
+
+    /* ── Dove trovarlo (rich_text o select) ── */
+    const doveProp = p.properties && (
+      p.properties['Dove trovarlo'] || p.properties['dove_trovarlo'] ||
+      p.properties['Dove Trovarlo'] || p.properties['location']
+    );
+    const dove = doveProp
+      ? doveProp.type === 'rich_text'
+        ? (doveProp.rich_text || []).map(t => t.plain_text).join('')
+        : doveProp.type === 'select' && doveProp.select
+          ? doveProp.select.name
+          : null
+      : null;
+
+    /* ── Macro-argomento (multi_select) ── */
+    const argProp = p.properties && (
+      p.properties['Macro-argomento'] || p.properties['macro_argomento'] ||
+      p.properties['Argomento'] || p.properties['argomento'] ||
+      p.properties['Tags'] || p.properties['tags']
+    );
+    const argomenti = argProp && argProp.type === 'multi_select'
+      ? (argProp.multi_select || []).map(s => ({ name: s.name, color: s.color }))
+      : [];
+
+    const loreProp = p.properties && (
+      p.properties['Lore'] || p.properties['lore']
+    );
+    const lore = loreProp
+      ? loreProp.type === 'select' && loreProp.select
+        ? loreProp.select.name
+        : loreProp.type === 'multi_select' && loreProp.multi_select.length
+          ? loreProp.multi_select.map(s => s.name).join(', ')
+          : null
+      : null;
+
+    const importanzaProp = p.properties && (
+      p.properties['Importanza'] || p.properties['importanza']
+    );
+    const importanza = importanzaProp
+  ? importanzaProp.type === 'multi_select' && importanzaProp.multi_select.length
+    ? importanzaProp.multi_select[0].name
+    : importanzaProp.type === 'select' && importanzaProp.select
+      ? importanzaProp.select.name
+      : null
+  : null;
+
+    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, dove, argomenti, lore, importanza };
+    }));
+
+  const payload = JSON.stringify({ pages });
+  await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+
+  return new Response(payload, {
+    headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
+  });
+}
+
+    /* ── Fallback if no parameters match ── */
+    return new Response(JSON.stringify({ error: 'Parametro mancante' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json', ...cors }
+    });
+
+  } catch (e) {
+    /* ── Global Error Handler ── */
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...cors }
+    });
+  }
+}
+
+/* ════ loadChildren — parallelo + ricorsivo ════ */
+async function loadChildren(blocks, headers) {
+  const childResults = await Promise.all(
+    blocks.map(async function(block) {
+      if (!block.has_children) return { id: block.id, children: null };
+      try {
+        const res = await fetch(
+          'https://api.notion.com/v1/blocks/' + block.id + '/children?page_size=100',
+          { headers }
+        );
+        if (!res.ok) return { id: block.id, children: [] };
+        const data = await res.json();
+        const children = await loadChildren(data.results, headers);
+        return { id: block.id, children };
+      } catch(e) {
+        return { id: block.id, children: [] };
+      }
+    })
+  );
+
+  const childMap = {};
+  childResults.forEach(function(r) {
+    if (r.children !== null) childMap[r.id] = r.children;
+  });
+
+  return blocks.map(function(block) {
+    if (block.has_children && childMap[block.id] !== undefined) {
+      return Object.assign({}, block, { children: childMap[block.id] });
+    }
+    return block;
+  });
+}
