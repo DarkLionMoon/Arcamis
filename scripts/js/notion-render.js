@@ -583,7 +583,6 @@ function _injectSpecieCSS(){
 @media(max-width:640px){.sp-layout{grid-template-columns:1fr;}.sp-sidebar{border-right:none;border-bottom:1px solid rgba(200,155,60,.15);max-height:180px;}.sp-content{padding:20px 16px;max-height:none;}}
   `;
   document.head.appendChild(s);
-}ocument.head.appendChild(s);
 }
 
 window.spSelect=function(el,id,title,icon){
