@@ -71,7 +71,11 @@ export async function onRequest(context) {
         });
       }
       const list = await KV.list();
-      await Promise.all(list.keys.map(k => KV.delete(k.name)));
+const toDelete = list.keys.filter(k => !k.name.startsWith('admin_'));
+await Promise.all(toDelete.map(k => KV.delete(k.name)));
+return new Response(JSON.stringify({ purged: 'all', count: toDelete.length }), {
+  headers: { 'Content-Type': 'application/json', ...cors }
+});
       return new Response(JSON.stringify({ purged: 'all', count: list.keys.length }), {
         headers: { 'Content-Type': 'application/json', ...cors }
       });
