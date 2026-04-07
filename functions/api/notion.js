@@ -43,7 +43,7 @@ export async function onRequest(context) {
   async function kvPut(key, data) {
     const wrapper = JSON.stringify({
       expiresAt: Date.now() + CACHE_TTL * 1000,
-      data: data
+      data
     });
     await KV.put(key, wrapper, { expirationTtl: CACHE_SWR });
   }
