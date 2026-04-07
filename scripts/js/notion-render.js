@@ -592,7 +592,7 @@ window.spSelect=function(el,id,title,icon){
   if(!content)return;
   content.innerHTML='<div class="sp-loading"><div class="gs-loading-spin"></div></div>';
   fetch('/api/notion?pageId='+id)
-    .then(function(r){return r.json();})
+    .then(async function(r){   const text = await r.text();   try {     return JSON.parse(text);   } catch(e) {     console.error("JSON ERROR:", text);     throw e;   } })
     .then(function(data){
       if(!data.blocks)throw new Error('no blocks');
       var html=renderBlocks(data.blocks,true);
