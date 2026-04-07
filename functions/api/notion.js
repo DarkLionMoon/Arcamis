@@ -103,10 +103,10 @@ export async function onRequest(context) {
         if (cached.stale) {
           kvRefreshBg(cacheKey, async function() {
             const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);
-            return JSON.stringify(data);
+            return data;
           });
         }
-        return new Response(cached.value, {
+        return new Response(JSON.stringify(cached.value), {
           headers: {
             'Content-Type': 'application/json',
             'X-Cache': cached.stale ? 'STALE' : 'HIT',
@@ -116,9 +116,7 @@ export async function onRequest(context) {
       }
 
       const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);
-      const payload = JSON.stringify(data);
-      await kvPut(cacheKey, payload);
-
+      await kvPut(cacheKey, data);
       return new Response(payload, {
         headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
       });
@@ -134,10 +132,10 @@ export async function onRequest(context) {
         if (cached.stale) {
           kvRefreshBg(cacheKey, async function() {
             const data = await fetchDb(cleanId, notionHeaders);
-            return JSON.stringify(data);
+            return data;
           });
         }
-        return new Response(cached.value, {
+        return new Response(JSON.stringify(cached.value), {
           headers: {
             'Content-Type': 'application/json',
             'X-Cache': cached.stale ? 'STALE' : 'HIT',
