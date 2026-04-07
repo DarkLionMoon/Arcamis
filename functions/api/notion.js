@@ -46,7 +46,7 @@ export async function onRequest(context) {
   async function kvPut(key, data) {
     const wrapper = JSON.stringify({
       expiresAt: Date.now() + CACHE_TTL * 1000,
-      data
+      data: data
     });
     await KV.put(key, wrapper, { expirationTtl: CACHE_SWR });
   }
@@ -101,72 +101,58 @@ return new Response(JSON.stringify({ purged: 'all', count: toDelete.length }), {
       });
     }
 
-    /* ── Carica pagina singola ── */
-    if (pageId) {
-      const cleanId = pageId.replace(/-/g, '');
-      const cacheKey = 'pg_' + cleanId;
+   /* ── Carica pagina singola ── */
+if (pageId) {
+  const cleanId = pageId.replace(/-/g, '');
+  const cacheKey = 'pg_' + cleanId;
 
-      const cached = await kvGet(cacheKey);
-      if (cached) {
-        // Se stale: servi subito e aggiorna in background
-        if (cached.stale) {
-          kvRefreshBg(cacheKey, () => fetchPage(cleanId, notionHeaders, MAX_DEPTH));
-        }
-        return new Response(cached.value, {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Cache': cached.stale ? 'STALE' : 'HIT',
-            ...cors
-          }
-        });
-      }
-
-      const payload = JSON.stringify(await fetchPage(cleanId, notionHeaders, MAX_DEPTH));
-      await kvPut(cacheKey, payload);
-
-      return new Response(payload, {
-        headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
+  const cached = await kvGet(cacheKey);
+  if (cached) {
+    if (cached.stale) {
+      kvRefreshBg(cacheKey, async () => {
+        const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);
+        return JSON.stringify(data);  // ← stringa
       });
     }
-
-    /* ── Carica database ── */
-    if (dbId) {
-      const cleanId = dbId.replace(/-/g, '');
-      const cacheKey = 'db_' + cleanId;
-
-      const cached = await kvGet(cacheKey);
-      if (cached) {
-        if (cached.stale) {
-          kvRefreshBg(cacheKey, () => fetchDb(cleanId, notionHeaders));
-        }
-        return new Response(cached.value, {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Cache': cached.stale ? 'STALE' : 'HIT',
-            ...cors
-          }
-        });
-      }
-
-      const payload = JSON.stringify(await fetchDb(cleanId, notionHeaders));
-      await kvPut(cacheKey, payload);
-
-      return new Response(payload, {
-        headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
-      });
-    }
-
-    return new Response(JSON.stringify({ error: 'Parametro mancante' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json', ...cors }
-    });
-
-  } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', ...cors }
+    return new Response(cached.value, {
+      headers: { 'Content-Type': 'application/json', 'X-Cache': cached.stale ? 'STALE' : 'HIT', ...cors }
     });
   }
+
+  const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);
+  const payload = JSON.stringify(data);  // ← stringa
+  await kvPut(cacheKey, payload);        // ← salva stringa
+
+  return new Response(payload, {
+    headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
+  });
+}
+
+/* ── Carica database ── */
+if (dbId) {
+  const cleanId = dbId.replace(/-/g, '');
+  const cacheKey = 'db_' + cleanId;
+
+  const cached = await kvGet(cacheKey);
+  if (cached) {
+    if (cached.stale) {
+      kvRefreshBg(cacheKey, async () => {
+        const data = await fetchDb(cleanId, notionHeaders);
+        return JSON.stringify(data);  // ← stringa
+      });
+    }
+    return new Response(cached.value, {
+      headers: { 'Content-Type': 'application/json', 'X-Cache': cached.stale ? 'STALE' : 'HIT', ...cors }
+    });
+  }
+
+  const data = await fetchDb(cleanId, notionHeaders);
+  const payload = JSON.stringify(data);  // ← stringa
+  await kvPut(cacheKey, payload);        // ← salva stringa
+
+  return new Response(payload, {
+    headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
+  });
 }
 
 /* ════ fetchPage ════ */
