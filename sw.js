@@ -1,20 +1,23 @@
 /* ════════════════════════════════════
    ARCAMIS — Service Worker
-   Auto-unregister per forzare aggiornamento
+   Auto-unregister: non fa nulla, si rimuove
 ════════════════════════════════════ */
 self.addEventListener('install', function() {
   self.skipWaiting();
 });
+
 self.addEventListener('activate', function(e) {
   e.waitUntil(
-    caches.keys().then(function(keys){
-      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
-    }).then(function(){
-      return self.clients.claim();
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+    }).then(function() {
+      return self.registration.unregister();
+    }).then(function() {
+      return self.clients.matchAll();
+    }).then(function(clients) {
+      clients.forEach(function(client) {
+        if (client.navigate) client.navigate(client.url);
+      });
     })
   );
-});
-self.addEventListener('fetch', function(e) {
-  /* Nessuna cache — passa tutto alla rete */
-  e.respondWith(fetch(e.request));
 });
