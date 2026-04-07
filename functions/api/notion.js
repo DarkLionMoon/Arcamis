@@ -110,7 +110,7 @@ return new Response(JSON.stringify({ purged: 'all', count: toDelete.length }), {
       if (cached) {
         // Se stale: servi subito e aggiorna in background
         if (cached.stale) {
-          kvRefreshBg(cacheKey, () => fetchPage(cleanId, notionHeaders, MAX_DEPTH));
+          kvRefreshBg(cacheKey, async () => {   const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);   return JSON.stringify(data); });
         }
         return new Response(cached.value, {
           headers: {
@@ -137,7 +137,7 @@ return new Response(JSON.stringify({ purged: 'all', count: toDelete.length }), {
       const cached = await kvGet(cacheKey);
       if (cached) {
         if (cached.stale) {
-          kvRefreshBg(cacheKey, () => fetchDb(cleanId, notionHeaders));
+          kvRefreshBg(cacheKey, async () => {   const data = await fetchDb(cleanId, notionHeaders);   return JSON.stringify(data); });
         }
         return new Response(cached.value, {
           headers: {
