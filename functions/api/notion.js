@@ -9,9 +9,9 @@ export async function onRequest(context) {
   const KV = context.env.ARCAMIS_CACHE;
 
   const PURGE_SECRET = context.env.PURGE_SECRET || 'arcamis-purge';
-  const CACHE_TTL = 3600;       // secondi fino a stale
-  const CACHE_SWR = 86400;      // secondi totali in KV (stale ok per 24h)
-  const MAX_DEPTH = 3;          // profondità massima loadChildren
+  const CACHE_TTL = 3600;
+  const CACHE_SWR = 86400;
+  const MAX_DEPTH = 3;
 
   const notionHeaders = {
     'Authorization': 'Bearer ' + TOKEN,
@@ -24,19 +24,16 @@ export async function onRequest(context) {
     'Cache-Control': 'public, max-age=60, stale-while-revalidate=300'
   };
 
-  /* ── Helper KV con stale-while-revalidate ── */
   async function kvGet(key) {
     try {
       const raw = await KV.get(key, 'text');
       if (!raw) return null;
-      // Prova a leggere il wrapper { expiresAt, data }
       try {
         const wrapper = JSON.parse(raw);
         if (wrapper && wrapper.expiresAt && wrapper.data !== undefined) {
           return { value: wrapper.data, stale: Date.now() > wrapper.expiresAt };
         }
       } catch (_) {}
-      // Vecchio formato (stringa diretta) — compatibile
       return { value: raw, stale: false };
     } catch (_) {
       return null;
@@ -51,10 +48,9 @@ export async function onRequest(context) {
     await KV.put(key, wrapper, { expirationTtl: CACHE_SWR });
   }
 
-  // Aggiorna KV in background senza bloccare la risposta
   function kvRefreshBg(key, fetchFn) {
     context.waitUntil(
-      fetchFn().then(data => kvPut(key, data)).catch(() => {})
+      fetchFn().then(function(data) { return kvPut(key, data); }).catch(function() {})
     );
   }
 
@@ -71,11 +67,7 @@ export async function onRequest(context) {
         });
       }
       const list = await KV.list();
-const toDelete = list.keys.filter(k => !k.name.startsWith('admin_'));
-await Promise.all(toDelete.map(k => KV.delete(k.name)));
-return new Response(JSON.stringify({ purged: 'all', count: toDelete.length }), {
-  headers: { 'Content-Type': 'application/json', ...cors }
-});
+      await Promise.all(list.keys.map(function(k) { return KV.delete(k.name); }));
       return new Response(JSON.stringify({ purged: 'all', count: list.keys.length }), {
         headers: { 'Content-Type': 'application/json', ...cors }
       });
@@ -101,58 +93,80 @@ return new Response(JSON.stringify({ purged: 'all', count: toDelete.length }), {
       });
     }
 
-   /* ── Carica pagina singola ── */
-if (pageId) {
-  const cleanId = pageId.replace(/-/g, '');
-  const cacheKey = 'pg_' + cleanId;
+    /* ── Carica pagina singola ── */
+    if (pageId) {
+      const cleanId = pageId.replace(/-/g, '');
+      const cacheKey = 'pg_' + cleanId;
 
-  const cached = await kvGet(cacheKey);
-  if (cached) {
-    if (cached.stale) {
-      kvRefreshBg(cacheKey, async () => {
-        const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);
-        return JSON.stringify(data);  // ← stringa
+      const cached = await kvGet(cacheKey);
+      if (cached) {
+        if (cached.stale) {
+          kvRefreshBg(cacheKey, async function() {
+            const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);
+            return JSON.stringify(data);
+          });
+        }
+        return new Response(cached.value, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Cache': cached.stale ? 'STALE' : 'HIT',
+            ...cors
+          }
+        });
+      }
+
+      const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);
+      const payload = JSON.stringify(data);
+      await kvPut(cacheKey, payload);
+
+      return new Response(payload, {
+        headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
       });
     }
-    return new Response(cached.value, {
-      headers: { 'Content-Type': 'application/json', 'X-Cache': cached.stale ? 'STALE' : 'HIT', ...cors }
-    });
-  }
 
-  const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);
-  const payload = JSON.stringify(data);  // ← stringa
-  await kvPut(cacheKey, payload);        // ← salva stringa
+    /* ── Carica database ── */
+    if (dbId) {
+      const cleanId = dbId.replace(/-/g, '');
+      const cacheKey = 'db_' + cleanId;
 
-  return new Response(payload, {
-    headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
-  });
-}
+      const cached = await kvGet(cacheKey);
+      if (cached) {
+        if (cached.stale) {
+          kvRefreshBg(cacheKey, async function() {
+            const data = await fetchDb(cleanId, notionHeaders);
+            return JSON.stringify(data);
+          });
+        }
+        return new Response(cached.value, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Cache': cached.stale ? 'STALE' : 'HIT',
+            ...cors
+          }
+        });
+      }
 
-/* ── Carica database ── */
-if (dbId) {
-  const cleanId = dbId.replace(/-/g, '');
-  const cacheKey = 'db_' + cleanId;
+      const data = await fetchDb(cleanId, notionHeaders);
+      const payload = JSON.stringify(data);
+      await kvPut(cacheKey, payload);
 
-  const cached = await kvGet(cacheKey);
-  if (cached) {
-    if (cached.stale) {
-      kvRefreshBg(cacheKey, async () => {
-        const data = await fetchDb(cleanId, notionHeaders);
-        return JSON.stringify(data);  // ← stringa
+      return new Response(payload, {
+        headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
       });
     }
-    return new Response(cached.value, {
-      headers: { 'Content-Type': 'application/json', 'X-Cache': cached.stale ? 'STALE' : 'HIT', ...cors }
+
+    /* ── Fallback ── */
+    return new Response(JSON.stringify({ error: 'Parametro mancante' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json', ...cors }
+    });
+
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...cors }
     });
   }
-
-  const data = await fetchDb(cleanId, notionHeaders);
-  const payload = JSON.stringify(data);  // ← stringa
-  await kvPut(cacheKey, payload);        // ← salva stringa
-
-  return new Response(payload, {
-    headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
-  });
 }
 
 /* ════ fetchPage ════ */
@@ -167,7 +181,6 @@ async function fetchPage(cleanId, headers, maxDepth) {
   const page = await pageRes.json();
   const blocksData = await blocksRes.json();
 
-  // Paginazione blocchi root
   let allBlocks = blocksData.results;
   let cursor = blocksData.next_cursor;
   while (blocksData.has_more && cursor) {
@@ -186,7 +199,7 @@ async function fetchPage(cleanId, headers, maxDepth) {
   return { page, blocks };
 }
 
-/* ════ fetchDb — con paginazione ════ */
+/* ════ fetchDb ════ */
 async function fetchDb(cleanId, headers) {
   const TIMELINE_DB = '2fc0274fdc1c800f8ac0d6d03b255cad';
 
@@ -198,7 +211,7 @@ async function fetchDb(cleanId, headers) {
   let cursor = null;
 
   do {
-    const body = cursor ? { ...queryBody, start_cursor: cursor } : queryBody;
+    const body = cursor ? Object.assign({}, queryBody, { start_cursor: cursor }) : queryBody;
     const res = await fetch('https://api.notion.com/v1/databases/' + cleanId + '/query', {
       method: 'POST',
       headers,
@@ -212,18 +225,22 @@ async function fetchDb(cleanId, headers) {
 
   if (cleanId === TIMELINE_DB.replace(/-/g, '')) {
     allResults.sort(function(a, b) {
-      const getOrder = p => {
+      function getOrder(p) {
         const prop = p.properties && (p.properties['Order'] || p.properties['Ordine'] || p.properties['order']);
         return (prop && prop.number != null) ? prop.number : 9999;
-      };
+      }
       return getOrder(a) - getOrder(b);
     });
   }
 
-  const pages = allResults.map(p => {
-    const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
+  function getProp(p, names) {
+    return names.reduce(function(acc, n) { return acc || (p.properties && p.properties[n]); }, null);
+  }
+
+  const pages = allResults.map(function(p) {
+    const titleProp = Object.values(p.properties || {}).find(function(v) { return v.type === 'title'; });
     const title = titleProp
-      ? (titleProp.title || []).map(t => t.plain_text).join('')
+      ? (titleProp.title || []).map(function(t) { return t.plain_text; }).join('')
       : 'Senza titolo';
 
     const icon = p.icon && p.icon.emoji ? p.icon.emoji : '📄';
@@ -232,37 +249,35 @@ async function fetchDb(cleanId, headers) {
       ? (p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url))
       : null;
 
-    const getProp = (names) => names.reduce((acc, n) => acc || (p.properties && p.properties[n]), null);
-
-    const classeProp = getProp(['Classe','classe','Class','class']);
+    const classeProp = getProp(p, ['Classe','classe','Class','class']);
     const classe = classeProp
       ? (classeProp.type === 'multi_select' && classeProp.multi_select.length)
-        ? classeProp.multi_select.map(s => s.name).join(', ')
+        ? classeProp.multi_select.map(function(s) { return s.name; }).join(', ')
         : (classeProp.select ? classeProp.select.name : null)
       : null;
 
-    const doveProp = getProp(['Dove trovarlo','dove_trovarlo','Dove Trovarlo','location']);
+    const doveProp = getProp(p, ['Dove trovarlo','dove_trovarlo','Dove Trovarlo','location']);
     const dove = doveProp
       ? doveProp.type === 'rich_text'
-        ? (doveProp.rich_text || []).map(t => t.plain_text).join('')
+        ? (doveProp.rich_text || []).map(function(t) { return t.plain_text; }).join('')
         : doveProp.type === 'select' && doveProp.select
           ? doveProp.select.name : null
       : null;
 
-    const argProp = getProp(['Macro-argomento','macro_argomento','Argomento','argomento','Tags','tags']);
+    const argProp = getProp(p, ['Macro-argomento','macro_argomento','Argomento','argomento','Tags','tags']);
     const argomenti = argProp && argProp.type === 'multi_select'
-      ? (argProp.multi_select || []).map(s => ({ name: s.name, color: s.color }))
+      ? (argProp.multi_select || []).map(function(s) { return { name: s.name, color: s.color }; })
       : [];
 
-    const loreProp = getProp(['Lore','lore']);
+    const loreProp = getProp(p, ['Lore','lore']);
     const lore = loreProp
       ? loreProp.type === 'select' && loreProp.select
         ? loreProp.select.name
         : loreProp.type === 'multi_select' && loreProp.multi_select.length
-          ? loreProp.multi_select.map(s => s.name).join(', ') : null
+          ? loreProp.multi_select.map(function(s) { return s.name; }).join(', ') : null
       : null;
 
-    const importanzaProp = getProp(['Importanza','importanza']);
+    const importanzaProp = getProp(p, ['Importanza','importanza']);
     const importanza = importanzaProp
       ? importanzaProp.type === 'multi_select' && importanzaProp.multi_select.length
         ? importanzaProp.multi_select[0].name
@@ -270,10 +285,10 @@ async function fetchDb(cleanId, headers) {
           ? importanzaProp.select.name : null
       : null;
 
-    const specieProp = getProp(['Specie','specie']);
+    const specieProp = getProp(p, ['Specie','specie']);
     const specie = specieProp
       ? (specieProp.type === 'multi_select' && specieProp.multi_select.length)
-        ? specieProp.multi_select.map(s => s.name).join(', ')
+        ? specieProp.multi_select.map(function(s) { return s.name; }).join(', ')
         : (specieProp.select ? specieProp.select.name : null)
       : null;
 
@@ -283,12 +298,12 @@ async function fetchDb(cleanId, headers) {
   return { pages };
 }
 
-/* ════ loadChildren — parallelo + ricorsivo + limite profondità ════ */
+/* ════ loadChildren ════ */
 async function loadChildren(blocks, headers, depth) {
-  if (depth <= 0) return blocks; // limite raggiunto
+  if (depth <= 0) return blocks;
 
   const childResults = await Promise.all(
-    blocks.map(async block => {
+    blocks.map(async function(block) {
       if (!block.has_children) return { id: block.id, children: null };
       try {
         const res = await fetch(
@@ -306,9 +321,11 @@ async function loadChildren(blocks, headers, depth) {
   );
 
   const childMap = {};
-  childResults.forEach(r => { if (r.children !== null) childMap[r.id] = r.children; });
+  childResults.forEach(function(r) {
+    if (r.children !== null) childMap[r.id] = r.children;
+  });
 
-  return blocks.map(block => {
+  return blocks.map(function(block) {
     if (block.has_children && childMap[block.id] !== undefined) {
       return Object.assign({}, block, { children: childMap[block.id] });
     }
