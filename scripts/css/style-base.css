@@ -18,6 +18,9 @@
   --vglow:0 0 22px rgba(102,68,170,.25);
 }
 html,body{height:100%;overflow:hidden}
+html, body {
+  overscroll-behavior: none;
+}
 html{scroll-behavior:smooth}
 body{
   font-family:'Crimson Pro',Georgia,serif;font-size:15px;color:var(--text);
