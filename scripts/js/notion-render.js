@@ -608,28 +608,33 @@ window.spSelect=function(el,id,title,icon){
       content.innerHTML='<div style="color:rgba(200,155,60,.4);font-family:Cinzel,serif;font-size:11px;padding:40px;text-align:center">Errore caricamento</div>';
     });
 };
-window.spSelectGroup=function(el,gruppo){
-  document.querySelectorAll('.sp-class-item').forEach(function(i){i.classList.remove('active');});
+window.spSelectGroup = function(el, gruppo) {
+  document.querySelectorAll('.sp-class-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
 
-  var layout=el.closest('.sp-layout');
-  if(!layout||!layout._spData)return;
-  var sottospecie=layout._spData[gruppo]||[];
+  var layout = el.closest('.sp-layout');
+  if (!layout || !layout._spData) return;
+  var sottospecie = layout._spData[gruppo] || [];
 
-  var tabsEl=document.getElementById('sp-tabs');
-  var contentEl=document.getElementById('sp-content');
-  if(!tabsEl||!contentEl)return;
+  var tabsEl = document.getElementById('sp-tabs');
+  var contentEl = document.getElementById('sp-content');
+  if (!tabsEl || !contentEl) return;
 
-  tabsEl.innerHTML=sottospecie.map(function(p){
-    var titleSafe=p.title.replace(/'/g,"\\'");
-    return'<div class="sp-tab" onclick="spSelectTab(this,\''+p.id+'\',\''+titleSafe+'\',\''+p.icon+'\')">'+p.title+'</div>';
+  tabsEl.innerHTML = sottospecie.map(function(p) {
+    var titleSafe = p.title.replace(/'/g, "\\'");
+    return '<div class="sp-tab" onclick="spSelectTab(this,\'' + p.id + '\',\'' + titleSafe + '\',\'' + p.icon + '\')">' + p.title + '</div>';
   }).join('');
 
-  contentEl.innerHTML='<div class="sp-placeholder">↑ Seleziona una sotto-specie</div>';
+  contentEl.innerHTML = '<div class="sp-placeholder">↑ Seleziona una sotto-specie</div>';
 
-  if(sottospecie.length){
-    var firstTab=tabsEl.querySelector('.sp-tab');
-    if(firstTab)spSelectTab(firstTab,sottospecie[0].id,sottospecie[0].title,sottospecie[0].icon);
+  // Prefetch silenziosa dei primi 3 elementi (scalda KV)
+  sottospecie.slice(0, 3).forEach(function(p) {
+    fetch('/api/notion?pageId=' + p.id).catch(function(){});
+  });
+
+  if (sottospecie.length) {
+    var firstTab = tabsEl.querySelector('.sp-tab');
+    if (firstTab) spSelectTab(firstTab, sottospecie[0].id, sottospecie[0].title, sottospecie[0].icon);
   }
 };
 
