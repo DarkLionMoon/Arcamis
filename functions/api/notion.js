@@ -9,7 +9,9 @@ export async function onRequest(context) {
   const KV = context.env.ARCAMIS_CACHE;
 
   const PURGE_SECRET = context.env.PURGE_SECRET || 'arcamis-purge';
-  const CACHE_TTL = 3600; /* secondi — 1 ora */
+  const CACHE_TTL = 3600;       // secondi fino a stale
+  const CACHE_SWR = 86400;      // secondi totali in KV (stale ok per 24h)
+  const MAX_DEPTH = 3;          // profondità massima loadChildren
 
   const notionHeaders = {
     'Authorization': 'Bearer ' + TOKEN,
@@ -21,6 +23,40 @@ export async function onRequest(context) {
     'Access-Control-Allow-Origin': '*',
     'Cache-Control': 'public, max-age=60, stale-while-revalidate=300'
   };
+
+  /* ── Helper KV con stale-while-revalidate ── */
+  async function kvGet(key) {
+    try {
+      const raw = await KV.get(key, 'text');
+      if (!raw) return null;
+      // Prova a leggere il wrapper { expiresAt, data }
+      try {
+        const wrapper = JSON.parse(raw);
+        if (wrapper && wrapper.expiresAt && wrapper.data !== undefined) {
+          return { value: wrapper.data, stale: Date.now() > wrapper.expiresAt };
+        }
+      } catch (_) {}
+      // Vecchio formato (stringa diretta) — compatibile
+      return { value: raw, stale: false };
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function kvPut(key, data) {
+    const wrapper = JSON.stringify({
+      expiresAt: Date.now() + CACHE_TTL * 1000,
+      data
+    });
+    await KV.put(key, wrapper, { expirationTtl: CACHE_SWR });
+  }
+
+  // Aggiorna KV in background senza bloccare la risposta
+  function kvRefreshBg(key, fetchFn) {
+    context.waitUntil(
+      fetchFn().then(data => kvPut(key, data)).catch(() => {})
+    );
+  }
 
   try {
 
@@ -34,7 +70,6 @@ export async function onRequest(context) {
           headers: { 'Content-Type': 'application/json', ...cors }
         });
       }
-      /* purge tutto */
       const list = await KV.list();
       await Promise.all(list.keys.map(k => KV.delete(k.name)));
       return new Response(JSON.stringify({ purged: 'all', count: list.keys.length }), {
@@ -47,19 +82,16 @@ export async function onRequest(context) {
       const decoded = decodeURIComponent(imgUrl);
       const img = await fetch(decoded);
       const ct = img.headers.get('content-type') || '';
-
-      /* Se S3 risponde con XML = URL scaduto → 404 */
       if (!ct.startsWith('image/')) {
         return new Response('Image expired or unavailable', {
           status: 404,
           headers: { 'Content-Type': 'text/plain', ...cors }
         });
       }
-
       return new Response(img.body, {
         headers: {
           'Content-Type': ct,
-          'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
+          'Cache-Control': 'public, max-age=3600, stale-while-revalidate=7200',
           ...cors
         }
       });
@@ -70,82 +102,135 @@ export async function onRequest(context) {
       const cleanId = pageId.replace(/-/g, '');
       const cacheKey = 'pg_' + cleanId;
 
-      /* 1. Controlla KV cache */
-      const cached = await KV.get(cacheKey);
+      const cached = await kvGet(cacheKey);
       if (cached) {
-        return new Response(cached, {
+        // Se stale: servi subito e aggiorna in background
+        if (cached.stale) {
+          kvRefreshBg(cacheKey, () => fetchPage(cleanId, notionHeaders, MAX_DEPTH));
+        }
+        return new Response(cached.value, {
           headers: {
             'Content-Type': 'application/json',
-            'X-Cache': 'HIT',
+            'X-Cache': cached.stale ? 'STALE' : 'HIT',
             ...cors
           }
         });
       }
 
-      /* 2. Cache miss → chiama Notion */
-      const [pageRes, blocksRes] = await Promise.all([
-        fetch('https://api.notion.com/v1/pages/' + cleanId, { headers: notionHeaders }),
-        fetch('https://api.notion.com/v1/blocks/' + cleanId + '/children?page_size=100', { headers: notionHeaders })
-      ]);
-
-      if (!pageRes.ok) throw new Error('Notion page error: ' + pageRes.status);
-      if (!blocksRes.ok) throw new Error('Notion blocks error: ' + blocksRes.status);
-
-      const page = await pageRes.json();
-      const blocksData = await blocksRes.json();
-      const blocks = await loadChildren(blocksData.results, notionHeaders);
-
-      const payload = JSON.stringify({ page, blocks });
-
-      /* 3. Salva in KV */
-      await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+      const payload = JSON.stringify(await fetchPage(cleanId, notionHeaders, MAX_DEPTH));
+      await kvPut(cacheKey, payload);
 
       return new Response(payload, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Cache': 'MISS',
-          ...cors
-        }
+        headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
       });
     }
 
-   /* ── Carica database ── */
-if (dbId) {
-  const cleanId = dbId.replace(/-/g, '');
-  const cacheKey = 'db_' + cleanId;
+    /* ── Carica database ── */
+    if (dbId) {
+      const cleanId = dbId.replace(/-/g, '');
+      const cacheKey = 'db_' + cleanId;
 
-  const cached = await KV.get(cacheKey);
-  if (cached) {
-    return new Response(cached, {
-      headers: { 'Content-Type': 'application/json', 'X-Cache': 'HIT', ...cors }
+      const cached = await kvGet(cacheKey);
+      if (cached) {
+        if (cached.stale) {
+          kvRefreshBg(cacheKey, () => fetchDb(cleanId, notionHeaders));
+        }
+        return new Response(cached.value, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Cache': cached.stale ? 'STALE' : 'HIT',
+            ...cors
+          }
+        });
+      }
+
+      const payload = JSON.stringify(await fetchDb(cleanId, notionHeaders));
+      await kvPut(cacheKey, payload);
+
+      return new Response(payload, {
+        headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
+      });
+    }
+
+    return new Response(JSON.stringify({ error: 'Parametro mancante' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json', ...cors }
+    });
+
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...cors }
     });
   }
+}
 
+/* ════ fetchPage ════ */
+async function fetchPage(cleanId, headers, maxDepth) {
+  const [pageRes, blocksRes] = await Promise.all([
+    fetch('https://api.notion.com/v1/pages/' + cleanId, { headers }),
+    fetch('https://api.notion.com/v1/blocks/' + cleanId + '/children?page_size=100', { headers })
+  ]);
+  if (!pageRes.ok) throw new Error('Notion page error: ' + pageRes.status);
+  if (!blocksRes.ok) throw new Error('Notion blocks error: ' + blocksRes.status);
+
+  const page = await pageRes.json();
+  const blocksData = await blocksRes.json();
+
+  // Paginazione blocchi root
+  let allBlocks = blocksData.results;
+  let cursor = blocksData.next_cursor;
+  while (blocksData.has_more && cursor) {
+    const moreRes = await fetch(
+      'https://api.notion.com/v1/blocks/' + cleanId + '/children?page_size=100&start_cursor=' + cursor,
+      { headers }
+    );
+    if (!moreRes.ok) break;
+    const moreData = await moreRes.json();
+    allBlocks = allBlocks.concat(moreData.results);
+    cursor = moreData.next_cursor;
+    if (!moreData.has_more) break;
+  }
+
+  const blocks = await loadChildren(allBlocks, headers, maxDepth);
+  return { page, blocks };
+}
+
+/* ════ fetchDb — con paginazione ════ */
+async function fetchDb(cleanId, headers) {
   const TIMELINE_DB = '2fc0274fdc1c800f8ac0d6d03b255cad';
 
   const queryBody = cleanId === TIMELINE_DB.replace(/-/g, '')
     ? { page_size: 100, sorts: [{ property: 'Order', direction: 'ascending' }] }
     : { page_size: 100 };
 
-  const res = await fetch('https://api.notion.com/v1/databases/' + cleanId + '/query', {
-    method: 'POST',
-    headers: notionHeaders,
-    body: JSON.stringify(queryBody)
-  });
+  let allResults = [];
+  let cursor = null;
 
-  if (!res.ok) throw new Error('Notion DB error: ' + res.status);
-  const data = await res.json();
+  do {
+    const body = cursor ? { ...queryBody, start_cursor: cursor } : queryBody;
+    const res = await fetch('https://api.notion.com/v1/databases/' + cleanId + '/query', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error('Notion DB error: ' + res.status);
+    const data = await res.json();
+    allResults = allResults.concat(data.results);
+    cursor = data.has_more ? data.next_cursor : null;
+  } while (cursor);
+
   if (cleanId === TIMELINE_DB.replace(/-/g, '')) {
-  data.results.sort(function(a, b) {
-    const getOrder = function(p) {
-      const prop = p.properties && (p.properties['Order'] || p.properties['Ordine'] || p.properties['order']);
-      return (prop && prop.number != null) ? prop.number : 9999;
-    };
-    return getOrder(a) - getOrder(b);
-  });
-}
+    allResults.sort(function(a, b) {
+      const getOrder = p => {
+        const prop = p.properties && (p.properties['Order'] || p.properties['Ordine'] || p.properties['order']);
+        return (prop && prop.number != null) ? prop.number : 9999;
+      };
+      return getOrder(a) - getOrder(b);
+    });
+  }
 
-  const pages = await Promise.all(data.results.map(async p => {
+  const pages = allResults.map(p => {
     const titleProp = Object.values(p.properties || {}).find(v => v.type === 'title');
     const title = titleProp
       ? (titleProp.title || []).map(t => t.plain_text).join('')
@@ -157,100 +242,63 @@ if (dbId) {
       ? (p.cover.type === 'external' ? p.cover.external.url : (p.cover.file && p.cover.file.url))
       : null;
 
-    const classeProp = p.properties && (
-      p.properties['Classe'] || p.properties['classe'] ||
-      p.properties['Class'] || p.properties['class']
-    );
+    const getProp = (names) => names.reduce((acc, n) => acc || (p.properties && p.properties[n]), null);
+
+    const classeProp = getProp(['Classe','classe','Class','class']);
     const classe = classeProp
       ? (classeProp.type === 'multi_select' && classeProp.multi_select.length)
-        ? classeProp.multi_select.map(function(s){ return s.name; }).join(', ')
+        ? classeProp.multi_select.map(s => s.name).join(', ')
         : (classeProp.select ? classeProp.select.name : null)
       : null;
 
-    /* ── Dove trovarlo (rich_text o select) ── */
-    const doveProp = p.properties && (
-      p.properties['Dove trovarlo'] || p.properties['dove_trovarlo'] ||
-      p.properties['Dove Trovarlo'] || p.properties['location']
-    );
+    const doveProp = getProp(['Dove trovarlo','dove_trovarlo','Dove Trovarlo','location']);
     const dove = doveProp
       ? doveProp.type === 'rich_text'
         ? (doveProp.rich_text || []).map(t => t.plain_text).join('')
         : doveProp.type === 'select' && doveProp.select
-          ? doveProp.select.name
-          : null
+          ? doveProp.select.name : null
       : null;
 
-    /* ── Macro-argomento (multi_select) ── */
-    const argProp = p.properties && (
-      p.properties['Macro-argomento'] || p.properties['macro_argomento'] ||
-      p.properties['Argomento'] || p.properties['argomento'] ||
-      p.properties['Tags'] || p.properties['tags']
-    );
+    const argProp = getProp(['Macro-argomento','macro_argomento','Argomento','argomento','Tags','tags']);
     const argomenti = argProp && argProp.type === 'multi_select'
       ? (argProp.multi_select || []).map(s => ({ name: s.name, color: s.color }))
       : [];
 
-    const loreProp = p.properties && (
-      p.properties['Lore'] || p.properties['lore']
-    );
+    const loreProp = getProp(['Lore','lore']);
     const lore = loreProp
       ? loreProp.type === 'select' && loreProp.select
         ? loreProp.select.name
         : loreProp.type === 'multi_select' && loreProp.multi_select.length
-          ? loreProp.multi_select.map(s => s.name).join(', ')
-          : null
+          ? loreProp.multi_select.map(s => s.name).join(', ') : null
       : null;
 
-    const importanzaProp = p.properties && (
-      p.properties['Importanza'] || p.properties['importanza']
-    );
+    const importanzaProp = getProp(['Importanza','importanza']);
     const importanza = importanzaProp
-  ? importanzaProp.type === 'multi_select' && importanzaProp.multi_select.length
-    ? importanzaProp.multi_select[0].name
-    : importanzaProp.type === 'select' && importanzaProp.select
-      ? importanzaProp.select.name
-      : null
-  : null;
+      ? importanzaProp.type === 'multi_select' && importanzaProp.multi_select.length
+        ? importanzaProp.multi_select[0].name
+        : importanzaProp.type === 'select' && importanzaProp.select
+          ? importanzaProp.select.name : null
+      : null;
 
-    const specieProp = p.properties && (
-  p.properties['Specie'] || p.properties['specie']
-);
-const specie = specieProp
-  ? (specieProp.type === 'multi_select' && specieProp.multi_select.length)
-    ? specieProp.multi_select.map(function(s){ return s.name; }).join(', ')
-    : (specieProp.select ? specieProp.select.name : null)
-  : null;
+    const specieProp = getProp(['Specie','specie']);
+    const specie = specieProp
+      ? (specieProp.type === 'multi_select' && specieProp.multi_select.length)
+        ? specieProp.multi_select.map(s => s.name).join(', ')
+        : (specieProp.select ? specieProp.select.name : null)
+      : null;
 
-return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, specie, dove, argomenti, lore, importanza };
-    }));
-
-  const payload = JSON.stringify({ pages });
-  await KV.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
-
-  return new Response(payload, {
-    headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
+    return { id: p.id.replace(/-/g, ''), title, icon, cover, classe, specie, dove, argomenti, lore, importanza };
   });
+
+  return { pages };
 }
 
-    /* ── Fallback if no parameters match ── */
-    return new Response(JSON.stringify({ error: 'Parametro mancante' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json', ...cors }
-    });
+/* ════ loadChildren — parallelo + ricorsivo + limite profondità ════ */
+async function loadChildren(blocks, headers, depth) {
+  if (depth <= 0) return blocks; // limite raggiunto
 
-  } catch (e) {
-    /* ── Global Error Handler ── */
-    return new Response(JSON.stringify({ error: e.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', ...cors }
-    });
-  }
-}
-
-/* ════ loadChildren — parallelo + ricorsivo ════ */
-async function loadChildren(blocks, headers) {
   const childResults = await Promise.all(
-    blocks.map(async function(block) {
+    blocks.map(async block => {
       if (!block.has_children) return { id: block.id, children: null };
       try {
         const res = await fetch(
@@ -259,20 +307,18 @@ async function loadChildren(blocks, headers) {
         );
         if (!res.ok) return { id: block.id, children: [] };
         const data = await res.json();
-        const children = await loadChildren(data.results, headers);
+        const children = await loadChildren(data.results, headers, depth - 1);
         return { id: block.id, children };
-      } catch(e) {
+      } catch (_) {
         return { id: block.id, children: [] };
       }
     })
   );
 
   const childMap = {};
-  childResults.forEach(function(r) {
-    if (r.children !== null) childMap[r.id] = r.children;
-  });
+  childResults.forEach(r => { if (r.children !== null) childMap[r.id] = r.children; });
 
-  return blocks.map(function(block) {
+  return blocks.map(block => {
     if (block.has_children && childMap[block.id] !== undefined) {
       return Object.assign({}, block, { children: childMap[block.id] });
     }
