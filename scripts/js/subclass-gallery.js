@@ -42,12 +42,10 @@ window.loadSpeciesGallery = function(container, pages) {  // ← qui
 };
 
 function _renderHbLayout(container, pages, options) {
-
-  /* ── Raggruppa per classe, ordina classi e sottoclassi ── */
-   var opts = options || {};
-  var groupKey  = opts.groupKey  || 'classe';   // campo di raggruppamento
-  var sideLabel = opts.sideLabel || 'Classi';   // titolo sidebar
-  var fallback  = opts.fallback  || 'Altra';    // valore se null
+  var opts = options || {};
+  var groupKey  = opts.groupKey  || 'classe';
+  var sideLabel = opts.sideLabel || 'Classi';
+  var fallback  = opts.fallback  || 'Altra';
 
   var grouped = {};
   pages.forEach(function(p){
@@ -55,8 +53,19 @@ function _renderHbLayout(container, pages, options) {
     if(!grouped[cl]) grouped[cl] = [];
     grouped[cl].push(p);
   });
-  ...
-  '<div class="hbsc-sidebar-title">'+sideLabel+'</div>'+
+  var classi = Object.keys(grouped).sort(function(a,b){ return a.localeCompare(b,'it'); });
+  classi.forEach(function(cl){
+    grouped[cl].sort(function(a,b){ return a.title.localeCompare(b.title,'it'); });
+  });
+
+  var sidebarItems = classi.map(function(cl){
+    return '<li class="hbsc-class-item" data-classe="'+cl+'" onclick="hbscSelectClass(this,\''+cl+'\')">'+cl+'</li>';
+  }).join('');
+
+  container.innerHTML =
+    '<div class="hbsc-layout">'+
+      '<aside class="hbsc-sidebar">'+
+        '<div class="hbsc-sidebar-title">'+sideLabel+'</div>'+
         '<ul class="hbsc-class-list">'+sidebarItems+'</ul>'+
       '</aside>'+
       '<div class="hbsc-main">'+
@@ -66,20 +75,12 @@ function _renderHbLayout(container, pages, options) {
         '</div>'+
       '</div>'+
     '</div>';
-    /* ── Salva i dati sul layout ── */
+
   var layout = container.querySelector('.hbsc-layout');
   if(layout) layout._hbscData = grouped;
 
-  /* ── Seleziona la prima classe automaticamente ── */
-  if(classi.length){
-    var firstItem = container.querySelector('.hbsc-class-item');
-    if(firstItem) hbscSelectClass(firstItem, classi[0]);
-  }
-
-  /* ── Salva i dati raggruppati nel container per accesso globale ── */
   container._hbscData = grouped;
 
-  /* ── Seleziona la prima classe automaticamente ── */
   if(classi.length){
     var firstItem = container.querySelector('.hbsc-class-item');
     if(firstItem) hbscSelectClass(firstItem, classi[0]);
