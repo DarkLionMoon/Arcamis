@@ -5,6 +5,17 @@ window.addEventListener('load', function(){
   setTimeout(function(){
     var l = document.getElementById('site-loader');
     if(l) l.classList.add('hidden');
+    // Prefetch pagine frequenti
+    var prefetch = [
+      '2f00274fdc1c8065a11ff45192aa5dcb',
+      '2f00274fdc1c800b9d8fc366e8e40c5c',
+      '2dd222f22ef8413f8cb48f03bbb4f4b0',
+      '2f00274fdc1c80e78ad7ce985007b7c6',
+      '2f00274fdc1c806f8f17dbc6532d2211',
+    ];
+    prefetch.forEach(function(id){
+      fetch('/api/notion?pageId=' + id).catch(function(){});
+    });
   }, 500);
 });
 
