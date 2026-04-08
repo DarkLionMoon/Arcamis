@@ -204,7 +204,7 @@ pbody.querySelectorAll('.hb-subclass-container').forEach(function(c){
   if(window.loadSubclassGallery) loadSubclassGallery(c);
 });
 pbody.querySelectorAll('.hb-specie-container').forEach(function(c){
-  if(window.loadSubclassGallery) loadSubclassGallery(c);
+  if(window.loadSpeciesGallery) loadSpeciesGallery(c);
 });
     pbody.querySelectorAll('.gs-container').forEach(function(c){if(window.loadGallery)loadGallery(c);});
     pbody.querySelectorAll('details.n-toggle').forEach(function(det){
