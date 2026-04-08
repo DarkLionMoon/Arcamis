@@ -497,6 +497,7 @@ window.gsSelect = function(id, name) {
   detail.classList.remove('hidden');
   detail.style.setProperty('--gs-acc', col.c);
   detail.style.setProperty('--gs-glow', col.glow);
+  detail.style.setProperty('--gs-bg-img', cover ? 'url(\''+cover+'\')' : 'none');
 
   var tagsHtml = (p.tags||[]).map(function(t) {
     var tc = _getClassColor([t]);
