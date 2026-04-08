@@ -300,8 +300,8 @@ if(cpCoverSafe){
   }else if(dbRawId==='2ff0274fdc1c807ea473db02ac4ae391'){
     h+='<div class="hb-subclass-container" id="hbsc-'+dbRawId+'"></div>';
   }else if(dbRawId==='3350274fdc1c808fba5ed9ad1f3b4bb4'){
-    h+='<div class="hb-specie-container" id="hbsp-'+dbRawId+'"></div>';
-  }else{
+  h+='<div class="n-db-wrap"><div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
+}else{
     h+='<div class="n-db-wrap">'
       +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
       +'<div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
@@ -471,6 +471,54 @@ if(dbId===SPECIE_DB){
   if(gruppi.length){
     var firstItem=document.querySelector('.sp-class-item');
     if(firstItem)spSelectGroup(firstItem,gruppi[0]);
+  }
+
+  _injectSpecieCSS();
+  return;
+}
+/* ── SPECIE HOMEBREW (tabella Classi — secondo DB) ── */
+var SPECIES_HB_DB2 = '3350274fdc1c808fba5ed9ad1f3b4bb4';
+if (dbId === SPECIES_HB_DB2) {
+  var grouped = {};
+  data.pages.forEach(function(p) {
+    var gr = p.specie || 'Altra';
+    if (!grouped[gr]) grouped[gr] = [];
+    grouped[gr].push(p);
+  });
+  var gruppi = Object.keys(grouped).sort(function(a, b) { return a.localeCompare(b, 'it'); });
+  gruppi.forEach(function(gr) {
+    grouped[gr].sort(function(a, b) { return a.title.localeCompare(b.title, 'it'); });
+  });
+
+  var sidebarItems = gruppi.map(function(gr) {
+    return '<li class="sp-class-item" data-specie="' + gr + '" onclick="spSelectGroup(this,\'' + gr + '\')">' + gr + '</li>';
+  }).join('');
+
+  var specieHtml =
+    '<div class="sp-layout">' +
+      '<aside class="sp-sidebar">' +
+        '<div class="sp-sidebar-title">Specie</div>' +
+        '<ul class="sp-class-list">' + sidebarItems + '</ul>' +
+      '</aside>' +
+      '<div class="sp-main">' +
+        '<div class="sp-tabs" id="sp-tabs"></div>' +
+        '<div class="sp-content" id="sp-content">' +
+          '<div class="sp-placeholder">← Seleziona una specie</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  var wrap = grid.closest('.n-db-wrap');
+  var uid = 'dblc-' + dbId;
+  if (wrap) { wrap.outerHTML = '<div class="n-db-lc-wrap" id="' + uid + '">' + specieHtml + '</div>'; }
+  else { grid.outerHTML = '<div>' + specieHtml + '</div>'; }
+
+  var layoutEl = document.querySelector('#' + uid + ' .sp-layout');
+  if (layoutEl) layoutEl._spData = grouped;
+
+  if (gruppi.length) {
+    var firstItem = document.querySelector('#' + uid + ' .sp-class-item');
+    if (firstItem) spSelectGroup(firstItem, gruppi[0]);
   }
 
   _injectSpecieCSS();
