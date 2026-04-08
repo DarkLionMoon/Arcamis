@@ -250,7 +250,7 @@ async function fetchDb(cleanId, headers) {
 
     const getProp = (names) => names.reduce((acc, n) => acc || (p.properties && p.properties[n]), null);
 
-    const classeProp = getProp(['Classe','classe','Class','class']);
+    const classeProp = getProp(['Classi','Classe','classe','Class','class']);
     const classe = classeProp
       ? (classeProp.type === 'multi_select' && classeProp.multi_select.length)
         ? classeProp.multi_select.map(s => s.name).join(', ')
