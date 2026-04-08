@@ -69,6 +69,11 @@ function showToast(txt, icon, dur){
     document.getElementById('hv').style.display = 'none';
     document.getElementById('pv').style.display = 'block';
     document.body.classList.add('page-open');
+    var ts = document.getElementById('ts');
+    if(ts) ts.value = '';
+    csearch();
+  };
+})();
   };
 })();
 
