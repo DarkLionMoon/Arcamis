@@ -21,6 +21,9 @@ html,body{height:100%;overflow:hidden}
 html, body {
   overscroll-behavior: none;
 }
+html, body {
+  overscroll-behavior-y: contain;
+}
 html{scroll-behavior:smooth}
 body{
   font-family:'Crimson Pro',Georgia,serif;font-size:15px;color:var(--text);
