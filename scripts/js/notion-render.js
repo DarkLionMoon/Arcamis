@@ -297,6 +297,11 @@ if(cpCoverSafe){
     h+='<div class="hb-subclass-container" id="hbsc-'+dbRawId+'"></div>';
   }else if(dbRawId===NPC_PARENT_DB.replace(/-/g,'')){
     h+='<div class="npc-gallery-container" id="npcg-'+dbRawId+'"></div>';
+  } else if(dbRawId === '2ff0274fdc1c807ea473db02ac4ae391'){
+  h += '<div class="hb-subclass-container" id="hbsc-' + dbRawId + '"></div>';
+  } else if(dbRawId === '3350274fdc1c808fba5ed9ad1f3b4bb4'){
+  h += '<div class="hb-specie-container" id="hbsp-' + dbRawId + '"></div>';
+  }
   }else{
     h+='<div class="n-db-wrap">'
       +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
