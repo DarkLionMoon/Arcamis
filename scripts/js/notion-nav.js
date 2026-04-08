@@ -35,6 +35,9 @@ function buildCrumb(currentLabel){
 ════════════════════════════════════ */
 async function gp(id,label,icon,_fromPop){
   if(!id||id==='undefined'||id==='null')return;
+  var ts = document.getElementById('ts');
+  if(ts) ts.value = '';
+  csearch();
    if (id === '2f70274fdc1c803ca5cafa97ca1817cd') {
         const container = document.getElementById('page-content'); 
         if (container && window.loadSubclassGallery) {
