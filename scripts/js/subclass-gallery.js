@@ -1,4 +1,5 @@
 var HB_SUBCLASS_DB_ID = '2f70274fdc1c80e3bdc7f95f81eb9cc0';
+var HB_SPECIES_DB_ID  = '3350274fdc1c808fba5ed9ad1f3b4bb4'; 
 
 /* ════════════════════════════════════
    SUBCLASS GALLERY
@@ -19,29 +20,43 @@ window.loadSubclassGallery = function(container, pages) {
       console.error(err);
     });
 };
+window.loadSpeciesGallery = function(container, pages) {  // ← qui
+  if (pages && pages.length) {
+    _renderHbLayout(container, pages, { groupKey: 'specie', sideLabel: 'Specie', fallback: 'Altra' });
+    return;
+  }
+  container.innerHTML = '<div class="loader-dots">...';
+  fetch('/api/notion?dbId=' + HB_SPECIES_DB_ID)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      _renderHbLayout(container, data.pages || [], {
+        groupKey:  'specie',
+        sideLabel: 'Specie',
+        fallback:  'Altra'
+      });
+    })
+    .catch(function(err){
+      container.innerHTML = '<p class="sec-p">Errore nel risveglio delle pergamene.</p>';
+      console.error(err);
+    });
+};
 
-function _renderHbLayout(container, pages) {
+function _renderHbLayout(container, pages, options) {
+
   /* ── Raggruppa per classe, ordina classi e sottoclassi ── */
+   var opts = options || {};
+  var groupKey  = opts.groupKey  || 'classe';   // campo di raggruppamento
+  var sideLabel = opts.sideLabel || 'Classi';   // titolo sidebar
+  var fallback  = opts.fallback  || 'Altra';    // valore se null
+
   var grouped = {};
   pages.forEach(function(p){
-    var cl = p.classe || 'Altra';
+    var cl = p[groupKey] || fallback;
     if(!grouped[cl]) grouped[cl] = [];
     grouped[cl].push(p);
   });
-  var classi = Object.keys(grouped).sort(function(a,b){ return a.localeCompare(b,'it'); });
-  classi.forEach(function(cl){
-    grouped[cl].sort(function(a,b){ return a.title.localeCompare(b.title,'it'); });
-  });
-
-  /* ── Struttura HTML ── */
-  var sidebarItems = classi.map(function(cl){
-    return '<li class="hbsc-class-item" data-classe="'+cl+'" onclick="hbscSelectClass(this,\''+cl+'\')">'+cl+'</li>';
-  }).join('');
-
-  container.innerHTML =
-    '<div class="hbsc-layout">'+
-      '<aside class="hbsc-sidebar">'+
-        '<div class="hbsc-sidebar-title">Classi</div>'+
+  ...
+  '<div class="hbsc-sidebar-title">'+sideLabel+'</div>'+
         '<ul class="hbsc-class-list">'+sidebarItems+'</ul>'+
       '</aside>'+
       '<div class="hbsc-main">'+
