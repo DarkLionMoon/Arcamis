@@ -108,6 +108,8 @@ return new Response(JSON.stringify({ purged: 'all', count: toDelete.length }), {
 
       const cached = await kvGet(cacheKey);
       if (cached) {
+      const testParse = (() => { try { JSON.parse(cached.value); return 'ok'; } catch(e) { return 'INVALID: ' + cached.value.slice(0, 100); } })();
+  console.log('Cache value check:', testParse);
         // Se stale: servi subito e aggiorna in background
         if (cached.stale) {
           kvRefreshBg(cacheKey, async () => {   const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);   return JSON.stringify(data); });
