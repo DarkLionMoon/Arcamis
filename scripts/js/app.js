@@ -85,8 +85,6 @@ function showToast(txt, icon, dur){
     csearch();
   };
 })();
-  };
-})();
 
 /* ════ COPY LINK ════ */
 window.copyPageLink = function(){
