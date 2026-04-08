@@ -6,6 +6,7 @@
 ════════════════════════════════════ */
 
 var GALLERY_DB_ID = '2fd0274fdc1c8001bf09e373134ab721';
+var NPC_PARENT_DB = '2f90274fdc1c8015bf95f52c4e7681b8';
 
 function safeCoverUrl(url){
   if(!url)return null;
