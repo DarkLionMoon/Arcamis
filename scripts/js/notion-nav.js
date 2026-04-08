@@ -7,6 +7,13 @@
 
 var navStack = [];
 var _memCache = {};
+window.prefetchPage = function(id){
+  if(!id || _memCache['pg_'+id]) return;
+  fetch('/api/notion?pageId=' + id)
+    .then(function(r){ return r.json(); })
+    .then(function(data){ _memCache['pg_'+id] = data; })
+    .catch(function(){});
+};
 
 /* ════════════════════════════════════
    BACK NAVIGATION
