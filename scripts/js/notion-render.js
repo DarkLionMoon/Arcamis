@@ -181,12 +181,33 @@ function renderBlocks(blocks,isRoot){
       case'image':
         var src=d.type==='external'?(d.external&&d.external.url):(d.file&&d.file.url);
         src=safeCoverUrl(src)||src;
+        var cap=d.caption&&d.caption.length?rt(d.caption):'';
         if(src){
-          var cap=d.caption&&d.caption.length?rt(d.caption):'';
           h+='<figure class="n-image">'
             +'<img src="'+src+'" loading="lazy" class="n-zoomable" onclick="arcZoom(\''+src+'\')" onerror="this.parentElement.style.display=\'none\'"/>'
             +(cap?'<figcaption class="n-figcap">'+cap+'</figcaption>':'')
             +'</figure>';
+        }else if(d.type==='file'&&d.file&&d.file._blockId){
+          var bid=d.file._blockId;
+          h+='<figure class="n-image" id="nimg-'+bid+'">'
+            +'<div style="height:180px;display:flex;align-items:center;justify-content:center;opacity:.3;font-family:Cinzel,serif;font-size:11px;letter-spacing:.1em">⏳</div>'
+            +'</figure>';
+          (function(blockId,caption){
+            fetch('/api/notion?blockId='+blockId)
+              .then(function(r){return r.json();})
+              .then(function(data){
+                if(!data.url)return;
+                var proxied=safeCoverUrl(data.url)||data.url;
+                var fig=document.getElementById('nimg-'+blockId);
+                if(!fig)return;
+                fig.innerHTML='<img src="'+proxied+'" loading="lazy" class="n-zoomable" onclick="arcZoom(\''+proxied+'\')" onerror="this.parentElement.style.display=\'none\'"/>'
+                  +(caption?'<figcaption class="n-figcap">'+caption+'</figcaption>':'');
+              })
+              .catch(function(){
+                var fig=document.getElementById('nimg-'+blockId);
+                if(fig)fig.style.display='none';
+              });
+          })(bid,cap);
         }
         break;
 
