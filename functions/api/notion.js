@@ -1,10 +1,11 @@
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const pageId = url.searchParams.get('pageId');
-  const dbId = url.searchParams.get('dbId');
-  const imgUrl = url.searchParams.get('img');
-  const purge = url.searchParams.get('purge');
-  const purgeKey = url.searchParams.get('key');
+const dbId = url.searchParams.get('dbId');
+const imgUrl = url.searchParams.get('img');
+const purge = url.searchParams.get('purge');
+const purgeKey = url.searchParams.get('key');
+const blockId = url.searchParams.get('blockId');
   const TOKEN = context.env.NOTION_TOKEN;
   const KV = context.env.ARCAMIS_CACHE;
 
@@ -117,6 +118,16 @@ if (imgUrl) {
       ...cors
     }
   });
+}
+    /* ── Fetch URL fresco per blocco image ── */
+if (blockId) {
+  const cleanBlockId = blockId.replace(/-/g, '');
+  const res = await fetch('https://api.notion.com/v1/blocks/' + cleanBlockId, { headers: notionHeaders });
+  if (!res.ok) return new Response(JSON.stringify({ error: 'block not found' }), { status: 404, headers: { 'Content-Type': 'application/json', ...cors } });
+  const block = await res.json();
+  const freshUrl = block.image && block.image.file && block.image.file.url;
+  if (!freshUrl) return new Response(JSON.stringify({ error: 'no url' }), { status: 404, headers: { 'Content-Type': 'application/json', ...cors } });
+  return new Response(JSON.stringify({ url: freshUrl }), { headers: { 'Content-Type': 'application/json', ...cors } });
 }
     /* ── Carica pagina singola ── */
     if (pageId) {
@@ -364,13 +375,12 @@ function hasS3Images(blocks) {
   }
   return false;
 }
-/* ════ sanitizeBlocks — sostituisce URL S3 con blockId per fetch fresco ════ */
+/* ════ sanitizeBlocks ════ */
 function sanitizeBlocks(blocks) {
   if (!blocks) return blocks;
   return blocks.map(function(block) {
     var b = Object.assign({}, block);
     if (b.type === 'image' && b.image && b.image.type === 'file') {
-      // Conserva solo il block ID, rimuovi l'URL S3 che scade
       b.image = Object.assign({}, b.image, {
         file: { url: null, _blockId: b.id.replace(/-/g, '') }
       });
