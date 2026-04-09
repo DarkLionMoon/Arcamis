@@ -83,24 +83,30 @@ return new Response(JSON.stringify({ purged: 'all', count: toDelete.length }), {
 
     /* ── Proxy immagini S3 Notion ── */
     if (imgUrl) {
-      const decoded = decodeURIComponent(imgUrl);
-      const img = await fetch(decoded);
-      const ct = img.headers.get('content-type') || '';
-      if (!ct.startsWith('image/')) {
-        return new Response('Image expired or unavailable', {
-          status: 404,
-          headers: { 'Content-Type': 'text/plain', ...cors }
-        });
-      }
-      return new Response(img.body, {
-        headers: {
-          'Content-Type': ct,
-          'Cache-Control': 'public, max-age=3600, stale-while-revalidate=7200',
-          ...cors
-        }
-      });
+  const decoded = decodeURIComponent(imgUrl);
+  const img = await fetch(decoded);
+  const ct = img.headers.get('content-type') || '';
+  if (!ct.startsWith('image/')) {
+    // URL S3 scaduto — invalida tutte le cache pg_ così si ricaricano freschi
+    context.waitUntil((async () => {
+      try {
+        const list = await KV.list({ prefix: 'pg_' });
+        await Promise.all(list.keys.map(k => KV.delete(k.name)));
+      } catch(_) {}
+    })());
+    return new Response('Image expired or unavailable', {
+      status: 404,
+      headers: { 'Content-Type': 'text/plain', ...cors }
+    });
+  }
+  return new Response(img.body, {
+    headers: {
+      'Content-Type': ct,
+      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=7200',
+      ...cors
     }
-
+  });
+}
     /* ── Carica pagina singola ── */
     if (pageId) {
       const cleanId = pageId.replace(/-/g, '');
