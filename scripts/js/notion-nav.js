@@ -6,6 +6,42 @@
 ════════════════════════════════════ */
 
 var navStack = [];
+var _navMap = {
+  '2f00274fdc1c8065a11ff45192aa5dcb': 'regole',
+  '2f00274fdc1c800b9d8fc366e8e40c5c': 'personaggio',
+  '2dd222f22ef8413f8cb48f03bbb4f4b0': 'lavori',
+  '2f00274fdc1c80e78ad7ce985007b7c6': 'lore',
+};
+
+function _navKeyForPage(id){
+  if(_navMap[id]) return _navMap[id];
+  for(var i = navStack.length - 1; i >= 0; i--){
+    var k = _navMap[navStack[i].id];
+    if(k) return k;
+  }
+  return '';
+}
+
+function _setNavFromPage(id){
+  var k = _navKeyForPage(id);
+  setNav(k);
+}
+
+function _renderLastUpdated(isoDate){
+  if(!isoDate) return;
+  var d = new Date(isoDate);
+  var fmt = d.toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
+  var old = document.getElementById('arc-lastupdated');
+  if(old) old.remove();
+  var el = document.createElement('div');
+  el.id = 'arc-lastupdated';
+  el.className = 'arc-lastupdated';
+  el.textContent = 'Aggiornato il ' + fmt;
+  var phTitle = document.getElementById('ph-title');
+  if(phTitle && phTitle.parentNode){
+    phTitle.parentNode.insertBefore(el, phTitle.nextSibling);
+  }
+}
 var _memCache = {};
 window.prefetchPage = function(id){
   if(!id || _memCache['pg_'+id]) return;
@@ -227,6 +263,8 @@ pbody.querySelectorAll('.hb-specie-container').forEach(function(c){
       _initCarouselArrows(pbody);
     },200);
 
+    _setNavFromPage(id);
+    if(data.page) _renderLastUpdated(data.page.last_edited_time);
     if(typeof addRecente==='function')addRecente(id,ptitle,picon);
     if(typeof setBnavActive==='function')setBnavActive('');
     if(typeof afterPageRender==='function')afterPageRender();
