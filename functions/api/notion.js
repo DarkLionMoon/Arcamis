@@ -82,23 +82,34 @@ return new Response(JSON.stringify({ purged: 'all', count: toDelete.length }), {
     }
 
     /* ── Proxy immagini S3 Notion ── */
-    if (imgUrl) {
+if (imgUrl) {
   const decoded = decodeURIComponent(imgUrl);
-  const img = await fetch(decoded);
-  const ct = img.headers.get('content-type') || '';
-  if (!ct.startsWith('image/')) {
-    // URL S3 scaduto — invalida tutte le cache pg_ così si ricaricano freschi
+  let img;
+  try {
+    img = await fetch(decoded);
+  } catch(e) {
+    // Invalida cache pg_ in background e restituisci 404
     context.waitUntil((async () => {
       try {
         const list = await KV.list({ prefix: 'pg_' });
         await Promise.all(list.keys.map(k => KV.delete(k.name)));
       } catch(_) {}
     })());
-    return new Response('Image expired or unavailable', {
-      status: 404,
-      headers: { 'Content-Type': 'text/plain', ...cors }
-    });
+    return new Response('Image fetch error', { status: 404, headers: { 'Content-Type': 'text/plain', ...cors } });
   }
+
+  const ct = img.headers.get('content-type') || '';
+  if (!ct.startsWith('image/')) {
+    // URL S3 scaduto — invalida tutta la cache pg_ in background
+    context.waitUntil((async () => {
+      try {
+        const list = await KV.list({ prefix: 'pg_' });
+        await Promise.all(list.keys.map(k => KV.delete(k.name)));
+      } catch(_) {}
+    })());
+    return new Response('Image expired', { status: 404, headers: { 'Content-Type': 'text/plain', ...cors } });
+  }
+
   return new Response(img.body, {
     headers: {
       'Content-Type': ct,
