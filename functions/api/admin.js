@@ -42,6 +42,26 @@ export async function onRequest(context) {
   }
 
   /* ════ LOGIN ════ */
+  /* ── Helper: scrivi log entry ── */
+  async function writeAdminLog(action, target, extra) {
+    try {
+      const LOG_KEY = 'admin_log';
+      const MAX_ENTRIES = 50;
+      let existing = [];
+      try {
+        const raw = await KV.get(LOG_KEY, 'text');
+        if (raw) existing = JSON.parse(raw);
+      } catch(_) {}
+      existing.unshift({
+        action:    action,
+        target:    target || '',
+        extra:     extra  || '',
+        timestamp: new Date().toISOString()
+      });
+      existing = existing.slice(0, MAX_ENTRIES);
+      await KV.put(LOG_KEY, JSON.stringify(existing), { expirationTtl: 30 * 24 * 3600 });
+    } catch(_) {}
+  }
   if (action === 'login' && request.method === 'POST') {
     let body;
     try { body = await request.json(); } catch (e) {
@@ -102,6 +122,12 @@ if (!authed) {
 }
 
   /* ════ SALVA COVER ════ */
+  /* ════ GET LOG ════ */
+  if (action === 'get_log') {
+    const raw = await KV.get('admin_log', 'text');
+    const entries = raw ? JSON.parse(raw) : [];
+    return new Response(JSON.stringify({ entries }), { headers: cors });
+  }
   if (action === 'set_cover' && request.method === 'POST') {
     let body;
     try { body = await request.json(); } catch (e) {
@@ -121,6 +147,7 @@ if (!authed) {
     }
     /* Invalida cache galleria */
     try { await KV.delete('gallery_pg_v2'); } catch (e) {}
+    await writeAdminLog('cover_page', pageId);
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
 }
