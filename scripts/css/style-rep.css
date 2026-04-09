@@ -1,0 +1,89 @@
+/* ═══ REPUTATION TABLE ═══ */
+.rep-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.rep-intro {
+  font-family: 'Crimson Pro', serif;
+  font-size: 16px;
+  color: var(--text2);
+  margin-bottom: 24px;
+  line-height: 1.7;
+}
+.rep-intro strong { color: var(--gold2); }
+.rep-hint {
+  font-size: 13px;
+  color: var(--text3);
+  opacity: .7;
+  margin-top: 4px;
+}
+
+.rep-table-scroll {
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid rgba(200,160,80,.15);
+  background: rgba(8,10,14,.6);
+}
+
+.rep-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+}
+
+.rep-th {
+  background: rgba(180,140,60,.1);
+  color: var(--gold2);
+  padding: 10px 14px;
+  text-align: center;
+  letter-spacing: .08em;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid rgba(200,160,80,.2);
+  transition: background .15s;
+}
+.rep-th:first-child { text-align: left; }
+.rep-th:hover { background: rgba(180,140,60,.2); }
+.rep-sort-arrow { opacity: .5; font-size: 10px; }
+
+.rep-tr { transition: background .1s; }
+.rep-tr-alt td { background: rgba(255,255,255,.015); }
+.rep-tr:hover td { background: rgba(200,160,80,.06) !important; }
+
+.rep-tr-totale td {
+  background: rgba(180,140,60,.08) !important;
+  color: var(--gold2) !important;
+  font-weight: 700;
+  border-top: 1px solid rgba(200,160,80,.2);
+  border-bottom: 1px solid rgba(200,160,80,.2);
+}
+.rep-tr-totale .rep-td-name { color: var(--gold2) !important; }
+
+.rep-td {
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  color: var(--text2);
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+}
+.rep-td-name {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  color: var(--text1);
+  white-space: nowrap;
+  min-width: 120px;
+}
+.rep-td-val { text-align: center; min-width: 72px; }
+
+.rep-footer {
+  margin-top: 16px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 12px;
+  color: var(--text3);
+  opacity: .55;
+  text-align: right;
+}
