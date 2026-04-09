@@ -223,7 +223,7 @@ async function fetchPage(cleanId, headers, maxDepth) {
   }
 
   const blocks = await loadChildren(allBlocks, headers, maxDepth);
-  return { page, blocks };
+return { page, blocks: sanitizeBlocks(blocks) };
 }
 
 /* ════ fetchDb — con paginazione ════ */
@@ -363,4 +363,19 @@ function hasS3Images(blocks) {
     if (b.children && hasS3Images(b.children)) return true;
   }
   return false;
+}
+/* ════ sanitizeBlocks — sostituisce URL S3 con blockId per fetch fresco ════ */
+function sanitizeBlocks(blocks) {
+  if (!blocks) return blocks;
+  return blocks.map(function(block) {
+    var b = Object.assign({}, block);
+    if (b.type === 'image' && b.image && b.image.type === 'file') {
+      // Conserva solo il block ID, rimuovi l'URL S3 che scade
+      b.image = Object.assign({}, b.image, {
+        file: { url: null, _blockId: b.id.replace(/-/g, '') }
+      });
+    }
+    if (b.children) b.children = sanitizeBlocks(b.children);
+    return b;
+  });
 }
