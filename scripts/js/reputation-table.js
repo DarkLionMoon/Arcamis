@@ -130,6 +130,8 @@ async function showReputationTable() {
     document.getElementById('hv').style.display = 'none';
     document.getElementById('pv').style.display = 'block';
     document.getElementById('ph-icon').textContent = '🗺️';
+    document.getElementById('pbody').style.maxWidth = 'none';
+    document.getElementById('pbody').style.width = '100%';
     document.getElementById('ph-title').textContent = 'REPUTAZIONI';
     document.getElementById('ph-eyebrow').textContent = 'Personaggio';
     document.getElementById('ph-crumb').textContent = 'Il tuo PG';
@@ -166,7 +168,7 @@ async function showReputationTable() {
     _repHeaders = validCols.map(i => headerRow[i]);
     // Prende solo le righe con almeno un valore non vuoto (esclude righe vuote in fondo)
     _repRows = rows.slice(2)
-      .filter(r => validCols.some(i => r[i] && r[i].trim() !== ''))
+      .filter(r => r[validCols[0]] && r[validCols[0]].trim() !== '')
       .map(r => validCols.map(i => r[i] || ''));
 
     _repSortCol = null;
