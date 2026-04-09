@@ -180,6 +180,7 @@ function renderBlocks(blocks,isRoot){
 
       case'image':
         var src=d.type==='external'?(d.external&&d.external.url):(d.file&&d.file.url);
+        src=safeCoverUrl(src)||src;
         if(src){
           var cap=d.caption&&d.caption.length?rt(d.caption):'';
           h+='<figure class="n-image">'
