@@ -142,7 +142,7 @@ async function showReputationTable() {
 
   const pbody = document.getElementById('pbody');
   pbody.innerHTML = `
-    <div class="notion-body" style="padding:32px 0 64px">
+    <div class="notion-body" style="padding:32px 0 64px;max-width:100%;width:100%">
       <div id="rep-loading" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:80px 0;color:var(--text3);font-family:'Cinzel',serif;font-size:13px;letter-spacing:.15em">
         <span style="opacity:.6">Caricamento reputazioni…</span>
       </div>
