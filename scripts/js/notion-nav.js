@@ -221,12 +221,18 @@ async function _gpRender(id,label,icon){
     /* Render */
     var html=renderBlocks(bl,true);
     var pbody=document.getElementById('pbody');
+    pbody.style.maxWidth='';
+    pbody.style.width='';
     var emptyHtml='<div class="n-empty"><div class="n-empty-icon">'+picon+'</div>'
       +'<div class="n-empty-title">'+ptitle+'</div>'
       +'<div class="n-empty-msg">Questa pagina non ha ancora contenuto.</div></div>';
     var footer='<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
       +'<div class="n-page-footer-text">Archivi di Arcamis — '+ptitle+'</div></div>';
     pbody.innerHTML='<div class="nc" style="animation:fi .22s ease forwards">'+(html||emptyHtml)+footer+'</div>';
+    if(pbody.querySelector('.pb-wide-trigger')){
+      pbody.style.maxWidth='none';
+      pbody.style.width='100%';
+    }
 
     applyGlossary(pbody);
 
