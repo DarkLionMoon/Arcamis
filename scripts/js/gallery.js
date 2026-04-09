@@ -552,16 +552,25 @@ window.gsFilter = function(btn, filter) {
 };
 
 /* ── Funzione principale: carica e mostra la galleria ── */
+/* ── Funzione principale: carica e mostra la galleria ── */
 window.loadGallery = function(container) {
   container.innerHTML = '<div class="gs-loading"><div class="gs-loading-spin"></div><span>Caricamento eroi...</span></div>';
 
-  fetch('/api/gallery')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      _galleryData = data.pages || [];
-      renderGallery(container, _galleryData);
-    })
-    .catch(function(e) {
-      container.innerHTML = '<div class="gs-loading">⚠️ Errore caricamento galleria</div>';
-    });
+  function doFetch(attempt) {
+    fetch('/api/gallery')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        _galleryData = data.pages || [];
+        if (!_galleryData.length && attempt < 2) {
+          setTimeout(function() { doFetch(attempt + 1); }, 800);
+          return;
+        }
+        renderGallery(container, _galleryData);
+      })
+      .catch(function(e) {
+        container.innerHTML = '<div class="gs-loading">⚠️ Errore caricamento galleria</div>';
+      });
+  }
+
+  doFetch(0);
 };
