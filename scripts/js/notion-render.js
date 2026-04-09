@@ -196,12 +196,11 @@ function renderBlocks(blocks,isRoot){
             fetch('/api/notion?blockId='+blockId)
               .then(function(r){return r.json();})
               .then(function(data){
-  if(!data.url)return;
-  var proxied=safeCoverUrl(data.url)||data.url;
-  var fig=document.getElementById('nimg-'+blockId);
-  console.log('nimg lookup', blockId, fig, proxied);
-  if(!fig)return;
-                fig.innerHTML='<img src="'+proxied+'" loading="lazy" class="n-zoomable" onclick="arcZoom(\''+proxied+'\')" onerror="this.parentElement.style.display=\'none\'"/>'
+                if(!data.url)return;
+                var freshUrl=data.url;
+                var fig=document.getElementById('nimg-'+blockId);
+                if(!fig)return;
+                fig.innerHTML='<img src="'+freshUrl+'" loading="lazy" class="n-zoomable" onclick="arcZoom(\''+freshUrl+'\')" onerror="this.parentElement.style.display=\'none\'"/>'
                   +(caption?'<figcaption class="n-figcap">'+caption+'</figcaption>':'');
               })
               .catch(function(){
