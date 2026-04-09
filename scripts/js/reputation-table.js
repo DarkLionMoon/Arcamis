@@ -11,6 +11,8 @@ const REP_CACHE_TTL = 10 * 60 * 1000; // 10 minuti
 
 // ─── Parsing CSV minimale (gestisce virgole dentro virgolette) ───
 function parseCSV(text) {
+  // Rimuove BOM e normalizza line endings
+  text = text.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const lines = text.trim().split('\n');
   const result = [];
   for (const line of lines) {
@@ -152,9 +154,7 @@ async function showReputationTable() {
     if (!rows || rows.length < 2) throw new Error('Dati vuoti');
 
     _repHeaders = rows[0]; // prima riga = intestazioni
-    _repRows = rows.slice(2); // riga 2 = "Totale", dal 3 in poi i PG
-    // In realtà rows[1] è "Totale" — includiamola
-    _repRows = rows.slice(1);
+    _repRows = rows.slice(1); // dalla seconda riga in poi (include Totale)
 
     _repSortCol = null;
     _repSortAsc = true;
