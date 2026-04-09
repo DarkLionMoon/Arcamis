@@ -140,8 +140,11 @@ if (imgUrl) {
         });
       }
 
-      const payload = JSON.stringify(await fetchPage(cleanId, notionHeaders, MAX_DEPTH));
-      await kvPut(cacheKey, payload);
+      const pageData = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);
+const payload = JSON.stringify(pageData);
+const ttl = hasS3Images(pageData.blocks) ? 2700 : CACHE_TTL;
+const wrapper = JSON.stringify({ expiresAt: Date.now() + ttl * 1000, data: payload });
+await KV.put(cacheKey, wrapper, { expirationTtl: CACHE_SWR });
 
       return new Response(payload, {
         headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
@@ -347,4 +350,13 @@ async function loadChildren(blocks, headers, depth) {
     }
     return block;
   });
+}
+/* ════ hasS3Images ════ */
+function hasS3Images(blocks) {
+  if (!blocks) return false;
+  for (var b of blocks) {
+    if (b.type === 'image' && b.image && b.image.type === 'file') return true;
+    if (b.children && hasS3Images(b.children)) return true;
+  }
+  return false;
 }
