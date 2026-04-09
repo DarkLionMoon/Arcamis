@@ -21,7 +21,7 @@ export async function onRequest(context) {
 
   const cors = {
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'public, max-age=60, stale-while-revalidate=300'
+    'Cache-Control': 'no-cache'
   };
 
   /* ── Helper KV con stale-while-revalidate ── */
