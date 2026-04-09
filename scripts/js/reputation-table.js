@@ -153,6 +153,9 @@ async function showReputationTable() {
     const rows = await fetchRepData();
     if (!rows || rows.length < 2) throw new Error('Dati vuoti');
 
+    console.log('HEADERS:', rows[0]);
+    console.log('PRIMA RIGA DATI:', rows[1]);
+    console.log('TOT RIGHE:', rows.length);
     _repHeaders = rows[0]; // prima riga = intestazioni
     _repRows = rows.slice(1); // dalla seconda riga in poi (include Totale)
 
