@@ -479,3 +479,253 @@ html body .wiki-layout .dnd-grid .lcard.dnd-5e:hover {
     transform: translateY(-2px) !important;
     box-shadow: 4px 4px 15px rgba(0,0,0,0.4) !important;
 }
+/* ── Scroll to Top ── */
+#arc-stt {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 38px;
+  height: 38px;
+  background: rgba(200,155,60,.12);
+  border: 1px solid rgba(200,155,60,.28);
+  color: var(--gold2, #c89b3c);
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s, background .2s, transform .2s;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#arc-stt.arc-stt-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+#arc-stt:hover {
+  background: rgba(200,155,60,.22);
+  transform: translateY(-2px);
+}
+ 
+/* ── Last Updated ── */
+.arc-lastupdated {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .15em;
+  color: rgba(200,155,60,.35);
+  margin-top: -6px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+ 
+/* ── Breadcrumb active nav ── */
+.tn.ta {
+  color: var(--gold2, #c89b3c) !important;
+  border-bottom: 2px solid rgba(200,155,60,.6);
+}
+ 
+/* ── Tag Cloud Biblioteca ── */
+.arc-tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px 0 24px;
+  border-bottom: 1px solid rgba(200,155,60,.1);
+  margin-bottom: 20px;
+}
+.arc-tag-cloud-item {
+  font-family: 'Cinzel', serif;
+  letter-spacing: .04em;
+  color: rgba(200,155,60,.6);
+  cursor: pointer;
+  transition: color .15s;
+  user-select: none;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+.arc-tag-cloud-item:hover {
+  color: var(--gold2, #c89b3c);
+  background: rgba(200,155,60,.07);
+}
+.arc-tag-cloud-item small {
+  font-size: .7em;
+  opacity: .6;
+}
+.arc-tag-cloud-item.active {
+  color: var(--gold2, #c89b3c);
+  background: rgba(200,155,60,.12);
+  border: 1px solid rgba(200,155,60,.25);
+}
+ 
+/* ── Novità page ── */
+.arc-news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  padding: 8px 0;
+}
+.arc-news-card {
+  background: rgba(200,155,60,.04);
+  border: 1px solid rgba(200,155,60,.12);
+  border-radius: 6px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, transform .15s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.arc-news-card:hover {
+  background: rgba(200,155,60,.09);
+  border-color: rgba(200,155,60,.28);
+  transform: translateY(-2px);
+}
+.arc-news-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+.arc-news-title {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold2, #c89b3c);
+  letter-spacing: .04em;
+}
+.arc-news-date {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: rgba(200,155,60,.4);
+  text-transform: uppercase;
+}
+.arc-news-loading {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: rgba(200,155,60,.35);
+  padding: 40px 0;
+  text-align: center;
+  letter-spacing: .1em;
+}
+ 
+/* ── Admin Log ── */
+.arc-admin-log {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.arc-admin-log-entry {
+  display: flex;
+  gap: 12px;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(200,155,60,.07);
+  align-items: flex-start;
+}
+.arc-admin-log-entry:hover {
+  background: rgba(200,155,60,.04);
+}
+.arc-log-time {
+  color: rgba(200,155,60,.4);
+  white-space: nowrap;
+  font-size: 10px;
+  padding-top: 1px;
+  min-width: 120px;
+}
+.arc-log-action {
+  color: rgba(200,155,60,.8);
+  flex: 1;
+}
+.arc-log-target {
+  color: rgba(240,230,200,.5);
+  font-size: 10px;
+}
+.arc-log-empty {
+  color: rgba(200,155,60,.3);
+  font-style: italic;
+  padding: 20px 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+}
+ 
+/* ── Admin Preview Modal ── */
+#arc-preview-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(4,6,14,.85);
+  backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+}
+#arc-preview-modal.open {
+  display: flex;
+}
+.arc-preview-inner {
+  background: rgba(8,10,22,.97);
+  border: 1px solid rgba(200,155,60,.25);
+  border-radius: 8px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.arc-preview-title {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold2, #c89b3c);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.arc-preview-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(200,155,60,.15);
+}
+.arc-preview-meta {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  color: rgba(240,230,200,.5);
+  letter-spacing: .08em;
+}
+.arc-preview-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.arc-preview-confirm {
+  background: rgba(200,155,60,.15);
+  border: 1px solid rgba(200,155,60,.4);
+  color: var(--gold2, #c89b3c);
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: .1em;
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.arc-preview-confirm:hover { background: rgba(200,155,60,.28); }
+.arc-preview-cancel {
+  background: transparent;
+  border: 1px solid rgba(200,155,60,.15);
+  color: rgba(240,230,200,.4);
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: .1em;
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+.arc-preview-cancel:hover {
+  border-color: rgba(200,155,60,.3);
+  color: rgba(240,230,200,.7);
+}
