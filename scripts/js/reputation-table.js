@@ -156,8 +156,18 @@ async function showReputationTable() {
     console.log('HEADERS:', rows[0]);
     console.log('PRIMA RIGA DATI:', rows[1]);
     console.log('TOT RIGHE:', rows.length);
-    _repHeaders = rows[0]; // prima riga = intestazioni
-    _repRows = rows.slice(1); // dalla seconda riga in poi (include Totale)
+   // Trova le colonne con intestazione non vuota nella riga 1
+    const headerRow = rows[1];
+    const validCols = [];
+    for (let i = 0; i < headerRow.length; i++) {
+      if (headerRow[i].trim() !== '') validCols.push(i);
+    }
+
+    _repHeaders = validCols.map(i => headerRow[i]);
+    // Prende solo le righe con almeno un valore non vuoto (esclude righe vuote in fondo)
+    _repRows = rows.slice(2)
+      .filter(r => validCols.some(i => r[i] && r[i].trim() !== ''))
+      .map(r => validCols.map(i => r[i] || ''));
 
     _repSortCol = null;
     _repSortAsc = true;
