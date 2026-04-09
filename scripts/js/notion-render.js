@@ -291,7 +291,7 @@ if(cpCoverSafe){
       case'child_database':
   var dbRawId=b.id.replace(/-/g,'');
   if(dbRawId===GALLERY_DB_ID){
-    h+='<div class="gs-container" id="gs-'+dbRawId+'"></div>';
+    h+='<div class="gs-container pb-wide-trigger" id="gs-'+dbRawId+'"></div>';
   }else if(dbRawId==='3040274fdc1c80e0a0dccfa9761bff55'){
     h+='<div class="hb-library-container pb-wide-trigger" id="hblib-'+dbRawId+'"></div>';
   }else if(dbRawId==='2f70274fdc1c80e3bdc7f95f81eb9cc0'){
