@@ -317,3 +317,32 @@ window.arcZoom = function(src) {
   };
   document.addEventListener('keydown', onKey);
 };
+/* ── Scroll to Top ── */
+(function(){
+  var btn = document.createElement('button');
+  btn.id = 'arc-stt';
+  btn.innerHTML = '↑';
+  btn.title = 'Torna in cima';
+  btn.onclick = function(){
+    var main = document.getElementById('main');
+    if(main){
+      main.scrollTo({top:0, behavior:'smooth'});
+    } else {
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+  };
+  document.body.appendChild(btn);
+ 
+  function checkScroll(){
+    var main = document.getElementById('main');
+    var scrolled = main ? main.scrollTop > 300 : window.scrollY > 300;
+    btn.classList.toggle('arc-stt-visible', scrolled);
+  }
+ 
+  var main = document.getElementById('main');
+  if(main){
+    main.addEventListener('scroll', checkScroll, {passive:true});
+  }
+  window.addEventListener('scroll', checkScroll, {passive:true});
+})();
+ 
