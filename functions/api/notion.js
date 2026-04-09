@@ -142,9 +142,13 @@ if (imgUrl) {
 
       const pageData = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);
 const payload = JSON.stringify(pageData);
-const ttl = hasS3Images(pageData.blocks) ? 2700 : CACHE_TTL;
-const wrapper = JSON.stringify({ expiresAt: Date.now() + ttl * 1000, data: payload });
-await KV.put(cacheKey, wrapper, { expirationTtl: CACHE_SWR });
+if (hasS3Images(pageData.blocks)) {
+  // Non cachare pagine con immagini S3 — gli URL scadono troppo presto
+  return new Response(payload, {
+    headers: { 'Content-Type': 'application/json', 'X-Cache': 'BYPASS', ...cors }
+  });
+}
+await kvPut(cacheKey, payload);
 
       return new Response(payload, {
         headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS', ...cors }
