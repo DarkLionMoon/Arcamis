@@ -303,7 +303,7 @@ function _renderLivello(rows) {
 
   /* Mappa colonne */
   var colNome = -1, colProgetto = -1, colMatPrinc = -1, colMatSec = -1;
-  var colTipo = -1, colDesc = -1, colValCraft = -1, colValVend = -1;
+  var colTipo = -1, colDesc = -1, colValCraft = -1, colValVend = -1, colUrl = -1;
   var colDtLv = {};
 
   headers.forEach(function(h, i) {
@@ -313,6 +313,7 @@ function _renderLivello(rows) {
     else if (h.indexOf('secondari') > -1) colMatSec = i;
     else if (h === 'tipologia') colTipo = i;
     else if (h === 'descrizione') colDesc = i;
+    else if (h === 'url') colUrl = i;
     else if (h.indexOf('crafting') > -1) colValCraft = i;
     else if (h.indexOf('vendita') > -1) colValVend = i;
     else {
