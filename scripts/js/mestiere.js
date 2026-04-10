@@ -359,18 +359,22 @@ function _renderLivello(rows) {
 
     /* Colonna Descrizione */
     if (colDesc > -1) {
-      var desc = (row[colDesc] || '').trim();
-      var isLink = desc.toLowerCase() === 'clicca qui' || desc.toLowerCase().indexOf('http') > -1;
-      if (!desc) {
-        h += '<td>—</td>';
-      } else if (isLink && desc.toLowerCase() === 'clicca qui') {
-        h += '<td><span style="color:var(--ms-c);font-family:\'Cinzel\',serif;font-size:11px;opacity:.6;font-style:italic">Clicca qui</span></td>';
-      } else if (desc.toLowerCase().indexOf('http') > -1) {
-        h += '<td><a href="' + desc + '" target="_blank" rel="noopener" style="color:var(--ms-c);font-family:\'Cinzel\',serif;font-size:11px">Link →</a></td>';
-      } else {
-        h += '<td><span style="font-family:\'Crimson Pro\',serif;font-size:14px;color:rgba(220,200,160,.75);font-style:italic">' + desc + '</span></td>';
-      }
-    }
+  var desc = (row[colDesc] || '').trim();
+  var url  = colUrl > -1 ? (row[colUrl] || '').trim() : '';
+  var isClicca = desc.toLowerCase() === 'clicca qui';
+
+  if (!desc) {
+    h += '<td>—</td>';
+  } else if (isClicca && url) {
+    h += '<td><a href="' + url + '" target="_blank" rel="noopener" '
+       + 'style="color:var(--ms-c);font-family:\'Cinzel\',serif;font-size:11px;opacity:.8;text-decoration:none;border-bottom:1px solid currentColor">'
+       + 'Clicca qui →</a></td>';
+  } else if (isClicca) {
+    h += '<td><span style="color:var(--ms-c);font-family:\'Cinzel\',serif;font-size:11px;opacity:.4;font-style:italic">Clicca qui</span></td>';
+  } else {
+    h += '<td><span style="font-family:\'Crimson Pro\',serif;font-size:14px;color:rgba(220,200,160,.75);font-style:italic">' + desc + '</span></td>';
+  }
+}
 
     if (colValCraft > -1) h += '<td class="ms-val-mo">' + (row[colValCraft] || '—') + ' mo</td>';
     if (colValVend > -1) h += '<td class="ms-val-mo">' + (row[colValVend] || '—') + ' mo</td>';
