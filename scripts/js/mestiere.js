@@ -236,17 +236,16 @@ function _renderIntro(rows) {
 
   validRows.forEach(function(row) {
     var cell = row[0].trim();
-    /* Titolo: breve, non inizia con parole di testo descrittivo */
     var isTitolo = cell.length < 80
       && !cell.match(/[.,]$/)
       && cell.length > 3
-      && !cell.match(/^(Il |La |Lo |Un |Una |Ogni |Per |Imparare |Livello PG)/i);
+      && !cell.match(/^(Il |La |Lo |Un |Una |Ogni |Per |Imparare |Livello PG|Livello \d)/i);
     if (isTitolo) {
-      current = { titolo: cell, testo: [] };
+      current = { titolo: cell, righe: [] };
       sections.push(current);
     } else {
-      if (!current) { current = { titolo: '', testo: [] }; sections.push(current); }
-      current.testo.push(cell);
+      if (!current) { current = { titolo: '', righe: [] }; sections.push(current); }
+      current.righe.push(cell);
     }
   });
 
@@ -254,7 +253,35 @@ function _renderIntro(rows) {
   sections.forEach(function(sec) {
     h += '<div class="ms-intro-section">';
     if (sec.titolo) h += '<div class="ms-intro-section-title">' + sec.titolo + '</div>';
-    if (sec.testo.length) h += '<div class="ms-intro-section-body">' + sec.testo.join('<br><br>') + '</div>';
+    if (sec.righe.length) {
+      /* Righe "lista" (brevi, tipo "Livello X: ...") → <br> singolo; paragrafi → <br><br> */
+      var parts = [];
+      var buf = [];
+      sec.righe.forEach(function(riga) {
+        var isLista = riga.length < 60 && riga.match(/^(Livello |LV\d|LV \d|\d+[.:)])/i);
+        if (isLista) {
+          if (buf.length) { parts.push({ tipo: 'para', righe: buf.slice() }); buf = []; }
+          parts.push({ tipo: 'lista', righe: [riga] });
+        } else {
+          /* Se la riga precedente era anche lista, aggiungila al gruppo lista */
+          var last = parts[parts.length - 1];
+          if (last && last.tipo === 'lista') { last.righe.push(riga); }
+          else buf.push(riga);
+        }
+      });
+      if (buf.length) parts.push({ tipo: 'para', righe: buf });
+
+      var bodyHtml = '';
+      parts.forEach(function(p) {
+        if (p.tipo === 'lista') {
+          bodyHtml += p.righe.join('<br>');
+        } else {
+          bodyHtml += p.righe.join('<br><br>');
+        }
+        bodyHtml += '<br><br>';
+      });
+      h += '<div class="ms-intro-section-body">' + bodyHtml.replace(/<br><br>$/, '') + '</div>';
+    }
     h += '</div>';
   });
   h += '</div>';
@@ -289,7 +316,6 @@ function _renderLivello(rows) {
     else if (h.indexOf('crafting') > -1) colValCraft = i;
     else if (h.indexOf('vendita') > -1) colValVend = i;
     else {
-      /* DT columns: "n° di dt prof lv1", "n° di dt prof lv2+", ecc. */
       var m = h.match(/lv\s*(\d+)/i);
       if (m && (h.indexOf('dt') > -1 || h.indexOf('prof') > -1)) {
         colDtLv[m[1]] = i;
@@ -301,9 +327,11 @@ function _renderLivello(rows) {
 
   var h = '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
   h += '<th>Nome</th>';
+  if (colProgetto > -1) h += '<th>Progetto</th>';
   if (colMatPrinc > -1) h += '<th>Mat. Principale</th>';
   if (colMatSec > -1) h += '<th>Mat. Secondario</th>';
   if (colTipo > -1) h += '<th>Tipologia</th>';
+  if (colDesc > -1) h += '<th>Descrizione</th>';
   if (colValCraft > -1) h += '<th>Crafting</th>';
   if (colValVend > -1) h += '<th>Vendita</th>';
   lvKeys.forEach(function(lv) {
@@ -315,21 +343,34 @@ function _renderLivello(rows) {
     var nome = colNome > -1 ? (row[colNome] || '').trim() : '';
     if (!nome) return;
 
-    var isProgetto = colProgetto > -1 && (row[colProgetto] || '').toLowerCase().trim() === 'si';
-    var desc = colDesc > -1 ? (row[colDesc] || '').trim() : '';
-    var descIsLink = desc.toLowerCase().indexOf('http') > -1 || desc.toLowerCase() === 'clicca qui';
-
     h += '<tr>';
-    h += '<td>' + nome;
-    if (isProgetto) h += '<span class="ms-badge-prog">Progetto</span>';
-    if (desc && !descIsLink) {
-      h += '<br><span style="font-family:\'Crimson Pro\',serif;font-size:13px;color:rgba(200,180,140,.55);font-style:italic">' + desc + '</span>';
+    h += '<td>' + nome + '</td>';
+
+    /* Colonna Progetto */
+    if (colProgetto > -1) {
+      var isP = (row[colProgetto] || '').toLowerCase().trim() === 'si';
+      h += '<td style="text-align:center">' + (isP ? '<span class="ms-badge-prog">Sì</span>' : '—') + '</td>';
     }
-    h += '</td>';
 
     if (colMatPrinc > -1) h += '<td>' + (row[colMatPrinc] || '—') + '</td>';
     if (colMatSec > -1) h += '<td>' + (row[colMatSec] || '—') + '</td>';
     if (colTipo > -1) h += '<td>' + _tipoBadge(row[colTipo] || '') + '</td>';
+
+    /* Colonna Descrizione */
+    if (colDesc > -1) {
+      var desc = (row[colDesc] || '').trim();
+      var isLink = desc.toLowerCase() === 'clicca qui' || desc.toLowerCase().indexOf('http') > -1;
+      if (!desc) {
+        h += '<td>—</td>';
+      } else if (isLink && desc.toLowerCase() === 'clicca qui') {
+        h += '<td><span style="color:var(--ms-c);font-family:\'Cinzel\',serif;font-size:11px;opacity:.6;font-style:italic">Clicca qui</span></td>';
+      } else if (desc.toLowerCase().indexOf('http') > -1) {
+        h += '<td><a href="' + desc + '" target="_blank" rel="noopener" style="color:var(--ms-c);font-family:\'Cinzel\',serif;font-size:11px">Link →</a></td>';
+      } else {
+        h += '<td><span style="font-family:\'Crimson Pro\',serif;font-size:14px;color:rgba(220,200,160,.75);font-style:italic">' + desc + '</span></td>';
+      }
+    }
+
     if (colValCraft > -1) h += '<td class="ms-val-mo">' + (row[colValCraft] || '—') + ' mo</td>';
     if (colValVend > -1) h += '<td class="ms-val-mo">' + (row[colValVend] || '—') + ' mo</td>';
     lvKeys.forEach(function(lv) {
