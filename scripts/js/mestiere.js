@@ -401,9 +401,15 @@ function _renderPergamene(rows) {
   var headerIdx = -1;
   for (var i = 0; i < rows.length; i++) {
     var first = (rows[i][0] || '').toLowerCase().trim();
-    if (first === 'livello incantesimo' || first === 'livello' || first.indexOf('incantesimo') > -1) {
-      headerIdx = i; break;
-    }
+var nonEmpty = rows[i].filter(function(c){ return c && c.trim(); }).length;
+/* Header = riga con 3+ colonne popolate E prima cella contiene parole chiave */
+if (nonEmpty >= 3 && (first.indexOf('livello') > -1 || first.indexOf('incantesimo') > -1 || first === 'trucchetto')) {
+  headerIdx = i; break;
+}
+/* Oppure: prima riga con 4+ colonne popolate dopo almeno 1 riga di testo */
+if (i > 0 && nonEmpty >= 4) {
+  headerIdx = i; break;
+}
   }
 
   /* Testo introduttivo sopra la tabella */
