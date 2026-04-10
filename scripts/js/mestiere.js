@@ -235,19 +235,25 @@ function _renderIntro(rows) {
   var current = null;
 
   validRows.forEach(function(row) {
-    var cell = row[0].trim();
-    var isTitolo = cell.length < 80
-      && !cell.match(/[.,]$/)
-      && cell.length > 3
-      && !cell.match(/^(Il |La |Lo |Un |Una |Ogni |Per |Imparare |Livello PG|Livello \d)/i);
+  var cell = row[0].trim();
+  /* Se la cella contiene newline interni, splittala in sotto-righe */
+  var subrighe = cell.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
+  var righe = subrighe.length > 1 ? subrighe : [cell];
+
+  righe.forEach(function(sr) {
+    var isTitolo = sr.length < 80
+      && !sr.match(/[.,]$/)
+      && sr.length > 3
+      && !sr.match(/^(Il |La |Lo |Un |Una |Ogni |Per |Imparare |Livello PG|Livello \d)/i);
     if (isTitolo) {
-      current = { titolo: cell, righe: [] };
+      current = { titolo: sr, righe: [] };
       sections.push(current);
     } else {
       if (!current) { current = { titolo: '', righe: [] }; sections.push(current); }
-      current.righe.push(cell);
+      current.righe.push(sr);
     }
   });
+});
 
   var h = '<div class="ms-intro-panel">';
   sections.forEach(function(sec) {
