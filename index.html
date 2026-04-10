@@ -72,7 +72,7 @@
     <div class="tn-drop" id="dd-lavori">
       <div class="tn" onclick="toggleDd('dd-lavori',event)">Lavori</div>
       <div class="tn-menu">
-        <div class="tn-menu-label">Gilde &amp; Mestieri</div>
+        <div class="tn-menu-label">Lavori</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️')"><span class="tn-ii">🗡️</span>Gilda avventurieri</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')"><span class="tn-ii">🍺</span>Locanda</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')"><span class="tn-ii">🔥</span>Forgia</div>
@@ -83,6 +83,17 @@
         <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c80769a4ae243f22f0582','Corporazione costruttori','🔨')"><span class="tn-ii">🔨</span>Corporazione dei costruttori</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')"><span class="tn-ii">⚕️</span>Ospedale</div>
         <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c8035bad4f0b6ab705192','Sartoria','🧵')"><span class="tn-ii">🧵</span>Sartoria</div>
+        <div class="tn-div"></div>
+        <div class="tn-menu-label">Mestieri</div>
+        <div class="tn-item" onclick="closeDd();showMestiere('come-funzionano')"><span class="tn-ii">📜</span>Come funzionano</div>
+        <div class="tn-item" onclick="closeDd();showMestiere('alchimista')"><span class="tn-ii">⚗️</span>Alchimista</div>
+        <div class="tn-item" onclick="closeDd();showMestiere('architetto')"><span class="tn-ii">🏛️</span>Architetto</div>
+        <div class="tn-item" onclick="closeDd();showMestiere('artigiano')"><span class="tn-ii">🔨</span>Artigiano</div>
+        <div class="tn-item" onclick="closeDd();showMestiere('artista')"><span class="tn-ii">🎨</span>Artista</div>
+        <div class="tn-item" onclick="closeDd();showMestiere('falegname')"><span class="tn-ii">🪚</span>Falegname</div>
+        <div class="tn-item" onclick="closeDd();showMestiere('metallurgo')"><span class="tn-ii">⚒️</span>Metallurgo</div>
+        <div class="tn-item" onclick="closeDd();showMestiere('oste')"><span class="tn-ii">🍺</span>Oste</div>
+        <div class="tn-item" onclick="closeDd();showMestiere('sarto')"><span class="tn-ii">🧵</span>Sarto</div>
       </div>
     </div>
 
@@ -150,6 +161,18 @@
     <div class="mn-item" onclick="closeMobileNav();gp('2ff0274fdc1c80688dd6c2b293a1f626','Caserma','🛡️')"><span class="mn-ii">🛡️</span>Caserma</div>
     <div class="mn-item" onclick="closeMobileNav();gp('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')"><span class="mn-ii">⚕️</span>Ospedale</div>
     <div class="mn-item" onclick="closeMobileNav();gp('2ff0274fdc1c8035bad4f0b6ab705192','Sartoria','🧵')"><span class="mn-ii">🧵</span>Sartoria</div>
+    <div class="mn-section">
+    <div class="mn-label">Mestieri</div>
+    <div class="mn-item" onclick="closeMobileNav();showMestiere('come-funzionano')"><span class="mn-ii">📜</span>Come funzionano</div>
+    <div class="mn-item" onclick="closeMobileNav();showMestiere('alchimista')"><span class="mn-ii">⚗️</span>Alchimista</div>
+    <div class="mn-item" onclick="closeMobileNav();showMestiere('architetto')"><span class="mn-ii">🏛️</span>Architetto</div>
+    <div class="mn-item" onclick="closeMobileNav();showMestiere('artigiano')"><span class="mn-ii">🔨</span>Artigiano</div>
+    <div class="mn-item" onclick="closeMobileNav();showMestiere('artista')"><span class="mn-ii">🎨</span>Artista</div>
+    <div class="mn-item" onclick="closeMobileNav();showMestiere('falegname')"><span class="mn-ii">🪚</span>Falegname</div>
+    <div class="mn-item" onclick="closeMobileNav();showMestiere('metallurgo')"><span class="mn-ii">⚒️</span>Metallurgo</div>
+    <div class="mn-item" onclick="closeMobileNav();showMestiere('oste')"><span class="mn-ii">🍺</span>Oste</div>
+    <div class="mn-item" onclick="closeMobileNav();showMestiere('sarto')"><span class="mn-ii">🧵</span>Sarto</div>
+  </div>
   </div>
   <div class="mn-section">
     <div class="mn-label">Lore &amp; Mondo</div>
@@ -491,5 +514,6 @@
 <script src="scripts/js/npc-gallery.js" defer></script>
 <script src="scripts/js/reputation-table.js" defer></script>
 <script src="scripts/js/novita-widget.js" defer></script>
+<script src="scripts/js/mestiere.js" defer></script>
 </body>
 </html>
