@@ -431,20 +431,37 @@ function closeSubMap(id){
 
 /* ════ PTR (Pull to Refresh) ════ */
 (function(){
-  var startY = 0, pulling = false;
+  var startY = 0, pulling = false, atTop = false, atTopTimer = null;
   var ind = document.getElementById('ptr-indicator');
+
+  /* Traccia se siamo a top da almeno 300ms */
+  var mainEl = document.getElementById('main') || window;
+  function onScroll(){
+    var sy = mainEl.scrollTop !== undefined ? mainEl.scrollTop : window.scrollY;
+    if(sy === 0){
+      if(!atTopTimer) atTopTimer = setTimeout(function(){ atTop = true; }, 300);
+    } else {
+      atTop = false;
+      clearTimeout(atTopTimer); atTopTimer = null;
+    }
+  }
+  mainEl.addEventListener('scroll', onScroll, {passive:true});
+
   document.addEventListener('touchstart', function(e){
-    if(window.scrollY === 0) startY = e.touches[0].clientY;
+    if(atTop) startY = e.touches[0].clientY;
+    else startY = 0;
   }, {passive:true});
+
   document.addEventListener('touchmove', function(e){
     if(!startY) return;
     var dy = e.touches[0].clientY - startY;
-    if(dy > 60){ pulling = true; if(ind) ind.classList.add('visible'); }
+    if(dy > 110){ pulling = true; if(ind) ind.classList.add('vis'); }
   }, {passive:true});
+
   document.addEventListener('touchend', function(){
-    if(pulling) location.reload();
+    if(pulling){ location.reload(); }
     pulling = false; startY = 0;
-    if(ind) ind.classList.remove('visible');
+    if(ind) ind.classList.remove('vis');
   });
 })();
 
