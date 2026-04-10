@@ -452,6 +452,10 @@ function closeSubMap(id){
 window.addEventListener('popstate', function(e){
   if(e.state && e.state.id){
     if(e.state.stack) navStack = e.state.stack;
+    if(e.state.id.startsWith('mestiere-')){
+      showMestiere(e.state.id.replace('mestiere-', ''));
+      return;
+    }
     gp(e.state.id, e.state.label, e.state.icon, true);
   } else {
     showHome();
@@ -463,6 +467,11 @@ window.addEventListener('popstate', function(e){
   var params = new URLSearchParams(location.search);
   var pid = params.get('p');
   if(pid){
+    if(pid.startsWith('mestiere-')){
+      var key = pid.replace('mestiere-', '');
+      setTimeout(function(){ showMestiere(key); }, 0);
+      return;
+    }
     var pg = getPage(pid) || {l:'Pagina', i:'📄', id:pid};
     gp(pg.id, pg.l, pg.i, true);
   }
