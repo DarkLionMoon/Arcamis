@@ -395,7 +395,72 @@ function _renderLivello(rows) {
   h += '</tbody></table></div>';
   return h;
 }
+/* ── Render tab Pergamene ── */
+function _renderPergamene(rows) {
+  /* Le prime righe sono testo descrittivo finché non troviamo l'header reale */
+  var headerIdx = -1;
+  for (var i = 0; i < rows.length; i++) {
+    var first = (rows[i][0] || '').toLowerCase().trim();
+    if (first === 'livello incantesimo' || first === 'livello' || first.indexOf('incantesimo') > -1) {
+      headerIdx = i; break;
+    }
+  }
 
+  /* Testo introduttivo sopra la tabella */
+  var introRows = headerIdx > 0 ? rows.slice(0, headerIdx) : [];
+  var introHtml = '';
+  if (introRows.length) {
+    var testo = introRows
+      .map(function(r) { return (r[0] || '').trim(); })
+      .filter(Boolean)
+      .join('<br><br>');
+    if (testo) {
+      introHtml = '<div class="ms-intro-section" style="margin-bottom:20px">'
+        + '<div class="ms-intro-section-body">' + testo + '</div>'
+        + '</div>';
+    }
+  }
+
+  if (headerIdx === -1) return introHtml || '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
+
+  var headers = rows[headerIdx].map(_normHeader);
+  var data = rows.slice(headerIdx + 1).filter(function(r) {
+    return r.some(function(c) { return c && c.trim(); });
+  });
+
+  if (!data.length) return introHtml + '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
+
+  /* Costruisce tabella con tutte le colonne presenti */
+  var visibleHeaders = headers.filter(function(h) { return h; });
+  var visibleIdxs = [];
+  headers.forEach(function(h, i) { if (h) visibleIdxs.push(i); });
+
+  var h = introHtml + '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
+  visibleHeaders.forEach(function(header) {
+    /* Capitalizza prima lettera */
+    var label = header.charAt(0).toUpperCase() + header.slice(1);
+    h += '<th>' + label + '</th>';
+  });
+  h += '</tr></thead><tbody>';
+
+  data.forEach(function(row) {
+    var firstVal = (row[visibleIdxs[0]] || '').trim();
+    if (!firstVal) return;
+    h += '<tr>';
+    visibleIdxs.forEach(function(ci, ii) {
+      var val = (row[ci] || '').trim() || '—';
+      if (ii === 0) {
+        h += '<td>' + val + '</td>';
+      } else {
+        h += '<td class="ms-dt-cell">' + val + '</td>';
+      }
+    });
+    h += '</tr>';
+  });
+
+  h += '</tbody></table></div>';
+  return h;
+}
 /* ── Mostra tab ── */
 function _msShowTab(key, tabName, container, mestiere) {
   container.querySelectorAll('.ms-tab').forEach(function(t) {
@@ -410,7 +475,11 @@ function _msShowTab(key, tabName, container, mestiere) {
     .then(function(r) { return r.text(); })
     .then(function(text) {
       var rows = _parseCsv(text);
-      panel.innerHTML = tabName === 'Introduzione' ? _renderIntro(rows) : _renderLivello(rows);
+      panel.innerHTML = tabName === 'Introduzione'
+  ? _renderIntro(rows)
+  : tabName === 'Pergamene'
+    ? _renderPergamene(rows)
+    : _renderLivello(rows);
     })
     .catch(function() {
       panel.innerHTML = '<div class="ms-empty">⚠️ Errore caricamento dati.</div>';
