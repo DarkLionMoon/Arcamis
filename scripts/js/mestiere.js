@@ -25,10 +25,11 @@ var _MESTIERI = {
     colore: 'rgba(180,110,40,.8)',
   },
   'artista': {
-    nome: 'Artista', emoji: '🎨',
-    sheetId: '14wN27A8m6_dLCwrqFDRhgt_OsVdOGd0on8s6iuGpkv4',
-    livelli: [1, 2],
-    colore: 'rgba(240,100,160,.8)',
+  nome: 'Artista', emoji: '🎨',
+  sheetId: '14wN27A8m6_dLCwrqFDRhgt_OsVdOGd0on8s6iuGpkv4',
+  livelli: [1, 2],
+  extra: ['Pergamene'],
+  colore: 'rgba(240,100,160,.8)',
   },
   'falegname': {
     nome: 'Falegname', emoji: '🪚',
@@ -507,7 +508,8 @@ window.showMestiere = function(key) {
     _showComeFunzionano(pbody.querySelector('.ms-wrap'), mestiere);
   } else {
     var tabs = ['Introduzione'];
-    mestiere.livelli.forEach(function(lv) { tabs.push('LV ' + lv); });
+mestiere.livelli.forEach(function(lv) { tabs.push('LV ' + lv); });
+if (mestiere.extra) mestiere.extra.forEach(function(t) { tabs.push(t); });
 
     html += '<div class="ms-tabs">';
     tabs.forEach(function(tab, idx) {
