@@ -321,7 +321,7 @@ if(cpCoverSafe){
   }else if(dbRawId===NPC_PARENT_DB.replace(/-/g,'')){
     h+='<div class="npc-gallery-container pb-wide-trigger" id="npcg-'+dbRawId+'"></div>';
   }else if(dbRawId==='2ff0274fdc1c807ea473db02ac4ae391'){
-    h+='<div class="hb-subclass-container pb-wide-trigger" id="hbsc-'+dbRawId+'"></div>';
+  h+='<div class="n-db-wrap"><div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
   }else if(dbRawId==='3350274fdc1c808fba5ed9ad1f3b4bb4'){
   h+='<div class="n-db-wrap"><div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
 }else{
