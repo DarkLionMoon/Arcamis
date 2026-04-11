@@ -9,50 +9,43 @@ var _MESTIERI = {
   'alchimista': {
     nome: 'Alchimista', emoji: '⚗️',
     sheetId: '1uhrl26JgLv3pkqkqUwJITeVRC66sDsEn_7iRna9bk4Q',
-    livelli: [1, 2],
     colore: 'rgba(80,180,160,.8)',
   },
   'architetto': {
     nome: 'Architetto', emoji: '🏛️',
     sheetId: '1lqgabVPdkmxCgAyTS9FJlarpk6kaVUoDEMXd6hF5mps',
-    livelli: [1, 2],
     colore: 'rgba(190,140,60,.8)',
   },
   'artigiano': {
     nome: 'Artigiano', emoji: '🔨',
     sheetId: '1pcNTvNKOzV3dl-cwAFcm-r4gxVN-F8_G2tdkvSl_Oss',
-    livelli: [1, 2],
     colore: 'rgba(180,110,40,.8)',
   },
   'artista': {
   nome: 'Artista', emoji: '🎨',
   sheetId: '14wN27A8m6_dLCwrqFDRhgt_OsVdOGd0on8s6iuGpkv4',
-  livelli: [1, 2],
+  
   extra: ['Pergamene'],
   colore: 'rgba(240,100,160,.8)',
   },
   'falegname': {
     nome: 'Falegname', emoji: '🪚',
     sheetId: '1TY1jBO27VNy_czEfeLtgJr8f2KQLDospO85sIgLM3Xo',
-    livelli: [1, 2],
     colore: 'rgba(160,100,50,.8)',
   },
   'metallurgo': {
     nome: 'Metallurgo', emoji: '⚒️',
     sheetId: '193EbLwI0nkFDhLA4WSeLympCEKtQIXtIuEbrC2fTNLc',
-    livelli: [1, 2],
     colore: 'rgba(160,160,180,.8)',
   },
   'oste': {
     nome: 'Oste', emoji: '🍺',
     sheetId: '1jMCKim7y6Z730I92VJdyMBK_JFMdh7PkuALBxOAmHcM',
-    livelli: [1, 2],
     colore: 'rgba(200,140,40,.8)',
   },
   'sarto': {
     nome: 'Sarto', emoji: '🧵',
-    sheetId: '1Q-YNWmRyIjCO0ReQ8KoYa_bHRxQLJ-DOU7QyDPqJBHU',
-    livelli: [1, 2],
+    sheetId: '1Q-YNWmRyIjCO0ReQ8KoYa_bHRxQLJ-DOU7QyDPqJBHU',  
     colore: 'rgba(180,80,220,.8)',
   },
   'come-funzionano': {
@@ -519,7 +512,43 @@ function _showComeFunzionano(container, mestiere) {
         + '</div></div>';
     });
 }
+function _discoverLevels(key, mestiere, container) {
+  var maxLv = 5;
+  var found = 0;
 
+  function tryLevel(lv) {
+    if (lv > maxLv) return;
+    fetch(_csvUrl(mestiere.sheetId, 'LV ' + lv))
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        var rows = _parseCsv(text);
+        /* Controlla se ci sono dati reali (almeno 2 righe con contenuto) */
+        var dataRows = rows.slice(1).filter(function(r) {
+          return r.some(function(c) { return c && c.trim(); });
+        });
+        if (dataRows.length > 0) {
+          found++;
+          /* Aggiungi il tab */
+          var placeholder = container.querySelector('.ms-tabs-lv-placeholder');
+          if (placeholder) {
+            var tab = document.createElement('div');
+            tab.className = 'ms-tab';
+            tab.setAttribute('data-tab', 'LV ' + lv);
+            tab.setAttribute('onclick', 'msTabClick(this)');
+            tab.textContent = 'LV ' + lv;
+            placeholder.parentNode.insertBefore(tab, placeholder);
+          }
+        }
+        /* Prova il livello successivo */
+        tryLevel(lv + 1);
+      })
+      .catch(function() {
+        tryLevel(lv + 1);
+      });
+  }
+
+  tryLevel(1);
+}
 /* ════════════════════════════════════
    FUNZIONE PRINCIPALE — showMestiere()
 ════════════════════════════════════ */
@@ -583,7 +612,20 @@ window.showMestiere = function(key) {
     _showComeFunzionano(pbody.querySelector('.ms-wrap'), mestiere);
   } else {
     var tabs = ['Introduzione'];
-mestiere.livelli.forEach(function(lv) { tabs.push('LV ' + lv); });
+var html = '<div class="ms-tabs">';
+html += '<div class="ms-tab active" data-tab="Introduzione" onclick="msTabClick(this)">Introduzione</div>';
+html += '<div class="ms-tabs-lv-placeholder"></div>';
+html += '</div><div class="ms-panel"></div></div>';
+pbody.innerHTML = html;
+
+var container = pbody.querySelector('.ms-wrap');
+window.msTabClick = function(el) {
+  _msShowTab(key, el.getAttribute('data-tab'), container, mestiere);
+};
+
+/* Scopri i livelli disponibili provando LV 1-5 */
+_discoverLevels(key, mestiere, container);
+_msShowTab(key, 'Introduzione', container, mestiere);
 if (mestiere.extra) mestiere.extra.forEach(function(t) { tabs.push(t); });
 
     html += '<div class="ms-tabs">';
