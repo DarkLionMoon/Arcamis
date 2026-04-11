@@ -630,25 +630,6 @@ window.showMestiere = function(key) {
 
     _discoverLevels(key, mestiere, container);
     _msShowTab(key, 'Introduzione', container, mestiere);
-  };
-
-/* Scopri i livelli disponibili provando LV 1-5 */
-_discoverLevels(key, mestiere, container);
-_msShowTab(key, 'Introduzione', container, mestiere);
-if (mestiere.extra) mestiere.extra.forEach(function(t) { tabs.push(t); });
-
-    html += '<div class="ms-tabs">';
-    tabs.forEach(function(tab, idx) {
-      html += '<div class="ms-tab' + (idx === 0 ? ' active' : '') + '" data-tab="' + tab + '" onclick="msTabClick(this)">' + tab + '</div>';
-    });
-    html += '</div><div class="ms-panel"></div></div>';
-    pbody.innerHTML = html;
-
-    var container = pbody.querySelector('.ms-wrap');
-    window.msTabClick = function(el) {
-      _msShowTab(key, el.getAttribute('data-tab'), container, mestiere);
-    };
-    _msShowTab(key, 'Introduzione', container, mestiere);
   }
 
   if (typeof afterPageRender === 'function') afterPageRender();
