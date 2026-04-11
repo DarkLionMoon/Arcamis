@@ -1,6 +1,15 @@
 /* ════════════════════════════════════
    ARCAMIS — app.js
 ════════════════════════════════════ */
+/* ════ CACHE VERSION — incrementa ad ogni deploy ════ */
+(function(){
+  var CACHE_VER = '4'; // ← incrementa questo numero ad ogni deploy
+  var stored = localStorage.getItem('arc_cache_ver');
+  if(stored !== CACHE_VER){
+    sessionStorage.clear();
+    localStorage.setItem('arc_cache_ver', CACHE_VER);
+  }
+})();
 window.addEventListener('load', function(){
   setTimeout(function(){
     var l = document.getElementById('site-loader');
