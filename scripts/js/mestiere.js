@@ -391,49 +391,26 @@ function _renderLivello(rows) {
 }
 /* ── Render tab Pergamene ── */
 function _renderPergamene(rows) {
+  /* Trova l'header: prima riga con 6+ colonne popolate */
   var headerIdx = -1;
   for (var i = 0; i < rows.length; i++) {
     var nonEmpty = rows[i].filter(function(c) { return c && c.trim(); }).length;
-    var first = (rows[i][0] || '').toLowerCase().trim();
-    if (nonEmpty >= 4 && first.indexOf('livello') > -1) {
-      headerIdx = i; break;
-    }
+    if (nonEmpty >= 6) { headerIdx = i; break; }
   }
 
-  /* Testo introduttivo: righe prima dell'header */
-  var introParas = [];
-  var introLimit = headerIdx > 0 ? headerIdx : rows.length;
-  for (var j = 0; j < introLimit; j++) {
-    var cell = (rows[j][0] || '').trim();
-    if (!cell) continue;
-    /* Salta righe-titolo tipo "Descrizione", "Numero di Downtime" ecc. */
-if (cell.length < 60 && !cell.match(/[.!?,]$/) && rows[j].filter(function(c){ return c && c.trim(); }).length <= 1) continue;
-    /* Splitta newline interni nella cella */
-    var subrighe = cell.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
-    subrighe.forEach(function(sr) { introParas.push(sr); });
-  }
-
-  var introHtml = '';
-  if (introParas.length) {
-    introHtml = '<div class="ms-intro-section" style="margin-bottom:20px">'
-      + '<div class="ms-intro-section-body">'
-      + introParas.join('<br><br>')
-      + '</div></div>';
-  }
-
-  if (headerIdx === -1) return introHtml || '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
+  if (headerIdx === -1) return '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
 
   var headers = rows[headerIdx].map(_normHeader);
   var data = rows.slice(headerIdx + 1).filter(function(r) {
     return r.some(function(c) { return c && c.trim(); });
   });
 
-  if (!data.length) return introHtml + '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
+  if (!data.length) return '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
 
   var visibleIdxs = [];
   headers.forEach(function(h, i) { if (h) visibleIdxs.push(i); });
 
-  var h = introHtml + '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
+  var h = '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
   visibleIdxs.forEach(function(i) {
     var label = headers[i].charAt(0).toUpperCase() + headers[i].slice(1);
     h += '<th>' + label + '</th>';
