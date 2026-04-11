@@ -260,6 +260,7 @@ async function fetchDb(cleanId, headers) {
     allResults = allResults.concat(data.results);
     cursor = data.has_more ? data.next_cursor : null;
   } while (cursor);
+  allResults = allResults.filter(p => p.object === 'page');
 
   if (cleanId === TIMELINE_DB.replace(/-/g, '')) {
     allResults.sort(function(a, b) {
