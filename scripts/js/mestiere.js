@@ -406,8 +406,8 @@ function _renderPergamene(rows) {
   for (var j = 0; j < introLimit; j++) {
     var cell = (rows[j][0] || '').trim();
     if (!cell) continue;
-    /* Salta righe-titolo brevi senza punteggiatura finale */
-    if (cell.length < 50 && !cell.match(/[.!?,]$/)) continue;
+    /* Salta righe-titolo tipo "Descrizione", "Numero di Downtime" ecc. */
+if (cell.length < 60 && !cell.match(/[.!?,]$/) && rows[j].filter(function(c){ return c && c.trim(); }).length <= 1) continue;
     /* Splitta newline interni nella cella */
     var subrighe = cell.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
     subrighe.forEach(function(sr) { introParas.push(sr); });
