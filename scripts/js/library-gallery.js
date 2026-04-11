@@ -191,13 +191,16 @@ window.libOpenBook = function(el) {
           '</div>'+
           '<div class="lib-info-body n-body">'+html+'</div>'+
           '<div class="lib-info-footer">'+
-            '<button class="lib-open-btn" onclick="gp(\''+id+'\',\''+title.replace(/'/g,"\\'")+'\',\'📖\')">Apri pagina completa →</button>'+
+            '<button class="lib-open-btn" id="lib-open-'+id+'">Apri pagina completa →</button>'+
           '</div>'+
         '</div>';
     })
     .catch(function() {
       info.innerHTML = '<div class="lib-info-err">Errore caricamento</div>';
-    });
+    var openBtn = document.getElementById('lib-open-' + id);
+if (openBtn) openBtn.addEventListener('click', function() {
+  gp(id, title, '📖');
+});
 };
 
 function _injectLibCSS() {
