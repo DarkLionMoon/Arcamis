@@ -474,6 +474,7 @@ function _renderPergamene(rows) {
 
   h += '</tbody></table></div>';
   return h;
+   }
 /* ── Mostra tab ── */
 function _msShowTab(key, tabName, container, mestiere) {
   container.querySelectorAll('.ms-tab').forEach(function(t) {
