@@ -438,7 +438,31 @@ function _renderPergamene(rows) {
     if (h) visibleIdxs.push(i);
   });
 
-  var h = introHtml + '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
+  /* Raccoglie tutte le descrizioni non vuote */
+  var tutteDesc = [];
+  data.forEach(function(row) {
+    if (descIdx > -1) {
+      var d = (row[descIdx] || '').trim();
+      if (d) tutteDesc.push(d);
+    }
+  });
+
+  /* Pannello descrizione espandibile */
+  var descPanelHtml = '';
+  if (tutteDesc.length) {
+    var descId = 'ms-desc-panel-' + Math.random().toString(36).slice(2);
+    descPanelHtml = '<div style="margin-bottom:16px">'
+      + '<div onclick="var p=document.getElementById(\'' + descId + '\');p.style.display=p.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.ms-desc-arr\').textContent=p.style.display===\'none\'?\'▶\':\'▼\'"'
+      + ' style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:\'Cinzel\',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--ms-c);opacity:.8;padding:8px 14px;border:1px solid rgba(200,155,60,.2);background:rgba(200,155,60,.04)">'
+      + '<span class="ms-desc-arr">▶</span> Descrizione'
+      + '</div>'
+      + '<div id="' + descId + '" style="display:none;margin-top:8px">'
+      + '<div class="ms-intro-section"><div class="ms-intro-section-body">'
+      + tutteDesc.join('<br><br>')
+      + '</div></div></div></div>';
+  }
+
+  var h = introHtml + descPanelHtml + '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
   visibleIdxs.forEach(function(i) {
     var label = headers[i].charAt(0).toUpperCase() + headers[i].slice(1);
     h += '<th>' + label + '</th>';
