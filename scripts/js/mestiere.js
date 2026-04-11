@@ -470,11 +470,10 @@ function _msShowTab(key, tabName, container, mestiere) {
   fetch(_csvUrl(mestiere.sheetId, tabName))
     .then(function(r) { return r.text(); })
     .then(function(text) {
-      var rows = _parseCsv(text);
       panel.innerHTML = tabName === 'Introduzione'
   ? _renderIntro(rows)
   : tabName === 'Pergamene'
-    ? _renderPergamene(rows)
+    ? _renderIntro(rows) + _renderPergamene(rows)
     : _renderLivello(rows);
     })
     .catch(function() {
