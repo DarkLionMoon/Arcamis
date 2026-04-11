@@ -45,10 +45,11 @@ function _renderLastUpdated(isoDate){
 }
 var _memCache = {};
 window.prefetchPage = function(id){
-  if(!id || _memCache[var cacheKey = 'pg_' + _CACHE_VER + '_' + id;]) return;
-  fetch('/api/notion?pageId=' + id)
-    .then(function(r){ return r.json(); })
-    .then(function(data){ _memCache[var cacheKey = 'pg_' + _CACHE_VER + '_' + id;] = data; })
+  var cacheKey = 'pg_' + id;
+if(!id || _memCache[cacheKey]) return;
+fetch('/api/notion?pageId=' + id)
+  .then(function(r){ return r.json(); })
+  .then(function(data){ _memCache[cacheKey] = data; })
     .catch(function(){});
 };
 
@@ -241,7 +242,7 @@ async function _gpRender(id,label,icon){
       img.addEventListener('error',function(){
         if(img.dataset.retried)return;
         img.dataset.retried='1';
-        try{sessionStorage.removeItem(var cacheKey = 'pg_' + _CACHE_VER + '_' + id;);}catch(ex){}
+        try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
       },{once:true});
     });
 
