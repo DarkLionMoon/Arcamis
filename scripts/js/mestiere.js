@@ -394,11 +394,9 @@ function _renderPergamene(rows) {
   /* Trova l'header: prima riga con 6+ colonne popolate */
   var headerIdx = -1;
   for (var i = 0; i < rows.length; i++) {
-    var nonEmpty = rows[i].filter(function(c) { return c && c.trim(); }).length;
-    if (nonEmpty >= 6) { headerIdx = i; break; }
-  }
-
-   console.log('headerIdx:', headerIdx, rows[headerIdx]);
+  var first = (rows[i][0] || '').toLowerCase().trim();
+  if (first === 'livello incantesimo') { headerIdx = i; break; }
+}
 
   if (headerIdx === -1) return '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
 
