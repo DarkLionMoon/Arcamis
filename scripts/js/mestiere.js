@@ -391,34 +391,36 @@ function _renderLivello(rows) {
 }
 /* ── Render tab Pergamene ── */
 function _renderPergamene(rows) {
-  /* Le prime righe sono testo descrittivo finché non troviamo l'header reale */
+  /* Trova l'header reale: prima riga che ha "livello" o "incantesimo"
+     oppure ha 4+ colonne popolate */
   var headerIdx = -1;
   for (var i = 0; i < rows.length; i++) {
+    var nonEmpty = rows[i].filter(function(c) { return c && c.trim(); }).length;
     var first = (rows[i][0] || '').toLowerCase().trim();
-var nonEmpty = rows[i].filter(function(c){ return c && c.trim(); }).length;
-/* Header = riga con 3+ colonne popolate E prima cella contiene parole chiave */
-if (nonEmpty >= 3 && (first.indexOf('livello') > -1 || first.indexOf('incantesimo') > -1 || first === 'trucchetto')) {
-  headerIdx = i; break;
-}
-/* Oppure: prima riga con 4+ colonne popolate dopo almeno 1 riga di testo */
-if (i > 0 && nonEmpty >= 4) {
-  headerIdx = i; break;
-}
+    if (nonEmpty >= 4 && (first.indexOf('livello') > -1 || first.indexOf('incantesimo') > -1 || first === 'trucchetto')) {
+      headerIdx = i; break;
+    }
+    if (nonEmpty >= 5) { headerIdx = i; break; }
   }
 
-  /* Testo introduttivo sopra la tabella */
-  var introRows = headerIdx > 0 ? rows.slice(0, headerIdx) : [];
+  /* Testo introduttivo: tutto prima dell'header, saltando righe-titolo brevi */
+  var introParas = [];
+  var introLimit = headerIdx > 0 ? headerIdx : rows.length;
+  for (var j = 0; j < introLimit; j++) {
+    var cell = (rows[j][0] || '').trim();
+    if (!cell) continue;
+    /* Salta righe-titolo tipo "Descrizione" o "Numero di Downtime" */
+    var nonEmptyCols = rows[j].filter(function(c) { return c && c.trim(); }).length;
+    if (nonEmptyCols === 1 && cell.length < 50 && !cell.match(/[.!?]$/)) continue;
+    introParas.push(cell);
+  }
+
   var introHtml = '';
-  if (introRows.length) {
-    var testo = introRows
-      .map(function(r) { return (r[0] || '').trim(); })
-      .filter(Boolean)
-      .join('<br><br>');
-    if (testo) {
-      introHtml = '<div class="ms-intro-section" style="margin-bottom:20px">'
-        + '<div class="ms-intro-section-body">' + testo + '</div>'
-        + '</div>';
-    }
+  if (introParas.length) {
+    introHtml = '<div class="ms-intro-section" style="margin-bottom:20px">'
+      + '<div class="ms-intro-section-body">'
+      + introParas.join('<br><br>')
+      + '</div></div>';
   }
 
   if (headerIdx === -1) return introHtml || '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
@@ -430,15 +432,12 @@ if (i > 0 && nonEmpty >= 4) {
 
   if (!data.length) return introHtml + '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
 
-  /* Costruisce tabella con tutte le colonne presenti */
-  var visibleHeaders = headers.filter(function(h) { return h; });
   var visibleIdxs = [];
   headers.forEach(function(h, i) { if (h) visibleIdxs.push(i); });
 
   var h = introHtml + '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
-  visibleHeaders.forEach(function(header) {
-    /* Capitalizza prima lettera */
-    var label = header.charAt(0).toUpperCase() + header.slice(1);
+  visibleIdxs.forEach(function(i) {
+    var label = headers[i].charAt(0).toUpperCase() + headers[i].slice(1);
     h += '<th>' + label + '</th>';
   });
   h += '</tr></thead><tbody>';
@@ -449,11 +448,9 @@ if (i > 0 && nonEmpty >= 4) {
     h += '<tr>';
     visibleIdxs.forEach(function(ci, ii) {
       var val = (row[ci] || '').trim() || '—';
-      if (ii === 0) {
-        h += '<td>' + val + '</td>';
-      } else {
-        h += '<td class="ms-dt-cell">' + val + '</td>';
-      }
+      h += ii === 0
+        ? '<td>' + val + '</td>'
+        : '<td class="ms-dt-cell">' + val + '</td>';
     });
     h += '</tr>';
   });
