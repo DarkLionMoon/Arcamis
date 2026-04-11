@@ -98,7 +98,7 @@ function _injectMestiereCSS() {
   var s = document.createElement('style');
   s.id = 'mestiere-css';
   s.textContent = `
-.ms-wrap { width: 100%; }
+.ms-wrap { width: 100%; max-width: 100%; overflow-x: hidden; }
 
 .ms-tabs {
   display: flex; gap: 2px; margin-bottom: 28px;
@@ -120,6 +120,7 @@ function _injectMestiereCSS() {
 .ms-intro-section {
   background: rgba(200,155,60,.03); border: 1px solid rgba(200,155,60,.1);
   border-left: 3px solid var(--ms-c, rgba(200,155,60,.5)); padding: 16px 20px;
+  overflow: hidden; word-break: break-word;
 }
 .ms-intro-section-title {
   font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
