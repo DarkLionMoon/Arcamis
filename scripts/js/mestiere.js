@@ -395,7 +395,7 @@ function _renderPergamene(rows) {
   var headerIdx = -1;
   for (var i = 0; i < rows.length; i++) {
   var first = (rows[i][0] || '').toLowerCase().trim();
-  if (first === 'livello incantesimo') { headerIdx = i; break; }
+  if (first.indexOf('livello') > -1 && first.indexOf('incantesimo') > -1) { headerIdx = i; break; }
 }
 
   if (headerIdx === -1) return '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
