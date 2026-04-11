@@ -432,9 +432,11 @@ function _renderPergamene(rows) {
   if (!data.length) return introHtml + '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
 
   var visibleIdxs = [];
-headers.forEach(function(h, i) { 
-  if (h && h !== 'descrizione') visibleIdxs.push(i); 
-});
+  var descIdx = -1;
+  headers.forEach(function(h, i) {
+    if (h === 'descrizione') { descIdx = i; return; }
+    if (h) visibleIdxs.push(i);
+  });
 
   var h = introHtml + '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
   visibleIdxs.forEach(function(i) {
@@ -446,19 +448,32 @@ headers.forEach(function(h, i) {
   data.forEach(function(row) {
     var firstVal = (row[visibleIdxs[0]] || '').trim();
     if (!firstVal) return;
-    h += '<tr>';
+    var desc = descIdx > -1 ? (row[descIdx] || '').trim() : '';
+    var hasDesc = desc.length > 0;
+    var rowId = 'pgrow-' + Math.random().toString(36).slice(2);
+
+    h += '<tr' + (hasDesc ? ' style="cursor:pointer" onclick="var d=document.getElementById(\'' + rowId + '\');d.style.display=d.style.display===\'table-row\'?\'none\':\'table-row\'"' : '') + '>';
     visibleIdxs.forEach(function(ci, ii) {
       var val = (row[ci] || '').trim() || '—';
-      h += ii === 0
-        ? '<td>' + val + '</td>'
-        : '<td class="ms-dt-cell">' + val + '</td>';
+      if (ii === 0) {
+        h += '<td>' + val + (hasDesc ? ' <span style="opacity:.4;font-size:10px">▶</span>' : '') + '</td>';
+      } else {
+        h += '<td class="ms-dt-cell">' + val + '</td>';
+      }
     });
     h += '</tr>';
+
+    if (hasDesc) {
+      var colspan = visibleIdxs.length;
+      h += '<tr id="' + rowId + '" style="display:none">'
+        + '<td colspan="' + colspan + '" style="background:rgba(200,155,60,.04);padding:12px 18px;font-family:\'Crimson Pro\',serif;font-size:15px;color:rgba(220,200,160,.75);font-style:italic;line-height:1.6">'
+        + desc
+        + '</td></tr>';
+    }
   });
 
   h += '</tbody></table></div>';
   return h;
-}
 /* ── Mostra tab ── */
 function _msShowTab(key, tabName, container, mestiere) {
   container.querySelectorAll('.ms-tab').forEach(function(t) {
