@@ -197,9 +197,6 @@ window.libOpenBook = function(el) {
     })
     .catch(function() {
       info.innerHTML = '<div class="lib-info-err">Errore caricamento</div>';
-    var openBtn = document.getElementById('lib-open-' + id);
-if (openBtn) openBtn.addEventListener('click', function() {
-  gp(id, title, '📖');
 });
 };
 
