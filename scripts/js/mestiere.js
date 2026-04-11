@@ -569,6 +569,10 @@ function _discoverLevels(key, mestiere, container) {
 window.showMestiere = function(key) {
   var mestiere = _MESTIERI[key];
   if (!mestiere) return;
+  if (typeof navStack === 'undefined') {
+    setTimeout(function(){ window.showMestiere(key); }, 100);
+    return;
+  }
 
   _injectMestiereCSS();
   if (typeof closeDd === 'function') closeDd();
