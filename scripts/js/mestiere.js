@@ -611,17 +611,26 @@ window.showMestiere = function(key) {
     pbody.innerHTML = html;
     _showComeFunzionano(pbody.querySelector('.ms-wrap'), mestiere);
   } else {
-    var tabs = ['Introduzione'];
-var html = '<div class="ms-tabs">';
-html += '<div class="ms-tab active" data-tab="Introduzione" onclick="msTabClick(this)">Introduzione</div>';
-html += '<div class="ms-tabs-lv-placeholder"></div>';
-html += '</div><div class="ms-panel"></div></div>';
-pbody.innerHTML = html;
+    var html2 = '<div class="ms-wrap nc" style="--ms-c:' + mestiere.colore + ';animation:fi .22s ease forwards">';
+    html2 += '<div class="ms-tabs">';
+    html2 += '<div class="ms-tab active" data-tab="Introduzione" onclick="msTabClick(this)">Introduzione</div>';
+    if (mestiere.extra) {
+      mestiere.extra.forEach(function(t) {
+        html2 += '<div class="ms-tab" data-tab="' + t + '" onclick="msTabClick(this)">' + t + '</div>';
+      });
+    }
+    html2 += '<div class="ms-tabs-lv-placeholder"></div>';
+    html2 += '</div><div class="ms-panel"></div></div>';
+    pbody.innerHTML = html2;
 
-var container = pbody.querySelector('.ms-wrap');
-window.msTabClick = function(el) {
-  _msShowTab(key, el.getAttribute('data-tab'), container, mestiere);
-};
+    var container = pbody.querySelector('.ms-wrap');
+    window.msTabClick = function(el) {
+      _msShowTab(key, el.getAttribute('data-tab'), container, mestiere);
+    };
+
+    _discoverLevels(key, mestiere, container);
+    _msShowTab(key, 'Introduzione', container, mestiere);
+  };
 
 /* Scopri i livelli disponibili provando LV 1-5 */
 _discoverLevels(key, mestiere, container);
