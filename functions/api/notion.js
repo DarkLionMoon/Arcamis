@@ -77,9 +77,6 @@ await Promise.all(toDelete.map(k => KV.delete(k.name)));
 return new Response(JSON.stringify({ purged: 'all', count: toDelete.length }), {
   headers: { 'Content-Type': 'application/json', ...cors }
 });
-      return new Response(JSON.stringify({ purged: 'all', count: list.keys.length }), {
-        headers: { 'Content-Type': 'application/json', ...cors }
-      });
     }
 
     /* ── Proxy immagini S3 Notion ── */
@@ -136,7 +133,6 @@ if (blockId) {
 
       const cached = await kvGet(cacheKey);
       if (cached) {
-      const testParse = (() => { try { JSON.parse(cached.value); return 'ok'; } catch(e) { return 'INVALID: ' + cached.value.slice(0, 100); } })();
         // Se stale: servi subito e aggiorna in background
         if (cached.stale) {
           kvRefreshBg(cacheKey, async () => {   const data = await fetchPage(cleanId, notionHeaders, MAX_DEPTH);   return JSON.stringify(data); });
