@@ -191,7 +191,7 @@ window.libOpenBook = function(el) {
           '</div>'+
           '<div class="lib-info-body n-body">'+html+'</div>'+
           '<div class="lib-info-footer">'+
-            '<button class="lib-open-btn" id="lib-open-'+id+'">Apri pagina completa →</button>'+
+            '<button class="lib-open-btn" onclick="gp(\''+id+'\',\''+title.replace(/'/g,"\'")+'\',\'📖\')">Apri pagina completa →</button>'+
           '</div>'+
         '</div>';
     })
