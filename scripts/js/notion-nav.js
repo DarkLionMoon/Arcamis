@@ -5,6 +5,7 @@
    history API.
 ════════════════════════════════════ */
 
+var _CACHE_VER = 'v3';
 var navStack = [];
 var _navMap = {
   '2f00274fdc1c8065a11ff45192aa5dcb': 'regole',
@@ -44,10 +45,10 @@ function _renderLastUpdated(isoDate){
 }
 var _memCache = {};
 window.prefetchPage = function(id){
-  if(!id || _memCache['pg_'+id]) return;
+  if(!id || _memCache[var cacheKey = 'pg_' + _CACHE_VER + '_' + id;]) return;
   fetch('/api/notion?pageId=' + id)
     .then(function(r){ return r.json(); })
-    .then(function(data){ _memCache['pg_'+id] = data; })
+    .then(function(data){ _memCache[var cacheKey = 'pg_' + _CACHE_VER + '_' + id;] = data; })
     .catch(function(){});
 };
 
@@ -158,7 +159,7 @@ async function _gpRender(id,label,icon){
   var phHero=document.getElementById('page-hero');
   var phCrumb=document.getElementById('ph-crumb');
 
-  var cacheKey='pg_'+id;
+  var cacheKey='pg_v2_'+id;
   var data=_memCache[cacheKey]||null;
   if(!data){try{var _ss=sessionStorage.getItem(cacheKey);if(_ss)data=JSON.parse(_ss);}catch(e){}}
   if(data)_memCache[cacheKey]=data;
@@ -240,7 +241,7 @@ async function _gpRender(id,label,icon){
       img.addEventListener('error',function(){
         if(img.dataset.retried)return;
         img.dataset.retried='1';
-        try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
+        try{sessionStorage.removeItem(var cacheKey = 'pg_' + _CACHE_VER + '_' + id;);}catch(ex){}
       },{once:true});
     });
 
