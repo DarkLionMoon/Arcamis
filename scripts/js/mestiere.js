@@ -432,7 +432,9 @@ function _renderPergamene(rows) {
   if (!data.length) return introHtml + '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
 
   var visibleIdxs = [];
-  headers.forEach(function(h, i) { if (h) visibleIdxs.push(i); });
+headers.forEach(function(h, i) { 
+  if (h && h !== 'descrizione') visibleIdxs.push(i); 
+});
 
   var h = introHtml + '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
   visibleIdxs.forEach(function(i) {
