@@ -59,8 +59,12 @@ window.loadLibraryGallery = function(container) {
 function _renderLibrary(container, pages) {
   var allArgs = {};
   pages.forEach(function(p) {
-    (p.argomenti || []).forEach(function(a) { allArgs[a.name] = a.color; });
-  });
+    if (p && p.argomenti) {
+        p.argomenti.forEach(function(a) { 
+            if (a && a.name) allArgs[a.name] = a.color; 
+        });
+    }
+});
   container._libAllArgs = allArgs;
   var argKeys = Object.keys(allArgs).sort();
 
