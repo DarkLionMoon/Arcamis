@@ -391,25 +391,20 @@ function _renderLivello(rows) {
 }
 /* ── Render tab Pergamene ── */
 function _renderPergamene(rows) {
-  /* Trova l'header reale: prima riga che ha "livello" o "incantesimo"
-     oppure ha 4+ colonne popolate */
   var headerIdx = -1;
   for (var i = 0; i < rows.length; i++) {
     var nonEmpty = rows[i].filter(function(c) { return c && c.trim(); }).length;
     var first = (rows[i][0] || '').toLowerCase().trim();
-    if (nonEmpty >= 4 && (first.indexOf('livello') > -1 || first.indexOf('incantesimo') > -1 || first === 'trucchetto')) {
+    if (nonEmpty >= 4 && (first.indexOf('livello') > -1 || first.indexOf('incantesimo') > -1)) {
       headerIdx = i; break;
     }
-    if (nonEmpty >= 5) { headerIdx = i; break; }
   }
 
-  /* Testo introduttivo: tutto prima dell'header, saltando righe-titolo brevi */
   var introParas = [];
   var introLimit = headerIdx > 0 ? headerIdx : rows.length;
   for (var j = 0; j < introLimit; j++) {
     var cell = (rows[j][0] || '').trim();
     if (!cell) continue;
-    /* Salta righe-titolo tipo "Descrizione" o "Numero di Downtime" */
     var nonEmptyCols = rows[j].filter(function(c) { return c && c.trim(); }).length;
     if (nonEmptyCols === 1 && cell.length < 50 && !cell.match(/[.!?]$/)) continue;
     introParas.push(cell);
