@@ -391,26 +391,50 @@ function _renderLivello(rows) {
 }
 /* ── Render tab Pergamene ── */
 function _renderPergamene(rows) {
-  /* Trova l'header: prima riga con 6+ colonne popolate */
   var headerIdx = -1;
   for (var i = 0; i < rows.length; i++) {
-  var first = (rows[i][0] || '').toLowerCase().trim();
-  if (first.indexOf('livello') > -1 && first.indexOf('incantesimo') > -1) { headerIdx = i; break; }
-}
+    var first = (rows[i][0] || '').toLowerCase().trim();
+    if (first.indexOf('livello') > -1 && first.indexOf('incantesimo') > -1) {
+      headerIdx = i; break;
+    }
+  }
 
-  if (headerIdx === -1) return '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
+  /* Testo intro: tutto prima dell'header */
+  var introHtml = '';
+  if (headerIdx > 0) {
+    var paragrafi = [];
+    for (var j = 0; j < headerIdx; j++) {
+      var cell = (rows[j][0] || '').trim();
+      if (!cell) continue;
+      /* Salta righe-titolo brevi senza punteggiatura */
+      if (cell.length < 60 && !cell.match(/[.!?,]$/)) continue;
+      /* Splitta newline interni */
+      cell.split('\n').forEach(function(sr) {
+        sr = sr.trim();
+        if (sr) paragrafi.push(sr);
+      });
+    }
+    if (paragrafi.length) {
+      introHtml = '<div class="ms-intro-section" style="margin-bottom:20px">'
+        + '<div class="ms-intro-section-body">'
+        + paragrafi.join('<br><br>')
+        + '</div></div>';
+    }
+  }
+
+  if (headerIdx === -1) return introHtml || '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
 
   var headers = rows[headerIdx].map(_normHeader);
   var data = rows.slice(headerIdx + 1).filter(function(r) {
     return r.some(function(c) { return c && c.trim(); });
   });
 
-  if (!data.length) return '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
+  if (!data.length) return introHtml + '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
 
   var visibleIdxs = [];
   headers.forEach(function(h, i) { if (h) visibleIdxs.push(i); });
 
-  var h = '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
+  var h = introHtml + '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
   visibleIdxs.forEach(function(i) {
     var label = headers[i].charAt(0).toUpperCase() + headers[i].slice(1);
     h += '<th>' + label + '</th>';
