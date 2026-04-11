@@ -127,9 +127,9 @@ details.n-th>.n-tsum{list-style:none;display:flex;align-items:center;gap:10px;cu
 details.n-th>.n-tsum.n-h1{font-size:1.45em}
 details.n-th>.n-tsum.n-h2{font-size:1.2em}
 details.n-th>.n-tsum.n-h3{font-size:1em}
-details.n-th>.n-tsum::before{content:'◆';font-size:.5em;color:var(--gold);transition:transform .22s;flex-shrink:0}
+details.n-th>.n-tsum::before{content:'▶';font-size:8px;color:var(--gold);transition:transform .22s;flex-shrink:0}
 details.n-th[open]>.n-tsum{color:var(--gold3)}
-details.n-th[open]>.n-tsum::before{content:'◆';transform:rotate(45deg)}
+details.n-th[open]>.n-tsum::before{content:'▶';transform:rotate(90deg)}
 details.n-th>.n-tc{padding:12px 0 8px 0;margin-top:8px}
 
 @keyframes toggleOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
