@@ -5,7 +5,6 @@
    history API.
 ════════════════════════════════════ */
 
-var _CACHE_VER = 'v3';
 var navStack = [];
 var _navMap = {
   '2f00274fdc1c8065a11ff45192aa5dcb': 'regole',
