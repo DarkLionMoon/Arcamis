@@ -159,7 +159,7 @@ async function _gpRender(id,label,icon){
   var phHero=document.getElementById('page-hero');
   var phCrumb=document.getElementById('ph-crumb');
 
-  var cacheKey='pg_v2_'+id;
+  var cacheKey='pg_'+id;
   var data=_memCache[cacheKey]||null;
   if(!data){try{var _ss=sessionStorage.getItem(cacheKey);if(_ss)data=JSON.parse(_ss);}catch(e){}}
   if(data)_memCache[cacheKey]=data;
