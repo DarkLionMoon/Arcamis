@@ -395,19 +395,22 @@ function _renderPergamene(rows) {
   for (var i = 0; i < rows.length; i++) {
     var nonEmpty = rows[i].filter(function(c) { return c && c.trim(); }).length;
     var first = (rows[i][0] || '').toLowerCase().trim();
-    if (nonEmpty >= 4 && (first.indexOf('livello') > -1 || first.indexOf('incantesimo') > -1)) {
+    if (nonEmpty >= 4 && first.indexOf('livello') > -1) {
       headerIdx = i; break;
     }
   }
 
+  /* Testo introduttivo: righe prima dell'header */
   var introParas = [];
   var introLimit = headerIdx > 0 ? headerIdx : rows.length;
   for (var j = 0; j < introLimit; j++) {
     var cell = (rows[j][0] || '').trim();
     if (!cell) continue;
-    var nonEmptyCols = rows[j].filter(function(c) { return c && c.trim(); }).length;
-    if (nonEmptyCols === 1 && cell.length < 50 && !cell.match(/[.!?]$/)) continue;
-    introParas.push(cell);
+    /* Salta righe-titolo brevi senza punteggiatura finale */
+    if (cell.length < 50 && !cell.match(/[.!?,]$/)) continue;
+    /* Splitta newline interni nella cella */
+    var subrighe = cell.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
+    subrighe.forEach(function(sr) { introParas.push(sr); });
   }
 
   var introHtml = '';
