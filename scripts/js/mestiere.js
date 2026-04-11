@@ -398,6 +398,8 @@ function _renderPergamene(rows) {
     if (nonEmpty >= 6) { headerIdx = i; break; }
   }
 
+   console.log('headerIdx:', headerIdx, rows[headerIdx]);
+
   if (headerIdx === -1) return '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
 
   var headers = rows[headerIdx].map(_normHeader);
