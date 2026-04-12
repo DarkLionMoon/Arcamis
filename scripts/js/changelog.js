@@ -31,6 +31,7 @@ window.loadChangelog = async function(container) {
     if (!tree[v][sv]) tree[v][sv] = {};
     const pKey = p ?? '__none__';
     if (!tree[v][sv][pKey]) tree[v][sv][pKey] = [];
+    console.log('pushing to:', v, sv, pKey, 'type:', typeof tree[v][sv][pKey], Array.isArray(tree[v][sv][pKey]));
     tree[v][sv][pKey].push(e);
   }
 
