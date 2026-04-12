@@ -498,6 +498,10 @@ window.addEventListener('popstate', function(e){
       showMestiere(e.state.id.replace('mestiere-', ''));
       return;
     }
+     if(e.state && e.state.id === 'codice-giuridico'){
+  showCodiceGiuridico();
+  return;
+}
    
     gp(e.state.id, e.state.label, e.state.icon, true);
   } else {
