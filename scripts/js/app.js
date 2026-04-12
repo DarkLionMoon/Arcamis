@@ -492,20 +492,41 @@ function closeSubMap(id){
 
 /* ════ POPSTATE ════ */
 window.addEventListener('popstate', function(e){
-  if(e.state && e.state.id){
-    if(e.state.stack) navStack = e.state.stack;
+  // Verifichiamo che e.state esista prima di ogni altra cosa
+  if(e && e.state && e.state.id){
+    
+    // Sincronizza il breadcrumb se presente nello stato
+    if(e.state.stack) {
+        navStack = JSON.parse(JSON.stringify(e.state.stack)); // Copia profonda per sicurezza
+    }
+
+    // 1. Caso specifico: Mestieri
     if(e.state.id.startsWith('mestiere-')){
-      showMestiere(e.state.id.replace('mestiere-', ''));
+      if (typeof showMestiere === 'function') {
+        showMestiere(e.state.id.replace('mestiere-', ''));
+      }
       return;
     }
-     if(e.state && e.state.id === 'codice-giuridico'){
-  showCodiceGiuridico();
-  return;
-}
-   
-    gp(e.state.id, e.state.label, e.state.icon, true);
+    
+    // 2. Caso specifico: Codice Giuridico
+    if(e.state.id === 'codice-giuridico'){
+      if (typeof showCodiceGiuridico === 'function') {
+        showCodiceGiuridico();
+      }
+      return;
+    }
+    
+    // 3. Navigazione generica (gp)
+    // Usiamo parametri di fallback per evitare che gp() riceva null
+    var label = e.state.label || '';
+    var icon = e.state.icon || '';
+    gp(e.state.id, label, icon, true);
+
   } else {
-    showHome();
+    // Se e.state è nullo (es. si torna alla pagina iniziale caricata senza pushState)
+    if (typeof showHome === 'function') {
+        showHome();
+    }
   }
 });
 
