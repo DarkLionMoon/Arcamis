@@ -462,7 +462,7 @@ function _renderPergamene(rows) {
       + '</div></div></div></div>';
   }
 
-  var h = introHtml + descPanelHtml + '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
+  var h = descPanelHtml + '<div class="ms-table-wrap"><table class="ms-table"><thead><tr>';
   visibleIdxs.forEach(function(i) {
     var label = headers[i].charAt(0).toUpperCase() + headers[i].slice(1);
     h += '<th>' + label + '</th>';
