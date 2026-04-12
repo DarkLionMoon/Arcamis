@@ -161,8 +161,17 @@ async function _gpRender(id,label,icon){
 
   var cacheKey='pg_'+id;
   var data=_memCache[cacheKey]||null;
-  if(!data){try{var _ss=sessionStorage.getItem(cacheKey);if(_ss)data=JSON.parse(_ss);}catch(e){}}
-  if(data)_memCache[cacheKey]=data;
+  if(!data){
+  try{
+    var _ss=sessionStorage.getItem(cacheKey);
+    if(_ss){
+      var _parsed=JSON.parse(_ss);
+      if(_parsed&&_parsed.page&&_parsed.blocks) data=_parsed;
+      else sessionStorage.removeItem(cacheKey);
+    }
+  }catch(e){sessionStorage.removeItem(cacheKey);}
+}
+if(data)_memCache[cacheKey]=data;
 
   try{
     if(!data){
