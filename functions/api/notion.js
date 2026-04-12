@@ -10,7 +10,7 @@ const blockId = url.searchParams.get('blockId');
   const KV = context.env.ARCAMIS_CACHE;
 
   const PURGE_SECRET = context.env.PURGE_SECRET || 'arcamis-purge';
-  const CACHE_TTL = 3600;       // secondi fino a stale
+  const CACHE_TTL = 600;       // secondi fino a stale
   const CACHE_SWR = 86400;      // secondi totali in KV (stale ok per 24h)
   const MAX_DEPTH = 5;          // profondità massima loadChildren
 
