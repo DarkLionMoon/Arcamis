@@ -142,10 +142,11 @@ window.loadChangelog = async function(container) {
         const btn = document.createElement('button');
         btn.className = 'cl-tab-btn cl-patch-btn' + (p === activeP ? ' active' : '');
         btn.textContent = p;
-        btn.addEventListener('click', () => {
-          activeP = p;
-          render();
-        });
+        btn.addEventListener('click', (ev) => {
+  ev.stopPropagation();
+  activeP = p;
+  render();
+});
         pTabs.appendChild(btn);
       }
       main.appendChild(pTabs);
