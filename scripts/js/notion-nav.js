@@ -319,7 +319,8 @@ pbody.querySelectorAll('.hb-changelog-container').forEach(function(c){
     if(typeof afterPageRender==='function')afterPageRender();
 
   }catch(e){
-    document.getElementById('pbody').innerHTML='<div class="errbox">⚠️ '+e.message+'</div>';
+    document.getElementById('pbody').innerHTML='';
+showToast('Errore caricamento pagina: '+e.message, '⚠️', 4000);
     if(typeof afterPageRender==='function')afterPageRender();
   }
 }
