@@ -298,6 +298,9 @@ pbody.querySelectorAll('.hb-subclass-container').forEach(function(c){
 pbody.querySelectorAll('.hb-specie-container').forEach(function(c){
   if(window.loadSpeciesGallery) loadSpeciesGallery(c);
 });
+pbody.querySelectorAll('.hb-changelog-container').forEach(function(c){
+  if(window.loadChangelog) loadChangelog(c);
+});
     pbody.querySelectorAll('.gs-container').forEach(function(c){if(window.loadGallery)loadGallery(c);});
     pbody.querySelectorAll('details.n-toggle').forEach(function(det){
       det.addEventListener('toggle',function(){
