@@ -57,19 +57,25 @@ fetch('/api/notion?pageId=' + id)
    BACK NAVIGATION
 ════════════════════════════════════ */
 function gpBack(stackIdx){
-  var item=navStack[stackIdx];
-  if(!item)return;
-  navStack=navStack.slice(0,stackIdx);
-  history.pushState({id:item.id,label:item.label,icon:item.icon,stack:navStack.slice()},'',(location.pathname+'?p='+item.id));
-  _gpRender(item.id,item.label,item.icon);
-}
-/* Ripristina posizione scroll */
-var _savedScroll = _scrollPositions[item.id];
-if(_savedScroll){
-  setTimeout(function(){
-    document.getElementById('main').scrollTo({top:_savedScroll, behavior:'smooth'});
-  }, 350);
-}
+  var item = navStack[stackIdx];
+  if(!item) return;
+  
+  // Salvo l'ID per lo scroll prima di modificare lo stack
+  var targetId = item.id;
+
+  navStack = navStack.slice(0, stackIdx);
+  history.pushState({id:item.id, label:item.label, icon:item.icon, stack:navStack.slice()}, '', (location.pathname + '?p=' + item.id));
+  _gpRender(item.id, item.label, item.icon);
+
+  // LOGICA SCROLL SPOSTATA QUI DENTRO (ora 'item' o 'targetId' sono validi)
+  var _savedScroll = _scrollPositions[targetId];
+  if(_savedScroll !== undefined){
+    setTimeout(function(){
+      var mainEl = document.getElementById('main');
+      if(mainEl) mainEl.scrollTo({top: _savedScroll, behavior: 'smooth'});
+    }, 350);
+  }
+} // <--- La chiusura deve stare DOPO lo scroll
 function buildCrumb(currentLabel){
   var h='<span class="ph-bc" onclick="showHome()">🏰 Home</span>';
   for(var ci=0;ci<navStack.length-1;ci++){
