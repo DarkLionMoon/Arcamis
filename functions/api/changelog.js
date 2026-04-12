@@ -51,9 +51,9 @@ export async function onRequest(context) {
     });
 
     if (!res.ok) {
-      const err = await res.text();
-      return new Response(JSON.stringify({ error: err }), { status: 500, headers });
-    }
+  const err = await res.text();
+  return new Response(JSON.stringify({ error: err, dbId: DB_ID, status: res.status }), { status: 500, headers });
+}
 
     const data = await res.json();
     hasMore = data.has_more;
