@@ -476,11 +476,11 @@ function _renderPergamene(rows) {
     var hasDesc = desc.length > 0;
     var rowId = 'pgrow-' + Math.random().toString(36).slice(2);
 
-    h += '<tr' + (hasDesc ? ' style="cursor:pointer" onclick="var d=document.getElementById(\'' + rowId + '\');d.style.display=d.style.display===\'table-row\'?\'none\':\'table-row\'"' : '') + '>';
+    h += '<tr>';
     visibleIdxs.forEach(function(ci, ii) {
       var val = (row[ci] || '').trim() || '—';
       if (ii === 0) {
-        h += '<td>' + val + (hasDesc ? ' <span style="opacity:.4;font-size:10px">▶</span>' : '') + '</td>';
+        h += '<td>' + val + '</td>';
       } else {
         h += '<td class="ms-dt-cell">' + val + '</td>';
       }
