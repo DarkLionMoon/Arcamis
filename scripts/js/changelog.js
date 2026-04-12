@@ -25,6 +25,7 @@ window.loadChangelog = async function(container) {
     const v    = String(e.versione      ?? '?');
     const sv   = String(e.sottoversione ?? (v + '.0'));
     const p    = e.patch != null ? String(e.patch) : null;
+    if (p) console.log('patch raw:', JSON.stringify(p), [...p].map(c => c.charCodeAt(0)));
     const pKey = p ?? '__none__';
 
     if (!tree[v])        tree[v]         = {};
