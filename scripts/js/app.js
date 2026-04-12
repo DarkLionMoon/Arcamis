@@ -587,3 +587,10 @@ document.getElementById('overlay') && document.getElementById('overlay').addEven
   var bnav = document.querySelector('.bnav-item[data-k="menu"]');
   if(bnav) bnav.addEventListener('click', loadRoster);
 })();
+/* ════ OFFLINE FALLBACK ════ */
+window.addEventListener('offline', function(){
+  showToast('Sei offline — ricarica quando torni connesso', '📡', 8000);
+});
+window.addEventListener('online', function(){
+  showToast('Connessione ripristinata', '✅', 2500);
+});
