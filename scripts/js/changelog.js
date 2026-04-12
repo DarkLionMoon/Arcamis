@@ -22,11 +22,9 @@ window.loadChangelog = async function(container) {
   const tree = {};
 
   for (const e of entries) {
-    console.log(e.title, '| v:', e.versione, '| sv:', e.sottoversione, '| p:', e.patch);
     const v    = String(e.versione      ?? '?');
     const sv   = String(e.sottoversione ?? (v + '.0'));
     const p    = e.patch != null ? String(e.patch) : null;
-    if (p) console.log('patch raw:', JSON.stringify(p), [...p].map(c => c.charCodeAt(0)));
     const pKey = p ?? '__none__';
 
     if (!tree[v])        tree[v]         = {};
@@ -72,9 +70,7 @@ window.loadChangelog = async function(container) {
     if (!activeSV || !svList.includes(activeSV)) activeSV = svList[svList.length - 1];
 
     const patches  = getPatches(activeV, activeSV);
-    console.log('patches:', JSON.stringify(patches));
-console.log('activeP:', JSON.stringify(activeP));
-console.log('includes:', patches.includes(activeP));
+    
 
     const hasPatch = patches.length > 0;
 
