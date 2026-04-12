@@ -62,7 +62,7 @@ tree[v][sv][pKey].push(e);
   // ── Render ────────────────────────────────────────────────────────────────
   function render() {
     const svList = getSubversions(activeV);
-    if (!activeSV || !svList.includes(activeSV)) activeSV = svList[svList.length - 1];
+    if (!activeSV || !svList.includes(activeSV)) activeSV = svList[0];
 
     const patches = getPatches(activeV, activeSV);
     const hasPatch = patches.length > 0;
@@ -71,10 +71,6 @@ tree[v][sv][pKey].push(e);
 
     // Entries to show
     let visibleEntries;
-    console.log('tree dump:', JSON.stringify(tree));
-    console.log('activeSV:', activeSV, 'patches:', patches, 'activeP:', activeP, 'visible:', visibleEntries);
-    console.log('keys of tree[0][0.3]:', Object.keys(tree['0']?.['0.3'] ?? {}));
-console.log('direct access:', tree['0']?.['0.3']?.['0.3.5']);
     if (hasPatch && activeP) {
       visibleEntries = tree[activeV]?.[activeSV]?.[activeP] ?? [];
     } else {
