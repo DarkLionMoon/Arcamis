@@ -19,19 +19,18 @@ window.loadChangelog = async function(container) {
   }
 
   // ── Build hierarchical structure ──────────────────────────────────────────
-  // Map: versione → sottoversione → patch → entries[]
   const tree = {};
 
   for (const e of entries) {
-    const v = String(e.versione ?? '?');
-    const sv = String(e.sottoversione ?? v + '.0');
-    const p = e.patch ?? null;
-
-    if (!tree[v]) tree[v] = {};
-    if (!tree[v][sv]) tree[v][sv] = {};
+    const v    = String(e.versione      ?? '?');
+    const sv   = String(e.sottoversione ?? (v + '.0'));
+    const p    = e.patch != null ? String(e.patch) : null;
     const pKey = p ?? '__none__';
+
+    if (!tree[v])        tree[v]         = {};
+    if (!tree[v][sv])    tree[v][sv]     = {};
     if (!Array.isArray(tree[v][sv][pKey])) tree[v][sv][pKey] = [];
-tree[v][sv][pKey].push(e);
+    tree[v][sv][pKey].push(e);
   }
 
   const versions = Object.keys(tree).sort((a, b) => parseFloat(a) - parseFloat(b));
@@ -54,28 +53,33 @@ tree[v][sv][pKey].push(e);
   }
 
   function getPatches(v, sv) {
-    const patches = Object.keys(tree[v]?.[sv] ?? {}).filter(p => p !== '__none__');
-    if (!patches.length) return [];
-    return patches.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    return Object.keys(tree[v]?.[sv] ?? {})
+      .filter(p => p !== '__none__')
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
   function render() {
     const svList = getSubversions(activeV);
-    if (!activeSV || !svList.includes(activeSV)) activeSV = svList[0];
+    if (!activeSV || !svList.includes(activeSV)) activeSV = svList[svList.length - 1];
 
-    const patches = getPatches(activeV, activeSV);
+    const patches  = getPatches(activeV, activeSV);
     const hasPatch = patches.length > 0;
-    if (hasPatch && (!activeP || !patches.includes(activeP))) activeP = patches[patches.length - 1];
-    if (!hasPatch) activeP = null;
+
+    if (hasPatch) {
+      if (!activeP || !patches.includes(activeP)) activeP = patches[patches.length - 1];
+    } else {
+      activeP = null;
+    }
 
     // Entries to show
     let visibleEntries;
     if (hasPatch && activeP) {
-      visibleEntries = tree[activeV]?.[activeSV]?.[activeP] ?? [];
+      const bucket = tree[activeV]?.[activeSV]?.[activeP];
+      visibleEntries = Array.isArray(bucket) ? bucket : [];
     } else {
       const svBucket = tree[activeV]?.[activeSV] ?? {};
-      visibleEntries = Object.values(svBucket).flat();
+      visibleEntries = Object.values(svBucket).flat().filter(e => e && e.id);
     }
 
     container.innerHTML = '';
@@ -98,7 +102,7 @@ tree[v][sv][pKey].push(e);
       btn.className = 'cl-ver-btn' + (v === activeV ? ' active' : '');
       btn.textContent = 'Versione ' + v;
       btn.addEventListener('click', () => {
-        activeV = v;
+        activeV  = v;
         activeSV = null;
         activeP  = null;
         render();
@@ -169,31 +173,31 @@ tree[v][sv][pKey].push(e);
         titleEl.textContent = entry.title;
         titleEl.href = '#';
         titleEl.addEventListener('click', (ev) => {
-  ev.preventDefault();
-  const existing = container.querySelector('.cl-inline-content');
-  if (existing && existing.dataset.id === entry.id) {
-    existing.remove();
-    card.classList.remove('cl-entry-card--open');
-    return;
-  }
-  if (existing) existing.remove();
-  container.querySelectorAll('.cl-entry-card--open').forEach(c => c.classList.remove('cl-entry-card--open'));
-  card.classList.add('cl-entry-card--open');
-  const inline = document.createElement('div');
-  inline.className = 'cl-inline-content';
-  inline.dataset.id = entry.id;
-  inline.innerHTML = '<div class="hbsc-loading"><div class="gs-loading-spin"></div></div>';
-  card.appendChild(inline);
-  fetch('/api/notion?pageId=' + entry.id)
-    .then(r => r.json())
-    .then(data => {
-      if (!data.blocks) throw new Error('no blocks');
-      inline.innerHTML = '<div class="n-body">' + renderBlocks(data.blocks, true) + '</div>';
-    })
-    .catch(() => {
-      inline.innerHTML = '<div class="cl-error">Errore caricamento</div>';
-    });
-});
+          ev.preventDefault();
+          const existing = container.querySelector('.cl-inline-content');
+          if (existing && existing.dataset.id === entry.id) {
+            existing.remove();
+            card.classList.remove('cl-entry-card--open');
+            return;
+          }
+          if (existing) existing.remove();
+          container.querySelectorAll('.cl-entry-card--open').forEach(c => c.classList.remove('cl-entry-card--open'));
+          card.classList.add('cl-entry-card--open');
+          const inline = document.createElement('div');
+          inline.className = 'cl-inline-content';
+          inline.dataset.id = entry.id;
+          inline.innerHTML = '<div class="hbsc-loading"><div class="gs-loading-spin"></div></div>';
+          card.appendChild(inline);
+          fetch('/api/notion?pageId=' + entry.id)
+            .then(r => r.json())
+            .then(data => {
+              if (!data.blocks) throw new Error('no blocks');
+              inline.innerHTML = '<div class="n-body">' + renderBlocks(data.blocks, true) + '</div>';
+            })
+            .catch(() => {
+              inline.innerHTML = '<div class="cl-error">Errore caricamento</div>';
+            });
+        });
 
         cardHeader.appendChild(titleEl);
 
