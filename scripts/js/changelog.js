@@ -72,6 +72,7 @@ window.loadChangelog = async function(container) {
     // Entries to show
     let visibleEntries;
     console.log('tree dump:', JSON.stringify(tree));
+    console.log('activeSV:', activeSV, 'patches:', patches, 'activeP:', activeP, 'visible:', visibleEntries);
     if (hasPatch && activeP) {
       visibleEntries = tree[activeV]?.[activeSV]?.[activeP] ?? [];
     } else {
