@@ -594,3 +594,35 @@ window.addEventListener('offline', function(){
 window.addEventListener('online', function(){
   showToast('Connessione ripristinata', '✅', 2500);
 });
+/* ════ LAZY LOAD BACKGROUND-IMAGE ════ */
+(function(){
+  function _lazyBg(root){
+    root = root || document;
+    root.querySelectorAll('.loc-card[style*="background-image"], .gs-card .gs-card-bg[style*="background-image"]').forEach(function(el){
+      if(el.dataset.lazyBgDone) return;
+      el.dataset.lazyBgDone = '1';
+      var io = new IntersectionObserver(function(entries, obs){
+        entries.forEach(function(en){
+          if(!en.isIntersecting) return;
+          obs.unobserve(en.target);
+          /* Forza il browser a caricare l'immagine */
+          var bg = en.target.style.backgroundImage;
+          en.target.style.backgroundImage = 'none';
+          requestAnimationFrame(function(){
+            en.target.style.backgroundImage = bg;
+          });
+        });
+      }, { rootMargin: '200px' });
+      io.observe(el);
+    });
+  }
+
+  /* Esegui dopo ogni render pagina */
+  (function(){
+    var _orig = window.afterPageRender;
+    window.afterPageRender = function(){
+      if(_orig) _orig();
+      setTimeout(function(){ _lazyBg(document.getElementById('pbody')); }, 500);
+    };
+  })();
+})();
