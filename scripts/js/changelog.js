@@ -22,6 +22,7 @@ window.loadChangelog = async function(container) {
   const tree = {};
 
   for (const e of entries) {
+    console.log(e.title, '| v:', e.versione, '| sv:', e.sottoversione, '| p:', e.patch);
     const v    = String(e.versione      ?? '?');
     const sv   = String(e.sottoversione ?? (v + '.0'));
     const p    = e.patch != null ? String(e.patch) : null;
