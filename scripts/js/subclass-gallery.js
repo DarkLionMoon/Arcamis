@@ -1,3 +1,4 @@
+var HB_CHANGELOG_DB_ID = '3400274fdc1c80178db3dcf6ba7098aa';
 var HB_SUBCLASS_DB_ID = '2f70274fdc1c80e3bdc7f95f81eb9cc0';
 var HB_SPECIES_DB_ID  = '3350274fdc1c808fba5ed9ad1f3b4bb4'; 
 
