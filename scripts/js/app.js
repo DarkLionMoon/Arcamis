@@ -285,7 +285,11 @@ function _resetCarTimer(){
   if(_carTimer) clearInterval(_carTimer);
   _carTimer = setInterval(function(){ if(!window._carouselPaused) changeSlide(1); }, 6000);
 }
-
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    if(window.applyRecentBadges) applyRecentBadges();
+  }, 1500);
+});
 /* Auto-avanzamento — verso destra (slide successiva) */
 _carTimer = setInterval(function(){ if(!window._carouselPaused) changeSlide(1); }, 6000);
 
@@ -366,13 +370,17 @@ function _applyCovers(covers){
 
 /* Hook afterPageRender — riapplica covers sulle nuove card dopo ogni navigazione */
 (function(){
-  var _origAfter = window.afterPageRender;
+  var _orig = window.afterPageRender;
   window.afterPageRender = function(){
-    if(_origAfter) _origAfter();
+    if(_orig) _orig();
     if(_cachedCovers){
       setTimeout(function(){ _applyCovers(_cachedCovers); }, 300);
       setTimeout(function(){ _applyCovers(_cachedCovers); }, 1200);
     }
+    /* Badge aggiornamento — dopo che le card sono nel DOM */
+    setTimeout(function(){
+      if(window.applyRecentBadges) applyRecentBadges();
+    }, 600);
   };
 })();
 
