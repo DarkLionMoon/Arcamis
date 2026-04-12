@@ -1,7 +1,5 @@
-// scripts/js/pages/changelog/script.js
-(async () => {
-  const container = document.getElementById('notion-content');
-  if (!container) return;
+/* scripts/js/changelog.js */
+window.loadChangelog = async function(container) {
 
   container.innerHTML = '<p class="cl-loading">Caricamento changelog…</p>';
 
@@ -27,7 +25,7 @@
   for (const e of entries) {
     const v = e.versione ?? '?';
     const sv = e.sottoversione ?? v + '.0';
-    const p = e.patch ?? null; // null = no patch level
+    const p = e.patch ?? null;
 
     if (!tree[v]) tree[v] = {};
     if (!tree[v][sv]) tree[v][sv] = {};
@@ -38,10 +36,10 @@
 
   const versions = Object.keys(tree).sort((a, b) => parseFloat(a) - parseFloat(b));
 
-  // ── State ──────────────────────────────────────────────────────────────────
-  let activeV = versions[versions.length - 1]; // default: latest version
+  // ── State ─────────────────────────────────────────────────────────────────
+  let activeV  = versions[versions.length - 1];
   let activeSV = null;
-  let activeP = null;
+  let activeP  = null;
 
   function getSubversions(v) {
     return Object.keys(tree[v] ?? {}).sort((a, b) => {
@@ -61,11 +59,7 @@
     return patches.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   }
 
-  function hasRealPatches(v, sv) {
-    return getPatches(v, sv).length > 0;
-  }
-
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────────
   function render() {
     const svList = getSubversions(activeV);
     if (!activeSV || !svList.includes(activeSV)) activeSV = svList[svList.length - 1];
@@ -80,18 +74,17 @@
     if (hasPatch && activeP) {
       visibleEntries = tree[activeV]?.[activeSV]?.[activeP] ?? [];
     } else {
-      // no patch level: show all entries under this subversion
       const svBucket = tree[activeV]?.[activeSV] ?? {};
       visibleEntries = Object.values(svBucket).flat();
     }
 
     container.innerHTML = '';
 
-    // ── Layout wrapper ───────────────────────────────────────────────────────
+    // ── Layout wrapper ────────────────────────────────────────────────────────
     const layout = document.createElement('div');
     layout.className = 'cl-layout';
 
-    // ── Sidebar ──────────────────────────────────────────────────────────────
+    // ── Sidebar ───────────────────────────────────────────────────────────────
     const sidebar = document.createElement('nav');
     sidebar.className = 'cl-sidebar';
 
@@ -107,7 +100,7 @@
       btn.addEventListener('click', () => {
         activeV = v;
         activeSV = null;
-        activeP = null;
+        activeP  = null;
         render();
       });
       sidebar.appendChild(btn);
@@ -115,7 +108,7 @@
 
     layout.appendChild(sidebar);
 
-    // ── Main panel ───────────────────────────────────────────────────────────
+    // ── Main panel ────────────────────────────────────────────────────────────
     const main = document.createElement('div');
     main.className = 'cl-main';
 
@@ -129,7 +122,7 @@
       btn.textContent = sv;
       btn.addEventListener('click', () => {
         activeSV = sv;
-        activeP = null;
+        activeP  = null;
         render();
       });
       svTabs.appendChild(btn);
@@ -177,7 +170,6 @@
         titleEl.href = '#';
         titleEl.addEventListener('click', (e) => {
           e.preventDefault();
-          // Navigate to the entry page using the site's router
           if (window.gp) window.gp(entry.id);
         });
 
@@ -196,9 +188,9 @@
         const badges = document.createElement('div');
         badges.className = 'cl-entry-badges';
 
-        if (entry.versione) badges.appendChild(makeBadge(entry.versione, 'badge-v'));
+        if (entry.versione)      badges.appendChild(makeBadge(entry.versione,      'badge-v'));
         if (entry.sottoversione) badges.appendChild(makeBadge(entry.sottoversione, 'badge-sv'));
-        if (entry.patch) badges.appendChild(makeBadge(entry.patch, 'badge-p'));
+        if (entry.patch)         badges.appendChild(makeBadge(entry.patch,         'badge-p'));
 
         card.appendChild(badges);
         entriesWrap.appendChild(card);
@@ -224,4 +216,4 @@
   }
 
   render();
-})();
+};
