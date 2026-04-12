@@ -55,10 +55,16 @@ window.loadChangelog = async function(container) {
   }
 
   function getPatches(v, sv) {
-    return Object.keys(tree[v]?.[sv] ?? {})
-      .filter(p => p !== '__none__')
-      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-  }
+  return Object.keys(tree[v]?.[sv] ?? {})
+    .filter(p => p !== '__none__')
+    .sort((a, b) => {
+      const partsA = a.split(' ');
+      const partsB = b.split(' ');
+      const numCmp = partsA[0].localeCompare(partsB[0], undefined, { numeric: true });
+      if (numCmp !== 0) return numCmp;
+      return (partsA[1] ?? '').localeCompare(partsB[1] ?? '');
+    });
+}
 
   // ── Render ────────────────────────────────────────────────────────────────
   function render() {
