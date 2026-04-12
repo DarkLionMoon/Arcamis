@@ -81,9 +81,17 @@ console.log('includes:', patches.includes(activeP));
     // Entries to show
     let visibleEntries;
     if (hasPatch && activeP) {
-      const bucket = tree[activeV]?.[activeSV]?.[activeP];
-      visibleEntries = Array.isArray(bucket) ? bucket : [];
-    } else {
+  const bucket = tree[activeV]?.[activeSV]?.[activeP];
+  if (Array.isArray(bucket) && bucket.length) {
+    visibleEntries = bucket;
+  } else {
+    visibleEntries = [];
+    for (const sv of Object.values(tree[activeV] ?? {})) {
+      const b = sv[activeP];
+      if (Array.isArray(b)) visibleEntries.push(...b);
+    }
+  }
+} else {
       const svBucket = tree[activeV]?.[activeSV] ?? {};
       visibleEntries = Object.values(svBucket).flat().filter(e => e && e.id);
     }
