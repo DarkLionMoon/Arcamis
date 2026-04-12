@@ -43,6 +43,7 @@ function _renderLastUpdated(isoDate){
   }
 }
 var _memCache = {};
+var _scrollPositions = {};
 window.prefetchPage = function(id){
   var cacheKey = 'pg_' + id;
 if(!id || _memCache[cacheKey]) return;
@@ -62,7 +63,13 @@ function gpBack(stackIdx){
   history.pushState({id:item.id,label:item.label,icon:item.icon,stack:navStack.slice()},'',(location.pathname+'?p='+item.id));
   _gpRender(item.id,item.label,item.icon);
 }
-
+/* Ripristina posizione scroll */
+var _savedScroll = _scrollPositions[item.id];
+if(_savedScroll){
+  setTimeout(function(){
+    document.getElementById('main').scrollTo({top:_savedScroll, behavior:'smooth'});
+  }, 350);
+}
 function buildCrumb(currentLabel){
   var h='<span class="ph-bc" onclick="showHome()">🏰 Home</span>';
   for(var ci=0;ci<navStack.length-1;ci++){
@@ -129,6 +136,9 @@ async function gp(id,label,icon,_fromPop){
 
   if(hv.style.display==='block'){
     xfade(hv,pv);
+    /* Salva posizione scroll della pagina corrente prima di navigare */
+var _curId = navStack.length > 1 ? navStack[navStack.length-2].id : null;
+if(_curId) _scrollPositions[_curId] = document.getElementById('main').scrollTop;
     document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
     await _gpRender(id,label,icon);
   }else{
