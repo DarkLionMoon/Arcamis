@@ -5,6 +5,8 @@ export async function onRequest(context) {
   const NOTION_KEY = env.NOTION_TOKEN;
   const DB_ID = '3400274fdc1c80178db3dcf6ba7098aa';
   const CACHE_KEY = 'db_changelog_v1';
+  const CACHE_TTL = 3600;
+  const CACHE_SWR = 86400;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -22,70 +24,88 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ ok: true, purged: CACHE_KEY }), { headers });
   }
 
-  // Cache check
-  const cached = await KV.get(CACHE_KEY);
-  if (cached) {
-    return new Response(cached, { headers });
+  // SWR cache helpers — stesso pattern di notion.js
+  async function kvGet(k) {
+    try {
+      const raw = await KV.get(k, 'text');
+      if (!raw) return null;
+      try {
+        const wrapper = JSON.parse(raw);
+        if (wrapper && wrapper.expiresAt && wrapper.data !== undefined) {
+          return { value: wrapper.data, stale: Date.now() > wrapper.expiresAt };
+        }
+      } catch (_) {}
+      return { value: raw, stale: false };
+    } catch (_) { return null; }
   }
 
-  // Fetch all pages from DB (paginated)
-  let entries = [];
-  let cursor = undefined;
-  let hasMore = true;
+  async function kvPut(k, data) {
+    const wrapper = JSON.stringify({ expiresAt: Date.now() + CACHE_TTL * 1000, data });
+    await KV.put(k, wrapper, { expirationTtl: CACHE_SWR });
+  }
 
-  while (hasMore) {
-    const body = {
-      sorts: [{ property: 'Data', direction: 'descending' }],
-      page_size: 100,
-    };
-    if (cursor) body.start_cursor = cursor;
+  async function fetchEntries() {
+    let entries = [];
+    let cursor = undefined;
+    let hasMore = true;
 
-    const res = await fetch(`https://api.notion.com/v1/databases/${DB_ID}/query`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${NOTION_KEY}`,
-        'Notion-Version': '2022-06-28',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+    while (hasMore) {
+      const body = { sorts: [{ property: 'Data', direction: 'ascending' }], page_size: 100 };
+      if (cursor) body.start_cursor = cursor;
 
-    if (!res.ok) {
-  const err = await res.text();
-  return new Response(JSON.stringify({ error: err, dbId: DB_ID, status: res.status }), { status: 500, headers });
-}
-
-    const data = await res.json();
-    hasMore = data.has_more;
-    cursor = data.next_cursor;
-
-    for (const page of data.results) {
-      const props = page.properties;
-
-      const title = props['Titolo']?.title?.[0]?.plain_text ?? '(senza titolo)';
-      const versione = props['Versione']?.select?.name ?? null;
-      const sottoversione = props['Sottoversione']?.select?.name ?? null;
-      const patch = props['Patch']?.select?.name ?? null;
-      const data_raw = props['Data']?.date?.start ?? null;
-
-      entries.push({
-        id: page.id,
-        title,
-        versione,
-        sottoversione,
-        patch,
-        date: data_raw,
+      const res = await fetch(`https://api.notion.com/v1/databases/${DB_ID}/query`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${NOTION_KEY}`,
+          'Notion-Version': '2022-06-28',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
       });
+
+      if (!res.ok) throw new Error(`Notion ${res.status}: ${await res.text()}`);
+
+      const data = await res.json();
+      hasMore = data.has_more;
+      cursor = data.next_cursor;
+
+      for (const page of data.results) {
+        const props = page.properties;
+        entries.push({
+          id: page.id.replace(/-/g, ''),
+          title:        props['Titolo']?.title?.[0]?.plain_text ?? '(senza titolo)',
+          versione:     props['Versione']?.select?.name ?? null,
+          sottoversione:props['Sottoversione']?.select?.name ?? null,
+          patch:        props['Patch']?.select?.name ?? null,
+          date:         props['Data']?.date?.start ?? null,
+        });
+      }
     }
+    return entries;
   }
 
-  // Sort ascending for display (oldest first within groups)
-  entries.sort((a, b) => {
-    if (a.date && b.date) return a.date.localeCompare(b.date);
-    return 0;
-  });
+  try {
+    const cached = await kvGet(CACHE_KEY);
 
-  const result = JSON.stringify(entries);
-  await KV.put(CACHE_KEY, result, { expirationTtl: 3600 });
-  return new Response(result, { headers });
+    if (cached) {
+      // Stale: servi subito e aggiorna in background
+      if (cached.stale) {
+        context.waitUntil(
+          fetchEntries()
+            .then(e => kvPut(CACHE_KEY, JSON.stringify(e)))
+            .catch(() => {})
+        );
+      }
+      return new Response(cached.value, { headers });
+    }
+
+    // Cache miss: fetch e salva
+    const entries = await fetchEntries();
+    const result = JSON.stringify(entries);
+    await kvPut(CACHE_KEY, result);
+    return new Response(result, { headers });
+
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers });
+  }
 }
