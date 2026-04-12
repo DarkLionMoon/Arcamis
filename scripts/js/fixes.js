@@ -109,6 +109,21 @@
     };
   }, 200);
 
+   /* ════════════════════════════════
+     4. DEEP LINK CODICE GIURIDICO
+     Intercetta la navigazione popstate 
+     per la pagina specifica.
+  ════════════════════════════════ */
+  window.addEventListener('popstate', function(e) {
+    if (e.state && e.state.id === 'codice-giuridico') {
+      if (typeof window.showCodiceGiuridico === 'function') {
+        window.showCodiceGiuridico();
+        /* Impediamo che altri listener eseguano gp() sovrascrivendo la vista */
+        e.stopImmediatePropagation(); 
+      }
+    }
+  }, true); // Capture true per agire tempestivamente
+
   /* ════════════════════════════════
      3. INIT
   ════════════════════════════════ */
