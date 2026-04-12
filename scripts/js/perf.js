@@ -133,10 +133,11 @@
 
     var _origPrefetch = window.prefetchPage;
     window.prefetchPage = function(id) {
-      if (!id) return;
-      var key = 'pg_' + id;
-      /* Controlla TTL prima di skippare */
-      if (_store[key] && _times[key] && Date.now() - _times[key] < MC_TTL) return;
+  if (!id) return;
+  var key = 'pg_' + id;
+  /* Controlla sia _store locale che _memCache globale */
+  if (_store[key] && _times[key] && Date.now() - _times[key] < MC_TTL) return;
+  if (typeof _memCache !== 'undefined' && _memCache[key]) return;
       _evict();
       fetch('/api/notion?pageId=' + id)
         .then(function(r) { return r.json(); })
