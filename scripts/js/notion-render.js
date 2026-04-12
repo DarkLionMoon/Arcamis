@@ -325,6 +325,8 @@ if(cpCoverSafe){
   h+='<div class="n-db-wrap"><div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
   }else if(dbRawId==='3350274fdc1c808fba5ed9ad1f3b4bb4'){
   h+='<div class="n-db-wrap"><div class="n-db-grid" id="db-'+dbRawId+'"><div class="n-db-loading">⏳ Caricamento...</div></div></div>';
+}else if(dbRawId==='3400274fdc1c80178db3dcf6ba7098aa'){
+  h+='<div class="hb-changelog-container pb-wide-trigger" id="cl-'+dbRawId+'"></div>';
 }else{
     h+='<div class="n-db-wrap">'
       +(d.title?'<div class="n-db-title">'+d.title+'</div>':'')
