@@ -3,7 +3,15 @@
 ════════════════════════════════════ */
 /* ════ CACHE VERSION — incrementa ad ogni deploy ════ */
 (function(){
-  var CACHE_VER = '6'; // ← incrementa questo numero ad ogni deploy
+  /* Cache version automatica — usa il deploy ID di Cloudflare Pages */
+var CACHE_VER = (function(){
+  /* CF_PAGES_COMMIT_SHA è iniettato da Cloudflare Pages come meta tag
+     se lo aggiungi in index.html, altrimenti fallback alla data del giorno */
+  var meta = document.querySelector('meta[name="cf-pages-sha"]');
+  if(meta && meta.content) return meta.content.slice(0,8);
+  /* Fallback: data corrente troncata al giorno (cambia ogni giorno automaticamente) */
+  return Math.floor(Date.now() / 86400000).toString();
+})();
   var stored = localStorage.getItem('arc_cache_ver');
   if(stored !== CACHE_VER){
     sessionStorage.clear();
