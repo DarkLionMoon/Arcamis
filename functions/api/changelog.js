@@ -1,7 +1,7 @@
 // functions/api/changelog.js
 export async function onRequest(context) {
   const { env } = context;
-  const KV = env.ARCAMIS_KV;
+  const KV = env.ARCAMIS_CACHE;
   const NOTION_KEY = env.NOTION_KEY;
   const DB_ID = '3400274fdc1c80178db3dcf6ba7098aa';
   const CACHE_KEY = 'db_changelog_v1';
