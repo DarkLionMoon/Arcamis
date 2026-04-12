@@ -168,10 +168,32 @@ window.loadChangelog = async function(container) {
         titleEl.className = 'cl-entry-title';
         titleEl.textContent = entry.title;
         titleEl.href = '#';
-        titleEl.addEventListener('click', (e) => {
-          e.preventDefault();
-          if (window.gp) window.gp(entry.id);
-        });
+        titleEl.addEventListener('click', (ev) => {
+  ev.preventDefault();
+  const existing = container.querySelector('.cl-inline-content');
+  if (existing && existing.dataset.id === entry.id) {
+    existing.remove();
+    card.classList.remove('cl-entry-card--open');
+    return;
+  }
+  if (existing) existing.remove();
+  container.querySelectorAll('.cl-entry-card--open').forEach(c => c.classList.remove('cl-entry-card--open'));
+  card.classList.add('cl-entry-card--open');
+  const inline = document.createElement('div');
+  inline.className = 'cl-inline-content';
+  inline.dataset.id = entry.id;
+  inline.innerHTML = '<div class="hbsc-loading"><div class="gs-loading-spin"></div></div>';
+  card.appendChild(inline);
+  fetch('/api/notion?pageId=' + entry.id)
+    .then(r => r.json())
+    .then(data => {
+      if (!data.blocks) throw new Error('no blocks');
+      inline.innerHTML = '<div class="n-body">' + renderBlocks(data.blocks, true) + '</div>';
+    })
+    .catch(() => {
+      inline.innerHTML = '<div class="cl-error">Errore caricamento</div>';
+    });
+});
 
         cardHeader.appendChild(titleEl);
 
