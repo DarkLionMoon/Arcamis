@@ -92,18 +92,17 @@ export async function onRequest(context) {
       if (cached.stale) {
         context.waitUntil(
           fetchEntries()
-            .then(e => kvPut(CACHE_KEY, JSON.stringify(e)))
+            .then(e => kvPut(CACHE_KEY, e))
             .catch(() => {})
         );
       }
-      return new Response(cached.value, { headers });
+      return new Response(JSON.stringify(cached.value), { headers });
     }
 
     // Cache miss: fetch e salva
     const entries = await fetchEntries();
-    const result = JSON.stringify(entries);
-    await kvPut(CACHE_KEY, result);
-    return new Response(result, { headers });
+await kvPut(CACHE_KEY, entries);
+return new Response(JSON.stringify(entries), { headers });
 
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers });
