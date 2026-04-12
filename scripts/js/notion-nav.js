@@ -262,12 +262,27 @@ if(data)_memCache[cacheKey]=data;
     applyGlossary(pbody);
 
     pbody.querySelectorAll('img').forEach(function(img){
-      img.addEventListener('error',function(){
-        if(img.dataset.retried)return;
-        img.dataset.retried='1';
-        try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
-      },{once:true});
-    });
+  img.addEventListener('error',function(){
+    if(img.dataset.retried)return;
+    img.dataset.retried='1';
+    /* Invalida cache per questa pagina */
+    try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
+    delete _memCache['pg_'+id];
+    /* Se è un'immagine proxata via /api/notion?img=, riprova il fetch */
+    var src = img.getAttribute('src') || '';
+    if(src.indexOf('/api/notion?img=') > -1){
+      /* Ricarica solo l'immagine aggiungendo un timestamp */
+      var sep = src.indexOf('?') > -1 ? '&' : '?';
+      img.src = src + sep + '_t=' + Date.now();
+    } else if(src.indexOf('prod-files-secure') > -1 || src.indexOf('s3.us-west') > -1){
+      /* URL Notion diretto scaduto — proxalo */
+      img.src = '/api/notion?img=' + encodeURIComponent(src);
+    } else {
+      /* Altro — nascondi il broken image */
+      img.closest('figure') ? img.closest('figure').style.display='none' : img.style.display='none';
+    }
+  },{once:true});
+});
 
     attachShine(pbody);
     loadDbGalleries(pbody);
