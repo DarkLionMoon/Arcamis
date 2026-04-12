@@ -180,7 +180,22 @@ if(data)_memCache[cacheKey]=data;
       if(!r.ok)throw new Error('HTTP '+r.status);
       data=await r.json();
       _memCache[cacheKey]=data;
-      try{sessionStorage.setItem(cacheKey,JSON.stringify(data));}catch(e){}
+      try{
+  /* Limite: max 60 chiavi pg_ in sessionStorage */
+  var _ssKeys = Object.keys(sessionStorage).filter(function(k){ return k.indexOf('pg_') === 0; });
+  if(_ssKeys.length >= 60){
+    /* Rimuovi la più vecchia (prima inserita) */
+    sessionStorage.removeItem(_ssKeys[0]);
+  }
+  sessionStorage.setItem(cacheKey, JSON.stringify(data));
+}catch(e){
+  /* Se ancora fallisce (es. storage pieno), svuota tutte le pg_ */
+  try{
+    Object.keys(sessionStorage).forEach(function(k){
+      if(k.indexOf('pg_') === 0) sessionStorage.removeItem(k);
+    });
+  }catch(e2){}
+}
     }
 
     var pg=data.page,bl=data.blocks;
