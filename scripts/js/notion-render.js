@@ -572,6 +572,16 @@ if (dbId === SPECIES_HB_DB2) {
       if(innerEl&&window.loadSubclassGallery){window.loadSubclassGallery(innerEl,data.pages);}
       return;
     }
+   /* ── CHANGELOG ── */  
+   var CHANGELOG_DB = '3400274fdc1c80178db3dcf6ba7098aa';
+if(dbId === CHANGELOG_DB){
+  var wrap = grid.closest('.n-db-wrap');
+  var uid = 'cl-' + dbId;
+  if(wrap){ wrap.outerHTML = '<div class="n-db-lc-wrap pb-wide-trigger" id="' + uid + '"></div>'; }
+  var clContainer = document.getElementById(uid);
+  if(clContainer && window.loadChangelog){ window.loadChangelog(clContainer); }
+  return;
+}
      /* ── SOTTOCLASSI HOMEBREW (secondo DB) ── */
 var SUBCLASS_DB2 = '2ff0274fdc1c807ea473db02ac4ae391';
 if(dbId === SUBCLASS_DB2){
