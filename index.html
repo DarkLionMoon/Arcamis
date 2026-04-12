@@ -525,21 +525,5 @@
 <script src="scripts/js/novita-widget.js" defer></script>
 <script src="scripts/js/perf.js" defer></script>
 <script src="scripts/js/fixes.js" defer></script>
-<script>
-  // Intercettiamo l'errore prima che il sito mostri il banner
-  window.onerror = function(message, source, lineno, colno, error) {
-    if (message.includes("properties")) {
-      console.warn("Errore di rendering bloccato per evitare il crash visivo.");
-      return true; // Questo impedisce al browser di mostrare l'errore all'utente
-    }
-  };
-
-  // Se il banner è un elemento HTML che appare nel sito, lo forziamo a sparire
-  const observer = new MutationObserver(((mutations) => {
-    const banner = document.querySelector('.error-banner') || document.querySelector('[class*="error"]');
-    if (banner) banner.style.display = 'none';
-  }));
-  observer.observe(document.body, { childList: true, subtree: true });
-</script>
 </body>
 </html>
