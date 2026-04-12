@@ -603,11 +603,15 @@ window.showMestiere = function(key) {
   if (typeof closeDd === 'function') closeDd();
 
   var fakeId = 'mestiere-' + key;
+  /* Evita duplicati nel navStack */
+var _alreadyIn = navStack.length && navStack[navStack.length-1].id === fakeId;
+if(!_alreadyIn){
   navStack.push({ id: fakeId, label: mestiere.nome, icon: mestiere.emoji });
-  history.pushState(
-    { id: fakeId, label: mestiere.nome, icon: mestiere.emoji, stack: navStack.slice(0, -1) },
-    '', location.pathname + '?p=' + fakeId
-  );
+}
+history.pushState(
+  { id: fakeId, label: mestiere.nome, icon: mestiere.emoji, stack: navStack.slice(0, -1) },
+  '', location.pathname + '?p=' + fakeId
+);
 
   var phTitle   = document.getElementById('ph-title');
   var phIcon    = document.getElementById('ph-icon');
