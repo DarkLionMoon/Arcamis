@@ -64,6 +64,10 @@ window.loadChangelog = async function(container) {
     if (!activeSV || !svList.includes(activeSV)) activeSV = svList[svList.length - 1];
 
     const patches  = getPatches(activeV, activeSV);
+    console.log('patches:', JSON.stringify(patches));
+console.log('activeP:', JSON.stringify(activeP));
+console.log('includes:', patches.includes(activeP));
+
     const hasPatch = patches.length > 0;
 
     if (hasPatch) {
