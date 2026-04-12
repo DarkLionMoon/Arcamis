@@ -6,6 +6,15 @@
   min-height: 60vh;
   align-items: flex-start;
 }
+.cl-entry-card--open {
+  border-color: var(--gold-dim, #a08840);
+}
+
+.cl-inline-content {
+  margin-top: .75rem;
+  padding-top: .75rem;
+  border-top: 1px solid var(--border, #4a3f2a);
+}
 
 /* Sidebar */
 .cl-sidebar {
