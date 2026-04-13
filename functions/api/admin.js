@@ -4,7 +4,8 @@ export async function onRequest(context) {
   const action = url.searchParams.get('action');
   const KV = env.ARCAMIS_CACHE;
   const ADMIN_SECRET = env.ADMIN_SECRET;
-  const SESSION_TTL = 86400; /* 24 ore */
+  const SESSION_TTL        = 86400;          /* 24 ore  (default) */
+  const SESSION_TTL_LONG   = 90 * 86400;     /* 90 giorni (ricordami) */
 
   const cors = {
     'Access-Control-Allow-Origin': url.origin,
@@ -41,7 +42,6 @@ export async function onRequest(context) {
     return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  /* ════ LOGIN ════ */
   /* ── Helper: scrivi log entry ── */
   async function writeAdminLog(action, target, extra) {
     try {
@@ -62,21 +62,28 @@ export async function onRequest(context) {
       await KV.put(LOG_KEY, JSON.stringify(existing), { expirationTtl: 30 * 24 * 3600 });
     } catch(_) {}
   }
+
+  /* ════ LOGIN ════ */
   if (action === 'login' && request.method === 'POST') {
     let body;
     try { body = await request.json(); } catch (e) {
       return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
     }
     if (!body.password || body.password !== ADMIN_SECRET) {
-      /* Piccolo delay anti-brute-force */
       await new Promise(r => setTimeout(r, 800));
       return new Response(JSON.stringify({ error: 'Password errata' }), { status: 401, headers: cors });
     }
-    /* Crea sessione */
+
+    /* Scegli TTL in base a "ricordami" */
+    const remember = !!body.remember;
+    const ttl = remember ? SESSION_TTL_LONG : SESSION_TTL;
+
     const token = genToken();
-    await KV.put('admin_session_' + token, 'valid', { expirationTtl: SESSION_TTL });
+    await KV.put('admin_session_' + token, 'valid', { expirationTtl: ttl });
+
     const cookieVal = 'arc_admin=' + token
-      + '; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=' + SESSION_TTL;
+      + '; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=' + ttl;
+
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...cors, 'Set-Cookie': cookieVal }
     });
@@ -100,34 +107,35 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ ok }), { headers: cors });
   }
 
-/* ════ LEGGI TUTTE LE COVER ADMIN — pubblica ════ */
-if (action === 'get_covers') {
-  try {
-    const list = await KV.list({ prefix: 'admin_cover_' });
-    const covers = {};
-    await Promise.all(list.keys.map(async function(k) {
-      const pageId = k.name.replace('admin_cover_', '');
-      covers[pageId] = await KV.get(k.name);
-    }));
-    return new Response(JSON.stringify({ covers }), { headers: cors });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+  /* ════ LEGGI TUTTE LE COVER ADMIN — pubblica ════ */
+  if (action === 'get_covers') {
+    try {
+      const list = await KV.list({ prefix: 'admin_cover_' });
+      const covers = {};
+      await Promise.all(list.keys.map(async function(k) {
+        const pageId = k.name.replace('admin_cover_', '');
+        covers[pageId] = await KV.get(k.name);
+      }));
+      return new Response(JSON.stringify({ covers }), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    }
   }
-}
 
-/* ── Da qui in poi richiede sessione valida ── */
-const authed = await checkSession();
-if (!authed) {
-  return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
-}
+  /* ── Da qui in poi richiede sessione valida ── */
+  const authed = await checkSession();
+  if (!authed) {
+    return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+  }
 
-  /* ════ SALVA COVER ════ */
   /* ════ GET LOG ════ */
   if (action === 'get_log') {
     const raw = await KV.get('admin_log', 'text');
     const entries = raw ? JSON.parse(raw) : [];
     return new Response(JSON.stringify({ entries }), { headers: cors });
   }
+
+  /* ════ SALVA COVER ════ */
   if (action === 'set_cover' && request.method === 'POST') {
     let body;
     try { body = await request.json(); } catch (e) {
@@ -139,13 +147,10 @@ if (!authed) {
     }
     const key = 'admin_cover_' + pageId.replace(/-/g, '');
     if (!coverUrl) {
-      /* coverUrl vuoto = rimuovi override */
       await KV.delete(key);
     } else {
-      /* Salva senza TTL — le cover admin sono permanenti */
       await KV.put(key, coverUrl);
     }
-    /* Invalida cache galleria */
     try { await KV.delete('gallery_pg_v2'); } catch (e) {}
     await writeAdminLog('cover_page', pageId);
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
