@@ -744,11 +744,10 @@
   function arcOpenGalleryCardEditor(card, pageId){
     var bgEl = card.querySelector('.gs-card-bg');
     var cur = bgEl ? (bgEl.style.backgroundImage||'').replace(/url\(['"]?/,'').replace(/['"]?\)$/,'') : '';
-    var curPos = '50'; // default centro
-// leggi posizione salvata dalle covers già caricate
+    var curPosX = '50', curPosY = '50';
 if(window._cachedCovers && window._cachedCovers[pageId + '_pos']) {
-  var m2 = (window._cachedCovers[pageId + '_pos'] || '').match(/(\d+)%/);
-  if(m2) curPos = m2[1];
+  var m2 = (window._cachedCovers[pageId + '_pos'] || '').match(/(\d+)%\s+(\d+)%/);
+  if(m2) { curPosX = m2[1]; curPosY = m2[2]; }
 }
     var name = (card.querySelector('.gs-card-name')||{}).textContent||pageId;
     var html = '<div class="ap-section-label" style="margin-bottom:8px">'+name+'</div>'
@@ -765,9 +764,11 @@ if(window._cachedCovers && window._cachedCovers[pageId + '_pos']) {
       +'<div class="ap-sep"></div>'
 +'<div class="ap-section-label">Posizione immagine</div>'
 +'<div class="ap-field">'
-+'<div class="ap-label">Verticale (0% = cima, 50% = centro, 100% = fondo)</div>'
-+'<input type="range" id="apgal-pos" min="0" max="100" value="'+escH(curPos)+'" style="width:100%;accent-color:var(--gold,#c89b3c)" oninput="arcGalleryPosPreview(\''+pageId+'\',this.value)"/>'
-+'<div style="font-family:Cinzel,serif;font-size:9px;color:rgba(200,155,60,.6);margin-top:4px" id="apgal-pos-label">center '+escH(curPos)+'%</div>'
++'<div class="ap-label">Orizzontale</div>'
++'<input type="range" id="apgal-posx" min="0" max="100" value="'+escH(curPosX)+'" style="width:100%;accent-color:var(--gold,#c89b3c)" oninput="arcGalleryPosPreview(\''+pageId+'\')"/>'
++'<div class="ap-label" style="margin-top:8px">Verticale</div>'
++'<input type="range" id="apgal-posy" min="0" max="100" value="'+escH(curPosY)+'" style="width:100%;accent-color:var(--gold,#c89b3c)" oninput="arcGalleryPosPreview(\''+pageId+'\')"/>'
++'<div style="font-family:Cinzel,serif;font-size:9px;color:rgba(200,155,60,.6);margin-top:4px" id="apgal-pos-label">'+curPosX+'% '+curPosY+'%</div>'
 +'</div>'
 +'<div class="ap-actions">'
 +'<button class="ap-btn-save" onclick="arcSaveGalleryPos(\''+pageId+'\')">Salva posizione</button>'
@@ -885,22 +886,26 @@ if(window._cachedCovers && window._cachedCovers[pageId + '_pos']) {
     window._currentPageId = id;
     return _origGp(id, label, icon, fromPop);
   };
-window.arcGalleryPosPreview = function(pageId, val) {
+window.arcGalleryPosPreview = function(pageId) {
+  var sx = document.getElementById('apgal-posx');
+  var sy = document.getElementById('apgal-posy');
+  var vx = sx ? sx.value : '50';
+  var vy = sy ? sy.value : '50';
+  var pos = vx + '% ' + vy + '%';
   var label = document.getElementById('apgal-pos-label');
-  if(label) label.textContent = 'center ' + val + '%';
-  // Preview live sulla card
+  if(label) label.textContent = pos;
   if(window._arcEditGalCard) {
     var bgEl = window._arcEditGalCard.querySelector('.gs-card-bg');
-    if(bgEl) bgEl.style.backgroundPosition = 'center ' + val + '%';
+    if(bgEl) bgEl.style.backgroundPosition = pos;
   }
 };
 
 window.arcSaveGalleryPos = async function(pageId) {
-  var slider = document.getElementById('apgal-pos');
-  var val = slider ? 'center ' + slider.value + '%' : 'center 50%';
+  var sx = document.getElementById('apgal-posx');
+  var sy = document.getElementById('apgal-posy');
+  var val = (sx ? sx.value : '50') + '% ' + (sy ? sy.value : '50') + '%';
   setApStatus('apgal-status', 'Salvataggio…', '');
   var ok = await arcSave(pageId + '_pos', val);
-  // Aggiorna _cachedCovers locale
   if(ok && window._cachedCovers) window._cachedCovers[pageId + '_pos'] = val;
   setApStatus('apgal-status', ok ? '✓ Posizione salvata' : '✕ Errore', ok ? 'ok' : 'err');
   arcToast(ok ? 'Posizione salvata ✓' : 'Errore', ok);
