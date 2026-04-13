@@ -364,7 +364,10 @@ function _applyCovers(covers){
     var pageId = card.id.replace('gsc-','');
     if(!pageId || !covers[pageId]) return;
     var bgEl = card.querySelector('.gs-card-bg');
-    if(bgEl) bgEl.style.backgroundImage = 'url(\'' + covers[pageId] + '\')';
+if(bgEl) {
+  bgEl.style.backgroundImage = 'url(\'' + covers[pageId] + '\')';
+  if(covers[pageId + '_pos']) bgEl.style.backgroundPosition = covers[pageId + '_pos'];
+}
   });
 }
 
