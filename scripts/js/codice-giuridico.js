@@ -88,6 +88,11 @@ window.showCodiceGiuridico = function() {
 
 /* ════════════════════════════════════
    PARSER HTML
+   Struttura output:
+   chapters[] → { id, numeral, title, emoji, nodes[], sections[] }
+   sections[] → { id, title, emoji, nodesBefore[], nodesBefore[] }
+   Ogni h2/h3 nel corpo di un capitolo diventa una "section"
+   visibile anche nella sidebar come sotto-voce.
 ════════════════════════════════════ */
 function _parseHtml(htmlStr) {
   var parser = new DOMParser();
@@ -103,17 +108,38 @@ function _parseHtml(htmlStr) {
     'GIUDIZIARIO': '⚖️', 'GIUDIZIA': '⚖️', 'CRIMINI': '⚠️',
   };
 
-  function _getEmoji(title) {
+  var sectionEmojis = {
+    'ALTO GRADO': '🔴', 'ALTO': '🔴',
+    'MEDIO': '🟠', 'MEDIA': '🟠',
+    'BASSO': '🟢', 'BASSA': '🟢',
+    'OMICIDIO': '🩸', 'COMMERCIALE': '💰',
+    'TARIFFE': '💰', 'CASISTICHE': '📋',
+  };
+
+  function _getEmoji(title, map) {
     var up = (title || '').toUpperCase();
-    for (var k in chapterEmojis) {
-      if (up.indexOf(k) > -1) return chapterEmojis[k];
+    for (var k in map) {
+      if (up.indexOf(k) > -1) return map[k];
     }
-    return '📜';
+    return null;
   }
 
   var romanRx = /^([IVX]+)\.\s*/;
   var chapters = [];
   var current = null;
+  var currentSection = null;
+  var sectionCounter = 0;
+
+  function _pushSection(chapter, tag, text, node) {
+    sectionCounter++;
+    var secId = chapter.id + '-s' + sectionCounter;
+    var secTitle = text.replace(/^[\s🔴🟠🟢🔵🟡⚪•·◆✦\-–—]+/u, '').trim();
+    var secEmoji = _getEmoji(secTitle, sectionEmojis) || '';
+    var section = { id: secId, title: secTitle, emoji: secEmoji, level: tag, nodes: [] };
+    chapter.sections.push(section);
+    currentSection = section;
+    return section;
+  }
 
   Array.from(body.childNodes).forEach(function(node) {
     if (node.nodeType !== 1) return;
@@ -121,6 +147,7 @@ function _parseHtml(htmlStr) {
     var text = (node.textContent || '').trim();
     if (!text && tag !== 'table') return;
 
+    /* ── Capitolo (h1) ── */
     if (tag === 'h1') {
       var m = text.match(romanRx);
       var numeral = m ? m[1] : '';
@@ -129,21 +156,40 @@ function _parseHtml(htmlStr) {
         id: 'cap-' + (numeral ? numeral.toLowerCase() : _cgSlugify(title)),
         numeral: numeral,
         title: title,
-        emoji: _getEmoji(title),
-        nodes: []
+        emoji: _getEmoji(title, chapterEmojis) || '📜',
+        nodes: [],    // nodi prima della prima section
+        sections: []  // array di sotto-sezioni h2/h3
       };
+      currentSection = null;
       chapters.push(current);
       return;
     }
 
+    /* Se non c'è ancora un capitolo, crea l'intro */
     if (!current) {
-      current = { id: 'cap-intro', numeral: '', title: 'Introduzione', emoji: '📜', nodes: [] };
+      current = { id: 'cap-intro', numeral: '', title: 'Introduzione', emoji: '📜', nodes: [], sections: [] };
+      currentSection = null;
       chapters.push(current);
     }
-    current.nodes.push(node.cloneNode(true));
+
+    /* ── Sotto-sezione (h2/h3) → entra nella sidebar ── */
+    if (tag === 'h2' || tag === 'h3') {
+      _pushSection(current, tag, text, node);
+      return;
+    }
+
+    /* ── Nodo di contenuto ── */
+    var clone = node.cloneNode(true);
+    if (currentSection) {
+      currentSection.nodes.push(clone);
+    } else {
+      current.nodes.push(clone);
+    }
   });
 
-  return { chapters: chapters.filter(function(c) { return c.nodes && c.nodes.length; }) };
+  return { chapters: chapters.filter(function(c) {
+    return (c.nodes && c.nodes.length) || (c.sections && c.sections.length);
+  }) };
 }
 
 function _cgSlugify(str) {
@@ -160,14 +206,29 @@ function _renderCodice(pbody, data) {
     return;
   }
 
+  /* Costruisce la sidebar con capitoli e sotto-sezioni */
   var sidebarHtml = chapters.map(function(ch, i) {
-    return '<li class="cg-ch-item' + (i === 0 ? ' active' : '') + '" data-id="' + ch.id + '" onclick="cgSelectChapter(this,\'' + ch.id + '\')">'
-      + '<span class="cg-ch-emoji">' + ch.emoji + '</span>'
-      + '<div class="cg-ch-info">'
-      + (ch.numeral ? '<span class="cg-ch-num">' + ch.numeral + '.</span>' : '')
-      + '<span class="cg-ch-label">' + ch.title + '</span>'
-      + '</div>'
+    var hasSections = ch.sections && ch.sections.length;
+    var chHtml =
+      '<li class="cg-ch-item' + (i === 0 ? ' active' : '') + '" data-id="' + ch.id + '" onclick="cgSelectChapter(this,\'' + ch.id + '\')">'
+        + '<span class="cg-ch-emoji">' + ch.emoji + '</span>'
+        + '<div class="cg-ch-info">'
+          + (ch.numeral ? '<span class="cg-ch-num">' + ch.numeral + '.</span>' : '')
+          + '<span class="cg-ch-label">' + ch.title + '</span>'
+        + '</div>'
       + '</li>';
+
+    if (hasSections) {
+      var secHtml = ch.sections.map(function(sec) {
+        return '<li class="cg-sec-item" data-chid="' + ch.id + '" data-secid="' + sec.id + '" onclick="cgSelectSection(this,\'' + ch.id + '\',\'' + sec.id + '\')">'
+          + (sec.emoji ? '<span class="cg-sec-emoji">' + sec.emoji + '</span>' : '<span class="cg-sec-dot"></span>')
+          + '<span class="cg-sec-label">' + sec.title + '</span>'
+          + '</li>';
+      }).join('');
+      chHtml += '<ul class="cg-sec-list" data-chid="' + ch.id + '" style="display:' + (i === 0 ? 'block' : 'none') + '">' + secHtml + '</ul>';
+    }
+
+    return chHtml;
   }).join('');
 
   pbody.innerHTML =
@@ -194,21 +255,61 @@ function _renderCodice(pbody, data) {
    SELEZIONE CAPITOLO
 ════════════════════════════════════ */
 window.cgSelectChapter = function(el, chapterId) {
+  /* Deseleziona tutti i capitoli e nasconde le sec-list */
   document.querySelectorAll('.cg-ch-item').forEach(function(i) { i.classList.remove('active'); });
+  document.querySelectorAll('.cg-sec-list').forEach(function(ul) { ul.style.display = 'none'; });
+  document.querySelectorAll('.cg-sec-item').forEach(function(i) { i.classList.remove('active'); });
+
   el.classList.add('active');
+
+  /* Mostra la sec-list del capitolo selezionato */
+  var secList = document.querySelector('.cg-sec-list[data-chid="' + chapterId + '"]');
+  if (secList) secList.style.display = 'block';
 
   var wrap = el.closest('.cg-wrap');
   if (!wrap || !wrap._cgData) return;
   var chapter = wrap._cgData.chapters.find(function(c) { return c.id === chapterId; });
   if (!chapter) return;
 
+  _renderChapterContent(chapter);
+};
+
+/* ════════════════════════════════════
+   SELEZIONE SECTION (scroll)
+════════════════════════════════════ */
+window.cgSelectSection = function(el, chapterId, sectionId) {
+  /* Seleziona il capitolo se non già attivo */
+  var chItem = document.querySelector('.cg-ch-item[data-id="' + chapterId + '"]');
+  if (chItem && !chItem.classList.contains('active')) {
+    cgSelectChapter(chItem, chapterId);
+  }
+
+  /* Evidenzia la sezione */
+  document.querySelectorAll('.cg-sec-item').forEach(function(i) { i.classList.remove('active'); });
+  el.classList.add('active');
+
+  /* Scroll all'ancora nella cg-main */
+  var anchor = document.getElementById(sectionId);
+  if (anchor) {
+    var cgMain = anchor.closest('.cg-main');
+    if (cgMain) {
+      var offset = anchor.offsetTop - 20;
+      cgMain.scrollTo({ top: offset, behavior: 'smooth' });
+    }
+  }
+};
+
+/* ════════════════════════════════════
+   RENDER CONTENUTO CAPITOLO
+════════════════════════════════════ */
+function _renderChapterContent(chapter) {
   var content = document.getElementById('cg-content');
   if (!content) return;
 
   var chapterDiv = document.createElement('div');
   chapterDiv.className = 'cg-chapter';
 
-  /* Header */
+  /* Header capitolo */
   var header = document.createElement('div');
   header.className = 'cg-chapter-header';
   header.innerHTML =
@@ -217,10 +318,31 @@ window.cgSelectChapter = function(el, chapterId) {
     + '<span class="cg-chapter-title">' + chapter.title + '</span>';
   chapterDiv.appendChild(header);
 
-  /* Nodi */
+  /* Nodi introduttivi (prima della prima section) */
   (chapter.nodes || []).forEach(function(node) {
     var rendered = _cgRenderNode(node);
     if (rendered) chapterDiv.appendChild(rendered);
+  });
+
+  /* Sezioni */
+  (chapter.sections || []).forEach(function(sec) {
+    /* Ancora invisibile per lo scroll */
+    var anchor = document.createElement('div');
+    anchor.id = sec.id;
+    anchor.className = 'cg-sec-anchor';
+    chapterDiv.appendChild(anchor);
+
+    /* Sub-heading visibile */
+    var sh = document.createElement('div');
+    sh.className = 'cg-subheading cg-subheading--section';
+    sh.innerHTML = (sec.emoji ? '<span class="cg-sh-emoji">' + sec.emoji + '</span>' : '') + sec.title;
+    chapterDiv.appendChild(sh);
+
+    /* Nodi della sezione */
+    (sec.nodes || []).forEach(function(node) {
+      var rendered = _cgRenderNode(node);
+      if (rendered) chapterDiv.appendChild(rendered);
+    });
   });
 
   content.innerHTML = '';
@@ -228,7 +350,7 @@ window.cgSelectChapter = function(el, chapterId) {
 
   var cgMain = content.closest('.cg-main');
   if (cgMain) cgMain.scrollTop = 0;
-};
+}
 
 /* ════════════════════════════════════
    RENDER NODO
@@ -364,6 +486,8 @@ function _injectCodiceCSS() {
   background: rgba(4,6,14,.97);
   z-index: 1;
 }
+
+/* ── Capitoli ── */
 .cg-ch-list { list-style: none; margin: 0; padding: 8px 0; }
 .cg-ch-item {
   display: flex;
@@ -389,6 +513,37 @@ function _injectCodiceCSS() {
 }
 .cg-ch-item.active .cg-ch-label { color: rgba(220,200,160,.95); }
 .cg-ch-item:hover .cg-ch-label { color: rgba(220,200,160,.85); }
+
+/* ── Sezioni (sotto i capitoli) ── */
+.cg-sec-list {
+  list-style: none; margin: 0; padding: 0 0 6px 0;
+  border-bottom: 1px solid rgba(200,155,60,.07);
+}
+.cg-sec-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 36px;
+  cursor: pointer;
+  transition: .15s;
+  border-left: 2px solid transparent;
+}
+.cg-sec-item:hover { background: rgba(200,155,60,.04); border-left-color: rgba(200,155,60,.15); }
+.cg-sec-item.active { background: rgba(200,155,60,.06); border-left-color: rgba(200,155,60,.5); }
+.cg-sec-emoji { font-size: .85em; flex-shrink: 0; }
+.cg-sec-dot {
+  width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(200,155,60,.3);
+}
+.cg-sec-item.active .cg-sec-dot { background: rgba(200,155,60,.8); }
+.cg-sec-label {
+  font-family: 'Cinzel', serif; font-size: 8.5px;
+  letter-spacing: .04em; color: rgba(220,200,160,.45); line-height: 1.35;
+}
+.cg-sec-item:hover .cg-sec-label { color: rgba(220,200,160,.75); }
+.cg-sec-item.active .cg-sec-label { color: rgba(220,200,160,.9); }
+
+/* ── Main content ── */
 .cg-main { overflow-y: auto; max-height: 82vh; background: rgba(6,8,18,.4); }
 .cg-content { padding: 32px 40px 48px; }
 .cg-chapter-header {
@@ -405,12 +560,22 @@ function _injectCodiceCSS() {
   font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700;
   color: rgba(240,225,190,.95); letter-spacing: .05em; line-height: 1.3;
 }
+
+/* Ancora invisibile per scroll */
+.cg-sec-anchor { height: 0; overflow: hidden; display: block; }
+
 .cg-subheading {
   font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
   letter-spacing: .14em; color: rgba(200,155,60,.85); text-transform: uppercase;
   margin: 28px 0 14px; padding: 10px 14px;
   background: rgba(200,155,60,.04); border-left: 3px solid rgba(200,155,60,.4);
 }
+.cg-subheading--section {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 32px;
+}
+.cg-sh-emoji { font-size: 1.1em; }
+
 .cg-para {
   font-family: 'Crimson Pro', serif; font-size: 16px;
   line-height: 1.8; color: rgba(220,200,160,.75); margin: 0 0 12px;
@@ -470,11 +635,12 @@ function _injectCodiceCSS() {
 }
 @media (max-width: 700px) {
   .cg-layout { grid-template-columns: 1fr; }
-  .cg-sidebar { border-right: none; border-bottom: 1px solid rgba(200,155,60,.15); max-height: 220px; }
+  .cg-sidebar { border-right: none; border-bottom: 1px solid rgba(200,155,60,.15); max-height: 260px; }
   .cg-main { max-height: none; }
   .cg-content { padding: 20px 16px 32px; }
   .cg-chapter-title { font-size: 16px; }
   .cg-table td, .cg-table th { padding: 7px 10px; font-size: 12px; }
+  .cg-sec-item { padding-left: 28px; }
 }
   `;
   document.head.appendChild(s);
