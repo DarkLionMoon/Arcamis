@@ -327,11 +327,15 @@ async function showPanel(){
 _pages.forEach(function(p) {
   var slider = document.getElementById('pos-' + p.id);
   var label  = document.getElementById('pos-label-' + p.id);
-  var pos = _covers[p.id + '_pos'] || 'center 50%';
-  var m = pos.match(/(\d+)%/);
-  var val = m ? m[1] : '50';
-  if(slider) slider.value = val;
-  if(label)  label.textContent = 'center ' + val + '%';
+  var pos = _covers[p.id + '_pos'] || '50% 50%';
+var mx = pos.match(/(\d+)%\s+(\d+)%/);
+var vx = mx ? mx[1] : '50';
+var vy = mx ? mx[2] : '50';
+var sliderX = document.getElementById('posx-' + p.id);
+var sliderY = document.getElementById('posy-' + p.id);
+if(sliderX) sliderX.value = vx;
+if(sliderY) sliderY.value = vy;
+if(label)   label.textContent = vx + '% ' + vy + '%';
 });
   
 /* TABS */
@@ -401,9 +405,12 @@ function renderGalleryGrid(){
       +'<button class="btn-remove" onclick="removeCover(\''+p.id+'\')">✕ Rimuovi</button>'
       +'</div>'
       +'<div class="card-divider"></div>'
-+'<div class="cta-section-label" style="margin-bottom:6px">Posizione verticale</div>'
-+'<input type="range" id="pos-'+p.id+'" min="0" max="100" value="50" style="width:100%;accent-color:var(--gold,#c89b3c)" oninput="previewPos(\''+p.id+'\',this.value)"/>'
-+'<div style="font-family:Cinzel,serif;font-size:9px;color:rgba(200,155,60,.5);margin:3px 0 6px" id="pos-label-'+p.id+'">center 50%</div>'
++'<div class="cta-section-label" style="margin-bottom:6px">Posizione immagine</div>'
++'<div style="font-family:Cinzel,serif;font-size:8px;letter-spacing:.1em;color:rgba(200,155,60,.5);margin-bottom:3px">ORIZZONTALE</div>'
++'<input type="range" id="posx-'+p.id+'" min="0" max="100" value="50" style="width:100%;accent-color:var(--gold,#c89b3c)" oninput="previewPos(\''+p.id+'\')"/>'
++'<div style="font-family:Cinzel,serif;font-size:8px;letter-spacing:.1em;color:rgba(200,155,60,.5);margin:8px 0 3px">VERTICALE</div>'
++'<input type="range" id="posy-'+p.id+'" min="0" max="100" value="50" style="width:100%;accent-color:var(--gold,#c89b3c)" oninput="previewPos(\''+p.id+'\')"/>'
++'<div style="font-family:Cinzel,serif;font-size:9px;color:rgba(200,155,60,.5);margin:3px 0 6px" id="pos-label-'+p.id+'">50% 50%</div>'
 +'<button class="btn-save" onclick="savePos(\''+p.id+'\')" style="margin-bottom:4px">Salva posizione</button>'
 +'<div class="card-status" id="status-'+p.id+'"></div>'
       +'</div>'
@@ -688,16 +695,23 @@ function showToast(msg){
   clearTimeout(t._t);
   t._t=setTimeout(function(){t.className='';},2800);
 }
-function previewPos(id, val) {
+function previewPos(id) {
+  var sx = document.getElementById('posx-' + id);
+  var sy = document.getElementById('posy-' + id);
+  var vx = sx ? sx.value : '50';
+  var vy = sy ? sy.value : '50';
+  var pos = vx + '% ' + vy + '%';
   var label = document.getElementById('pos-label-' + id);
-  if(label) label.textContent = 'center ' + val + '%';
+  if(label) label.textContent = pos;
   var prev = document.getElementById('prev-' + id);
-  if(prev) prev.style.backgroundPosition = 'center ' + val + '%';
+  if(prev) prev.style.backgroundPosition = pos;
 }
 
 async function savePos(id) {
   var slider = document.getElementById('pos-' + id);
-  var val = slider ? 'center ' + slider.value + '%' : 'center 50%';
+  var sx = document.getElementById('posx-' + id);
+var sy = document.getElementById('posy-' + id);
+var val = (sx ? sx.value : '50') + '% ' + (sy ? sy.value : '50') + '%';
   setStatus(id, 'Salvataggio…', '');
   try {
     var r = await fetch('/api/admin?action=set_cover', {
