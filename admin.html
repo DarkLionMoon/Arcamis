@@ -324,7 +324,16 @@ async function showPanel(){
   renderFilterBar();
   renderGalleryGrid();
 }
-
+_pages.forEach(function(p) {
+  var slider = document.getElementById('pos-' + p.id);
+  var label  = document.getElementById('pos-label-' + p.id);
+  var pos = _covers[p.id + '_pos'] || 'center 50%';
+  var m = pos.match(/(\d+)%/);
+  var val = m ? m[1] : '50';
+  if(slider) slider.value = val;
+  if(label)  label.textContent = 'center ' + val + '%';
+});
+  
 /* TABS */
 function switchTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -679,7 +688,30 @@ function showToast(msg){
   clearTimeout(t._t);
   t._t=setTimeout(function(){t.className='';},2800);
 }
+function previewPos(id, val) {
+  var label = document.getElementById('pos-label-' + id);
+  if(label) label.textContent = 'center ' + val + '%';
+  var prev = document.getElementById('prev-' + id);
+  if(prev) prev.style.backgroundPosition = 'center ' + val + '%';
+}
 
+async function savePos(id) {
+  var slider = document.getElementById('pos-' + id);
+  var val = slider ? 'center ' + slider.value + '%' : 'center 50%';
+  setStatus(id, 'Salvataggio…', '');
+  try {
+    var r = await fetch('/api/admin?action=set_cover', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pageId: id + '_pos', coverUrl: val })
+    });
+    var d = await r.json();
+    if(d.ok) { setStatus(id, '✓ Posizione salvata', 'ok'); showToast('Posizione salvata ✓'); }
+    else setStatus(id, '✕ Errore', 'err');
+  } catch(e) { setStatus(id, '✕ Errore rete', 'err'); }
+  setTimeout(function(){ setStatus(id, '', ''); }, 3000);
+}
+  
 function getClassBg(tags){
   if(!tags||!tags.length)return'background:#0a0c14';
   var t=tags[0].toLowerCase();
