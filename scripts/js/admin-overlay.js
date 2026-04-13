@@ -744,6 +744,12 @@
   function arcOpenGalleryCardEditor(card, pageId){
     var bgEl = card.querySelector('.gs-card-bg');
     var cur = bgEl ? (bgEl.style.backgroundImage||'').replace(/url\(['"]?/,'').replace(/['"]?\)$/,'') : '';
+    var curPos = '50'; // default centro
+// leggi posizione salvata dalle covers già caricate
+if(window._cachedCovers && window._cachedCovers[pageId + '_pos']) {
+  var m2 = (window._cachedCovers[pageId + '_pos'] || '').match(/(\d+)%/);
+  if(m2) curPos = m2[1];
+}
     var name = (card.querySelector('.gs-card-name')||{}).textContent||pageId;
     var html = '<div class="ap-section-label" style="margin-bottom:8px">'+name+'</div>'
       +'<div class="ap-preview" id="apgal-prev" style="'+(cur?'background-image:url(\''+cur+'\')':'')+'">'+(cur?'':'Nessuna immagine')+'</div>'
@@ -756,7 +762,17 @@
       +'<button class="ap-btn-save" onclick="arcSaveGalleryCard(\''+pageId+'\')">Salva</button>'
       +'<button class="ap-btn-save" style="flex:0;padding:9px 12px;background:rgba(180,40,30,.1);border-color:rgba(180,40,30,.3);color:#ff8888" onclick="arcRemoveGalleryCard(\''+pageId+'\')">✕</button>'
       +'</div>'
-      +'<div class="ap-status" id="apgal-status"></div>';
+      +'<div class="ap-sep"></div>'
++'<div class="ap-section-label">Posizione immagine</div>'
++'<div class="ap-field">'
++'<div class="ap-label">Verticale (0% = cima, 50% = centro, 100% = fondo)</div>'
++'<input type="range" id="apgal-pos" min="0" max="100" value="'+escH(curPos)+'" style="width:100%;accent-color:var(--gold,#c89b3c)" oninput="arcGalleryPosPreview(\''+pageId+'\',this.value)"/>'
++'<div style="font-family:Cinzel,serif;font-size:9px;color:rgba(200,155,60,.6);margin-top:4px" id="apgal-pos-label">center '+escH(curPos)+'%</div>'
++'</div>'
++'<div class="ap-actions">'
++'<button class="ap-btn-save" onclick="arcSaveGalleryPos(\''+pageId+'\')">Salva posizione</button>'
++'</div>'
++'<div class="ap-status" id="apgal-status"></div>';
     arcOpenPanel('Cover — '+name, html);
     window._arcEditGalCard = card;
   }
@@ -869,5 +885,24 @@
     window._currentPageId = id;
     return _origGp(id, label, icon, fromPop);
   };
+window.arcGalleryPosPreview = function(pageId, val) {
+  var label = document.getElementById('apgal-pos-label');
+  if(label) label.textContent = 'center ' + val + '%';
+  // Preview live sulla card
+  if(window._arcEditGalCard) {
+    var bgEl = window._arcEditGalCard.querySelector('.gs-card-bg');
+    if(bgEl) bgEl.style.backgroundPosition = 'center ' + val + '%';
+  }
+};
 
+window.arcSaveGalleryPos = async function(pageId) {
+  var slider = document.getElementById('apgal-pos');
+  var val = slider ? 'center ' + slider.value + '%' : 'center 50%';
+  setApStatus('apgal-status', 'Salvataggio…', '');
+  var ok = await arcSave(pageId + '_pos', val);
+  // Aggiorna _cachedCovers locale
+  if(ok && window._cachedCovers) window._cachedCovers[pageId + '_pos'] = val;
+  setApStatus('apgal-status', ok ? '✓ Posizione salvata' : '✕ Errore', ok ? 'ok' : 'err');
+  arcToast(ok ? 'Posizione salvata ✓' : 'Errore', ok);
+};
 })();
