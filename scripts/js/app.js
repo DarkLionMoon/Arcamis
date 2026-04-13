@@ -665,26 +665,3 @@ window.addEventListener('online', function(){
     };
   })();
 })();
-/* ════ EASTER EGG — click logo ════ */
-(function(){
-  var _logoClicks = 0;
-  var _logoTimer = null;
-  var tlogo = document.getElementById('tlogo');
-  if(!tlogo) return;
-  tlogo.addEventListener('click', function(){
-    _logoClicks++;
-    clearTimeout(_logoTimer);
-    _logoTimer = setTimeout(function(){ _logoClicks = 0; }, 2000);
-    if(_logoClicks >= 10){
-      _logoClicks = 0;
-      var overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);cursor:pointer';
-      var img = document.createElement('img');
-      img.src = 'https://media1.tenor.com/m/KR3ro3xVXXMAAAAd/sea-lion-funny.gif';
-      img.style.cssText = 'max-width:90vw;max-height:90vh;border:2px solid rgba(200,155,60,.5);border-radius:4px';
-      overlay.appendChild(img);
-      overlay.addEventListener('click', function(){ overlay.remove(); });
-      document.body.appendChild(overlay);
-    }
-  });
-})();
