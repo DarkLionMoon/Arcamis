@@ -199,9 +199,24 @@ function _injectMestiereCSS() {
 .ms-doc-panel p { margin:0 0 12px; }
 
 @media(max-width:700px){
-  .ms-table thead th,.ms-table tbody td{padding:7px 10px;font-size:12px;}
-  .ms-table tbody td:first-child{font-size:10px;}
   .ms-tab{padding:7px 12px;font-size:8.5px;}
+  .ms-table-wrap{margin:0 -16px;border-radius:0;}
+  .ms-table thead th{
+    padding:6px 8px;font-size:7px;letter-spacing:.06em;
+    white-space:nowrap;
+  }
+  .ms-table tbody td{
+    padding:6px 8px;font-size:12px;line-height:1.35;
+  }
+  .ms-table tbody td:first-child{font-size:10px;min-width:90px;}
+  .ms-dt-lv-header{min-width:38px;}
+  .ms-dt-cell{font-size:11px;}
+  .ms-val-mo{font-size:11px;}
+  /* Nascondi colonne meno importanti su schermi molto piccoli */
+  @media(max-width:400px){
+    .ms-table th:nth-child(n+5),
+    .ms-table td:nth-child(n+5){display:none;}
+  }
 }
   `;
   document.head.appendChild(s);
