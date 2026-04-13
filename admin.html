@@ -391,7 +391,12 @@ function renderGalleryGrid(){
       +'<button class="btn-save" onclick="saveUrl(\''+p.id+'\')">Salva URL</button>'
       +'<button class="btn-remove" onclick="removeCover(\''+p.id+'\')">✕ Rimuovi</button>'
       +'</div>'
-      +'<div class="card-status" id="status-'+p.id+'"></div>'
+      +'<div class="card-divider"></div>'
++'<div class="cta-section-label" style="margin-bottom:6px">Posizione verticale</div>'
++'<input type="range" id="pos-'+p.id+'" min="0" max="100" value="50" style="width:100%;accent-color:var(--gold,#c89b3c)" oninput="previewPos(\''+p.id+'\',this.value)"/>'
++'<div style="font-family:Cinzel,serif;font-size:9px;color:rgba(200,155,60,.5);margin:3px 0 6px" id="pos-label-'+p.id+'">center 50%</div>'
++'<button class="btn-save" onclick="savePos(\''+p.id+'\')" style="margin-bottom:4px">Salva posizione</button>'
++'<div class="card-status" id="status-'+p.id+'"></div>'
       +'</div>'
       +'</div>';
   }).join('');
