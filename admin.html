@@ -52,7 +52,13 @@ body{display:flex;flex-direction:column;min-height:100vh}
 .login-btn:hover{background:rgba(200,155,60,.22);box-shadow:0 0 28px rgba(200,155,60,.18)}
 .login-btn:disabled{opacity:.35;cursor:not-allowed}
 .login-err{margin-top:16px;padding:10px 14px;background:rgba(180,40,30,.1);border:1px solid rgba(180,40,30,.28);color:#ff7060;font-size:13px;text-align:center;display:none}
-
+.remember-label {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: .12em;
+  color: var(--text2); text-transform: uppercase; cursor: pointer;
+  margin-bottom: 18px; user-select: none;
+}
+.remember-label input { accent-color: var(--gold); width: 14px; height: 14px; cursor: pointer; }
 /* PANEL */
 #admin-panel{flex:1;display:none;flex-direction:column}
 .panel-body{flex:1;padding:36px 40px;max-width:1440px;margin:0 auto;width:100%}
@@ -194,6 +200,11 @@ body{display:flex;flex-direction:column;min-height:100vh}
       <label class="field-label" for="pwd">Password</label>
       <input class="field-input" id="pwd" type="password" placeholder="Inserisci la password…" onkeydown="if(event.key==='Enter')doLogin()"/>
     </div>
+    
+    <label class="remember-label">
+      <input type="checkbox" id="remember-me"/>
+      <span>Ricordami per 90 giorni</span>
+    </label>
     <button class="login-btn" id="login-btn" onclick="doLogin()">Accedi al pannello</button>
     <div class="login-err" id="login-err">Password errata. Riprova.</div>
   </div>
@@ -275,29 +286,31 @@ var SLIDES = [
 
 /* AUTH */
 async function doLogin(){
-  var btn=document.getElementById('login-btn');
-  var err=document.getElementById('login-err');
-  var pwd=document.getElementById('pwd').value;
-  if(!pwd)return;
-  btn.disabled=true; btn.textContent='Accesso…'; err.style.display='none';
-  try{
-    var r=await fetch('/api/admin?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
-    var d=await r.json();
-    if(d.ok){
-  sessionStorage.setItem('arcadmin','1');
-  console.log('SET arcadmin:', sessionStorage.getItem('arcadmin'));
-  window.location.href='/?arcadmin=1';
-}
-    else{err.style.display='block';btn.disabled=false;btn.textContent='Accedi al pannello';}
-  }catch(e){
-    err.textContent='Errore di rete.';err.style.display='block';
-    btn.disabled=false;btn.textContent='Accedi al pannello';
+  var btn = document.getElementById('login-btn');
+  var err = document.getElementById('login-err');
+  var pwd = document.getElementById('pwd').value;
+  var remember = document.getElementById('remember-me').checked;
+  if(!pwd) return;
+  btn.disabled = true; btn.textContent = 'Accesso…'; err.style.display = 'none';
+  try {
+    var r = await fetch('/api/admin?action=login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd, remember: remember })
+    });
+    var d = await r.json();
+    if(d.ok) {
+      sessionStorage.setItem('arcadmin', '1');
+      window.location.href = '/?arcadmin=1';
+    } else {
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Accedi al pannello';
+    }
+  } catch(e) {
+    err.textContent = 'Errore di rete.'; err.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Accedi al pannello';
   }
-}
-
-async function doLogout(){
-  await fetch('/api/admin?action=logout',{method:'POST'});
-  location.reload();
 }
 
 /* PANEL */
