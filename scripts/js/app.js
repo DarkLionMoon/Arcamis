@@ -497,6 +497,11 @@ function closeSubMap(id){
 window.addEventListener('popstate', function(e){
   // Verifichiamo che e.state esista prima di ogni altra cosa
   if(e && e.state && e.state.id){
+     
+   if(e.state.id === 'codice-giuridico'){
+      showCodiceGiuridico();
+      return;
+    }
     
     // Sincronizza il breadcrumb se presente nello stato
     if(e.state.stack) {
