@@ -94,6 +94,8 @@ async function injectCustomCovers(pages, KV) {
     try {
       const customCover = await KV.get('admin_cover_' + p.id);
       if (customCover) p.cover = customCover;
+      const customPos = await KV.get('admin_cover_' + p.id + '_pos');
+      if (customPos) p.coverPos = customPos;
     } catch (e) {}
   }));
 }
