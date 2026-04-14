@@ -533,4 +533,160 @@
   }
 
 })();
+/* ════════════════════════════════════
+   2. "IL RICHIAMO DEL MARE" — Scroll Easter Egg
+   Trigger: scroll veloce alternato 4 volte
+   → pinna SVG attraversa lo schermo
+   → click sulla pinna = overlay con gif + messaggio
+════════════════════════════════════ */
+(function(){
+  /* ── Config ── */
+  var SPEED_THRESHOLD = 8;    // px/ms per considerare lo scroll "veloce"
+  var SWINGS_NEEDED   = 4;    // inversioni di direzione necessarie
+  var RESET_DELAY     = 1800; // ms di inattività prima di resettare il contatore
 
+  var lastY       = 0;
+  var lastT       = 0;
+  var lastDir     = 0;
+  var swingCount  = 0;
+  var resetTimer  = null;
+  var finRunning  = false;
+
+  /* ── Rileva scroll rapido alternato ── */
+  document.getElementById('main').addEventListener('scroll', function(){
+    var now = performance.now();
+    var y   = this.scrollTop;
+    var dt  = now - lastT;
+    if(dt < 5) return;
+
+    var speed = Math.abs(y - lastY) / dt;
+    var dir   = y > lastY ? 1 : -1;
+
+    if(speed > SPEED_THRESHOLD){
+      if(dir !== lastDir && lastDir !== 0){
+        swingCount++;
+        if(swingCount >= SWINGS_NEEDED && !finRunning){
+          swingCount = 0;
+          spawnFin();
+        }
+      }
+      lastDir = dir;
+    }
+
+    lastY = y;
+    lastT = now;
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(function(){ swingCount = 0; lastDir = 0; }, RESET_DELAY);
+  }, { passive: true });
+
+  /* ── Crea la pinna SVG ── */
+  function spawnFin(){
+    finRunning = true;
+    var fromRight = Math.random() > .5;
+
+    var fin = document.createElement('div');
+    fin.style.cssText = [
+      'position:fixed',
+      'bottom:' + (80 + Math.random() * 120) + 'px',
+      fromRight ? 'right:-90px' : 'left:-90px',
+      'z-index:8000',
+      'cursor:pointer',
+      'transition:' + (fromRight ? 'right' : 'left') + ' 4.2s linear',
+      'filter:drop-shadow(0 0 8px rgba(200,155,60,.45))',
+    ].join(';');
+
+    fin.innerHTML = '<svg width="80" height="60" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">'
+      + '<path d="M10 55 Q20 10 50 5 Q65 3 72 20 Q60 30 40 38 Q25 44 10 55Z" fill="rgba(200,155,60,0.85)" stroke="rgba(245,228,168,0.6)" stroke-width="1.2"/>'
+      + '<path d="M10 55 Q22 42 40 38" stroke="rgba(245,228,168,0.35)" stroke-width="0.8" fill="none"/>'
+      + '<ellipse cx="38" cy="52" rx="30" ry="5" fill="rgba(200,155,60,0.18)"/>'
+      + '</svg>';
+
+    fin.title = 'Clicca!';
+    document.body.appendChild(fin);
+
+    /* Tooltip hint */
+    var hint = document.createElement('div');
+    hint.textContent = '?';
+    hint.style.cssText = 'position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-family:Cinzel,serif;font-size:11px;color:rgba(245,228,168,.7);letter-spacing:.1em;pointer-events:none;animation:hintpulse 1s ease-in-out infinite alternate';
+    if(!document.getElementById('hintpulse-style')){
+      var s = document.createElement('style');
+      s.id = 'hintpulse-style';
+      s.textContent = '@keyframes hintpulse{from{opacity:.3;transform:translateX(-50%) translateY(0)}to{opacity:1;transform:translateX(-50%) translateY(-4px)}}';
+      document.head.appendChild(s);
+    }
+    fin.appendChild(hint);
+
+    /* Anima traversata */
+    requestAnimationFrame(function(){
+      setTimeout(function(){
+        fin.style[fromRight ? 'right' : 'left'] = (window.innerWidth + 90) + 'px';
+      }, 50);
+    });
+
+    /* Click → overlay */
+    fin.addEventListener('click', function(e){
+      e.stopPropagation();
+      fin.remove();
+      showGuardianOverlay();
+      finRunning = false;
+    });
+
+    /* Auto-cleanup dopo traversata */
+    setTimeout(function(){
+      if(fin.parentNode) fin.remove();
+      finRunning = false;
+    }, 4800);
+  }
+
+  /* ── Overlay Guardiano ── */
+  function showGuardianOverlay(){
+    var ov = document.createElement('div');
+    ov.style.cssText = [
+      'position:fixed;inset:0;z-index:9999',
+      'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px',
+      'background:rgba(4,5,14,.88)',
+      'cursor:pointer',
+      'animation:fadeInOv .35s ease',
+    ].join(';');
+
+    if(!document.getElementById('fadeInOv-style')){
+      var s2 = document.createElement('style');
+      s2.id = 'fadeInOv-style';
+      s2.textContent = '@keyframes fadeInOv{from{opacity:0}to{opacity:1}}';
+      document.head.appendChild(s2);
+    }
+
+    /* Titolo */
+    var title = document.createElement('div');
+    title.textContent = '✦ Guardiano delle Acque di Arcamis ✦';
+    title.style.cssText = [
+      'font-family:Cinzel,serif;font-size:18px;font-weight:900;letter-spacing:.18em',
+      'color:#f5e4a8',
+      'text-shadow:0 0 28px rgba(200,155,60,.6)',
+      'text-align:center;padding:0 20px',
+    ].join(';');
+
+    /* Sottotitolo */
+    var sub = document.createElement('div');
+    sub.textContent = 'Hai trovato il Guardiano delle Acque di Arcamis.';
+    sub.style.cssText = 'font-family:Crimson Pro,Georgia,serif;font-size:15px;font-style:italic;color:rgba(196,168,98,.75);letter-spacing:.06em;text-align:center;padding:0 20px';
+
+    /* GIF */
+    var img = document.createElement('img');
+    img.src = 'https://media1.tenor.com/m/KR3ro3xVXXMAAAAd/sea-lion-funny.gif';
+    img.style.cssText = 'max-width:min(480px,88vw);max-height:55vh;border:1px solid rgba(200,155,60,.35);display:block';
+
+    /* Hint chiusura */
+    var close = document.createElement('div');
+    close.textContent = 'clicca per congedare il Guardiano';
+    close.style.cssText = 'font-family:Cinzel,serif;font-size:9px;letter-spacing:.2em;color:rgba(200,155,60,.35);text-transform:uppercase';
+
+    ov.appendChild(title);
+    ov.appendChild(img);
+    ov.appendChild(sub);
+    ov.appendChild(close);
+    ov.addEventListener('click', function(){ ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
+})();
