@@ -49,15 +49,56 @@ function fontDown(){ applyFont(_fs - .08); }
 
 /* ════ THEME ════ */
 var _theme = localStorage.getItem('arc_theme') || 'dark';
+var _THEMES = ['dark','light','blood','forest','abyss','alchemy'];
+
 function applyTheme(t){
   _theme = t;
-  document.body.classList.toggle('light', t === 'light');
-  var btn = document.getElementById('theme-toggle');
-  if(btn) btn.textContent = t === 'light' ? '🌙' : '☀️';
+  _THEMES.forEach(function(th){ document.body.classList.remove(th === 'dark' ? '' : 'theme-'+th); });
+  document.body.classList.remove('light','theme-blood','theme-forest','theme-abyss','theme-alchemy');
+  if(t === 'light') document.body.classList.add('light');
+  else if(t !== 'dark') document.body.classList.add('theme-'+t);
   localStorage.setItem('arc_theme', t);
+  _renderOptionsPanel();
 }
 applyTheme(_theme);
-function toggleTheme(){ applyTheme(_theme === 'dark' ? 'light' : 'dark'); }
+
+function toggleTheme(){ _openOptionsPanel(); }
+
+/* ── Pannello Opzioni ── */
+var _optPanelOpen = false;
+
+function _openOptionsPanel(){
+  var p = document.getElementById('arc-options-panel');
+  if(!p) return;
+  _optPanelOpen = !_optPanelOpen;
+  p.classList.toggle('open', _optPanelOpen);
+}
+
+function _closeOptionsPanel(){
+  _optPanelOpen = false;
+  var p = document.getElementById('arc-options-panel');
+  if(p) p.classList.remove('open');
+}
+
+function _renderOptionsPanel(){
+  var p = document.getElementById('arc-options-panel');
+  if(!p) return;
+  p.querySelectorAll('[data-theme]').forEach(function(el){
+    el.classList.toggle('active', el.getAttribute('data-theme') === _theme);
+  });
+  var pct = Math.round(((_fs - 0.85) / (1.3 - 0.85)) * 100);
+  var fsEl = p.querySelector('#arc-opt-fontpct');
+  if(fsEl) fsEl.textContent = Math.round(_fs * 100) + '%';
+}
+
+document.addEventListener('click', function(e){
+  if(!_optPanelOpen) return;
+  var panel = document.getElementById('arc-options-panel');
+  var btn = document.getElementById('theme-toggle');
+  if(panel && !panel.contains(e.target) && btn && !btn.contains(e.target)){
+    _closeOptionsPanel();
+  }
+});
 
 /* ════ UI NAVIGATION ════ */
 function showHome(){
