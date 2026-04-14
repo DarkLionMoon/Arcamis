@@ -44,8 +44,8 @@ function applyFont(s){
   localStorage.setItem('arc_font', _fs);
 }
 applyFont(_fs);
-function fontUp(){ applyFont(_fs + .08); }
-function fontDown(){ applyFont(_fs - .08); }
+function fontUp(){ applyFont(_fs + .08); _renderOptionsPanel(); }
+function fontDown(){ applyFont(_fs - .08); _renderOptionsPanel(); }
 
 /* ════ THEME ════ */
 var _theme = localStorage.getItem('arc_theme') || 'dark';
