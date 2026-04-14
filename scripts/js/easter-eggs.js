@@ -702,10 +702,10 @@
     '/audio/door-knock.mp3',
     '/audio/whale-song.mp3',
   ];
-  var IDLE_DELAY    = 60000; // 60s di inattività
+  var IDLE_DELAY    = 30000; // 60s di inattività
   var FADE_IN_MS    = 3000;  // fade in 3s
   var FADE_OUT_MS   = 1500;  // fade out 1.5s
-  var MAX_VOL       = 0.18;  // volume massimo (discreto)
+  var MAX_VOL       = 0.50;  // volume massimo (discreto)
   var SPEED_THRESH  = 180;   // px/s per considerare il mouse "veloce"
 
   var audio       = null;
