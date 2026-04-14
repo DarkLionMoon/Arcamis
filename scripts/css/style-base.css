@@ -846,3 +846,14 @@ nav#tnav{display:flex;align-items:stretch}
 }
 .arc-deco-r .arc-deco-runes{animation-delay:1.8s;}
 @media(max-width:768px){.arc-deco{display:none;}}
+/* ════════════════════════════════════
+   PERGAMENA DEL DESTINO — selezione testo
+════════════════════════════════════ */
+::selection {
+  background: rgba(200, 155, 60, 0.3);
+  color: #f5e4a8;
+}
+::-moz-selection {
+  background: rgba(200, 155, 60, 0.3);
+  color: #f5e4a8;
+}
