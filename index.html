@@ -492,6 +492,51 @@
     </div>
   </div>
 </div>
+  <div id="arc-options-panel">
+  <div class="aop-section">
+    <div class="aop-label">Tema</div>
+    <div class="aop-themes">
+      <button class="aop-theme-btn" data-theme="dark" onclick="applyTheme('dark')">
+        <span class="aop-theme-icon">🌙</span>
+        <span class="aop-theme-name">Dark</span>
+      </button>
+      <button class="aop-theme-btn" data-theme="light" onclick="applyTheme('light')">
+        <span class="aop-theme-icon">☀️</span>
+        <span class="aop-theme-name">Light</span>
+      </button>
+      <button class="aop-theme-btn" data-theme="blood" onclick="applyTheme('blood')">
+        <span class="aop-theme-dot" style="background:#8b1a1a"></span>
+        <span class="aop-theme-name">Sangue</span>
+      </button>
+      <button class="aop-theme-btn" data-theme="forest" onclick="applyTheme('forest')">
+        <span class="aop-theme-dot" style="background:#2d7a3a"></span>
+        <span class="aop-theme-name">Foresta</span>
+      </button>
+      <button class="aop-theme-btn" data-theme="abyss" onclick="applyTheme('abyss')">
+        <span class="aop-theme-dot" style="background:#0d4f7a"></span>
+        <span class="aop-theme-name">Abisso</span>
+      </button>
+      <button class="aop-theme-btn" data-theme="alchemy" onclick="applyTheme('alchemy')">
+        <span class="aop-theme-dot" style="background:#6b2fa0"></span>
+        <span class="aop-theme-name">Alchimia</span>
+      </button>
+    </div>
+  </div>
+  <div class="aop-section">
+    <div class="aop-label">Dimensione testo</div>
+    <div class="aop-font-row">
+      <button class="aop-font-btn" onclick="fontDown()">−</button>
+      <span id="arc-opt-fontpct" class="aop-font-pct">100%</span>
+      <button class="aop-font-btn" onclick="fontUp()">+</button>
+    </div>
+  </div>
+  <div class="aop-section aop-section--disabled">
+    <div class="aop-label">Lingua <span class="aop-coming">prossimamente</span></div>
+    <div class="aop-lang-row">
+      <span>Italiano</span><span>/</span><span>English</span>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ BOTTOM NAV mobile ═══ -->
 <nav id="bottom-nav">
