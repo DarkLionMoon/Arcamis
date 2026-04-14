@@ -753,8 +753,14 @@
     isPlaying = true;
     if(audio){ audio.pause(); audio = null; }
     audio = new Audio(pickSound());
+audio.addEventListener('ended', function(){
+  isPlaying = false;
+  // cooldown random tra 5 e 10 minuti
+  var cooldown = (5 + Math.random() * 5) * 60 * 1000;
+  setTimeout(resetIdle, cooldown);
+});
+fadeIn(audio, MAX_VOL, FADE_IN_MS);
     
-    fadeIn(audio, MAX_VOL, FADE_IN_MS);
   }
 
   function resetIdle(){
