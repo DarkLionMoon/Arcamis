@@ -696,7 +696,7 @@
     '/audio/door-knock.mp3',
     '/audio/whale-song.mp3',
   ];
-  var IDLE_DELAY   = 60000;
+  var IDLE_DELAY   = 10000;
   var FADE_IN_MS   = 3000;
   var FADE_OUT_MS  = 1500;
   var MAX_VOL      = 0.18;
