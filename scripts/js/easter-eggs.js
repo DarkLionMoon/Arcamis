@@ -534,31 +534,24 @@
 
 })();
 /* ════════════════════════════════════
-   3. PERGAMENA DEL DESTINO
-   Trasforma la selezione del testo
+   3. PERGAMENA DEL DESTINO - CSS PULITO
 ════════════════════════════════════ */
-(function() {
-    /* ── CSS per lo stile della selezione ── */
-    var _parchmentStyle = document.createElement('style');
-    _parchmentStyle.textContent = `
-        /* Colore di selezione stile pergamena antica */
-        ::selection {
-            background-color: rgba(230, 190, 130, 0.99) !important; 
-            color: #2d1e10 !important;
-            text-shadow: none !important;
-        }
-        ::-moz-selection {
-            background-color: rgba(230, 190, 130, 0.99) !important;
-            color: #2d1e10 !important;
-        }
+/* Solo colore e sfondo sono ammessi qui */
+::selection {
+    background-color: rgba(230, 190, 130, 0.99); 
+    color: #2d1e10;
+    text-shadow: none;
+}
+::-moz-selection {
+    background-color: rgba(230, 190, 130, 0.99);
+    color: #2d1e10;
+}
 
-        /* Classe applicata al body durante la selezione attiva */
-        .arc-parchment-mode ::selection {
-            font-family: 'Crimson Pro', 'Georgia', serif !important;
-            font-style: italic !important;
-        }
-    `;
-    document.head.appendChild(_parchmentStyle);
+/* Questa classe, applicata via JS, forzerà il font corsivo per TUTTO il body */
+.arc-parchment-mode, .arc-parchment-mode * {
+    font-family: 'Crimson Pro', 'Georgia', serif !important;
+    font-style: italic !important;
+}
 
     /* ── JS per gestire il cambio font dinamico ── */
     function _handleSelection() {
