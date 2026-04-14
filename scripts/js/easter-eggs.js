@@ -692,6 +692,9 @@
 })();
 /* ════════════════════════════════════
    3. "IL SUSSURRO DELLA PAGINA" — Audio Ambientale
+   Trigger: 60s di inattività
+   → audio random dalla lista
+   → mouse veloce = fade out
 ════════════════════════════════════ */
 (function(){
   var SOUNDS = [
@@ -699,117 +702,106 @@
     '/audio/door-knock.mp3',
     '/audio/whale-song.mp3',
   ];
-  var IDLE_DELAY   = 30000;
-  var FADE_IN_MS   = 3000;
-  var FADE_OUT_MS  = 1500;
-  var MAX_VOL      = 0.20;
-  var SPEED_THRESH = 180;
+  var IDLE_DELAY    = 10000; // 10s di inattività
+  var FADE_IN_MS    = 3000;  // fade in 3s
+  var FADE_OUT_MS   = 1500;  // fade out 1.5s
+  var MAX_VOL       = 0.18;  // volume massimo (discreto)
+  var SPEED_THRESH  = 180;   // px/s per considerare il mouse "veloce"
 
-  var ctx         = null;
-  var gainNode    = null;
-  var sourceNode  = null;
-  var buffers     = {};
-  var unlocked    = false;
+  var audio       = null;
+  var fadeTimer   = null;
+  var idleTimer   = null;
   var isPlaying   = false;
   var isFading    = false;
-  var idleTimer   = null;
-  var fadeTimer   = null;
-  var lastMX=0, lastMY=0, lastMT=0;
+  var lastMX = 0, lastMY = 0, lastMT = 0;
 
-  /* ── 1. Al primo gesto utente: crea AudioContext e precarica ── */
-  function unlock(){
-    if(unlocked) return;
-    unlocked = true;
-    ctx      = new (window.AudioContext || window.webkitAudioContext)();
-    gainNode = ctx.createGain();
-    gainNode.gain.value = 0;
-    gainNode.connect(ctx.destination);
-    /* Precarica tutti i file */
-    SOUNDS.forEach(function(url){
-      fetch(url)
-        .then(function(r){ return r.arrayBuffer(); })
-        .then(function(ab){ return ctx.decodeAudioData(ab); })
-        .then(function(buf){ buffers[url] = buf; })
-        .catch(function(e){ console.warn('Arcamis audio: errore caricamento', url, e); });
-    });
+  /* ── Scegli audio random ── */
+  function pickSound(){
+    return SOUNDS[Math.floor(Math.random() * SOUNDS.length)];
   }
 
-  /* ── 2. Fade gain ── */
-  function fadeTo(target, ms){
-    if(!ctx) return;
-    var now = ctx.currentTime;
-    gainNode.gain.cancelScheduledValues(now);
-    gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-    gainNode.gain.linearRampToValueAtTime(target, now + ms/1000);
+  /* ── Fade in ── */
+  function fadeIn(el, targetVol, ms){
+    el.volume = 0;
+    el.play().catch(function(){});
+    var steps = 40;
+    var interval = ms / steps;
+    var step = targetVol / steps;
+    var i = 0;
+    clearInterval(fadeTimer);
+    fadeTimer = setInterval(function(){
+      i++;
+      el.volume = Math.min(targetVol, parseFloat((el.volume + step).toFixed(4)));
+      if(i >= steps){ clearInterval(fadeTimer); isFading = false; }
+    }, interval);
   }
 
-  /* ── 3. Avvia sussurro ── */
-  function startWhisper(){
-    if(isPlaying || isFading || !unlocked) return;
-    var keys = Object.keys(buffers);
-    if(keys.length === 0) return; // buffer non ancora pronti
-    var url = keys[Math.floor(Math.random() * keys.length)];
-    var buf = buffers[url];
-    if(!buf) return;
-
-    if(sourceNode){ try{ sourceNode.stop(); }catch(e){} }
-    sourceNode = ctx.createBufferSource();
-    sourceNode.buffer = buf;
-    sourceNode.loop   = true;
-    sourceNode.connect(gainNode);
-    gainNode.gain.value = 0;
-    sourceNode.start(0);
-    isPlaying = true;
-    fadeTo(MAX_VOL, FADE_IN_MS);
-  }
-
-  /* ── 4. Ferma con fade ── */
-  function stopWhisper(cb){
-    if(!isPlaying || isFading) return;
+  /* ── Fade out ── */
+  function fadeOut(el, ms, cb){
+    if(!el || el.paused) return;
     isFading = true;
-    fadeTo(0, FADE_OUT_MS);
-    setTimeout(function(){
-      if(sourceNode){ try{ sourceNode.stop(); }catch(e){} sourceNode = null; }
-      isPlaying = false;
-      isFading  = false;
-      if(cb) cb();
-    }, FADE_OUT_MS + 100);
+    var steps = 30;
+    var interval = ms / steps;
+    var step = el.volume / steps;
+    var i = 0;
+    clearInterval(fadeTimer);
+    fadeTimer = setInterval(function(){
+      i++;
+      el.volume = Math.max(0, parseFloat((el.volume - step).toFixed(4)));
+      if(i >= steps){
+        clearInterval(fadeTimer);
+        el.pause();
+        el.currentTime = 0;
+        isPlaying = false;
+        isFading = false;
+        if(cb) cb();
+      }
+    }, interval);
   }
 
-  /* ── 5. Idle timer ── */
+  /* ── Avvia il sussurro ── */
+  function startWhisper(){
+    if(isPlaying || isFading) return;
+    isPlaying = true;
+    if(audio){ audio.pause(); audio = null; }
+    audio = new Audio(pickSound());
+    audio.loop = true;
+    fadeIn(audio, MAX_VOL, FADE_IN_MS);
+  }
+
+  /* ── Reset idle timer ── */
   function resetIdle(){
     clearTimeout(idleTimer);
     idleTimer = setTimeout(startWhisper, IDLE_DELAY);
   }
 
-  /* ── 6. Mouse veloce → stop ── */
+  /* ── Rileva mouse veloce → fade out ── */
   document.addEventListener('mousemove', function(e){
     var now = performance.now();
-    var dx  = e.clientX - lastMX;
-    var dy  = e.clientY - lastMY;
-    var dt  = (now - lastMT) / 1000;
-    if(dt > 0 && Math.sqrt(dx*dx+dy*dy)/dt > SPEED_THRESH && isPlaying && !isFading){
-      stopWhisper(resetIdle);
+    var dx = e.clientX - lastMX;
+    var dy = e.clientY - lastMY;
+    var dt = (now - lastMT) / 1000;
+    if(dt > 0){
+      var speed = Math.sqrt(dx*dx + dy*dy) / dt;
+      if(speed > SPEED_THRESH && isPlaying && !isFading){
+        fadeOut(audio, FADE_OUT_MS, function(){
+          resetIdle(); // riparte il timer dopo il fade
+        });
+      }
     }
-    lastMX=e.clientX; lastMY=e.clientY; lastMT=now;
+    lastMX = e.clientX; lastMY = e.clientY; lastMT = now;
     if(!isPlaying && !isFading) resetIdle();
   });
 
-  /* ── 7. Altre interazioni ── */
-  ['keydown','click','touchstart'].forEach(function(ev){
+  /* ── Altri eventi che rompono l'idle ── */
+  ['keydown','click','touchstart','scroll'].forEach(function(ev){
     document.addEventListener(ev, function(){
-      unlock(); // sblocca al primo gesto
-      if(isPlaying && !isFading) stopWhisper();
+      if(isPlaying && !isFading) fadeOut(audio, FADE_OUT_MS);
       resetIdle();
-    }, { passive:true });
+    }, { passive: true });
   });
 
-  document.getElementById('main').addEventListener('scroll', function(){
-    if(isPlaying && !isFading) stopWhisper();
-    resetIdle();
-  }, { passive:true });
-
-  /* ── Avvia timer subito ── */
+  /* ── Avvia il timer al caricamento ── */
   resetIdle();
 
 })();
