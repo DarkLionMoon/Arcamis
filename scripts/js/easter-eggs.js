@@ -533,43 +533,4 @@
   }
 
 })();
-/* ════════════════════════════════════
-   3. PERGAMENA DEL DESTINO - CSS PULITO
-════════════════════════════════════ */
-(function() {
-    // 1. Iniettiamo il CSS per il colore (che è l'unica cosa che il browser accetta in ::selection)
-    const style = document.createElement('style');
-    style.textContent = `
-        ::selection { background: #e6be82 !important; color: #2d1e10 !important; }
-        ::-moz-selection { background: #e6be82 !important; color: #2d1e10 !important; }
-        .arc-force-parchment { font-style: italic !important; font-family: 'Crimson Pro', Georgia, serif !important; }
-    `;
-    document.head.appendChild(style);
 
-    // 2. Funzione per attivare/disattivare l'effetto
-    function toggleParchment() {
-        // Controlliamo se c'è del testo selezionato
-        const hasSelection = window.getSelection().toString().length > 0;
-        
-        if (hasSelection) {
-            document.body.classList.add('arc-force-parchment');
-        } else {
-            // Un piccolo delay per non far "scattare" il font troppo bruscamente
-            setTimeout(() => {
-                if (window.getSelection().toString().length === 0) {
-                    document.body.classList.remove('arc-force-parchment');
-                }
-            }, 100);
-        }
-    }
-
-    // 3. Ascoltiamo gli eventi di selezione in modo aggressivo
-    document.addEventListener('selectionchange', toggleParchment);
-    
-    // Fallback: se l'utente clicca ma non seleziona nulla, puliamo tutto
-    document.addEventListener('mousedown', () => {
-        document.body.classList.remove('arc-force-parchment');
-    });
-
-    console.log("Arcamis: Pergamena del Destino pronta.");
-})();
