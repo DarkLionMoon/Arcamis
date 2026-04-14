@@ -753,7 +753,7 @@
     isPlaying = true;
     if(audio){ audio.pause(); audio = null; }
     audio = new Audio(pickSound());
-    audio.loop = true;
+    
     fadeIn(audio, MAX_VOL, FADE_IN_MS);
   }
 
