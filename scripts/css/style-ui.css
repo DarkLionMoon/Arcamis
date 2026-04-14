@@ -247,6 +247,182 @@ body.light .lcard{background:linear-gradient(160deg,rgba(235,229,215,.97),rgba(2
 body.light .lcard:hover{box-shadow:0 14px 40px rgba(100,70,20,.15)!important}
 
 /* ════════════════════════════════════
+   LIGHT THEME — EXTENDED
+════════════════════════════════════ */
+
+/* ── Home sections ── */
+body.light .arcadia-sec{
+  background:linear-gradient(160deg,rgba(235,228,210,.97),rgba(228,220,200,.99))!important;
+  border-color:rgba(120,88,36,.12)!important;
+}
+body.light .arcadia-sec::before{
+  background:radial-gradient(ellipse 70% 80% at 85% 50%,rgba(180,140,80,.08) 0%,transparent 65%)!important;
+}
+
+body.light .fpill{
+  background:rgba(245,238,220,.8)!important;
+  border-color:rgba(120,88,36,.2)!important;
+}
+body.light .fpill:hover{
+  background:rgba(235,225,200,.95)!important;
+  border-color:rgba(180,130,50,.5)!important;
+  box-shadow:0 8px 28px rgba(100,70,20,.15),0 0 20px rgba(180,130,50,.1)!important;
+}
+
+/* ── Location cards ── */
+body.light .loc-card{
+  border-color:rgba(120,88,36,.15)!important;
+}
+body.light .loc-ov{
+  background:linear-gradient(0deg,rgba(230,220,195,.97) 0%,rgba(230,220,195,.55) 45%,rgba(230,220,195,.05) 100%)!important;
+}
+body.light .loc-card:hover .loc-ov{
+  background:linear-gradient(0deg,rgba(225,215,188,1) 0%,rgba(225,215,188,.8) 55%,rgba(210,200,175,.2) 100%)!important;
+}
+body.light .loc-name{color:var(--text)!important}
+body.light .loc-badge{color:var(--gold2)!important;background:rgba(180,130,50,.1)!important;border-color:rgba(180,130,50,.25)!important}
+body.light .la{
+  background:rgba(242,237,223,.85)!important;
+  border-color:rgba(120,88,36,.2)!important;
+  color:var(--gold)!important;
+}
+body.light .la:hover{
+  background:rgba(235,220,190,.95)!important;
+  border-color:var(--gold2)!important;
+}
+
+/* ── Mystery cards ── */
+body.light .mys-card{
+  background:linear-gradient(160deg,rgba(240,233,215,.95),rgba(232,224,205,.98))!important;
+  border-color:rgba(120,88,36,.2)!important;
+}
+body.light .mys-name{color:var(--text)!important}
+body.light .mys-txt{color:rgba(80,60,30,.6)!important}
+body.light .mys-card:hover{border-color:rgba(160,120,50,.5)!important;box-shadow:0 16px 44px rgba(100,70,20,.2),0 0 28px rgba(160,120,50,.1)!important;}
+body.light .mys-cin{border-color:rgba(120,88,36,.15)!important}
+
+/* ── Guild cards ── */
+body.light .guild-card{
+  background:linear-gradient(160deg,rgba(240,233,215,.97),rgba(232,224,205,.99))!important;
+  border-color:rgba(120,88,36,.18)!important;
+}
+body.light .guild-card:hover{
+  border-color:rgba(160,120,50,.45)!important;
+  box-shadow:0 14px 44px rgba(100,70,20,.2),0 0 28px rgba(180,130,50,.08)!important;
+}
+body.light .guild-name{color:var(--gold)!important}
+body.light .guild-desc{color:var(--text3)!important}
+body.light .guild-divider{background:linear-gradient(90deg,rgba(120,88,36,.2),transparent)!important}
+body.light .guild-sub{
+  background:rgba(120,88,36,.04)!important;
+  border-color:rgba(120,88,36,.1)!important;
+}
+body.light .guild-sub:hover{background:rgba(120,88,36,.09)!important;border-color:rgba(120,88,36,.25)!important}
+body.light .guild-sub-n{color:var(--gold2)!important}
+body.light .guild-sub-d{color:rgba(80,60,30,.65)!important}
+
+/* ── Steps ── */
+body.light .step{
+  background:rgba(120,88,36,.03)!important;
+  border-color:rgba(120,88,36,.12)!important;
+}
+body.light .step:hover{
+  background:rgba(120,88,36,.06)!important;
+  border-color:rgba(120,88,36,.3)!important;
+  box-shadow:0 8px 28px rgba(100,70,20,.15)!important;
+}
+body.light .step-title{color:var(--gold2)!important}
+body.light .step-desc{color:var(--text)!important}
+body.light .step-n{color:rgba(120,88,36,.12)!important}
+
+/* ── Section headers ── */
+body.light .sec-eyebrow{color:var(--gold2)!important}
+body.light .sec-eyebrow::before{background:var(--gold2)!important}
+body.light .sec-h{color:var(--text)!important;text-shadow:none!important}
+body.light .sec-p{color:var(--text3)!important}
+
+/* ── Separatore ── */
+body.light .gold-sep::before{background:linear-gradient(90deg,transparent,rgba(120,88,36,.18) 15%,rgba(120,88,36,.4) 45%,rgba(120,88,36,.4) 55%,rgba(120,88,36,.18) 85%,transparent)!important}
+
+/* ── Loc banner ── */
+body.light .loc-banner{border-color:rgba(120,88,36,.15)!important}
+body.light .loc-banner:hover{border-color:rgba(120,88,36,.38)!important}
+body.light .loc-banner-title{color:var(--text)!important}
+
+/* ── Wiki toggle ── */
+body.light .wiki-toggle-btn:hover{background:rgba(120,88,36,.04)!important}
+
+/* ── Page view ── */
+body.light #pbody{background:var(--bg)!important;color:var(--text)!important}
+body.light #page-hero .ph-title{color:var(--text)!important}
+body.light .ph-eyebrow{color:var(--gold2)!important}
+body.light .ph-tag{background:rgba(120,88,36,.1)!important;color:var(--gold2)!important;border-color:rgba(120,88,36,.2)!important}
+
+/* ── Notion blocks ── */
+body.light .n-h1,body.light .n-h2,body.light .n-h3{color:var(--text)!important}
+body.light .n-p,body.light .n-li{color:var(--text2)!important}
+body.light .n-quote{border-color:var(--gold2)!important;color:var(--text3)!important;background:rgba(120,88,36,.04)!important}
+body.light .n-callout{background:rgba(120,88,36,.06)!important;border-color:rgba(120,88,36,.15)!important}
+body.light .n-divider{border-color:rgba(120,88,36,.18)!important}
+body.light .n-table th{background:rgba(120,88,36,.08)!important;color:var(--text)!important}
+body.light .n-table td{color:var(--text2)!important;border-color:rgba(120,88,36,.12)!important}
+body.light .n-table tr:hover td{background:rgba(120,88,36,.04)!important}
+
+/* ── DB cards (lcard) ── */
+body.light .lcard{
+  background:linear-gradient(160deg,rgba(240,233,215,.97),rgba(232,224,205,.99))!important;
+  border-color:rgba(120,88,36,.15)!important;
+}
+body.light .lcard:hover{
+  border-color:rgba(160,120,50,.4)!important;
+  box-shadow:0 14px 40px rgba(100,70,20,.15)!important;
+}
+body.light .lcard-title{color:var(--text)!important}
+body.light .lcard-meta{color:var(--text3)!important}
+body.light .lcard-tag{background:rgba(120,88,36,.08)!important;color:var(--gold2)!important;border-color:rgba(120,88,36,.18)!important}
+
+/* ── Topbar dropdown ── */
+body.light .tn-drop .tn-menu{
+  background:rgba(242,237,223,.98)!important;
+  border-color:rgba(120,88,36,.2)!important;
+}
+body.light .tn-menu-item{color:var(--text2)!important}
+body.light .tn-menu-item:hover{background:rgba(120,88,36,.06)!important;color:var(--text)!important}
+
+/* ── Search ── */
+body.light #ts{background:rgba(120,88,36,.06)!important;border-color:rgba(120,88,36,.18)!important;color:var(--text)!important}
+body.light #ts::placeholder{color:var(--text3)!important}
+body.light #sr{background:rgba(242,237,223,.99)!important;border-color:rgba(120,88,36,.2)!important}
+body.light .sri{color:var(--text)!important}
+body.light .sri:hover{background:rgba(120,88,36,.06)!important}
+
+/* ── Mobile nav ── */
+body.light #mobile-nav{background:rgba(242,237,223,.98)!important;border-bottom-color:rgba(120,88,36,.3)!important}
+body.light .mn-item{color:var(--text2)!important}
+body.light .mn-item:hover{background:rgba(120,88,36,.06)!important;color:var(--text)!important}
+body.light .mn-label{color:var(--gold2)!important}
+
+/* ── Bottom nav ── */
+body.light #bottom-nav{background:rgba(242,237,223,.97)!important;border-top-color:rgba(120,88,36,.15)!important}
+body.light .bnav-item{color:rgba(120,88,36,.35)!important}
+body.light .bnav-item.active{color:var(--gold2)!important}
+
+/* ── Toast ── */
+body.light .toast{background:rgba(242,237,223,.97)!important;border-color:rgba(120,88,36,.25)!important;color:var(--text)!important}
+
+/* ── Scroll top btn ── */
+body.light #scroll-top-btn{background:rgba(242,237,223,.92)!important;border-color:rgba(120,88,36,.3)!important;color:var(--gold)!important}
+body.light #arc-stt{background:rgba(120,88,36,.1)!important;border-color:rgba(120,88,36,.28)!important}
+
+/* ── Dust VFX ── */
+body.light #dust-vfx .dp{background:rgba(120,88,36,.08)!important}
+
+/* ── Gold separator ── */
+body.light .gold-sep::after{color:var(--gold)!important}
+
+
+
+/* ════════════════════════════════════
    MOBILE RESPONSIVE UI
 ════════════════════════════════════ */
 @media(max-width:768px){
@@ -729,3 +905,4 @@ html body .wiki-layout .dnd-grid .lcard.dnd-5e:hover {
   border-color: rgba(200,155,60,.3);
   color: rgba(240,230,200,.7);
 }
+
