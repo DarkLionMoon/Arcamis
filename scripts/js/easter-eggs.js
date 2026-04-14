@@ -702,7 +702,7 @@
   var IDLE_DELAY   = 30000;
   var FADE_IN_MS   = 3000;
   var FADE_OUT_MS  = 1500;
-  var MAX_VOL      = 0.50;
+  var MAX_VOL      = 0.20;
   var SPEED_THRESH = 180;
 
   var ctx         = null;
