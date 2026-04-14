@@ -533,3 +533,48 @@
   }
 
 })();
+/* ════════════════════════════════════
+   3. PERGAMENA DEL DESTINO
+   Trasforma la selezione del testo
+════════════════════════════════════ */
+(function() {
+    /* ── CSS per lo stile della selezione ── */
+    var _parchmentStyle = document.createElement('style');
+    _parchmentStyle.textContent = `
+        /* Colore di selezione stile pergamena antica */
+        ::selection {
+            background-color: rgba(230, 190, 130, 0.99) !important; 
+            color: #2d1e10 !important;
+            text-shadow: none !important;
+        }
+        ::-moz-selection {
+            background-color: rgba(230, 190, 130, 0.99) !important;
+            color: #2d1e10 !important;
+        }
+
+        /* Classe applicata al body durante la selezione attiva */
+        .arc-parchment-mode ::selection {
+            font-family: 'Crimson Pro', 'Georgia', serif !important;
+            font-style: italic !important;
+        }
+    `;
+    document.head.appendChild(_parchmentStyle);
+
+    /* ── JS per gestire il cambio font dinamico ── */
+    function _handleSelection() {
+        var selection = window.getSelection();
+        if (selection && selection.toString().length > 0) {
+            document.body.classList.add('arc-parchment-mode');
+        } else {
+            document.body.classList.remove('arc-parchment-mode');
+        }
+    }
+
+    // Eventi per monitorare quando l'utente seleziona o deseleziona
+    document.addEventListener('selectionchange', _handleSelection);
+    
+    // Fallback per pulire la classe se si clicca fuori
+    document.addEventListener('mousedown', function() {
+        document.body.classList.remove('arc-parchment-mode');
+    });
+})();
