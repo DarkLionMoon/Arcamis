@@ -51,8 +51,22 @@ function fontDown(){ applyFont(_fs - .08); _renderOptionsPanel(); }
 var _theme = localStorage.getItem('arc_theme') || 'dark';
 var _THEMES = ['dark','light','blood','forest','abyss','alchemy'];
 
-function applyTheme(t){
-  _theme = t;
+function applyTheme(t) {
+    _theme = t;
+
+    // 1. Create an array of class names to remove
+    const classesToRemove = _THEMES.map(th => th === 'dark' ? 'dark' : 'theme-' + th);
+    
+    // 2. Remove 'light' specifically if it's not in your mapping, 
+    // or just spread the array (classList.remove accepts multiple arguments)
+    document.body.classList.remove(...classesToRemove, 'light');
+
+    if (t === 'light') document.body.classList.add('light');
+    else if (t !== 'dark') document.body.classList.add('theme-' + t);
+
+    localStorage.setItem('arc_theme', t);
+    _renderOptionsPanel();
+}
   _THEMES.forEach(function(th){ document.body.classList.remove(th === 'dark' ? '' : 'theme-'+th); });
   document.body.classList.remove('light','theme-blood','theme-forest','theme-abyss','theme-alchemy');
   if(t === 'light') document.body.classList.add('light');
