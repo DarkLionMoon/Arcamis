@@ -94,7 +94,8 @@ function _renderOptionsPanel(){
 function _syncEnvBtns(){
   var cb = document.getElementById('aop-candle-btn');
   var ab = document.getElementById('aop-audio-btn');
-  if(cb) cb.classList.toggle('active', document.body.classList.contains('candlelight'));
+  var ov = document.getElementById('candlelight-overlay');
+  if(cb) cb.classList.toggle('active', ov ? ov.classList.contains('cl-on') : false);
   if(ab) ab.classList.toggle('active', !!window._arcAudioPlaying);
 }
 
