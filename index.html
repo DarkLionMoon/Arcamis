@@ -555,6 +555,64 @@
   <img id="arc-lightbox-img" src="" alt="">
 </div>
 
+<!-- ════ HELP WIDGET ════ -->
+<div id="arc-help-btn" onclick="toggleHelpPanel()" title="Oracolo — Aiuto">
+  <span id="arc-help-icon">🔮</span>
+</div>
+
+<div id="arc-help-panel">
+  <div class="ahp-header">
+    <span class="ahp-title">Oracolo di Arcamis</span>
+    <button class="ahp-close" onclick="toggleHelpPanel()">✕</button>
+  </div>
+
+  <div class="ahp-tabs">
+    <button class="ahp-tab active" onclick="switchHelpTab('faq', this)">FAQ</button>
+    <button class="ahp-tab" onclick="switchHelpTab('dm', this)">Contatta il DM</button>
+  </div>
+
+  <div id="ahp-faq" class="ahp-body">
+    <div class="ahp-faq-item">
+      <div class="ahp-faq-q" onclick="toggleFaq(this)">
+        <span>Come creo il mio personaggio?</span><span class="ahp-faq-arr">▶</span>
+      </div>
+      <div class="ahp-faq-a">Vai su <strong>Personaggio</strong> nel menu in alto e segui le istruzioni per la creazione guidata.</div>
+    </div>
+    <div class="ahp-faq-item">
+      <div class="ahp-faq-q" onclick="toggleFaq(this)">
+        <span>Dove trovo le regole del server?</span><span class="ahp-faq-arr">▶</span>
+      </div>
+      <div class="ahp-faq-a">Tutte le regole si trovano nella sezione <strong>Regole</strong> accessibile dalla topbar.</div>
+    </div>
+    <div class="ahp-faq-item">
+      <div class="ahp-faq-q" onclick="toggleFaq(this)">
+        <span>Come segnalo un errore nella wiki?</span><span class="ahp-faq-arr">▶</span>
+      </div>
+      <div class="ahp-faq-a">Usa il tab "Contatta il DM" qui accanto, oppure scrivi direttamente su Discord nel canale #segnalazioni.</div>
+    </div>
+    <div class="ahp-faq-item">
+      <div class="ahp-faq-q" onclick="toggleFaq(this)">
+        <span>Come funziona il sistema dei mestieri?</span><span class="ahp-faq-arr">▶</span>
+      </div>
+      <div class="ahp-faq-a">Vai su <strong>Lavori</strong> nel menu — ogni mestiere ha la propria pagina con tabelle, requisiti e progressioni.</div>
+    </div>
+    <div class="ahp-faq-item">
+      <div class="ahp-faq-q" onclick="toggleFaq(this)">
+        <span>Posso cambiare il tema del sito?</span><span class="ahp-faq-arr">▶</span>
+      </div>
+      <div class="ahp-faq-a">Sì — clicca l'icona ⚙️ in alto a destra per aprire le opzioni: trovi 6 temi e il controllo della dimensione del testo.</div>
+    </div>
+  </div>
+
+  <div id="ahp-dm" class="ahp-body" style="display:none">
+    <p class="ahp-dm-intro">Hai una domanda, una segnalazione o vuoi contattare il DM? Scrivi qui sotto.</p>
+    <input id="ahp-dm-name" class="ahp-input" type="text" placeholder="Il tuo nome (personaggio o giocatore)" maxlength="60" />
+    <textarea id="ahp-dm-msg" class="ahp-input ahp-textarea" placeholder="Il tuo messaggio..." maxlength="500"></textarea>
+    <div class="ahp-dm-counter"><span id="ahp-dm-count">0</span>/500</div>
+    <button class="ahp-send-btn" onclick="sendHelpMsg()">✦ Invia al DM</button>
+    <div id="ahp-dm-status" class="ahp-dm-status"></div>
+  </div>
+</div>
 <!-- ═══ SCRIPT ═══ -->
 <script src="scripts/js/data.js" defer></script>
 <script src="scripts/js/notion-render.js" defer></script>
