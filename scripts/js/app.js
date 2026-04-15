@@ -597,12 +597,17 @@ window.addEventListener('popstate', function(e){
       setTimeout(function(){ showMestiere(key); }, 0);
       return;
     }
-    // Pagine "fake" con renderer custom
     if(pid === 'codice-giuridico'){
       setTimeout(function(){ showCodiceGiuridico(); }, 0);
       return;
     }
-    var pg = getPage(pid) || {l:'Pagina', i:'📄', id:pid};
+    if(pid === 'reputazioni'){
+      setTimeout(function(){ showReputationTable(); }, 0);
+      return;
+    }
+    /* Risolvi slug → UUID se necessario */
+    var resolvedId = (typeof _slugMap !== 'undefined' && _slugMap[pid]) ? _slugMap[pid] : pid;
+    var pg = getPage(resolvedId) || {l:'Pagina', i:'📄', id:resolvedId};
     gp(pg.id, pg.l, pg.i, true);
   }
 })();
