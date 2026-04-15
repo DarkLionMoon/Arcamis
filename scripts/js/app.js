@@ -706,3 +706,98 @@ window.addEventListener('online', function(){
     };
   })();
 })();
+/* ════ HELP WIDGET ════ */
+var _helpOpen = false;
+
+function toggleHelpPanel(){
+  _helpOpen = !_helpOpen;
+  var panel = document.getElementById('arc-help-panel');
+  var btn   = document.getElementById('arc-help-btn');
+  if(panel) panel.classList.toggle('open', _helpOpen);
+  if(btn)   btn.classList.toggle('open', _helpOpen);
+}
+
+function switchHelpTab(tab, el){
+  document.querySelectorAll('.ahp-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.ahp-body').forEach(function(b){ b.style.display = 'none'; });
+  el.classList.add('active');
+  var target = document.getElementById('ahp-' + tab);
+  if(target) target.style.display = 'flex';
+}
+
+function toggleFaq(el){
+  var item = el.parentElement;
+  var wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.ahp-faq-item').forEach(function(i){ i.classList.remove('open'); });
+  if(!wasOpen) item.classList.add('open');
+}
+
+document.getElementById('ahp-dm-msg') && document.getElementById('ahp-dm-msg').addEventListener('input', function(){
+  var len = this.value.length;
+  var counter = document.getElementById('ahp-dm-count');
+  if(counter) counter.textContent = len;
+});
+
+function sendHelpMsg(){
+  var name = (document.getElementById('ahp-dm-name').value || '').trim();
+  var msg  = (document.getElementById('ahp-dm-msg').value  || '').trim();
+  var status = document.getElementById('ahp-dm-status');
+  if(!msg){ status.textContent = 'Scrivi un messaggio prima di inviare.'; status.className='ahp-dm-status err'; return; }
+
+  /* Invia via Discord webhook — sostituisci WEBHOOK_URL con il tuo */
+  var WEBHOOK_URL = 'INSERISCI_QUI_IL_TUO_DISCORD_WEBHOOK';
+  status.textContent = 'Invio in corso...'; status.className='ahp-dm-status';
+
+  fetch(WEBHOOK_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      username: 'Oracolo di Arcamis',
+      avatar_url: 'https://arcamis.pages.dev/favicon.png',
+      embeds:[{
+        title: '📩 Messaggio al DM',
+        color: 0xC89B3C,
+        fields:[
+          {name:'Mittente', value: name || '*(anonimo)*', inline:true},
+          {name:'Messaggio', value: msg}
+        ],
+        footer:{text:'Arcamis Help Widget'},
+        timestamp: new Date().toISOString()
+      }]
+    })
+  })
+  .then(function(r){
+    if(r.ok){
+      status.textContent = '✦ Messaggio inviato al DM!';
+      status.className = 'ahp-dm-status ok';
+      document.getElementById('ahp-dm-name').value = '';
+      document.getElementById('ahp-dm-msg').value  = '';
+      document.getElementById('ahp-dm-count').textContent = '0';
+    } else {
+      throw new Error();
+    }
+  })
+  .catch(function(){
+    status.textContent = 'Errore nell\'invio — prova su Discord.';
+    status.className = 'ahp-dm-status err';
+  });
+}
+
+/* Pulse al primo caricamento */
+setTimeout(function(){
+  var btn = document.getElementById('arc-help-btn');
+  if(btn && !localStorage.getItem('arc_help_seen')){
+    btn.classList.add('pulse');
+    localStorage.setItem('arc_help_seen','1');
+  }
+}, 3000);
+
+/* Chiudi cliccando fuori */
+document.addEventListener('click', function(e){
+  if(!_helpOpen) return;
+  var panel = document.getElementById('arc-help-panel');
+  var btn   = document.getElementById('arc-help-btn');
+  if(panel && !panel.contains(e.target) && btn && !btn.contains(e.target)){
+    toggleHelpPanel();
+  }
+});
