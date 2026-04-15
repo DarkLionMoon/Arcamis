@@ -1,45 +1,71 @@
-# ════ ARCAMIS — Clean URL Redirects (Fixed) ════
+# ════════════════════════════════════════════════════════════
+#             ARCAMIS - CLEAN URL REDIRECTS
+# ════════════════════════════════════════════════════════════
 
-# Regole / Meta
-/gameplay              /?p=gameplay              301
-/regole-generali       /?p=regole-generali       301
-/materiale-approvato   /?p=materiale-approvato   301
+# --- Sezione: Regole > Gameplay ---
+/regole/gameplay/combattimento    /?p=2f60274fdc1c80b7a729ef091b278682    301
+/regole/gameplay/codex            /?p=2f60274fdc1c80adb7a5d6beeef3e544    301
+/regole/gameplay                  /?p=gameplay                            301
 
-# Personaggio
-/come-si-inizia        /?p=come-si-inizia        301
-/andando-avanti        /?p=andando-avanti        301
-/galleria-pg           /?p=galleria-pg           301
-/homebrew              /?p=homebrew              301
-/maestria-titoli       /?p=maestria-titoli       301
+# --- Sezione: Regole > Generali ---
+/regole/generali/off-game         /?p=2f10274fdc1c80368140c7aaffd80cd4    301
+/regole/generali/in-game          /?p=2f10274fdc1c80ce8fccea2d4c589376    301
+/regole/generali/pvp              /?p=2f10274fdc1c8042b72efc2361d6766b    301
+/regole/generali                  /?p=regole-generali                     301
 
-# Lavori
-/gilda-avventurieri    /?p=gilda-avventurieri    301
-/locanda               /?p=locanda               301
-/forgia                /?p=forgia                301
-/biblioteca            /?p=biblioteca            301
-/bottega-farmaceutica  /?p=bottega-farmaceutica  301
-/caserma               /?p=caserma               301
-/corporazione          /?p=corporazione-costruttori 301
-/ospedale              /?p=ospedale              301
-/sartoria              /?p=sartoria              301
+# --- Sezione: Personaggio ---
+/personaggio/come-si-inizia       /?p=come-si-inizia                      301
+/personaggio/andando-avanti       /?p=andando-avanti                      301
+/personaggio/galleria-pg          /?p=galleria-pg                         301
 
-# Lore
-/storia-del-mondo      /?p=storia-del-mondo      301
-/pantheon              /?p=pantheon              301
-/mappe                 /?p=mappe                 301
-/changelog             /?p=changelog             301
+# --- Sezione: Homebrew ---
+/homebrew/specie-hb               /?p=2f00274fdc1c81a1bc4ddbf500704b80    301
+/homebrew/classi-hb               /?p=2f70274fdc1c803ca5cafa97ca1817cd    301
+/homebrew/mscge                   /?p=2ff0274fdc1c8054a400c64b1fdd2ab9    301
 
-# Sottopagine Storia del Mondo
-/biblioteca-scoperta    /?p=biblioteca-scoperta    301
-/specie-homebrew        /?p=specie-homebrew        301
-/sottoclassi            /?p=sottoclassi            301
-/reputazioni            /?p=reputazioni            301
-/codice-giuridico       /?p=codice-giuridico       301
+# --- Sezione: Lavori ---
+/lavori/gilda-avventurieri        /?p=gilda-avventurieri                  301
+/lavori/locanda                   /?p=locanda                             301
+/lavori/forgia                    /?p=forgia                              301
+/lavori/biblioteca                /?p=biblioteca                          301
+/lavori/bottega-farmaceutica      /?p=bottega-farmaceutica                301
+/lavori/caserma                   /?p=caserma                             301
+/lavori/corporazione-costruttori  /?p=corporazione-costruttori            301
+/lavori/ospedale                  /?p=ospedale                            301
+/lavori/sartoria                  /?p=sartoria                            301
 
-# Nota sui mestieri: Cloudflare non supporta il remapping dinamico :key -> ?p= 
-# nel file _redirects. Se hai pochi mestieri, aggiungili a mano come sopra.
-# Altrimenti, il fallback qui sotto caricherà la index e dovrai gestire /mestiere/ via JS.
-/mestiere/* /index.html               200
+# --- Sezione: Mestieri ---
+/mestieri/guida                   /?p=mestiere-come-funzionano            301
+/mestieri/alchimista              /?p=mestiere-alchimista                 301
+/mestieri/architetto              /?p=mestiere-architetto                 301
+/mestieri/artigiano               /?p=mestiere-artigiano                  301
+/mestieri/artista                 /?p=mestiere-artista                    301
+/mestieri/falegname               /?p=mestiere-falegname                  301
+/mestieri/metallurgo              /?p=mestiere-metallurgo                 301
+/mestieri/oste                    /?p=mestiere-oste                       301
+/mestieri/sarto                   /?p=mestiere-sarto                      301
 
-# Fallback SPA — Fondamentale per evitare il 404 al refresh
-/* /index.html               200
+# --- Sezione: Lore del Mondo ---
+/lore/mondo/introduzione/storia           /?p=2fc0274fdc1c80c4bbc1c8806f591e0f    301
+/lore/mondo/introduzione                  /?p=2f60274fdc1c80558d8fe99842377aef    301
+/lore/mondo/esplora-dal-vivo/marche-di-arcamis /?p=30d0274fdc1c805cbbc2daf73b5f3a66    301
+/lore/mondo/esplora-dal-vivo              /?p=3090274fdc1c80008f0dffe3a677cb66    301
+/lore/mondo/extra                         /?p=3410274fdc1c805d891bcbda6364e0ad    301
+/lore/mondo/bibliografia                  /?p=3040274fdc1c80ed816ef58f6a606f21    301
+/lore/mondo/linguaggi                     /?p=2fb0274fdc1c8073addaf1d5a3e9768b    301
+/lore/mondo/pde                           /?p=2fb0274fdc1c8080b07bd553e953c88d    301
+/lore/mondo/npc                           /?p=2f90274fdc1c8015bf95f52c4e7681b8    301
+/lore/storia                              /?p=storia-del-mondo                    301
+/lore/pantheon                            /?p=pantheon                            301
+
+# --- Mappe, Legge e Varie ---
+/mappe/arcamis                    /?p=2f10274fdc1c80dca8caeb2e6de23146    301
+/mappe                            /?p=mappe                               301
+/codice-giuridico                 /?p=codice-giuridico                    301
+/regole/materiale-approvato       /?p=materiale-approvato                 301
+/changelog                        /?p=changelog                           301
+
+# ════════════════════════════════════════════════════════════
+# FALLBACK SPA (Fondamentale)
+# Deve rimanere SEMPRE come ultima riga
+/* /index.html                             200
