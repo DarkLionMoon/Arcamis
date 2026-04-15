@@ -1,42 +1,45 @@
-# ════ ARCAMIS — Clean URL Redirects ════
+# ════ ARCAMIS — Clean URL Redirects (Fixed) ════
+
 # Regole / Meta
-/gameplay              /index.html?p=gameplay              200
-/regole-generali       /index.html?p=regole-generali       200
-/materiale-approvato   /index.html?p=materiale-approvato   200
+/gameplay              /?p=gameplay              301
+/regole-generali       /?p=regole-generali       301
+/materiale-approvato   /?p=materiale-approvato   301
 
 # Personaggio
-/come-si-inizia        /index.html?p=come-si-inizia        200
-/andando-avanti        /index.html?p=andando-avanti        200
-/galleria-pg           /index.html?p=galleria-pg           200
-/homebrew              /index.html?p=homebrew              200
-/maestria-titoli       /index.html?p=maestria-titoli       200
+/come-si-inizia        /?p=come-si-inizia        301
+/andando-avanti        /?p=andando-avanti        301
+/galleria-pg           /?p=galleria-pg           301
+/homebrew              /?p=homebrew              301
+/maestria-titoli       /?p=maestria-titoli       301
 
 # Lavori
-/gilda-avventurieri    /index.html?p=gilda-avventurieri    200
-/locanda               /index.html?p=locanda               200
-/forgia                /index.html?p=forgia                200
-/biblioteca            /index.html?p=biblioteca            200
-/bottega-farmaceutica  /index.html?p=bottega-farmaceutica  200
-/caserma               /index.html?p=caserma               200
-/corporazione          /index.html?p=corporazione-costruttori 200
-/ospedale              /index.html?p=ospedale              200
-/sartoria              /index.html?p=sartoria              200
+/gilda-avventurieri    /?p=gilda-avventurieri    301
+/locanda               /?p=locanda               301
+/forgia                /?p=forgia                301
+/biblioteca            /?p=biblioteca            301
+/bottega-farmaceutica  /?p=bottega-farmaceutica  301
+/caserma               /?p=caserma               301
+/corporazione          /?p=corporazione-costruttori 301
+/ospedale              /?p=ospedale              301
+/sartoria              /?p=sartoria              301
 
 # Lore
-/storia-del-mondo      /index.html?p=storia-del-mondo      200
-/pantheon              /index.html?p=pantheon              200
-/mappe                 /index.html?p=mappe                 200
-/changelog             /index.html?p=changelog             200
+/storia-del-mondo      /?p=storia-del-mondo      301
+/pantheon              /?p=pantheon              301
+/mappe                 /?p=mappe                 301
+/changelog             /?p=changelog             301
 
 # Sottopagine Storia del Mondo
-/biblioteca-scoperta   /index.html?p=biblioteca-scoperta   200
-/specie-homebrew       /index.html?p=specie-homebrew       200
-/sottoclassi           /index.html?p=sottoclassi           200
-/reputazioni           /index.html?p=reputazioni           200
-/codice-giuridico      /index.html?p=codice-giuridico      200
+/biblioteca-scoperta    /?p=biblioteca-scoperta    301
+/specie-homebrew        /?p=specie-homebrew        301
+/sottoclassi            /?p=sottoclassi            301
+/reputazioni            /?p=reputazioni            301
+/codice-giuridico       /?p=codice-giuridico       301
 
-# Mestieri (parametro dinamico)
-/mestiere/:key         /index.html?p=mestiere-:key         200
+# Nota sui mestieri: Cloudflare non supporta il remapping dinamico :key -> ?p= 
+# nel file _redirects. Se hai pochi mestieri, aggiungili a mano come sopra.
+# Altrimenti, il fallback qui sotto caricherà la index e dovrai gestire /mestiere/ via JS.
+/mestiere/* /index.html               200
 
-# Fallback SPA — deve stare SEMPRE per ultima
-/*                     /index.html                         200
+# Fallback SPA — Fondamentale per evitare il 404 al refresh
+/* /index.html               200
