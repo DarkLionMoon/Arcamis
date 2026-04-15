@@ -1,19 +1,20 @@
 /* ════════════════════════════════════
    ARCAMIS — app.js
 ════════════════════════════════════ */
-/* ════ CACHE VERSION — incrementa ad ogni deploy ════ */
+/* ════ CACHE VERSION ════ */
 (function(){
   var CACHE_VER = (function(){
-  var meta = document.querySelector('meta[name="cf-pages-sha"]');
-  if(meta && meta.content) return meta.content.slice(0,8);
-  return Math.floor(Date.now() / 86400000).toString();
-})();
+    var meta = document.querySelector('meta[name="cf-pages-sha"]');
+    if(meta && meta.content) return meta.content.slice(0,8);
+    return Math.floor(Date.now() / 86400000).toString();
+  })();
   var stored = localStorage.getItem('arc_cache_ver');
   if(stored !== CACHE_VER){
     sessionStorage.clear();
     localStorage.setItem('arc_cache_ver', CACHE_VER);
   }
 })();
+
 window.addEventListener('load', function(){
   setTimeout(function(){
     var l = document.getElementById('site-loader');
@@ -45,7 +46,6 @@ function fontDown(){ applyFont(_fs - .08); _renderOptionsPanel(); }
 /* ════ THEME ════ */
 var _theme = localStorage.getItem('arc_theme') || 'dark';
 var _THEMES = ['dark','light','blood','forest','abyss','alchemy'];
-
 function applyTheme(t){
   _theme = t;
   _THEMES.forEach(function(th){ if(th !== 'dark') document.body.classList.remove('theme-' + th); });
@@ -56,25 +56,21 @@ function applyTheme(t){
   _renderOptionsPanel();
 }
 applyTheme(_theme);
-
 function toggleTheme(){ _openOptionsPanel(); }
 
 /* ── Pannello Opzioni ── */
 var _optPanelOpen = false;
-
 function _openOptionsPanel(){
   var p = document.getElementById('arc-options-panel');
   if(!p) return;
   _optPanelOpen = !_optPanelOpen;
   p.classList.toggle('open', _optPanelOpen);
 }
-
 function _closeOptionsPanel(){
   _optPanelOpen = false;
   var p = document.getElementById('arc-options-panel');
   if(p) p.classList.remove('open');
 }
-
 function _renderOptionsPanel(){
   var p = document.getElementById('arc-options-panel');
   if(!p) return;
@@ -85,7 +81,6 @@ function _renderOptionsPanel(){
   if(fsEl) fsEl.textContent = Math.round(_fs * 100) + '%';
   _syncEnvBtns();
 }
-
 function _syncEnvBtns(){
   var cb = document.getElementById('aop-candle-btn');
   var ab = document.getElementById('aop-audio-btn');
@@ -93,7 +88,6 @@ function _syncEnvBtns(){
   if(cb) cb.classList.toggle('active', ov ? ov.classList.contains('cl-on') : false);
   if(ab) ab.classList.toggle('active', !!window._arcAudioPlaying);
 }
-
 document.addEventListener('click', function(e){
   if(!_optPanelOpen) return;
   var panel = document.getElementById('arc-options-panel');
@@ -112,18 +106,12 @@ function showHome(){
   if(cv) cv.style.opacity = '0';
   history.replaceState(null, '', '/');
 }
-
 function ovo(){
   var overlay = document.getElementById('overlay');
   if(!overlay) return;
-  if(overlay.classList.contains('ovopen')){
-    cv();
-  } else {
-    overlay.classList.remove('ovclose');
-    overlay.classList.add('ovopen');
-  }
+  if(overlay.classList.contains('ovopen')){ cv(); }
+  else { overlay.classList.remove('ovclose'); overlay.classList.add('ovopen'); }
 }
-
 function showToast(txt, icon, dur){
   var t = document.createElement('div');
   t.className = 'toast';
@@ -161,9 +149,7 @@ window.copyPageLink = function(){
 function toggleDd(id, e){
   if(e) e.stopPropagation();
   var all = document.querySelectorAll('.tn-drop');
-  all.forEach(function(d){
-    if(d.id !== id) d.classList.remove('open');
-  });
+  all.forEach(function(d){ if(d.id !== id) d.classList.remove('open'); });
   document.getElementById(id).classList.toggle('open');
 }
 function closeDd(){
@@ -182,15 +168,12 @@ function closeMobileNav(){
   document.getElementById('mobile-nav').classList.remove('open');
   document.body.classList.remove('nav-open');
 }
+
 /* ════ SEARCH ════ */
 var _searchDebounce = null;
-
 function hsearch(val){
   var sr = document.getElementById('sr');
-  if(!val || val.length < 2){
-    if(sr) sr.innerHTML = '';
-    return;
-  }
+  if(!val || val.length < 2){ if(sr) sr.innerHTML = ''; return; }
   clearTimeout(_searchDebounce);
   _searchDebounce = setTimeout(function(){
     if(sr) sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic">Ricerca...</div>';
@@ -198,30 +181,19 @@ function hsearch(val){
       .then(function(r){ return r.json(); })
       .then(function(data){
         if(!sr) return;
-        if(data.stale){
-          sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic">Indice non ancora costruito</div>';
-          return;
-        }
+        if(data.stale){ sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic">Indice non ancora costruito</div>'; return; }
         var res = data.results || [];
-        if(!res.length){
-          sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Nessun risultato</div>';
-          return;
-        }
+        if(!res.length){ sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Nessun risultato</div>'; return; }
         sr.innerHTML = res.map(function(p){
           var sub = p.parentTitle ? '<span class="sri-tag">'+p.parentTitle+'</span>' : '';
           return '<div class="sri" onclick="csearch();gp(\''+p.id+'\',\''+p.title+'\',\''+p.icon+'\')">'
-            +'<span class="si2">'+p.icon+'</span>'
-            +'<span class="sl">'+p.title+'</span>'
-            +sub+'</div>';
+            +'<span class="si2">'+p.icon+'</span><span class="sl">'+p.title+'</span>'+sub+'</div>';
         }).join('');
         sr.classList.add('open');
       })
-      .catch(function(){
-        if(sr) sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Errore ricerca</div>';
-      });
+      .catch(function(){ if(sr) sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Errore ricerca</div>'; });
   }, 280);
 }
-
 function csearch(){
   var sr = document.getElementById('sr');
   var ts = document.getElementById('ts');
@@ -229,6 +201,7 @@ function csearch(){
   if(ts) ts.value = '';
   clearTimeout(_searchDebounce);
 }
+
 /* ════ SCROLL TOP ════ */
 function goToTop(){
   document.getElementById('main').scrollTo({top:0, behavior:'smooth'});
@@ -243,12 +216,8 @@ function xfade(from, to){
   from.style.transition = 'opacity .2s ease';
   from.style.opacity = '0';
   setTimeout(function(){
-    from.style.display = 'none';
-    from.style.opacity = '';
-    from.style.transition = '';
-    to.style.display = 'block';
-    to.style.opacity = '0';
-    to.style.transition = 'opacity .2s ease';
+    from.style.display = 'none'; from.style.opacity = ''; from.style.transition = '';
+    to.style.display = 'block'; to.style.opacity = '0'; to.style.transition = 'opacity .2s ease';
     setTimeout(function(){
       to.style.opacity = '1';
       setTimeout(function(){ to.style.transition=''; to.style.opacity=''; }, 200);
@@ -300,56 +269,42 @@ function markChangelogSeen(){
 /* ════ CAROUSEL HOME ════ */
 var _slideIdx = 0;
 var _carTimer = null;
-
 function _applySlide(){
   var track = document.getElementById('ctrack');
   if(track) track.style.transform = 'translateX(-' + (_slideIdx * 33.3333) + '%)';
   updateDots();
 }
-
 function changeSlide(dir){
   var slides = document.querySelectorAll('.slide');
   if(!slides.length) return;
   slides[_slideIdx].classList.remove('active');
   _slideIdx = (_slideIdx + dir + slides.length) % slides.length;
   slides[_slideIdx].classList.add('active');
-  _applySlide();
-  _resetCarTimer();
+  _applySlide(); _resetCarTimer();
 }
-
 function jumpToSlide(idx){
   var slides = document.querySelectorAll('.slide');
   if(!slides.length) return;
   slides[_slideIdx].classList.remove('active');
-  _slideIdx = idx;
-  slides[_slideIdx].classList.add('active');
-  _applySlide();
-  _resetCarTimer();
+  _slideIdx = idx; slides[_slideIdx].classList.add('active');
+  _applySlide(); _resetCarTimer();
 }
-
 function updateDots(){
-  document.querySelectorAll('.cdot').forEach(function(d,i){
-    d.classList.toggle('ca', i === _slideIdx);
-  });
+  document.querySelectorAll('.cdot').forEach(function(d,i){ d.classList.toggle('ca', i === _slideIdx); });
 }
-
 function _resetCarTimer(){
   if(_carTimer) clearInterval(_carTimer);
   _carTimer = setInterval(function(){ if(!window._carouselPaused) changeSlide(1); }, 6000);
 }
 window.addEventListener('load', function(){
-  setTimeout(function(){
-    if(window.applyRecentBadges) applyRecentBadges();
-  }, 1500);
+  setTimeout(function(){ if(window.applyRecentBadges) applyRecentBadges(); }, 1500);
 });
 _carTimer = setInterval(function(){ if(!window._carouselPaused) changeSlide(1); }, 6000);
 
-/* Applicazione dinamica sfondo e bottoni CTA da KV */
+/* ════ COVERS ════ */
 var _cachedCovers = null;
-
 function _applyCovers(covers){
   _cachedCovers = covers;
-
   var slideEls = document.querySelectorAll('.slide');
   ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
     if(covers[key] && slideEls[i]){
@@ -358,7 +313,6 @@ function _applyCovers(covers){
       slideEls[i].style.backgroundPosition = 'center 40%';
     }
   });
-
   ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
     if(!covers[key+'_meta'] || !slideEls[i]) return;
     try {
@@ -367,7 +321,6 @@ function _applyCovers(covers){
       if(meta.tit){ var titEl = slideEls[i].querySelector('.stit'); if(titEl) titEl.innerHTML = meta.tit.replace(/\n/g,'<br>'); }
     } catch(e){}
   });
-
   ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
     if(!covers[key+'_btns'] || !slideEls[i]) return;
     try {
@@ -386,7 +339,6 @@ function _applyCovers(covers){
       });
     } catch(e){}
   });
-
   document.querySelectorAll('#pbody .loc-card').forEach(function(card){
     var onclick = card.getAttribute('onclick') || '';
     var m = onclick.match(/gp\(['"]([a-f0-9]{32})['"]/);
@@ -397,25 +349,22 @@ function _applyCovers(covers){
     card.style.backgroundSize = 'cover';
     card.style.backgroundPosition = 'center';
   });
-
   document.querySelectorAll('.gs-card').forEach(function(card){
     var pageId = card.id.replace('gsc-','');
     if(!pageId || !covers[pageId]) return;
     var bgEl = card.querySelector('.gs-card-bg');
-if(bgEl) {
-  bgEl.style.backgroundImage = 'url(\'' + covers[pageId] + '\')';
-  if(covers[pageId + '_pos']) bgEl.style.backgroundPosition = covers[pageId + '_pos'];
-}
+    if(bgEl){
+      bgEl.style.backgroundImage = 'url(\'' + covers[pageId] + '\')';
+      if(covers[pageId + '_pos']) bgEl.style.backgroundPosition = covers[pageId + '_pos'];
+    }
   });
 }
-
 (function(){
   fetch('/api/admin?action=get_covers')
     .then(function(r){ return r.json(); })
     .then(function(d){ _applyCovers(d.covers || {}); })
     .catch(function(){});
 })();
-
 (function(){
   var _orig = window.afterPageRender;
   window.afterPageRender = function(){
@@ -424,12 +373,9 @@ if(bgEl) {
       setTimeout(function(){ _applyCovers(_cachedCovers); }, 300);
       setTimeout(function(){ _applyCovers(_cachedCovers); }, 1200);
     }
-    setTimeout(function(){
-      if(window.applyRecentBadges) applyRecentBadges();
-    }, 600);
+    setTimeout(function(){ if(window.applyRecentBadges) applyRecentBadges(); }, 600);
   };
 })();
-
 (function(){
   var _debounce = null;
   var pbody = document.getElementById('pbody');
@@ -460,19 +406,12 @@ if(bgEl) {
       tip.style.left = (pr.left - mr.left + pr.width/2) + 'px';
       tip.style.top  = (pr.top  - mr.top  - 10) + 'px';
     });
-    pin.addEventListener('mouseleave', function(){
-      if(tip) tip.classList.remove('visible');
-    });
+    pin.addEventListener('mouseleave', function(){ if(tip) tip.classList.remove('visible'); });
     pin.addEventListener('click', function(){
       var id   = pin.getAttribute('data-id');
       var name = pin.getAttribute('data-name');
       var sub  = pin.getAttribute('data-sub');
-      if(sub){
-        closeSubMap(null);
-        var panel = document.getElementById('sub-'+sub);
-        if(panel) panel.classList.add('open');
-        return;
-      }
+      if(sub){ closeSubMap(null); var panel = document.getElementById('sub-'+sub); if(panel) panel.classList.add('open'); return; }
       if(id) gp(id, name, pin.querySelector('.mpin-dot') ? '📍' : '📄');
     });
   });
@@ -495,54 +434,26 @@ function closeSubMap(id){
 (function(){
   var startY = 0, pulling = false, atTop = false, atTopTimer = null;
   var ind = document.getElementById('ptr-indicator');
-
   var mainEl = document.getElementById('main') || window;
   function onScroll(){
     var sy = mainEl.scrollTop !== undefined ? mainEl.scrollTop : window.scrollY;
-    if(sy === 0){
-      if(!atTopTimer) atTopTimer = setTimeout(function(){ atTop = true; }, 300);
-    } else {
-      atTop = false;
-      clearTimeout(atTopTimer); atTopTimer = null;
-    }
+    if(sy === 0){ if(!atTopTimer) atTopTimer = setTimeout(function(){ atTop = true; }, 300); }
+    else { atTop = false; clearTimeout(atTopTimer); atTopTimer = null; }
   }
   mainEl.addEventListener('scroll', onScroll, {passive:true});
-
-  document.addEventListener('touchstart', function(e){
-    if(atTop) startY = e.touches[0].clientY;
-    else startY = 0;
-  }, {passive:true});
-
-  document.addEventListener('touchmove', function(e){
-    if(!startY) return;
-    var dy = e.touches[0].clientY - startY;
-    if(dy > 110){ pulling = true; if(ind) ind.classList.add('vis'); }
-  }, {passive:true});
-
-  document.addEventListener('touchend', function(){
-    if(pulling){ location.reload(); }
-    pulling = false; startY = 0;
-    if(ind) ind.classList.remove('vis');
-  });
+  document.addEventListener('touchstart', function(e){ if(atTop) startY = e.touches[0].clientY; else startY = 0; }, {passive:true});
+  document.addEventListener('touchmove', function(e){ if(!startY) return; var dy = e.touches[0].clientY - startY; if(dy > 110){ pulling = true; if(ind) ind.classList.add('vis'); } }, {passive:true});
+  document.addEventListener('touchend', function(){ if(pulling){ location.reload(); } pulling = false; startY = 0; if(ind) ind.classList.remove('vis'); });
 })();
 
 /* ════ POPSTATE ════ */
 window.addEventListener('popstate', function(e){
   if(e && e.state && e.state.id){
-
-    if(e.state.stack) {
-      navStack = JSON.parse(JSON.stringify(e.state.stack));
-    }
-
-    /* Mestieri: id salvato come "mestiere-alchimista" */
+    if(e.state.stack) navStack = JSON.parse(JSON.stringify(e.state.stack));
     if(e.state.id.startsWith('mestiere-')){
-      if(typeof showMestiere === 'function'){
-        showMestiere(e.state.id.replace('mestiere-', ''));
-      }
+      if(typeof showMestiere === 'function') showMestiere(e.state.id.replace('mestiere-', ''));
       return;
     }
-
-    /* Pagine speciali JS */
     if(e.state.id === 'codice-giuridico'){
       if(typeof showCodiceGiuridico === 'function') showCodiceGiuridico();
       return;
@@ -551,31 +462,118 @@ window.addEventListener('popstate', function(e){
       if(typeof showReputationTable === 'function') showReputationTable();
       return;
     }
-
-    /* Navigazione generica */
     gp(e.state.id, e.state.label || '', e.state.icon || '', true);
-
   } else {
     if(typeof showHome === 'function') showHome();
   }
 });
 
+/* ════ PATHNAME → PAGE ID MAP ════
+   Mappa tutti i pathname puliti al loro UUID Notion (o id speciale).
+   Usata dal deep link per risolvere il path al caricamento della pagina.
+════════════════════════════════ */
+var _pathMap = {
+  /* Regole */
+  'regole/gameplay':                          '2f00274fdc1c8065a11ff45192aa5dcb',
+  'regole/gameplay/combattimento':            '2f60274fdc1c80b7a729ef091b278682',
+  'regole/gameplay/codex':                    '2f60274fdc1c80adb7a5d6beeef3e544',
+  'regole/generali':                          '2f00274fdc1c800b9d8fc366e8e40c5c',
+  'regole/generali/off-game':                 '2f10274fdc1c80368140c7aaffd80cd4',
+  'regole/generali/in-game':                  '2f10274fdc1c80ce8fccea2d4c589376',
+  'regole/generali/pvp':                      '2f10274fdc1c8042b72efc2361d6766b',
+  'materiale-approvato':                      '3130274fdc1c807eb61fde24e8236659',
+  /* Personaggio */
+  'personaggio/come-si-inizia':               '2dd222f22ef8413f8cb48f03bbb4f4b0',
+  'personaggio/andando-avanti':               '5cea525d149f4acb9c59007bf6b3d5ff',
+  'personaggio/galleria-pg':                  '2fd0274fdc1c80d8b948c4133f874f28',
+  'maestria-titoli':                          '2f00274fdc1c802a9babd4239d97a319',
+  /* Homebrew */
+  'homebrew':                                 '2f00274fdc1c80e78ad7ce985007b7c6',
+  'homebrew/specie-hb':                       '2f00274fdc1c81a1bc4ddbf500704b80',
+  'homebrew/classi-hb':                       '2f70274fdc1c803ca5cafa97ca1817cd',
+  'homebrew/mscge':                           '2ff0274fdc1c8054a400c64b1fdd2ab9',
+  /* Lavori */
+  'lavori/gilda-avventurieri':                '2f00274fdc1c801b8c13cefd9e15694e',
+  'lavori/locanda':                           '2f00274fdc1c80faa99eda064ef0fabc',
+  'lavori/forgia':                            '2f00274fdc1c805ca01ec57f18d2ffee',
+  'lavori/biblioteca':                        '2f00274fdc1c8089bfe6c24434d53b67',
+  'lavori/bottega-farmaceutica':              '2f00274fdc1c801c9697e75caa8d5f13',
+  'lavori/caserma':                           '2ff0274fdc1c80688dd6c2b293a1f626',
+  'lavori/corporazione-costruttori':          '2ff0274fdc1c80769a4ae243f22f0582',
+  'lavori/ospedale':                          '2f00274fdc1c807aa03cc6cbeb3687cc',
+  'lavori/sartoria':                          '2ff0274fdc1c8035bad4f0b6ab705192',
+  /* Mestieri — id speciale gestito da showMestiere() */
+  'mestieri/guida':                           'mestiere-come-funzionano',
+  'mestieri/alchimista':                      'mestiere-alchimista',
+  'mestieri/architetto':                      'mestiere-architetto',
+  'mestieri/artigiano':                       'mestiere-artigiano',
+  'mestieri/artista':                         'mestiere-artista',
+  'mestieri/falegname':                       'mestiere-falegname',
+  'mestieri/metallurgo':                      'mestiere-metallurgo',
+  'mestieri/oste':                            'mestiere-oste',
+  'mestieri/sarto':                           'mestiere-sarto',
+  /* Lore */
+  'lore/storia':                              '2f00274fdc1c806f8f17dbc6532d2211',
+  'lore/pantheon':                            '2f00274fdc1c80679bd3c3df8a1fa040',
+  'lore/mondo/introduzione':                  '2f60274fdc1c80558d8fe99842377aef',
+  'lore/mondo/introduzione/storia':           '2fc0274fdc1c80c4bbc1c8806f591e0f',
+  'lore/mondo/esplora-dal-vivo':              '3090274fdc1c80008f0dffe3a677cb66',
+  'lore/mondo/esplora-dal-vivo/marche-di-arcamis': '30d0274fdc1c805cbbc2daf73b5f3a66',
+  'lore/mondo/extra':                         '3410274fdc1c805d891bcbda6364e0ad',
+  'lore/mondo/bibliografia':                  '3040274fdc1c80ed816ef58f6a606f21',
+  'lore/mondo/linguaggi':                     '2fb0274fdc1c8073addaf1d5a3e9768b',
+  'lore/mondo/pde':                           '2fb0274fdc1c8080b07bd553e953c88d',
+  'lore/mondo/npc':                           '2f90274fdc1c8015bf95f52c4e7681b8',
+  /* Mappe */
+  'mappe':                                    '2f10274fdc1c80489f23c49164747770',
+  'mappe/arcamis':                            '2f10274fdc1c80dca8caeb2e6de23146',
+  /* Speciali */
+  'codice-giuridico':                         'codice-giuridico',
+  'reputazioni':                              'reputazioni',
+  'changelog':                                '3000274fdc1c8033a214c44a1aa7f01f',
+  'sottoclassi':                              '2f70274fdc1c80e3bdc7f95f81eb9cc0',
+  'specie-homebrew':                          '2f60274fdc1c80fba671c588ba93b116',
+};
+
 /* ════ DEEP LINK ════ */
 (function(){
-  /* Legge prima il pathname, poi fallback a ?p= per retrocompatibilità */
-  var path = location.pathname.replace(/^\//, '').replace(/\/$/, ''); // es. "pantheon"
+  /* 1. Prova il pathname pulito */
+  var path = location.pathname.replace(/^\//, '').replace(/\/$/, '');
+  /* 2. Fallback retrocompatibile: ?p= */
   var params = new URLSearchParams(location.search);
-  var pid = path || params.get('p');
+  var qp = params.get('p');
 
-  if(!pid || pid === 'index.html') return;
+  /* Se siamo sulla root o index.html, niente da fare */
+  if(!path && !qp) return;
+  if(path === 'index.html') path = '';
 
-  /* Mestieri: /mestiere/alchimista */
-  if(pid.startsWith('mestiere/')){
-    var key = pid.replace('mestiere/', '');
+  var pid = null;
+
+  if(path){
+    /* Risolvi il pathname nella mappa */
+    var resolved = _pathMap[path];
+    if(resolved){
+      pid = resolved;
+    } else if(typeof _slugMap !== 'undefined' && _slugMap[path]){
+      /* Supporto slug piatti legacy (es. /gameplay) */
+      pid = _slugMap[path];
+    } else {
+      /* Pathname non mappato — trattalo come UUID diretto (es. /2f00274f...) */
+      pid = path;
+    }
+  } else if(qp) {
+    /* Vecchio ?p= — supporto retrocompatibile */
+    pid = (typeof _slugMap !== 'undefined' && _slugMap[qp]) ? _slugMap[qp] : qp;
+  }
+
+  if(!pid) return;
+
+  /* Mestieri */
+  if(pid.startsWith('mestiere-')){
+    var key = pid.replace('mestiere-', '');
     setTimeout(function(){ if(typeof showMestiere === 'function') showMestiere(key); }, 0);
     return;
   }
-
   /* Pagine speciali JS */
   if(pid === 'codice-giuridico'){
     setTimeout(function(){ if(typeof showCodiceGiuridico === 'function') showCodiceGiuridico(); }, 0);
@@ -585,10 +583,8 @@ window.addEventListener('popstate', function(e){
     setTimeout(function(){ if(typeof showReputationTable === 'function') showReputationTable(); }, 0);
     return;
   }
-
-  /* Slug → UUID (supporta anche UUID diretti e vecchi ?p=UUID) */
-  var resolvedId = (typeof _slugMap !== 'undefined' && _slugMap[pid]) ? _slugMap[pid] : pid;
-  var pg = getPage(resolvedId) || {l:'Pagina', i:'📄', id:resolvedId};
+  /* Pagina Notion generica */
+  var pg = getPage(pid) || {l:'Pagina', i:'📄', id:pid};
   gp(pg.id, pg.l, pg.i, true);
 })();
 
@@ -625,15 +621,15 @@ document.getElementById('overlay') && document.getElementById('overlay').addEven
         var count = document.getElementById('avv-count');
         if(!list) return;
         var BOTS = [
-         {u:'Apollo',d:'5552'},{u:'Arcane',d:'7800'},{u:'Carl-bot',d:'1536'},
-         {u:'DISBOARD',d:'2760'},{u:'Discohook Utils',d:'4333'},{u:'Jockie Music',d:'8158'},
-         {u:'Jockie Music (1)',d:'6951'},{u:'MogiBot',d:'6973'},{u:'ServerStats',d:'0197'},
-         {u:'Ticket Tool',d:'4843'},{u:'TTS Bot',d:'3590'},{u:'Tupperbox',d:'4754'},
-         {u:'VoiceMaster',d:'9351'}
-];
-       var members = (data.members || []).filter(function(m){
-         return !BOTS.some(function(b){ return b.u === m.username && b.d === m.discriminator; });
-});
+          {u:'Apollo',d:'5552'},{u:'Arcane',d:'7800'},{u:'Carl-bot',d:'1536'},
+          {u:'DISBOARD',d:'2760'},{u:'Discohook Utils',d:'4333'},{u:'Jockie Music',d:'8158'},
+          {u:'Jockie Music (1)',d:'6951'},{u:'MogiBot',d:'6973'},{u:'ServerStats',d:'0197'},
+          {u:'Ticket Tool',d:'4843'},{u:'TTS Bot',d:'3590'},{u:'Tupperbox',d:'4754'},
+          {u:'VoiceMaster',d:'9351'}
+        ];
+        var members = (data.members || []).filter(function(m){
+          return !BOTS.some(function(b){ return b.u === m.username && b.d === m.discriminator; });
+        });
         if(count) count.textContent = members.length ? '(' + members.length + ' online)' : '';
         if(!members.length){
           list.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-style:italic;font-size:13px;padding:30px">Nessun avventuriero online</div>';
@@ -642,11 +638,9 @@ document.getElementById('overlay') && document.getElementById('overlay').addEven
         list.innerHTML = members.map(function(m){
           return '<div class="roster-member">'
             +'<img class="roster-avatar" src="'+m.avatar_url+'" alt="'+m.username+'" onerror="this.style.display=\'none\'">'
-            +'<div>'
-              +'<div class="roster-name">'+m.username+'</div>'
-              +(m.game ? '<div class="roster-game">'+m.game.name+'</div>' : '')
-            +'</div>'
-            +'</div>';
+            +'<div><div class="roster-name">'+m.username+'</div>'
+            +(m.game ? '<div class="roster-game">'+m.game.name+'</div>' : '')
+            +'</div></div>';
         }).join('');
       })
       .catch(function(){
@@ -654,19 +648,16 @@ document.getElementById('overlay') && document.getElementById('overlay').addEven
         if(list) list.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-style:italic;font-size:13px;padding:30px">Impossibile caricare</div>';
       });
   }
-
   var ovbtn = document.getElementById('ovbtn');
   if(ovbtn) ovbtn.addEventListener('click', loadRoster);
   var bnav = document.querySelector('.bnav-item[data-k="menu"]');
   if(bnav) bnav.addEventListener('click', loadRoster);
 })();
+
 /* ════ OFFLINE FALLBACK ════ */
-window.addEventListener('offline', function(){
-  showToast('Sei offline — ricarica quando torni connesso', '📡', 8000);
-});
-window.addEventListener('online', function(){
-  showToast('Connessione ripristinata', '✅', 2500);
-});
+window.addEventListener('offline', function(){ showToast('Sei offline — ricarica quando torni connesso', '📡', 8000); });
+window.addEventListener('online',  function(){ showToast('Connessione ripristinata', '✅', 2500); });
+
 /* ════ LAZY LOAD BACKGROUND-IMAGE ════ */
 (function(){
   function _lazyBg(root){
@@ -680,15 +671,12 @@ window.addEventListener('online', function(){
           obs.unobserve(en.target);
           var bg = en.target.style.backgroundImage;
           en.target.style.backgroundImage = 'none';
-          requestAnimationFrame(function(){
-            en.target.style.backgroundImage = bg;
-          });
+          requestAnimationFrame(function(){ en.target.style.backgroundImage = bg; });
         });
       }, { rootMargin: '200px' });
       io.observe(el);
     });
   }
-
   (function(){
     var _orig = window.afterPageRender;
     window.afterPageRender = function(){
@@ -697,9 +685,9 @@ window.addEventListener('online', function(){
     };
   })();
 })();
+
 /* ════ HELP WIDGET ════ */
 var _helpOpen = false;
-
 function toggleHelpPanel(){
   _helpOpen = !_helpOpen;
   var panel = document.getElementById('arc-help-panel');
@@ -707,7 +695,6 @@ function toggleHelpPanel(){
   if(panel) panel.classList.toggle('open', _helpOpen);
   if(btn)   btn.classList.toggle('open', _helpOpen);
 }
-
 function switchHelpTab(tab, el){
   document.querySelectorAll('.ahp-tab').forEach(function(t){ t.classList.remove('active'); });
   document.querySelectorAll('.ahp-body').forEach(function(b){ b.style.display = 'none'; });
@@ -715,77 +702,51 @@ function switchHelpTab(tab, el){
   var target = document.getElementById('ahp-' + tab);
   if(target) target.style.display = 'flex';
 }
-
 function toggleFaq(el){
   var item = el.parentElement;
   var wasOpen = item.classList.contains('open');
   document.querySelectorAll('.ahp-faq-item').forEach(function(i){ i.classList.remove('open'); });
   if(!wasOpen) item.classList.add('open');
 }
-
 document.getElementById('ahp-dm-msg') && document.getElementById('ahp-dm-msg').addEventListener('input', function(){
-  var len = this.value.length;
   var counter = document.getElementById('ahp-dm-count');
-  if(counter) counter.textContent = len;
+  if(counter) counter.textContent = this.value.length;
 });
-
 function sendHelpMsg(){
   var name = (document.getElementById('ahp-dm-name').value || '').trim();
   var msg  = (document.getElementById('ahp-dm-msg').value  || '').trim();
   var status = document.getElementById('ahp-dm-status');
   if(!msg){ status.textContent = 'Scrivi un messaggio prima di inviare.'; status.className='ahp-dm-status err'; return; }
-
   var WEBHOOK_URL = 'https://discord.com/api/webhooks/1493894632776667237/Qc2dXguKfoUvddrN89BwdTCHxZ6hgyDMm60AC3izsCDZm2vSyWXbO9dTFD0_s-1IsiCu';
   status.textContent = 'Invio in corso...'; status.className='ahp-dm-status';
-
   fetch(WEBHOOK_URL, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
+    method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({
       username: 'Oracolo di Arcamis',
       avatar_url: 'https://arcamis.pages.dev/favicon.png',
-      embeds:[{
-        title: '📩 Messaggio al DM',
-        color: 0xC89B3C,
-        fields:[
-          {name:'Mittente', value: name || '*(anonimo)*', inline:true},
-          {name:'Messaggio', value: msg}
-        ],
-        footer:{text:'Arcamis Help Widget'},
-        timestamp: new Date().toISOString()
+      embeds:[{ title:'📩 Messaggio al DM', color:0xC89B3C,
+        fields:[{name:'Mittente', value:name||'*(anonimo)*', inline:true},{name:'Messaggio', value:msg}],
+        footer:{text:'Arcamis Help Widget'}, timestamp:new Date().toISOString()
       }]
     })
   })
   .then(function(r){
     if(r.ok){
-      status.textContent = '✦ Messaggio inviato al DM!';
-      status.className = 'ahp-dm-status ok';
+      status.textContent = '✦ Messaggio inviato al DM!'; status.className='ahp-dm-status ok';
       document.getElementById('ahp-dm-name').value = '';
       document.getElementById('ahp-dm-msg').value  = '';
       document.getElementById('ahp-dm-count').textContent = '0';
-    } else {
-      throw new Error();
-    }
+    } else { throw new Error(); }
   })
-  .catch(function(){
-    status.textContent = 'Errore nell\'invio — prova su Discord.';
-    status.className = 'ahp-dm-status err';
-  });
+  .catch(function(){ status.textContent = 'Errore nell\'invio — prova su Discord.'; status.className='ahp-dm-status err'; });
 }
-
 setTimeout(function(){
   var btn = document.getElementById('arc-help-btn');
-  if(btn && !localStorage.getItem('arc_help_seen')){
-    btn.classList.add('pulse');
-    localStorage.setItem('arc_help_seen','1');
-  }
+  if(btn && !localStorage.getItem('arc_help_seen')){ btn.classList.add('pulse'); localStorage.setItem('arc_help_seen','1'); }
 }, 3000);
-
 document.addEventListener('click', function(e){
   if(!_helpOpen) return;
   var panel = document.getElementById('arc-help-panel');
   var btn   = document.getElementById('arc-help-btn');
-  if(panel && !panel.contains(e.target) && btn && !btn.contains(e.target)){
-    toggleHelpPanel();
-  }
+  if(panel && !panel.contains(e.target) && btn && !btn.contains(e.target)) toggleHelpPanel();
 });
