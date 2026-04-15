@@ -77,6 +77,8 @@
 }
 .font-btn:hover{background:rgba(200,155,60,.12);border-color:rgba(200,155,60,.4)}
 #font-controls{display:flex;align-items:center;gap:3px;margin-left:6px}
+/* nascosti dal topbar — controllati dal pannello opzioni */
+#font-controls{display:none!important}
 
 /* ════════════════════════════════════
    THEME TOGGLE
@@ -245,6 +247,29 @@ body.light .n-code{background:rgba(200,180,140,.12);color:var(--text)}
 body.light .n-image img{border-color:rgba(120,88,36,.2)}
 body.light .lcard{background:linear-gradient(160deg,rgba(235,229,215,.97),rgba(225,218,200,.99))!important;border-color:rgba(120,88,36,.15)}
 body.light .lcard:hover{box-shadow:0 14px 40px rgba(100,70,20,.15)!important}
+
+/* ── Tabelle in light mode ── */
+body.light .n-table{background:transparent!important}
+body.light .n-table thead tr{background:rgba(120,88,36,.1)!important}
+body.light .n-table th{
+  background:rgba(120,88,36,.1)!important;
+  color:var(--text)!important;
+  border-color:rgba(120,88,36,.18)!important;
+}
+body.light .n-table td{
+  background:rgba(242,237,223,.6)!important;
+  color:var(--text2)!important;
+  border-color:rgba(120,88,36,.12)!important;
+}
+body.light .n-table tr:nth-child(even) td{background:rgba(235,228,210,.7)!important}
+body.light .n-table tr:hover td{background:rgba(220,210,188,.8)!important}
+
+/* fix tabelle custom (reputazione, mestieri, ecc.) */
+body.light table th{background:rgba(120,88,36,.1)!important;color:var(--text)!important;border-color:rgba(120,88,36,.2)!important}
+body.light table td{background:rgba(242,237,223,.5)!important;color:var(--text2)!important;border-color:rgba(120,88,36,.1)!important}
+body.light table tr:nth-child(even) td{background:rgba(232,224,205,.65)!important}
+body.light table tr:hover td{background:rgba(218,208,185,.75)!important}
+body.light table{border-color:rgba(120,88,36,.2)!important}
 
 /* ════════════════════════════════════
    LIGHT THEME — EXTENDED
