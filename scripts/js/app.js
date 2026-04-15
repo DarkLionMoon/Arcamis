@@ -86,9 +86,16 @@ function _renderOptionsPanel(){
   p.querySelectorAll('[data-theme]').forEach(function(el){
     el.classList.toggle('active', el.getAttribute('data-theme') === _theme);
   });
-  var pct = Math.round(((_fs - 0.85) / (1.3 - 0.85)) * 100);
   var fsEl = p.querySelector('#arc-opt-fontpct');
   if(fsEl) fsEl.textContent = Math.round(_fs * 100) + '%';
+  _syncEnvBtns();
+}
+
+function _syncEnvBtns(){
+  var cb = document.getElementById('aop-candle-btn');
+  var ab = document.getElementById('aop-audio-btn');
+  if(cb) cb.classList.toggle('active', document.body.classList.contains('candlelight'));
+  if(ab) ab.classList.toggle('active', !!window._arcAudioPlaying);
 }
 
 document.addEventListener('click', function(e){
