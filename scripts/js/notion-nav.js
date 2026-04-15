@@ -6,6 +6,46 @@
 ════════════════════════════════════ */
 
 var navStack = [];
+/* ════ SLUG MAP ════ */
+var _slugMap = {
+  /* Regole */
+  'gameplay':               '2f00274fdc1c8065a11ff45192aa5dcb',
+  'regole-generali':        '2f00274fdc1c800b9d8fc366e8e40c5c',
+  'materiale-approvato':    '3130274fdc1c807eb61fde24e8236659',
+  /* Personaggio */
+  'come-si-inizia':         '2dd222f22ef8413f8cb48f03bbb4f4b0',
+  'andando-avanti':         '5cea525d149f4acb9c59007bf6b3d5ff',
+  'galleria-pg':            '2fd0274fdc1c80d8b948c4133f874f28',
+  'homebrew':               '2f00274fdc1c80e78ad7ce985007b7c6',
+  'maestria-titoli':        '2f00274fdc1c802a9babd4239d97a319',
+  /* Lavori */
+  'gilda-avventurieri':     '2f00274fdc1c801b8c13cefd9e15694e',
+  'locanda':                '2f00274fdc1c80faa99eda064ef0fabc',
+  'forgia':                 '2f00274fdc1c805ca01ec57f18d2ffee',
+  'biblioteca':             '2f00274fdc1c8089bfe6c24434d53b67',
+  'bottega-farmaceutica':   '2f00274fdc1c801c9697e75caa8d5f13',
+  'caserma':                '2ff0274fdc1c80688dd6c2b293a1f626',
+  'corporazione-costruttori':'2ff0274fdc1c80769a4ae243f22f0582',
+  'ospedale':               '2f00274fdc1c807aa03cc6cbeb3687cc',
+  'sartoria':               '2ff0274fdc1c8035bad4f0b6ab705192',
+  /* Lore */
+  'storia-del-mondo':       '2f00274fdc1c806f8f17dbc6532d2211',
+  'pantheon':               '2f00274fdc1c80679bd3c3df8a1fa040',
+  'mappe':                  '2f10274fdc1c80489f23c49164747770',
+  'changelog':              '3000274fdc1c8033a214c44a1aa7f01f',
+  /* Gallerie/Speciali */
+  'biblioteca-scoperta':    '3040274fdc1c80ed816ef58f6a6b6f21',
+  'specie-homebrew':        '2f60274fdc1c80fba671c588ba93b116',
+  'sottoclassi':            '2f70274fdc1c80e3bdc7f95f81eb9cc0',
+};
+
+/* Mappa inversa id→slug, generata automaticamente */
+var _idToSlug = {};
+(function(){
+  Object.keys(_slugMap).forEach(function(slug){
+    _idToSlug[_slugMap[slug]] = slug;
+  });
+})();
 var _navMap = {
   '2f00274fdc1c8065a11ff45192aa5dcb': 'regole',
   '2f00274fdc1c800b9d8fc366e8e40c5c': 'personaggio',
@@ -100,10 +140,11 @@ async function gp(id,label,icon,_fromPop){
         if (container && window.loadSubclassGallery) {
             window.loadSubclassGallery(container);
             
-            if(!_fromPop){
-                navStack.push({id:id, label:label, icon:icon});
-                history.pushState({id:id, label:label, icon:icon, stack:navStack.slice(0,-1)}, '', location.pathname+'?p='+id);
-            }
+           if(!_fromPop){
+    navStack.push({id:id,label:label,icon:icon});
+    var _urlParam = _idToSlug[id] || id;  // usa slug se disponibile, altrimenti UUID
+    history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'',location.pathname+'?p='+_urlParam);
+}
             
             // Pulisce l'header della pagina per far spazio alla galleria
             document.getElementById('ph-title').textContent = label || 'Sottoclassi';
@@ -114,8 +155,9 @@ async function gp(id,label,icon,_fromPop){
 
   if(!_fromPop){
     navStack.push({id:id,label:label,icon:icon});
-    history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'',location.pathname+'?p='+id);
-  }
+    var _urlParam = _idToSlug[id] || id;  // usa slug se disponibile, altrimenti UUID
+    history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'',location.pathname+'?p='+_urlParam);
+}
 
   setNav('');
 
