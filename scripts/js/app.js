@@ -745,7 +745,7 @@ function sendHelpMsg(){
   if(!msg){ status.textContent = 'Scrivi un messaggio prima di inviare.'; status.className='ahp-dm-status err'; return; }
 
   /* Invia via Discord webhook — sostituisci WEBHOOK_URL con il tuo */
-  var WEBHOOK_URL = 'INSERISCI_QUI_IL_TUO_DISCORD_WEBHOOK';
+  var WEBHOOK_URL = 'https://discord.com/api/webhooks/1493894632776667237/Qc2dXguKfoUvddrN89BwdTCHxZ6hgyDMm60AC3izsCDZm2vSyWXbO9dTFD0_s-1IsiCu';
   status.textContent = 'Invio in corso...'; status.className='ahp-dm-status';
 
   fetch(WEBHOOK_URL, {
