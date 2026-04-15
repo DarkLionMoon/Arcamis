@@ -37,6 +37,9 @@ var _slugMap = {
   'biblioteca-scoperta':    '3040274fdc1c80ed816ef58f6a6b6f21',
   'specie-homebrew':        '2f60274fdc1c80fba671c588ba93b116',
   'sottoclassi':            '2f70274fdc1c80e3bdc7f95f81eb9cc0',
+  /* Pagine speciali non-Notion (gestite via JS) */
+  'reputazioni':            'reputazioni',
+  'codice-giuridico':       'codice-giuridico',
 };
 
 /* Mappa inversa id→slug, generata automaticamente */
@@ -100,14 +103,14 @@ function gpBack(stackIdx){
   var item = navStack[stackIdx];
   if(!item) return;
   
-  // Salvo l'ID per lo scroll prima di modificare lo stack
   var targetId = item.id;
 
   navStack = navStack.slice(0, stackIdx);
-  history.pushState({id:item.id, label:item.label, icon:item.icon, stack:navStack.slice()}, '', (location.pathname + '?p=' + item.id));
+  var _slug = _idToSlug[item.id];
+  var _url = _slug ? ('/' + _slug) : ('/?p=' + item.id);
+  history.pushState({id:item.id, label:item.label, icon:item.icon, stack:navStack.slice()}, '', _url);
   _gpRender(item.id, item.label, item.icon);
 
-  // LOGICA SCROLL SPOSTATA QUI DENTRO (ora 'item' o 'targetId' sono validi)
   var _savedScroll = _scrollPositions[targetId];
   if(_savedScroll !== undefined){
     setTimeout(function(){
@@ -115,7 +118,8 @@ function gpBack(stackIdx){
       if(mainEl) mainEl.scrollTo({top: _savedScroll, behavior: 'smooth'});
     }, 350);
   }
-} // <--- La chiusura deve stare DOPO lo scroll
+}
+
 function buildCrumb(currentLabel){
   var h='<span class="ph-bc" onclick="showHome()">🏰 Home</span>';
   for(var ci=0;ci<navStack.length-1;ci++){
@@ -141,23 +145,24 @@ async function gp(id,label,icon,_fromPop){
             window.loadSubclassGallery(container);
             
            if(!_fromPop){
-    navStack.push({id:id,label:label,icon:icon});
-    var _urlParam = _idToSlug[id] || id;  // usa slug se disponibile, altrimenti UUID
-    history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'',location.pathname+'?p='+_urlParam);
-}
+              navStack.push({id:id,label:label,icon:icon});
+              var _slug = _idToSlug[id];
+              var _url = _slug ? ('/' + _slug) : ('/?p=' + id);
+              history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'', _url);
+            }
             
-            // Pulisce l'header della pagina per far spazio alla galleria
             document.getElementById('ph-title').textContent = label || 'Sottoclassi';
             if(window.cv) window.cv(); 
-            return; // Blocca il caricamento standard di Notion
+            return;
         }
     }
 
   if(!_fromPop){
     navStack.push({id:id,label:label,icon:icon});
-    var _urlParam = _idToSlug[id] || id;  // usa slug se disponibile, altrimenti UUID
-    history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'',location.pathname+'?p='+_urlParam);
-}
+    var _slug = _idToSlug[id];
+    var _url = _slug ? ('/' + _slug) : ('/?p=' + id);
+    history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'', _url);
+  }
 
   setNav('');
 
@@ -184,9 +189,8 @@ async function gp(id,label,icon,_fromPop){
 
   if(hv.style.display==='block'){
     xfade(hv,pv);
-    /* Salva posizione scroll della pagina corrente prima di navigare */
-var _curId = navStack.length > 1 ? navStack[navStack.length-2].id : null;
-if(_curId) _scrollPositions[_curId] = document.getElementById('main').scrollTop;
+    var _curId = navStack.length > 1 ? navStack[navStack.length-2].id : null;
+    if(_curId) _scrollPositions[_curId] = document.getElementById('main').scrollTop;
     document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
     await _gpRender(id,label,icon);
   }else{
@@ -239,15 +243,12 @@ if(data)_memCache[cacheKey]=data;
       data=await r.json();
       _memCache[cacheKey]=data;
       try{
-  /* Limite: max 60 chiavi pg_ in sessionStorage */
   var _ssKeys = Object.keys(sessionStorage).filter(function(k){ return k.indexOf('pg_') === 0; });
   if(_ssKeys.length >= 60){
-    /* Rimuovi la più vecchia (prima inserita) */
     sessionStorage.removeItem(_ssKeys[0]);
   }
   sessionStorage.setItem(cacheKey, JSON.stringify(data));
 }catch(e){
-  /* Se ancora fallisce (es. storage pieno), svuota tutte le pg_ */
   try{
     Object.keys(sessionStorage).forEach(function(k){
       if(k.indexOf('pg_') === 0) sessionStorage.removeItem(k);
@@ -323,20 +324,15 @@ if(data)_memCache[cacheKey]=data;
   img.addEventListener('error',function(){
     if(img.dataset.retried)return;
     img.dataset.retried='1';
-    /* Invalida cache per questa pagina */
     try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
     delete _memCache['pg_'+id];
-    /* Se è un'immagine proxata via /api/notion?img=, riprova il fetch */
     var src = img.getAttribute('src') || '';
     if(src.indexOf('/api/notion?img=') > -1){
-      /* Ricarica solo l'immagine aggiungendo un timestamp */
       var sep = src.indexOf('?') > -1 ? '&' : '?';
       img.src = src + sep + '_t=' + Date.now();
     } else if(src.indexOf('prod-files-secure') > -1 || src.indexOf('s3.us-west') > -1){
-      /* URL Notion diretto scaduto — proxalo */
       img.src = '/api/notion?img=' + encodeURIComponent(src);
     } else {
-      /* Altro — nascondi il broken image */
       img.closest('figure') ? img.closest('figure').style.display='none' : img.style.display='none';
     }
   },{once:true});
