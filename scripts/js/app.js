@@ -3,13 +3,9 @@
 ════════════════════════════════════ */
 /* ════ CACHE VERSION — incrementa ad ogni deploy ════ */
 (function(){
-  /* Cache version automatica — usa il deploy ID di Cloudflare Pages */
-var CACHE_VER = (function(){
-  /* CF_PAGES_COMMIT_SHA è iniettato da Cloudflare Pages come meta tag
-     se lo aggiungi in index.html, altrimenti fallback alla data del giorno */
+  var CACHE_VER = (function(){
   var meta = document.querySelector('meta[name="cf-pages-sha"]');
   if(meta && meta.content) return meta.content.slice(0,8);
-  /* Fallback: data corrente troncata al giorno (cambia ogni giorno automaticamente) */
   return Math.floor(Date.now() / 86400000).toString();
 })();
   var stored = localStorage.getItem('arc_cache_ver');
@@ -22,7 +18,6 @@ window.addEventListener('load', function(){
   setTimeout(function(){
     var l = document.getElementById('site-loader');
     if(l) l.classList.add('hidden');
-    // Prefetch pagine frequenti
     var prefetch = [
       '2f00274fdc1c8065a11ff45192aa5dcb',
       '2f00274fdc1c800b9d8fc366e8e40c5c',
@@ -115,7 +110,7 @@ function showHome(){
   document.body.classList.remove('page-open');
   var cv = document.querySelector('.ph-covbg');
   if(cv) cv.style.opacity = '0';
-  history.replaceState(null, '', location.pathname);
+  history.replaceState(null, '', '/');
 }
 
 function ovo(){
@@ -347,7 +342,6 @@ window.addEventListener('load', function(){
     if(window.applyRecentBadges) applyRecentBadges();
   }, 1500);
 });
-/* Auto-avanzamento — verso destra (slide successiva) */
 _carTimer = setInterval(function(){ if(!window._carouselPaused) changeSlide(1); }, 6000);
 
 /* Applicazione dinamica sfondo e bottoni CTA da KV */
@@ -356,7 +350,6 @@ var _cachedCovers = null;
 function _applyCovers(covers){
   _cachedCovers = covers;
 
-  /* ── Carousel homepage: sfondi ── */
   var slideEls = document.querySelectorAll('.slide');
   ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
     if(covers[key] && slideEls[i]){
@@ -366,7 +359,6 @@ function _applyCovers(covers){
     }
   });
 
-  /* ── Carousel homepage: tag e titolo ── */
   ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
     if(!covers[key+'_meta'] || !slideEls[i]) return;
     try {
@@ -376,7 +368,6 @@ function _applyCovers(covers){
     } catch(e){}
   });
 
-  /* ── Carousel homepage: bottoni CTA ── */
   ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
     if(!covers[key+'_btns'] || !slideEls[i]) return;
     try {
@@ -396,7 +387,6 @@ function _applyCovers(covers){
     } catch(e){}
   });
 
-  /* ── loc-card nelle pagine ── */
   document.querySelectorAll('#pbody .loc-card').forEach(function(card){
     var onclick = card.getAttribute('onclick') || '';
     var m = onclick.match(/gp\(['"]([a-f0-9]{32})['"]/);
@@ -408,7 +398,6 @@ function _applyCovers(covers){
     card.style.backgroundPosition = 'center';
   });
 
-  /* ── galleria PG (.gs-card) ── */
   document.querySelectorAll('.gs-card').forEach(function(card){
     var pageId = card.id.replace('gsc-','');
     if(!pageId || !covers[pageId]) return;
@@ -420,7 +409,6 @@ if(bgEl) {
   });
 }
 
-/* Fetch covers una volta sola, poi riapplica ad ogni render pagina */
 (function(){
   fetch('/api/admin?action=get_covers')
     .then(function(r){ return r.json(); })
@@ -428,7 +416,6 @@ if(bgEl) {
     .catch(function(){});
 })();
 
-/* Hook afterPageRender — riapplica covers sulle nuove card dopo ogni navigazione */
 (function(){
   var _orig = window.afterPageRender;
   window.afterPageRender = function(){
@@ -437,14 +424,12 @@ if(bgEl) {
       setTimeout(function(){ _applyCovers(_cachedCovers); }, 300);
       setTimeout(function(){ _applyCovers(_cachedCovers); }, 1200);
     }
-    /* Badge aggiornamento — dopo che le card sono nel DOM */
     setTimeout(function(){
       if(window.applyRecentBadges) applyRecentBadges();
     }, 600);
   };
 })();
 
-/* MutationObserver su #pbody — riapplica covers quando _loadSingleDb inserisce card lazy */
 (function(){
   var _debounce = null;
   var pbody = document.getElementById('pbody');
@@ -511,7 +496,6 @@ function closeSubMap(id){
   var startY = 0, pulling = false, atTop = false, atTopTimer = null;
   var ind = document.getElementById('ptr-indicator');
 
-  /* Traccia se siamo a top da almeno 300ms */
   var mainEl = document.getElementById('main') || window;
   function onScroll(){
     var sy = mainEl.scrollTop !== undefined ? mainEl.scrollTop : window.scrollY;
@@ -544,72 +528,68 @@ function closeSubMap(id){
 
 /* ════ POPSTATE ════ */
 window.addEventListener('popstate', function(e){
-  // Verifichiamo che e.state esista prima di ogni altra cosa
   if(e && e.state && e.state.id){
-     
-   if(e.state.id === 'codice-giuridico'){
-      showCodiceGiuridico();
-      return;
-    }
-    
-    // Sincronizza il breadcrumb se presente nello stato
+
     if(e.state.stack) {
-        navStack = JSON.parse(JSON.stringify(e.state.stack)); // Copia profonda per sicurezza
+      navStack = JSON.parse(JSON.stringify(e.state.stack));
     }
 
-    // 1. Caso specifico: Mestieri
+    /* Mestieri: id salvato come "mestiere-alchimista" */
     if(e.state.id.startsWith('mestiere-')){
-      if (typeof showMestiere === 'function') {
+      if(typeof showMestiere === 'function'){
         showMestiere(e.state.id.replace('mestiere-', ''));
       }
       return;
     }
-    
-    // 2. Caso specifico: Codice Giuridico
+
+    /* Pagine speciali JS */
     if(e.state.id === 'codice-giuridico'){
-      if (typeof showCodiceGiuridico === 'function') {
-        showCodiceGiuridico();
-      }
+      if(typeof showCodiceGiuridico === 'function') showCodiceGiuridico();
       return;
     }
-    
-    // 3. Navigazione generica (gp)
-    // Usiamo parametri di fallback per evitare che gp() riceva null
-    var label = e.state.label || '';
-    var icon = e.state.icon || '';
-    gp(e.state.id, label, icon, true);
+    if(e.state.id === 'reputazioni'){
+      if(typeof showReputationTable === 'function') showReputationTable();
+      return;
+    }
+
+    /* Navigazione generica */
+    gp(e.state.id, e.state.label || '', e.state.icon || '', true);
 
   } else {
-    // Se e.state è nullo (es. si torna alla pagina iniziale caricata senza pushState)
-    if (typeof showHome === 'function') {
-        showHome();
-    }
+    if(typeof showHome === 'function') showHome();
   }
 });
 
 /* ════ DEEP LINK ════ */
 (function(){
+  /* Legge prima il pathname, poi fallback a ?p= per retrocompatibilità */
+  var path = location.pathname.replace(/^\//, '').replace(/\/$/, ''); // es. "pantheon"
   var params = new URLSearchParams(location.search);
-  var pid = params.get('p');
-  if(pid){
-    if(pid.startsWith('mestiere-')){
-      var key = pid.replace('mestiere-', '');
-      setTimeout(function(){ showMestiere(key); }, 0);
-      return;
-    }
-    if(pid === 'codice-giuridico'){
-      setTimeout(function(){ showCodiceGiuridico(); }, 0);
-      return;
-    }
-    if(pid === 'reputazioni'){
-      setTimeout(function(){ showReputationTable(); }, 0);
-      return;
-    }
-    /* Risolvi slug → UUID se necessario */
-    var resolvedId = (typeof _slugMap !== 'undefined' && _slugMap[pid]) ? _slugMap[pid] : pid;
-    var pg = getPage(resolvedId) || {l:'Pagina', i:'📄', id:resolvedId};
-    gp(pg.id, pg.l, pg.i, true);
+  var pid = path || params.get('p');
+
+  if(!pid || pid === 'index.html') return;
+
+  /* Mestieri: /mestiere/alchimista */
+  if(pid.startsWith('mestiere/')){
+    var key = pid.replace('mestiere/', '');
+    setTimeout(function(){ if(typeof showMestiere === 'function') showMestiere(key); }, 0);
+    return;
   }
+
+  /* Pagine speciali JS */
+  if(pid === 'codice-giuridico'){
+    setTimeout(function(){ if(typeof showCodiceGiuridico === 'function') showCodiceGiuridico(); }, 0);
+    return;
+  }
+  if(pid === 'reputazioni'){
+    setTimeout(function(){ if(typeof showReputationTable === 'function') showReputationTable(); }, 0);
+    return;
+  }
+
+  /* Slug → UUID (supporta anche UUID diretti e vecchi ?p=UUID) */
+  var resolvedId = (typeof _slugMap !== 'undefined' && _slugMap[pid]) ? _slugMap[pid] : pid;
+  var pg = getPage(resolvedId) || {l:'Pagina', i:'📄', id:resolvedId};
+  gp(pg.id, pg.l, pg.i, true);
 })();
 
 /* ════ WIKI SECTION TOGGLE ════ */
@@ -698,7 +678,6 @@ window.addEventListener('online', function(){
         entries.forEach(function(en){
           if(!en.isIntersecting) return;
           obs.unobserve(en.target);
-          /* Forza il browser a caricare l'immagine */
           var bg = en.target.style.backgroundImage;
           en.target.style.backgroundImage = 'none';
           requestAnimationFrame(function(){
@@ -710,7 +689,6 @@ window.addEventListener('online', function(){
     });
   }
 
-  /* Esegui dopo ogni render pagina */
   (function(){
     var _orig = window.afterPageRender;
     window.afterPageRender = function(){
@@ -757,7 +735,6 @@ function sendHelpMsg(){
   var status = document.getElementById('ahp-dm-status');
   if(!msg){ status.textContent = 'Scrivi un messaggio prima di inviare.'; status.className='ahp-dm-status err'; return; }
 
-  /* Invia via Discord webhook — sostituisci WEBHOOK_URL con il tuo */
   var WEBHOOK_URL = 'https://discord.com/api/webhooks/1493894632776667237/Qc2dXguKfoUvddrN89BwdTCHxZ6hgyDMm60AC3izsCDZm2vSyWXbO9dTFD0_s-1IsiCu';
   status.textContent = 'Invio in corso...'; status.className='ahp-dm-status';
 
@@ -796,7 +773,6 @@ function sendHelpMsg(){
   });
 }
 
-/* Pulse al primo caricamento */
 setTimeout(function(){
   var btn = document.getElementById('arc-help-btn');
   if(btn && !localStorage.getItem('arc_help_seen')){
@@ -805,7 +781,6 @@ setTimeout(function(){
   }
 }, 3000);
 
-/* Chiudi cliccando fuori */
 document.addEventListener('click', function(e){
   if(!_helpOpen) return;
   var panel = document.getElementById('arc-help-panel');
