@@ -1229,3 +1229,32 @@ body.light #arc-help-panel{background:rgba(245,239,224,.98)!important;border-col
 body.light .ahp-input{background:rgba(120,88,36,.05)!important;border-color:rgba(120,88,36,.18)!important;color:var(--text)!important}
 body.light .ahp-faq-q{color:var(--text2)!important}
 body.light .ahp-send-btn{color:var(--gold)!important}
+
+.aop-env-row {
+  display: flex;
+  gap: 8px;
+}
+.aop-env-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  padding: 7px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--bord);
+  border-radius: 6px;
+  color: var(--text2);
+  font-family: 'Crimson Pro', serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.aop-env-btn:hover {
+  background: var(--bg4);
+  color: var(--text1);
+}
+.aop-env-btn.active {
+  background: rgba(200,155,60,.12);
+  border-color: var(--gold3);
+  color: var(--gold2);
+}
