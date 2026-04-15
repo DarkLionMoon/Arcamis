@@ -229,7 +229,7 @@ initFadeIn();
 
 /* ── Tasto Runa Audio ── */
 (function(){
-  var _aud=null,_on=false;
+  var _aud=null,_on=false; window._arcAudioPlaying=false;
   window.toggleArcAudio=function(){
     var btn=document.getElementById('audio-runa');
     if(!_aud){
@@ -241,10 +241,10 @@ initFadeIn();
       };
     }
     if(_on){
-      _aud.pause();_on=false;
+      _aud.pause();_on=false;window._arcAudioPlaying=false;
       if(btn)btn.classList.remove('ara-on');
     }else{
-      _aud.play().catch(function(){});_on=true;
+      _aud.play().catch(function(){});_on=true;window._arcAudioPlaying=true;
       if(btn)btn.classList.add('ara-on');
     }
   };
