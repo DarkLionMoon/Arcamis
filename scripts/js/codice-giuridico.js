@@ -26,7 +26,7 @@ window.showCodiceGiuridico = function() {
   }
   history.pushState(
     { id: fakeId, label: 'Pubblico Editto del Regno di Arcadia', icon: '⚖️', stack: navStack.slice(0, -1) },
-    '', location.pathname + '?p=' + fakeId
+    '', '/codice-giuridico'
   );
 
   var phTitle   = document.getElementById('ph-title');
