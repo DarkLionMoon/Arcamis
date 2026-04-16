@@ -87,13 +87,19 @@ function _setNavFromPage(id){ setNav(_navKeyForPage(id)); }
 
 /* Costruisce l'URL pulito per un dato id */
 function _urlForId(id){
+  /* Mestieri — id speciale */
+  if(id && id.startsWith('mestiere-')){
+    var key = id.replace('mestiere-', '');
+    return '/mestieri/' + key;
+  }
   var map = _getIdToPath();
   if(map[id]) return map[id];
   /* Fallback legacy slug */
   if(_idToSlug[id]) return '/' + _idToSlug[id];
-  /* Nessuna mappa — usa ?p= come ultima risorsa */
-  return '/?p=' + id;
+  /* Nessuna mappa — genera path automatico da UUID */
+return '/p/' + id;
 }
+  
 
 function _renderLastUpdated(isoDate){
   if(!isoDate) return;
