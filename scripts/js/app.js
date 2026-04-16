@@ -549,7 +549,10 @@ var _pathMap = {
 
   var pid = null;
 
-  if(path){
+  if(path && path.startsWith('p/')){
+    /* Path automatico UUID: /p/2f00274f... */
+    pid = path.replace('p/', '');
+  } else if(path){
     /* Risolvi il pathname nella mappa */
     var resolved = _pathMap[path];
     if(resolved){
