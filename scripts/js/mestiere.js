@@ -625,7 +625,7 @@ if(!_alreadyIn){
 }
 history.pushState(
   { id: fakeId, label: mestiere.nome, icon: mestiere.emoji, stack: navStack.slice(0, -1) },
-  '', location.pathname + '?p=' + fakeId
+  '', '/mestieri/' + key
 );
 
   var phTitle   = document.getElementById('ph-title');
