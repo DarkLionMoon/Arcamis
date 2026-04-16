@@ -6,7 +6,8 @@
 ════════════════════════════════════ */
 
 var navStack = [];
-/* ════ SLUG MAP ════ */
+
+/* ════ SLUG MAP (legacy — usata per retrocompatibilità ?p= ) ════ */
 var _slugMap = {
   /* Regole */
   'gameplay':               '2f00274fdc1c8065a11ff45192aa5dcb',
@@ -37,18 +38,36 @@ var _slugMap = {
   'biblioteca-scoperta':    '3040274fdc1c80ed816ef58f6a6b6f21',
   'specie-homebrew':        '2f60274fdc1c80fba671c588ba93b116',
   'sottoclassi':            '2f70274fdc1c80e3bdc7f95f81eb9cc0',
-  /* Pagine speciali non-Notion (gestite via JS) */
-  'reputazioni':            'reputazioni',
-  'codice-giuridico':       'codice-giuridico',
 };
 
-/* Mappa inversa id→slug, generata automaticamente */
+/* ════ ID → PATH MAP (UUID / id-speciale → pathname pulito) ════
+   Generata da _pathMap in app.js, ma definiamo qui la versione
+   inversa per usarla nel pushState di gp().
+   NOTA: _pathMap è definita in app.js — questa funzione la inverte
+   al primo uso (lazy), dopo che app.js è stato eseguito.
+════════════════════════════════════ */
+var _idToPath = null;
+function _getIdToPath(){
+  if(_idToPath) return _idToPath;
+  _idToPath = {};
+  if(typeof _pathMap !== 'undefined'){
+    Object.keys(_pathMap).forEach(function(path){
+      var id = _pathMap[path];
+      /* Non sovrascrivere se già mappato (teniamo il path più corto/canonico) */
+      if(!_idToPath[id]) _idToPath[id] = '/' + path;
+    });
+  }
+  return _idToPath;
+}
+
+/* Mappa inversa id→slug legacy (per fallback) */
 var _idToSlug = {};
 (function(){
   Object.keys(_slugMap).forEach(function(slug){
     _idToSlug[_slugMap[slug]] = slug;
   });
 })();
+
 var _navMap = {
   '2f00274fdc1c8065a11ff45192aa5dcb': 'regole',
   '2f00274fdc1c800b9d8fc366e8e40c5c': 'personaggio',
@@ -64,10 +83,16 @@ function _navKeyForPage(id){
   }
   return '';
 }
+function _setNavFromPage(id){ setNav(_navKeyForPage(id)); }
 
-function _setNavFromPage(id){
-  var k = _navKeyForPage(id);
-  setNav(k);
+/* Costruisce l'URL pulito per un dato id */
+function _urlForId(id){
+  var map = _getIdToPath();
+  if(map[id]) return map[id];
+  /* Fallback legacy slug */
+  if(_idToSlug[id]) return '/' + _idToSlug[id];
+  /* Nessuna mappa — usa ?p= come ultima risorsa */
+  return '/?p=' + id;
 }
 
 function _renderLastUpdated(isoDate){
@@ -81,36 +106,28 @@ function _renderLastUpdated(isoDate){
   el.className = 'arc-lastupdated';
   el.textContent = 'Aggiornato il ' + fmt;
   var phTitle = document.getElementById('ph-title');
-  if(phTitle && phTitle.parentNode){
-    phTitle.parentNode.insertBefore(el, phTitle.nextSibling);
-  }
+  if(phTitle && phTitle.parentNode) phTitle.parentNode.insertBefore(el, phTitle.nextSibling);
 }
+
 var _memCache = {};
 var _scrollPositions = {};
 window.prefetchPage = function(id){
   var cacheKey = 'pg_' + id;
-if(!id || _memCache[cacheKey]) return;
-fetch('/api/notion?pageId=' + id)
-  .then(function(r){ return r.json(); })
-  .then(function(data){ _memCache[cacheKey] = data; })
+  if(!id || _memCache[cacheKey]) return;
+  fetch('/api/notion?pageId=' + id)
+    .then(function(r){ return r.json(); })
+    .then(function(data){ _memCache[cacheKey] = data; })
     .catch(function(){});
 };
 
-/* ════════════════════════════════════
-   BACK NAVIGATION
-════════════════════════════════════ */
+/* ════ BACK NAVIGATION ════ */
 function gpBack(stackIdx){
   var item = navStack[stackIdx];
   if(!item) return;
-  
   var targetId = item.id;
-
   navStack = navStack.slice(0, stackIdx);
-  var _slug = _idToSlug[item.id];
-  var _url = _slug ? ('/' + _slug) : ('/?p=' + item.id);
-  history.pushState({id:item.id, label:item.label, icon:item.icon, stack:navStack.slice()}, '', _url);
+  history.pushState({id:item.id, label:item.label, icon:item.icon, stack:navStack.slice()}, '', _urlForId(item.id));
   _gpRender(item.id, item.label, item.icon);
-
   var _savedScroll = _scrollPositions[targetId];
   if(_savedScroll !== undefined){
     setTimeout(function(){
@@ -131,37 +148,31 @@ function buildCrumb(currentLabel){
   return h;
 }
 
-/* ════════════════════════════════════
-   OPEN PAGE — gp()
-════════════════════════════════════ */
+/* ════ OPEN PAGE — gp() ════ */
 async function gp(id,label,icon,_fromPop){
   if(!id||id==='undefined'||id==='null')return;
   var ts = document.getElementById('ts');
   if(ts) ts.value = '';
   csearch();
-   if (id === '2f70274fdc1c803ca5cafa97ca1817cd') {
-        const container = document.getElementById('page-content'); 
-        if (container && window.loadSubclassGallery) {
-            window.loadSubclassGallery(container);
-            
-           if(!_fromPop){
-              navStack.push({id:id,label:label,icon:icon});
-              var _slug = _idToSlug[id];
-              var _url = _slug ? ('/' + _slug) : ('/?p=' + id);
-              history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'', _url);
-            }
-            
-            document.getElementById('ph-title').textContent = label || 'Sottoclassi';
-            if(window.cv) window.cv(); 
-            return;
-        }
+
+  /* Caso speciale: galleria sottoclassi */
+  if(id === '2f70274fdc1c803ca5cafa97ca1817cd'){
+    var container = document.getElementById('page-content');
+    if(container && window.loadSubclassGallery){
+      window.loadSubclassGallery(container);
+      if(!_fromPop){
+        navStack.push({id:id,label:label,icon:icon});
+        history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'', _urlForId(id));
+      }
+      document.getElementById('ph-title').textContent = label || 'Sottoclassi';
+      if(window.cv) window.cv();
+      return;
     }
+  }
 
   if(!_fromPop){
     navStack.push({id:id,label:label,icon:icon});
-    var _slug = _idToSlug[id];
-    var _url = _slug ? ('/' + _slug) : ('/?p=' + id);
-    history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'', _url);
+    history.pushState({id:id,label:label,icon:icon,stack:navStack.slice(0,-1)},'', _urlForId(id));
   }
 
   setNav('');
@@ -203,9 +214,7 @@ async function gp(id,label,icon,_fromPop){
   }
 }
 
-/* ════════════════════════════════════
-   _gpRender — fetch + render pagina
-════════════════════════════════════ */
+/* ════ _gpRender — fetch + render pagina ════ */
 async function _gpRender(id,label,icon){
   if(!id||id==='undefined'||id==='null'){
     if(typeof afterPageRender==='function')afterPageRender();
@@ -224,16 +233,16 @@ async function _gpRender(id,label,icon){
   var cacheKey='pg_'+id;
   var data=_memCache[cacheKey]||null;
   if(!data){
-  try{
-    var _ss=sessionStorage.getItem(cacheKey);
-    if(_ss){
-      var _parsed=JSON.parse(_ss);
-      if(_parsed&&_parsed.page&&_parsed.blocks) data=_parsed;
-      else sessionStorage.removeItem(cacheKey);
-    }
-  }catch(e){sessionStorage.removeItem(cacheKey);}
-}
-if(data)_memCache[cacheKey]=data;
+    try{
+      var _ss=sessionStorage.getItem(cacheKey);
+      if(_ss){
+        var _parsed=JSON.parse(_ss);
+        if(_parsed&&_parsed.page&&_parsed.blocks) data=_parsed;
+        else sessionStorage.removeItem(cacheKey);
+      }
+    }catch(e){sessionStorage.removeItem(cacheKey);}
+  }
+  if(data)_memCache[cacheKey]=data;
 
   try{
     if(!data){
@@ -243,18 +252,12 @@ if(data)_memCache[cacheKey]=data;
       data=await r.json();
       _memCache[cacheKey]=data;
       try{
-  var _ssKeys = Object.keys(sessionStorage).filter(function(k){ return k.indexOf('pg_') === 0; });
-  if(_ssKeys.length >= 60){
-    sessionStorage.removeItem(_ssKeys[0]);
-  }
-  sessionStorage.setItem(cacheKey, JSON.stringify(data));
-}catch(e){
-  try{
-    Object.keys(sessionStorage).forEach(function(k){
-      if(k.indexOf('pg_') === 0) sessionStorage.removeItem(k);
-    });
-  }catch(e2){}
-}
+        var _ssKeys=Object.keys(sessionStorage).filter(function(k){return k.indexOf('pg_')===0;});
+        if(_ssKeys.length>=60) sessionStorage.removeItem(_ssKeys[0]);
+        sessionStorage.setItem(cacheKey,JSON.stringify(data));
+      }catch(e){
+        try{ Object.keys(sessionStorage).forEach(function(k){if(k.indexOf('pg_')===0)sessionStorage.removeItem(k);}); }catch(e2){}
+      }
     }
 
     var pg=data.page,bl=data.blocks;
@@ -272,13 +275,12 @@ if(data)_memCache[cacheKey]=data;
     phHero.style.setProperty('--ph-acc',acc.c);
     phHero.style.setProperty('--ph-accbg',acc.bg);
 
-    /* Cover */
     var coverUrl=null;
     if(pg.cover){
       coverUrl=pg.cover.type==='external'?pg.cover.external.url:(pg.cover.file&&pg.cover.file.url);
     }
     if(!coverUrl){
-      var firstImg=bl.find(function(blk){return blk.type==='image'});
+      var firstImg=bl.find(function(blk){return blk.type==='image';});
       if(firstImg){var fi=firstImg.image;coverUrl=fi&&fi.type==='external'?fi.external.url:(fi&&fi.file&&fi.file.url);}
     }
     if(coverUrl){
@@ -291,7 +293,6 @@ if(data)_memCache[cacheKey]=data;
       phIcon.style.opacity='0.06';
     }
 
-    /* Subtitle dal primo blocco */
     var firstSub=bl.find(function(blk){
       if(blk.type==='callout')return true;
       return blk.type==='paragraph'&&blk.paragraph&&blk.paragraph.rich_text&&blk.paragraph.rich_text.length>0;
@@ -302,7 +303,6 @@ if(data)_memCache[cacheKey]=data;
       if(sub)phSub.textContent=sub+(sub.length>=130?'…':'');
     }
 
-    /* Render */
     var html=renderBlocks(bl,true);
     var pbody=document.getElementById('pbody');
     pbody.style.maxWidth='';
@@ -321,67 +321,51 @@ if(data)_memCache[cacheKey]=data;
     applyGlossary(pbody);
 
     pbody.querySelectorAll('img').forEach(function(img){
-  img.addEventListener('error',function(){
-    if(img.dataset.retried)return;
-    img.dataset.retried='1';
-    try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
-    delete _memCache['pg_'+id];
-    var src = img.getAttribute('src') || '';
-    if(src.indexOf('/api/notion?img=') > -1){
-      var sep = src.indexOf('?') > -1 ? '&' : '?';
-      img.src = src + sep + '_t=' + Date.now();
-    } else if(src.indexOf('prod-files-secure') > -1 || src.indexOf('s3.us-west') > -1){
-      img.src = '/api/notion?img=' + encodeURIComponent(src);
-    } else {
-      img.closest('figure') ? img.closest('figure').style.display='none' : img.style.display='none';
-    }
-  },{once:true});
-});
+      img.addEventListener('error',function(){
+        if(img.dataset.retried)return;
+        img.dataset.retried='1';
+        try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
+        delete _memCache['pg_'+id];
+        var src=img.getAttribute('src')||'';
+        if(src.indexOf('/api/notion?img=')>-1){
+          var sep=src.indexOf('?')>-1?'&':'?';
+          img.src=src+sep+'_t='+Date.now();
+        }else if(src.indexOf('prod-files-secure')>-1||src.indexOf('s3.us-west')>-1){
+          img.src='/api/notion?img='+encodeURIComponent(src);
+        }else{
+          img.closest('figure')?img.closest('figure').style.display='none':img.style.display='none';
+        }
+      },{once:true});
+    });
 
     attachShine(pbody);
     loadDbGalleries(pbody);
-    pbody.querySelectorAll('.npc-gallery-container').forEach(function(c) {
-  if (window.loadNpcGallery) loadNpcGallery(c);
-});
-   pbody.querySelectorAll('.hb-library-container').forEach(function(c){
-  if(window.loadLibraryGallery) loadLibraryGallery(c);
-});
-pbody.querySelectorAll('.hb-subclass-container').forEach(function(c){
-  if(window.loadSubclassGallery) loadSubclassGallery(c);
-});
-pbody.querySelectorAll('.hb-specie-container').forEach(function(c){
-  if(window.loadSpeciesGallery) loadSpeciesGallery(c);
-});
-pbody.querySelectorAll('.hb-changelog-container').forEach(function(c){
-  if(window.loadChangelog) loadChangelog(c);
-});
+    pbody.querySelectorAll('.npc-gallery-container').forEach(function(c){if(window.loadNpcGallery)loadNpcGallery(c);});
+    pbody.querySelectorAll('.hb-library-container').forEach(function(c){if(window.loadLibraryGallery)loadLibraryGallery(c);});
+    pbody.querySelectorAll('.hb-subclass-container').forEach(function(c){if(window.loadSubclassGallery)loadSubclassGallery(c);});
+    pbody.querySelectorAll('.hb-specie-container').forEach(function(c){if(window.loadSpeciesGallery)loadSpeciesGallery(c);});
+    pbody.querySelectorAll('.hb-changelog-container').forEach(function(c){if(window.loadChangelog)loadChangelog(c);});
     pbody.querySelectorAll('.gs-container').forEach(function(c){if(window.loadGallery)loadGallery(c);});
     pbody.querySelectorAll('details.n-toggle').forEach(function(det){
-      det.addEventListener('toggle',function(){
-        if(det.open){loadDbGalleries(det);}
-      },{once:true});
+      det.addEventListener('toggle',function(){if(det.open){loadDbGalleries(det);}},{once:true});
     });
     initFadeIn(pbody);
-    setTimeout(function(){
-      _initCarouselArrows(pbody);
-    },200);
+    setTimeout(function(){ _initCarouselArrows(pbody); },200);
 
     _setNavFromPage(id);
-    if(data.page) _renderLastUpdated(data.page.last_edited_time);
+    if(data.page)_renderLastUpdated(data.page.last_edited_time);
     if(typeof addRecente==='function')addRecente(id,ptitle,picon);
     if(typeof setBnavActive==='function')setBnavActive('');
     if(typeof afterPageRender==='function')afterPageRender();
 
   }catch(e){
     document.getElementById('pbody').innerHTML='';
-showToast('Errore caricamento pagina: '+e.message, '⚠️', 4000);
+    showToast('Errore caricamento pagina: '+e.message,'⚠️',4000);
     if(typeof afterPageRender==='function')afterPageRender();
   }
 }
 
-/* ════════════════════════════════════
-   GLOSSARIO AUTOMATICO
-════════════════════════════════════ */
+/* ════ GLOSSARIO AUTOMATICO ════ */
 var _glossary={
   'gp':'Pezzi d\'oro — valuta principale di Arcamis',
   'mo':'Monete d\'oro — stessa cosa di gp',
@@ -403,7 +387,6 @@ var _glossary={
   'LV':'Livello del personaggio',
   'CD':'Classe Difficoltà — il numero da raggiungere nel dado'
 };
-
 function applyGlossary(root){
   var terms=Object.keys(_glossary);
   root.querySelectorAll('.n-p,.n-callout-body,.n-intro-body').forEach(function(el){
