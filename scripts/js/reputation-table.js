@@ -160,6 +160,11 @@ async function showReputationTable() {
   document.getElementById('pbody').style.maxWidth = 'none';
   document.getElementById('pbody').style.width = '100%';
   document.getElementById('main').scrollTo({ top: 0, behavior: 'smooth' });
+  // Deep link
+history.pushState(
+  { id: 'reputazioni', label: 'Reputazioni', icon: '🗺️', stack: [] },
+  '', '/reputazioni'
+);
 
   // Reset filtro e ordinamento
   _repFilter = '';
