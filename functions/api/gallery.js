@@ -85,7 +85,7 @@ return { id: p.id.replace(/-/g, ''), title, icon, cover: null, tags, posa };
 if (customPosa) p.posa = customPosa;
 
     /* 5. Salva in KV (senza cover, quelle vengono iniettate live) */
-    const cachePayload = { pages: pages.map(p => Object.assign({}, p, { cover: null, posa: null })) };
+    const cachePayload = { pages: pages.map(function(pg) { return Object.assign({}, pg, { cover: null, posa: null }); }) };
     if (KV) {
       await KV.put(cacheKey, JSON.stringify(cachePayload), { expirationTtl: CACHE_TTL });
     }
