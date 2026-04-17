@@ -81,6 +81,8 @@ return { id: p.id.replace(/-/g, ''), title, icon, cover: null, tags, posa };
     await injectCustomCovers(pages, KV);
 
     const payload = { pages };
+    const customPosa = await KV.get('admin_posa_' + p.id);
+if (customPosa) p.posa = customPosa;
 
     /* 5. Salva in KV (senza cover, quelle vengono iniettate live) */
     const cachePayload = { pages: pages.map(p => Object.assign({}, p, { cover: null, posa: null })) };
