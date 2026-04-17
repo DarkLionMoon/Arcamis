@@ -767,7 +767,7 @@ function handlePosaUpload(event, id) {
   var reader = new FileReader();
   reader.onload = function(e) {
     bar.style.width = '55%';
-    compressImage(e.target.result, function(b64) {
+    compressImagePosa(e.target.result, function(b64) {
       bar.style.width = '85%';
       doSavePosa(id, b64, function() {
         bar.style.width = '100%';
@@ -776,6 +776,22 @@ function handlePosaUpload(event, id) {
     });
   };
   reader.readAsDataURL(file);
+}
+
+function compressImagePosa(dataUrl, cb) {
+  var img = new Image();
+  img.onload = function() {
+    var MAX = 900, w = img.width, h = img.height;
+    if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+    if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+    var c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    var ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0, w, h);
+    cb(c.toDataURL('image/png'));
+  };
+  img.src = dataUrl;
 }
 
 async function doSavePosa(id, value, onDone) {
