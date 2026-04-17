@@ -581,7 +581,11 @@ window.gsFilter = function(btn, filter) {
     if (detail) detail.classList.add('hidden');
   }
 };
-
+window.gsOpenPage = function(id) {
+  var p = _galleryData && _galleryData.find(function(x) { return x.id === id; });
+  if (!p) return;
+  gp(id, p.title, p.icon);
+};
 /* ── Funzione principale: carica e mostra la galleria ── */
 /* ── Funzione principale: carica e mostra la galleria ── */
 window.loadGallery = function(container) {
