@@ -481,7 +481,7 @@ function renderGallery(container, pages) {
     var posa = p.posa ? _safeCover(p.posa) : null;
     var col = _getClassColor(p.tags);
     var tagLabel = p.tags && p.tags.length ? p.tags.join(' / ') : '';
-    var nameSafe = p.title.replace(/'/g, "\\'");
+    var nameSafe = p.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
     gridHtml += '<div class="gs-card" id="gsc-'+p.id+'"'
       + ' style="--gs-c:'+col.c+';--gs-glow:'+col.glow+'"'
       + ' data-tags="'+(p.tags||[]).join(',')+'"'
@@ -541,7 +541,7 @@ window.gsSelect = function(id, name) {
     + '<div class="gs-detail-eyebrow">Avventuriero</div>'
     + '<div class="gs-detail-name">'+p.title+'</div>'
     + (tagsHtml ? '<div class="gs-detail-tags">'+tagsHtml+'</div>' : '')
-    + '<div class="gs-detail-btn" onclick="gp(\''+id+'\',\''+p.title.replace(/'/g,"&apos;")+'\',\''+p.icon+'\')">'
+    p.title.replace(/'/g,"&apos;").replace(/"/g,'&quot;')
     + '⚔ Apri scheda personaggio'
     + '</div>'
     + '</div>';
