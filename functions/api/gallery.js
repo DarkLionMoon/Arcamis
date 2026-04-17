@@ -16,7 +16,7 @@ export async function onRequest(context) {
   };
 
   try {
-    const cacheKey = 'gallery_pg_v2';
+    const cacheKey = 'gallery_pg_v3';
 
     /* 1. Cache KV */
     if (KV) {
