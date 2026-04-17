@@ -156,3 +156,22 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
 }
+/* ════ SALVA POSA ════ */
+if (action === 'set_posa' && request.method === 'POST') {
+  let body;
+  try { body = await request.json(); } catch (e) {
+    return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+  }
+  const { pageId, posaUrl } = body;
+  if (!pageId) {
+    return new Response(JSON.stringify({ error: 'pageId mancante' }), { status: 400, headers: cors });
+  }
+  const key = 'admin_posa_' + pageId.replace(/-/g, '');
+  if (!posaUrl) {
+    await KV.delete(key);
+  } else {
+    await KV.put(key, posaUrl);
+  }
+  await writeAdminLog('posa_page', pageId);
+  return new Response(JSON.stringify({ ok: true }), { headers: cors });
+}
