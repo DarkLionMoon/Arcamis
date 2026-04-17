@@ -412,6 +412,19 @@ function renderGalleryGrid(){
 +'<input type="range" id="posy-'+p.id+'" min="0" max="100" value="50" style="width:100%;accent-color:var(--gold,#c89b3c)" oninput="previewPos(\''+p.id+'\')"/>'
 +'<div style="font-family:Cinzel,serif;font-size:9px;color:rgba(200,155,60,.5);margin:3px 0 6px" id="pos-label-'+p.id+'">50% 50%</div>'
 +'<button class="btn-save" onclick="savePos(\''+p.id+'\')" style="margin-bottom:4px">Salva posizione</button>'
++'<div class="card-divider"></div>'
++'<div class="cta-section-label" style="margin-bottom:6px">Immagine posa</div>'
++'<div class="upload-zone">'
++'<input type="file" accept="image/*" onchange="handlePosaUpload(event,\''+p.id+'\')" id="posafile-'+p.id+'"/>'
++'<span class="upload-zone-icon">🧍</span>'
++'<div class="upload-zone-txt">Carica immagine posa</div>'
++'<div class="upload-zone-sub">JPG · PNG · WEBP — max 5MB</div>'
++'</div>'
++'<div class="upload-progress" id="posaprog-'+p.id+'"><div class="upload-progress-bar" id="posabar-'+p.id+'"></div></div>'
++'<div class="card-actions">'
++'<button class="btn-remove" onclick="removePosa(\''+p.id+'\')" style="flex:1">✕ Rimuovi posa</button>'
++'</div>'
++'<div class="card-status" id="posastatus-'+p.id+'"></div>'
 +'<div class="card-status" id="status-'+p.id+'"></div>'
       +'</div>'
       +'</div>';
@@ -743,6 +756,71 @@ function getClassBg(tags){
   if(t.indexOf('sorcerer')>-1)return'background:linear-gradient(135deg,#180202,#240404)';
   if(t.indexOf('artificer')>-1)return'background:linear-gradient(135deg,#021018,#041820)';
   return'background:#0a0c14';
+}
+function handlePosaUpload(event, id) {
+  var file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5*1024*1024) { showToast('File troppo grande (max 5MB)'); return; }
+  var prog = document.getElementById('posaprog-' + id);
+  var bar  = document.getElementById('posabar-' + id);
+  prog.style.display = 'block'; bar.style.width = '25%';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    bar.style.width = '55%';
+    compressImage(e.target.result, function(b64) {
+      bar.style.width = '85%';
+      doSavePosa(id, b64, function() {
+        bar.style.width = '100%';
+        setTimeout(function(){ prog.style.display='none'; bar.style.width='0%'; }, 500);
+      });
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+async function doSavePosa(id, value, onDone) {
+  var statusEl = document.getElementById('posastatus-' + id);
+  if (statusEl) { statusEl.textContent = 'Salvataggio…'; statusEl.className = 'card-status'; }
+  try {
+    var r = await fetch('/api/admin?action=set_posa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pageId: id, posaUrl: value })
+    });
+    var d = await r.json();
+    if (d.ok) {
+      if (statusEl) { statusEl.textContent = '✓ Posa salvata'; statusEl.className = 'card-status ok'; }
+      showToast('Posa salvata ✓');
+    } else {
+      if (statusEl) { statusEl.textContent = '✕ Errore'; statusEl.className = 'card-status err'; }
+    }
+  } catch(e) {
+    if (statusEl) { statusEl.textContent = '✕ Errore rete'; statusEl.className = 'card-status err'; }
+  }
+  if (onDone) onDone();
+  setTimeout(function(){ if(statusEl) statusEl.textContent = ''; }, 3000);
+}
+
+async function removePosa(id) {
+  var statusEl = document.getElementById('posastatus-' + id);
+  if (statusEl) { statusEl.textContent = 'Rimozione…'; statusEl.className = 'card-status'; }
+  try {
+    var r = await fetch('/api/admin?action=set_posa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pageId: id, posaUrl: '' })
+    });
+    var d = await r.json();
+    if (d.ok) {
+      if (statusEl) { statusEl.textContent = '✓ Rimossa'; statusEl.className = 'card-status ok'; }
+      showToast('Posa rimossa ✓');
+    } else {
+      if (statusEl) { statusEl.textContent = '✕ Errore'; statusEl.className = 'card-status err'; }
+    }
+  } catch(e) {
+    if (statusEl) { statusEl.textContent = '✕ Errore rete'; statusEl.className = 'card-status err'; }
+  }
+  setTimeout(function(){ if(statusEl) statusEl.textContent = ''; }, 3000);
 }
 </script>
 </body>
