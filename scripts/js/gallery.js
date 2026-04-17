@@ -1,4 +1,4 @@
-/* ════════════════════════════════════
+/* ARCAMIS — gallery.js — Character Select Screen — Galleria PG */
    ARCAMIS — gallery.js
    Character Select Screen — Galleria PG
 ════════════════════════════════════ */
