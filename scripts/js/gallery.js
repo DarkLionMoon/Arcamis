@@ -1,7 +1,4 @@
-/* ARCAMIS — gallery.js — Character Select Screen — Galleria PG */
-   ARCAMIS — gallery.js
-   Character Select Screen — Galleria PG
-/* ARCAMIS — gallery.js — Character Select Screen — Galleria PG */ */
+/* ARCAMIS - gallery.js - Character Select Screen - Galleria PG */
 
 var _galleryData = null;
 var _gallerySelected = null;
