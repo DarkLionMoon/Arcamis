@@ -541,8 +541,7 @@ window.gsSelect = function(id, name) {
     + '<div class="gs-detail-eyebrow">Avventuriero</div>'
     + '<div class="gs-detail-name">'+p.title+'</div>'
     + (tagsHtml ? '<div class="gs-detail-tags">'+tagsHtml+'</div>' : '')
-    p.title.replace(/'/g,"&apos;").replace(/"/g,'&quot;')
-    + '⚔ Apri scheda personaggio'
+    + '<div class="gs-detail-btn" onclick="gsOpenPage(\''+id+'\')">⚔ Apri scheda personaggio</div>'
     + '</div>'
     + '</div>';
 
