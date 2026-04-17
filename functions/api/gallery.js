@@ -61,7 +61,20 @@ export async function onRequest(context) {
       }
 
       /* cover null — viene sovrascritta dalle cover admin se presenti */
-      return { id: p.id.replace(/-/g, ''), title, icon, cover: null, tags };
+      /* Immagine posa (Files & Media) */
+const posaProp = p.properties && (
+  p.properties['Immagine posa'] || p.properties['immagine posa'] ||
+  p.properties['Posa'] || p.properties['posa']
+);
+let posa = null;
+if (posaProp && posaProp.type === 'files' && posaProp.files && posaProp.files.length) {
+  const f = posaProp.files[0];
+  posa = f.type === 'external' ? f.external.url
+       : f.type === 'file'     ? f.file.url
+       : null;
+}
+
+return { id: p.id.replace(/-/g, ''), title, icon, cover: null, tags, posa };
     });
 
     /* 4. Inietta cover custom admin */
