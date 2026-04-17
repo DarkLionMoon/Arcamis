@@ -78,11 +78,19 @@ return { id: p.id.replace(/-/g, ''), title, icon, cover: null, tags, posa };
     });
 
     /* 4. Inietta cover custom admin */
-    await injectCustomCovers(pages, KV);
-
-    const payload = { pages };
-    const customPosa = await KV.get('admin_posa_' + p.id);
-if (customPosa) p.posa = customPosa;
+    async function injectCustomCovers(pages, KV) {
+  if (!KV || !pages || !pages.length) return;
+  await Promise.all(pages.map(async function(p) {
+    try {
+      const customCover = await KV.get('admin_cover_' + p.id);
+      if (customCover) p.cover = customCover;
+      const customPos = await KV.get('admin_cover_' + p.id + '_pos');
+      if (customPos) p.coverPos = customPos;
+      const customPosa = await KV.get('admin_posa_' + p.id);
+      if (customPosa) p.posa = customPosa;
+    } catch (e) {}
+  }));
+}
 
     /* 5. Salva in KV (senza cover, quelle vengono iniettate live) */
     const cachePayload = { pages: pages.map(function(pg) { return Object.assign({}, pg, { cover: null, posa: null }); }) };
