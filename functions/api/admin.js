@@ -155,8 +155,7 @@ export async function onRequest(context) {
     await writeAdminLog('cover_page', pageId);
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
-}
-/* ════ SALVA POSA ════ */
+  /* ════ SALVA POSA ════ */
 if (action === 'set_posa' && request.method === 'POST') {
   let body;
   try { body = await request.json(); } catch (e) {
@@ -174,4 +173,6 @@ if (action === 'set_posa' && request.method === 'POST') {
   }
   await writeAdminLog('posa_page', pageId);
   return new Response(JSON.stringify({ ok: true }), { headers: cors });
+}
+
 }
