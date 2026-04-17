@@ -516,6 +516,7 @@ window.gsSelect = function(id, name) {
 
   var col = _getClassColor(p.tags);
   var cover = _safeCover(p.cover);
+  var posa = p.posa ? _safeCover(p.posa) : null;
   var detail = document.getElementById('gs-detail');
   if (!detail) return;
 
