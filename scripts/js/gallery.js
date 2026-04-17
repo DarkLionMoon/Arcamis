@@ -428,6 +428,32 @@ function _injectGalleryCSS() {
   .gs-detail-name { font-size: 22px; }
   .gs-detail-body { padding: 24px 20px; }
 }
+/* ════ POSA SPLASH ════ */
+.gs-posa {
+  position: absolute;
+  bottom: 0;
+  right: 32px;
+  height: 115%;
+  width: auto;
+  max-width: 55%;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(-8px 0 32px rgba(0,0,0,.9));
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity .5s ease .1s, transform .5s cubic-bezier(.22,1,.36,1) .1s;
+  pointer-events: none;
+  z-index: 2;
+}
+.gs-posa.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+@media (max-width: 700px) {
+  .gs-posa { display: none; }
+}
+`;
+  document.head.appendChild(s);
 `;
   document.head.appendChild(s);
 }
@@ -457,6 +483,7 @@ function renderGallery(container, pages) {
   var gridHtml = '<div class="gs-grid" id="gs-grid">';
   pages.forEach(function(p) {
     var cover = _safeCover(p.cover);
+    var posa = p.posa ? _safeCover(p.posa) : null;
     var col = _getClassColor(p.tags);
     var tagLabel = p.tags && p.tags.length ? p.tags.join(' / ') : '';
     var nameSafe = p.title.replace(/'/g, "\\'");
@@ -508,6 +535,7 @@ window.gsSelect = function(id, name) {
     '<div class="gs-detail-cover">'
     + (cover ? '<div class="gs-detail-cover-img" style="background-image:url(\''+cover+'\')"></div>' : '<div class="gs-detail-cover-img" style="background:'+col.bg+'"></div>')
     + '<div class="gs-detail-cover-overlay"></div>'
+    + (posa ? '<img class="gs-posa" id="gs-posa-img" src="'+posa+'" alt="">' : '')
     + '</div>'
     + '<div class="gs-detail-body">'
     + '<div class="gs-corner gs-corner-tl"></div>'
@@ -522,6 +550,13 @@ window.gsSelect = function(id, name) {
     + '</div>'
     + '</div>';
 
+   if (posa) {
+    setTimeout(function() {
+      var img = document.getElementById('gs-posa-img');
+      if (img) img.classList.add('visible');
+    }, 50);
+  }
+   
   /* Scroll al dettaglio */
   setTimeout(function() {
     detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
