@@ -454,8 +454,6 @@ function _injectGalleryCSS() {
 }
 `;
   document.head.appendChild(s);
-`;
-  document.head.appendChild(s);
 }
 
 /* ── Render del character select ── */
