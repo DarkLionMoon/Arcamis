@@ -237,6 +237,12 @@ body{display:flex;flex-direction:column;min-height:100vh}
 <div class="section" id="sec-search">
   <div class="section-title">Indice di Ricerca</div>
   <div class="section-sub">Ricostruisci l'indice full-text dopo aver aggiornato contenuto su Notion.</div>
+  <div style="margin-bottom:24px;padding:16px;background:rgba(180,40,30,.06);border:1px solid rgba(180,40,30,.2)">
+    <div class="section-title" style="margin-bottom:6px">⚠️ Cache Notion</div>
+    <div style="font-size:13px;color:var(--text3);font-style:italic;margin-bottom:14px">Purga la cache KV delle pagine Notion. Usare solo se i contenuti del sito non si aggiornano dopo modifiche su Notion.</div>
+    <button class="btn-remove" style="padding:10px 24px;font-size:9px" onclick="runPurge()">🗑 Purga cache Notion</button>
+    <div class="card-status" id="purge-status"></div>
+  </div>
   <div id="search-index-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
 
     <div class="pg-card">
@@ -925,7 +931,20 @@ async function doSavePosa(id, value, onDone) {
   }
   setTimeout(function(){ if(statusEl) statusEl.textContent = ''; }, 5000);
 }
-
+async function runPurge() {
+  var statusEl = document.getElementById('purge-status');
+  if (statusEl) { statusEl.textContent = 'Purgando…'; statusEl.className = 'card-status'; }
+  try {
+    var r = await fetch('/api/notion?purge=1&key=Hermes');
+    var d = await r.json();
+    if (statusEl) { statusEl.textContent = '✓ Cache purgata'; statusEl.className = 'card-status ok'; }
+    showToast('Cache Notion purgata ✓');
+  } catch(e) {
+    if (statusEl) { statusEl.textContent = '✕ Errore'; statusEl.className = 'card-status err'; }
+    showToast('Errore purga cache');
+  }
+  setTimeout(function(){ if(statusEl) statusEl.textContent = ''; }, 4000);
+}
 
 async function removePosa(id) {
   var statusEl = document.getElementById('posastatus-' + id);
