@@ -96,7 +96,21 @@ function extractPageTitle(page) {
 function extractPageIcon(page) {
   return page.icon && page.icon.emoji ? page.icon.emoji : '📄';
 }
-
+function extractProperties(page) {
+  const parts = [];
+  for (const prop of Object.values(page.properties || {})) {
+    if (prop.type === 'select' && prop.select) {
+      parts.push(prop.select.name || '');
+    } else if (prop.type === 'multi_select') {
+      (prop.multi_select || []).forEach(s => parts.push(s.name || ''));
+    } else if (prop.type === 'rich_text') {
+      (prop.rich_text || []).forEach(t => parts.push(t.plain_text || ''));
+    } else if (prop.type === 'title') {
+      (prop.title || []).forEach(t => parts.push(t.plain_text || ''));
+    }
+  }
+  return parts.filter(Boolean).join(' ');
+}
   export async function onRequest(context) {
   const url = new URL(context.request.url);
   const key = url.searchParams.get('key');
@@ -142,8 +156,10 @@ function extractPageIcon(page) {
           const icon = extractPageIcon(page);
           const id = page.id.replace(/-/g, '');
           const blocks = await fetchBlocks(id, TOKEN);
-          const text = extractText(blocks);
-          const entry = { id, title, icon, text };
+const bodyText = extractText(blocks);
+const propsText = extractProperties(page);
+const text = (propsText + ' ' + bodyText).trim();
+const entry = { id, title, icon, text };
           await KV.put('search_idx:' + id, JSON.stringify(entry), { expirationTtl: 60 * 60 * 24 * 7 });
           dbCount++;
         } catch (e) {}
