@@ -33,3 +33,27 @@ var pages = [
 function getPage(idOrK){
   return pages.find(p => p.id === idOrK || p.k === idOrK);
 }
+/* ════ LAVORI & MESTIERI ════ */
+var LAVORI = [
+  { l:'Gilda avventurieri',          i:'🗡️', id:'2f00274fdc1c801b8c13cefd9e15694e' },
+  { l:'Locanda',                     i:'🍺', id:'2f00274fdc1c80faa99eda064ef0fabc' },
+  { l:'Forgia',                      i:'🔥', id:'2f00274fdc1c805ca01ec57f18d2ffee' },
+  { l:'Biblioteca',                  i:'📚', id:'2f00274fdc1c8089bfe6c24434d53b67' },
+  { l:'Bottega farmaceutica',        i:'💊', id:'2f00274fdc1c801c9697e75caa8d5f13' },
+  { l:'Caserma',                     i:'🛡️', id:'2ff0274fdc1c80688dd6c2b293a1f626' },
+  { l:'Corporazione dei costruttori',i:'🔨', id:'2ff0274fdc1c80769a4ae243f22f0582' },
+  { l:'Ospedale',                    i:'⚕️', id:'2f00274fdc1c807aa03cc6cbeb3687cc' },
+  { l:'Sartoria',                    i:'🧵', id:'2ff0274fdc1c8035bad4f0b6ab705192' },
+];
+
+var MESTIERI = [
+  { l:'Come funzionano', i:'📜', k:'come-funzionano' },
+  { l:'Alchimista',      i:'⚗️', k:'alchimista'      },
+  { l:'Architetto',      i:'🏛️', k:'architetto'      },
+  { l:'Artigiano',       i:'🔨', k:'artigiano'        },
+  { l:'Artista',         i:'🎨', k:'artista'          },
+  { l:'Falegname',       i:'🪚', k:'falegname'        },
+  { l:'Metallurgo',      i:'⚒️', k:'metallurgo'       },
+  { l:'Oste',            i:'🍺', k:'oste'             },
+  { l:'Sarto',           i:'🧵', k:'sarto'            },
+];
