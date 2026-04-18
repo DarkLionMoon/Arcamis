@@ -124,7 +124,13 @@ function extractProperties(page) {
   if (key !== SECRET) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: cors });
   }
-
+  if (url.searchParams.get('action') === 'clear') {
+    const list = await KV.list({ prefix: 'search_idx:' });
+    for (const k of list.keys) {
+      await KV.delete(k.name);
+    }
+    return new Response(JSON.stringify({ ok: true, deleted: list.keys.length }), { headers: cors });
+  }
   const results = [];
 
   if (!dbParam) {
