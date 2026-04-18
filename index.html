@@ -78,33 +78,47 @@
     </div>
 
     <!-- ── Lavori ▾ ── -->
-    <div class="tn-drop" id="dd-lavori">
-      <div class="tn" onclick="toggleDd('dd-lavori',event)">Lavori</div>
-      <div class="tn-menu">
-        <div class="tn-menu-label">Lavori</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️')"><span class="tn-ii">🗡️</span>Gilda avventurieri</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')"><span class="tn-ii">🍺</span>Locanda</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')"><span class="tn-ii">🔥</span>Forgia</div>
-        <div class="tn-div"></div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c8089bfe6c24434d53b67','Biblioteca','📚')"><span class="tn-ii">📚</span>Biblioteca</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801c9697e75caa8d5f13','Bottega farmaceutica','💊')"><span class="tn-ii">💊</span>Bottega farmaceutica</div>
-        <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c80688dd6c2b293a1f626','Caserma','🛡️')"><span class="tn-ii">🛡️</span>Caserma</div>
-        <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c80769a4ae243f22f0582','Corporazione costruttori','🔨')"><span class="tn-ii">🔨</span>Corporazione dei costruttori</div>
-        <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')"><span class="tn-ii">⚕️</span>Ospedale</div>
-        <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c8035bad4f0b6ab705192','Sartoria','🧵')"><span class="tn-ii">🧵</span>Sartoria</div>
-        <div class="tn-div"></div>
-        <div class="tn-menu-label">Mestieri</div>
-        <div class="tn-item" onclick="closeDd();showMestiere('come-funzionano')"><span class="tn-ii">📜</span>Come funzionano</div>
-        <div class="tn-item" onclick="closeDd();showMestiere('alchimista')"><span class="tn-ii">⚗️</span>Alchimista</div>
-        <div class="tn-item" onclick="closeDd();showMestiere('architetto')"><span class="tn-ii">🏛️</span>Architetto</div>
-        <div class="tn-item" onclick="closeDd();showMestiere('artigiano')"><span class="tn-ii">🔨</span>Artigiano</div>
-        <div class="tn-item" onclick="closeDd();showMestiere('artista')"><span class="tn-ii">🎨</span>Artista</div>
-        <div class="tn-item" onclick="closeDd();showMestiere('falegname')"><span class="tn-ii">🪚</span>Falegname</div>
-        <div class="tn-item" onclick="closeDd();showMestiere('metallurgo')"><span class="tn-ii">⚒️</span>Metallurgo</div>
-        <div class="tn-item" onclick="closeDd();showMestiere('oste')"><span class="tn-ii">🍺</span>Oste</div>
-        <div class="tn-item" onclick="closeDd();showMestiere('sarto')"><span class="tn-ii">🧵</span>Sarto</div>
-      </div>
+<div class="tn-drop" id="dd-lavori">
+  <div class="tn" onclick="toggleDd('dd-lavori',event)">Lavori</div>
+  <div class="tn-menu tn-menu--acc">
+
+    <!-- ACCORDION: Lavori -->
+    <div class="tn-acc-header open" onclick="toggleTnAcc(this)">
+      <span class="tn-menu-label" style="margin:0">Lavori</span>
+      <span class="tn-acc-arrow">▾</span>
     </div>
+    <div class="tn-acc-body">
+      <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801b8c13cefd9e15694e','Gilda avventurieri','🗡️')"><span class="tn-ii">🗡️</span>Gilda avventurieri</div>
+      <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c80faa99eda064ef0fabc','Locanda','🍺')"><span class="tn-ii">🍺</span>Locanda</div>
+      <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c805ca01ec57f18d2ffee','Forgia','🔥')"><span class="tn-ii">🔥</span>Forgia</div>
+      <div class="tn-div"></div>
+      <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c8089bfe6c24434d53b67','Biblioteca','📚')"><span class="tn-ii">📚</span>Biblioteca</div>
+      <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c801c9697e75caa8d5f13','Bottega farmaceutica','💊')"><span class="tn-ii">💊</span>Bottega farmaceutica</div>
+      <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c80688dd6c2b293a1f626','Caserma','🛡️')"><span class="tn-ii">🛡️</span>Caserma</div>
+      <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c80769a4ae243f22f0582','Corporazione costruttori','🔨')"><span class="tn-ii">🔨</span>Corporazione dei costruttori</div>
+      <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c807aa03cc6cbeb3687cc','Ospedale','⚕️')"><span class="tn-ii">⚕️</span>Ospedale</div>
+      <div class="tn-item" onclick="closeDd();gp('2ff0274fdc1c8035bad4f0b6ab705192','Sartoria','🧵')"><span class="tn-ii">🧵</span>Sartoria</div>
+    </div>
+
+    <!-- ACCORDION: Mestieri -->
+    <div class="tn-acc-header" onclick="toggleTnAcc(this)">
+      <span class="tn-menu-label" style="margin:0">Mestieri</span>
+      <span class="tn-acc-arrow">▾</span>
+    </div>
+    <div class="tn-acc-body" style="display:none">
+      <div class="tn-item" onclick="closeDd();showMestiere('come-funzionano')"><span class="tn-ii">📜</span>Come funzionano</div>
+      <div class="tn-item" onclick="closeDd();showMestiere('alchimista')"><span class="tn-ii">⚗️</span>Alchimista</div>
+      <div class="tn-item" onclick="closeDd();showMestiere('architetto')"><span class="tn-ii">🏛️</span>Architetto</div>
+      <div class="tn-item" onclick="closeDd();showMestiere('artigiano')"><span class="tn-ii">🔨</span>Artigiano</div>
+      <div class="tn-item" onclick="closeDd();showMestiere('artista')"><span class="tn-ii">🎨</span>Artista</div>
+      <div class="tn-item" onclick="closeDd();showMestiere('falegname')"><span class="tn-ii">🪚</span>Falegname</div>
+      <div class="tn-item" onclick="closeDd();showMestiere('metallurgo')"><span class="tn-ii">⚒️</span>Metallurgo</div>
+      <div class="tn-item" onclick="closeDd();showMestiere('oste')"><span class="tn-ii">🍺</span>Oste</div>
+      <div class="tn-item" onclick="closeDd();showMestiere('sarto')"><span class="tn-ii">🧵</span>Sarto</div>
+    </div>
+
+  </div>
+</div>
 
     <!-- ── Lore ▾ ── -->
     <div class="tn-drop" id="dd-lore">
