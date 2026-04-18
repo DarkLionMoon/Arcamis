@@ -185,10 +185,12 @@ function hsearch(val){
         var res = data.results || [];
         if(!res.length){ sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Nessun risultato</div>'; return; }
         sr.innerHTML = res.map(function(p){
-          var sub = p.parentTitle ? '<span class="sri-tag">'+p.parentTitle+'</span>' : '';
-          return '<div class="sri" onclick="csearch();gp(\''+p.id+'\',\''+p.title+'\',\''+p.icon+'\')">'
-            +'<span class="si2">'+p.icon+'</span><span class="sl">'+p.title+'</span>'+sub+'</div>';
-        }).join('');
+  var snippet = p.snippet ? '<div class="sri-snippet">'+p.snippet+'</div>' : '';
+  return '<div class="sri" onclick="csearch();gp(\''+p.id+'\',\''+p.title+'\',\''+p.icon+'\')">'
+    +'<span class="si2">'+p.icon+'</span>'
+    +'<div class="sri-body"><span class="sl">'+p.title+'</span>'+snippet+'</div>'
+    +'</div>';
+}).join('');
         sr.classList.add('open');
       })
       .catch(function(){ if(sr) sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Errore ricerca</div>'; });
