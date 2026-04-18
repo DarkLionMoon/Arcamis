@@ -1278,3 +1278,22 @@ body.light .ahp-send-btn{color:var(--gold)!important}
 }
 .tn-acc-header.open .tn-acc-arrow { transform: rotate(180deg); }
 .tn-acc-body { padding: 2px 0 4px; }
+/* ── Search snippet ── */
+.sri { align-items: flex-start; }
+.sri-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sri-snippet {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+.sri-snippet mark {
+  background: rgba(201,162,39,0.25);
+  color: var(--gold2);
+  border-radius: 2px;
+  padding: 0 1px;
+  font-style: normal;
+}
