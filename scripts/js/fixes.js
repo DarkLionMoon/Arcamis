@@ -162,3 +162,72 @@ function toggleTnAcc(header) {
   header.classList.toggle('open', !isOpen);
   header.nextElementSibling.style.display = isOpen ? 'none' : 'block';
 }
+/* ════ BUILD LAVORI NAV DINAMICO ════ */
+function buildLavoriNav() {
+  // ── Desktop accordion bodies ──
+  var ddMenu = document.querySelector('#dd-lavori .tn-menu--acc');
+  if (ddMenu) {
+    var bodies = ddMenu.querySelectorAll('.tn-acc-body');
+    var lavoriBody   = bodies[0];
+    var mestieriBody = bodies[1];
+
+    if (lavoriBody) {
+      lavoriBody.innerHTML = '';
+      LAVORI.forEach(function(v, i) {
+        if (i === 2) lavoriBody.appendChild(_tnDiv()); // separatore dopo Forgia
+        var el = _tnItem(v.i, v.l, function() { closeDd(); gp(v.id, v.l, v.i); });
+        lavoriBody.appendChild(el);
+      });
+    }
+
+    if (mestieriBody) {
+      mestieriBody.innerHTML = '';
+      MESTIERI.forEach(function(v) {
+        var el = _tnItem(v.i, v.l, function(k){ return function(){ closeDd(); showMestiere(k); }; }(v.k));
+        mestieriBody.appendChild(el);
+      });
+    }
+  }
+
+  // ── Mobile drawer ──
+  var mnLavori   = document.querySelector('#mobile-nav .mn-section--lavori');
+  var mnMestieri = document.querySelector('#mobile-nav .mn-section--mestieri');
+
+  if (mnLavori) {
+    mnLavori.innerHTML = '<div class="mn-label">Lavori</div>';
+    LAVORI.forEach(function(v) {
+      var el = _mnItem(v.i, v.l, function(id,l,i){ return function(){ closeMobileNav(); gp(id,l,i); }; }(v.id,v.l,v.i));
+      mnLavori.appendChild(el);
+    });
+  }
+
+  if (mnMestieri) {
+    mnMestieri.innerHTML = '<div class="mn-label">Mestieri</div>';
+    MESTIERI.forEach(function(v) {
+      var el = _mnItem(v.i, v.l, function(k){ return function(){ closeMobileNav(); showMestiere(k); }; }(v.k));
+      mnMestieri.appendChild(el);
+    });
+  }
+}
+
+function _tnItem(icon, label, fn) {
+  var d = document.createElement('div');
+  d.className = 'tn-item';
+  d.innerHTML = '<span class="tn-ii">' + icon + '</span>' + label;
+  d.addEventListener('click', fn);
+  return d;
+}
+function _tnDiv() {
+  var d = document.createElement('div');
+  d.className = 'tn-div';
+  return d;
+}
+function _mnItem(icon, label, fn) {
+  var d = document.createElement('div');
+  d.className = 'mn-item';
+  d.innerHTML = '<span class="mn-ii">' + icon + '</span>' + label;
+  d.addEventListener('click', fn);
+  return d;
+}
+
+document.addEventListener('DOMContentLoaded', buildLavoriNav);
