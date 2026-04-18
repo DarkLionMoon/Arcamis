@@ -98,8 +98,10 @@ function extractPageIcon(page) {
 }
 
 export async function onRequest(context) {
+  export async function onRequest(context) {
   const url = new URL(context.request.url);
   const key = url.searchParams.get('key');
+  const dbParam = url.searchParams.get('db'); // es. ?db=specie
   const TOKEN = context.env.NOTION_TOKEN;
   const SECRET = context.env.PURGE_SECRET;
   const KV = context.env.ARCAMIS_CACHE;
@@ -112,21 +114,25 @@ export async function onRequest(context) {
 
   const results = [];
 
-  // Indicizza pagine note
-  for (const page of PAGES_TO_INDEX) {
-    try {
-      const blocks = await fetchBlocks(page.id, TOKEN);
-      const text = extractText(blocks);
-      const entry = { id: page.id, title: page.title, icon: page.icon, text };
-      await KV.put('search_idx:' + page.id, JSON.stringify(entry), { expirationTtl: 60 * 60 * 24 * 7 });
-      results.push({ id: page.id, title: page.title, ok: true, chars: text.length });
-    } catch (e) {
-      results.push({ id: page.id, title: page.title, ok: false, error: e.message });
+  if (!dbParam) {
+    // Solo pagine note, nessun database
+    for (const page of PAGES_TO_INDEX) {
+      try {
+        const blocks = await fetchBlocks(page.id, TOKEN);
+        const text = extractText(blocks);
+        const entry = { id: page.id, title: page.title, icon: page.icon, text };
+        await KV.put('search_idx:' + page.id, JSON.stringify(entry), { expirationTtl: 60 * 60 * 24 * 7 });
+        results.push({ id: page.id, title: page.title, ok: true, chars: text.length });
+      } catch (e) {
+        results.push({ id: page.id, title: page.title, ok: false, error: e.message });
+      }
     }
-  }
-
-  // Indicizza pagine dei database
-  for (const db of DATABASES_TO_INDEX) {
+  } else {
+    // Indicizza solo il database richiesto
+    const db = DATABASES_TO_INDEX.find(d => d.label.toLowerCase().replace(/\s+/g, '-') === dbParam);
+    if (!db) {
+      return new Response(JSON.stringify({ error: 'Database non trovato: ' + dbParam }), { headers: cors });
+    }
     try {
       const pages = await fetchDatabasePages(db.id, TOKEN);
       let dbCount = 0;
