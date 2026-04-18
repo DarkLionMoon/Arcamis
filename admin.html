@@ -216,6 +216,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
     <div class="tabs">
       <div class="tab active" onclick="switchTab('gallery',this)">Galleria PG</div>
       <div class="tab" onclick="switchTab('carousel',this)">Carousel Home</div>
+      <div class="tab" onclick="switchTab('search',this)">Indice Ricerca</div>
     </div>
 
     <!-- TAB GALLERIA -->
@@ -232,6 +233,95 @@ body{display:flex;flex-direction:column;min-height:100vh}
       <div class="section-sub">Modifica sfondo e bottoni CTA di ogni slide della homepage.</div>
       <div id="carousel-grid"><div class="loading-wrap"><div class="spin"></div><div class="loading-txt">Caricamento…</div></div></div>
     </div>
+    <!-- TAB INDICE RICERCA -->
+<div class="section" id="sec-search">
+  <div class="section-title">Indice di Ricerca</div>
+  <div class="section-sub">Ricostruisci l'indice full-text dopo aver aggiornato contenuto su Notion.</div>
+  <div id="search-index-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+
+    <div class="pg-card">
+      <div class="pg-body">
+        <div class="pg-name">📄 Pagine principali</div>
+        <div style="font-size:13px;color:var(--text3);font-style:italic;margin-bottom:12px">Gameplay, Regole, Lavori, Lore…</div>
+        <button class="btn-save" onclick="runIndex('')">Reindicizza</button>
+        <div class="card-status" id="idx-status-main"></div>
+      </div>
+    </div>
+
+    <div class="pg-card">
+      <div class="pg-body">
+        <div class="pg-name">🧬 Specie HB</div>
+        <div style="font-size:13px;color:var(--text3);font-style:italic;margin-bottom:12px">Tutte le specie homebrew</div>
+        <button class="btn-save" onclick="runIndex('specie-hb')">Reindicizza</button>
+        <div class="card-status" id="idx-status-specie-hb"></div>
+      </div>
+    </div>
+
+    <div class="pg-card">
+      <div class="pg-body">
+        <div class="pg-name">🧬 Specie HB alt</div>
+        <div style="font-size:13px;color:var(--text3);font-style:italic;margin-bottom:12px">Database specie alternativo</div>
+        <button class="btn-save" onclick="runIndex('specie-hb-alt')">Reindicizza</button>
+        <div class="card-status" id="idx-status-specie-hb-alt"></div>
+      </div>
+    </div>
+
+    <div class="pg-card">
+      <div class="pg-body">
+        <div class="pg-name">⚔️ Classi HB</div>
+        <div style="font-size:13px;color:var(--text3);font-style:italic;margin-bottom:12px">Classi homebrew</div>
+        <button class="btn-save" onclick="runIndex('classi-hb')">Reindicizza</button>
+        <div class="card-status" id="idx-status-classi-hb"></div>
+      </div>
+    </div>
+
+    <div class="pg-card">
+      <div class="pg-body">
+        <div class="pg-name">🗡️ Sottoclassi HB</div>
+        <div style="font-size:13px;color:var(--text3);font-style:italic;margin-bottom:12px">Sottoclassi homebrew</div>
+        <button class="btn-save" onclick="runIndex('sottoclassi-hb')">Reindicizza</button>
+        <div class="card-status" id="idx-status-sottoclassi-hb"></div>
+      </div>
+    </div>
+
+    <div class="pg-card">
+      <div class="pg-body">
+        <div class="pg-name">📚 Biblioteca</div>
+        <div style="font-size:13px;color:var(--text3);font-style:italic;margin-bottom:12px">Libri e tomi</div>
+        <button class="btn-save" onclick="runIndex('biblioteca')">Reindicizza</button>
+        <div class="card-status" id="idx-status-biblioteca"></div>
+      </div>
+    </div>
+
+    <div class="pg-card">
+      <div class="pg-body">
+        <div class="pg-name">🖼️ Galleria PG</div>
+        <div style="font-size:13px;color:var(--text3);font-style:italic;margin-bottom:12px">Personaggi giocanti</div>
+        <button class="btn-save" onclick="runIndex('galleria-pg')">Reindicizza</button>
+        <div class="card-status" id="idx-status-galleria-pg"></div>
+      </div>
+    </div>
+
+    <div class="pg-card">
+      <div class="pg-body">
+        <div class="pg-name">🧑 NPC Arcamis</div>
+        <div style="font-size:13px;color:var(--text3);font-style:italic;margin-bottom:12px">Personaggi non giocanti</div>
+        <button class="btn-save" onclick="runIndex('npc-arcamis')">Reindicizza</button>
+        <div class="card-status" id="idx-status-npc-arcamis"></div>
+      </div>
+    </div>
+
+    <div class="pg-card">
+      <div class="pg-body">
+        <div class="pg-name">🧑 NPC Virturia</div>
+        <div style="font-size:13px;color:var(--text3);font-style:italic;margin-bottom:12px">NPC di Virturia</div>
+        <button class="btn-save" onclick="runIndex('npc-virturia')">Reindicizza</button>
+        <div class="card-status" id="idx-status-npc-virturia"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
   </div>
 </div>
 
@@ -815,6 +905,25 @@ async function doSavePosa(id, value, onDone) {
   }
   if (onDone) onDone();
   setTimeout(function(){ if(statusEl) statusEl.textContent = ''; }, 3000);
+  async function runIndex(db) {
+  var key = db || 'main';
+  var statusEl = document.getElementById('idx-status-' + key);
+  if (statusEl) { statusEl.textContent = 'Indicizzazione…'; statusEl.className = 'card-status'; }
+  var url = '/api/index-build?key=Hermes' + (db ? '&db=' + db : '');
+  try {
+    var r = await fetch(url);
+    var d = await r.json();
+    var pages = db
+      ? (d.results && d.results[0] ? d.results[0].pages : '?')
+      : d.indexed;
+    if (statusEl) { statusEl.textContent = '✓ ' + pages + ' indicizzate'; statusEl.className = 'card-status ok'; }
+    showToast('Indice aggiornato ✓');
+  } catch(e) {
+    if (statusEl) { statusEl.textContent = '✕ Errore'; statusEl.className = 'card-status err'; }
+    showToast('Errore indicizzazione');
+  }
+  setTimeout(function(){ if(statusEl) statusEl.textContent = ''; }, 5000);
+}
 }
 
 async function removePosa(id) {
