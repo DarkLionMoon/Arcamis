@@ -905,6 +905,7 @@ async function doSavePosa(id, value, onDone) {
   }
   if (onDone) onDone();
   setTimeout(function(){ if(statusEl) statusEl.textContent = ''; }, 3000);
+  }
   async function runIndex(db) {
   var key = db || 'main';
   var statusEl = document.getElementById('idx-status-' + key);
@@ -924,7 +925,7 @@ async function doSavePosa(id, value, onDone) {
   }
   setTimeout(function(){ if(statusEl) statusEl.textContent = ''; }, 5000);
 }
-}
+
 
 async function removePosa(id) {
   var statusEl = document.getElementById('posastatus-' + id);
