@@ -44,6 +44,7 @@ var LAVORI = [
   { l:'Corporazione dei costruttori',i:'🔨', id:'2ff0274fdc1c80769a4ae243f22f0582' },
   { l:'Ospedale',                    i:'⚕️', id:'2f00274fdc1c807aa03cc6cbeb3687cc' },
   { l:'Sartoria',                    i:'🧵', id:'2ff0274fdc1c8035bad4f0b6ab705192' },
+  { l:'Tribunale',                   i:'⚖️', id:'3460274fdc1c800c8b3bf9a53d0cbf59' },
 ];
 
 var MESTIERI = [
