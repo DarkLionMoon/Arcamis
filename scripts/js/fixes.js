@@ -148,3 +148,17 @@
   })();
 
 })();
+function toggleTnAcc(header) {
+  var menu = header.closest('.tn-menu--acc');
+  // chiudi tutti gli altri header della stessa menu
+  menu.querySelectorAll('.tn-acc-header').forEach(function(h) {
+    if (h !== header) {
+      h.classList.remove('open');
+      h.nextElementSibling.style.display = 'none';
+    }
+  });
+  // toggle quello cliccato
+  var isOpen = header.classList.contains('open');
+  header.classList.toggle('open', !isOpen);
+  header.nextElementSibling.style.display = isOpen ? 'none' : 'block';
+}
