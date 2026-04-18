@@ -1258,3 +1258,23 @@ body.light .ahp-send-btn{color:var(--gold)!important}
   border-color: var(--gold3);
   color: var(--gold2);
 }
+/* ── Accordion nel dropdown Lavori ── */
+.tn-acc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 14px 7px 16px;
+  cursor: pointer;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  transition: background .12s;
+}
+.tn-acc-header:first-child { border-top: none; }
+.tn-acc-header:hover { background: rgba(255,255,255,0.04); }
+.tn-acc-arrow {
+  font-size: 10px;
+  color: var(--gold3, #8a6a28);
+  transition: transform .2s ease;
+  margin-left: 8px;
+}
+.tn-acc-header.open .tn-acc-arrow { transform: rotate(180deg); }
+.tn-acc-body { padding: 2px 0 4px; }
