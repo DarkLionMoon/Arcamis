@@ -97,7 +97,6 @@ function extractPageIcon(page) {
   return page.icon && page.icon.emoji ? page.icon.emoji : '📄';
 }
 
-export async function onRequest(context) {
   export async function onRequest(context) {
   const url = new URL(context.request.url);
   const key = url.searchParams.get('key');
