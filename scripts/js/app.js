@@ -181,7 +181,7 @@ function hsearch(val){
       .then(function(r){ return r.json(); })
       .then(function(data){
         if(!sr) return;
-        if(data.stale){ sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic">Indice non ancora costruito</div>'; return; }
+        if(data.stale || !data.results){ sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic">Indice non ancora costruito</div>'; return; }
         var res = data.results || [];
         if(!res.length){ sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Nessun risultato</div>'; return; }
         sr.innerHTML = res.map(function(p){
