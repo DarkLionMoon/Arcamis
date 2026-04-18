@@ -19,7 +19,16 @@ const PAGES_TO_INDEX = [
   { id:'2f10274fdc1c80489f23c49164747770', title:'Mappe',                       icon:'🗺️' },
   { id:'2f00274fdc1c802a9babd4239d97a319', title:'Maestria / Titoli',           icon:'🏅' },
   { id:'2f00274fdc1c80e78ad7ce985007b7c6', title:'Homebrew',                    icon:'⚗️' },
-  { id:'2f00274fdc1c8065a11ff45192aa5dcb', title:'Gameplay',                    icon:'⚔️' },
+];
+
+const DATABASES_TO_INDEX = [
+  { id:'2fd0274fdc1c8001bf09e373134ab721', label:'Galleria PG' },
+  { id:'2f60274fdc1c80fba671c588ba93b116', label:'Specie HB' },
+  { id:'2ff0274fdc1c807ea473db02ac4ae391', label:'Specie HB alt' },
+  { id:'2f70274fdc1c80e3bdc7f95f81eb9cc0', label:'Sottoclassi HB' },
+  { id:'3350274fdc1c808fba5ed9ad1f3b4bb4', label:'Classi HB' },
+  { id:'3040274fdc1c80e0a0dccfa9761bff55', label:'Biblioteca' },
+  { id:'2f90274fdc1c8015bf95f52c4e7681b8', label:'NPC' },
 ];
 
 async function fetchBlocks(pageId, token) {
@@ -55,6 +64,39 @@ function extractText(blocks) {
   return lines.join(' ');
 }
 
+async function fetchDatabasePages(dbId, token) {
+  const pages = [];
+  let cursor = undefined;
+  do {
+    const body = { page_size: 100 };
+    if (cursor) body.start_cursor = cursor;
+    const res = await fetch('https://api.notion.com/v1/databases/' + dbId + '/query', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) break;
+    const data = await res.json();
+    pages.push(...(data.results || []));
+    cursor = data.has_more ? data.next_cursor : undefined;
+  } while (cursor);
+  return pages;
+}
+
+function extractPageTitle(page) {
+  const titleProp = Object.values(page.properties || {}).find(v => v.type === 'title');
+  if (titleProp) return (titleProp.title || []).map(t => t.plain_text).join('').trim();
+  return '';
+}
+
+function extractPageIcon(page) {
+  return page.icon && page.icon.emoji ? page.icon.emoji : '📄';
+}
+
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const key = url.searchParams.get('key');
@@ -69,6 +111,8 @@ export async function onRequest(context) {
   }
 
   const results = [];
+
+  // Indicizza pagine note
   for (const page of PAGES_TO_INDEX) {
     try {
       const blocks = await fetchBlocks(page.id, TOKEN);
@@ -78,6 +122,30 @@ export async function onRequest(context) {
       results.push({ id: page.id, title: page.title, ok: true, chars: text.length });
     } catch (e) {
       results.push({ id: page.id, title: page.title, ok: false, error: e.message });
+    }
+  }
+
+  // Indicizza pagine dei database
+  for (const db of DATABASES_TO_INDEX) {
+    try {
+      const pages = await fetchDatabasePages(db.id, TOKEN);
+      let dbCount = 0;
+      for (const page of pages) {
+        try {
+          const title = extractPageTitle(page);
+          if (!title) continue;
+          const icon = extractPageIcon(page);
+          const id = page.id.replace(/-/g, '');
+          const blocks = await fetchBlocks(id, TOKEN);
+          const text = extractText(blocks);
+          const entry = { id, title, icon, text };
+          await KV.put('search_idx:' + id, JSON.stringify(entry), { expirationTtl: 60 * 60 * 24 * 7 });
+          dbCount++;
+        } catch (e) {}
+      }
+      results.push({ db: db.label, ok: true, pages: dbCount });
+    } catch (e) {
+      results.push({ db: db.label, ok: false, error: e.message });
     }
   }
 
