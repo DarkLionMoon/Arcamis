@@ -306,7 +306,7 @@ window.showReputationTable = function() {
 
     var pbody = document.getElementById('pbody');
     if (pbody) {
-      pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">'
+      pbody.innerHTML = '<div class="nc pb-wide-trigger" style="animation:fi .22s ease forwards">'
         + '<div style="margin-bottom:1.2rem">'
         + '<input id="rep-search" type="text" placeholder="Cerca personaggio…" '
         + 'style="padding:6px 12px;background:#111;border:1px solid #333;color:#e8d5a3;border-radius:4px;font-family:\'Crimson Pro\',serif;font-size:0.95rem;width:100%;max-width:320px"/>'
