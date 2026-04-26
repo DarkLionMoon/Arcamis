@@ -450,6 +450,10 @@ function closeSubMap(id){
 
 /* ════ POPSTATE ════ */
 window.addEventListener('popstate', function(e){
+   if (state && state.id === 'reputazioni') {
+  if (typeof showReputationTable === 'function') showReputationTable();
+  return;
+}
   if(e && e.state && e.state.id){
     if(e.state.stack) navStack = JSON.parse(JSON.stringify(e.state.stack));
     if(e.state.id.startsWith('mestiere-')){
