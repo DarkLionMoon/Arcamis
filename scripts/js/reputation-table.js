@@ -1,246 +1,273 @@
-// ═══════════════════════════════════════════════════════════
-//  reputation-table.js — Tabella reputazione PG per regione
-// ═══════════════════════════════════════════════════════════
+// reputation-table.js — Arcamis Wiki
+// Legge il nuovo Google Sheet con struttura a doppio header (regione + sotto-fazione)
+// Sheet ID: 1196WfeJFp4C9QIKnwAR2O3exz3AkfRDvwcBAiIBHV0M  gid: 1406195911
 
-const REP_SHEET_URL =
-  'https://docs.google.com/spreadsheets/d/1196WfeJFp4C9QIKnwAR2O3exz3AkfRDvwcBAiIBHV0M/export?format=csv&gid=1284615895';
-const REP_CACHE_KEY = 'arcamis_rep_cache';
-const REP_CACHE_TTL = 10 * 60 * 1000;
+(function () {
+  const SHEET_ID = '1196WfeJFp4C9QIKnwAR2O3exz3AkfRDvwcBAiIBHV0M';
+  const GID      = '1406195911';
+  const CSV_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+  const CACHE_KEY   = 'arcamis_rep_v2';
+  const CACHE_TS    = 'arcamis_rep_v2_ts';
+  const CACHE_TTL   = 5 * 60 * 1000; // 5 minuti
 
-// ─── CSV parser ───
-function parseCSV(text) {
-  text = text.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-  const lines = text.trim().split('\n');
-  const result = [];
-  for (const line of lines) {
-    const row = [];
-    let cur = '', inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const c = line[i];
-      if (c === '"') { inQ = !inQ; }
-      else if (c === ',' && !inQ) { row.push(cur.trim()); cur = ''; }
-      else { cur += c; }
-    }
-    row.push(cur.trim());
-    result.push(row);
-  }
-  return result;
-}
+  // ── Regioni e loro colori (ordine come nel CSV) ──────────────────────────
+  const REGION_COLORS = {
+    'ARCADIA':      '#4a7c59',
+    'BANDLE CITY':  '#c9a84c',
+    'BILGEWATER':   '#1a6b8a',
+    'DEMACIA':      '#3a5fa0',
+    'FREJLORD':     '#5b8fa8',
+    'ICATHIA':      '#7a3a9e',
+    'IONIA':        '#c45b8a',
+    'ISOLE OMBRA':  '#4a4a6e',
+    'IXTAL':        '#2e7d52',
+    'NOXUS':        '#9e2a2a',
+    'PILTOVER':     '#c47a1a',
+    'SHURIMA':      '#b8872a',
+    'TARGON':       '#6a4a9e',
+    'ZAUN':         '#3a7a5a',
+    'VOID':         '#5a1a7a',
+  };
 
-// ─── Fetch con cache sessionStorage ───
-async function fetchRepData(forceRefresh) {
-  if (!forceRefresh) {
-    const cached = sessionStorage.getItem(REP_CACHE_KEY);
-    if (cached) {
-      try {
-        const { ts, data } = JSON.parse(cached);
-        if (Date.now() - ts < REP_CACHE_TTL) return data;
-      } catch (_) {}
-    }
-  }
-  const res = await fetch(REP_SHEET_URL);
-  if (!res.ok) throw new Error('Fetch fallito: ' + res.status);
-  const text = await res.text();
-  const rows = parseCSV(text);
-  sessionStorage.setItem(REP_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: rows }));
-  return rows;
-}
-
-// ─── Colori ───
-function repDisplay(val) {
-  const n = parseInt(val, 10);
-  if (isNaN(n) || n === 0) return '<span style="color:var(--text3);opacity:.45">—</span>';
-  const color = n > 0 ? '#5ecb8a' : '#e05a5a';
-  return `<span style="color:${color};font-weight:600">${n > 0 ? '+' + n : n}</span>`;
-}
-
-// ─── Stato ───
-let _repSortCol = null;
-let _repSortAsc = true;
-let _repRows = [];
-let _repHeaders = [];
-let _repFilter = '';
-
-// ─── Render body con filtro e ordinamento ───
-function _repRenderBody() {
-  const tbody = document.getElementById('rep-tbody');
-  if (!tbody) return;
-
-  let rows = [..._repRows];
-
-  // Separa Totale
-  const totaleIdx = rows.findIndex(r => (r[0] || '').toLowerCase() === 'totale');
-  let totaleRow = null;
-  if (totaleIdx !== -1) totaleRow = rows.splice(totaleIdx, 1)[0];
-
-  // Filtro ricerca
-  if (_repFilter) {
-    const q = _repFilter.toLowerCase();
-    rows = rows.filter(r => (r[0] || '').toLowerCase().includes(q));
-  }
-
-  // Ordinamento
-  if (_repSortCol !== null) {
-    rows.sort((a, b) => {
-      if (_repSortCol === 0) {
-        return _repSortAsc
-          ? String(a[0]).localeCompare(String(b[0]))
-          : String(b[0]).localeCompare(String(a[0]));
+  // ── CSV parser che gestisce virgolette ───────────────────────────────────
+  function parseCSV(text) {
+    const rows = [];
+    const lines = text.split('\n');
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const cols = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"') { inQ = !inQ; }
+        else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+        else { cur += c; }
       }
-      const ai = parseInt(a[_repSortCol], 10) || 0;
-      const bi = parseInt(b[_repSortCol], 10) || 0;
-      return _repSortAsc ? ai - bi : bi - ai;
+      cols.push(cur.trim());
+      rows.push(cols);
+    }
+    return rows;
+  }
+
+  // ── Trova le righe header nel CSV ────────────────────────────────────────
+  // Il CSV ha questa struttura:
+  //   riga 0: vuota | Player | ARCADIA | BANDLE CITY | ... (regioni, con merge)
+  //   riga 1: vuota | Player | ARCADIA | BANDLE CITY | BILGEWATER | SOLDATI DI. | ...
+  // Cerchiamo la riga che inizia con '' e ha 'Player' in pos 1
+  function findHeaders(rows) {
+    for (let i = 0; i < Math.min(rows.length, 10); i++) {
+      const r = rows[i];
+      if (r[1] && r[1].trim().toUpperCase() === 'PLAYER') {
+        // riga i = sotto-fazioni (header dettagliato)
+        // riga i-1 = regioni (se esiste e ha contenuto)
+        const regionRow = i > 0 ? rows[i - 1] : null;
+        return { regionRow, subRow: r, dataStart: i + 1 };
+      }
+    }
+    // Fallback: prima riga non vuota come header
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].some(c => c)) return { regionRow: null, subRow: rows[i], dataStart: i + 1 };
+    }
+    return null;
+  }
+
+  // ── Costruisce struttura colonne con raggruppamento per regione ──────────
+  function buildColumns(regionRow, subRow) {
+    const cols = [];
+    let currentRegion = '';
+    for (let i = 2; i < subRow.length; i++) {
+      const sub = (subRow[i] || '').trim().replace(/\.$/, '');
+      if (!sub) continue;
+      // regione: prendi da regionRow se disponibile
+      if (regionRow) {
+        const reg = (regionRow[i] || '').trim().toUpperCase();
+        if (reg) currentRegion = reg;
+      }
+      cols.push({ idx: i, region: currentRegion, sub: sub });
+    }
+    return cols;
+  }
+
+  // ── Render principale ────────────────────────────────────────────────────
+  function render(csvText) {
+    const container = document.getElementById('rep-table-container');
+    if (!container) return;
+
+    const rows = parseCSV(csvText);
+    const headers = findHeaders(rows);
+    if (!headers) { container.innerHTML = '<p>Errore nel leggere la tabella.</p>'; return; }
+
+    const { subRow, dataStart } = headers;
+    const regionRow = headers.regionRow;
+    const cols = buildColumns(regionRow, subRow);
+
+    // Filtra righe dati: deve avere un nome PG in pos 1
+    const dataRows = rows.slice(dataStart).filter(r => {
+      const name = (r[1] || '').trim();
+      return name && name.toUpperCase() !== 'PLAYER' && name !== 'Totale' && !name.startsWith('🗺');
+    });
+
+    // Raggruppa colonne per regione
+    const regionGroups = {};
+    const regionOrder = [];
+    for (const col of cols) {
+      if (!regionGroups[col.region]) {
+        regionGroups[col.region] = [];
+        regionOrder.push(col.region);
+      }
+      regionGroups[col.region].push(col);
+    }
+
+    // ── Costruisci HTML tabella ──────────────────────────────────────────
+    let html = `<div class="rep-table-wrap"><table class="rep-table" id="rep-main-table">`;
+
+    // Header riga 1: regioni
+    html += `<thead><tr><th class="rep-th-name" rowspan="2">Nome PG ⇅</th>`;
+    for (const region of regionOrder) {
+      const grp = regionGroups[region];
+      const color = REGION_COLORS[region] || '#555';
+      const label = region || '—';
+      html += `<th colspan="${grp.length}" class="rep-th-region" style="background:${color}20;border-top:2px solid ${color};color:${color}">${label}</th>`;
+    }
+    html += `</tr>`;
+
+    // Header riga 2: sotto-fazioni
+    html += `<tr>`;
+    for (const region of regionOrder) {
+      const color = REGION_COLORS[region] || '#555';
+      for (const col of regionGroups[region]) {
+        html += `<th class="rep-th-sub" style="border-bottom:2px solid ${color}" data-col="${col.idx}" data-region="${region}">${col.sub} ⇅</th>`;
+      }
+    }
+    html += `</tr></thead>`;
+
+    // Body
+    html += `<tbody>`;
+    for (const row of dataRows) {
+      const name = (row[1] || '').trim();
+      html += `<tr><td class="rep-td-name">${name}</td>`;
+      for (const region of regionOrder) {
+        for (const col of regionGroups[region]) {
+          const raw = (row[col.idx] || '').trim().replace(/\\/g, '').replace(/\+/g, '');
+          const val = parseInt(raw, 10);
+          if (!raw || isNaN(val) || val === 0) {
+            html += `<td class="rep-td rep-zero">—</td>`;
+          } else if (val > 0) {
+            html += `<td class="rep-td rep-pos">+${val}</td>`;
+          } else {
+            html += `<td class="rep-td rep-neg">${val}</td>`;
+          }
+        }
+      }
+      html += `</tr>`;
+    }
+    html += `</tbody></table></div>`;
+
+    container.innerHTML = html;
+    attachSort();
+  }
+
+  // ── Ordinamento colonne/nome ─────────────────────────────────────────────
+  function attachSort() {
+    const table = document.getElementById('rep-main-table');
+    if (!table) return;
+    let sortCol = -1, sortAsc = true;
+
+    table.querySelectorAll('th').forEach((th, thIdx) => {
+      th.style.cursor = 'pointer';
+      th.addEventListener('click', () => {
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        if (sortCol === thIdx) { sortAsc = !sortAsc; } else { sortCol = thIdx; sortAsc = true; }
+        rows.sort((a, b) => {
+          const aCell = a.querySelectorAll('td')[thIdx];
+          const bCell = b.querySelectorAll('td')[thIdx];
+          const aT = aCell ? aCell.textContent.replace(/[+—]/g, '').trim() : '';
+          const bT = bCell ? bCell.textContent.replace(/[+—]/g, '').trim() : '';
+          const aN = parseFloat(aT), bN = parseFloat(bT);
+          if (!isNaN(aN) && !isNaN(bN)) return sortAsc ? aN - bN : bN - aN;
+          return sortAsc ? aT.localeCompare(bT, 'it') : bT.localeCompare(aT, 'it');
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
     });
   }
 
-  // Totale sempre in cima (solo se non si sta filtrando)
-  if (totaleRow && !_repFilter) rows.unshift(totaleRow);
-
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td class="rep-no-results" colspan="${_repHeaders.length}">Nessun personaggio trovato.</td></tr>`;
-    return;
+  // ── Ricerca PG ───────────────────────────────────────────────────────────
+  function attachSearch() {
+    const input = document.getElementById('rep-search');
+    if (!input) return;
+    input.addEventListener('input', () => {
+      const q = input.value.toLowerCase();
+      document.querySelectorAll('#rep-main-table tbody tr').forEach(tr => {
+        const name = tr.querySelector('td')?.textContent.toLowerCase() || '';
+        tr.style.display = name.includes(q) ? '' : 'none';
+      });
+    });
   }
 
-  tbody.innerHTML = rows.map((row, ri) => {
-    const isTotale = (row[0] || '').toLowerCase() === 'totale';
-    const cls = isTotale ? 'rep-tr rep-tr-totale' : (ri % 2 === 0 ? 'rep-tr' : 'rep-tr rep-tr-alt');
-    const cells = _repHeaders.map((_, ci) => {
-      if (ci === 0) return `<td class="rep-td rep-td-name">${row[0] || ''}</td>`;
-      return `<td class="rep-td rep-td-val">${repDisplay(row[ci])}</td>`;
-    }).join('');
-    return `<tr class="${cls}">${cells}</tr>`;
-  }).join('');
-}
+  // ── Fetch con cache sessionStorage ──────────────────────────────────────
+  async function load() {
+    const container = document.getElementById('rep-table-container');
+    if (!container) return;
+    container.innerHTML = '<p class="rep-loading">Caricamento reputazioni...</p>';
 
-function _repSetSort(col) {
-  if (_repSortCol === col) { _repSortAsc = !_repSortAsc; }
-  else { _repSortCol = col; _repSortAsc = col === 0; }
-  document.querySelectorAll('.rep-th').forEach((th, i) => {
-    th.querySelector('.rep-sort-arrow').textContent =
-      i === _repSortCol ? (_repSortAsc ? ' ▲' : ' ▼') : ' ⇅';
-  });
-  _repRenderBody();
-}
+    let csv = null;
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      const cachedTs = parseInt(sessionStorage.getItem(CACHE_TS) || '0', 10);
+      if (cached && Date.now() - cachedTs < CACHE_TTL) {
+        csv = cached;
+      }
+    } catch (_) {}
 
-// ─── Refresh dati ───
-async function _repRefresh() {
-  const btn = document.getElementById('rep-refresh-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Aggiornamento…'; }
-  try {
-    const rows = await fetchRepData(true);
-    const headerRow = rows[1];
-    const validCols = [];
-    for (let i = 0; i < headerRow.length; i++) {
-      if (headerRow[i].trim() !== '') validCols.push(i);
+    if (!csv) {
+      try {
+        const resp = await fetch(CSV_URL);
+        if (!resp.ok) throw new Error('Fetch failed');
+        csv = await resp.text();
+        try {
+          sessionStorage.setItem(CACHE_KEY, csv);
+          sessionStorage.setItem(CACHE_TS, Date.now().toString());
+        } catch (_) {}
+      } catch (e) {
+        container.innerHTML = '<p>Impossibile caricare i dati di reputazione.</p>';
+        return;
+      }
     }
-    _repHeaders = validCols.map(i => headerRow[i]);
-    _repRows = rows.slice(2)
-      .filter(r => r[validCols[0]] && r[validCols[0]].trim() !== '')
-      .map(r => validCols.map(i => r[i] || ''));
-    _repRenderBody();
-    const ts = document.getElementById('rep-ts');
-    if (ts) ts.textContent = 'Ultimo aggiornamento: ' + new Date().toLocaleTimeString('it-IT');
-  } catch (e) {
-    console.error('[RepTable refresh]', e);
+
+    render(csv);
+    attachSearch();
   }
-  if (btn) { btn.disabled = false; btn.textContent = '↻ Aggiorna'; }
-}
 
-// ─── Entry point ───
-async function showReputationTable() {
-  document.getElementById('hv').style.display = 'none';
-  document.getElementById('pv').style.display = 'block';
-  document.getElementById('ph-icon').textContent = '🗺️';
-  document.getElementById('ph-title').textContent = 'REPUTAZIONI';
-  document.getElementById('ph-eyebrow').textContent = 'Personaggio';
-  document.getElementById('ph-crumb').textContent = 'Il tuo PG';
-  document.getElementById('ph-sub').textContent = 'Fama e infamia nelle regioni di Runeterra';
-  document.getElementById('ph-covbg').style.backgroundImage = '';
-  document.getElementById('ph-overlay').style.opacity = '1';
-  document.getElementById('pbody').style.maxWidth = 'none';
-  document.getElementById('pbody').style.width = '100%';
-  document.getElementById('main').scrollTo({ top: 0, behavior: 'smooth' });
-  // Deep link
-history.pushState(
-  { id: 'reputazioni', label: 'Reputazioni', icon: '🗺️', stack: [] },
-  '', '/reputazioni'
-);
-
-  // Reset filtro e ordinamento
-  _repFilter = '';
-  _repSortCol = null;
-  _repSortAsc = true;
-
-  const pbody = document.getElementById('pbody');
-  pbody.innerHTML = `
-    <div class="notion-body" style="padding:32px 0 64px;max-width:100%;width:100%">
-      <div id="rep-loading" style="display:flex;align-items:center;justify-content:center;padding:80px 0;color:var(--text3);font-family:'Cinzel',serif;font-size:13px;letter-spacing:.15em">
-        <span style="opacity:.6">Caricamento reputazioni…</span>
-      </div>
-      <div id="rep-content" style="display:none"></div>
-    </div>`;
-
-  try {
-    const rows = await fetchRepData(false);
-    if (!rows || rows.length < 2) throw new Error('Dati vuoti');
-
-    const headerRow = rows[1];
-    const validCols = [];
-    for (let i = 0; i < headerRow.length; i++) {
-      if (headerRow[i].trim() !== '') validCols.push(i);
-    }
-    _repHeaders = validCols.map(i => headerRow[i]);
-    _repRows = rows.slice(2)
-      .filter(r => r[validCols[0]] && r[validCols[0]].trim() !== '')
-      .map(r => validCols.map(i => r[i] || ''));
-
-    const theadCells = _repHeaders.map((h, i) => `
-      <th class="rep-th" onclick="_repSetSort(${i})" title="Ordina per ${h}">
-        <span class="rep-th-label">${h}</span><span class="rep-sort-arrow"> ⇅</span>
-      </th>`).join('');
-
-    document.getElementById('rep-content').innerHTML = `
-      <div class="rep-wrap">
-        <div class="rep-intro">
-          <p>La tabella mostra la <strong>reputazione</strong> di ogni PG nelle principali regioni. I valori positivi indicano fama, quelli negativi infamia.</p>
-        </div>
-        <div class="rep-toolbar">
-          <input
-            class="rep-search"
-            id="rep-search"
-            type="text"
-            placeholder="Cerca personaggio…"
-            oninput="_repFilter=this.value;_repRenderBody()"
-          />
-          <button class="rep-refresh-btn" id="rep-refresh-btn" onclick="_repRefresh()">↻ Aggiorna</button>
-        </div>
-        <div class="rep-table-scroll">
-          <table class="rep-table">
-            <thead><tr>${theadCells}</tr></thead>
-            <tbody id="rep-tbody"></tbody>
-          </table>
-        </div>
-        <div class="rep-footer">Dati dallo sheet ufficiale · <span id="rep-ts"></span></div>
-      </div>`;
-
-    _repRenderBody();
-
-    const cached = sessionStorage.getItem(REP_CACHE_KEY);
-    if (cached) {
-      const { ts } = JSON.parse(cached);
-      document.getElementById('rep-ts').textContent =
-        'Ultimo aggiornamento: ' + new Date(ts).toLocaleTimeString('it-IT');
-    }
-
-    document.getElementById('rep-loading').style.display = 'none';
-    document.getElementById('rep-content').style.display = 'block';
-
-  } catch (err) {
-    console.error('[RepTable]', err);
-    document.getElementById('rep-loading').innerHTML = `
-      <div style="color:#e05a5a;font-family:'Crimson Pro',serif;font-size:15px;text-align:center;padding:60px 20px">
-        ⚠ Impossibile caricare i dati.<br>
-        <span style="font-size:13px;opacity:.7">Controlla che il foglio sia pubblico e riprova.</span>
-      </div>`;
+  // ── CSS inline per la tabella ────────────────────────────────────────────
+  function injectCSS() {
+    if (document.getElementById('rep-table-style')) return;
+    const s = document.createElement('style');
+    s.id = 'rep-table-style';
+    s.textContent = `
+      .rep-table-wrap { overflow-x: auto; max-width: 100%; }
+      .rep-table { border-collapse: collapse; width: max-content; font-size: 0.78rem; font-family: 'Crimson Pro', serif; }
+      .rep-table th, .rep-table td { padding: 4px 8px; text-align: center; white-space: nowrap; }
+      .rep-th-name { position: sticky; left: 0; background: #1a1510; z-index: 3; text-align: left; color: #c9a84c; font-size: 0.8rem; border-bottom: 2px solid #c9a84c; }
+      .rep-th-region { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; padding: 6px 4px; }
+      .rep-th-sub { font-size: 0.68rem; color: #aaa; padding: 4px 6px; background: #111; }
+      .rep-td-name { position: sticky; left: 0; background: #1a1510; z-index: 2; text-align: left; color: #e8d5a3; font-size: 0.82rem; border-right: 1px solid #333; padding-left: 10px; }
+      .rep-td { min-width: 38px; border: 1px solid #222; }
+      .rep-zero { color: #444; }
+      .rep-pos { color: #4caf7d; font-weight: 600; }
+      .rep-neg { color: #e05252; font-weight: 600; }
+      tbody tr:hover td { background: #1f1a12 !important; }
+      .rep-loading { color: #888; font-style: italic; padding: 1rem; }
+    `;
+    document.head.appendChild(s);
   }
-}
+
+  // ── Entry point ──────────────────────────────────────────────────────────
+  injectCSS();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', load);
+  } else {
+    load();
+  }
+})();
