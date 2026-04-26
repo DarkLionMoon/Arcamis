@@ -270,4 +270,53 @@
   } else {
     load();
   }
+window.showReputationTable = function() {
+    var hv = document.getElementById('hv');
+    var pv = document.getElementById('pv');
+    var phTitle = document.getElementById('ph-title');
+    var phIcon = document.getElementById('ph-icon');
+    var phCrumb = document.getElementById('ph-crumb');
+    var phEyebrow = document.getElementById('ph-eyebrow');
+    var phSub = document.getElementById('ph-sub');
+    var phCovbg = document.getElementById('ph-covbg');
+    var phOverlay = document.getElementById('ph-overlay');
+    var phHero = document.getElementById('page-hero');
+
+    if (phTitle) phTitle.textContent = 'Reputazioni';
+    if (phIcon) { phIcon.textContent = '🗺️'; phIcon.style.opacity = '0.06'; }
+    if (phEyebrow) phEyebrow.textContent = 'Archivi di Arcamis';
+    if (phSub) phSub.textContent = 'Reputazioni dei personaggi nelle regioni del mondo.';
+    if (phCovbg) phCovbg.style.backgroundImage = '';
+    if (phOverlay) phOverlay.style.opacity = '0';
+    if (phHero) { phHero.style.removeProperty('--ph-acc'); phHero.style.removeProperty('--ph-accbg'); }
+    if (phCrumb && typeof buildCrumb === 'function') phCrumb.innerHTML = buildCrumb('Reputazioni');
+    document.title = 'Reputazioni — Arcamis';
+
+    if (hv && pv) {
+      if (hv.style.display === 'block') {
+        if (typeof xfade === 'function') xfade(hv, pv);
+        else { hv.style.display = 'none'; pv.style.display = 'block'; }
+      }
+    }
+
+    if (typeof navStack !== 'undefined') {
+      navStack.push({ id: 'reputazioni', label: 'Reputazioni', icon: '🗺️' });
+    }
+    history.pushState({ id: 'reputazioni', label: 'Reputazioni', icon: '🗺️' }, '', '/reputazioni');
+
+    var pbody = document.getElementById('pbody');
+    if (pbody) {
+      pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">'
+        + '<div style="margin-bottom:1.2rem">'
+        + '<input id="rep-search" type="text" placeholder="Cerca personaggio…" '
+        + 'style="padding:6px 12px;background:#111;border:1px solid #333;color:#e8d5a3;border-radius:4px;font-family:\'Crimson Pro\',serif;font-size:0.95rem;width:100%;max-width:320px"/>'
+        + '</div>'
+        + '<div id="rep-table-container"></div>'
+        + '</div>';
+    }
+
+    load();
+    attachSearch();
+  };
+
 })();
