@@ -427,3 +427,10 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
   .loc-banner { padding: 14px 16px; gap: 14px; }
   .loc-banner-title { font-size: 12px; }
 }
+.n-children {
+  margin-left: 1.2em;
+  margin-top: 4px;
+}
+.n-children .n-p {
+  margin: 4px 0;
+}
