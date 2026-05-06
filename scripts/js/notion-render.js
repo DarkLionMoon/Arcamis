@@ -135,12 +135,12 @@ function renderBlocks(blocks,isRoot){
         break;
 
       case'bulleted_list_item':
-        h+='<ul class="n-ul"><li>'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</li></ul>';
-        break;
+  h+='<ul class="n-ul"><li>'+rt(d.rich_text)+(b.children?'<div class="n-children">'+renderBlocks(b.children)+'</div>':'')+'</li></ul>';
+  break;
 
       case'numbered_list_item':
-        h+='<ol class="n-ol"><li>'+rt(d.rich_text)+(b.children?renderBlocks(b.children):'')+'</li></ol>';
-        break;
+  h+='<ol class="n-ol"><li>'+rt(d.rich_text)+(b.children?'<div class="n-children">'+renderBlocks(b.children)+'</div>':'')+'</li></ol>';
+  break;
 
       case'quote':
         h+='<blockquote class="n-quote">'+rt(d.rich_text)+'</blockquote>';
