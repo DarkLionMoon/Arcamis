@@ -110,8 +110,15 @@ function renderBlocks(blocks,isRoot){
     switch(b.type){
 
       case'paragraph':
-        h+='<p class="n-p">'+(rt(d.rich_text)||'<br>')+'</p>';
-        break;
+  if((!d.rich_text||!d.rich_text.length) && b.children && b.children.length){
+    h+='<div class="n-children">'+renderBlocks(b.children)+'</div>';
+  } else {
+    h+='<p class="n-p">'+(rt(d.rich_text)||'<br>')+'</p>';
+    if(b.children && b.children.length){
+      h+='<div class="n-children">'+renderBlocks(b.children)+'</div>';
+    }
+  }
+  break;
 
       case'heading_1':
         if(d.is_toggleable&&b.children){
