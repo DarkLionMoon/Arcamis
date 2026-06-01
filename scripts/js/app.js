@@ -464,6 +464,10 @@ window.addEventListener('popstate', function(e){
       if(typeof showCodiceGiuridico === 'function') showCodiceGiuridico();
       return;
     }
+     if(e.state.id === 'patenti-arcadia'){
+  if(typeof showPatenti === 'function') showPatenti();
+  return;
+}
     if(e.state.id === 'reputazioni'){
       if(typeof showReputationTable === 'function') showReputationTable();
       return;
@@ -535,6 +539,7 @@ var _pathMap = {
   'mappe/arcamis':                            '2f10274fdc1c80dca8caeb2e6de23146',
   /* Speciali */
   'codice-giuridico':                         'codice-giuridico',
+  'patenti-arcadia':                          'patenti-arcadia',
   'reputazioni':                              'reputazioni',
   'changelog':                                '3000274fdc1c8033a214c44a1aa7f01f',
   'sottoclassi':                              '2f70274fdc1c80e3bdc7f95f81eb9cc0',
@@ -588,6 +593,10 @@ var _pathMap = {
     setTimeout(function(){ if(typeof showCodiceGiuridico === 'function') showCodiceGiuridico(); }, 0);
     return;
   }
+   if(pid === 'patenti-arcadia'){
+  setTimeout(function(){ if(typeof showPatenti === 'function') showPatenti(); }, 0);
+  return;
+}
   if(pid === 'reputazioni'){
     setTimeout(function(){ if(typeof showReputationTable === 'function') showReputationTable(); }, 0);
     return;
