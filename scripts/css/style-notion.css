@@ -434,3 +434,144 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 .n-children .n-p {
   margin: 4px 0;
 }
+
+/* ═══════════════════════════════════════
+   MATERIALE APPROVATO — Enhanced Styles
+   ═══════════════════════════════════════ */
+
+/* ── Tables ── */
+.page-3130274fdc1c807eb61fde24e8236659 .n-twrap {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(200,155,60,.2);
+  box-shadow: 0 4px 20px rgba(0,0,0,.4), inset 0 0 40px rgba(200,155,60,.03);
+  margin: 18px 0;
+}
+.page-3130274fdc1c807eb61fde24e8236659 table.n-tbl {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.page-3130274fdc1c807eb61fde24e8236659 table.n-tbl th {
+  background: linear-gradient(180deg, rgba(30,22,8,.95), rgba(18,13,5,.92));
+  border-bottom: 2px solid rgba(200,155,60,.35);
+  font-size: 10px;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-shadow: 0 1px 4px rgba(0,0,0,.6);
+}
+.page-3130274fdc1c807eb61fde24e8236659 table.n-tbl td {
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(200,155,60,.08);
+  transition: background .18s, box-shadow .18s;
+}
+.page-3130274fdc1c807eb61fde24e8236659 table.n-tbl tr:nth-child(odd) td {
+  background: rgba(200,155,60,.03);
+}
+.page-3130274fdc1c807eb61fde24e8236659 table.n-tbl tr:hover td {
+  background: rgba(200,155,60,.08);
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+/* ── Callout ── */
+.page-3130274fdc1c807eb61fde24e8236659 .n-callout {
+  border-radius: 8px;
+  border-left-width: 4px;
+  box-shadow: inset 0 0 50px rgba(200,155,60,.05), 0 4px 16px rgba(0,0,0,.35);
+  padding: 18px 22px;
+}
+.page-3130274fdc1c807eb61fde24e8236659 .n-callout-icon {
+  font-size: 24px;
+  margin-top: 0;
+}
+
+/* ── Lists ── */
+.page-3130274fdc1c807eb61fde24e8236659 .n-ul>li {
+  padding: 5px 0 5px 24px;
+  line-height: 2;
+}
+.page-3130274fdc1c807eb61fde24e8236659 .n-ul>li::before {
+  font-size: 8px;
+  top: 10px;
+  text-shadow: 0 0 6px rgba(200,155,60,.4);
+}
+.page-3130274fdc1c807eb61fde24e8236659 .n-ol {
+  padding-left: 24px;
+}
+.page-3130274fdc1c807eb61fde24e8236659 .n-ol>li {
+  margin-bottom: .45em;
+  line-height: 2;
+}
+
+/* ── Headings ── */
+.page-3130274fdc1c807eb61fde24e8236659 .n-h1 {
+  margin-top: 48px !important;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(200,155,60,.2);
+}
+.page-3130274fdc1c807eb61fde24e8236659 .n-h2 {
+  margin-top: 2em !important;
+  margin-bottom: .5em;
+}
+.page-3130274fdc1c807eb61fde24e8236659 .n-h3 {
+  margin-top: 1.6em !important;
+}
+
+/* ── Quote ── */
+.page-3130274fdc1c807eb61fde24e8236659 .n-quote {
+  border-left-width: 4px;
+  padding: 18px 26px 18px 56px;
+  margin: 24px 0;
+  background: linear-gradient(135deg, rgba(18,13,5,.9), rgba(12,8,3,.86));
+}
+
+/* ── Divider ── */
+.page-3130274fdc1c807eb61fde24e8236659 .n-divider {
+  margin: 38px 0 !important;
+}
+.page-3130274fdc1c807eb61fde24e8236659 .n-divider::before,
+.page-3130274fdc1c807eb61fde24e8236659 .n-divider::after {
+  max-width: 240px;
+  background: linear-gradient(90deg, transparent, rgba(200,155,60,.35)) !important;
+}
+.page-3130274fdc1c807eb61fde24e8236659 .n-divider-gem {
+  font-size: 11px;
+  text-shadow: 0 0 8px rgba(200,155,60,.3);
+}
+
+/* ── Toggle ── */
+.page-3130274fdc1c807eb61fde24e8236659 details.n-toggle>.n-ts {
+  border-radius: 8px;
+  padding: 12px 18px;
+}
+.page-3130274fdc1c807eb61fde24e8236659 details.n-toggle>.n-tc {
+  padding: 12px 18px 10px 26px;
+}
+
+/* ── Code ── */
+.page-3130274fdc1c807eb61fde24e8236659 .n-code {
+  border-radius: 8px;
+  border: 1px solid rgba(200,155,60,.15);
+}
+
+/* ── Spacing generale ── */
+.page-3130274fdc1c807eb61fde24e8236659 .nc {
+  gap: 6px;
+}
+.page-3130274fdc1c807eb61fde24e8236659 .nc>*+* {
+  margin-top: .85em;
+}
+
+/* ── Intro block ── */
+.page-3130274fdc1c807eb61fde24e8236659 .n-intro {
+  border-radius: 0 8px 8px 0;
+  padding: 22px 26px;
+  margin-bottom: 32px;
+}
+
+/* ── Bookmark / embed ── */
+.page-3130274fdc1c807eb61fde24e8236659 .n-bkm {
+  border-radius: 8px;
+  border: 1px solid rgba(200,155,60,.18);
+}

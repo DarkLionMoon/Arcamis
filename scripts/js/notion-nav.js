@@ -311,6 +311,7 @@ async function _gpRender(id,label,icon){
 
     var html=renderBlocks(bl,true);
     var pbody=document.getElementById('pbody');
+    pbody.className='page-'+id;
     pbody.style.maxWidth='';
     pbody.style.width='';
     var emptyHtml='<div class="n-empty"><div class="n-empty-icon">'+picon+'</div>'
