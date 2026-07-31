@@ -58,6 +58,18 @@ function applyTheme(t){
 applyTheme(_theme);
 function toggleTheme(){ _openOptionsPanel(); }
 
+/* ════ SOUND FX ════ */
+var _sfxEnabled = localStorage.getItem('arc_sfx') !== 'off';
+function toggleSfx(){
+  _sfxEnabled = !_sfxEnabled;
+  localStorage.setItem('arc_sfx', _sfxEnabled ? 'on' : 'off');
+  if(!_sfxEnabled){
+    if(typeof toggleArcAudio === 'function' && window._arcAudioPlaying) toggleArcAudio();
+    if(typeof _stopWhisper === 'function') _stopWhisper();
+  }
+  _renderOptionsPanel();
+}
+
 /* ── Pannello Opzioni ── */
 var _optPanelOpen = false;
 function _openOptionsPanel(){
@@ -84,9 +96,15 @@ function _renderOptionsPanel(){
 function _syncEnvBtns(){
   var cb = document.getElementById('aop-candle-btn');
   var ab = document.getElementById('aop-audio-btn');
+  var sb = document.getElementById('aop-sfx-btn');
   var ov = document.getElementById('candlelight-overlay');
   if(cb) cb.classList.toggle('active', ov ? ov.classList.contains('cl-on') : false);
-  if(ab) ab.classList.toggle('active', !!window._arcAudioPlaying);
+  if(ab){
+    ab.classList.toggle('active', !!window._arcAudioPlaying);
+    ab.style.opacity = _sfxEnabled ? '' : '.4';
+    ab.title = _sfxEnabled ? 'Audio ambientale' : 'Disattiva SFX prima';
+  }
+  if(sb) sb.classList.toggle('active', _sfxEnabled);
 }
 document.addEventListener('click', function(e){
   if(!_optPanelOpen) return;

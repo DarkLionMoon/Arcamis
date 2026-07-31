@@ -750,6 +750,7 @@
 
   function startWhisper(){
     if(isPlaying || isFading) return;
+    if(typeof _sfxEnabled!=='undefined'&&!_sfxEnabled) return;
     isPlaying = true;
     if(audio){ audio.pause(); audio = null; }
     audio = new Audio(pickSound());
@@ -762,6 +763,11 @@ audio.addEventListener('ended', function(){
 fadeIn(audio, MAX_VOL, FADE_IN_MS);
     
   }
+
+  window._stopWhisper = function(){
+    clearTimeout(idleTimer);
+    if(isPlaying && !isFading && audio) fadeOut(audio, FADE_OUT_MS);
+  };
 
   function resetIdle(){
     clearTimeout(idleTimer);

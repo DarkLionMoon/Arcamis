@@ -232,6 +232,11 @@ initFadeIn();
   var _aud=null,_on=false; window._arcAudioPlaying=false;
   window.toggleArcAudio=function(){
     var btn=document.getElementById('audio-runa');
+    if(typeof _sfxEnabled!=='undefined'&&!_sfxEnabled){
+      if(_aud){_aud.pause();_on=false;window._arcAudioPlaying=false;}
+      if(btn)btn.classList.remove('ara-on');
+      return;
+    }
     if(!_aud){
       _aud=new Audio('/ambient.mp3');
       _aud.loop=true;_aud.volume=0.18;
