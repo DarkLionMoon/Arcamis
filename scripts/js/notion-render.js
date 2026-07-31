@@ -186,7 +186,6 @@ function renderBlocks(blocks,isRoot){
         break;
 
       case'image':
-          console.log('IMAGE BLOCK:', JSON.stringify(d));
         var src=d.type==='external'?(d.external&&d.external.url):(d.file&&d.file.url);
         src=safeCoverUrl(src)||src;
         var cap=d.caption&&d.caption.length?rt(d.caption):'';

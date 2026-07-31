@@ -5,7 +5,7 @@ export async function onRequest(context) {
   const CACHE_TTL = 1800;
 
   const cors = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://arcamis.pages.dev',
     'Cache-Control': 'public, max-age=60, stale-while-revalidate=300'
   };
 

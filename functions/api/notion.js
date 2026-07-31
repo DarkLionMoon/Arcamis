@@ -9,7 +9,7 @@ const blockId = url.searchParams.get('blockId');
   const TOKEN = context.env.NOTION_TOKEN;
   const KV = context.env.ARCAMIS_CACHE;
 
-  const PURGE_SECRET = context.env.PURGE_SECRET || 'arcamis-purge';
+  const PURGE_SECRET = context.env.PURGE_SECRET;
   const CACHE_TTL = 600;       // secondi fino a stale
   const CACHE_SWR = 86400;      // secondi totali in KV (stale ok per 24h)
   const MAX_DEPTH = 5;          // profondità massima loadChildren
@@ -21,7 +21,7 @@ const blockId = url.searchParams.get('blockId');
   };
 
   const cors = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://arcamis.pages.dev',
     'Cache-Control': 'no-cache'
   };
 
@@ -62,7 +62,7 @@ const blockId = url.searchParams.get('blockId');
   try {
 
     /* ── Purge cache ── */
-    if (purge && purgeKey === PURGE_SECRET) {
+    if (purge && purgeKey && PURGE_SECRET && purgeKey === PURGE_SECRET) {
       const id = pageId || dbId;
       if (id) {
         await KV.delete('pg_' + id.replace(/-/g, ''));

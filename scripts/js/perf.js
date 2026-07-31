@@ -15,8 +15,6 @@
      i domini esterni usati dal sito
   ════════════════════════════════ */
   var dnsDomains = [
-    'fonts.googleapis.com',
-    'fonts.gstatic.com',
     'docs.google.com',
   ];
   dnsDomains.forEach(function(domain) {
@@ -238,15 +236,11 @@
   }
 
   /* Hook afterPageRender per riattaccare sulle nuove card */
-  (function() {
-    var _orig = window.afterPageRender;
-    window.afterPageRender = function() {
-      if (_orig) _orig();
-      setTimeout(function() {
-        _attachCardPrefetch(document.getElementById('pbody'));
-      }, 400);
-    };
-  })();
+  window.onAfterPageRender(function() {
+    setTimeout(function() {
+      _attachCardPrefetch(document.getElementById('pbody'));
+    }, 400);
+  });
 
   /* ════════════════════════════════
      8. PREFETCH ANTICIPATO PAGINE
@@ -270,7 +264,7 @@
       hotPages.forEach(function(id) {
         if (window.prefetchPage) window.prefetchPage(id);
       });
-    }, 2000);
+    }, 5000);
   });
 
 })();

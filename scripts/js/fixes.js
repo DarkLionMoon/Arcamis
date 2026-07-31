@@ -139,13 +139,9 @@
 
   /* Riattacca dopo ogni navigazione (il mobile nav
      viene ricreato dinamicamente in alcuni casi) */
-  (function() {
-    var _orig = window.afterPageRender;
-    window.afterPageRender = function() {
-      if (_orig) _orig();
-      setTimeout(_attachNavReset, 100);
-    };
-  })();
+  window.onAfterPageRender(function() {
+    setTimeout(_attachNavReset, 100);
+  });
 
 })();
 function toggleTnAcc(header) {

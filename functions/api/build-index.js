@@ -3,11 +3,11 @@ export async function onRequest(context) {
   const key = url.searchParams.get('key');
   const KV = context.env.ARCAMIS_CACHE;
   const TOKEN = context.env.NOTION_TOKEN;
-  const PURGE_SECRET = context.env.PURGE_SECRET || 'arcamis-purge';
+  const PURGE_SECRET = context.env.PURGE_SECRET;
 
   const cors = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
+    'Access-Control-Allow-Origin': 'https://arcamis.pages.dev'
   };
 
   if (key !== PURGE_SECRET) {

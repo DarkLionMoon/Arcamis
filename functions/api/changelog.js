@@ -10,7 +10,7 @@ export async function onRequest(context) {
 
   const headers = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://arcamis.pages.dev',
   };
 
   // Purge

@@ -119,7 +119,7 @@ function extractProperties(page) {
   const SECRET = context.env.PURGE_SECRET;
   const KV = context.env.ARCAMIS_CACHE;
 
-  const cors = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
+  const cors = { 'Access-Control-Allow-Origin': 'https://arcamis.pages.dev', 'Content-Type': 'application/json' };
 
   if (key !== SECRET) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: cors });

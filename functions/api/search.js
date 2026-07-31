@@ -81,7 +81,7 @@ export async function onRequest(context) {
   const q = (url.searchParams.get('q') || '').trim();
   const KV = context.env.ARCAMIS_CACHE;
   const TOKEN = context.env.NOTION_TOKEN;
-  const cors = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
+  const cors = { 'Access-Control-Allow-Origin': 'https://arcamis.pages.dev', 'Content-Type': 'application/json' };
 
   if (q.length < 2) {
     return new Response(JSON.stringify({ results: [] }), { headers: cors });

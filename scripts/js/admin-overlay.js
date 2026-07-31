@@ -840,14 +840,12 @@ if(window._cachedCovers && window._cachedCovers[pageId + '_pos']) {
     setTimeout(injectGalleryButtons, 1200);
   });
 
-  var _origAfterPage = window.afterPageRender;
-  window.afterPageRender = function(){
-    if(_origAfterPage) _origAfterPage();
+  window.onAfterPageRender(function(){
     setTimeout(function(){
       injectPageCarouselButtons();
       injectGalleryButtons();
     }, 400);
-  };
+  });
 
   var _origLoadGallery = window.loadGallery;
   if(typeof _origLoadGallery === 'function'){

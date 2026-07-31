@@ -13,9 +13,10 @@
 <meta property="og:image" content="https://arcamis.pages.dev/Artboard_1.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://arcamis.pages.dev">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Arcamis Wiki","url":"https://arcamis.pages.dev","description":"Wiki ufficiale del server D&D Arcamis","potentialAction":{"@type":"SearchAction","target":"https://arcamis.pages.dev/api/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/></noscript>
 <link rel="stylesheet" href="/scripts/css/style-base.css">
 <link rel="stylesheet" href="/scripts/css/changelog.css">
 <link rel="stylesheet" href="/scripts/css/style-home.css">
@@ -53,8 +54,8 @@
     <div class="tn ta" data-v="home" onclick="showHome();closeDd()">Home</div>
 
     <!-- ── Regole ▾ ── -->
-    <div class="tn-drop" id="dd-regole">
-      <div class="tn" onclick="toggleDd('dd-regole',event)">Regole</div>
+    <div class="tn-drop" id="dd-regole" role="menu" aria-haspopup="true">
+      <div class="tn" onclick="toggleDd('dd-regole',event)" role="menuitem" aria-expanded="false" tabindex="0">Regole</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Regolamento</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️')"><span class="tn-ii">⚔️</span>Gameplay</div>
@@ -64,8 +65,8 @@
     </div>
 
     <!-- ── Personaggio ▾ ── -->
-    <div class="tn-drop" id="dd-pg">
-      <div class="tn" onclick="toggleDd('dd-pg',event)">Personaggio</div>
+    <div class="tn-drop" id="dd-pg" role="menu" aria-haspopup="true">
+      <div class="tn" onclick="toggleDd('dd-pg',event)" role="menuitem" aria-expanded="false" tabindex="0">Personaggio</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Il tuo PG</div>
         <div class="tn-item" onclick="closeDd();gp('2dd222f22ef8413f8cb48f03bbb4f4b0','Come si inizia','🌟')"><span class="tn-ii">🌟</span>Come si inizia</div>
@@ -78,8 +79,8 @@
     </div>
 
     <!-- ── Lavori ▾ ── -->
-<div class="tn-drop" id="dd-lavori">
-  <div class="tn" onclick="toggleDd('dd-lavori',event)">Lavori</div>
+<div class="tn-drop" id="dd-lavori" role="menu" aria-haspopup="true">
+  <div class="tn" onclick="toggleDd('dd-lavori',event)" role="menuitem" aria-expanded="false" tabindex="0">Lavori</div>
   <div class="tn-menu tn-menu--acc">
 
     <!-- ACCORDION: Lavori -->
@@ -122,8 +123,8 @@
 </div>
 
     <!-- ── Lore ▾ ── -->
-    <div class="tn-drop" id="dd-lore">
-      <div class="tn" onclick="toggleDd('dd-lore',event)">Lore</div>
+    <div class="tn-drop" id="dd-lore" role="menu" aria-haspopup="true">
+      <div class="tn" onclick="toggleDd('dd-lore',event)" role="menuitem" aria-expanded="false" tabindex="0">Lore</div>
       <div class="tn-menu">
         <div class="tn-menu-label">Il Mondo</div>
         <div class="tn-item" onclick="closeDd();gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📖')"><span class="tn-ii">📖</span>Storia del mondo</div>
@@ -464,7 +465,7 @@
 </div><!-- /main -->
 
 <!-- ═══ OVERLAY Discord ═══ -->
-<div id="overlay">
+<div id="overlay" role="dialog" aria-modal="true" aria-label="Menu">
   <div id="ovp">
     <span class="rune-tl">✦ ᛟ</span><span class="rune-tr">ᚹ ✦</span>
     <span class="rune-bl">ᛉ ✦</span><span class="rune-br">✦ ᚷ</span>
@@ -489,7 +490,7 @@
     </div>
   </div>
 </div>
-  <div id="arc-options-panel">
+  <div id="arc-options-panel" role="dialog" aria-label="Opzioni">
   <div class="aop-section">
     <div class="aop-label">Tema</div>
     <div class="aop-themes">
@@ -545,11 +546,11 @@
 
 <!-- ═══ BOTTOM NAV mobile ═══ -->
 <nav id="bottom-nav">
-  <div class="bnav-item active" data-k="home" onclick="showHome();setBnavActive('home')"><span>🏰</span><span class="bnav-label">Home</span></div>
-  <div class="bnav-item" data-k="regole" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️');setBnavActive('regole')"><span>⚔️</span><span class="bnav-label">Regole</span></div>
-  <div class="bnav-item" data-k="lore" onclick="gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📖');setBnavActive('lore')"><span>📖</span><span class="bnav-label">Lore</span></div>
-  <div class="bnav-item" data-k="lavori" onclick="toggleMobileNav()"><span>🗡️</span><span class="bnav-label">Lavori</span></div>
-  <div class="bnav-item" data-k="menu" onclick="ovo()"><span>☰</span><span class="bnav-label">Menu</span><div class="bnav-badge changelog-badge"></div></div>
+  <div class="bnav-item active" data-k="home" onclick="showHome();setBnavActive('home')" tabindex="0" role="button"><span>🏰</span><span class="bnav-label">Home</span></div>
+  <div class="bnav-item" data-k="regole" onclick="gp('2f00274fdc1c8065a11ff45192aa5dcb','Gameplay','⚔️');setBnavActive('regole')" tabindex="0" role="button"><span>⚔️</span><span class="bnav-label">Regole</span></div>
+  <div class="bnav-item" data-k="lore" onclick="gp('2f00274fdc1c806f8f17dbc6532d2211','Lore','📖');setBnavActive('lore')" tabindex="0" role="button"><span>📖</span><span class="bnav-label">Lore</span></div>
+  <div class="bnav-item" data-k="lavori" onclick="toggleMobileNav()" tabindex="0" role="button"><span>🗡️</span><span class="bnav-label">Lavori</span></div>
+  <div class="bnav-item" data-k="menu" onclick="ovo()" tabindex="0" role="button"><span>☰</span><span class="bnav-label">Menu</span><div class="bnav-badge changelog-badge"></div></div>
 </nav>
 
 <!-- ═══ ELEMENTI FISSI ═══ -->
@@ -565,7 +566,7 @@
   <span id="arc-help-icon">🔮</span>
 </div>
 
-<div id="arc-help-panel">
+<div id="arc-help-panel" role="dialog" aria-label="Aiuto">
   <div class="ahp-header">
     <span class="ahp-title">Oracolo di Arcamis</span>
     <button class="ahp-close" onclick="toggleHelpPanel()">✕</button>

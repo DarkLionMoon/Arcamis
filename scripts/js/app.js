@@ -10,7 +10,7 @@
   })();
   var stored = localStorage.getItem('arc_cache_ver');
   if(stored !== CACHE_VER){
-    sessionStorage.clear();
+    Object.keys(sessionStorage).forEach(function(k){ if(k.indexOf('pg_')===0) sessionStorage.removeItem(k); });
     localStorage.setItem('arc_cache_ver', CACHE_VER);
   }
 })();
@@ -19,16 +19,20 @@ window.addEventListener('load', function(){
   setTimeout(function(){
     var l = document.getElementById('site-loader');
     if(l) l.classList.add('hidden');
-    var prefetch = [
-      '2f00274fdc1c8065a11ff45192aa5dcb',
-      '2f00274fdc1c800b9d8fc366e8e40c5c',
-      '2dd222f22ef8413f8cb48f03bbb4f4b0',
-      '2f00274fdc1c80e78ad7ce985007b7c6',
-      '2f00274fdc1c806f8f17dbc6532d2211',
-    ];
-    prefetch.forEach(function(id){
-      fetch('/api/notion?pageId=' + id).catch(function(){});
-    });
+    function _doPrefetch(){
+      var prefetch = [
+        '2f00274fdc1c8065a11ff45192aa5dcb',
+        '2f00274fdc1c800b9d8fc366e8e40c5c',
+        '2dd222f22ef8413f8cb48f03bbb4f4b0',
+        '2f00274fdc1c80e78ad7ce985007b7c6',
+        '2f00274fdc1c806f8f17dbc6532d2211',
+      ];
+      prefetch.forEach(function(id){
+        fetch('/api/notion?pageId=' + id, {priority:'low'}).catch(function(){});
+      });
+    }
+    if(window.requestIdleCallback) requestIdleCallback(_doPrefetch, {timeout:5000});
+    else setTimeout(_doPrefetch, 3000);
   }, 500);
 });
 
@@ -44,6 +48,7 @@ function fontUp(){ applyFont(_fs + .08); _renderOptionsPanel(); }
 function fontDown(){ applyFont(_fs - .08); _renderOptionsPanel(); }
 
 /* ════ THEME ════ */
+function _escHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 var _theme = localStorage.getItem('arc_theme') || 'dark';
 var _THEMES = ['dark','light','blood','forest','abyss','alchemy'];
 function applyTheme(t){
@@ -133,25 +138,24 @@ function ovo(){
 function showToast(txt, icon, dur){
   var t = document.createElement('div');
   t.className = 'toast';
-  t.innerHTML = '<span>'+icon+'</span>'+txt;
+  t.innerHTML = '<span>'+_escHtml(icon)+'</span>'+_escHtml(txt);
   document.body.appendChild(t);
   setTimeout(function(){ t.classList.add('vis'); }, 10);
   setTimeout(function(){ t.classList.remove('vis'); setTimeout(function(){ t.remove(); }, 400); }, dur || 3000);
 }
 
-/* ════ HOOKS ════ */
-(function(){
-  var _origAfter = window.afterPageRender;
-  window.afterPageRender = function(){
-    if(_origAfter) _origAfter();
-    document.getElementById('hv').style.display = 'none';
-    document.getElementById('pv').style.display = 'block';
-    document.body.classList.add('page-open');
+/* ════ HOOKS — event bus ════ */
+window._afterPageRenderCbs = [];
+window.onAfterPageRender = function(cb){ window._afterPageRenderCbs.push(cb); };
+window.afterPageRender = function(){
+  window._afterPageRenderCbs.forEach(function(cb){ try{cb();}catch(e){} });
+  document.getElementById('hv').style.display = 'none';
+  document.getElementById('pv').style.display = 'block';
+  document.body.classList.add('page-open');
     var ts = document.getElementById('ts');
     if(ts) ts.value = '';
     csearch();
-  };
-})();
+};
 
 /* ════ COPY LINK ════ */
 window.copyPageLink = function(){
@@ -168,13 +172,32 @@ function toggleDd(id, e){
   if(e) e.stopPropagation();
   var all = document.querySelectorAll('.tn-drop');
   all.forEach(function(d){ if(d.id !== id) d.classList.remove('open'); });
-  document.getElementById(id).classList.toggle('open');
+  var dd = document.getElementById(id);
+  dd.classList.toggle('open');
+  var trigger = dd.querySelector('.tn');
+  if(trigger) trigger.setAttribute('aria-expanded', dd.classList.contains('open'));
 }
 function closeDd(){
-  document.querySelectorAll('.tn-drop').forEach(function(d){ d.classList.remove('open'); });
+  document.querySelectorAll('.tn-drop').forEach(function(d){
+    d.classList.remove('open');
+    var t=d.querySelector('.tn'); if(t) t.setAttribute('aria-expanded','false');
+  });
 }
 document.addEventListener('click', function(e){
   if(!e.target.closest('.tn-drop')) closeDd();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Enter'||e.key===' '){
+    var el=e.target;
+    if(el.classList.contains('tn')&&el.closest('.tn-drop')){
+      e.preventDefault(); el.click();
+    } else if(el.classList.contains('bnav-item')){
+      e.preventDefault(); el.click();
+    }
+  }
+  if(e.key==='Escape'){
+    closeDd(); closeMobileNav(); _closeOptionsPanel();
+  }
 });
 
 /* ════ MOBILE NAV ════ */
@@ -203,10 +226,11 @@ function hsearch(val){
         var res = data.results || [];
         if(!res.length){ sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Nessun risultato</div>'; return; }
         sr.innerHTML = res.map(function(p){
+  var et=_escHtml(p.title), ei=_escHtml(p.icon), eid=_escHtml(p.id);
   var snippet = p.snippet ? '<div class="sri-snippet">'+p.snippet+'</div>' : '';
-  return '<div class="sri" onclick="csearch();gp(\''+p.id+'\',\''+p.title+'\',\''+p.icon+'\')">'
-    +'<span class="si2">'+p.icon+'</span>'
-    +'<div class="sri-body"><span class="sl">'+p.title+'</span>'+snippet+'</div>'
+  return '<div class="sri" onclick="csearch();gp(\''+eid+'\',\''+et+'\',\''+ei+'\')">'
+    +'<span class="si2">'+ei+'</span>'
+    +'<div class="sri-body"><span class="sl">'+et+'</span>'+snippet+'</div>'
     +'</div>';
 }).join('');
         sr.classList.add('open');
@@ -381,17 +405,13 @@ function _applyCovers(covers){
     .then(function(d){ _applyCovers(d.covers || {}); })
     .catch(function(){});
 })();
-(function(){
-  var _orig = window.afterPageRender;
-  window.afterPageRender = function(){
-    if(_orig) _orig();
-    if(_cachedCovers){
-      setTimeout(function(){ _applyCovers(_cachedCovers); }, 300);
-      setTimeout(function(){ _applyCovers(_cachedCovers); }, 1200);
-    }
-    setTimeout(function(){ if(window.applyRecentBadges) applyRecentBadges(); }, 600);
-  };
-})();
+window.onAfterPageRender(function(){
+  if(_cachedCovers){
+    setTimeout(function(){ _applyCovers(_cachedCovers); }, 300);
+    setTimeout(function(){ _applyCovers(_cachedCovers); }, 1200);
+  }
+  setTimeout(function(){ if(window.applyRecentBadges) applyRecentBadges(); }, 600);
+});
 (function(){
   var _debounce = null;
   var pbody = document.getElementById('pbody');
@@ -709,13 +729,9 @@ window.addEventListener('online',  function(){ showToast('Connessione ripristina
       io.observe(el);
     });
   }
-  (function(){
-    var _orig = window.afterPageRender;
-    window.afterPageRender = function(){
-      if(_orig) _orig();
-      setTimeout(function(){ _lazyBg(document.getElementById('pbody')); }, 500);
-    };
-  })();
+  window.onAfterPageRender(function(){
+    setTimeout(function(){ _lazyBg(document.getElementById('pbody')); }, 500);
+  });
 })();
 
 /* ════ HELP WIDGET ════ */
@@ -749,18 +765,10 @@ function sendHelpMsg(){
   var msg  = (document.getElementById('ahp-dm-msg').value  || '').trim();
   var status = document.getElementById('ahp-dm-status');
   if(!msg){ status.textContent = 'Scrivi un messaggio prima di inviare.'; status.className='ahp-dm-status err'; return; }
-  var WEBHOOK_URL = 'https://discord.com/api/webhooks/1493894632776667237/Qc2dXguKfoUvddrN89BwdTCHxZ6hgyDMm60AC3izsCDZm2vSyWXbO9dTFD0_s-1IsiCu';
   status.textContent = 'Invio in corso...'; status.className='ahp-dm-status';
-  fetch(WEBHOOK_URL, {
+  fetch('/api/send-help', {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      username: 'Oracolo di Arcamis',
-      avatar_url: 'https://arcamis.pages.dev/favicon.png',
-      embeds:[{ title:'📩 Messaggio al DM', color:0xC89B3C,
-        fields:[{name:'Mittente', value:name||'*(anonimo)*', inline:true},{name:'Messaggio', value:msg}],
-        footer:{text:'Arcamis Help Widget'}, timestamp:new Date().toISOString()
-      }]
-    })
+    body: JSON.stringify({ name: name, message: msg })
   })
   .then(function(r){
     if(r.ok){

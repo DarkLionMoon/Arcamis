@@ -6,7 +6,7 @@ export async function onRequest(context) {
   const TOKEN = context.env.NOTION_TOKEN;
   const KV    = context.env.ARCAMIS_CACHE;
   const cors = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://arcamis.pages.dev',
     'Cache-Control': 'public, max-age=300'
   };
   const CACHE_KEY = 'recent_pages';

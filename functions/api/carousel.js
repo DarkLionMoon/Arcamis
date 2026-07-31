@@ -5,7 +5,7 @@
 export async function onRequest(context) {
   const KV = context.env.ARCAMIS_CACHE;
   const cors = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://arcamis.pages.dev',
     'Content-Type': 'application/json',
     'Cache-Control': 'no-store'
   };

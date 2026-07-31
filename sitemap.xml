@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://arcamis.pages.dev/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://arcamis.pages.dev/regole/gameplay</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://arcamis.pages.dev/regole/generali</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://arcamis.pages.dev/personaggio/come-si-inizia</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://arcamis.pages.dev/personaggio/andando-avanti</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://arcamis.pages.dev/personaggio/galleria-pg</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/lore/storia</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://arcamis.pages.dev/lore/pantheon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/homebrew</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/lavori/gilda-avventurieri</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/lavori/locanda</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/lavori/forgia</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/lavori/biblioteca</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/lavori/bottega-farmaceutica</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/lavori/caserma</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/lavori/ospedale</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/lavori/sartoria</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://arcamis.pages.dev/mappe</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://arcamis.pages.dev/changelog</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://arcamis.pages.dev/maestria-titoli</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://arcamis.pages.dev/materiale-approvato</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+</urlset>
