@@ -540,6 +540,7 @@
    → click sulla pinna = overlay con gif + messaggio
 ════════════════════════════════════ */
 (function(){
+  if(window._reducedMotion) return;
   /* ── Config ── */
   var SPEED_THRESHOLD = 8;    // px/ms per considerare lo scroll "veloce"
   var SWINGS_NEEDED   = 4;    // inversioni di direzione necessarie
@@ -691,6 +692,7 @@
 
 })();
 (function(){
+  if(window._reducedMotion) return;
   var SOUNDS = [
     '/audio/footsteps.mp3',
     '/audio/door-knock.mp3',

@@ -857,3 +857,21 @@ nav#tnav{display:flex;align-items:stretch}
   background: rgba(200, 155, 60, 0.3);
   color: #f5e4a8;
 }
+
+/* ════════════════════════════════════
+   REDUCED MOTION — ottimizzazione hardware deboli
+════════════════════════════════════ */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:0.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:0.01ms!important;
+    scroll-behavior:auto!important;
+  }
+  .particle,.portal-p,.star,.dp,.spark{display:none!important}
+  #dust-vfx,#hero-particles,#portal-pts,#star-field{display:none!important}
+  #candlelight-overlay{display:none!important}
+  .shine{display:none!important}
+  body::before{display:none!important}
+  *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+}

@@ -953,9 +953,7 @@ html body .wiki-layout .dnd-grid .lcard.dnd-5e:hover {
 
 .aop-section{padding:16px 18px;border-bottom:1px solid rgba(200,155,60,.1)}
 .aop-section:last-child{border-bottom:none}
-.aop-section--disabled{opacity:.4;pointer-events:none}
 .aop-label{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.25em;text-transform:uppercase;color:rgba(200,155,60,.55);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.aop-coming{font-size:7.5px;background:rgba(200,155,60,.1);color:rgba(200,155,60,.6);padding:1px 6px;letter-spacing:.1em}
 
 .aop-themes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .aop-theme-btn{
@@ -982,8 +980,6 @@ html body .wiki-layout .dnd-grid .lcard.dnd-5e:hover {
 }
 .aop-font-btn:hover{background:rgba(200,155,60,.1);border-color:rgba(200,155,60,.4)}
 .aop-font-pct{flex:1;text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--parch,rgba(240,230,200,.85))}
-
-.aop-lang-row{display:flex;gap:8px;font-family:'Cinzel',serif;font-size:11px;color:var(--text3,rgba(200,180,140,.5))}
 
 /* ════════════════════════════════════
    THEME — SANGUE & OSCURITÀ

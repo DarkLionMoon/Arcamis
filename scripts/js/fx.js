@@ -4,6 +4,10 @@
    di navigazione o dati)
 ════════════════════════════════════ */
 
+/* ── Reduced motion detection ── */
+window._reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var _pMul = window._reducedMotion ? 0.3 : 1;
+
 /* ── Glossy shine sulle lcard ── */
 function attachShine(root){
   (root||document).querySelectorAll('.lcard').forEach(function(card){
@@ -23,6 +27,7 @@ attachShine();
 
 /* ── Micro sparkle sulle lcard ── */
 (function(){
+  if(window._reducedMotion) return;
   document.querySelectorAll('.lcard').forEach(function(card){
     card.addEventListener('mouseenter',function(e){ spawnSparks(card,e); });
   });
@@ -53,6 +58,7 @@ attachShine();
 
 /* ── Sparkle sulle mys-card ── */
 (function(){
+  if(window._reducedMotion) return;
   document.querySelectorAll('.mys-card').forEach(function(card){
     card.addEventListener('mouseenter',function(){
       var n=4+Math.floor(Math.random()*3);
@@ -84,7 +90,8 @@ attachShine();
 (function(){
   var hp=document.getElementById('hero-particles');
   if(!hp)return;
-  for(var i=0;i<18;i++){
+  var _hCount=Math.round(18*_pMul);
+  for(var i=0;i<_hCount;i++){
     var p=document.createElement('div');
     p.className='particle';
     var sz=Math.random()<0.3?3:Math.random()<0.7?2:1;
@@ -102,7 +109,8 @@ attachShine();
 (function(){
   var pts=document.getElementById('portal-pts');
   if(!pts)return;
-  for(var i=0;i<18;i++){
+  var _ppCount=Math.round(18*_pMul);
+  for(var i=0;i<_ppCount;i++){
     var p=document.createElement('div');
     p.className='portal-p';
     var sz=(1.5+Math.random()*2.5);
@@ -120,7 +128,8 @@ attachShine();
 (function(){
   var sf=document.getElementById('star-field');
   if(!sf)return;
-  for(var i=0;i<110;i++){
+  var _sfCount=Math.round(110*_pMul);
+  for(var i=0;i<_sfCount;i++){
     var s=document.createElement('div');
     s.className='star';
     var size=(Math.random()<0.15)?2.5:(Math.random()<0.4)?1.5:1;
@@ -155,6 +164,7 @@ attachShine();
 
 /* ── Mouse parallax sul carousel ── */
 (function(){
+  if(window._reducedMotion) return;
   var cw=document.getElementById('carousel-wrap');
   if(!cw)return;
   cw.addEventListener('mousemove',function(e){
@@ -171,7 +181,7 @@ attachShine();
 })();
 
 /* ── Ripple sui .sbtn ── */
-document.addEventListener('click',function(e){
+if(!window._reducedMotion) document.addEventListener('click',function(e){
   var btn=e.target.closest('.sbtn');
   if(!btn)return;
   var r=btn.getBoundingClientRect();
@@ -258,7 +268,7 @@ initFadeIn();
 (function(){
   var wrap=document.getElementById('dust-vfx');
   if(!wrap)return;
-  var N=18; /* numero particelle */
+  var N=Math.round(18*_pMul); /* numero particelle */
   for(var i=0;i<N;i++){
     (function(idx){
       var p=document.createElement('div');
@@ -283,9 +293,11 @@ initFadeIn();
 (function(){
   var ov=document.getElementById('candlelight-overlay');
   if(!ov)return;
+  if(window._reducedMotion){ov.style.display='none';return;}
   var cx=50,cy=50;
   var tx=50,ty=50;
   var enabled=false; /* OFF di default */
+  var rafId=null;
   window.toggleCandlelight=function(){
     enabled=!enabled;
     ov.classList.toggle('cl-on',enabled);
@@ -294,13 +306,16 @@ initFadeIn();
       btn.classList.toggle('cl-on',enabled);
       btn.title=enabled?'Spegni lume di candela':'Lume di candela';
     }
+    if(enabled&&!rafId) tick();
+    else if(!enabled&&rafId){cancelAnimationFrame(rafId);rafId=null;}
   };
   function tick(){
+    if(!enabled)return;
     cx+=(tx-cx)*0.08;
     cy+=(ty-cy)*0.08;
     ov.style.setProperty('--clx',cx.toFixed(2)+'%');
     ov.style.setProperty('--cly',cy.toFixed(2)+'%');
-    requestAnimationFrame(tick);
+    rafId=requestAnimationFrame(tick);
   }
   document.addEventListener('mousemove',function(e){
     tx=(e.clientX/window.innerWidth)*100;

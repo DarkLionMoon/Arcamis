@@ -254,7 +254,7 @@
      silenzioso delle pagine più
      visitate non ancora in cache.
   ════════════════════════════════ */
-  window.addEventListener('load', function() {
+  if(!window._reducedMotion) window.addEventListener('load', function() {
     setTimeout(function() {
       /* Pagine lavori — le più cliccate */
       var hotPages = [

@@ -226,10 +226,6 @@ function csearch(){
 function goToTop(){
   document.getElementById('main').scrollTo({top:0, behavior:'smooth'});
 }
-window.addEventListener('scroll', function(){
-  var btn = document.getElementById('scroll-top-btn');
-  if(btn) btn.classList.toggle('visible', window.scrollY > 400);
-}, {passive:true});
 
 /* ════ XFADE ════ */
 function xfade(from, to){
