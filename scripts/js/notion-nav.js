@@ -7,6 +7,49 @@
 
 var navStack = [];
 
+/* ════ MARKDOWN → HTML (per JSON locali) ════ */
+function _mdToHtml(md){
+  if(!md) return '';
+  /* Code blocks */
+  md = md.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+  /* Inline code */
+  md = md.replace(/`([^`]+)`/g, '<code>$1</code>');
+  /* Tables */
+  md = md.replace(/^(\|.+\|)\n(\|[-| :]+\|)\n((?:\|.+\|\n?)*)/gm, function(m, header, sep, body){
+    var ths = header.split('|').filter(function(c){return c.trim()}).map(function(c){return '<th>'+c.trim()+'</th>'}).join('');
+    var rows = body.trim().split('\n').map(function(r){
+      var tds = r.split('|').filter(function(c){return c.trim()}).map(function(c){return '<td>'+c.trim()+'</td>'}).join('');
+      return '<tr>'+tds+'</tr>';
+    }).join('');
+    return '<table><thead><tr>'+ths+'</tr></thead><tbody>'+rows+'</tbody></table>';
+  });
+  /* Headers */
+  md = md.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+  md = md.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  md = md.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  md = md.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  /* Bold & italic */
+  md = md.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  md = md.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  md = md.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  /* Blockquote */
+  md = md.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  /* HR */
+  md = md.replace(/^---$/gm, '<hr>');
+  /* Unordered list */
+  md = md.replace(/^- (.+)$/gm, '<li>$1</li>');
+  /* Ordered list */
+  md = md.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  /* Links */
+  md = md.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  /* Images */
+  md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;border-radius:4px;margin:8px 0">');
+  /* Paragraphs */
+  md = md.replace(/\n\n/g, '</p><p>');
+  md = md.replace(/\n/g, '<br>');
+  return '<p>' + md + '</p>';
+}
+
 /* ════ SLUG MAP (legacy — usata per retrocompatibilità ?p= ) ════ */
 var _slugMap = {
   /* Regole */
@@ -235,6 +278,47 @@ async function _gpRender(id,label,icon){
   var phSub=document.getElementById('ph-sub');
   var phHero=document.getElementById('page-hero');
   var phCrumb=document.getElementById('ph-crumb');
+
+  /* ═══ LOCAL JSON CHECK ═══ */
+  var _localPage = (typeof pages !== 'undefined') ? pages.find(function(p){ return p.id === id; }) : null;
+  if(_localPage && _localPage.k){
+    try {
+      var _localResp = await fetch('/content/pages/' + _localPage.k + '.json');
+      if(_localResp.ok){
+        var _localJson = await _localResp.json();
+        if(_localJson.content){
+          /* Render markdown locally */
+          var ptitle = _localJson.title || label || 'Pagina';
+          var picon = _localJson.icon || icon || '📄';
+          phTitle.textContent = ptitle;
+          phIcon.textContent = picon;
+          phEyebrow.textContent = 'Archivi di Arcamis';
+          document.title = ptitle + ' — Arcamis';
+          phCrumb.innerHTML = buildCrumb(ptitle);
+          var acc = iconAccent(picon);
+          phHero.style.setProperty('--ph-acc', acc.c);
+          phHero.style.setProperty('--ph-accbg', acc.bg);
+          phCovbg.style.backgroundImage = '';
+          phOverlay.style.opacity = '0';
+          phIcon.style.opacity = '0.06';
+          var _localHtml = _mdToHtml(_localJson.content);
+          var pbody = document.getElementById('pbody');
+          pbody.className = 'page-' + id;
+          pbody.style.maxWidth = '';
+          pbody.style.width = '';
+          var _emptyHtml = '<div class="n-empty"><div class="n-empty-icon">' + picon + '</div>'
+            + '<div class="n-empty-title">' + ptitle + '</div>'
+            + '<div class="n-empty-msg">Questa pagina non ha ancora contenuto.</div></div>';
+          var _footer = '<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
+            + '<div class="n-page-footer-text">Archivi di Arcamis — ' + ptitle + '</div></div>';
+          pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + (_localHtml || _emptyHtml) + _footer + '</div>';
+          applyGlossary(pbody);
+          if(typeof afterPageRender === 'function') afterPageRender();
+          return;
+        }
+      }
+    } catch(_e) { /* Fall through to Notion API */ }
+  }
 
   var cacheKey='pg_'+id;
   var data=_memCache[cacheKey]||null;
