@@ -373,3 +373,234 @@
   .regle-links { flex-direction: column; }
   .regle-link-card { width: 100%; }
 }
+
+/* ════════ LORE / LUOGHI ════════ */
+.lore-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.lore-empty {
+  text-align: center;
+  padding: 48px 24px;
+  background: rgba(200, 155, 60, .03);
+  border: 1px dashed rgba(200, 155, 60, .15);
+  border-radius: 12px;
+}
+.lore-empty-icon { font-size: 32px; margin-bottom: 12px; }
+.lore-empty-title {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(200, 155, 60, .8);
+  margin-bottom: 6px;
+}
+.lore-empty-msg {
+  font-size: 13px;
+  color: rgba(240, 230, 200, .5);
+}
+.lore-intro {
+  background: rgba(200, 155, 60, .04);
+  border-left: 3px solid rgba(200, 155, 60, .25);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  line-height: 1.7;
+}
+.lore-section {
+  background: rgba(200, 155, 60, .03);
+  border: 1px solid rgba(200, 155, 60, .08);
+  border-radius: 10px;
+  padding: 18px 20px;
+  transition: border-color .15s;
+}
+.lore-section:hover {
+  border-color: rgba(200, 155, 60, .2);
+}
+.lore-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(200, 155, 60, .85);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(200, 155, 60, .1);
+  letter-spacing: .03em;
+}
+.lore-section-body {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: rgba(240, 230, 200, .72);
+}
+.lore-section-body strong {
+  color: rgba(200, 155, 60, .9);
+}
+.lore-callout {
+  background: rgba(200, 155, 60, .06);
+  border-left: 3px solid rgba(200, 155, 60, .3);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: rgba(200, 155, 60, .65);
+  margin-top: 10px;
+}
+
+/* ════════ LAVORO / GILDE ════════ */
+.lavoro-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.lavoro-intro {
+  background: rgba(200, 155, 60, .05);
+  border-left: 3px solid rgba(200, 155, 60, .3);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(240, 230, 200, .8);
+  font-style: italic;
+}
+.lavoro-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.lavoro-section {
+  background: rgba(200, 155, 60, .03);
+  border: 1px solid rgba(200, 155, 60, .08);
+  border-radius: 10px;
+  padding: 16px 18px;
+  transition: border-color .15s;
+}
+.lavoro-section:hover {
+  border-color: rgba(200, 155, 60, .2);
+}
+.lavoro-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(200, 155, 60, .85);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(200, 155, 60, .1);
+  letter-spacing: .03em;
+}
+.lavoro-section-body {
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(240, 230, 200, .7);
+}
+.lavoro-section-body strong {
+  color: rgba(200, 155, 60, .9);
+}
+.lavoro-section-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0;
+}
+.lavoro-section-body li {
+  padding: 3px 0 3px 16px;
+  position: relative;
+}
+.lavoro-section-body li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  color: rgba(200, 155, 60, .4);
+  font-size: 7px;
+  top: 7px;
+}
+.lavoro-body {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: rgba(240, 230, 200, .72);
+}
+@media (max-width: 700px) {
+  .lavoro-sections { grid-template-columns: 1fr; }
+}
+
+/* ════════ PERSONAGGIO ════════ */
+.pers-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.pers-intro {
+  background: rgba(200, 155, 60, .05);
+  border-left: 3px solid rgba(200, 155, 60, .3);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(240, 230, 200, .8);
+}
+.pers-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pers-step {
+  display: flex;
+  gap: 16px;
+  background: rgba(200, 155, 60, .03);
+  border: 1px solid rgba(200, 155, 60, .08);
+  border-radius: 10px;
+  padding: 16px 18px;
+  transition: border-color .15s;
+}
+.pers-step:hover {
+  border-color: rgba(200, 155, 60, .2);
+}
+.pers-step-num {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(200, 155, 60, .6);
+  min-width: 36px;
+  text-align: center;
+  line-height: 1;
+  padding-top: 4px;
+}
+.pers-step-content { flex: 1; }
+.pers-step-title {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(200, 155, 60, .85);
+  margin-bottom: 8px;
+  letter-spacing: .03em;
+}
+.pers-step-body {
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(240, 230, 200, .7);
+}
+.pers-step-body strong {
+  color: rgba(200, 155, 60, .9);
+}
+.pers-step-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0;
+}
+.pers-step-body li {
+  padding: 3px 0 3px 16px;
+  position: relative;
+}
+.pers-step-body li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  color: rgba(200, 155, 60, .4);
+  font-size: 7px;
+  top: 7px;
+}
+.pers-body {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: rgba(240, 230, 200, .72);
+}
+@media (max-width: 700px) {
+  .pers-step { flex-direction: column; gap: 8px; }
+  .pers-step-num { text-align: left; min-width: auto; }
+}

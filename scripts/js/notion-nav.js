@@ -21,33 +21,35 @@ function _mdToHtml(md){
       var tds = r.split('|').filter(function(c){return c.trim()}).map(function(c){return '<td>'+c.trim()+'</td>'}).join('');
       return '<tr>'+tds+'</tr>';
     }).join('');
-    return '<table><thead><tr>'+ths+'</tr></thead><tbody>'+rows+'</tbody></table>';
+    return '<div class="n-tbl-wrap"><table><thead><tr>'+ths+'</tr></thead><tbody>'+rows+'</tbody></table></div>';
   });
   /* Headers */
-  md = md.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
-  md = md.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  md = md.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-  md = md.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  md = md.replace(/^#### (.+)$/gm, '<h4 class="n-h4">$1</h4>');
+  md = md.replace(/^### (.+)$/gm, '<h3 class="n-h3">$1</h3>');
+  md = md.replace(/^## (.+)$/gm, '<h2 class="n-h2">$1</h2>');
+  md = md.replace(/^# (.+)$/gm, '<h1 class="n-h1">$1</h1>');
   /* Bold & italic */
   md = md.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
   md = md.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   md = md.replace(/\*(.+?)\*/g, '<em>$1</em>');
   /* Blockquote */
-  md = md.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  md = md.replace(/^> (.+)$/gm, '<blockquote class="n-quote"><span class="n-quote-mark">"</span>$1</blockquote>');
   /* HR */
-  md = md.replace(/^---$/gm, '<hr>');
+  md = md.replace(/^---$/gm, '<hr class="n-divider">');
   /* Unordered list */
-  md = md.replace(/^- (.+)$/gm, '<li>$1</li>');
+  md = md.replace(/^- (.+)$/gm, '<li class="n-li">$1</li>');
   /* Ordered list */
-  md = md.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  md = md.replace(/^\d+\. (.+)$/gm, '<li class="n-li">$1</li>');
+  /* Wrap consecutive li in ul */
+  md = md.replace(/((?:<li class="n-li">.*<\/li>\n?)+)/g, '<ul class="n-ul">$1</ul>');
   /* Links */
-  md = md.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  md = md.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="n-link">$1</a>');
   /* Images */
-  md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;border-radius:4px;margin:8px 0">');
+  md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="n-image">');
   /* Paragraphs */
-  md = md.replace(/\n\n/g, '</p><p>');
+  md = md.replace(/\n\n/g, '</p><p class="n-p">');
   md = md.replace(/\n/g, '<br>');
-  return '<p>' + md + '</p>';
+  return '<p class="n-p">' + md + '</p>';
 }
 
 /* ════ SLUG MAP (legacy — usata per retrocompatibilità ?p= ) ════ */
@@ -301,7 +303,7 @@ async function _gpRender(id,label,icon){
           phCovbg.style.backgroundImage = '';
           phOverlay.style.opacity = '0';
           phIcon.style.opacity = '0.06';
-          var _localHtml = (_localPage.k === 'materiale') ? _renderMateriale(_localJson.content) : (_localPage.k === 'regole') ? _renderRegole(_localJson.content) : _mdToHtml(_localJson.content);
+          var _localHtml = (_localPage.k === 'materiale') ? _renderMateriale(_localJson.content) : (_localPage.k === 'regole' || _localPage.k === 'gameplay') ? _renderRegole(_localJson.content) : (_localPage.k === 'inizia' || _localPage.k === 'avanti') ? _renderPersonaggio(_localJson.content) : (_localPage.k === 'gilda' || _localPage.k === 'locanda' || _localPage.k === 'farmacia' || _localPage.k === 'biblioteca' || _localPage.k === 'ospedale' || _localPage.k === 'sartoria' || _localPage.k === 'deserto') ? _renderLavoro(_localJson.content, _localJson.title) : (_localPage.k === 'pantheon' || _localPage.k === 'maestria' || _localPage.k === 'arcamis' || _localPage.k === 'selva' || _localPage.k === 'foresta' || _localPage.k === 'volonx' || _localPage.k === 'arpax' || _localPage.k === 'galleria') ? _renderLore(_localJson.content, _localJson.title, _localJson.icon) : _mdToHtml(_localJson.content);
           var pbody = document.getElementById('pbody');
           pbody.className = 'page-' + id;
           pbody.style.maxWidth = '';
@@ -728,4 +730,175 @@ function _renderRegole(md) {
   }
 
   return '<div class="regle-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER LORE / LUOGHI
+   Card organizzate per pagine di lore
+   ══════════════════════════════════════ */
+function _renderLore(md, title, icon) {
+  if (!md || md.trim().length < 5) {
+    return '<div class="lore-page"><div class="lore-empty">'
+      + '<div class="lore-empty-icon">' + (icon || '📄') + '</div>'
+      + '<div class="lore-empty-title">' + (title || 'Pagina') + '</div>'
+      + '<div class="lore-empty-msg">Contenuto in arrivo.</div></div></div>';
+  }
+
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+
+  /* Se non ci sono sezioni ##, usa tutto come intro */
+  if (sections.length === 0) {
+    html += '<div class="lore-intro">' + _mdToHtml(md) + '</div>';
+    return '<div class="lore-page">' + html + '</div>';
+  }
+
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var sectionTitle = (lines.shift() || '').trim();
+    var body = lines.join('\n').trim();
+
+    /* Estrai callout */
+    var callouts = [];
+    body = body.replace(/^>\s*(.+)$/gm, function(_, txt) {
+      callouts.push(txt);
+      return '';
+    });
+
+    html += '<div class="lore-section">';
+    html += '<h2 class="lore-section-title">' + sectionTitle + '</h2>';
+    if (body) {
+      html += '<div class="lore-section-body">' + _mdToHtml(body) + '</div>';
+    }
+    callouts.forEach(function(c) {
+      html += '<div class="lore-callout">💡 ' + c + '</div>';
+    });
+    html += '</div>';
+  });
+
+  return '<div class="lore-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER LAVORO / GILDE
+   Scheda lavoro con stipendio e regole
+   ══════════════════════════════════════ */
+function _renderLavoro(md, title) {
+  if (!md) return '';
+  var html = '';
+
+  /* Split in blocchi separati da --- */
+  var blocks = md.split(/\n---\n/);
+
+  /* Primo blocco: intro */
+  var introBlock = (blocks.shift() || '').trim();
+  if (introBlock) {
+    /* Rimuovi immagini dall'intro (sono link Notion non funzionanti) */
+    var cleanIntro = introBlock.replace(/!\[[^\]]*\]\([^)]+\)/g, '').trim();
+    if (cleanIntro) {
+      html += '<div class="lavoro-intro">' + _mdToHtml(cleanIntro) + '</div>';
+    }
+  }
+
+  /* Sezioni con ### */
+  var sections = [];
+  blocks.forEach(function(block) {
+    var lines = block.split('\n');
+    var headerMatch = null;
+    var body = [];
+    lines.forEach(function(line) {
+      var hm = line.match(/^###\s+(.+)/);
+      if (hm) {
+        headerMatch = hm[1];
+      } else if (line.trim()) {
+        body.push(line);
+      }
+    });
+    if (headerMatch) {
+      sections.push({ title: headerMatch, body: body.join('\n') });
+    }
+  });
+
+  /* Se ci sono sezioni,entalle in card */
+  if (sections.length) {
+    html += '<div class="lavoro-sections">';
+    sections.forEach(function(sec) {
+      html += '<div class="lavoro-section">';
+      html += '<div class="lavoro-section-title">' + sec.title + '</div>';
+      html += '<div class="lavoro-section-body">' + _mdToHtml(sec.body) + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  /* Se non ci sono sezioni ###, usa tutto come body */
+  if (sections.length === 0 && blocks.length) {
+    var remaining = blocks.join('\n---\n').trim();
+    if (remaining) {
+      html += '<div class="lavoro-body">' + _mdToHtml(remaining) + '</div>';
+    }
+  }
+
+  return '<div class="lavoro-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER PERSONAGGIO
+   Step-by-step per creazione PG
+   ══════════════════════════════════════ */
+function _renderPersonaggio(md) {
+  if (!md) return '';
+  var html = '';
+
+  /* Split in blocchi separati da --- */
+  var blocks = md.split(/\n---\n/);
+
+  /* Primo blocco: intro */
+  var introBlock = (blocks.shift() || '').trim();
+  if (introBlock) {
+    html += '<div class="pers-intro">' + _mdToHtml(introBlock) + '</div>';
+  }
+
+  /* Sezioni con ### */
+  var sections = [];
+  blocks.forEach(function(block) {
+    var lines = block.split('\n');
+    var headerMatch = null;
+    var body = [];
+    lines.forEach(function(line) {
+      var hm = line.match(/^###\s+(.+)/);
+      if (hm) {
+        headerMatch = hm[1];
+      } else if (line.trim()) {
+        body.push(line);
+      }
+    });
+    if (headerMatch) {
+      sections.push({ title: headerMatch, body: body.join('\n') });
+    }
+  });
+
+  /* Render come step cards */
+  if (sections.length) {
+    html += '<div class="pers-steps">';
+    sections.forEach(function(sec, i) {
+      html += '<div class="pers-step">';
+      html += '<div class="pers-step-num">' + (i + 1) + '</div>';
+      html += '<div class="pers-step-content">';
+      html += '<div class="pers-step-title">' + sec.title + '</div>';
+      html += '<div class="pers-step-body">' + _mdToHtml(sec.body) + '</div>';
+      html += '</div></div>';
+    });
+    html += '</div>';
+  }
+
+  /* Se non ci sono sezioni ###, usa tutto come body */
+  if (sections.length === 0 && blocks.length) {
+    var remaining = blocks.join('\n---\n').trim();
+    if (remaining) {
+      html += '<div class="pers-body">' + _mdToHtml(remaining) + '</div>';
+    }
+  }
+
+  return '<div class="pers-page">' + html + '</div>';
 }
