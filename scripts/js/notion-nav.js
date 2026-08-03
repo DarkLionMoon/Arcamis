@@ -301,7 +301,7 @@ async function _gpRender(id,label,icon){
           phCovbg.style.backgroundImage = '';
           phOverlay.style.opacity = '0';
           phIcon.style.opacity = '0.06';
-          var _localHtml = (_localPage.k === 'materiale') ? _renderMateriale(_localJson.content) : _mdToHtml(_localJson.content);
+          var _localHtml = (_localPage.k === 'materiale') ? _renderMateriale(_localJson.content) : (_localPage.k === 'regole') ? _renderRegole(_localJson.content) : _mdToHtml(_localJson.content);
           var pbody = document.getElementById('pbody');
           pbody.className = 'page-' + id;
           pbody.style.maxWidth = '';
@@ -633,4 +633,99 @@ function _renderMateriale(md) {
   });
 
   return '<div class="mat-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER REGOLE
+   Layout organizzato con sezioni e card
+   ══════════════════════════════════════ */
+function _renderRegole(md) {
+  if (!md) return '';
+  var html = '';
+
+  /* Split in blocchi principali separati da --- */
+  var blocks = md.split(/\n---\n/);
+
+  /* Primo blocco: intro + regole brevi */
+  var introBlock = blocks.shift() || '';
+  var introLines = introBlock.split('\n').filter(function(l){ return l.trim(); });
+  var introText = '';
+  var briefRules = [];
+  introLines.forEach(function(line) {
+    var m = line.match(/^\d+\)\s*(.+)/);
+    if (m) {
+      briefRules.push(m[1]);
+    } else if (!line.match(/^\[📄/)) {
+      introText += line + ' ';
+    }
+  });
+
+  /* Link alle sotto-pagine */
+  var subpageLinks = [];
+  md.replace(/\[📄\s*([^\]]+)\]/g, function(_, title) {
+    subpageLinks.push(title.trim());
+  });
+
+  /* Sezioni con ### */
+  var sections = [];
+  var currentSection = null;
+  blocks.forEach(function(block) {
+    var lines = block.split('\n');
+    var headerMatch = null;
+    var body = [];
+    lines.forEach(function(line) {
+      var hm = line.match(/^###\s+(.+)/);
+      if (hm) {
+        headerMatch = hm[1];
+      } else if (line.trim() && !line.match(/^\[📄/)) {
+        body.push(line);
+      }
+    });
+    if (headerMatch) {
+      sections.push({ title: headerMatch, body: body.join('\n') });
+    }
+  });
+
+  /* ── Intro callout ── */
+  if (introText.trim()) {
+    html += '<div class="regle-intro">' + _mdToHtml(introText.trim()) + '</div>';
+  }
+
+  /* ── Regole brevi ── */
+  if (briefRules.length) {
+    html += '<div class="regle-brief">';
+    briefRules.forEach(function(rule, i) {
+      html += '<div class="regle-brief-card">'
+        + '<span class="regle-brief-num">' + (i + 1) + '</span>'
+        + '<span class="regle-brief-text">' + rule + '</span>'
+        + '</div>';
+    });
+    html += '</div>';
+  }
+
+  /* ── Link sotto-pagine ── */
+  if (subpageLinks.length) {
+    html += '<div class="regle-links">';
+    subpageLinks.forEach(function(title) {
+      html += '<div class="regle-link-card">'
+        + '<span class="regle-link-icon">📄</span>'
+        + '<span class="regle-link-title">' + title + '</span>'
+        + '</div>';
+    });
+    html += '</div>';
+  }
+
+  /* ── Sezioni regole ── */
+  if (sections.length) {
+    html += '<div class="regle-sections">';
+    sections.forEach(function(sec) {
+      html += '<div class="regle-section">';
+      html += '<div class="regle-section-title">' + sec.title + '</div>';
+      html += '<div class="regle-section-body">' + _mdToHtml(sec.body) + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  return '<div class="regle-page">' + html + '</div>';
 }

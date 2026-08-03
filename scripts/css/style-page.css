@@ -238,3 +238,138 @@
   .mat-callout { grid-column: span 1; }
   .mat-classes { grid-template-columns: 1fr; }
 }
+
+/* ════════ REGOLE ════════ */
+.regle-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.regle-intro {
+  background: rgba(200, 155, 60, .05);
+  border-left: 3px solid rgba(200, 155, 60, .3);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(240, 230, 200, .8);
+}
+.regle-brief {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.regle-brief-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(200, 155, 60, .04);
+  border: 1px solid rgba(200, 155, 60, .1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: border-color .15s, background .15s;
+}
+.regle-brief-card:hover {
+  border-color: rgba(200, 155, 60, .25);
+  background: rgba(200, 155, 60, .07);
+}
+.regle-brief-num {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(200, 155, 60, .7);
+  min-width: 24px;
+  text-align: center;
+  line-height: 1;
+  padding-top: 2px;
+}
+.regle-brief-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(240, 230, 200, .75);
+}
+.regle-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.regle-link-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(200, 155, 60, .06);
+  border: 1px solid rgba(200, 155, 60, .15);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(200, 155, 60, .85);
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .15s;
+}
+.regle-link-card:hover {
+  border-color: rgba(200, 155, 60, .4);
+  background: rgba(200, 155, 60, .1);
+  transform: translateY(-1px);
+}
+.regle-link-icon { font-size: 16px; }
+.regle-link-title {
+  font-family: 'Cinzel', serif;
+  letter-spacing: .03em;
+}
+.regle-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.regle-section {
+  background: rgba(200, 155, 60, .03);
+  border: 1px solid rgba(200, 155, 60, .08);
+  border-radius: 10px;
+  padding: 16px 18px;
+  transition: border-color .15s;
+}
+.regle-section:hover {
+  border-color: rgba(200, 155, 60, .2);
+}
+.regle-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(200, 155, 60, .85);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(200, 155, 60, .1);
+  letter-spacing: .03em;
+}
+.regle-section-body {
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(240, 230, 200, .7);
+}
+.regle-section-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0;
+}
+.regle-section-body li {
+  padding: 3px 0 3px 16px;
+  position: relative;
+}
+.regle-section-body li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  color: rgba(200, 155, 60, .4);
+  font-size: 7px;
+  top: 7px;
+}
+.regle-section-body strong {
+  color: rgba(200, 155, 60, .9);
+  font-weight: 600;
+}
+@media (max-width: 700px) {
+  .regle-sections { grid-template-columns: 1fr; }
+  .regle-links { flex-direction: column; }
+  .regle-link-card { width: 100%; }
+}
