@@ -808,3 +808,25 @@ document.addEventListener('click', function(e){
   var btn   = document.getElementById('arc-help-btn');
   if(panel && !panel.contains(e.target) && btn && !btn.contains(e.target)) toggleHelpPanel();
 });
+
+/* ════════ MAINTENANCE BANNER ════════ */
+(function(){
+  var MAINT_KEY = 'arc_maint_dismissed';
+  var banner = document.getElementById('maint-banner');
+  if(!banner) return;
+  if(!localStorage.getItem(MAINT_KEY)){
+    banner.style.display = '';
+    document.body.classList.add('maint-shift');
+  }
+})();
+function dismissMaintBanner(){
+  var banner = document.getElementById('maint-banner');
+  if(banner){
+    banner.style.opacity = '0';
+    banner.style.transform = 'translateY(-100%)';
+    banner.style.transition = 'opacity .25s, transform .25s';
+    setTimeout(function(){ banner.style.display = 'none'; }, 260);
+  }
+  document.body.classList.remove('maint-shift');
+  localStorage.setItem('arc_maint_dismissed', '1');
+}
