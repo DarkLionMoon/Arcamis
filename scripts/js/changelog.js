@@ -5,7 +5,7 @@ window.loadChangelog = async function(container) {
 
   let entries;
   try {
-    const res = await fetch('/data/db/changelog.json');
+    const res = await fetch('/api/changelog');
     if (!res.ok) throw new Error('Fetch error ' + res.status);
     entries = await res.json();
   } catch (e) {
@@ -205,7 +205,7 @@ window.loadChangelog = async function(container) {
           inline.dataset.id = entry.id;
           inline.innerHTML = '<div class="hbsc-loading"><div class="gs-loading-spin"></div></div>';
           card.appendChild(inline);
-          fetch('/data/pages/' + entry.id + '.json')
+          fetch('/api/notion?pageId=' + entry.id)
             .then(r => r.json())
             .then(data => {
               if (!data.blocks) throw new Error('no blocks');

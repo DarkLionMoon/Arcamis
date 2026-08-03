@@ -48,7 +48,7 @@ window.loadNpcGallery = async function(container, cities) {
 
   if (!cities) {
     try {
-      var r = await fetch('/data/db/npc.json');
+      var r = await fetch('/api/notion?dbId=' + NPC_PARENT_DB);
       cities = (await r.json()).pages || [];
     } catch(e) {
       container.innerHTML = '<div class="npc-err">⚠️ Errore caricamento città.</div>'; return;
@@ -124,7 +124,7 @@ async function _loadCityBoard(board, city) {
 
   var subDbId = null;
   try {
-    var pr = await fetch('/data/pages/' + city.id + '.json');
+    var pr = await fetch('/api/notion?pageId=' + city.id);
     var pd = await pr.json();
     var dbBlock = (pd.blocks || []).find(function(b){ return b.type === 'child_database'; });
     if (dbBlock) subDbId = dbBlock.id.replace(/-/g, '');
@@ -134,7 +134,7 @@ async function _loadCityBoard(board, city) {
 
   var npcs = [];
   try {
-    var nr = await fetch('/data/db/npc-' + subDbId + '.json');
+    var nr = await fetch('/api/notion?dbId=' + subDbId);
     npcs = (await nr.json()).pages || [];
   } catch(e) { board.innerHTML = '<div class="npc-err">⚠️ Errore.</div>'; return; }
 

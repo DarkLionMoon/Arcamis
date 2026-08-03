@@ -223,10 +223,9 @@
 
     if (!csv) {
       try {
-        const resp = await fetch('/data/static/reputation.json');
+        const resp = await fetch(CSV_URL);
         if (!resp.ok) throw new Error('Fetch failed');
-        const data = await resp.json();
-        csv = data.csv;
+        csv = await resp.text();
         try {
           sessionStorage.setItem(CACHE_KEY, csv);
           sessionStorage.setItem(CACHE_TS, Date.now().toString());

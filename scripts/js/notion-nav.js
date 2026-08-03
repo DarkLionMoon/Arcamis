@@ -120,7 +120,7 @@ var _scrollPositions = {};
 window.prefetchPage = function(id){
   var cacheKey = 'pg_' + id;
   if(!id || _memCache[cacheKey]) return;
-  fetch('/data/pages/' + id + '.json')
+  fetch('/api/notion?pageId=' + id)
     .then(function(r){ return r.json(); })
     .then(function(data){ _memCache[cacheKey] = data; })
     .catch(function(){});
@@ -253,7 +253,7 @@ async function _gpRender(id,label,icon){
   try{
     if(!data){
       var timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('Timeout'))},25000)});
-      var r=await Promise.race([fetch('/data/pages/'+id+'.json'),timeout]);
+      var r=await Promise.race([fetch('/api/notion?pageId='+id),timeout]);
       if(!r.ok)throw new Error('HTTP '+r.status);
       data=await r.json();
       _memCache[cacheKey]=data;
@@ -332,8 +332,16 @@ async function _gpRender(id,label,icon){
         if(img.dataset.retried)return;
         img.dataset.retried='1';
         try{sessionStorage.removeItem('pg_'+id);}catch(ex){}
-        delete _memCache['pg_'+id);
-        img.closest('figure')?img.closest('figure').style.display='none':img.style.display='none';
+        delete _memCache['pg_'+id];
+        var src=img.getAttribute('src')||'';
+        if(src.indexOf('/api/notion?img=')>-1){
+          var sep=src.indexOf('?')>-1?'&':'?';
+          img.src=src+sep+'_t='+Date.now();
+        }else if(src.indexOf('prod-files-secure')>-1||src.indexOf('s3.us-west')>-1){
+          img.src='/api/notion?img='+encodeURIComponent(src);
+        }else{
+          img.closest('figure')?img.closest('figure').style.display='none':img.style.display='none';
+        }
       },{once:true});
     });
 

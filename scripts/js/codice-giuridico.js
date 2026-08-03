@@ -73,7 +73,7 @@ window.showCodiceGiuridico = function() {
     return;
   }
 
-  fetch('/data/static/codice-giuridico.html')
+  fetch('https://docs.google.com/document/d/' + _CODICE_DOC_ID + '/export?format=html')
     .then(function(r) { return r.text(); })
     .then(function(html) {
       _codiceData = _parseHtml(html);

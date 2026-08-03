@@ -137,7 +137,7 @@
   if (_store[key] && _times[key] && Date.now() - _times[key] < MC_TTL) return;
   if (typeof _memCache !== 'undefined' && _memCache[key]) return;
       _evict();
-      fetch('/data/pages/' + id + '.json')
+      fetch('/api/notion?pageId=' + id)
         .then(function(r) { return r.json(); })
         .then(function(data) {
           _store[key] = data;

@@ -28,7 +28,7 @@ window.addEventListener('load', function(){
         '2f00274fdc1c806f8f17dbc6532d2211',
       ];
       prefetch.forEach(function(id){
-        fetch('/data/pages/' + id + '.json', {priority:'low'}).catch(function(){});
+        fetch('/api/notion?pageId=' + id, {priority:'low'}).catch(function(){});
       });
     }
     if(window.requestIdleCallback) requestIdleCallback(_doPrefetch, {timeout:5000});
@@ -498,10 +498,18 @@ window.addEventListener('popstate', function(e){
       if(typeof showCodiceGiuridico === 'function') showCodiceGiuridico();
       return;
     }
-     if(e.state.id === 'patenti-arcadia'){
+      if(e.state.id === 'patenti-arcadia'){
   if(typeof showPatenti === 'function') showPatenti();
   return;
 }
+    if(e.state.id === 'mestieri-compendio'){
+      if(typeof showMestieriCompendio === 'function') showMestieriCompendio();
+      return;
+    }
+    if(e.state.id === 'societa-licenze'){
+      if(typeof showSocietaLicenze === 'function') showSocietaLicenze();
+      return;
+    }
     if(e.state.id === 'reputazioni'){
       if(typeof showReputationTable === 'function') showReputationTable();
       return;
@@ -556,6 +564,8 @@ var _pathMap = {
   'mestieri/metallurgo':                      'mestiere-metallurgo',
   'mestieri/oste':                            'mestiere-oste',
   'mestieri/sarto':                           'mestiere-sarto',
+  'mestieri/compendio':                       'mestieri-compendio',
+  'societa-licenze':                          'societa-licenze',
   /* Lore */
   'lore/storia':                              '2f00274fdc1c806f8f17dbc6532d2211',
   'lore/pantheon':                            '2f00274fdc1c80679bd3c3df8a1fa040',
@@ -631,6 +641,14 @@ var _pathMap = {
   setTimeout(function(){ if(typeof showPatenti === 'function') showPatenti(); }, 0);
   return;
 }
+  if(pid === 'mestieri-compendio'){
+    setTimeout(function(){ if(typeof showMestieriCompendio === 'function') showMestieriCompendio(); }, 0);
+    return;
+  }
+  if(pid === 'societa-licenze'){
+    setTimeout(function(){ if(typeof showSocietaLicenze === 'function') showSocietaLicenze(); }, 0);
+    return;
+  }
   if(pid === 'reputazioni'){
     setTimeout(function(){ if(typeof showReputationTable === 'function') showReputationTable(); }, 0);
     return;

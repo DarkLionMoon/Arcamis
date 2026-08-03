@@ -13,7 +13,7 @@ window.loadSubclassGallery = function(container, pages) {
     return;
   }
   container.innerHTML = '<div class="loader-dots">...';
-  fetch('/data/db/subclass.json')
+  fetch('/api/notion?dbId=' + HB_SUBCLASS_DB_ID)
     .then(function(r){ return r.json(); })
     .then(function(data){ _renderHbLayout(container, data.pages || []); })
     .catch(function(err){
@@ -27,7 +27,7 @@ window.loadSpeciesGallery = function(container, pages) {  // ← qui
     return;
   }
   container.innerHTML = '<div class="loader-dots">...';
-  fetch('/data/db/specie.json')
+  fetch('/api/notion?dbId=' + HB_SPECIES_DB_ID)
     .then(function(r){ return r.json(); })
     .then(function(data){
       _renderHbLayout(container, data.pages || [], {
@@ -129,7 +129,7 @@ window.hbscSelectTab = function(el, pageId, title) {
 
   contentEl.innerHTML = '<div class="hbsc-loading"><div class="gs-loading-spin"></div></div>';
 
-  fetch('/data/pages/' + pageId + '.json')
+  fetch('/api/notion?pageId=' + pageId)
     .then(function(r){ return r.json(); })
     .then(function(data){
       if(!data.blocks) throw new Error('no blocks');
