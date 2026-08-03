@@ -73,15 +73,16 @@ window.showCodiceGiuridico = function() {
     return;
   }
 
-  fetch('https://docs.google.com/document/d/' + _CODICE_DOC_ID + '/export?format=html')
-    .then(function(r) { return r.text(); })
-    .then(function(html) {
+  fetch('/content/docs/codice.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var html = data.content || '';
       _codiceData = _parseHtml(html);
       _renderCodice(pbody, _codiceData);
       if (typeof afterPageRender === 'function') afterPageRender();
     })
     .catch(function() {
-      pbody.innerHTML = '<div class="cg-err">⚠️ Impossibile caricare l\'editto. <a href="https://docs.google.com/document/d/' + _CODICE_DOC_ID + '/view" target="_blank" rel="noopener" style="color:var(--gold2)">Aprilo su Google Docs →</a></div>';
+      pbody.innerHTML = '<div class="cg-err">⚠️ Impossibile caricare l\'editto.</div>';
       if (typeof afterPageRender === 'function') afterPageRender();
     });
 };

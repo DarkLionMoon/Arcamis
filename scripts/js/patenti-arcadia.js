@@ -73,15 +73,16 @@ window.showPatenti = function() {
     return;
   }
 
-  fetch('https://docs.google.com/document/d/' + _PATENTI_DOC_ID + '/export?format=html')
-    .then(function(r) { return r.text(); })
-    .then(function(html) {
+  fetch('/content/docs/patenti.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var html = data.content || '';
       _patentiData = _parsePatentiHtml(html);
       _renderPatenti(pbody, _patentiData);
       if (typeof afterPageRender === 'function') afterPageRender();
     })
     .catch(function() {
-      pbody.innerHTML = '<div class="pa-err">⚠️ Impossibile caricare le patenti. <a href="https://docs.google.com/document/d/' + _PATENTI_DOC_ID + '/view" target="_blank" rel="noopener" style="color:var(--gold2)">Aprilo su Google Docs →</a></div>';
+      pbody.innerHTML = '<div class="pa-err">⚠️ Impossibile caricare le patenti.</div>';
       if (typeof afterPageRender === 'function') afterPageRender();
     });
 };
