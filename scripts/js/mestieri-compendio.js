@@ -53,8 +53,8 @@ var _CMP_MESTIERI = [
         {n:'Potion of Psychic Resistance', mp:'80 MO Estratto di Lavanda Magica', ms:'20 MO Materia Grigia', tip:'Uncommon', url:'https://5e.tools/', costo:100, vend:200, dt:[4,1,1,1]},
         {n:'Potion of Necrotic Resistance', mp:'55 MO Terra Sconsacrata', ms:"45 MO Polvere d'ossa di santo", tip:'Uncommon', url:'https://5e.tools/', costo:100, vend:200, dt:[4,1,1,1]},
       
-        {n:'Potion of Hill Giant Strenght',mp:'85 MO Unghia di Gigante',ms:'15 MO Polvere di Ferro',tip:'Uncommon',url:'https://5e.tools/items.html#potion%20of%20hill%20giant%20strength_xdmg',costo:100,vend:200,dt:[4,1,1,1]},
-        {n:'Potion of Animal Frienship',mp:'85 Mo Miele Selvatico',ms:'15 MO Peli di Lupo',tip:'Uncommon',url:'https://5e.tools/items.html#potion%20of%20animal%20friendship_xdmg',costo:100,vend:200,dt:[4,1,1,1]},
+        {n:'Potion of Hill Giant Strength',mp:'85 MO Unghia di Gigante',ms:'15 MO Polvere di Ferro',tip:'Uncommon',url:'https://5e.tools/items.html#potion%20of%20hill%20giant%20strength_xdmg',costo:100,vend:200,dt:[4,1,1,1]},
+        {n:'Potion of Animal Friendship',mp:'85 Mo Miele Selvatico',ms:'15 MO Peli di Lupo',tip:'Uncommon',url:'https://5e.tools/items.html#potion%20of%20animal%20friendship_xdmg',costo:100,vend:200,dt:[4,1,1,1]},
         {n:'Potion of Polychromy',mp:'75 MO Pigmenti di Arcobaleno',ms:'25 MO Scaglie di pesce combattente',tip:'Uncommon',url:'https://5e.tools/items.html#potion%20of%20polychromy_ditlcot',costo:100,vend:200,dt:[4,1,1,1]},
         {n:'Potion of Controlled Mutation',mp:'80 MO Fluido di Doppelganger',ms:'20 MO Essenza di Camaleonte',tip:'Uncommon',url:'https://5e.tools/items.html#potion%20of%20controlled%20mutation_monstersofdrakkenheim',costo:100,vend:200,dt:[4,1,1,1]},
         {n:'Potion of Resistance',prog:true,mp:'100 MO 2 Essenze elementali (aka il materiale prinicpale delle altre pozioni)',ms:'150 MO Polvere di diamante',tip:'Uncommon',desc:'Questa pozione a differenza delle altre ti consente di avere 2 resistenze anzichè 1 sola',costo:250,vend:500,dt:[10,3,1,1]},
@@ -231,7 +231,7 @@ var _CMP_MESTIERI = [
         {n:'Amulet of Proof against Detection and Location',prog:true,mp:'100 MO Metallo',ms:'100 MO Gemme',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#amulet%20of%20proof%20against%20detection%20and%20location_xdmg',costo:200,vend:400,dt:[8,2,1,1]},
         {n:'Belt of Weald',mp:'200 MO Metallo',ms:'—',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#belt%20of%20the%20weald_humblewoodtales',costo:200,vend:400,dt:[8,2,1,1]},
         {n:'Brooch of Living Essence',mp:'100 MO Gemme',ms:'100 MO Metallo',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#brooch%20of%20living%20essence_egw',costo:200,vend:400,dt:[8,2,1,1]},
-        {n:'Deacanter of Endless Water',mp:'200 MO Vetro',ms:'—',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#decanter%20of%20endless%20water_xdmg',costo:200,vend:400,dt:[8,2,1,1]},
+        {n:'Decanter of Endless Water',mp:'200 MO Vetro',ms:'—',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#decanter%20of%20endless%20water_xdmg',costo:200,vend:400,dt:[8,2,1,1]},
         {n:'Deck of Illusions',mp:'200 MO Carta',ms:'—',tip:'Oggetto Magico Non Comune',desc:'Deck of Illusions',url:'https://5e.tools/items.html#deck%20of%20illusions_xdmg',costo:200,vend:400,dt:[8,2,1,1]},
         {n:'Elemental Gem',mp:'200 MO Gemme',ms:'—',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#elemental%20gem_xdmg',costo:200,vend:400,dt:[8,2,1,1]},
         {n:'Emerald Pen',mp:'200 MO Smeraldi',ms:'—',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#emerald%20pen_ftd',costo:200,vend:400,dt:[8,2,1,1]},
@@ -240,7 +240,7 @@ var _CMP_MESTIERI = [
         {n:'Feywild Shard',prog:true,mp:'200 MO Topazio',ms:'—',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#feywild%20shard_tce',costo:200,vend:400,dt:[8,2,1,1]},
         {n:'Glowing Ember',prog:true,mp:'100 MO  Cristalli',ms:'100 MO Zolfo',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#glowing%20ember_humblewoodtales',costo:200,vend:400,dt:[8,2,1,1]},
         {n:'Guardian Emblem',prog:true,mp:'200 MO Metallo',ms:'—',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#guardian%20emblem_tce',costo:200,vend:400,dt:[8,2,1,1]},
-        {n:'Headbend of Intellect',prog:true,mp:'100 MO Metallo',ms:'100 MO Gemme',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#headband%20of%20intellect_xdmg',costo:200,vend:400,dt:[8,2,1,1]},
+        {n:'Headband of Intellect',prog:true,mp:'100 MO Metallo',ms:'100 MO Gemme',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#headband%20of%20intellect_xdmg',costo:200,vend:400,dt:[8,2,1,1]},
         {n:'Lantern of Revealing',mp:'200 MO Metallo',ms:'—',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#lantern%20of%20revealing_xdmg',costo:200,vend:400,dt:[8,2,1,1]},
         {n:'Necklace of Adaptation',prog:true,mp:'200 MO Metallo',ms:'—',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#necklace%20of%20adaptation_xdmg',costo:200,vend:400,dt:[8,2,1,1]},
         {n:'Nest Charm',mp:'200 MO Metallo',ms:'—',tip:'Oggetto Magico Non Comune',url:'https://5e.tools/items.html#nest%20charm_humblewoodcampaignsetting',costo:200,vend:400,dt:[8,2,1,1]},
@@ -908,11 +908,17 @@ function _cmpMatches(item, q) {
 //  MOBILE DRAWER
 // ═══════════════════════════════════════════════════════════════
 
+function _cmpDrawerEscHandler(e) {
+  if (e.key === 'Escape') _cmpCloseDrawer();
+}
+
 function _cmpOpenDrawer() {
   var d = document.getElementById('cmp-mobile-drawer');
   var o = document.getElementById('cmp-drawer-overlay');
   if (d) d.classList.add('open');
   if (o) o.classList.add('open');
+  document.body.classList.add('drawer-open');
+  document.addEventListener('keydown', _cmpDrawerEscHandler);
 }
 
 function _cmpCloseDrawer() {
@@ -920,6 +926,8 @@ function _cmpCloseDrawer() {
   var o = document.getElementById('cmp-drawer-overlay');
   if (d) d.classList.remove('open');
   if (o) o.classList.remove('open');
+  document.body.classList.remove('drawer-open');
+  document.removeEventListener('keydown', _cmpDrawerEscHandler);
 }
 
 function _cmpSyncMobileDrawer() {

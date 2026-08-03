@@ -43,11 +43,17 @@ var _slNav = {
 //  MOBILE
 // ═══════════════════════════════════════════════
 
+function _slDrawerEscHandler(e) {
+  if (e.key === 'Escape') _slCloseDrawer();
+}
+
 function _slOpenDrawer() {
   var d = document.getElementById('sl-mobile-drawer');
   var o = document.getElementById('sl-drawer-overlay');
   if (d) d.classList.add('open');
   if (o) o.classList.add('open');
+  document.body.classList.add('drawer-open');
+  document.addEventListener('keydown', _slDrawerEscHandler);
 }
 
 function _slCloseDrawer() {
@@ -55,6 +61,8 @@ function _slCloseDrawer() {
   var o = document.getElementById('sl-drawer-overlay');
   if (d) d.classList.remove('open');
   if (o) o.classList.remove('open');
+  document.body.classList.remove('drawer-open');
+  document.removeEventListener('keydown', _slDrawerEscHandler);
 }
 
 function _slSyncMobileDrawer() {
