@@ -56,9 +56,18 @@ var _MESTIERI = {
 };
 
 /* ── URL helper ── */
-function _csvUrl(sheetId, tab) {
-  return 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(tab);
-}
+  var _mestiereCache = {};
+
+  function _fetchMestiereData(key, mestiere) {
+    if (_mestiereCache[key]) return Promise.resolve(_mestiereCache[key]);
+    return fetch('/data/mestieri/' + key + '.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) { _mestiereCache[key] = data; return data; });
+  }
+
+  function _csvUrl(sheetId, tab) {
+    return 'https://docs.google.com/spreadsheets/d/' + sheetId + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(tab);
+  }
 
 /* ── CSV parser robusto — gestisce newline nelle celle quoted ── */
 function _parseCsv(text) {
@@ -524,16 +533,21 @@ function _msShowTab(key, tabName, container, mestiere) {
   if (!panel) return;
   panel.innerHTML = '<div class="ms-loading"><div class="ms-loading-spin"></div><span>Caricamento...</span></div>';
 
-  fetch(_csvUrl(mestiere.sheetId, tabName))
-    .then(function(r) { return r.text(); })
-    .then(function(text) {
-  var rows = _parseCsv(text);
-  panel.innerHTML = tabName === 'Introduzione'
-    ? _renderIntro(rows)
-    : tabName === 'Pergamene'
-      ? _renderPergamene(rows)
-      : _renderLivello(rows);
-})
+  _fetchMestiereData(key, mestiere)
+    .then(function(data) {
+      var tabData = data.tabs && data.tabs[tabName];
+      if (!tabData) {
+        panel.innerHTML = '<div class="ms-empty">⏳ Contenuto in arrivo...</div>';
+        return;
+      }
+      /* tabData is already an array of rows from the export */
+      var rows = tabData;
+      panel.innerHTML = tabName === 'Introduzione'
+        ? _renderIntro(rows)
+        : tabName === 'Pergamene'
+          ? _renderPergamene(rows)
+          : _renderLivello(rows);
+    })
     .catch(function() {
       panel.innerHTML = '<div class="ms-empty">⚠️ Errore caricamento dati.</div>';
     });
@@ -545,7 +559,7 @@ function _showComeFunzionano(container, mestiere) {
   if (!panel) return;
   panel.innerHTML = '<div class="ms-loading"><div class="ms-loading-spin"></div><span>Caricamento...</span></div>';
 
-  fetch('https://docs.google.com/document/d/' + mestiere.docId + '/export?format=txt')
+  fetch('/data/static/come-funzionano.html')
     .then(function(r) { return r.text(); })
     .then(function(text) {
       var lines = text.split('\n');
@@ -567,41 +581,25 @@ function _showComeFunzionano(container, mestiere) {
     });
 }
 function _discoverLevels(key, mestiere, container) {
-  var maxLv = 5;
-  var found = 0;
-
-  function tryLevel(lv) {
-    if (lv > maxLv) return;
-    fetch(_csvUrl(mestiere.sheetId, 'LV ' + lv))
-      .then(function(r) { return r.text(); })
-      .then(function(text) {
-        var rows = _parseCsv(text);
-        /* Controlla se ci sono dati reali (almeno 2 righe con contenuto) */
-        var dataRows = rows.slice(1).filter(function(r) {
-          return r.some(function(c) { return c && c.trim(); });
-        });
-        if (dataRows.length > 0) {
-          found++;
-          /* Aggiungi il tab */
+  _fetchMestiereData(key, mestiere)
+    .then(function(data) {
+      var tabs = data.tabs || {};
+      for (var lv = 1; lv <= 5; lv++) {
+        var tabName = 'LV ' + lv;
+        if (tabs[tabName] && tabs[tabName].length > 1) {
           var placeholder = container.querySelector('.ms-tabs-lv-placeholder');
           if (placeholder) {
             var tab = document.createElement('div');
             tab.className = 'ms-tab';
-            tab.setAttribute('data-tab', 'LV ' + lv);
+            tab.setAttribute('data-tab', tabName);
             tab.setAttribute('onclick', 'msTabClick(this)');
-            tab.textContent = 'LV ' + lv;
+            tab.textContent = tabName;
             placeholder.parentNode.insertBefore(tab, placeholder);
           }
         }
-        /* Prova il livello successivo */
-        tryLevel(lv + 1);
-      })
-      .catch(function() {
-        tryLevel(lv + 1);
-      });
-  }
-
-  tryLevel(1);
+      }
+    })
+    .catch(function() {});
 }
 /* ════════════════════════════════════
    FUNZIONE PRINCIPALE — showMestiere()

@@ -47,7 +47,7 @@ function _getSpineColor(argomenti) {
 
 window.loadLibraryGallery = function(container) {
   container.innerHTML = '<div class="lib-loader"><div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div></div>';
-  fetch('/api/notion?dbId=' + BIBLIO_DB_ID)
+  fetch('/data/db/library.json')
     .then(function(r) { return r.json(); })
     .then(function(data) { _renderLibrary(container, data.pages || []); })
     .catch(function(err) {
@@ -167,7 +167,7 @@ window.libOpenBook = function(el) {
   info.innerHTML = '<div class="lib-info-loading"><div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div></div>';
   info.classList.add('open');
 
-  fetch('/api/notion?pageId=' + id)
+  fetch('/data/pages/' + id + '.json')
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (!data.blocks) throw new Error('no blocks');

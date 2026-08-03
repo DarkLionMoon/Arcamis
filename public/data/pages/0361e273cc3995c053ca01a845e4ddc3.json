@@ -1,0 +1,810 @@
+{
+  "page": {
+    "id": "0361e273cc3995c053ca01a845e4ddc3",
+    "icon": {
+      "emoji": "📖"
+    },
+    "cover": null,
+    "last_edited_time": "2025-01-01T00:00:00Z",
+    "properties": {
+      "title": {
+        "title": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Lore"
+            },
+            "plain_text": "Lore",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    }
+  },
+  "blocks": [
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "La storia del mondo di "
+            },
+            "plain_text": "La storia del mondo di ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "Arcamis"
+            },
+            "plain_text": "Arcamis",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " è antica e complessa. Ecco le linee temporali principali."
+            },
+            "plain_text": " è antica e complessa. Ecco le linee temporali principali.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Le Ere del Mondo"
+            },
+            "plain_text": "Le Ere del Mondo",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "L'Era degli Dei (prima dell'era conosciuta)"
+            },
+            "plain_text": "L'Era degli Dei (prima dell'era conosciuta)",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Gli dei camminavano sulla terra e plasmavano il mondo a loro immagine. Le razze mortali erano appena creature senza forma, schiave delle forze primordiali."
+            },
+            "plain_text": "Gli dei camminavano sulla terra e plasmavano il mondo a loro immagine. Le razze mortali erano appena creature senza forma, schiave delle forze primordiali.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "La Prima Guerra (ca. 5000 anni fa)"
+            },
+            "plain_text": "La Prima Guerra (ca. 5000 anni fa)",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Una guerra tra divinità ha frantumato i continenti. Il mare ha inghiottito interi regni. Le Marche di Arcamis sono i resti di un continente più grande."
+            },
+            "plain_text": "Una guerra tra divinità ha frantumato i continenti. Il mare ha inghiottito interi regni. Le Marche di Arcamis sono i resti di un continente più grande.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "La Fondazione di Arcadia (ca. 3000 anni fa)"
+            },
+            "plain_text": "La Fondazione di Arcadia (ca. 3000 anni fa)",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Gli sopravvissuti hanno fondato il regno di "
+            },
+            "plain_text": "Gli sopravvissuti hanno fondato il regno di ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "Arcadia"
+            },
+            "plain_text": "Arcadia",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ", unendo le razze sotto un'unica bandiera. Il regno è sopravvissuto per millenni, ma le sue frontiere si sono contratte nel tempo."
+            },
+            "plain_text": ", unendo le razze sotto un'unica bandiera. Il regno è sopravvissuto per millenni, ma le sue frontiere si sono contratte nel tempo.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_3",
+      "heading_3": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "L'Era Attuale (oggi)"
+            },
+            "plain_text": "L'Era Attuale (oggi)",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Arcadia è un'ombra di ciò che era. Le Marche di Arcamis sono un avamposto ai margini di un regno in declino. I pericoli aumentano, e gli eroi sono più necessari che mai."
+            },
+            "plain_text": "Arcadia è un'ombra di ciò che era. Le Marche di Arcamis sono un avamposto ai margini di un regno in declino. I pericoli aumentano, e gli eroi sono più necessari che mai.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Le Grandi Fazioni"
+            },
+            "plain_text": "Le Grandi Fazioni",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Le fazioni che controllano il destino delle Marche:"
+            },
+            "plain_text": "Le fazioni che controllano il destino delle Marche:",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "La Corona"
+            },
+            "plain_text": "La Corona",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Il governo legittimo di Arcadia"
+            },
+            "plain_text": " — Il governo legittimo di Arcadia",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Il Consiglio dei Mercanti"
+            },
+            "plain_text": "Il Consiglio dei Mercanti",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Controlla il commercio e l'economia"
+            },
+            "plain_text": " — Controlla il commercio e l'economia",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "L'Ordine della Spada"
+            },
+            "plain_text": "L'Ordine della Spada",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — I difensori delle Marche"
+            },
+            "plain_text": " — I difensori delle Marche",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Il Culto delle Ombre"
+            },
+            "plain_text": "Il Culto delle Ombre",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Una setta segreta con piani oscuri"
+            },
+            "plain_text": " — Una setta segreta con piani oscuri",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "La Gilda degli Avventurieri"
+            },
+            "plain_text": "La Gilda degli Avventurieri",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — dove iniziano tutti gli eroi"
+            },
+            "plain_text": " — dove iniziano tutti gli eroi",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Geografia"
+            },
+            "plain_text": "Geografia",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Le Marche di Arcamis si estendono lungo la costa orientale. I luoghi principali:"
+            },
+            "plain_text": "Le Marche di Arcamis si estendono lungo la costa orientale. I luoghi principali:",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Arcamis"
+            },
+            "plain_text": "Arcamis",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — La città portuale, cuore della regione"
+            },
+            "plain_text": " — La città portuale, cuore della regione",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Vigilius"
+            },
+            "plain_text": "Vigilius",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — La città interna, centro politico"
+            },
+            "plain_text": " — La città interna, centro politico",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Selva Fogliabruna"
+            },
+            "plain_text": "Selva Fogliabruna",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Una foresta antica e pericolosa"
+            },
+            "plain_text": " — Una foresta antica e pericolosa",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Foresta dello Smarrimento"
+            },
+            "plain_text": "Foresta dello Smarrimento",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — I cui sentieri cambiano di notte"
+            },
+            "plain_text": " — I cui sentieri cambiano di notte",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Lago di Gromot"
+            },
+            "plain_text": "Lago di Gromot",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Acque profonde e misteriose"
+            },
+            "plain_text": " — Acque profonde e misteriose",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    }
+  ]
+}

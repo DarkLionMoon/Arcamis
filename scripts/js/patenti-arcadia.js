@@ -73,7 +73,7 @@ window.showPatenti = function() {
     return;
   }
 
-  fetch('https://docs.google.com/document/d/' + _PATENTI_DOC_ID + '/export?format=html')
+  fetch('/data/static/patenti.html')
     .then(function(r) { return r.text(); })
     .then(function(html) {
       _patentiData = _parsePatentiHtml(html);

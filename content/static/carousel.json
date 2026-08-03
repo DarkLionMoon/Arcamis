@@ -1,0 +1,17 @@
+{
+  "slides": [
+    {
+      "key": "carousel_0",
+      "img": "/cover.png",
+      "meta": {
+        "tag": "Città Portuale — Marche di Arcamis",
+        "tit": "ARCAMIS",
+        "desc": "Città portuale delle Marche di Arcamis, porta d'ingresso al regno di Arcadia."
+      },
+      "btns": [
+        {"label": "Entra nel Discord", "href": "https://discord.gg/JZPnXZbXEJ"},
+        {"label": "Scopri la città ↓", "href": "scroll"}
+      ]
+    }
+  ]
+}

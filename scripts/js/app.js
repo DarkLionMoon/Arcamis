@@ -28,7 +28,7 @@ window.addEventListener('load', function(){
         '2f00274fdc1c806f8f17dbc6532d2211',
       ];
       prefetch.forEach(function(id){
-        fetch('/api/notion?pageId=' + id, {priority:'low'}).catch(function(){});
+        fetch('/data/pages/' + id + '.json', {priority:'low'}).catch(function(){});
       });
     }
     if(window.requestIdleCallback) requestIdleCallback(_doPrefetch, {timeout:5000});

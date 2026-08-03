@@ -1,0 +1,53 @@
+{
+  "nome": "Alchimista",
+  "emoji": "⚗️",
+  "colore": "rgba(80,180,160,.8)",
+  "descrizione": "L'arte di trasformare la materia attraverso formule segrete e ingredienti rari.",
+  "livelli": {
+    "1": {
+      "nome": "Apprendista",
+      "descrizione": "Impari le basi dell'alchimia: estrazioni, distillazioni e preparati semplici.",
+      "oggetti": [
+        {
+          "nome": "Pozione di Guarigione Minore",
+          "progetto": false,
+          "materiali_principali": "Erba curativa (x2)",
+          "materiali_secondari": "Acqua distillata",
+          "tipologia": "Common",
+          "descrizione": "Ripristina 2d4+2 punti ferita.",
+          "crafting_value": 25,
+          "vendita_value": 15,
+          "dt": 10
+        },
+        {
+          "nome": "Veleno di Ragno",
+          "progetto": false,
+          "materiali_principali": "Ghianda di ragno (x1)",
+          "materiali_secondari": "Alcol forte",
+          "tipologia": "Common",
+          "descrizione": "Applica 1d4 di danno da veleno a un'arma.",
+          "crafting_value": 20,
+          "vendita_value": 12,
+          "dt": 10
+        }
+      ]
+    },
+    "2": {
+      "nome": "Alchimista",
+      "descrizione": "Padroneggi le formule intermedie e puoi creare preparati più potenti.",
+      "oggetti": [
+        {
+          "nome": "Pozione di Guarigione",
+          "progetto": false,
+          "materiali_principali": "Erba curativa (x3), Muschio luminoso (x1)",
+          "materiali_secondari": "Acqua distillata, Vetro vuoto",
+          "tipologia": "Uncommon",
+          "descrizione": "Ripristina 4d4+4 punti ferita.",
+          "crafting_value": 100,
+          "vendita_value": 50,
+          "dt": 15
+        }
+      ]
+    }
+  }
+}

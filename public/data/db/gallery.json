@@ -1,0 +1,44 @@
+{
+  "pages": [
+    {
+      "id": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+      "title": "Theron Valt",
+      "icon": "⚔️",
+      "cover": null,
+      "tags": ["Fighter", "Champion"],
+      "posa": null
+    },
+    {
+      "id": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6a7",
+      "title": "Lyra Moonshadow",
+      "icon": "🌙",
+      "cover": null,
+      "tags": ["Ranger", "Hunter"],
+      "posa": null
+    },
+    {
+      "id": "c3d4e5f6a7b8c9d0e1f2a3b4c5d6a7b8",
+      "title": "Brokk Stonehand",
+      "icon": "🔨",
+      "cover": null,
+      "tags": ["Barbarian", "Berserker"],
+      "posa": null
+    },
+    {
+      "id": "d4e5f6a7b8c9d0e1f2a3b4c5d6a7b8c9",
+      "title": "Seraphina Lightweaver",
+      "icon": "✨",
+      "cover": null,
+      "tags": ["Cleric", "Life Domain"],
+      "posa": null
+    },
+    {
+      "id": "e5f6a7b8c9d0e1f2a3b4c5d6a7b8c9d0",
+      "title": "Raven Darkhollow",
+      "icon": "🗡️",
+      "cover": null,
+      "tags": ["Rogue", "Assassin"],
+      "posa": null
+    }
+  ]
+}

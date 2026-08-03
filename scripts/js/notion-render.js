@@ -450,7 +450,7 @@ async function loadDbGalleries(container){
 async function _loadSingleDb(grid){
   var dbId=grid.id.replace('db-','');
   try{
-    var r=await fetch('/api/notion?dbId='+dbId);
+    var r=await fetch('/data/db/'+dbId+'.json');
     if(!r.ok)throw new Error('HTTP '+r.status);
     var data=await r.json();
     if(!data.pages||!data.pages.length){
@@ -695,7 +695,7 @@ window.spSelect=function(el,id,title,icon){
   var content=document.getElementById('sp-content');
   if(!content)return;
   content.innerHTML='<div class="sp-loading"><div class="gs-loading-spin"></div></div>';
-  fetch('/api/notion?pageId='+id)
+  fetch('/data/pages/'+id+'.json')
     .then(function(r){return r.json();})
     .then(function(data){
       if(!data.blocks)throw new Error('no blocks');
@@ -731,9 +731,9 @@ window.spSelectGroup = function(el, gruppo) {
 
   contentEl.innerHTML = '<div class="sp-placeholder">↑ Seleziona una sotto-specie</div>';
 
-  // Prefetch silenziosa dei primi 3 elementi (scalda KV)
+  // Prefetch silenziosa dei primi 3 elementi (static files)
   sottospecie.slice(0, 3).forEach(function(p) {
-    fetch('/api/notion?pageId=' + p.id).catch(function(){});
+    fetch('/data/pages/' + p.id + '.json').catch(function(){});
   });
 
   if (sottospecie.length) {
@@ -750,7 +750,7 @@ window.spSelectTab=function(el,pageId,title,icon){
   if(!contentEl)return;
   contentEl.innerHTML='<div class="sp-loading"><div class="gs-loading-spin"></div></div>';
 
-  fetch('/api/notion?pageId='+pageId)
+  fetch('/data/pages/'+pageId+'.json')
     .then(function(r){return r.json();})
     .then(function(data){
       if(!data.blocks)throw new Error('no blocks');

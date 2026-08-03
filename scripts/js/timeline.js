@@ -101,7 +101,7 @@ function _tlOpenModal(ev) {
   document.getElementById('tl-m-content').innerHTML = '<div class="tl-modal-loading"><div class="gs-loading-spin"></div></div>';
   bg.classList.add('open');
 
-  fetch('/api/notion?pageId=' + ev.id)
+  fetch('/data/pages/' + ev.id + '.json')
     .then(function(r){ return r.json(); })
     .then(function(data){
       if(!data.blocks) throw new Error('no blocks');

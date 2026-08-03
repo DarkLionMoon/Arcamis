@@ -34,9 +34,6 @@ function _getClassColor(tags) {
 
 function _safeCover(url) {
   if (!url) return null;
-  if (url.indexOf('s3.us-west') > -1 || url.indexOf('prod-files-secure') > -1) {
-    return '/api/notion?img=' + encodeURIComponent(url);
-  }
   return url;
 }
 
@@ -591,7 +588,7 @@ window.loadGallery = function(container) {
   container.innerHTML = '<div class="gs-loading"><div class="gs-loading-spin"></div><span>Caricamento eroi...</span></div>';
 
   function doFetch(attempt) {
-    fetch('/api/gallery')
+    fetch('/data/db/gallery.json')
       .then(function(r) { return r.json(); })
       .then(function(data) {
         _galleryData = data.pages || [];

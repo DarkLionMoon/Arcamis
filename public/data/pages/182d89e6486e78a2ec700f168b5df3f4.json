@@ -1,0 +1,1920 @@
+{
+  "page": {
+    "id": "182d89e6486e78a2ec700f168b5df3f4",
+    "icon": {
+      "emoji": "🌟"
+    },
+    "cover": null,
+    "last_edited_time": "2025-01-01T00:00:00Z",
+    "properties": {
+      "title": {
+        "title": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Come si inizia"
+            },
+            "plain_text": "Come si inizia",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    }
+  },
+  "blocks": [
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Creare un personaggio per "
+            },
+            "plain_text": "Creare un personaggio per ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "Arcamis"
+            },
+            "plain_text": "Arcamis",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " è semplice. Segui questi passi e inizia la tua avventura nelle Marche."
+            },
+            "plain_text": " è semplice. Segui questi passi e inizia la tua avventura nelle Marche.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Passo 1: Scegli la Specie"
+            },
+            "plain_text": "Passo 1: Scegli la Specie",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Le specie disponibili nel mondo di Arcamis:"
+            },
+            "plain_text": "Le specie disponibili nel mondo di Arcamis:",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Umano"
+            },
+            "plain_text": "Umano",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Il più versatile e adattabile"
+            },
+            "plain_text": " — Il più versatile e adattabile",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Elfo"
+            },
+            "plain_text": "Elfo",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Grazia e longevità senza pari"
+            },
+            "plain_text": " — Grazia e longevità senza pari",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Nano"
+            },
+            "plain_text": "Nano",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Forza e resistenza nella loro forma pura"
+            },
+            "plain_text": " — Forza e resistenza nella loro forma pura",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Halfling"
+            },
+            "plain_text": "Halfling",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Fortunato e sfuggente come nessun altro"
+            },
+            "plain_text": " — Fortunato e sfuggente come nessun altro",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Tiefling"
+            },
+            "plain_text": "Tiefling",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Segnato dall'inferno, ma non condannato"
+            },
+            "plain_text": " — Segnato dall'inferno, ma non condannato",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "quote",
+      "quote": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Nota:"
+            },
+            "plain_text": "Nota:",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " Alcune specie richiedono approvazione del DM. Consulta sempre la lista del "
+            },
+            "plain_text": " Alcune specie richiedono approvazione del DM. Consulta sempre la lista del ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "Materiale Approvato"
+            },
+            "plain_text": "Materiale Approvato",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": "#/page/3130274fdc1c807eb61fde24e8236659"
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "."
+            },
+            "plain_text": ".",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Passo 2: Scegli la Classe"
+            },
+            "plain_text": "Passo 2: Scegli la Classe",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Le classi disponibili al livello 1:"
+            },
+            "plain_text": "Le classi disponibili al livello 1:",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "table",
+      "table": {
+        "has_column_header": true,
+        "has_row_header": false,
+        "table_width": 3,
+        "children": [
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Classe"
+                        },
+                        "plain_text": "Classe",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Ruolo"
+                        },
+                        "plain_text": "Ruolo",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Abilità chiave"
+                        },
+                        "plain_text": "Abilità chiave",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Barbaro"
+                        },
+                        "plain_text": "Barbaro",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Combattente"
+                        },
+                        "plain_text": "Combattente",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "FOR, COS"
+                        },
+                        "plain_text": "FOR, COS",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Bardo"
+                        },
+                        "plain_text": "Bardo",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Supporto"
+                        },
+                        "plain_text": "Supporto",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "CAR, DES"
+                        },
+                        "plain_text": "CAR, DES",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Chierico"
+                        },
+                        "plain_text": "Chierico",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Guaritore"
+                        },
+                        "plain_text": "Guaritore",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "SAG, FOR"
+                        },
+                        "plain_text": "SAG, FOR",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Druido"
+                        },
+                        "plain_text": "Druido",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Natura"
+                        },
+                        "plain_text": "Natura",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "SAG, DES"
+                        },
+                        "plain_text": "SAG, DES",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Guerriero"
+                        },
+                        "plain_text": "Guerriero",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Combattente"
+                        },
+                        "plain_text": "Combattente",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "FOR, DES"
+                        },
+                        "plain_text": "FOR, DES",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Ladro"
+                        },
+                        "plain_text": "Ladro",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Esploratore"
+                        },
+                        "plain_text": "Esploratore",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "DES, INT"
+                        },
+                        "plain_text": "DES, INT",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Mago"
+                        },
+                        "plain_text": "Mago",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Castatore"
+                        },
+                        "plain_text": "Castatore",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "INT, SAG"
+                        },
+                        "plain_text": "INT, SAG",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Monaco"
+                        },
+                        "plain_text": "Monaco",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Combattente"
+                        },
+                        "plain_text": "Combattente",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "DES, SAG"
+                        },
+                        "plain_text": "DES, SAG",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Paladino"
+                        },
+                        "plain_text": "Paladino",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Combattente"
+                        },
+                        "plain_text": "Combattente",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "FOR, CAR"
+                        },
+                        "plain_text": "FOR, CAR",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Ranger"
+                        },
+                        "plain_text": "Ranger",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Esploratore"
+                        },
+                        "plain_text": "Esploratore",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "DES, SAG"
+                        },
+                        "plain_text": "DES, SAG",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Stregone"
+                        },
+                        "plain_text": "Stregone",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Castatore"
+                        },
+                        "plain_text": "Castatore",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "CAR, COS"
+                        },
+                        "plain_text": "CAR, COS",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Warlock"
+                        },
+                        "plain_text": "Warlock",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Castatore"
+                        },
+                        "plain_text": "Castatore",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "CAR, SAG"
+                        },
+                        "plain_text": "CAR, SAG",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Passo 3: Scegli il Background"
+            },
+            "plain_text": "Passo 3: Scegli il Background",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Il background descrice le origini del tuo personaggio. Scegli tra:"
+            },
+            "plain_text": "Il background descrice le origini del tuo personaggio. Scegli tra:",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Nobile"
+            },
+            "plain_text": "Nobile",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Benestante e ben connesso"
+            },
+            "plain_text": " — Benestante e ben connesso",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Popolano"
+            },
+            "plain_text": "Popolano",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Proviene dal basso"
+            },
+            "plain_text": " — Proviene dal basso",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Estraneo"
+            },
+            "plain_text": "Estraneo",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Straniero nelle Marche"
+            },
+            "plain_text": " — Straniero nelle Marche",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Soldato"
+            },
+            "plain_text": "Soldato",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Ha servito nelle forze armate"
+            },
+            "plain_text": " — Ha servito nelle forze armate",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Artigiano"
+            },
+            "plain_text": "Artigiano",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Maestro di una professione"
+            },
+            "plain_text": " — Maestro di una professione",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Saggio"
+            },
+            "plain_text": "Saggio",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Dedito allo studio"
+            },
+            "plain_text": " — Dedito allo studio",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Criminale"
+            },
+            "plain_text": "Criminale",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " — Ha un passato oscuro"
+            },
+            "plain_text": " — Ha un passato oscuro",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Passo 4: Completa il Foglio Personaggio"
+            },
+            "plain_text": "Passo 4: Completa il Foglio Personaggio",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Usa il template fornito nel canale "
+            },
+            "plain_text": "Usa il template fornito nel canale ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "#creazione-pg"
+            },
+            "plain_text": "#creazione-pg",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " del Discord. Il DM verificherà la tua build prima dell'approvazione."
+            },
+            "plain_text": " del Discord. Il DM verificherà la tua build prima dell'approvazione.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Passo 5: Iscriviti alla Gilda"
+            },
+            "plain_text": "Passo 5: Iscriviti alla Gilda",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Una volta approvato, ogni avventuriero deve registrarsi alla "
+            },
+            "plain_text": "Una volta approvato, ogni avventuriero deve registrarsi alla ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "Gilda degli Avventurieri"
+            },
+            "plain_text": "Gilda degli Avventurieri",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ". Da lì inizia tutto: missioni, contratti, e la tua leggenda."
+            },
+            "plain_text": ". Da lì inizia tutto: missioni, contratti, e la tua leggenda.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    }
+  ]
+}

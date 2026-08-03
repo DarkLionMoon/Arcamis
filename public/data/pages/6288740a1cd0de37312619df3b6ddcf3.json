@@ -1,0 +1,1057 @@
+{
+  "page": {
+    "id": "6288740a1cd0de37312619df3b6ddcf3",
+    "icon": {
+      "emoji": "⚔️"
+    },
+    "cover": {
+      "type": "external",
+      "external": {
+        "url": "/cover.png"
+      }
+    },
+    "last_edited_time": "2025-01-01T00:00:00Z",
+    "properties": {
+      "title": {
+        "title": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Gameplay"
+            },
+            "plain_text": "Gameplay",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    }
+  },
+  "blocks": [
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Le regole fondamentali che governano il mondo di "
+            },
+            "plain_text": "Le regole fondamentali che governano il mondo di ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "Arcamis"
+            },
+            "plain_text": "Arcamis",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ". Ogni avventuriero deve conoscerle prima di varcare i confini delle Marche."
+            },
+            "plain_text": ". Ogni avventuriero deve conoscerle prima di varcare i confini delle Marche.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Iniziativa"
+            },
+            "plain_text": "Iniziativa",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Ogni combattimento inizia con un tiro di "
+            },
+            "plain_text": "Ogni combattimento inizia con un tiro di ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "iniziativa"
+            },
+            "plain_text": "iniziativa",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ". Ogni giocatore tira un "
+            },
+            "plain_text": ". Ogni giocatore tira un ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "d20"
+            },
+            "plain_text": "d20",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " + il modificatore di "
+            },
+            "plain_text": " + il modificatore di ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "Destrezza"
+            },
+            "plain_text": "Destrezza",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ". L'ordine di iniziativa resta fisso per tutto il combattimento."
+            },
+            "plain_text": ". L'ordine di iniziativa resta fisso per tutto il combattimento.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Azioni in Combattimento"
+            },
+            "plain_text": "Azioni in Combattimento",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Durante il proprio turno, un personaggio può effettuare:"
+            },
+            "plain_text": "Durante il proprio turno, un personaggio può effettuare:",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Azione"
+            },
+            "plain_text": "Azione",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ": Attaccare, lanciare un incantesimo, usare un oggetto"
+            },
+            "plain_text": ": Attaccare, lanciare un incantesimo, usare un oggetto",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Movimento"
+            },
+            "plain_text": "Movimento",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ": Spostarsi fino alla propria velocità"
+            },
+            "plain_text": ": Spostarsi fino alla propria velocità",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Azione bonus"
+            },
+            "plain_text": "Azione bonus",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ": Come definito dalla classe o dagli incantesimi"
+            },
+            "plain_text": ": Come definito dalla classe o dagli incantesimi",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Reazione"
+            },
+            "plain_text": "Reazione",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ": Come il parata, scattare, o risposta a un trigger"
+            },
+            "plain_text": ": Come il parata, scattare, o risposta a un trigger",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Punti Ferita e Morte"
+            },
+            "plain_text": "Punti Ferita e Morte",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Quando i punti ferita cadono a "
+            },
+            "plain_text": "Quando i punti ferita cadono a ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "0"
+            },
+            "plain_text": "0",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ", il personaggio è "
+            },
+            "plain_text": ", il personaggio è ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "incosciente e morente"
+            },
+            "plain_text": "incosciente e morente",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ". Ogni turno deve effettuare un tiro salvezza:"
+            },
+            "plain_text": ". Ogni turno deve effettuare un tiro salvezza:",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "10+"
+            },
+            "plain_text": "10+",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ": Si stabilizza"
+            },
+            "plain_text": ": Si stabilizza",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "9 o meno"
+            },
+            "plain_text": "9 o meno",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ": Perde 1 successo critico"
+            },
+            "plain_text": ": Perde 1 successo critico",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "bulleted_list_item",
+      "bulleted_list_item": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "1"
+            },
+            "plain_text": "1",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": ": Perde 2 successi critici"
+            },
+            "plain_text": ": Perde 2 successi critici",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "quote",
+      "quote": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Nota importante:"
+            },
+            "plain_text": "Nota importante:",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " La morte è permanente nelle Marche di Arcamis. Non esistono resurrezioni facili."
+            },
+            "plain_text": " La morte è permanente nelle Marche di Arcamis. Non esistono resurrezioni facili.",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "heading_2",
+      "heading_2": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Avventuriero vs Mostro"
+            },
+            "plain_text": "Avventuriero vs Mostro",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "paragraph",
+      "paragraph": {
+        "rich_text": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Il sistema di combattimento segue le regole standard di "
+            },
+            "plain_text": "Il sistema di combattimento segue le regole standard di ",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": "D&D 5e"
+            },
+            "plain_text": "D&D 5e",
+            "annotations": {
+              "bold": true,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          },
+          {
+            "type": "text",
+            "text": {
+              "content": " con le seguenti modifiche homebrew:"
+            },
+            "plain_text": " con le seguenti modifiche homebrew:",
+            "annotations": {
+              "bold": false,
+              "italic": false,
+              "strikethrough": false,
+              "underline": false,
+              "code": false,
+              "color": "default"
+            },
+            "href": null
+          }
+        ]
+      }
+    },
+    {
+      "type": "table",
+      "table": {
+        "has_column_header": true,
+        "has_row_header": false,
+        "table_width": 2,
+        "children": [
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Regola standard"
+                        },
+                        "plain_text": "Regola standard",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Modifica Arcamis"
+                        },
+                        "plain_text": "Modifica Arcamis",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Punti ferita massimi"
+                        },
+                        "plain_text": "Punti ferita massimi",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "+10% a livello 1"
+                        },
+                        "plain_text": "+10% a livello 1",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Critico"
+                        },
+                        "plain_text": "Critico",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Danno extra = un solo dado"
+                        },
+                        "plain_text": "Danno extra = un solo dado",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Inspiring Heroism"
+                        },
+                        "plain_text": "Inspiring Heroism",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Non disponibile"
+                        },
+                        "plain_text": "Non disponibile",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "table_row",
+            "table_row": {
+              "cells": [
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Healing potions"
+                        },
+                        "plain_text": "Healing potions",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "table_cell",
+                  "table_cell": {
+                    "rich_text": [
+                      {
+                        "type": "text",
+                        "text": {
+                          "content": "Effetto ridotto del 25%"
+                        },
+                        "plain_text": "Effetto ridotto del 25%",
+                        "annotations": {
+                          "bold": false,
+                          "italic": false,
+                          "strikethrough": false,
+                          "underline": false,
+                          "code": false,
+                          "color": "default"
+                        },
+                        "href": null
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
