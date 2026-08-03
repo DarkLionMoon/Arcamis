@@ -301,7 +301,7 @@ async function _gpRender(id,label,icon){
           phCovbg.style.backgroundImage = '';
           phOverlay.style.opacity = '0';
           phIcon.style.opacity = '0.06';
-          var _localHtml = _mdToHtml(_localJson.content);
+          var _localHtml = (_localPage.k === 'materiale') ? _renderMateriale(_localJson.content) : _mdToHtml(_localJson.content);
           var pbody = document.getElementById('pbody');
           pbody.className = 'page-' + id;
           pbody.style.maxWidth = '';
@@ -492,4 +492,145 @@ function applyGlossary(root){
     });
     el.innerHTML=html;
   });
+}
+
+/* ══════════════════════════════════════
+   RENDER MATERIALE APPROVATO
+   Layout multi-colonna, classi raggruppate
+   ══════════════════════════════════════ */
+function _renderMateriale(md) {
+  if (!md) return '';
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+
+  function parseItems(txt) {
+    var items = [];
+    txt.replace(/^- (.+)$/gm, function(_, line) {
+      var source = '';
+      var name = line
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/^(.+?)\s*\(([A-Z0-9' ]+)\)\s*$/, function(_, n, s) {
+          source = s.trim();
+          return n;
+        });
+      items.push({ name: name, source: source });
+    });
+    return items;
+  }
+
+  function renderCards(items) {
+    var out = '<div class="mat-grid">';
+    items.forEach(function(it) {
+      out += '<div class="mat-card">'
+        + '<span class="mat-name">' + it.name + '</span>'
+        + (it.source ? '<span class="mat-badge">' + it.source + '</span>' : '')
+        + '</div>';
+    });
+    return out + '</div>';
+  }
+
+  function groupClasses(txt) {
+    var classes = {};
+    var currentClass = null;
+    txt.split('\n').forEach(function(line) {
+      var m = line.match(/^- (.+)$/);
+      if (!m) return;
+      var item = m[1];
+      var clean = item.replace(/\s*\([^)]+\)\s*$/, '').replace(/\*\*/g, '').trim();
+      var isBase = /^(Artificer|Barbarian|Bard|Cleric|Druid|Fighter|Monk|Paladin|Ranger|Rogue|Sorcerer|Warlock|Wizard)$/i.test(clean);
+      if (isBase) {
+        currentClass = clean;
+        classes[currentClass] = { base: item, subs: [] };
+      } else if (currentClass) {
+        classes[currentClass].subs.push(item);
+      } else {
+        if (!classes['_other']) classes['_other'] = [];
+        classes['_other'].push(item);
+      }
+    });
+    return classes;
+  }
+
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var sectionTitle = (lines.shift() || '').trim();
+    var body = lines.join('\n');
+
+    var callouts = [];
+    body = body.replace(/^>\s*💡\s*(.+)$/gm, function(_, txt) {
+      callouts.push(txt);
+      return '';
+    });
+
+    var subsections = body.split(/^### /m).filter(Boolean);
+    var allItems = [];
+    subsections.forEach(function(sub) {
+      var subLines = sub.split('\n');
+      var subTitle = null;
+      if (subLines.length > 1 && !subLines[0].trim().startsWith('-') && !subLines[0].trim().startsWith('**')) {
+        subTitle = subLines.shift().trim();
+      }
+      if (subTitle) allItems.push({ type: 'subtitle', text: subTitle });
+      parseItems(subLines.join('\n')).forEach(function(it) { allItems.push({ type: 'item', data: it }); });
+    });
+    if (allItems.length === 0) {
+      parseItems(body).forEach(function(it) { allItems.push({ type: 'item', data: it }); });
+    }
+
+    /* Specie / Talenti / Spell */
+    if (/^(Specie|Talenti|Spell)$/i.test(sectionTitle)) {
+      html += '<div class="mat-section">';
+      html += '<h2 class="mat-section-title">' + sectionTitle + '</h2>';
+      var cards = allItems.filter(function(i){ return i.type === 'item'; }).map(function(i){ return i.data; });
+      if (cards.length) html += renderCards(cards);
+      callouts.forEach(function(c) { html += '<div class="mat-callout">💡 ' + c + '</div>'; });
+      html += '</div>';
+      return;
+    }
+
+    /* Classi raggruppate */
+    if (/^Classi/i.test(sectionTitle)) {
+      html += '<div class="mat-section">';
+      html += '<h2 class="mat-section-title">' + sectionTitle + '</h2>';
+      var rawItems = allItems.filter(function(i){ return i.type === 'item'; }).map(function(i){ return i.data.name; });
+      var grouped = groupClasses(rawItems.join('\n'));
+      html += '<div class="mat-classes">';
+      Object.keys(grouped).forEach(function(cls) {
+        if (cls === '_other') return;
+        var g = grouped[cls];
+        html += '<div class="mat-class-group">';
+        html += '<div class="mat-class-base">' + g.base + '</div>';
+        html += '<div class="mat-class-subs">';
+        g.subs.forEach(function(s) {
+          var source = '';
+          var name = s.replace(/\s*\(([A-Z0-9' ]+)\)\s*$/, function(_, src) { source = src.trim(); return ''; });
+          html += '<div class="mat-sub-card">'
+            + '<span class="mat-sub-name">' + name.replace(/\*\*/g, '').trim() + '</span>'
+            + (source ? '<span class="mat-badge">' + source + '</span>' : '')
+            + '</div>';
+        });
+        html += '</div></div>';
+      });
+      html += '</div>';
+      callouts.forEach(function(c) { html += '<div class="mat-callout">💡 ' + c + '</div>'; });
+      html += '</div>';
+      return;
+    }
+
+    /* Fallback */
+    html += '<div class="mat-section">';
+    html += '<h2 class="mat-section-title">' + sectionTitle + '</h2>';
+    allItems.forEach(function(i) {
+      if (i.type === 'subtitle') {
+        html += '<h3 class="mat-subtitle">' + i.text + '</h3>';
+      } else {
+        html += renderCards([i.data]);
+      }
+    });
+    callouts.forEach(function(c) { html += '<div class="mat-callout">💡 ' + c + '</div>'; });
+    html += '</div>';
+  });
+
+  return '<div class="mat-page">' + html + '</div>';
 }
