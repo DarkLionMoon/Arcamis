@@ -350,13 +350,23 @@ async function ghGet(path) {
 
 async function ghPut(path, message, content, sha) {
   var url = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + path;
-  var body = { message: message, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
-  if (sha) body.sha = sha;
-  var res = await fetch(url, {
-    method: 'PUT',
-    headers: { 'Authorization': 'token ' + _token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-    body: JSON.stringify(body)
-  });
+  var headers = { 'Authorization': 'token ' + _token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' };
+
+  async function doPut(s) {
+    var body = { message: message, content: btoa(unescape(encodeURIComponent(content))), branch: GITHUB_BRANCH };
+    if (s) body.sha = s;
+    var res = await fetch(url, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+    return res;
+  }
+
+  var res = await doPut(sha);
+
+  /* 409 → SHA stale: re-fetch fresh SHA and retry once */
+  if (res.status === 409) {
+    var fresh = await ghGet(path);
+    res = await doPut(fresh.sha);
+  }
+
   if (!res.ok) throw new Error('GitHub API error: ' + res.status);
   return res.json();
 }
@@ -672,7 +682,8 @@ async function saveDb() {
   
   try {
     document.querySelector('.save-btn').disabled = true;
-    await ghPut(path, message, content, sha);
+    var result = await ghPut(path, message, content, sha);
+    if (result && result.content && result.content.sha) container.dataset.sha = result.content.sha;
     _modified = false;
     document.getElementById('save-status').className = 'badge badge-saved';
     document.getElementById('save-status').textContent = 'Salvato';
@@ -768,7 +779,8 @@ async function saveDoc() {
   
   try {
     document.querySelector('.save-btn').disabled = true;
-    await ghPut(path, message, content, sha);
+    var result = await ghPut(path, message, content, sha);
+    if (result && result.content && result.content.sha) container.dataset.sha = result.content.sha;
     _modified = false;
     document.getElementById('save-status').className = 'badge badge-saved';
     document.getElementById('save-status').textContent = 'Salvato';
