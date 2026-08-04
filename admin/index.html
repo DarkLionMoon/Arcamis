@@ -365,11 +365,20 @@ function buildToolbar(){
     {l:'🔗',c:function(){wrapMd('[','](url)')}},{l:'</>',c:function(){wrapMd('`','`')}},{l:'—',c:function(){insMd('\n---\n')}}
   ];
   var h='<div class="editor-toolbar">';
-  buttons.forEach(function(b){
+  buttons.forEach(function(b,idx){
     if(!b){h+='<div class="tb-sep"></div>';return}
-    h+='<button class="tb" onclick="">'+b.l+'</button>';
+    h+='<button class="tb" data-tb="'+idx+'">'+b.l+'</button>';
   });
-  return h+'</div>';
+  h+='</div>';
+  setTimeout(function(){
+    var i=0;
+    buttons.forEach(function(b,idx){
+      if(!b)return;
+      var el=document.querySelector('[data-tb="'+idx+'"]');
+      if(el)el.addEventListener('click',b.c);
+    });
+  },0);
+  return h;
 }
 function onMdInput(){_modified=true;setBadge('dirty','modificato');renderPreview()}
 function onMdKey(e){if(e.key==='Tab'){e.preventDefault();var ta=e.target,s=ta.selectionStart,en=ta.selectionEnd;ta.value=ta.value.substring(0,s)+'  '+ta.value.substring(en);ta.selectionStart=ta.selectionEnd=s+2;onMdInput()}if(e.ctrlKey&&e.key==='s'){e.preventDefault();savePage()}}
