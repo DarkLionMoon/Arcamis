@@ -399,7 +399,9 @@ async function savePage(){
   try{
     var r=await ghPut(path,'admin: update '+_current.k,JSON.stringify(json,null,2),_current.sha);
     if(r&&r.content&&r.content.sha)_current.sha=r.content.sha;
-    _modified=false;setBadge('ok','salvato');setStatus('ok','salvato');toast('Salvato!','success');
+    _modified=false;setBadge('ok','salvato');setStatus('ok','deploying...');
+    toast('Salvato! Deploy Cloudflare in corso (~30s)...','success');
+    startDeployTimer();
   }catch(e){setBadge('err','errore');setStatus('err','errore');toast(e.message,'error')}
   document.getElementById('save-btn').disabled=false;
 }
@@ -458,7 +460,9 @@ async function saveJson(){
   try{
     var r=await ghPut(path,'admin: update '+(_current.file||_current.k),content,_current.sha);
     if(r&&r.content&&r.content.sha)_current.sha=r.content.sha;
-    _modified=false;setBadge('ok','salvato');setStatus('ok','salvato');toast('Salvato!','success');
+    _modified=false;setBadge('ok','salvato');setStatus('ok','deploying...');
+    toast('Salvato! Deploy Cloudflare in corso (~30s)...','success');
+    startDeployTimer();
   }catch(e){setBadge('err','errore');setStatus('err','errore');toast(e.message,'error')}
   document.getElementById('save-btn').disabled=false;
 }
@@ -490,6 +494,30 @@ function mdToHtml(md){
   md=md.replace(/\n\n/g,'</p><p>');
   md=md.replace(/\n/g,'<br>');
   return'<p>'+md+'</p>';
+}
+
+/* ════════════════════════════════════
+   DEPLOY TIMER
+   Mostra countdown dopo salvataggio
+   ════════════════════════════════════ */
+var _deployInterval=null;
+function startDeployTimer(){
+  if(_deployInterval)clearInterval(_deployInterval);
+  var sec=45;
+  var el=document.getElementById('tb-status');
+  el.className='topbar-status saving';
+  el.textContent='deploy in '+sec+'s...';
+  _deployInterval=setInterval(function(){
+    sec--;
+    if(sec<=0){
+      clearInterval(_deployInterval);_deployInterval=null;
+      el.className='topbar-status ok';
+      el.textContent='deploy completato';
+      toast('Deploy completato! Ricarica il sito per vedere le modifiche.','success');
+    }else{
+      el.textContent='deploy in '+sec+'s...';
+    }
+  },1000);
 }
 </script>
 </body>
