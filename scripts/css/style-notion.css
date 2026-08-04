@@ -221,8 +221,8 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
 .rs{text-decoration:line-through;opacity:.6}
 .ru{text-decoration:underline}
 .rc{font-family:'Courier New',monospace;font-size:.85em;background:rgba(0,0,0,.3);border:1px solid var(--bdr2);padding:1px 5px;color:var(--gold3)}
-.rl{color:var(--gold2);text-decoration:none;border-bottom:1px dotted rgba(200,155,60,.35);cursor:pointer;transition:.15s}
-.rl:hover{color:var(--gold3)}
+.rl,.n-link{color:var(--gold2);text-decoration:none;border-bottom:1px dotted rgba(200,155,60,.35);cursor:pointer;transition:.15s}
+.rl:hover,.n-link:hover{color:var(--gold3)}
 .rg{color:var(--text3)}
 .rr{color:#b84030}
 .ro{color:#a86020}

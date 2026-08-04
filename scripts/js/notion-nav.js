@@ -303,11 +303,23 @@ async function _gpRender(id,label,icon){
           phCovbg.style.backgroundImage = '';
           phOverlay.style.opacity = '0';
           phIcon.style.opacity = '0.06';
-          var _localHtml = (_localPage.k === 'materiale') ? _renderMateriale(_localJson.content) : (_localPage.k === 'regole' || _localPage.k === 'gameplay') ? _renderRegole(_localJson.content) : (_localPage.k === 'inizia' || _localPage.k === 'avanti') ? _renderPersonaggio(_localJson.content) : (_localPage.k === 'gilda' || _localPage.k === 'locanda' || _localPage.k === 'farmacia' || _localPage.k === 'biblioteca' || _localPage.k === 'ospedale' || _localPage.k === 'sartoria' || _localPage.k === 'deserto') ? _renderLavoro(_localJson.content, _localJson.title) : (_localPage.k === 'pantheon' || _localPage.k === 'maestria' || _localPage.k === 'arcamis' || _localPage.k === 'selva' || _localPage.k === 'foresta' || _localPage.k === 'volonx' || _localPage.k === 'arpax' || _localPage.k === 'galleria') ? _renderLore(_localJson.content, _localJson.title, _localJson.icon) : _mdToHtml(_localJson.content);
+          var _localHtml;
+          var _layout = _localJson.layout || '';
+          if(_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
+          else if(_layout === 'regole') _localHtml = _renderRegole(_localJson.content);
+          else if(_layout === 'personaggio') _localHtml = _renderPersonaggio(_localJson.content);
+          else if(_layout === 'lavoro') _localHtml = _renderLavoro(_localJson.content, _localJson.title);
+          else if(_layout === 'lore') _localHtml = _renderLore(_localJson.content, _localJson.title, _localJson.icon);
+          else if(_layout === 'wide') { _localHtml = _mdToHtml(_localJson.content); }
+          else {
+            /* Auto-detect by page key (legacy fallback) */
+            _localHtml = (_localPage.k === 'materiale') ? _renderMateriale(_localJson.content) : (_localPage.k === 'regole' || _localPage.k === 'gameplay') ? _renderRegole(_localJson.content) : (_localPage.k === 'inizia' || _localPage.k === 'avanti') ? _renderPersonaggio(_localJson.content) : (_localPage.k === 'gilda' || _localPage.k === 'locanda' || _localPage.k === 'farmacia' || _localPage.k === 'biblioteca' || _localPage.k === 'ospedale' || _localPage.k === 'sartoria' || _localPage.k === 'deserto') ? _renderLavoro(_localJson.content, _localJson.title) : (_localPage.k === 'pantheon' || _localPage.k === 'maestria' || _localPage.k === 'arcamis' || _localPage.k === 'selva' || _localPage.k === 'foresta' || _localPage.k === 'volonx' || _localPage.k === 'arpax' || _localPage.k === 'galleria') ? _renderLore(_localJson.content, _localJson.title, _localJson.icon) : _mdToHtml(_localJson.content);
+          }
           var pbody = document.getElementById('pbody');
           pbody.className = 'page-' + id;
           pbody.style.maxWidth = '';
           pbody.style.width = '';
+          if(_layout === 'wide') { pbody.style.maxWidth = 'none'; pbody.style.width = '100%'; }
           var _emptyHtml = '<div class="n-empty"><div class="n-empty-icon">' + picon + '</div>'
             + '<div class="n-empty-title">' + ptitle + '</div>'
             + '<div class="n-empty-msg">Questa pagina non ha ancora contenuto.</div></div>';

@@ -85,6 +85,11 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .btn-primary:hover{background:var(--gold2);box-shadow:0 0 16px rgba(200,155,60,.25)}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
 
+/* Layout select */
+.layout-select{background:var(--bg3);border:1px solid var(--bdr);border-radius:5px;color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 10px;cursor:pointer;outline:none;transition:border-color .15s;max-width:260px}
+.layout-select:focus{border-color:var(--gold)}
+.layout-select option{background:var(--bg2);color:var(--white)}
+
 /* Toolbar */
 .editor-toolbar{display:flex;gap:2px;padding:6px 20px;border-bottom:1px solid var(--bdr2);flex-shrink:0;flex-wrap:wrap}
 .tb{background:none;border:1px solid transparent;border-radius:4px;color:var(--text3);font-size:12px;padding:4px 8px;cursor:pointer;transition:all .12s;font-family:'JetBrains Mono',monospace}
@@ -325,19 +330,34 @@ async function openItem(el){
 /* ════════════════════════════════════
    PAGE EDITOR
    ════════════════════════════════════ */
+var LAYOUTS=[
+  {v:'',l:'(Auto — rileva da chiave)',i:'🔍'},
+  {v:'generico',l:'Generico — Markdown semplice',i:'📄'},
+  {v:'lore',l:'Lore / Luoghi — Card sezioni',i:'🏰'},
+  {v:'regole',l:'Regole / Gameplay — Intro + card',i:'📜'},
+  {v:'lavoro',l:'Lavoro / Gilde — Intro + grid',i:'🗡️'},
+  {v:'personaggio',l:'Personaggio — Step numerati',i:'🌟'},
+  {v:'materiale',l:'Materiale — Grid classi',i:'📋'},
+  {v:'wide',l:'Wide — Larghezza piena',i:'↔️'}
+];
 async function openPage(k){
   var meta=PAGES.find(function(p){return p.k===k});
   var path=CONTENT+'/pages/'+k+'.json';
   var json,sha;
   try{var d=await ghGet(path);var raw=decodeURIComponent(escape(atob(d.content)));json=JSON.parse(raw);sha=d.sha}
   catch(e){json={k:k,title:meta?meta.l:k,icon:meta?meta.i:'📄',content:'# '+(meta?meta.l:k)+'\n\nInserisci il contenuto qui...',lastModified:new Date().toISOString()};sha=null}
-  _current={type:'page',k:k,sha:sha,title:json.title,icon:json.icon};
+  _current={type:'page',k:k,sha:sha,title:json.title,icon:json.icon,layout:json.layout||''};
   setTitle((json.icon||'📄')+' '+(json.title||k));
   var tb=buildToolbar();
+  var layoutOpts='';
+  LAYOUTS.forEach(function(l){
+    layoutOpts+='<option value="'+l.v+'"'+(l.v===(json.layout||'')?' selected':'')+'>'+l.i+' '+l.l+'</option>';
+  });
   var h='<div class="editor">';
   h+='<div class="editor-head"><h2>'+esc(json.title||k)+'</h2>';
   h+='<span class="badge badge-idle" id="e-badge">salvato</span>';
   h+='<div class="editor-actions">';
+  h+='<select id="e-layout" class="layout-select" onchange="_current.layout=this.value;_modified=true;setBadge(\'dirty\',\'modificato\')">'+layoutOpts+'</select>';
   h+='<button class="btn btn-ghost" onclick="toggleJson()">JSON</button>';
   h+='<button class="btn btn-primary" id="save-btn" onclick="savePage()">SALVA</button>';
   h+='</div></div>';
@@ -393,7 +413,7 @@ function toggleJson(){
     jp.classList.remove('active');mp.style.display='';if(pv)pv.style.display='';
     try{var j=JSON.parse(document.getElementById('e-json').value);document.getElementById('e-md').value=j.content||'';renderPreview()}catch(e){}
   }else{
-    var json={k:_current.k,title:_current.title,icon:_current.icon,content:document.getElementById('e-md').value,lastModified:new Date().toISOString()};
+    var json={k:_current.k,title:_current.title,icon:_current.icon,content:document.getElementById('e-md').value,layout:_current.layout||'',lastModified:new Date().toISOString()};
     document.getElementById('e-json').value=JSON.stringify(json,null,2);
     mp.style.display='none';jp.classList.add('active');
   }
@@ -401,7 +421,7 @@ function toggleJson(){
 async function savePage(){
   if(!_current)return;
   var md=document.getElementById('e-md').value;
-  var json={k:_current.k,title:_current.title,icon:_current.icon,content:md,lastModified:new Date().toISOString()};
+  var json={k:_current.k,title:_current.title,icon:_current.icon,content:md,layout:_current.layout||'',lastModified:new Date().toISOString()};
   var path=CONTENT+'/pages/'+_current.k+'.json';
   setStatus('saving','salvataggio...');
   document.getElementById('save-btn').disabled=true;
