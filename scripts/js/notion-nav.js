@@ -310,6 +310,14 @@ async function _gpRender(id,label,icon){
           else if(_layout === 'personaggio') _localHtml = _renderPersonaggio(_localJson.content);
           else if(_layout === 'lavoro') _localHtml = _renderLavoro(_localJson.content, _localJson.title);
           else if(_layout === 'lore') _localHtml = _renderLore(_localJson.content, _localJson.title, _localJson.icon);
+          else if(_layout === 'pantheon') _localHtml = _renderPantheon(_localJson.content);
+          else if(_layout === 'bestiario') _localHtml = _renderBestiario(_localJson.content);
+          else if(_layout === 'timeline') _localHtml = _renderTimeline(_localJson.content);
+          else if(_layout === 'fazioni') _localHtml = _renderFazioni(_localJson.content);
+          else if(_layout === 'oggetti') _localHtml = _renderOggetti(_localJson.content);
+          else if(_layout === 'glossario') _localHtml = _renderGlossario(_localJson.content);
+          else if(_layout === 'galleria') _localHtml = _renderGalleria(_localJson.content);
+          else if(_layout === 'tabelle') _localHtml = _renderTabelle(_localJson.content);
           else if(_layout === 'wide') { _localHtml = _mdToHtml(_localJson.content); }
           else {
             /* Auto-detect by page key (legacy fallback) */
@@ -913,4 +921,367 @@ function _renderPersonaggio(md) {
   }
 
   return '<div class="pers-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER PANTHEON — Schede divinita
+   ══════════════════════════════════════ */
+function _renderPantheon(md) {
+  if (!md) return '';
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var title = (lines.shift() || '').trim();
+    var body = lines.join('\n');
+    var intro = '';
+    var fields = [];
+    var lists = {};
+    var currentList = null;
+    body.split('\n').forEach(function(line) {
+      var fm = line.match(/^-\s+\*\*(.+?)\*\*\s*:\s*(.+)/);
+      if (fm) { fields.push({ key: fm[1], val: fm[2] }); currentList = null; return; }
+      var lm = line.match(/^###\s+(.+)/);
+      if (lm) { currentList = lm[1]; lists[currentList] = []; return; }
+      if (currentList && line.match(/^- /)) {
+        lists[currentList].push(line.replace(/^- /, ''));
+        return;
+      }
+      if (!fm && !lm && line.trim() && !intro) intro = line.trim();
+    });
+    html += '<div class="pan-card">';
+    if (intro) html += '<div class="pan-intro">' + _mdToHtml(intro) + '</div>';
+    if (fields.length) {
+      html += '<div class="pan-fields">';
+      fields.forEach(function(f) {
+        html += '<div class="pan-field"><span class="pan-key">' + f.key + '</span><span class="pan-val">' + f.val + '</span></div>';
+      });
+      html += '</div>';
+    }
+    Object.keys(lists).forEach(function(name) {
+      html += '<div class="pan-subtitle">' + name + '</div>';
+      html += '<div class="pan-list">';
+      lists[name].forEach(function(item) {
+        html += '<div class="pan-list-item">' + item + '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  return '<div class="pan-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER BESTIARIO — Schede mostri
+   ══════════════════════════════════════ */
+function _renderBestiario(md) {
+  if (!md) return '';
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var title = (lines.shift() || '').trim();
+    var body = lines.join('\n');
+    var intro = '';
+    var fields = [];
+    var blocks = {};
+    var currentBlock = null;
+    body.split('\n').forEach(function(line) {
+      var fm = line.match(/^-\s+\*\*(.+?)\*\*\s*:\s*(.+)/);
+      if (fm) { fields.push({ key: fm[1], val: fm[2] }); currentBlock = null; return; }
+      var hm = line.match(/^###\s+(.+)/);
+      if (hm) { currentBlock = hm[1]; blocks[currentBlock] = []; return; }
+      if (currentBlock && line.trim()) {
+        blocks[currentBlock].push(line.replace(/^-\s+/, ''));
+        return;
+      }
+      if (!fm && !hm && line.trim() && !intro) intro = line.trim();
+    });
+    html += '<div class="bst-card">';
+    html += '<div class="bst-title">' + title + '</div>';
+    if (intro) html += '<div class="bst-intro">' + _mdToHtml(intro) + '</div>';
+    if (fields.length) {
+      html += '<div class="bst-fields">';
+      fields.forEach(function(f) {
+        html += '<div class="bst-field"><span class="bst-key">' + f.key + '</span><span class="bst-val">' + f.val + '</span></div>';
+      });
+      html += '</div>';
+    }
+    Object.keys(blocks).forEach(function(name) {
+      html += '<div class="bst-block-title">' + name + '</div>';
+      html += '<div class="bst-block-body">';
+      blocks[name].forEach(function(item) {
+        html += '<div class="bst-block-item">' + item + '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  return '<div class="bst-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER TIMELINE — Eventi cronologici
+   ══════════════════════════════════════ */
+function _renderTimeline(md) {
+  if (!md) return '';
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var title = (lines.shift() || '').trim();
+    var body = lines.join('\n');
+    var intro = '';
+    var items = [];
+    var currentSub = null;
+    body.split('\n').forEach(function(line) {
+      var sm = line.match(/^###\s+(.+)/);
+      if (sm) { currentSub = sm[1]; items.push({ type: 'sub', text: currentSub }); return; }
+      var im = line.match(/^-\s+\*\*(.+?)\*\*\s*:\s*(.+)/);
+      if (im) { items.push({ type: 'event', title: im[1], desc: im[2], sub: currentSub }); return; }
+      var bm = line.match(/^- (.+)/);
+      if (bm) { items.push({ type: 'event', title: '', desc: bm[1], sub: currentSub }); return; }
+      if (!sm && !im && !bm && line.trim() && !intro) intro = line.trim();
+    });
+    html += '<div class="tl-section">';
+    html += '<div class="tl-title">' + title + '</div>';
+    if (intro) html += '<div class="tl-intro">' + _mdToHtml(intro) + '</div>';
+    html += '<div class="tl-timeline">';
+    items.forEach(function(it) {
+      if (it.type === 'sub') {
+        html += '<div class="tl-marker">' + it.text + '</div>';
+      } else {
+        html += '<div class="tl-event">';
+        if (it.title) html += '<div class="tl-event-title">' + it.title + '</div>';
+        html += '<div class="tl-event-desc">' + it.desc + '</div>';
+        html += '</div>';
+      }
+    });
+    html += '</div></div>';
+  });
+  return '<div class="tl-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER FAZIONI — Organizzazioni
+   ══════════════════════════════════════ */
+function _renderFazioni(md) {
+  if (!md) return '';
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var title = (lines.shift() || '').trim();
+    var body = lines.join('\n');
+    var intro = '';
+    var fields = [];
+    var lists = {};
+    var currentList = null;
+    body.split('\n').forEach(function(line) {
+      var fm = line.match(/^-\s+\*\*(.+?)\*\*\s*:\s*(.+)/);
+      if (fm) { fields.push({ key: fm[1], val: fm[2] }); currentList = null; return; }
+      var hm = line.match(/^###\s+(.+)/);
+      if (hm) { currentList = hm[1]; lists[currentList] = []; return; }
+      if (currentList && line.match(/^- /)) {
+        lists[currentList].push(line.replace(/^- /, ''));
+        return;
+      }
+      if (!fm && !hm && line.trim() && !intro) intro = line.trim();
+    });
+    html += '<div class="faz-card">';
+    html += '<div class="faz-title">' + title + '</div>';
+    if (intro) html += '<div class="faz-intro">' + _mdToHtml(intro) + '</div>';
+    if (fields.length) {
+      html += '<div class="faz-fields">';
+      fields.forEach(function(f) {
+        html += '<div class="faz-field"><span class="faz-key">' + f.key + '</span><span class="faz-val">' + f.val + '</span></div>';
+      });
+      html += '</div>';
+    }
+    Object.keys(lists).forEach(function(name) {
+      html += '<div class="faz-subtitle">' + name + '</div>';
+      html += '<div class="faz-list">';
+      lists[name].forEach(function(item) {
+        html += '<div class="faz-list-item">' + item + '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  return '<div class="faz-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER OGGETTI — Equipaggiamento
+   ══════════════════════════════════════ */
+function _renderOggetti(md) {
+  if (!md) return '';
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var title = (lines.shift() || '').trim();
+    var body = lines.join('\n');
+    var intro = '';
+    var fields = [];
+    var currentBlock = null;
+    var blockContent = [];
+    var blocks = {};
+    body.split('\n').forEach(function(line) {
+      var fm = line.match(/^-\s+\*\*(.+?)\*\*\s*:\s*(.+)/);
+      if (fm) { fields.push({ key: fm[1], val: fm[2] }); currentBlock = null; return; }
+      var hm = line.match(/^###\s+(.+)/);
+      if (hm) {
+        if (currentBlock && blockContent.length) blocks[currentBlock] = blockContent.join('\n');
+        currentBlock = hm[1]; blockContent = []; return;
+      }
+      if (currentBlock) { blockContent.push(line); return; }
+      if (!fm && !hm && line.trim() && !intro) intro = line.trim();
+    });
+    if (currentBlock && blockContent.length) blocks[currentBlock] = blockContent.join('\n');
+    var rarity = '';
+    fields.forEach(function(f) {
+      if (f.key === 'Rarita') rarity = f.val.toLowerCase().replace(/\s+/g, '');
+    });
+    var rarityClass = 'obj-common';
+    if (rarity.indexOf('leggendario') > -1) rarityClass = 'obj-legendary';
+    else if (rarity.indexOf('molto') > -1) rarityClass = 'obj-veryrare';
+    else if (rarity.indexOf('raro') > -1) rarityClass = 'obj-rare';
+    else if (rarity.indexOf('non') > -1) rarityClass = 'obj-uncommon';
+    html += '<div class="obj-card ' + rarityClass + '">';
+    html += '<div class="obj-title">' + title + '</div>';
+    if (intro) html += '<div class="obj-intro">' + _mdToHtml(intro) + '</div>';
+    if (fields.length) {
+      html += '<div class="obj-fields">';
+      fields.forEach(function(f) {
+        html += '<div class="obj-field"><span class="obj-key">' + f.key + '</span><span class="obj-val">' + f.val + '</span></div>';
+      });
+      html += '</div>';
+    }
+    Object.keys(blocks).forEach(function(name) {
+      html += '<div class="obj-block-title">' + name + '</div>';
+      html += '<div class="obj-block-body">' + _mdToHtml(blocks[name]) + '</div>';
+    });
+    html += '</div>';
+  });
+  return '<div class="obj-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER GLOSSARIO — Termini e definizioni
+   ══════════════════════════════════════ */
+function _renderGlossario(md) {
+  if (!md) return '';
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var title = (lines.shift() || '').trim();
+    html += '<div class="gl-letter">';
+    html += '<div class="gl-letter-title">' + title + '</div>';
+    var entries = [];
+    var currentTerm = null;
+    var currentDef = [];
+    lines.forEach(function(line) {
+      var tm = line.match(/^###\s+(.+)/);
+      if (tm) {
+        if (currentTerm) entries.push({ term: currentTerm, def: currentDef.join(' ').trim() });
+        currentTerm = tm[1]; currentDef = [];
+      } else if (currentTerm && line.trim()) {
+        currentDef.push(line.trim());
+      }
+    });
+    if (currentTerm) entries.push({ term: currentTerm, def: currentDef.join(' ').trim() });
+    entries.forEach(function(e) {
+      html += '<div class="gl-entry">';
+      html += '<div class="gl-term">' + e.term + '</div>';
+      html += '<div class="gl-def">' + e.def + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  return '<div class="gl-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER GALLERIA — Griglia immagini
+   ══════════════════════════════════════ */
+function _renderGalleria(md) {
+  if (!md) return '';
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var title = (lines.shift() || '').trim();
+    var body = lines.join('\n');
+    var intro = '';
+    var categories = {};
+    var currentCat = null;
+    body.split('\n').forEach(function(line) {
+      var cm = line.match(/^###\s+(.+)/);
+      if (cm) { currentCat = cm[1]; categories[currentCat] = []; return; }
+      var im = line.match(/^!\[([^\]]*)\]\(([^)]+)\)/);
+      if (im && currentCat) { categories[currentCat].push({ alt: im[1], src: im[2] }); return; }
+      var lm = line.match(/^- (.+)/);
+      if (lm && currentCat) { categories[currentCat].push({ alt: lm[1].split('—')[0].trim(), src: '', caption: lm[1] }); return; }
+      if (!cm && !im && !lm && line.trim() && !intro) intro = line.trim();
+    });
+    html += '<div class="gal-section">';
+    html += '<div class="gal-title">' + title + '</div>';
+    if (intro) html += '<div class="gal-intro">' + _mdToHtml(intro) + '</div>';
+    Object.keys(categories).forEach(function(cat) {
+      html += '<div class="gal-cat-title">' + cat + '</div>';
+      html += '<div class="gal-grid">';
+      categories[cat].forEach(function(img) {
+        if (img.src) {
+          html += '<div class="gal-item"><img src="' + img.src + '" alt="' + img.alt + '" loading="lazy">' + (img.alt ? '<div class="gal-caption">' + img.alt + '</div>' : '') + '</div>';
+        } else if (img.caption) {
+          html += '<div class="gal-item gal-text"><div class="gal-caption">' + img.caption + '</div></div>';
+        }
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  return '<div class="gal-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER TABELLE — Dati strutturati
+   ══════════════════════════════════════ */
+function _renderTabelle(md) {
+  if (!md) return '';
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var title = (lines.shift() || '').trim();
+    var body = lines.join('\n');
+    var intro = '';
+    var tables = [];
+    var currentTable = [];
+    var inTable = false;
+    body.split('\n').forEach(function(line) {
+      if (line.match(/^\|/)) {
+        inTable = true;
+        currentTable.push(line);
+        return;
+      }
+      if (inTable && currentTable.length) {
+        tables.push(currentTable.join('\n'));
+        currentTable = [];
+        inTable = false;
+      }
+      if (!line.match(/^\|/) && line.trim() && !intro) intro = line.trim();
+    });
+    if (inTable && currentTable.length) tables.push(currentTable.join('\n'));
+    html += '<div class="tab-section">';
+    html += '<div class="tab-title">' + title + '</div>';
+    if (intro) html += '<div class="tab-intro">' + _mdToHtml(intro) + '</div>';
+    tables.forEach(function(tbl) {
+      html += '<div class="tab-wrap">' + _mdToHtml(tbl) + '</div>';
+    });
+    html += '</div>';
+  });
+  return '<div class="tab-page">' + html + '</div>';
 }
