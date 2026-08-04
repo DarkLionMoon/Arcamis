@@ -340,6 +340,15 @@ var LAYOUTS=[
   {v:'materiale',l:'Materiale — Grid classi',i:'📋'},
   {v:'wide',l:'Wide — Larghezza piena',i:'↔️'}
 ];
+var LAYOUT_TEMPLATES={
+  generico:'# Titolo\n\nTesto della pagina qui.\n\n## Sottosezione\n\nContenuto della sottosezione.\n\n- Elemento 1\n- Elemento 2\n- Elemento 3\n\n> Questa è una citazione importante.\n\n---\n\n## Altra sezione\n\nAltro contenuto qui.',
+  lore:'# Titolo Luogo\n\n> Breve descrizione del luogo, atmosfera e cosa lo rende speciale.\n\n## Geografia\n\nDescrizione del territorio, clima, paesaggio.\n\n## Abitanti\n\nChi vive qui, culture, usanze.\n\n## Storia\n\nEventi importanti che hanno plasmato il luogo.\n\n## Segreti\n\nDettagli nascosti, leggende, misteri.\n\n## Collegamenti\n\nCome si collega alle altre zone del mondo.',
+  regole:'# Titolo Regola\n\n> Riepilogo breve della regola in una frase.\n\n## Regola 1\n\nDescrizione dettagliata della prima regola.\n\n## Regola 2\n\nDescrizione dettagliata della seconda regola.\n\n## Regola 3\n\nDescrizione dettagliata della terza regola.\n\n## Eccezioni\n\n- Eccezione 1\n- Eccezione 2\n\n## Esempio\n\n> Esempio pratico di come funziona la regola in gioco.',
+  lavoro:'# Titolo Attivita\n\n> Descrizione dell\'attivita, cosa offre e come funziona.\n\n## Servizi\n\n- Servizio 1: descrizione\n- Servizio 2: descrizione\n- Servizio 3: descrizione\n\n## Personale\n\nChi lavora qui, ruoli e specialita.\n\n## Storia\n\nCome e nata questa attivita.\n\n## Regole\n\n- Regola 1\n- Regola 2\n- Regola 3',
+  personaggio:'# Titolo Personaggio\n\n> Breve introduzione al processo di creazione.\n\n## 1. Inizia\n\n### Scegli la specie\n\n- Opzione 1\n- Opzione 2\n- Opzione 3\n\n### Scegli la classe\n\n- Opzione 1\n- Opzione 2\n- Opzione 3\n\n## 2. Avanti\n\n### Definisci il background\n\nDescrizione del background del personaggio.\n\n### Scegli i tratti\n\n- Tratto 1\n- Tratto 2\n- Tratto 3',
+  materiale:'# Materiale Approvato\n\n> Riepilogo di tutto il materiale disponibile per il gioco.\n\n## Specie\n\n- Specie 1 (PHB)\n- Specie 2 (PHB)\n- Specie 3 (XGE)\n\n## Classi\n\n### Barbarian\n\n- Barbarian (PHB)\n- Berserker (PHB)\n- Totem Warrior (PHB)\n\n### Fighter\n\n- Fighter (PHB)\n- Champion (PHB)\n- Battle Master (PHB)\n\n## Talenti\n\n- Talento 1 (PHB)\n- Talento 2 (XGE)\n- Talento 3 (TCE)\n\n## Spell\n\n- Spell 1 (PHB)\n- Spell 2 (XGE)\n- Spell 3 (TCE)',
+  wide:'# Titolo Pagina Wide\n\n> Questa pagina usa la larghezza piena, ideale per tabelle, mappe o contenuti che necessitano di piu spazio.\n\n## Sezione 1\n\nContenuto che beneficia della larghezza piena.\n\n## Sezione 2\n\nAltro contenuto qui.'
+};
 async function openPage(k){
   var meta=PAGES.find(function(p){return p.k===k});
   var path=CONTENT+'/pages/'+k+'.json';
@@ -357,7 +366,7 @@ async function openPage(k){
   h+='<div class="editor-head"><h2>'+esc(json.title||k)+'</h2>';
   h+='<span class="badge badge-idle" id="e-badge">salvato</span>';
   h+='<div class="editor-actions">';
-  h+='<select id="e-layout" class="layout-select" onchange="_current.layout=this.value;_modified=true;setBadge(\'dirty\',\'modificato\')">'+layoutOpts+'</select>';
+  h+='<select id="e-layout" class="layout-select" onchange="onLayoutChange(this.value)">'+layoutOpts+'</select>';
   h+='<button class="btn btn-ghost" onclick="toggleJson()">JSON</button>';
   h+='<button class="btn btn-primary" id="save-btn" onclick="savePage()">SALVA</button>';
   h+='</div></div>';
@@ -403,6 +412,16 @@ function buildToolbar(){
 function onMdInput(){_modified=true;setBadge('dirty','modificato');renderPreview()}
 function onMdKey(e){if(e.key==='Tab'){e.preventDefault();var ta=e.target,s=ta.selectionStart,en=ta.selectionEnd;ta.value=ta.value.substring(0,s)+'  '+ta.value.substring(en);ta.selectionStart=ta.selectionEnd=s+2;onMdInput()}if(e.ctrlKey&&e.key==='s'){e.preventDefault();savePage()}}
 function renderPreview(){var md=document.getElementById('e-md');var pv=document.getElementById('e-preview');if(md&&pv)pv.innerHTML=mdToHtml(md.value)}
+function onLayoutChange(val){
+  _current.layout=val;
+  var md=document.getElementById('e-md');
+  var current=(md?md.value:'').trim();
+  var tpl=LAYOUT_TEMPLATES[val]||'';
+  if(!current||confirm('Vuoi applicare il template per questo layout? Il contenuto attuale verra sostituito.')){
+    if(md&&tpl){md.value=tpl;onMdInput();}
+  }
+  _modified=true;setBadge('dirty','modificato');
+}
 function wrapMd(before,after){var ta=document.getElementById('e-md');var s=ta.selectionStart,en=ta.selectionEnd;var sel=ta.value.substring(s,en);ta.value=ta.value.substring(0,s)+before+sel+after+ta.value.substring(en);ta.selectionStart=s+before.length;ta.selectionEnd=s+before.length+sel.length;ta.focus();onMdInput()}
 function lineMd(prefix){var ta=document.getElementById('e-md');var s=ta.selectionStart;var lineStart=ta.value.lastIndexOf('\n',s-1)+1;ta.value=ta.value.substring(0,lineStart)+prefix+ta.value.substring(lineStart);ta.selectionStart=ta.selectionEnd=s+prefix.length;ta.focus();onMdInput()}
 function insMd(text){var ta=document.getElementById('e-md');var s=ta.selectionStart;ta.value=ta.value.substring(0,s)+text+ta.value.substring(s);ta.selectionStart=ta.selectionEnd=s+text.length;ta.focus();onMdInput()}
