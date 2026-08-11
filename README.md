@@ -29,8 +29,9 @@ Contenuto servito da JSON locali; API Functions come fallback Notion.
 │   └── mestieri/*.json     ← Dati mestieri (riferimento, non serviti)
 │
 ├── functions/api/*.js      ← Cloudflare Pages Functions
-├── admin/index.html        ← Pannello amministrazione
+├── admin/index.html        ← Pannello amministrazione (con upload immagini in /images/)
 ├── export/index.html       ← Tool export contenuti
+├── images/                 ← Immagini caricate dall'editor admin
 └── audio/                  ← Effetti sonori (ambient, footsteps, …)
 ```
 

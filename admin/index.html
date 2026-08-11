@@ -134,6 +134,25 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .toast.error{border-color:var(--red)}
 @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
+/* ── MODAL IMMAGINE ── */
+.img-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:400}
+.img-modal{background:var(--bg2);border:1px solid var(--bdr2);border-radius:12px;width:min(480px,92vw);padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.img-modal h3{font-family:'Cinzel',serif;color:var(--gold2);font-size:14px;letter-spacing:.08em}
+.img-field{display:flex;flex-direction:column;gap:5px}
+.img-field label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3)}
+.img-field input{background:var(--bg3);border:1px solid var(--bdr);border-radius:5px;color:var(--white);font-size:13px;padding:8px 10px;outline:none;font-family:'Crimson Pro',serif}
+.img-field input:focus{border-color:var(--gold)}
+.img-or{display:flex;align-items:center;gap:10px;color:var(--text3);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.15em;text-transform:uppercase}
+.img-or::before,.img-or::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.img-upload{position:relative;border:1px dashed var(--bdr2);border-radius:6px;padding:18px;text-align:center;cursor:pointer;background:var(--bg3)}
+.img-upload:hover{border-color:var(--gold)}
+.img-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-upload-txt{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;color:var(--text2);text-transform:uppercase}
+.img-preview{display:none;width:100%;max-height:180px;object-fit:contain;border-radius:6px;border:1px solid var(--bdr);background:var(--bg3)}
+.img-preview.show{display:block}
+.img-actions{display:flex;gap:8px;justify-content:flex-end}
+.img-status{font-size:12px;color:var(--text2);font-style:italic;min-height:16px}
+
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
   .sidebar{width:200px}
@@ -243,6 +262,16 @@ async function ghPut(path,msg,content,sha){
   var headers={'Authorization':'token '+_token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};
   async function put(s){var body={message:msg,content:btoa(unescape(encodeURIComponent(content))),branch:GH_BRANCH};if(s)body.sha=s;return fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)})}
   var r=await put(sha);
+  if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
+  if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+}
+/* Carica un file binario (immagine) su GitHub: il content va passato come base64 puro */
+async function ghPutBinary(path,msg,dataUri){
+  var m=dataUri.match(/^data:[^;]+;base64,(.*)$/);
+  var b64=m?m[1]:dataUri;
+  var headers={'Authorization':'token '+_token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};
+  async function put(s){var body={message:msg,content:b64,branch:GH_BRANCH};if(s)body.sha=s;return fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)})}
+  var r=await put(null);
   if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
   if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
 }
@@ -407,7 +436,7 @@ function buildToolbar(){
     null,
     {l:'•',c:function(){lineMd('- ')}},{l:'1.',c:function(){lineMd('1. ')}},{l:'>',c:function(){lineMd('> ')}},
     null,
-    {l:'🔗',c:function(){wrapMd('[','](url)')}},{l:'</>',c:function(){wrapMd('`','`')}},{l:'—',c:function(){insMd('\n---\n')}}
+    {l:'🔗',c:function(){wrapMd('[','](url)')}},{l:'🖼',c:openImgDialog},{l:'</>',c:function(){wrapMd('`','`')}},{l:'—',c:function(){insMd('\n---\n')}}
   ];
   var h='<div class="editor-toolbar">';
   buttons.forEach(function(b,idx){
@@ -441,6 +470,106 @@ function onLayoutChange(val){
 function wrapMd(before,after){var ta=document.getElementById('e-md');var s=ta.selectionStart,en=ta.selectionEnd;var sel=ta.value.substring(s,en);ta.value=ta.value.substring(0,s)+before+sel+after+ta.value.substring(en);ta.selectionStart=s+before.length;ta.selectionEnd=s+before.length+sel.length;ta.focus();onMdInput()}
 function lineMd(prefix){var ta=document.getElementById('e-md');var s=ta.selectionStart;var lineStart=ta.value.lastIndexOf('\n',s-1)+1;ta.value=ta.value.substring(0,lineStart)+prefix+ta.value.substring(lineStart);ta.selectionStart=ta.selectionEnd=s+prefix.length;ta.focus();onMdInput()}
 function insMd(text){var ta=document.getElementById('e-md');var s=ta.selectionStart;ta.value=ta.value.substring(0,s)+text+ta.value.substring(s);ta.selectionStart=ta.selectionEnd=s+text.length;ta.focus();onMdInput()}
+
+/* ════════════════════════════════════
+   INSERIMENTO IMMAGINI
+   ════════════════════════════════════ */
+var _imgDataUri=null;
+function openImgDialog(){
+  if(document.getElementById('img-modal'))return;
+  var d=document.createElement('div');
+  d.className='img-modal-backdrop';
+  d.id='img-modal';
+  d.innerHTML='<div class="img-modal">'
+    +'<h3>🖼 Inserisci immagine</h3>'
+    +'<div class="img-field"><label>Testo alternativo / didascalia (opzionale)</label>'
+    +'<input id="img-alt" placeholder="es. Mappa della regione"></div>'
+    +'<div class="img-field"><label>URL immagine</label>'
+    +'<input id="img-url" type="url" placeholder="https://… oppure /images/…" onkeydown="if(event.key===\'Enter\')insertImgFromUrl()">'
+    +'<div class="img-actions" style="margin-top:6px"><button class="btn btn-ghost" onclick="insertImgFromUrl()">Usa URL</button></div></div>'
+    +'<div class="img-or">oppure carica dal PC</div>'
+    +'<div class="img-upload">'
+    +'<input type="file" id="img-file" accept="image/*" onchange="imgFileSelected(this)">'
+    +'<div class="img-upload-txt">🖼 Scegli un file immagine</div></div>'
+    +'<img id="img-preview" class="img-preview" alt="anteprima">'
+    +'<div class="img-status" id="img-status"></div>'
+    +'<div class="img-actions">'
+    +'<button class="btn btn-ghost" onclick="closeImgDialog()">Annulla</button>'
+    +'<button class="btn btn-primary" id="img-upload-btn" onclick="insertImgFromUpload()" disabled>Carica e inserisci</button>'
+    +'</div></div>';
+  d.addEventListener('click',function(e){if(e.target===d)closeImgDialog()});
+  document.body.appendChild(d);
+  var alt=document.getElementById('img-alt');
+  if(alt)alt.focus();
+}
+function closeImgDialog(){var m=document.getElementById('img-modal');if(m)m.remove()}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeImgDialog()});
+function imgFileSelected(input){
+  var file=input.files&&input.files[0];
+  if(!file){_imgDataUri=null;return}
+  var status=document.getElementById('img-status');
+  if(status)status.textContent='Elaborazione…';
+  var reader=new FileReader();
+  reader.onload=function(e){
+    compressImg(e.target.result,function(b64){
+      _imgDataUri=b64;
+      var pv=document.getElementById('img-preview');
+      if(pv){pv.src=b64;pv.classList.add('show')}
+      var btn=document.getElementById('img-upload-btn');
+      if(btn)btn.disabled=false;
+      if(status)status.textContent='Immagine pronta ('+Math.round(b64.length/1024)+' KB)';
+    });
+  };
+  reader.readAsDataURL(file);
+}
+function compressImg(dataUrl,cb){
+  var img=new Image();
+  img.onload=function(){
+    var MAX=900,w=img.width,h=img.height;
+    if(w>MAX){h=Math.round(h*MAX/w);w=MAX}
+    if(h>MAX){w=Math.round(w*MAX/h);h=MAX}
+    var c=document.createElement('canvas');
+    c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    cb(c.toDataURL('image/jpeg',0.82));
+  };
+  img.src=dataUrl;
+}
+function insertImgFromUrl(){
+  var url=(document.getElementById('img-url').value||'').trim();
+  var alt=(document.getElementById('img-alt').value||'').trim();
+  if(!url){toast('Inserisci un URL','error');return}
+  insertImageMarkdown(alt,url);
+}
+async function insertImgFromUpload(){
+  if(!_imgDataUri){toast('Scegli prima un file immagine','error');return}
+  var btn=document.getElementById('img-upload-btn');
+  var status=document.getElementById('img-status');
+  if(btn)btn.disabled=true;
+  if(status)status.textContent='Caricamento su GitHub…';
+  var name=_current.k+'-'+Date.now()+'.'+_imgExt(_imgDataUri);
+  try{
+    await ghPutBinary('images/'+name,'admin: add image '+name,_imgDataUri);
+    var alt=(document.getElementById('img-alt').value||'').trim();
+    insertImageMarkdown(alt,'/images/'+name);
+    toast('Immagine caricata e inserita ✓','success');
+  }catch(e){
+    if(btn)btn.disabled=false;
+    if(status)status.textContent='';
+    toast('Errore caricamento: '+e.message,'error');
+  }
+}
+function _imgExt(dataUri){
+  var m=dataUri.match(/^data:image\/([a-zA-Z0-9.+-]+);/);
+  var t=m?m[1]:'jpg';
+  if(t==='jpeg')t='jpg';
+  return t;
+}
+function insertImageMarkdown(alt,src){
+  var a=(alt||'').replace(/\[/g,'(').replace(/\]/g,')');
+  insMd('\n!['+a+']('+src+')\n');
+  closeImgDialog();
+}
 function toggleJson(){
   var jp=document.getElementById('json-pane');var mp=document.getElementById('md-pane');
   var pv=mp?mp.querySelector('.pane:nth-child(2)'):null;
