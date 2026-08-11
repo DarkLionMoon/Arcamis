@@ -333,6 +333,7 @@ async function _gpRender(id,label,icon){
           else if(_layout === 'glossario') _localHtml = _renderGlossario(_localJson.content);
           else if(_layout === 'galleria') _localHtml = _renderGalleria(_localJson.content);
           else if(_layout === 'tabelle') _localHtml = _renderTabelle(_localJson.content);
+          else if(_layout === 'sessione' || _layout === 'quest' || _layout === 'npc' || _layout === 'spell' || _layout === 'specie' || _layout === 'citta' || _layout === 'evento') _localHtml = _renderSchede(_localJson.content);
           else if(_layout === 'wide') { _localHtml = _mdToHtml(_localJson.content); }
           else {
             /* Auto-detect by page key (legacy fallback) */
@@ -954,7 +955,7 @@ function _renderPantheon(md) {
     var lists = {};
     var currentList = null;
     body.split('\n').forEach(function(line) {
-      var fm = line.match(/^-\s+\*\*(.+?)\*\*\s*:\s*(.+)/);
+      var fm = line.match(/^-\s+\*\*(.+?):?\*\*\s*:?\s*(.+)/);
       if (fm) { fields.push({ key: fm[1], val: fm[2] }); currentList = null; return; }
       var lm = line.match(/^###\s+(.+)/);
       if (lm) { currentList = lm[1]; lists[currentList] = []; return; }
@@ -1002,7 +1003,7 @@ function _renderBestiario(md) {
     var blocks = {};
     var currentBlock = null;
     body.split('\n').forEach(function(line) {
-      var fm = line.match(/^-\s+\*\*(.+?)\*\*\s*:\s*(.+)/);
+      var fm = line.match(/^-\s+\*\*(.+?):?\*\*\s*:?\s*(.+)/);
       if (fm) { fields.push({ key: fm[1], val: fm[2] }); currentBlock = null; return; }
       var hm = line.match(/^###\s+(.+)/);
       if (hm) { currentBlock = hm[1]; blocks[currentBlock] = []; return; }
@@ -1052,7 +1053,7 @@ function _renderTimeline(md) {
     body.split('\n').forEach(function(line) {
       var sm = line.match(/^###\s+(.+)/);
       if (sm) { currentSub = sm[1]; items.push({ type: 'sub', text: currentSub }); return; }
-      var im = line.match(/^-\s+\*\*(.+?)\*\*\s*:\s*(.+)/);
+      var im = line.match(/^-\s+\*\*(.+?):?\*\*\s*:?\s*(.+)/);
       if (im) { items.push({ type: 'event', title: im[1], desc: im[2], sub: currentSub }); return; }
       var bm = line.match(/^- (.+)/);
       if (bm) { items.push({ type: 'event', title: '', desc: bm[1], sub: currentSub }); return; }
@@ -1093,7 +1094,7 @@ function _renderFazioni(md) {
     var lists = {};
     var currentList = null;
     body.split('\n').forEach(function(line) {
-      var fm = line.match(/^-\s+\*\*(.+?)\*\*\s*:\s*(.+)/);
+      var fm = line.match(/^-\s+\*\*(.+?):?\*\*\s*:?\s*(.+)/);
       if (fm) { fields.push({ key: fm[1], val: fm[2] }); currentList = null; return; }
       var hm = line.match(/^###\s+(.+)/);
       if (hm) { currentList = hm[1]; lists[currentList] = []; return; }
@@ -1143,7 +1144,7 @@ function _renderOggetti(md) {
     var blockContent = [];
     var blocks = {};
     body.split('\n').forEach(function(line) {
-      var fm = line.match(/^-\s+\*\*(.+?)\*\*\s*:\s*(.+)/);
+      var fm = line.match(/^-\s+\*\*(.+?):?\*\*\s*:?\s*(.+)/);
       if (fm) { fields.push({ key: fm[1], val: fm[2] }); currentBlock = null; return; }
       var hm = line.match(/^###\s+(.+)/);
       if (hm) {
@@ -1299,4 +1300,54 @@ function _renderTabelle(md) {
     html += '</div>';
   });
   return '<div class="tab-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER SCHEDE — layout generico a card
+   Usato da: sessione, quest, npc, spell,
+   specie, citta, evento.
+   Formato: ## Nome (card) + - **Chiave:** val
+   (campi) + ### Blocco (contenuto/elenchi)
+   ══════════════════════════════════════ */
+function _renderSchede(md) {
+  if (!md) return '';
+  var html = '';
+  var sections = md.split(/^## /m).filter(Boolean);
+  sections.forEach(function(sec) {
+    var lines = sec.split('\n');
+    var title = (lines.shift() || '').trim().replace(/^#\s+/, '');
+    var fields = [];
+    var blocks = {};
+    var currentBlock = null;
+    var blockContent = [];
+    var intro = [];
+    lines.forEach(function(line) {
+      var fm = line.match(/^-\s+\*\*(.+?):?\*\*\s*:?\s*(.+)/);
+      if (fm) { fields.push({ key: fm[1], val: fm[2] }); currentBlock = null; return; }
+      var hm = line.match(/^###\s+(.+)/);
+      if (hm) {
+        if (currentBlock && blockContent.length) blocks[currentBlock] = blockContent.join('\n');
+        currentBlock = hm[1]; blockContent = []; return;
+      }
+      if (currentBlock) { blockContent.push(line); return; }
+      if (line.trim()) intro.push(line);
+    });
+    if (currentBlock && blockContent.length) blocks[currentBlock] = blockContent.join('\n');
+    html += '<div class="sch-card">';
+    html += '<div class="sch-title">' + title + '</div>';
+    if (intro.length) html += '<div class="sch-intro">' + _mdToHtml(intro.join('\n')) + '</div>';
+    if (fields.length) {
+      html += '<div class="sch-fields">';
+      fields.forEach(function(f) {
+        html += '<div class="sch-field"><span class="sch-key">' + f.key + '</span><span class="sch-val">' + f.val + '</span></div>';
+      });
+      html += '</div>';
+    }
+    Object.keys(blocks).forEach(function(name) {
+      html += '<div class="sch-block-title">' + name + '</div>';
+      html += '<div class="sch-block-body">' + _mdToHtml(blocks[name]) + '</div>';
+    });
+    html += '</div>';
+  });
+  return '<div class="sch-page">' + html + '</div>';
 }
