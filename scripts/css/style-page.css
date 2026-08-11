@@ -36,7 +36,7 @@
 .ph-bc-mid:hover{opacity:.9;color:var(--gold3)}
 
 /* Page body */
-#pbody{padding:36px 44px 60px;max-width:860px;margin:0 auto;width:100%}
+#pbody{padding:36px clamp(20px,5vw,44px) 60px;max-width:860px;margin:0 auto;width:100%}
 
 /* ── Hero accent color ── */
 .ph-topline{background:linear-gradient(90deg,transparent,var(--ph-acc,var(--gold3)),transparent)!important;opacity:.6!important}
@@ -110,8 +110,18 @@
    RESPONSIVE PAGE
 ════════════════════════════════════ */
 @media(max-width:768px){
+  #page-hero{min-height:215px}
+  .ph-inner{padding:18px 16px 24px}
+  .ph-icon{right:12px;font-size:54px;opacity:.05}
+  .ph-sub{font-size:14px}
   .ph-title{font-size:clamp(22px,6vw,40px)}
-  .nc{padding:24px 16px 40px}
+  #pbody{padding:26px 16px 48px}
+  .nc{padding:0}
+}
+@media(max-width:390px){
+  .ph-icon{display:none}
+  .ph-copy-btn{margin-top:10px}
+  .ph-crumb{flex-wrap:wrap}
 }
 #pbody.pb-wide,
 #pbody:has(.pb-wide-trigger) {
@@ -728,8 +738,8 @@
 .tab-section{display:flex;flex-direction:column;gap:10px}
 .tab-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:rgba(200,155,60,.9);letter-spacing:.03em}
 .tab-intro{font-size:13.5px;line-height:1.7;color:rgba(240,230,200,.75)}
-.tab-wrap{overflow-x:auto}
-.tab-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}
+.tab-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-wrap table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px}
 .tab-wrap th{background:rgba(200,155,60,.06);color:rgba(200,155,60,.9);font-family:'Cinzel',serif;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:8px 12px;text-align:left;border:1px solid rgba(200,155,60,.12)}
 .tab-wrap td{padding:7px 12px;border:1px solid rgba(200,155,60,.08);color:rgba(240,230,200,.7);background:rgba(200,155,60,.02)}
 .tab-wrap tr:hover td{background:rgba(200,155,60,.05)}
