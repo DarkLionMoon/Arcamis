@@ -7,7 +7,6 @@ var ROOT = '2f00274fdc1c801a9b39d8d69800f7a8';
 var GUILD = '1348723468157456425';
 
 var pages = [
-  {k:'gameplay',   l:'Gameplay',                i:'⚔️', id:'2f00274fdc1c8065a11ff45192aa5dcb'},
   {k:'regole',     l:'Regole',                  i:'📜', id:'2f00274fdc1c800b9d8fc366e8e40c5c'},
   {k:'materiale',  l:'Materiale approvato',      i:'📋', id:'3130274fdc1c807eb61fde24e8236659'},
   {k:'inizia',     l:'Come si inizia',           i:'🌟', id:'2dd222f22ef8413f8cb48f03bbb4f4b0'},
