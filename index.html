@@ -143,20 +143,20 @@
   <div id="tr">
     <div id="sw">
       <span id="si">⌕</span>
-      <input id="ts" type="text" placeholder="Cerca nella wiki…" autocomplete="off"
+      <input id="ts" type="text" placeholder="Cerca nella wiki…" autocomplete="off" aria-label="Cerca nella wiki"
         oninput="hsearch(this.value)" onblur="setTimeout(csearch,600)"/>
       <div id="sr"></div>
     </div>
     <div id="font-controls">
-      <div class="font-btn" onclick="fontDown()" title="Testo più piccolo">A−</div>
-      <div class="font-btn" onclick="fontUp()" title="Testo più grande">A+</div>
+      <div class="font-btn" onclick="fontDown()" title="Testo più piccolo" role="button" aria-label="Riduci dimensione testo" tabindex="0">A−</div>
+      <div class="font-btn" onclick="fontUp()" title="Testo più grande" role="button" aria-label="Aumenta dimensione testo" tabindex="0">A+</div>
     </div>
-    <button id="theme-toggle" onclick="toggleTheme()">⚙️</button>
-    <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" id="dcbtn">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+    <button id="theme-toggle" onclick="toggleTheme()" aria-label="Impostazioni (tema, font e sonoro)">⚙️</button>
+    <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" id="dcbtn" aria-label="Server Discord">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
       Discord
     </a>
-    <div id="hamburger" onclick="toggleMobileNav()" aria-label="Menu" role="button">
+    <div id="hamburger" onclick="toggleMobileNav()" aria-label="Apri menu di navigazione" role="button" tabindex="0">
       <div class="hbr-bar"></div>
       <div class="hbr-bar"></div>
       <div class="hbr-bar"></div>
@@ -222,7 +222,7 @@
       <div id="hero-particles" aria-hidden="true"></div>
       <div id="ctrack">
         <!-- SLIDE 1 -->
-        <div class="slide active" style="background-image:url('/cover.png');background-size:cover;background-position:center 40%">
+        <div class="slide active" style="background-image:url('/cover.webp');background-size:cover;background-position:center 40%">
           <div class="scnt">
             <div class="stag">Città Portuale — Marche di Arcamis</div>
             <div class="stit">ARCAMIS</div>
@@ -279,7 +279,7 @@
       <div class="sec-h">MARCHE DI ARCAMIS</div>
       <p class="sec-p">La città portuale di Arcamis e i territori circostanti. Un piccolo angolo di un regno molto più vasto, ancora in gran parte sconosciuto.</p>
       <div class="map-container" id="arcamis-map" style="border-radius:2px;position:relative;overflow:hidden;background:#030608;line-height:0">
-        <img src="/mappa.png" alt="Mappa delle Marche di Arcamis" style="width:100%;display:block;pointer-events:none" draggable="false"/>
+        <img src="/mappa.webp" alt="Mappa delle Marche di Arcamis" style="width:100%;display:block;pointer-events:none" draggable="false"/>
 
         <div class="mpin t-city" id="mpin-arcamis" data-explored="true" style="left:87.76%;top:28.53%" data-id="3090274fdc1c80e1a365ce1c36873455" data-name="Arcamis" data-desc="Città portuale delle Marche. Porto, commercio, avventura." data-sub=""><div class="mpin-ring"></div><div class="mpin-dot"></div></div>
         <div class="mpin t-forest" id="mpin-selvafoglia" data-explored="true" style="left:78.58%;top:24.05%" data-id="30d0274fdc1c800999feeb0ca6669b22" data-name="Selva Fogliabruna" data-desc="Alberi troppo vecchi. Chi entra non sempre torna." data-sub="foglia"><div class="mpin-ring"></div><div class="mpin-dot"></div></div>

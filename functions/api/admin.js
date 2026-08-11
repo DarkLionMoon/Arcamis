@@ -63,16 +63,38 @@ export async function onRequest(context) {
     } catch(_) {}
   }
 
+  /* ── Helper: rate limit per IP (brute force) ── */
+  async function rateLimitReached() {
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const key = 'rl_admin_login_' + ip;
+    try {
+      const raw = await KV.get(key);
+      const count = raw ? parseInt(raw, 10) : 0;
+      if (count >= 5) return true;
+      await KV.put(key, String(count + 1), { expirationTtl: 15 * 60 });
+    } catch (_) {}
+    return false;
+  }
+
+  async function resetRateLimit() {
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    try { await KV.delete('rl_admin_login_' + ip); } catch (_) {}
+  }
+
   /* ════ LOGIN ════ */
   if (action === 'login' && request.method === 'POST') {
     let body;
     try { body = await request.json(); } catch (e) {
       return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
     }
+    if (await rateLimitReached()) {
+      return new Response(JSON.stringify({ error: 'Troppi tentativi, riprova più tardi' }), { status: 429, headers: cors });
+    }
     if (!body.password || body.password !== ADMIN_SECRET) {
       await new Promise(r => setTimeout(r, 800));
       return new Response(JSON.stringify({ error: 'Password errata' }), { status: 401, headers: cors });
     }
+    await resetRateLimit();
 
     /* Scegli TTL in base a "ricordami" */
     const remember = !!body.remember;

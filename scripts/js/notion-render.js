@@ -82,7 +82,9 @@ function rt(arr){
         var ni=pages.find(function(n){return n.id===m[1]});
         return'<a class="rl" onclick="gp(\''+m[1]+'\',\''+(ni?ni.l.replace(/'/g,"\\'"):'Pagina')+'\',\''+(ni?ni.i:'📄')+'\')">'+inner+'</a>';
       }
-      return'<a href="'+r.href+'" target="_blank" rel="noopener" class="rl">'+inner+'</a>';
+      var cleanHref=_cleanHref(r.href);
+      if(!cleanHref) return inner;
+      return'<a href="'+cleanHref+'" target="_blank" rel="noopener" class="rl">'+inner+'</a>';
     }
     return inner;
   }).join('');
@@ -98,6 +100,44 @@ function calloutColor(ic){
 }
 
 function safeHost(url){try{return new URL(url).hostname;}catch(e){return url;}}
+
+/* Sanitizza un URL per href/src: solo protocolli sicuri, escape degli attributi */
+function _cleanHref(url){
+  if(!url) return null;
+  var t = String(url).replace(/[\u0000-\u001f\u007f]/g, '').trim();
+  var m = t.match(/^([a-z][a-z0-9+.\-]*):/i);
+  var proto = m ? m[1].toLowerCase() : '';
+  if(proto && ['http','https','mailto'].indexOf(proto) === -1) return null;
+  return t.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/* Scrub dell'HTML come stringa, PRIMA di qualsiasi innerHTML.
+   Rimuove tag pericolosi e handler JS, mantenendo i pochi onclick
+   generati dal renderer (gp, arcZoom, spSelectGroup, ecc.). */
+function _scrubHtmlString(html){
+  if(!html) return html;
+  html = String(html);
+  html = html.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/(script|style)\s*>/gi, '');
+  html = html.replace(/<(script|style|object|embed|base|meta|link|title)\b[^>]*>/gi, '');
+  html = html.replace(/<\/(script|style|object|embed|base|meta|link|title)\s*>/gi, '');
+  /* Handler JS (on*) — mantieni solo i pattern generati dal renderer */
+  html = html.replace(/\son\w+\s*=\s*(("[^"]*")|('[^']*')|[^\s>]+)/gi, function(m){
+    var nameM = m.match(/^(\s*on\w+)\s*=/i);
+    var name = nameM ? nameM[1].replace(/^on/i, '').toLowerCase() : '';
+    var valM = m.match(/=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
+    var val = (valM && (valM[1] || valM[2] || valM[3])) ? (valM[1] || valM[2] || valM[3]) : '';
+    if(name === 'click' && /^(gp|arcZoom|spSelectGroup|spSelectTab|dbLocNav|showHome|gpBack)\(/.test(val)) return m;
+    if(name === 'error' && val.indexOf('this.parentElement.style.display') > -1) return m;
+    return '';
+  });
+  /* URL non sicuri in href/src/srcdoc */
+  html = html.replace(/\s(href|src|srcdoc|xlink:href)\s*=\s*(["'])(.*?)\2/gi, function(m, attr, q, url){
+    url = (url || '').trim();
+    if(/^(https?:|mailto:|#|\/|data:image\/|blob:)/i.test(url)) return m;
+    return ' data-arc-blocked="1"';
+  });
+  return html;
+}
 
 /* ════════════════════════════════════
    renderBlocks
@@ -207,7 +247,7 @@ function renderBlocks(blocks,isRoot){
                 var freshUrl=data.url;
                 var fig=document.getElementById('nimg-'+blockId);
                 if(!fig)return;
-                fig.innerHTML='<img src="'+freshUrl+'" loading="lazy" class="n-zoomable" onclick="arcZoom(\''+freshUrl+'\')" onerror="this.parentElement.style.display=\'none\'"/>'
+                fig.innerHTML=_scrubHtmlString('<img src="'+freshUrl+'" loading="lazy" class="n-zoomable" onclick="arcZoom(\''+freshUrl+'\')" onerror="this.parentElement.style.display=\'none\'"/>')
                   +(caption?'<figcaption class="n-figcap">'+caption+'</figcaption>':'');
               })
               .catch(function(){
@@ -242,7 +282,9 @@ function renderBlocks(blocks,isRoot){
         }else if(vime){
           h+='<div class="n-video"><iframe src="https://player.vimeo.com/video/'+vime[1]+'" allowfullscreen loading="lazy"></iframe></div>';
         }else{
-          h+='<a href="'+eu+'" target="_blank" rel="noopener" class="n-embed">'
+          var _eu=_cleanHref(eu);
+          if(!_eu) break;
+          h+='<a href="'+_eu+'" target="_blank" rel="noopener" class="n-embed">'
             +'<div class="n-embed-icon">🔗</div>'
             +'<div class="n-embed-body">'
             +(d.caption&&d.caption.length?'<div class="n-bkm-label">'+rt(d.caption)+'</div>':'')
@@ -253,9 +295,10 @@ function renderBlocks(blocks,isRoot){
 
       case'pdf':
         var pu=d.type==='external'?d.external&&d.external.url:d.file&&d.file.url;
-        if(pu){
+        var _pu=_cleanHref(pu);
+        if(_pu){
           var pcap=d.caption&&d.caption.length?d.caption.map(function(t){return t.plain_text}).join(''):'Documento PDF';
-          h+='<a href="'+pu+'" target="_blank" rel="noopener" class="n-pdf">'
+          h+='<a href="'+_pu+'" target="_blank" rel="noopener" class="n-pdf">'
             +'<div class="n-pdf-icon">📄</div>'
             +'<div><div class="n-pdf-label">'+pcap+'</div>'
             +'<div class="n-pdf-hint">Apri PDF →</div></div></a>';
@@ -264,10 +307,13 @@ function renderBlocks(blocks,isRoot){
 
       case'link_preview':
         var lpu=d.url||'#';
-        h+='<a href="'+lpu+'" target="_blank" rel="noopener" class="n-bkm">'
-          +'<div class="n-bkm-body"><div class="n-bkm-label">'+safeHost(lpu)+'</div>'
-          +'<div class="n-bkm-url">'+lpu+'</div></div>'
-          +'<div class="n-bkm-arr">→</div></a>';
+        var _lpu=_cleanHref(lpu);
+        if(_lpu){
+          h+='<a href="'+_lpu+'" target="_blank" rel="noopener" class="n-bkm">'
+            +'<div class="n-bkm-body"><div class="n-bkm-label">'+safeHost(lpu)+'</div>'
+            +'<div class="n-bkm-url">'+lpu+'</div></div>'
+            +'<div class="n-bkm-arr">→</div></a>';
+        }
         break;
 
       case'synced_block':
@@ -375,6 +421,7 @@ if(cpCoverSafe){
     }
   }
 
+  h = _scrubHtmlString(h);
   var tmp=document.createElement('div');tmp.innerHTML=h;
   ['ul','ol'].forEach(function(tag){
     tmp.querySelectorAll(tag).forEach(function(el){
@@ -700,13 +747,13 @@ window.spSelect=function(el,id,title,icon){
     .then(function(data){
       if(!data.blocks)throw new Error('no blocks');
       var html=renderBlocks(data.blocks,true);
-      content.innerHTML='<div class="n-body">'
+      content.innerHTML=_scrubHtmlString('<div class="n-body">'
         +'<div class="sp-content-title">'
         +(icon&&icon!=='📄'?'<span style="font-size:1.4em;margin-right:10px">'+icon+'</span>':'')
         +title
         +'</div>'
         +html
-        +'</div>';
+        +'</div>');
     })
     .catch(function(){
       content.innerHTML='<div style="color:rgba(200,155,60,.4);font-family:Cinzel,serif;font-size:11px;padding:40px;text-align:center">Errore caricamento</div>';
@@ -724,10 +771,10 @@ window.spSelectGroup = function(el, gruppo) {
   var contentEl = document.getElementById('sp-content');
   if (!tabsEl || !contentEl) return;
 
-  tabsEl.innerHTML = sottospecie.map(function(p) {
-    var titleSafe = p.title.replace(/'/g, "\\'");
+  tabsEl.innerHTML = _scrubHtmlString(sottospecie.map(function(p) {
+    var titleSafe = p.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g, "\\'");
     return '<div class="sp-tab" onclick="spSelectTab(this,\'' + p.id + '\',\'' + titleSafe + '\',\'' + p.icon + '\')">' + p.title + '</div>';
-  }).join('');
+  }).join(''));
 
   contentEl.innerHTML = '<div class="sp-placeholder">↑ Seleziona una sotto-specie</div>';
 
@@ -755,14 +802,14 @@ window.spSelectTab=function(el,pageId,title,icon){
     .then(function(data){
       if(!data.blocks)throw new Error('no blocks');
       var html=renderBlocks(data.blocks,true);
-      contentEl.innerHTML=
+      contentEl.innerHTML=_scrubHtmlString(
         '<div class="n-body">'+
           '<div class="sp-content-title">'+
           (icon&&icon!=='📄'?'<span style="font-size:1.4em;margin-right:10px">'+icon+'</span>':'')+
           title+
           '</div>'+
           html+
-        '</div>';
+        '</div>');
     })
     .catch(function(){
       contentEl.innerHTML='<div style="color:rgba(200,155,60,.4);font-family:Cinzel,serif;font-size:11px;padding:40px;text-align:center">Errore caricamento</div>';

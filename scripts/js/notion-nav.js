@@ -10,6 +10,11 @@ var navStack = [];
 /* ════ MARKDOWN → HTML (per JSON locali) ════ */
 function _mdToHtml(md){
   if(!md) return '';
+  /* Proteggi i marker di blockquote, poi neutralizza l'HTML grezzo */
+  var Q = '\u0000Q\u0000';
+  md = md.replace(/^> (.*)$/gm, Q + '$1');
+  md = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  md = md.replace(/\u0000Q\u0000/g, '> ');
   /* Code blocks */
   md = md.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
   /* Inline code */
@@ -42,10 +47,19 @@ function _mdToHtml(md){
   md = md.replace(/^\d+\. (.+)$/gm, '<li class="n-li">$1</li>');
   /* Wrap consecutive li in ul */
   md = md.replace(/((?:<li class="n-li">.*<\/li>\n?)+)/g, '<ul class="n-ul">$1</ul>');
-  /* Links */
-  md = md.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="n-link">$1</a>');
-  /* Images */
-  md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="n-image">');
+  /* Links — solo URL sicuri (decodifica l'escape iniziale, valida, ri-escappa) */
+  md = md.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, label, url){
+    var u = (url || '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+    if(!/^(https?:|mailto:|#|\/)/i.test(u)) return label;
+    return '<a href="'+u.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')+'" target="_blank" rel="noopener" class="n-link">'+label+'</a>';
+  });
+  /* Images — solo URL sicuri */
+  md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(m, alt, url){
+    var u = (url || '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+    var safeAlt = (alt || '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if(!/^(https?:|#|\/|data:image\/)/i.test(u)) return '';
+    return '<img src="'+u.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')+'" alt="'+safeAlt+'" loading="lazy" class="n-image">';
+  });
   /* Paragraphs */
   md = md.replace(/\n\n/g, '</p><p class="n-p">');
   md = md.replace(/\n/g, '<br>');
@@ -333,7 +347,7 @@ async function _gpRender(id,label,icon){
             + '<div class="n-empty-msg">Questa pagina non ha ancora contenuto.</div></div>';
           var _footer = '<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
             + '<div class="n-page-footer-text">Archivi di Arcamis — ' + ptitle + '</div></div>';
-          pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + (_localHtml || _emptyHtml) + _footer + '</div>';
+          pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + (_scrubHtmlString(_localHtml || '') || _emptyHtml) + _footer + '</div>';
           applyGlossary(pbody);
           if(typeof afterPageRender === 'function') afterPageRender();
           return;
@@ -395,7 +409,7 @@ async function _gpRender(id,label,icon){
       var firstImg=bl.find(function(blk){return blk.type==='image';});
       if(firstImg){var fi=firstImg.image;coverUrl=fi&&fi.type==='external'?fi.external.url:(fi&&fi.file&&fi.file.url);}
     }
-    if(coverUrl){
+    if(coverUrl && /^(https?:|data:image\/|blob:)/i.test(coverUrl)){
       phCovbg.style.backgroundImage='url("'+coverUrl+'")';
       phOverlay.style.opacity='1';
       phIcon.style.opacity='0';
@@ -425,7 +439,7 @@ async function _gpRender(id,label,icon){
       +'<div class="n-empty-msg">Questa pagina non ha ancora contenuto.</div></div>';
     var footer='<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
       +'<div class="n-page-footer-text">Archivi di Arcamis — '+ptitle+'</div></div>';
-    pbody.innerHTML='<div class="nc" style="animation:fi .22s ease forwards">'+(html||emptyHtml)+footer+'</div>';
+    pbody.innerHTML='<div class="nc" style="animation:fi .22s ease forwards">'+(_scrubHtmlString(html||'')||emptyHtml)+footer+'</div>';
     if(pbody.querySelector('.pb-wide-trigger')){
       pbody.style.maxWidth='none';
       pbody.style.width='100%';

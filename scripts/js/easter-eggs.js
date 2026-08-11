@@ -696,7 +696,7 @@
   var SOUNDS = [
     '/audio/footsteps.mp3',
     '/audio/door-knock.mp3',
-    '/audio/whale-song.mp3',
+    '/audio/whale_song.mp3',
   ];
   var IDLE_DELAY   = 10000;
   var FADE_IN_MS   = 3000;

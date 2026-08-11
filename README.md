@@ -1,149 +1,81 @@
 # Arcamis Wiki — Static Version
 
-Zero dipendenze da Notion API. Il sito legge solo file JSON locali.
+Wiki statica per la campagna D&D Arcamis, deployata su Cloudflare Pages.
+Contenuto servito da JSON locali; API Functions come fallback Notion.
 
 ---
 
-## Come aggiornare il contenuto
-
-### 1. Esporta da Notion
-
-In Notion, per ogni pagina che vuoi aggiornare:
-
-1. Apri la pagina
-2. Clicca `...` (tre puntini) in alto a destra
-3. **Export** → **Markdown & CSV** oppure **HTML**
-4. Formato consigliato: **HTML** (mantiene più formattazione)
-5. Includi sottopagine se necessario
-
-### 2. Converti con lo script
-
-```bash
-# Estrai lo zip dell'export in una cartella
-unzip notion-export.zip -d ./notion-export/
-
-# Lancia lo script
-node scripts/import-notion.js ./notion-export/
-
-# I file JSON vengono creati in: public/data/pages/<id>.json
-```
-
-### 3. Carica su GitHub
-
-```bash
-git add public/data/
-git commit -m "Aggiorna contenuto wiki"
-git push
-```
-
-Vercel/Cloudflare Pages deploya automaticamente in ~30 secondi.
-
----
-
-## Struttura file
+## Struttura
 
 ```
 /
-├── index.html          ← Home page (non toccare)
-├── app.js              ← Logica UI
-├── notion-render.js    ← Renderer pagine (no API)
-├── data.js             ← Registro pagine e ID
-├── style-base.css      ← CSS base
-├── style-page.css      ← CSS pagine interne
-├── style-fx.css        ← CSS effetti
-├── fx.js               ← Animazioni e effetti
-├── sw.js               ← Service Worker (cache)
-├── vercel.json         ← Config deployment
+├── index.html              ← SPA (home + routing)
+├── _headers                ← CSP + header di sicurezza
+├── _redirects              ← Redirect + SPA fallback
+├── _routes.json            ← Regole routing Cloudflare Functions
+├── sw.js                   ← Service worker (cache)
+├── robots.txt
+├── sitemap.xml
+│
 ├── scripts/
-│   └── import-notion.js ← Script conversione export
-└── data/
-    ├── pages/
-    │   ├── 2f00274fdc1c8065a11ff45192aa5dcb.json  ← Gameplay
-    │   ├── 2f00274fdc1c800b9d8fc366e8e40c5c.json  ← Regole
-    │   └── ...
-    └── db/
-        └── *.json  ← Database Notion (gallerie)
+│   ├── css/*.css           ← Stili (base, home, page, notion, fx, ui, …)
+│   ├── js/*.js             ← Logica SPA
+│   └── import-notion.js    ← Script export Notion → JSON (Node)
+│
+├── content/
+│   ├── pages/*.json        ← Pagine in markdown (usate dal client)
+│   ├── docs/*.json         ← Documenti HTML da Google Docs (codice, patenti)
+│   ├── db/*.json           ← Snapshot database (riferimento, non serviti)
+│   └── mestieri/*.json     ← Dati mestieri (riferimento, non serviti)
+│
+├── functions/api/*.js      ← Cloudflare Pages Functions
+├── admin/index.html        ← Pannello amministrazione
+├── export/index.html       ← Tool export contenuti
+└── audio/                  ← Effetti sonori (ambient, footsteps, …)
 ```
 
----
+## Contenuto
 
-## Aggiungere una pagina manualmente
+- **Pagine**: `content/pages/<slug>.json` con campo `content` in markdown.
+  Il client le legge localmente (`notion-nav.js` → `_gpRender`); se mancano,
+  ricade su `/api/notion?pageId=…`.
+- **Documenti** (`codice`, `patenti`): HTML da Google Docs in `content/docs/`.
+  Renderizzati da `codice-giuridico.js` e `patenti-arcadia.js`.
+- **Database/gallerie**: serviti via API `/api/notion?dbId=…` (Notion live).
+- **Ricerca**: `/api/search`, indici costruiti con `/api/build-index`.
+- `content/db/`, `content/mestieri/` e `content/docs/come-funzionano.json`
+  non sono più letti dal client: sono mantenuti come snapshot di riferimento.
 
-Se non vuoi usare lo script, puoi creare un JSON a mano in `data/pages/<id>.json`:
+## Aggiornare una pagina
 
-```json
-{
-  "page": {
-    "id": "NOTION_PAGE_ID_32CHARS",
-    "icon": { "emoji": "⚔️" },
-    "cover": null,
-    "properties": {
-      "title": {
-        "title": [{ "plain_text": "Nome Pagina" }]
-      }
-    }
-  },
-  "blocks": [
-    {
-      "type": "paragraph",
-      "paragraph": {
-        "rich_text": [{ "plain_text": "Testo del paragrafo.", "annotations": {}, "href": null }]
-      }
-    },
-    {
-      "type": "heading_1",
-      "heading_1": {
-        "rich_text": [{ "plain_text": "Titolo Sezione", "annotations": {}, "href": null }]
-      }
-    }
-  ]
-}
+Modifica `content/pages/<slug>.json` (campo `content`, markdown):
+
+```bash
+git add content/pages/regole.json
+git commit -m "Aggiorna pagina regole"
+git push
 ```
 
-### Tipi di blocco supportati
+Cloudflare Pages deploya automaticamente.
 
-| Tipo | Descrizione |
-|------|-------------|
-| `paragraph` | Paragrafo testo |
-| `heading_1` / `heading_2` / `heading_3` | Titoli |
-| `bulleted_list_item` | Lista puntata |
-| `numbered_list_item` | Lista numerata |
-| `quote` | Citazione |
-| `callout` | Box callout colorato |
-| `toggle` | Sezione espandibile |
-| `divider` | Separatore `✦` |
-| `code` | Blocco codice |
-| `image` | Immagine |
-| `video` | Video (YouTube/Vimeo/file) |
-| `embed` | Link embed |
-| `pdf` | Link PDF |
-| `bookmark` | Link bookmark |
-| `table` | Tabella |
-| `column_list` | Layout a colonne |
-| `to_do` | Checkbox |
-| `child_page` | Link a sottopagina (carousel) |
-| `child_database` | Database Notion (carousel) |
+## Sicurezza
 
----
+- `_headers` definisce una CSP restrittiva (`script-src 'self' 'unsafe-inline'`,
+  iframe YouTube/Vimeo, CDN cdnjs per three.js) + X-Frame-Options, nosniff,
+  Referrer-Policy, Permissions-Policy.
+- Rate limiting sulle API sensibili (`/api/admin`, `/api/send-help`) via KV
+  (`env.ARCAMIS_CACHE`), basato su `CF-Connecting-IP`.
+- Sanitizzazione XSS in `notion-render.js` (`_scrubHtmlString`, `_cleanHref`)
+  e in `notion-nav.js` (`_mdToHtml` escape dell'input).
 
 ## Deployment
 
-### Vercel
-```bash
-vercel --prod
-```
-Nessun build command necessario. Output directory: `.` (root).
-
-### Cloudflare Pages
+Cloudflare Pages:
 - Build command: *(vuoto)*
-- Output directory: `/`
+- Output directory: `/` (root)
+- Funzioni in `functions/`
 
-### GitHub Pages
-Aggiungi un file `.nojekyll` nella root e abilita Pages dal branch main.
-
----
-
-## ID Pagine di riferimento
+## ID pagine Notion di riferimento
 
 | Pagina | ID |
 |--------|----|
@@ -154,14 +86,6 @@ Aggiungi un file `.nojekyll` nella root e abilita Pages dal branch main.
 | Andando avanti | `5cea525d149f4acb9c59007bf6b3d5ff` |
 | Galleria PG | `2fd0274fdc1c80d8b948c4133f874f28` |
 | Biblioteca | `2f00274fdc1c8089bfe6c24434d53b67` |
-| Bottega farmaceutica | `2f00274fdc1c801c9697e75caa8d5f13` |
-| Caserma | `2ff0274fdc1c80688dd6c2b293a1f626` |
-| Corporazione | `2ff0274fdc1c80769a4ae243f22f0582` |
-| Forgia | `2f00274fdc1c805ca01ec57f18d2ffee` |
-| Gilda avventurieri | `2f00274fdc1c801b8c13cefd9e15694e` |
-| Locanda | `2f00274fdc1c80faa99eda064ef0fabc` |
-| Ospedale | `2f00274fdc1c807aa03cc6cbeb3687cc` |
-| Sartoria | `2ff0274fdc1c8035bad4f0b6ab705192` |
 | Pantheon | `2f00274fdc1c80679bd3c3df8a1fa040` |
 | Changelog | `3000274fdc1c8033a214c44a1aa7f01f` |
 | Maestria / Titoli | `2f00274fdc1c802a9babd4239d97a319` |

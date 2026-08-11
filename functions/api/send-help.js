@@ -18,6 +18,21 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ error: 'Webhook non configurato' }), { status: 500, headers: cors });
   }
 
+  /* ── Rate limit per IP: max 3 messaggi / ora ── */
+  const KV = env.ARCAMIS_CACHE;
+  if (KV) {
+    try {
+      const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+      const rlKey = 'rl_help_' + ip;
+      const raw = await KV.get(rlKey);
+      const count = raw ? parseInt(raw, 10) : 0;
+      if (count >= 3) {
+        return new Response(JSON.stringify({ error: 'Hai già inviato più messaggi. Riprova più tardi.' }), { status: 429, headers: cors });
+      }
+      await KV.put(rlKey, String(count + 1), { expirationTtl: 3600 });
+    } catch (_) {}
+  }
+
   let body;
   try { body = await request.json(); } catch (e) {
     return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });

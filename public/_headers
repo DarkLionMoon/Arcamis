@@ -1,7 +1,12 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), autoplay=(self)
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https: http:; media-src 'self' blob: https:; frame-src https://www.youtube.com https://player.vimeo.com; connect-src 'self' https://discord.com https://arcamis.pages.dev https://docs.google.com; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+
 /content/*
-  Cache-Control: no-cache, no-store, must-revalidate
-  Pragma: no-cache
-  Expires: 0
+  Cache-Control: public, max-age=0, must-revalidate
 
 /admin/*
   Cache-Control: no-cache, no-store, must-revalidate

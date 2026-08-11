@@ -193,6 +193,8 @@ document.addEventListener('keydown', function(e){
       e.preventDefault(); el.click();
     } else if(el.classList.contains('bnav-item')){
       e.preventDefault(); el.click();
+    } else if(el.getAttribute('role')==='button'){
+      e.preventDefault(); el.click();
     }
   }
   if(e.key==='Escape'){
