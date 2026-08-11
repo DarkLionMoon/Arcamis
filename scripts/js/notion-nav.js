@@ -58,7 +58,8 @@ function _mdToHtml(md){
     var u = (url || '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
     var safeAlt = (alt || '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     if(!/^(https?:|#|\/|data:image\/)/i.test(u)) return '';
-    return '<img src="'+u.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')+'" alt="'+safeAlt+'" loading="lazy" class="n-image">';
+    var jsUrl = u.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    return '<img src="'+u.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')+'" alt="'+safeAlt+'" loading="lazy" class="n-image n-zoomable" onclick="arcZoom(\''+jsUrl+'\')">';
   });
   /* Paragraphs */
   md = md.replace(/\n\n/g, '</p><p class="n-p">');

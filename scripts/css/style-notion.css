@@ -98,6 +98,14 @@
   transition:transform .4s ease;
 }
 .n-image:hover img{transform:scale(1.01)}
+/* Immagini markdown (img diretto con classe n-image): adattate al layout */
+img.n-image{
+  display:block;width:auto;max-width:100%;height:auto;max-height:72vh;
+  margin:24px auto;
+  border:1px solid rgba(200,155,60,.15);
+  border-radius:4px;
+  box-shadow:0 12px 40px rgba(0,0,0,.75);
+}
 .n-figcap{
   position:absolute;bottom:0;left:0;right:0;
   padding:8px 14px;
@@ -255,8 +263,9 @@ table.n-tbl tr:hover td{background:rgba(200,155,60,.05)}
   .n-db-grid{grid-template-columns:repeat(2,1fr)!important}
 }
 @media(max-width:768px){
-  .n-image img{width:100%!important;height:auto!important;max-width:100%!important}
+  .n-image img,img.n-image{width:100%!important;height:auto!important;max-width:100%!important;max-height:none}
   figure.n-image{margin:16px 0}
+  img.n-image{margin:16px auto}
   .n-twrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .n-tbl{min-width:400px}
   .n-code{overflow-x:auto;-webkit-overflow-scrolling:touch;font-size:12px}
