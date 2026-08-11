@@ -1,0 +1,8 @@
+{
+  "k": "la-storia-di-gandora",
+  "title": "La Storia di Gandora",
+  "icon": "🐉",
+  "content": "## Nome dell'Evento\n\nBreve descrizione dell'evento.\n\n- **Data:** [data]\n- **Luogo:** [luogo]\n- **Organizzatori:** Chi lo promuove\n\n### Antefatti\n\nCosa e successo prima dell'evento.\n\n### Svolgimento\n\nCome si e svolto l'evento.\n\n### Partecipanti\n\n- Persona 1: ruolo\n- Persona 2: ruolo\n\n### Conseguenze\n\nEffetti dell'evento sul mondo o sulla storia.",
+  "layout": "evento",
+  "lastModified": "2026-08-11T19:20:44.766Z"
+}
