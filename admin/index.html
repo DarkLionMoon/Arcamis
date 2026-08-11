@@ -86,6 +86,9 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .btn-primary{background:var(--gold);color:var(--bg)}
 .btn-primary:hover{background:var(--gold2);box-shadow:0 0 16px rgba(200,155,60,.25)}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-danger{background:none;border:1px solid var(--red);color:var(--red)}
+.btn-danger:hover{background:var(--red);color:var(--bg)}
+.btn-danger:disabled{opacity:.4;cursor:not-allowed}
 
 /* Layout select */
 .layout-select{background:var(--bg3);border:1px solid var(--bdr);border-radius:5px;color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 10px;cursor:pointer;outline:none;transition:border-color .15s;max-width:260px}
@@ -299,6 +302,14 @@ async function ghPutBinary(path,msg,dataUri){
   if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
   if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
 }
+/* Elimina un file dal repo (serve lo sha del file) */
+async function ghDelete(path,msg,sha){
+  var headers=_authHeaders();
+  async function del(s){var body={message:msg,branch:GH_BRANCH};if(s)body.sha=s;return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'DELETE',headers:headers,body:JSON.stringify(body)})}
+  var r=await del(sha);
+  if(r.status===409){var f=await ghGet(path);r=await del(f.sha)}
+  if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+}
 
 /* ════════════════════════════════════
    AUTH
@@ -451,6 +462,7 @@ async function openPage(k){
   h+='<div class="editor-actions">';
   h+='<select id="e-layout" class="layout-select" onchange="onLayoutChange(this.value)">'+layoutOpts+'</select>';
   h+='<button class="btn btn-ghost" onclick="toggleJson()">JSON</button>';
+  if(meta&&meta.c)h+='<button class="btn btn-danger" id="del-btn" onclick="deletePage()">ELIMINA</button>';
   h+='<button class="btn btn-primary" id="save-btn" onclick="savePage()">SALVA</button>';
   h+='</div></div>';
   h+=tb;
@@ -704,8 +716,8 @@ async function createNewPage(){
     await ghPut(CONTENT+'/pages/'+slug+'.json','admin: create page '+slug,JSON.stringify(json,null,2),null);
     await addToDataJs(slug,label,icon,id,sec);
     await addToPathMap(slug,id,sec);
-    await addToAdminPages(slug,label,icon);
-    PAGES.push({k:slug,l:label,i:icon});
+    await addToAdminPages(slug,label,icon,sec);
+    PAGES.push({k:slug,l:label,i:icon,sec:sec,c:1});
     buildSidebar();
     closeNewPageModal();
     toast('Pagina "'+label+'" creata! Deploy in corso (~30s)...','success');
@@ -720,6 +732,15 @@ async function createNewPage(){
     if(btn)btn.disabled=false;
   }
 }
+function _arrayInsert(s,marker,close,entry){
+  var start=s.indexOf(marker);
+  if(start===-1)throw new Error('Marker non trovato: '+marker);
+  var end=s.indexOf(close,start);
+  if(end===-1)throw new Error('Chiusura non trovata: '+close);
+  var before=s.slice(0,end).replace(/\s+$/,'');
+  if(before.slice(-1)!==',')before+=',';
+  return before+'\n'+entry+s.slice(end);
+}
 /* Registra la nuova pagina in data.js (array pages) */
 async function addToDataJs(slug,label,icon,id,sec){
   var d=await ghGet('scripts/js/data.js');
@@ -730,7 +751,7 @@ async function addToDataJs(slug,label,icon,id,sec){
   if(end===-1)throw new Error('data.js: chiusura pages non trovata');
   if(s.slice(start,end).indexOf("k:'"+slug+"'")!==-1)throw new Error('Pagina già registrata in data.js');
   var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+', id:'+JSON.stringify(id)+', sec:'+JSON.stringify(sec)+'},\n';
-  await ghPut('scripts/js/data.js','admin: add page '+slug+' to registry',s.slice(0,end)+entry+s.slice(end),d.sha);
+  await ghPut('scripts/js/data.js','admin: add page '+slug+' to registry',_arrayInsert(s,'var pages = [','];',entry),d.sha);
 }
 /* Registra l'URL pulito in app.js (_pathMap) */
 async function addToPathMap(slug,id,sec){
@@ -743,10 +764,10 @@ async function addToPathMap(slug,id,sec){
   var path=sec?(sec+'/'+slug):slug;
   if(s.slice(start,end).indexOf("'"+path+"'")!==-1)throw new Error('URL già registrato: /'+path);
   var entry='  '+JSON.stringify(path)+': '+JSON.stringify(id)+',\n';
-  await ghPut('scripts/js/app.js','admin: add page '+slug+' to path map',s.slice(0,end)+entry+s.slice(end),d.sha);
+  await ghPut('scripts/js/app.js','admin: add page '+slug+' to path map',_arrayInsert(s,'var _pathMap = {','};',entry),d.sha);
 }
 /* Registra la pagina nella sidebar dell'admin stesso (PAGES) */
-async function addToAdminPages(slug,label,icon){
+async function addToAdminPages(slug,label,icon,sec){
   var d=await ghGet('admin/index.html');
   var s=decodeURIComponent(escape(atob(d.content)));
   var start=s.indexOf('var PAGES = [');
@@ -754,8 +775,74 @@ async function addToAdminPages(slug,label,icon){
   var end=s.indexOf('];',start);
   if(end===-1)throw new Error('admin: chiusura PAGES non trovata');
   if(s.slice(start,end).indexOf("k:'"+slug+"'")!==-1)throw new Error('Pagina già in PAGES');
-  var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+'},\n';
-  await ghPut('admin/index.html','admin: add page '+slug+' to sidebar',s.slice(0,end)+entry+s.slice(end),d.sha);
+  var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+', sec:'+JSON.stringify(sec)+', c:1},\n';
+  await ghPut('admin/index.html','admin: add page '+slug+' to sidebar',_arrayInsert(s,'var PAGES = [','];',entry),d.sha);
+}
+
+/* ════════════════════════════════════
+   ELIMINA PAGINA / SEZIONE
+   ════════════════════════════════════ */
+function _removeLine(s,re){
+  var lines=s.split('\n');
+  for(var i=0;i<lines.length;i++){
+    if(re.test(lines[i])){lines.splice(i,1);return {s:lines.join('\n'),found:true}}
+  }
+  return {s:s,found:false};
+}
+function _cleanLastComma(s,marker,close){
+  var start=s.indexOf(marker);
+  if(start===-1)return s;
+  var end=s.indexOf(close,start);
+  if(end===-1)return s;
+  var before=s.slice(0,end).replace(/\s+$/,'');
+  if(before.slice(-1)!==',')return s;
+  return before.slice(0,-1)+'\n'+close+s.slice(end+close.length);
+}
+async function removeFromDataJs(slug){
+  var d=await ghGet('scripts/js/data.js');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var r=_removeLine(s,new RegExp('pag-'+slug));
+  if(r.found)await ghPut('scripts/js/data.js','admin: remove page '+slug+' from registry',_cleanLastComma(r.s,'var pages = [','];'),d.sha);
+}
+async function removeFromPathMap(slug){
+  var d=await ghGet('scripts/js/app.js');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var r=_removeLine(s,new RegExp('pag-'+slug));
+  if(r.found)await ghPut('scripts/js/app.js','admin: remove page '+slug+' from path map',_cleanLastComma(r.s,'var _pathMap = {','};'),d.sha);
+}
+async function removeFromAdminPages(slug){
+  var d=await ghGet('admin/index.html');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var r=_removeLine(s,new RegExp('k:["\']'+slug+'["\']'));
+  if(r.found)await ghPut('admin/index.html','admin: remove page '+slug+' from sidebar',_cleanLastComma(r.s,'var PAGES = [','];'),d.sha);
+}
+async function deletePage(){
+  if(!_current||_current.type!=='page')return;
+  var label=_current.title||_current.k;
+  if(!confirm('Eliminare definitivamente la pagina "'+label+'"?\n\nVerranno rimossi anche la voce dal menu del sito e l\'URL dedicato. Questa operazione non è reversibile.'))return;
+  var btn=document.getElementById('del-btn');
+  if(btn)btn.disabled=true;
+  setStatus('saving','eliminazione...');
+  var slug=_current.k;
+  try{
+    await ghDelete(CONTENT+'/pages/'+slug+'.json','admin: delete page '+slug,_current.sha);
+    await removeFromDataJs(slug);
+    await removeFromPathMap(slug);
+    await removeFromAdminPages(slug);
+    for(var i=0;i<PAGES.length;i++){if(PAGES[i].k===slug){PAGES.splice(i,1);break}}
+    _modified=false;
+    _current=null;
+    buildSidebar();
+    document.getElementById('main').innerHTML='<div class="main-empty"><div class="ico">🗑</div><p>Pagina eliminata</p></div>';
+    setTitle('Seleziona una voce dal menu');
+    toast('Pagina "'+label+'" eliminata! Deploy in corso (~30s)...','success');
+    setStatus('ok','deploying...');
+    startDeployTimer();
+  }catch(e){
+    setStatus('err','errore');
+    toast('Errore eliminazione: '+e.message,'error');
+    if(btn)btn.disabled=false;
+  }
 }
 
 /* ════════════════════════════════════

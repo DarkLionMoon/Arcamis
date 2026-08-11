@@ -95,6 +95,14 @@ Il sito è raggiungibile all'URL `/regole/<slug>`, `/lore/<slug>`, … (o
 `/<slug>` se nessuna sezione). Per una nuova sezione si intende una nuova
 voce in una delle sezioni del menu esistenti.
 
+### Eliminare una pagina
+
+Aprendo una pagina creata dall'admin compare il pulsante **ELIMINA** nell'editor
+(visibile solo per le pagine custom, contrassegnate da `c:1` in `PAGES`).
+L'eliminazione rimuove `content/pages/<slug>.json`, la registrazione in
+`data.js` e `_pathMap` e la voce dalla sidebar; la pagina scompare anche dal
+menu del sito dopo il deploy.
+
 ## Sicurezza
 
 - `_headers` definisce una CSP restrittiva (`script-src 'self' 'unsafe-inline'`,
