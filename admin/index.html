@@ -461,7 +461,8 @@ async function openPage(k){
   h+='<div class="editor-actions">';
   h+='<select id="e-layout" class="layout-select" onchange="onLayoutChange(this.value)">'+layoutOpts+'</select>';
   h+='<button class="btn btn-ghost" onclick="toggleJson()">JSON</button>';
-  if(meta&&meta.c)h+='<button class="btn btn-danger" id="del-btn" onclick="deletePage()">ELIMINA</button>';
+  h+='<button class="btn btn-ghost" onclick="openRenameModal()" title="Rinomina sezione / pagina">✏️ RINOMINA</button>';
+  h+='<button class="btn btn-danger" id="del-btn" onclick="deletePage()">ELIMINA</button>';
   h+='<button class="btn btn-primary" id="save-btn" onclick="savePage()">SALVA</button>';
   h+='</div></div>';
   h+=tb;
@@ -552,7 +553,7 @@ function openImgDialog(){
   if(alt)alt.focus();
 }
 function closeImgDialog(){var m=document.getElementById('img-modal');if(m)m.remove()}
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeImgDialog();closeNewPageModal()}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeImgDialog();closeNewPageModal();closeRenameModal()}});
 function imgFileSelected(input){
   var file=input.files&&input.files[0];
   if(!file){_imgDataUri=null;return}
@@ -800,14 +801,14 @@ function _cleanLastComma(s,marker,close){
 async function removeFromDataJs(slug){
   var d=await ghGet('scripts/js/data.js');
   var s=decodeURIComponent(escape(atob(d.content)));
-  var r=_removeLine(s,new RegExp('pag-'+slug));
+  var r=_removeLine(s,new RegExp('k:["\']'+slug+'["\']'));
   if(r.found)await ghPut('scripts/js/data.js','admin: remove page '+slug+' from registry',_cleanLastComma(r.s,'var pages = [','];'),d.sha);
 }
-async function removeFromPathMap(slug){
+async function removeFromPathMap(id){
   var d=await ghGet('scripts/js/app.js');
   var s=decodeURIComponent(escape(atob(d.content)));
-  var r=_removeLine(s,new RegExp('pag-'+slug));
-  if(r.found)await ghPut('scripts/js/app.js','admin: remove page '+slug+' from path map',_cleanLastComma(r.s,'var _pathMap = {','};'),d.sha);
+  var r=_removeLine(s,new RegExp('["\']\\s*:\\s*["\']'+id+'["\']'));
+  if(r.found)await ghPut('scripts/js/app.js','admin: remove page '+id+' from path map',_cleanLastComma(r.s,'var _pathMap = {','};'),d.sha);
 }
 async function removeFromAdminPages(slug){
   var d=await ghGet('admin/index.html');
@@ -817,29 +818,187 @@ async function removeFromAdminPages(slug){
 }
 async function deletePage(){
   if(!_current||_current.type!=='page')return;
+  var meta=PAGES.find(function(p){return p.k===_current.k});
+  var isCustom=!!(meta&&meta.c);
   var label=_current.title||_current.k;
-  if(!confirm('Eliminare definitivamente la pagina "'+label+'"?\n\nVerranno rimossi anche la voce dal menu del sito e l\'URL dedicato. Questa operazione non è reversibile.'))return;
+  var msg=isCustom
+    ?'Eliminare definitivamente la pagina "'+label+'"?\n\nVerranno rimossi contenuto, voce del menu e URL dedicato. Questa operazione non è reversibile.'
+    :'Eliminare la sezione "'+label+'"?\n\nAttenzione: è una sezione predefinita del sito. Verranno rimossi il contenuto locale, la voce dal menu (desktop e mobile), la card dalla home e l\'URL dedicato. Questa operazione non è reversibile.';
+  if(!confirm(msg))return;
   var btn=document.getElementById('del-btn');
   if(btn)btn.disabled=true;
   setStatus('saving','eliminazione...');
   var slug=_current.k;
   try{
-    await ghDelete(CONTENT+'/pages/'+slug+'.json','admin: delete page '+slug,_current.sha);
+    var id=await _getPageId(slug);
+    if(_current.sha)await ghDelete(CONTENT+'/pages/'+slug+'.json','admin: delete page '+slug,_current.sha);
     await removeFromDataJs(slug);
-    await removeFromPathMap(slug);
+    await removeFromPathMap(id);
     await removeFromAdminPages(slug);
+    if(id&&id.indexOf('pag-')!==0)await removeFromIndex(slug,id);
     for(var i=0;i<PAGES.length;i++){if(PAGES[i].k===slug){PAGES.splice(i,1);break}}
     _modified=false;
     _current=null;
     buildSidebar();
-    document.getElementById('main').innerHTML='<div class="main-empty"><div class="ico">🗑</div><p>Pagina eliminata</p></div>';
+    document.getElementById('main').innerHTML='<div class="main-empty"><div class="ico">🗑</div><p>'+esc(label)+' eliminata</p></div>';
     setTitle('Seleziona una voce dal menu');
-    toast('Pagina "'+label+'" eliminata! Deploy in corso (~30s)...','success');
+    toast('Sezione "'+label+'" eliminata! Deploy in corso (~30s)...','success');
     setStatus('ok','deploying...');
     startDeployTimer();
   }catch(e){
     setStatus('err','errore');
     toast('Errore eliminazione: '+e.message,'error');
+    if(btn)btn.disabled=false;
+  }
+}
+
+/* ════════════════════════════════════
+   RINOMINA SEZIONE / PAGINA
+   ════════════════════════════════════ */
+/* Recupera l'id (Notion o custom) della pagina dal registro data.js */
+async function _getPageId(slug){
+  try{
+    var d=await ghGet('scripts/js/data.js');
+    var s=decodeURIComponent(escape(atob(d.content)));
+    var m=s.match(new RegExp("k:[\"']"+slug+"[\"'][^}]*?id:[\"']([^\"']+)[\"']"));
+    return m?m[1]:null;
+  }catch(e){return null}
+}
+/* Sostituisce il valore di una chiave (l:/i:) in una riga di array JS */
+function _replaceKV(line,key,val){
+  var v=JSON.stringify(val);
+  return line.replace(new RegExp(key+":(\"[^\"]*\"|'[^']*')"),key+":"+v);
+}
+async function renameInDataJs(slug,label,icon){
+  var d=await ghGet('scripts/js/data.js');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var lines=s.split('\n');
+  var idx=-1;
+  for(var i=0;i<lines.length;i++){if(new RegExp('k:["\']'+slug+'["\']').test(lines[i])){idx=i;break}}
+  if(idx===-1)throw new Error('data.js: pagina '+slug+' non trovata');
+  lines[idx]=_replaceKV(lines[idx],'l',label);
+  lines[idx]=_replaceKV(lines[idx],'i',icon);
+  await ghPut('scripts/js/data.js','admin: rename page '+slug,lines.join('\n'),d.sha);
+}
+async function renameInAdminPages(slug,label,icon){
+  var d=await ghGet('admin/index.html');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var lines=s.split('\n');
+  var start=s.indexOf('var PAGES = [');
+  if(start===-1)throw new Error('admin: "var PAGES" non trovato');
+  var idx=-1;
+  for(var i=0;i<lines.length;i++){
+    if(new RegExp('k:["\']'+slug+'["\']').test(lines[i])&&s.indexOf(lines[i])>start){idx=i;break}
+  }
+  if(idx===-1)throw new Error('admin: pagina '+slug+' non trovata in PAGES');
+  lines[idx]=_replaceKV(lines[idx],'l',label);
+  lines[idx]=_replaceKV(lines[idx],'i',icon);
+  await ghPut('admin/index.html','admin: rename page '+slug+' in sidebar',lines.join('\n'),d.sha);
+}
+/* ── Sincronizzazione del menu hardcoded in index.html ── */
+function _gpArg(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function _rewriteIndexForPage(html,id,label,icon){
+  var L=_gpArg(label),I=_gpArg(icon),LH=esc(label),IH=esc(icon);
+  /* voce menu desktop */
+  html=html.replace(new RegExp("(<div class=\"tn-item\"[^>]*gp\\('"+id+"','[^']*','[^']*'\\)[^>]*>)<span class=\"tn-ii\">[^<]*</span>[^<]*(</div>)"),
+    "$1<span class=\"tn-ii\">"+IH+"</span>"+LH+"$2");
+  /* voce menu mobile */
+  html=html.replace(new RegExp("(<div class=\"mn-item\"[^>]*gp\\('"+id+"','[^']*','[^']*'\\)[^>]*>)<span class=\"mn-ii\">[^<]*</span>[^<]*(</div>)"),
+    "$1<span class=\"mn-ii\">"+IH+"</span>"+LH+"$2");
+  /* card home: icona */
+  html=html.replace(new RegExp("(<div class=\"lcard\"[^>]*gp\\('"+id+"','[^']*','[^']*'\\)[^>]*><div class=\"shine\"></div><div class=\"cthumb\"[^>]*>)<span>[^<]*</span>"),
+    "$1<span>"+IH+"</span>");
+  /* card home: titolo */
+  html=html.replace(new RegExp("(<div class=\"lcard\"[^>]*gp\\('"+id+"','[^']*','[^']*'\\)[^>]*>[^\\n]*?<div class=\"ctit\">)[^<]*(</div>)"),
+    "$1"+LH+"$2");
+  /* argomenti gp() ovunque (es. bottom nav) */
+  html=html.replace(new RegExp("gp\\('"+id+"','[^']*','[^']*'\\)"),"gp('"+id+"','"+L+"','"+I+"')");
+  return html;
+}
+function _removeIndexForPage(html,id){
+  html=html.replace(new RegExp("<div class=\"tn-item\"[^>]*gp\\('"+id+"','[^']*','[^']*'\\)[^>]*>[^\\n]*"),'');
+  html=html.replace(new RegExp("<div class=\"mn-item\"[^>]*gp\\('"+id+"','[^']*','[^']*'\\)[^>]*>[^\\n]*"),'');
+  html=html.replace(new RegExp("<div class=\"lcard\"[^>]*gp\\('"+id+"','[^']*','[^']*'\\)[^>]*>[^\\n]*"),'');
+  html=html.replace(new RegExp("<div class=\"bnav-item\"[^>]*gp\\('"+id+"','[^']*','[^']*'\\)[^>]*>[^\\n]*"),'');
+  return html;
+}
+async function renameInIndex(slug,id,label,icon){
+  if(id.indexOf('pag-')===0)return;
+  var d=await ghGet('index.html');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var out=_rewriteIndexForPage(s,id,label,icon);
+  if(out!==s)await ghPut('index.html','admin: rename page '+slug+' in nav',out,d.sha);
+}
+async function removeFromIndex(slug,id){
+  if(id.indexOf('pag-')===0)return;
+  var d=await ghGet('index.html');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var out=_removeIndexForPage(s,id);
+  if(out!==s)await ghPut('index.html','admin: remove page '+slug+' from nav',out,d.sha);
+}
+function openRenameModal(){
+  if(!_current||_current.type!=='page')return;
+  if(document.getElementById('rn-modal'))return;
+  var meta=PAGES.find(function(p){return p.k===_current.k});
+  var label=_current.title||(meta&&meta.l)||_current.k;
+  var icon=_current.icon||(meta&&meta.i)||'📄';
+  var d=document.createElement('div');
+  d.className='img-modal-backdrop';
+  d.id='rn-modal';
+  d.innerHTML='<div class="img-modal">'
+    +'<h3>✏️ Rinomina sezione / pagina</h3>'
+    +'<div class="img-field"><label>Nome</label>'
+    +'<input id="rn-label" value="'+esc(label)+'" onkeydown="if(event.key===\'Enter\')saveRename()"></div>'
+    +'<div class="img-field"><label>Icona (emoji)</label>'
+    +'<input id="rn-icon" value="'+esc(icon)+'" onkeydown="if(event.key===\'Enter\')saveRename()"></div>'
+    +'<div class="img-actions" style="margin-top:4px">'
+    +'<button class="btn btn-ghost" onclick="closeRenameModal()">Annulla</button>'
+    +'<button class="btn btn-primary" onclick="saveRename()">RINOMINA</button>'
+    +'</div></div>';
+  d.addEventListener('click',function(e){if(e.target===d)closeRenameModal()});
+  document.body.appendChild(d);
+  var l=document.getElementById('rn-label');
+  if(l)l.focus();
+}
+function closeRenameModal(){var m=document.getElementById('rn-modal');if(m)m.remove()}
+async function saveRename(){
+  if(!_current||_current.type!=='page')return;
+  var label=(document.getElementById('rn-label').value||'').trim();
+  var icon=(document.getElementById('rn-icon').value||'').trim()||'📄';
+  if(!label){toast('Inserisci un nome','error');return}
+  var slug=_current.k;
+  var btn=document.querySelector('#rn-modal .btn-primary');
+  if(btn)btn.disabled=true;
+  setStatus('saving','rinomina...');
+  try{
+    var id=await _getPageId(slug);
+    if(_current.sha){
+      var d=await ghGet(CONTENT+'/pages/'+slug+'.json');
+      var raw=decodeURIComponent(escape(atob(d.content)));
+      var json=JSON.parse(raw);
+      json.title=label;json.icon=icon;
+      var r=await ghPut(CONTENT+'/pages/'+slug+'.json','admin: rename page '+slug,JSON.stringify(json,null,2),d.sha);
+      if(r&&r.content&&r.content.sha)_current.sha=r.content.sha;
+    }
+    await renameInDataJs(slug,label,icon);
+    await renameInAdminPages(slug,label,icon);
+    var mi=PAGES.find(function(p){return p.k===slug});
+    if(mi){mi.l=label;mi.i=icon}
+    if(id&&id.indexOf('pag-')!==0)await renameInIndex(slug,id,label,icon);
+    _current.title=label;_current.icon=icon;
+    setTitle(icon+' '+label);
+    var h2=document.querySelector('.editor-head h2');
+    if(h2)h2.textContent=label;
+    buildSidebar();
+    setActive('page',slug);
+    closeRenameModal();
+    toast('Sezione "'+label+'" rinominata! Deploy in corso (~30s)...','success');
+    setStatus('ok','deploying...');
+    startDeployTimer();
+    _modified=false;
+  }catch(e){
+    setStatus('err','errore');
+    toast('Errore rinomina: '+e.message,'error');
     if(btn)btn.disabled=false;
   }
 }
@@ -879,6 +1038,7 @@ function renderJsonEditor(content){
   h+='<div class="editor-head"><h2>'+esc(_current.label)+'</h2>';
   h+='<span class="badge badge-idle" id="e-badge">salvato</span>';
   h+='<div class="editor-actions">';
+  h+='<button class="btn btn-danger" id="del-btn" onclick="deleteJsonFile()">ELIMINA</button>';
   h+='<button class="btn btn-primary" id="save-btn" onclick="saveJson()">SALVA</button>';
   h+='</div></div>';
   h+='<div class="editor-body"><div class="pane" style="display:flex;flex-direction:column">';
@@ -903,6 +1063,31 @@ async function saveJson(){
     startDeployTimer();
   }catch(e){setBadge('err','errore');setStatus('err','errore');toast(e.message,'error')}
   document.getElementById('save-btn').disabled=false;
+}
+async function deleteJsonFile(){
+  if(!_current||_current.type==='page')return;
+  var label=_current.label||_current.file;
+  var path=_current.type==='db'?CONTENT+'/db/'+_current.file:_current.type==='mestiere'?CONTENT+'/mestieri/'+_current.file:CONTENT+'/docs/'+_current.file;
+  if(!_current.sha){toast('File non esistente nel repo: '+path,'error');return}
+  if(!confirm('Eliminare definitivamente il file "'+label+'" ('+path+')?\n\nAttenzione: se qualche pagina del sito lo usa, quella funzionalità si romperà. Questa operazione non è reversibile.'))return;
+  var btn=document.getElementById('del-btn');
+  if(btn)btn.disabled=true;
+  setStatus('saving','eliminazione...');
+  try{
+    await ghDelete(path,'admin: delete '+_current.file,_current.sha);
+    _modified=false;
+    _current=null;
+    buildSidebar();
+    document.getElementById('main').innerHTML='<div class="main-empty"><div class="ico">🗑</div><p>'+esc(label)+' eliminato</p></div>';
+    setTitle('Seleziona una voce dal menu');
+    toast('File eliminato! Deploy in corso (~30s)...','success');
+    setStatus('ok','deploying...');
+    startDeployTimer();
+  }catch(e){
+    setStatus('err','errore');
+    toast('Errore eliminazione: '+e.message,'error');
+    if(btn)btn.disabled=false;
+  }
 }
 
 /* ════════════════════════════════════
