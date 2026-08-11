@@ -59,6 +59,25 @@ git push
 
 Cloudflare Pages deploya automaticamente.
 
+## Layout e template
+
+Ogni pagina `content/pages/<slug>.json` può dichiarare un `layout` che
+determina come viene renderizzata. Se manca, viene rilevato in automatico
+dalla chiave (es. `pantheon`, `regole`, …).
+
+La lista completa dei layout è in `admin/index.html` (`LAYOUTS` e
+`LAYOUT_TEMPLATES`): `generico`, `lore`, `regole`, `lavoro`,
+`personaggio`, `materiale`, `wide`, `pantheon`, `bestiario`, `timeline`,
+`fazioni`, `oggetti`, `glossario`, `galleria`, `tabelle` e i layout a card
+`sessione`, `quest`, `npc`, `spell`, `specie`, `citta`, `evento`.
+
+I layout a card sono renderizzati da `_renderSchede` in `notion-nav.js`
+(markdown → card con campi `- **Chiave:** valore`); gli altri da
+renderer dedicati (`_renderPantheon`, `_renderBestiario`, …).
+
+Nel pannello admin, il selettore Layout in alto a destra applica il template
+predefinito del layout scelto (chiede conferma se c'è già contenuto).
+
 ## Sicurezza
 
 - `_headers` definisce una CSP restrittiva (`script-src 'self' 'unsafe-inline'`,
