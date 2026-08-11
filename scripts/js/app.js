@@ -590,8 +590,7 @@ var _pathMap = {
   'changelog':                                '3000274fdc1c8033a214c44a1aa7f01f',
   'sottoclassi':                              '2f70274fdc1c80e3bdc7f95f81eb9cc0',
   'specie-homebrew':                          '2f60274fdc1c80fba671c588ba93b116',
-  "gandora-il-drago-dell-esilio": "pag-gandora-il-drago-dell-esilio",
-  "lore/la-storia-di-gandora": "pag-la-storia-di-gandora",
+  "lore/la-storia-di-gandora": "pag-la-storia-di-gandora"
 };
 
 /* ════ DEEP LINK ════ */
