@@ -28,8 +28,7 @@ var pages = [
   {k:'pantheon',   l:'Pantheon',                i:'🛐', id:'2f00274fdc1c80679bd3c3df8a1fa040'},
   {k:'changelog',  l:'Changelog',               i:'📝', id:'3000274fdc1c8033a214c44a1aa7f01f'},
   {k:'maestria',   l:'Maestria / Titoli',       i:'🔨', id:'2f00274fdc1c802a9babd4239d97a319'},
-  {k:"gandora-il-drago-dell-esilio", l:"Gandora il Drago dell'Esilio", i:"🐉", id:"pag-gandora-il-drago-dell-esilio", sec:""},
-  {k:"la-storia-di-gandora", l:"La Storia di Gandora", i:"🐉", id:"pag-la-storia-di-gandora", sec:"lore"},
+  {k:"la-storia-di-gandora", l:"La Storia di Gandora", i:"🐉", id:"pag-la-storia-di-gandora", sec:"lore"}
 ];
 
 function getPage(idOrK){
