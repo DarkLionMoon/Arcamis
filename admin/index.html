@@ -254,13 +254,26 @@ function setStatus(s,label){var el=document.getElementById('tb-status');el.class
 function setTitle(t){document.getElementById('tb-section').textContent=t||'Seleziona una voce dal menu'}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open')}
 
+function _authHeaders(){return {'Authorization':'token '+_token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'}}
+/* Wrapper API: se il token e' 401 (revocato/scaduto) lo azzera, ne chiede uno nuovo e ritenta */
+async function _api(url,opts){
+  var r=await fetch(url,opts);
+  if(r.status===401){
+    _token=prompt('Token GitHub non valido o revocato. Inserisci un nuovo Personal Access Token:');
+    if(!_token){_token='';localStorage.removeItem('arcamis_gh_token');throw new Error('GitHub API 401 - token mancante')}
+    localStorage.setItem('arcamis_gh_token',_token);
+    opts.headers['Authorization']='token '+_token;
+    r=await fetch(url,opts);
+  }
+  return r;
+}
 async function ghGet(path){
-  var r=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+path+'?ref='+GH_BRANCH,{headers:{'Authorization':'token '+_token,'Accept':'application/vnd.github.v3+json'}});
+  var r=await _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path+'?ref='+GH_BRANCH,{headers:_authHeaders()});
   if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
 }
 async function ghPut(path,msg,content,sha){
-  var headers={'Authorization':'token '+_token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};
-  async function put(s){var body={message:msg,content:btoa(unescape(encodeURIComponent(content))),branch:GH_BRANCH};if(s)body.sha=s;return fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)})}
+  var headers=_authHeaders();
+  async function put(s){var body={message:msg,content:btoa(unescape(encodeURIComponent(content))),branch:GH_BRANCH};if(s)body.sha=s;return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)})}
   var r=await put(sha);
   if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
   if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
@@ -269,8 +282,8 @@ async function ghPut(path,msg,content,sha){
 async function ghPutBinary(path,msg,dataUri){
   var m=dataUri.match(/^data:[^;]+;base64,(.*)$/);
   var b64=m?m[1]:dataUri;
-  var headers={'Authorization':'token '+_token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};
-  async function put(s){var body={message:msg,content:b64,branch:GH_BRANCH};if(s)body.sha=s;return fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)})}
+  var headers=_authHeaders();
+  async function put(s){var body={message:msg,content:b64,branch:GH_BRANCH};if(s)body.sha=s;return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)})}
   var r=await put(null);
   if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
   if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
