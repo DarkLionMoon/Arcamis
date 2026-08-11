@@ -528,7 +528,6 @@ window.addEventListener('popstate', function(e){
 ════════════════════════════════ */
 var _pathMap = {
   /* Regole */
-  'regole/gameplay':                          '2f00274fdc1c8065a11ff45192aa5dcb',
   'regole/gameplay/combattimento':            '2f60274fdc1c80b7a729ef091b278682',
   'regole/gameplay/codex':                    '2f60274fdc1c80adb7a5d6beeef3e544',
   'regole/generali':                          '2f00274fdc1c800b9d8fc366e8e40c5c',
