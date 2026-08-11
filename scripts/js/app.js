@@ -538,7 +538,6 @@ var _pathMap = {
   /* Personaggio */
   'personaggio/come-si-inizia':               '2dd222f22ef8413f8cb48f03bbb4f4b0',
   'personaggio/andando-avanti':               '5cea525d149f4acb9c59007bf6b3d5ff',
-  'personaggio/galleria-pg':                  '2fd0274fdc1c80d8b948c4133f874f28',
   'maestria-titoli':                          '2f00274fdc1c802a9babd4239d97a319',
   /* Homebrew */
   'homebrew':                                 '2f00274fdc1c80e78ad7ce985007b7c6',
