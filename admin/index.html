@@ -56,7 +56,9 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .sidebar-scroll::-webkit-scrollbar{width:4px}
 .sidebar-scroll::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
 .sb-group{margin-bottom:4px}
-.sb-label{font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding:8px 14px 4px;user-select:none}
+.sb-label{font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding:8px 14px 4px;user-select:none;display:flex;align-items:center;justify-content:space-between}
+.sb-add{background:none;border:1px solid var(--bdr);color:var(--text3);border-radius:3px;width:18px;height:18px;font-size:12px;line-height:1;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s}
+.sb-add:hover{color:var(--gold);border-color:var(--gold)}
 .sb-item{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .12s;border-left:2px solid transparent}
 .sb-item:hover{background:rgba(200,155,60,.04);color:var(--text)}
 .sb-item.active{background:rgba(200,155,60,.06);color:var(--gold);border-left-color:var(--gold)}
@@ -243,6 +245,13 @@ var DOCS = [
   {file:'codice.json',l:'Codice Giuridico',i:'📜'},
   {file:'come-funzionano.json',l:'Come Funzionano',i:'📖'}
 ];
+var SECTIONS = [
+  {v:'',l:'— Nessuna (solo URL) —'},
+  {v:'regole',l:'Regole'},
+  {v:'personaggio',l:'Personaggio'},
+  {v:'lavori',l:'Lavori'},
+  {v:'lore',l:'Lore'}
+];
 
 /* ════════════════════════════════════
    UTILITIES
@@ -317,15 +326,15 @@ function doLogout(){
 function buildSidebar(){
   var h='<div class="sidebar-search"><input type="text" id="sb-search" placeholder="Cerca..." oninput="filterSidebar(this.value)"></div>';
   h+='<div class="sidebar-scroll" id="sb-scroll">';
-  h+=sbGroup('Pagine Wiki','page',PAGES);
+  h+=sbGroup('Pagine Wiki','page',PAGES,'openNewPageModal');
   h+=sbGroup('Database','db',DB_FILES);
   h+=sbGroup('Mestieri','mestiere',MESTIERI);
   h+=sbGroup('Documenti','doc',DOCS);
   h+='</div>';
   document.getElementById('sidebar').innerHTML=h;
 }
-function sbGroup(label,type,items){
-  var h='<div class="sb-group"><div class="sb-label">'+label+'</div>';
+function sbGroup(label,type,items,onAdd){
+  var h='<div class="sb-group"><div class="sb-label">'+label+(onAdd?' <button class="sb-add" onclick="'+onAdd+'()" title="Crea nuova '+label+'">+</button>':'')+'</div>';
   items.forEach(function(it){
     h+='<div class="sb-item" data-type="'+type+'" data-key="'+(it.k||it.file)+'" onclick="openItem(this)">';
     h+='<span class="ico">'+it.i+'</span><span class="lbl">'+it.l+'</span></div>';
@@ -530,7 +539,7 @@ function openImgDialog(){
   if(alt)alt.focus();
 }
 function closeImgDialog(){var m=document.getElementById('img-modal');if(m)m.remove()}
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeImgDialog()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeImgDialog();closeNewPageModal()}});
 function imgFileSelected(input){
   var file=input.files&&input.files[0];
   if(!file){_imgDataUri=null;return}
@@ -624,6 +633,127 @@ async function savePage(){
     startDeployTimer();
   }catch(e){setBadge('err','errore');setStatus('err','errore');toast(e.message,'error')}
   document.getElementById('save-btn').disabled=false;
+}
+
+/* ════════════════════════════════════
+   NUOVA PAGINA / SEZIONE
+   ════════════════════════════════════ */
+var _slugTouched = false;
+function slugify(t){
+  return (t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'');
+}
+function openNewPageModal(){
+  if(document.getElementById('np-modal'))return;
+  _slugTouched=false;
+  var layoutOpts='';
+  LAYOUTS.forEach(function(l){if(l.v)layoutOpts+='<option value="'+l.v+'">'+l.i+' '+l.l+'</option>'});
+  var secOpts='';
+  SECTIONS.forEach(function(s){secOpts+='<option value="'+s.v+'">'+s.l+'</option>'});
+  var d=document.createElement('div');
+  d.className='img-modal-backdrop';
+  d.id='np-modal';
+  d.innerHTML='<div class="img-modal">'
+    +'<h3>➕ Nuova pagina / sezione</h3>'
+    +'<div class="img-field"><label>Nome della sezione</label>'
+    +'<input id="np-label" placeholder="es. La Gilda dei Mercanti" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
+    +'<div class="img-field"><label>Icona (emoji)</label>'
+    +'<input id="np-icon" placeholder="es. 🏛️" value="📄" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
+    +'<div class="img-field"><label>Slug / URL</label>'
+    +'<input id="np-slug" placeholder="auto (es. la-gilda-dei-mercanti)" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
+    +'<div class="img-field"><label>Sezione del menu</label>'
+    +'<select id="np-sec" class="layout-select" style="width:100%">'+secOpts+'</select></div>'
+    +'<div class="img-field"><label>Layout</label>'
+    +'<select id="np-layout" class="layout-select" style="width:100%">'+layoutOpts+'</select></div>'
+    +'<div class="img-actions" style="margin-top:4px">'
+    +'<button class="btn btn-ghost" onclick="closeNewPageModal()">Annulla</button>'
+    +'<button class="btn btn-primary" id="np-save" onclick="createNewPage()">CREA</button>'
+    +'</div></div>';
+  d.addEventListener('click',function(e){if(e.target===d)closeNewPageModal()});
+  document.body.appendChild(d);
+  var label=document.getElementById('np-label');
+  label.addEventListener('input',function(){
+    if(!_slugTouched)document.getElementById('np-slug').value=slugify(label.value);
+  });
+  document.getElementById('np-slug').addEventListener('input',function(){_slugTouched=true});
+  label.focus();
+}
+function closeNewPageModal(){var m=document.getElementById('np-modal');if(m)m.remove()}
+function buildNewPageContent(layout,label){
+  var tpl=LAYOUT_TEMPLATES[layout]||'';
+  if(tpl)return tpl;
+  return '# '+label+'\n\nInserisci il contenuto di questa sezione...';
+}
+async function createNewPage(){
+  var label=(document.getElementById('np-label').value||'').trim();
+  var icon=(document.getElementById('np-icon').value||'').trim()||'📄';
+  var slug=(document.getElementById('np-slug').value||'').trim()||slugify(label);
+  var sec=document.getElementById('np-sec').value||'';
+  var layout=document.getElementById('np-layout').value||'';
+  if(!label){toast('Inserisci un nome per la sezione','error');return}
+  if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)){toast('Slug non valido: solo minuscole, numeri e trattini','error');return}
+  if(PAGES.some(function(p){return p.k===slug})){toast('Esiste già una pagina con slug "'+slug+'"','error');return}
+  var id='pag-'+slug;
+  var btn=document.getElementById('np-save');
+  if(btn)btn.disabled=true;
+  setStatus('saving','creazione...');
+  try{
+    var json={k:slug,title:label,icon:icon,content:buildNewPageContent(layout,label),layout:layout,lastModified:new Date().toISOString()};
+    await ghPut(CONTENT+'/pages/'+slug+'.json','admin: create page '+slug,JSON.stringify(json,null,2),null);
+    await addToDataJs(slug,label,icon,id,sec);
+    await addToPathMap(slug,id,sec);
+    await addToAdminPages(slug,label,icon);
+    PAGES.push({k:slug,l:label,i:icon});
+    buildSidebar();
+    closeNewPageModal();
+    toast('Pagina "'+label+'" creata! Deploy in corso (~30s)...','success');
+    setStatus('ok','deploying...');
+    startDeployTimer();
+    _modified=false;
+    await openPage(slug);
+    setActive('page',slug);
+  }catch(e){
+    setStatus('err','errore');
+    toast('Errore creazione: '+e.message,'error');
+    if(btn)btn.disabled=false;
+  }
+}
+/* Registra la nuova pagina in data.js (array pages) */
+async function addToDataJs(slug,label,icon,id,sec){
+  var d=await ghGet('scripts/js/data.js');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var start=s.indexOf('var pages = [');
+  if(start===-1)throw new Error('data.js: "var pages" non trovato');
+  var end=s.indexOf('];',start);
+  if(end===-1)throw new Error('data.js: chiusura pages non trovata');
+  if(s.slice(start,end).indexOf("k:'"+slug+"'")!==-1)throw new Error('Pagina già registrata in data.js');
+  var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+', id:'+JSON.stringify(id)+', sec:'+JSON.stringify(sec)+'},\n';
+  await ghPut('scripts/js/data.js','admin: add page '+slug+' to registry',s.slice(0,end)+entry+s.slice(end),d.sha);
+}
+/* Registra l'URL pulito in app.js (_pathMap) */
+async function addToPathMap(slug,id,sec){
+  var d=await ghGet('scripts/js/app.js');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var start=s.indexOf('var _pathMap = {');
+  if(start===-1)throw new Error('app.js: "_pathMap" non trovato');
+  var end=s.indexOf('};',start);
+  if(end===-1)throw new Error('app.js: chiusura _pathMap non trovata');
+  var path=sec?(sec+'/'+slug):slug;
+  if(s.slice(start,end).indexOf("'"+path+"'")!==-1)throw new Error('URL già registrato: /'+path);
+  var entry='  '+JSON.stringify(path)+': '+JSON.stringify(id)+',\n';
+  await ghPut('scripts/js/app.js','admin: add page '+slug+' to path map',s.slice(0,end)+entry+s.slice(end),d.sha);
+}
+/* Registra la pagina nella sidebar dell'admin stesso (PAGES) */
+async function addToAdminPages(slug,label,icon){
+  var d=await ghGet('admin/index.html');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var start=s.indexOf('var PAGES = [');
+  if(start===-1)throw new Error('admin: "var PAGES" non trovato');
+  var end=s.indexOf('];',start);
+  if(end===-1)throw new Error('admin: chiusura PAGES non trovata');
+  if(s.slice(start,end).indexOf("k:'"+slug+"'")!==-1)throw new Error('Pagina già in PAGES');
+  var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+'},\n';
+  await ghPut('admin/index.html','admin: add page '+slug+' to sidebar',s.slice(0,end)+entry+s.slice(end),d.sha);
 }
 
 /* ════════════════════════════════════

@@ -78,6 +78,23 @@ renderer dedicati (`_renderPantheon`, `_renderBestiario`, …).
 Nel pannello admin, il selettore Layout in alto a destra applica il template
 predefinito del layout scelto (chiede conferma se c'è già contenuto).
 
+## Creare una nuova pagina/sezione
+
+Dal pannello admin, clicca **+** accanto a "Pagine Wiki": inserisci nome,
+icona (emoji), slug/URL, sezione del menu (Regole, Personaggio, Lavori, Lore
+o nessuna) e layout. La creazione:
+
+1. scrive `content/pages/<slug>.json` con il template del layout scelto;
+2. registra la pagina in `scripts/js/data.js` (array `pages`, con campo `sec`);
+3. registra l'URL pulito in `scripts/js/app.js` (`_pathMap`);
+4. aggiunge la voce alla sidebar dell'admin (`admin/index.html`, `PAGES`);
+5. al deploy, `scripts/js/custom-nav.js` inietta la voce nel menu del sito
+   (desktop e mobile) nella sezione scelta.
+
+Il sito è raggiungibile all'URL `/regole/<slug>`, `/lore/<slug>`, … (o
+`/<slug>` se nessuna sezione). Per una nuova sezione si intende una nuova
+voce in una delle sezioni del menu esistenti.
+
 ## Sicurezza
 
 - `_headers` definisce una CSP restrittiva (`script-src 'self' 'unsafe-inline'`,
