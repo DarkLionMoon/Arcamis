@@ -1482,6 +1482,39 @@ var JSON_TABLE_SCHEMAS={
   'biblioteca.json':[
     {k:'id',t:'text',req:true},{k:'title',t:'text',req:true},{k:'author',t:'text'},{k:'category',t:'text'},
     {k:'desc',t:'textarea'},{k:'link',t:'url'}
+  ],
+  'alchimista.json':[
+    {k:'title',t:'text',req:true},{k:'content',t:'textarea',req:true}
+  ],
+  'architetto.json':[
+    {k:'title',t:'text',req:true},{k:'content',t:'textarea',req:true}
+  ],
+  'artigiano.json':[
+    {k:'title',t:'text',req:true},{k:'content',t:'textarea',req:true}
+  ],
+  'artista.json':[
+    {k:'title',t:'text',req:true},{k:'content',t:'textarea',req:true}
+  ],
+  'falegname.json':[
+    {k:'title',t:'text',req:true},{k:'content',t:'textarea',req:true}
+  ],
+  'metallurgo.json':[
+    {k:'title',t:'text',req:true},{k:'content',t:'textarea',req:true}
+  ],
+  'oste.json':[
+    {k:'title',t:'text',req:true},{k:'content',t:'textarea',req:true}
+  ],
+  'sarto.json':[
+    {k:'title',t:'text',req:true},{k:'content',t:'textarea',req:true}
+  ],
+  'patenti.json':[
+    {k:'key',t:'text',req:true},{k:'content',t:'textarea',req:true},{k:'lastModified',t:'text'}
+  ],
+  'codice.json':[
+    {k:'key',t:'text',req:true},{k:'content',t:'textarea',req:true},{k:'lastModified',t:'text'}
+  ],
+  'come-funzionano.json':[
+    {k:'key',t:'text',req:true},{k:'content',t:'textarea',req:true},{k:'lastModified',t:'text'}
   ]
 };
 function _isArrayFile(file){return file in JSON_TABLE_SCHEMAS}
@@ -1502,20 +1535,26 @@ async function openDb(file){
 async function openMestiere(file){
   var meta=MESTIERI.find(function(m){return m.file===file});
   var path=CONTENT+'/mestieri/'+file;
-  var content='{}',sha=null;
-  try{var d=await ghGet(path);content=decodeURIComponent(escape(atob(d.content)));sha=d.sha}catch(e){}
-  _current={type:'mestiere',file:file,sha:sha,label:meta?meta.l:file};
+  var raw='{}',sha=null;
+  try{var d=await ghGet(path);raw=decodeURIComponent(escape(atob(d.content)));sha=d.sha}catch(e){}
+  var arr=[];
+  try{var parsed=JSON.parse(raw);if(Array.isArray(parsed)){parsed.forEach(function(p){if(Array.isArray(p)&&p.length>=2)arr.push({title:p[0],content:p[1]})});}}catch(e){}
+  var content=JSON.stringify(arr,null,2);
+  _current={type:'mestiere',file:file,sha:sha,label:meta?meta.l:file,raw:raw};
   setTitle((meta?meta.i:'📄')+' '+(meta?meta.l:file));
-  renderJsonEditor(content);
+  renderTableEditor(content,file);
 }
 async function openDoc(file){
   var meta=DOCS.find(function(d){return d.file===file});
   var path=CONTENT+'/docs/'+file;
-  var content='{}',sha=null;
-  try{var d=await ghGet(path);content=decodeURIComponent(escape(atob(d.content)));sha=d.sha}catch(e){}
-  _current={type:'doc',file:file,sha:sha,label:meta?meta.l:file};
+  var raw='{}',sha=null;
+  try{var d=await ghGet(path);raw=decodeURIComponent(escape(atob(d.content)));sha=d.sha}catch(e){}
+  var obj={};
+  try{obj=JSON.parse(raw)}catch(e){}
+  var content=JSON.stringify([obj],null,2);
+  _current={type:'doc',file:file,sha:sha,label:meta?meta.l:file,raw:raw};
   setTitle((meta?meta.i:'📄')+' '+(meta?meta.l:file));
-  renderJsonEditor(content);
+  renderTableEditor(content,file);
 }
 function renderJsonEditor(content){
   var h='<div class="editor">';
@@ -1612,9 +1651,21 @@ function tableToArray(){
 async function saveTable(){
   if(!_current)return;
   var arr=tableToArray();
-  var json=JSON.stringify(arr,null,2);
+  var file=_current.file;
+  var json,path;
+  if(file.indexOf('.json')!==-1&&_current.type==='mestiere'){
+    var out=[];
+    arr.forEach(function(r){out.push([r.title||'',r.content||''])});
+    json=JSON.stringify(out,null,2);
+    path=CONTENT+'/mestieri/'+file;
+  }else if(file.indexOf('.json')!==-1&&_current.type==='doc'){
+    json=JSON.stringify(arr[0]||{},null,2);
+    path=CONTENT+'/docs/'+file;
+  }else{
+    json=JSON.stringify(arr,null,2);
+    path=CONTENT+'/db/'+file;
+  }
   document.getElementById('e-json').value=json;
-  var path=CONTENT+'/db/'+_current.file;
   setStatus('saving','verifica conflitti...');
   if(!await _checkRemoteSha()){
     if(!confirm('⚠️ Il file è stato modificato da un\'altra sessione. Sovrascrivere comunque?')){setStatus('idle','annullato');return}
@@ -1622,10 +1673,10 @@ async function saveTable(){
   setStatus('saving','salvataggio...');
   document.getElementById('save-btn').disabled=true;
   try{
-    var r=await ghPut(path,'admin: update '+_current.file,json,_current.sha);
+    var r=await ghPut(path,'admin: update '+file,json,_current.sha);
     if(r&&r.content&&r.content.sha)_current.sha=r.content.sha;
     _modified=false;setBadge('ok','salvato');setStatus('ok','deploying...');
-    await _logAudit('save_db',_current.file,{rows:arr.length});
+    await _logAudit('save_'+_current.type,file,{rows:arr.length});
     toast('Salvato! Deploy Cloudflare in corso...','success');
     startDeployTimer();
   }catch(e){setBadge('err','errore');setStatus('err','errore');toast(e.message,'error')}
