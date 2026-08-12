@@ -158,6 +158,38 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .img-actions{display:flex;gap:8px;justify-content:flex-end}
 .img-status{font-size:12px;color:var(--text2);font-style:italic;min-height:16px}
 
+/* ── HAMBURGER (mobile) ── */
+.menu-btn{display:none;background:none;border:1px solid var(--bdr2);border-radius:4px;color:var(--gold);font-size:15px;padding:3px 9px;cursor:pointer;line-height:1;transition:all .15s}
+.menu-btn:hover{border-color:var(--gold)}
+
+/* ── CHECKBOX RICORDAMI ── */
+.login-remember{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer;user-select:none}
+.login-remember input{width:14px;height:14px;accent-color:var(--gold);cursor:pointer}
+
+/* ── MODAL LISTE (storia / ricerca / link) ── */
+.list-modal{background:var(--bg2);border:1px solid var(--bdr2);border-radius:12px;width:min(620px,94vw);max-height:80vh;display:flex;flex-direction:column;padding:20px;gap:10px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.list-modal h3{font-family:'Cinzel',serif;color:var(--gold2);font-size:14px;letter-spacing:.08em}
+.list-body{overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.list-item{background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;transition:border-color .15s}
+.list-item:hover{border-color:var(--gold)}
+.list-item .li-main{flex:1;min-width:0}
+.list-item .li-title{color:var(--white);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item .li-sub{color:var(--text3);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item .li-snippet{color:var(--text2);font-size:12px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.list-empty{color:var(--text3);text-align:center;padding:24px 0;font-style:italic}
+.list-modal .img-actions{justify-content:flex-end}
+.list-modal .img-field input{font-family:'Crimson Pro',serif}
+
+/* ── GALLERIA IMMAGINI ── */
+.img-grid{flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;align-content:start}
+.img-card{background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s}
+.img-card:hover{border-color:var(--gold)}
+.img-card img{width:100%;height:120px;object-fit:cover;background:var(--bg);display:block}
+.img-card .ic-name{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);padding:8px 10px 4px;word-break:break-all}
+.img-card .ic-meta{font-size:10px;color:var(--text3);padding:0 10px 8px}
+.img-card .ic-actions{display:flex;gap:6px;padding:0 10px 10px}
+.img-card .btn{font-size:9px;padding:5px 8px}
+
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
   .sidebar{width:200px}
@@ -165,6 +197,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   .pane+.pane{border-left:none;border-top:1px solid var(--bdr2)}
 }
 @media(max-width:600px){
+  .menu-btn{display:block}
   .sidebar{position:fixed;left:-240px;top:0;bottom:0;z-index:100;transition:left .2s}
   .sidebar.open{left:0}
   .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
@@ -180,6 +213,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   <div class="sub">Pannello Amministrazione</div>
   <div class="login-card">
     <input type="password" id="login-pw" placeholder="Password..." autocomplete="off">
+    <label class="login-remember"><input type="checkbox" id="login-remember"> Ricordami (90 giorni)</label>
     <button class="login-btn" onclick="doLogin()">ACCEDI</button>
     <div class="login-err" id="login-err">Password errata</div>
   </div>
@@ -188,6 +222,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 <!-- ═══ APP ═══ -->
 <div id="app">
   <div class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
     <h1>⚔ ARCAMIS</h1>
     <div class="topbar-sep"></div>
     <div class="topbar-section" id="tb-section">Seleziona una voce dal menu</div>
@@ -216,8 +251,8 @@ var ADMIN_PW = 'b0b9dd19ef971d0b25d73afa6c1b1a1a52aff81b4c6259e067aa305e187119f5
 var GH_REPO = 'DarkLionMoon/Arcamis';
 var GH_BRANCH = 'main';
 var CONTENT = 'content';
-var _token = null, _modified = false, _current = null;
-
+var _token = localStorage.getItem('arcamis_gh_token') || null, _modified = false, _current = null;
+var _autosaveTimer=null, _lastSavedContent='', _currentUser=null, _userRole='admin';
 var PAGES = [
   {k:'materiale',l:'Materiale approvato',i:'📋'},{k:'inizia',l:'Come si inizia',i:'🌟'},
   {k:'biblioteca',l:'Biblioteca',i:'📚'},{k:'farmacia',l:'Bottega farmaceutica',i:'🧪'},
@@ -256,6 +291,47 @@ var SECTIONS = [
 ];
 
 /* ════════════════════════════════════
+   AUTOSAVE, CONFLICT DETECTION, MULTI-USER
+   ════════════════════════════════════ */
+function _autosaveKey(){var u=_currentUser||'anon';var c=_current;return 'arc_autosave_'+u+'_'+(c&&(c.k||c.file)||'')}
+function _autosaveLoad(){
+  try{return JSON.parse(localStorage.getItem(_autosaveKey())||'null')}catch(e){return null}
+}
+function _autosaveStore(content){
+  localStorage.setItem(_autosaveKey(),JSON.stringify({content:content,ts:Date.now()}))
+}
+function _autosaveClear(){localStorage.removeItem(_autosaveKey())}
+function _checkUnsaved(){
+  var saved=_autosaveLoad();
+  if(saved&&saved.content&&saved.content!==_lastSavedContent){
+    if(confirm('Hai modifiche locali non salvate ('+new Date(saved.ts).toLocaleTimeString()+'). Ripristinare?')){
+      return saved.content;
+    }
+  }
+  return null;
+}
+async function _checkRemoteSha(){
+  if(!_current||!_current.sha)return true;
+  try{
+    var d=await ghGet(_current.type==='page'?CONTENT+'/pages/'+_current.k+'.json':_current.type==='db'?CONTENT+'/db/'+_current.file:_current.type==='mestiere'?CONTENT+'/mestieri/'+_current.file:CONTENT+'/docs/'+_current.file);
+    return d.sha===_current.sha;
+  }catch(e){return true}
+}
+async function _logAudit(action,target,extra){
+  try{await fetch('/api/admin?action=audit',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:action,target:target,extra:extra,user:_currentUser,role:_userRole})})}catch(e){}
+}
+function _startAutosave(){
+  if(_autosaveTimer)clearInterval(_autosaveTimer);
+  _autosaveTimer=setInterval(function(){
+    if(_modified&&_current){
+      var md=document.getElementById('e-md')||document.getElementById('e-json');
+      if(md){_autosaveStore(md.value);_lastSavedContent=md.value}
+    }
+  },15000);
+}
+function _stopAutosave(){if(_autosaveTimer){clearInterval(_autosaveTimer);_autosaveTimer=null}}
+
+/* ════════════════════════════════════
    UTILITIES
    ════════════════════════════════════ */
 function sha256(t){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')})}
@@ -264,6 +340,12 @@ function toast(msg,type){var el=document.createElement('div');el.className='toas
 function setStatus(s,label){var el=document.getElementById('tb-status');el.className='topbar-status '+(s||'idle');el.textContent=label||'pronto'}
 function setTitle(t){document.getElementById('tb-section').textContent=t||'Seleziona una voce dal menu'}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open')}
+function toggleSidebar(){
+  var sb=document.getElementById('sidebar');
+  var ov=document.getElementById('sb-overlay');
+  if(sb.classList.contains('open')){sb.classList.remove('open');ov.classList.remove('open')}
+  else{sb.classList.add('open');ov.classList.add('open')}
+}
 
 function _authHeaders(){return {'Authorization':'token '+_token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'}}
 /* Wrapper API: se il token e' 401 (revocato/scaduto) lo azzera, ne chiede uno nuovo e ritenta */
@@ -278,34 +360,72 @@ async function _api(url,opts){
   }
   return r;
 }
+/* ── Proxy GitHub server-side (functions/api/gh.js). Se disponibile evita di
+   esporre il Personal Access Token nel browser. Ogni operazione ricade sul
+   vecchio flusso diretto se la funzione non e' configurata (manca GH_TOKEN). */
+async function ghProxy(action,payload){
+  var r=await fetch('/api/gh',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:action,payload:payload})});
+  if(!r.ok){
+    var j=await r.json().catch(function(){return {}});
+    throw new Error(j.error||('GH proxy '+r.status));
+  }
+  return (await r.json()).data;
+}
 async function ghGet(path){
-  var r=await _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path+'?ref='+GH_BRANCH,{headers:_authHeaders()});
-  if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+  try{return await ghProxy('get',{path:path})}
+  catch(e){
+    var r=await _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path+'?ref='+GH_BRANCH,{headers:_authHeaders()});
+    if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+  }
+}
+async function ghGetAt(path,ref){
+  try{return await ghProxy('get',{path:path,ref:ref})}
+  catch(e){
+    var r=await _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path+'?ref='+ref,{headers:_authHeaders()});
+    if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+  }
 }
 async function ghPut(path,msg,content,sha){
-  var headers=_authHeaders();
-  async function put(s){var body={message:msg,content:btoa(unescape(encodeURIComponent(content))),branch:GH_BRANCH};if(s)body.sha=s;return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)})}
-  var r=await put(sha);
-  if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
-  if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+  try{return await ghProxy('put',{path:path,message:msg,content:btoa(unescape(encodeURIComponent(content))),sha:sha||null})}
+  catch(e){
+    var headers=_authHeaders();
+    async function put(s){var body={message:msg,content:btoa(unescape(encodeURIComponent(content))),branch:GH_BRANCH};if(s)body.sha=s;return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)})}
+    var r=await put(sha);
+    if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
+    if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+  }
 }
 /* Carica un file binario (immagine) su GitHub: il content va passato come base64 puro */
 async function ghPutBinary(path,msg,dataUri){
   var m=dataUri.match(/^data:[^;]+;base64,(.*)$/);
   var b64=m?m[1]:dataUri;
-  var headers=_authHeaders();
-  async function put(s){var body={message:msg,content:b64,branch:GH_BRANCH};if(s)body.sha=s;return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)})}
-  var r=await put(null);
-  if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
-  if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+  try{return await ghProxy('binary',{path:path,message:msg,content:b64,sha:null})}
+  catch(e){
+    var headers=_authHeaders();
+    async function put(s){var body={message:msg,content:b64,branch:GH_BRANCH};if(s)body.sha=s;return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)})}
+    var r=await put(null);
+    if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
+    if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+  }
 }
 /* Elimina un file dal repo (serve lo sha del file) */
 async function ghDelete(path,msg,sha){
-  var headers=_authHeaders();
-  async function del(s){var body={message:msg,branch:GH_BRANCH};if(s)body.sha=s;return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'DELETE',headers:headers,body:JSON.stringify(body)})}
-  var r=await del(sha);
-  if(r.status===409){var f=await ghGet(path);r=await del(f.sha)}
-  if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+  try{return await ghProxy('delete',{path:path,message:msg,sha:sha})}
+  catch(e){
+    var headers=_authHeaders();
+    async function del(s){var body={message:msg,branch:GH_BRANCH};if(s)body.sha=s;return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'DELETE',headers:headers,body:JSON.stringify(body)})}
+    var r=await del(sha);
+    if(r.status===409){var f=await ghGet(path);r=await del(f.sha)}
+    if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+  }
+}
+/* Cronologia commit di un file */
+async function ghCommits(path){
+  try{return await ghProxy('commits',{path:path,per_page:25})}
+  catch(e){
+    var r=await _api('https://api.github.com/repos/'+GH_REPO+'/commits?path='+encodeURIComponent(path)+'&per_page=25&sha='+GH_BRANCH,{headers:_authHeaders()});
+    if(!r.ok)throw new Error('GitHub API '+r.status);return r.json();
+  }
 }
 
 /* ════════════════════════════════════
@@ -314,16 +434,41 @@ async function ghDelete(path,msg,sha){
 document.getElementById('login-pw').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
 async function doLogin(){
   var pw=document.getElementById('login-pw').value;
-  var h=await sha256(pw);
-  if(h!==ADMIN_PW){document.getElementById('login-err').style.display='';return}
+  var remember=document.getElementById('login-remember')?document.getElementById('login-remember').checked:false;
   document.getElementById('login-err').style.display='none';
-  _token=localStorage.getItem('arcamis_gh_token');
-  if(!_token){_token=prompt('Inserisci il GitHub Personal Access Token:');if(!_token)return;localStorage.setItem('arcamis_gh_token',_token)}
+  var btn=document.querySelector('.login-btn');
+  if(btn)btn.disabled=true;
+  var ok=false;
+  /* 1. Prima prova il login server-side (cookie di sessione HttpOnly + rate limit) */
+  try{
+    var r=await fetch('/api/admin?action=login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw,remember:remember})});
+    ok=r.ok;
+  }catch(e){ok=false}
+  /* 2. Fallback: verifica hash client-side (compatibilità se ADMIN_SECRET non configurato) */
+  if(!ok){
+    var h=await sha256(pw);
+    ok=(h===ADMIN_PW);
+  }
+  if(!ok){
+    document.getElementById('login-err').style.display='';
+    if(btn)btn.disabled=false;
+    return;
+  }
+  if(btn)btn.disabled=false;
+  _currentUser='admin';_userRole='admin';
+  sessionStorage.setItem('arcadmin','1');
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='flex';
+  _startAutosave();
+  var restored=_checkUnsaved();
+  if(restored&&_current){_autosaveClear()}
   buildSidebar();
 }
 function doLogout(){
+  sessionStorage.removeItem('arcadmin');
+  fetch('/api/admin?action=logout',{method:'POST',credentials:'include'}).catch(function(){});
+  _stopAutosave();_autosaveClear();
+  _currentUser=null;_userRole='admin';
   _token=null;localStorage.removeItem('arcamis_gh_token');
   document.getElementById('app').style.display='none';
   document.getElementById('login').style.display='flex';
@@ -336,10 +481,13 @@ function doLogout(){
 function buildSidebar(){
   var h='<div class="sidebar-search"><input type="text" id="sb-search" placeholder="Cerca..." oninput="filterSidebar(this.value)"></div>';
   h+='<div class="sidebar-scroll" id="sb-scroll">';
+  h+='<div class="sb-item" data-type="search" onclick="openContentSearch()"><span class="ico">🔎</span><span class="lbl">Cerca nel contenuto</span></div>';
   h+=sbGroup('Pagine Wiki','page',PAGES,'openNewPageModal');
   h+=sbGroup('Database','db',DB_FILES);
   h+=sbGroup('Mestieri','mestiere',MESTIERI);
   h+=sbGroup('Documenti','doc',DOCS);
+  h+='<div class="sb-group"><div class="sb-label">Immagini</div>';
+  h+='<div class="sb-item" data-type="images" data-key="images" onclick="openImages()"><span class="ico">🖼️</span><span class="lbl">/images/ — gestione</span></div></div>';
   h+='</div>';
   document.getElementById('sidebar').innerHTML=h;
 }
@@ -459,6 +607,10 @@ async function openPage(k){
   h+='<div class="editor-actions">';
   h+='<select id="e-layout" class="layout-select" onchange="onLayoutChange(this.value)">'+layoutOpts+'</select>';
   h+='<button class="btn btn-ghost" onclick="toggleJson()">JSON</button>';
+  h+='<button class="btn btn-ghost" onclick="openHistory()" title="Cronologia commit e ripristino versione">📜 STORIA</button>';
+  h+='<button class="btn btn-ghost" onclick="checkLinks()" title="Verifica i link interni del contenuto">🔗 LINKS</button>';
+  h+='<button class="btn btn-ghost" onclick="copyPageUrl()" title="Copia URL pulito della pagina">🔗 URL</button>';
+  h+='<button class="btn btn-ghost" onclick="openPageOnSite()" title="Apri la pagina sul sito">🌐 APRI</button>';
   h+='<button class="btn btn-ghost" onclick="openRenameModal()" title="Rinomina sezione / pagina">✏️ RINOMINA</button>';
   h+='<button class="btn btn-danger" id="del-btn" onclick="deletePage()">ELIMINA</button>';
   h+='<button class="btn btn-primary" id="save-btn" onclick="savePage()">SALVA</button>';
@@ -502,7 +654,11 @@ function buildToolbar(){
   },0);
   return h;
 }
-function onMdInput(){_modified=true;setBadge('dirty','modificato');renderPreview()}
+function onMdInput(){
+  _modified=true;setBadge('dirty','modificato');renderPreview();
+  var md=document.getElementById('e-md');
+  if(md){_autosaveStore(md.value);_lastSavedContent=md.value}
+}
 function onMdKey(e){if(e.key==='Tab'){e.preventDefault();var ta=e.target,s=ta.selectionStart,en=ta.selectionEnd;ta.value=ta.value.substring(0,s)+'  '+ta.value.substring(en);ta.selectionStart=ta.selectionEnd=s+2;onMdInput()}if(e.ctrlKey&&e.key==='s'){e.preventDefault();savePage()}}
 function renderPreview(){var md=document.getElementById('e-md');var pv=document.getElementById('e-preview');if(md&&pv)pv.innerHTML=mdToHtml(md.value)}
 function onLayoutChange(val){
@@ -551,7 +707,7 @@ function openImgDialog(){
   if(alt)alt.focus();
 }
 function closeImgDialog(){var m=document.getElementById('img-modal');if(m)m.remove()}
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeImgDialog();closeNewPageModal();closeRenameModal()}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeImgDialog();closeNewPageModal();closeRenameModal();closeModal('hist-modal');closeModal('cs-modal');closeModal('lk-modal')}});
 function imgFileSelected(input){
   var file=input.files&&input.files[0];
   if(!file){_imgDataUri=null;return}
@@ -595,9 +751,15 @@ async function insertImgFromUpload(){
   var status=document.getElementById('img-status');
   if(btn)btn.disabled=true;
   if(status)status.textContent='Caricamento su GitHub…';
-  var name=_current.k+'-'+Date.now()+'.'+_imgExt(_imgDataUri);
+  var name=(_current.k||'img')+'-'+Date.now()+'.'+_imgExt(_imgDataUri);
   try{
     await ghPutBinary('images/'+name,'admin: add image '+name,_imgDataUri);
+    if(_current.type==='images'){
+      closeImgDialog();
+      toast('Immagine caricata ✓','success');
+      setTimeout(openImages,400);
+      return;
+    }
     var alt=(document.getElementById('img-alt').value||'').trim();
     insertImageMarkdown(alt,'/images/'+name);
     toast('Immagine caricata e inserita ✓','success');
@@ -635,13 +797,19 @@ async function savePage(){
   var md=document.getElementById('e-md').value;
   var json={k:_current.k,title:_current.title,icon:_current.icon,content:md,layout:_current.layout||'',lastModified:new Date().toISOString()};
   var path=CONTENT+'/pages/'+_current.k+'.json';
+  setStatus('saving','verifica conflitti...');
+  if(!await _checkRemoteSha()){
+    if(!confirm('⚠️ Il file è stato modificato da un\'altra sessione. Sovrascrivere comunque?')){setStatus('idle','annullato');return}
+  }
   setStatus('saving','salvataggio...');
   document.getElementById('save-btn').disabled=true;
   try{
     var r=await ghPut(path,'admin: update '+_current.k,JSON.stringify(json,null,2),_current.sha);
     if(r&&r.content&&r.content.sha)_current.sha=r.content.sha;
-    _modified=false;setBadge('ok','salvato');setStatus('ok','deploying...');
-    toast('Salvato! Deploy Cloudflare in corso (~30s)...','success');
+    _modified=false;_autosaveClear();_lastSavedContent=md;
+    setBadge('ok','salvato');setStatus('ok','deploying...');
+    await _logAudit('save_page',_current.k,{layout:_current.layout});
+    toast('Salvato! Deploy Cloudflare in corso...','success');
     startDeployTimer();
   }catch(e){setBadge('err','errore');setStatus('err','errore');toast(e.message,'error')}
   document.getElementById('save-btn').disabled=false;
@@ -1002,6 +1170,324 @@ async function saveRename(){
 }
 
 /* ════════════════════════════════════
+   UTILITÀ MODAL
+   ════════════════════════════════════ */
+function closeModal(id){var m=document.getElementById(id);if(m)m.remove()}
+
+/* ════════════════════════════════════
+   RICERCA NEL CONTENUTO
+   ════════════════════════════════════ */
+var _contentIndex=null,_contentIndexLoading=false;
+async function _loadContentIndex(){
+  if(_contentIndex)return _contentIndex;
+  if(_contentIndexLoading)return null;
+  _contentIndexLoading=true;
+  try{
+    var list=await ghGet('content/pages');
+    var idx=[];
+    for(var i=0;i<list.length;i++){
+      var it=list[i];
+      if(!it||it.type!=='file'||!it.name||it.name.slice(-5)!=='.json')continue;
+      try{
+        var c=await ghGet('content/pages/'+it.name);
+        var j=JSON.parse(decodeURIComponent(escape(atob(c.content))));
+        idx.push({k:j.k||it.name.replace('.json',''),title:j.title||'',icon:j.icon||'',content:j.content||''});
+      }catch(e){}
+    }
+    _contentIndex=idx;
+  }catch(e){_contentIndex=[]}
+  _contentIndexLoading=false;
+  return _contentIndex;
+}
+function openContentSearch(){
+  if(document.getElementById('cs-modal'))return;
+  var d=document.createElement('div');
+  d.className='img-modal-backdrop';
+  d.id='cs-modal';
+  d.innerHTML='<div class="list-modal">'
+    +'<h3>🔎 Cerca nel contenuto</h3>'
+    +'<input id="cs-input" class="img-field-input" placeholder="Termine da cercare nelle pagine…" style="width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:5px;color:var(--white);font-size:13px;padding:9px 12px;outline:none;font-family:\'Crimson Pro\',serif">'
+    +'<div class="list-body" id="cs-body"><div class="list-empty">Digita almeno 3 caratteri…</div></div>'
+    +'<div class="img-actions"><button class="btn btn-ghost" onclick="closeModal(\'cs-modal\')">Chiudi</button></div>'
+    +'</div>';
+  d.addEventListener('click',function(e){if(e.target===d)closeModal('cs-modal')});
+  document.body.appendChild(d);
+  document.getElementById('cs-input').addEventListener('input',function(){_runContentSearch()});
+  document.getElementById('cs-input').focus();
+}
+async function _runContentSearch(){
+  var input=document.getElementById('cs-input');
+  var body=document.getElementById('cs-body');
+  if(!input||!body)return;
+  var q=input.value.trim().toLowerCase();
+  if(q.length<3){body.innerHTML='<div class="list-empty">Digita almeno 3 caratteri…</div>';return}
+  body.innerHTML='<div class="list-empty">Ricerca…</div>';
+  var idx=await _loadContentIndex();
+  if(!idx){body.innerHTML='<div class="list-empty">Nessun contenuto indicizzato</div>';return}
+  var hits=[];
+  idx.forEach(function(p){
+    var c=p.content.toLowerCase();
+    var pos=c.indexOf(q);
+    if(pos===-1)return;
+    var start=Math.max(0,pos-60),end=Math.min(p.content.length,pos+q.length+60);
+    var snip=(start>0?'…':'')+p.content.slice(start,end).replace(/\s*\n+\s*/g,' ')+(end<p.content.length?'…':'');
+    hits.push({p:p,snip:snip});
+  });
+  if(!hits.length){body.innerHTML='<div class="list-empty">Nessun risultato per "'+esc(q)+'"</div>';return}
+  body.innerHTML=hits.map(function(h){
+    return '<div class="list-item" onclick="openSearchHit(\''+esc(h.p.k)+'\')">'
+      +'<span>'+h.p.icon+'</span>'
+      +'<div class="li-main"><div class="li-title">'+esc(h.p.title)+'</div>'
+      +'<div class="li-snippet">'+esc(h.snip)+'</div></div></div>';
+  }).join('');
+}
+async function openSearchHit(k){
+  closeModal('cs-modal');
+  if(_modified&&!confirm('Hai modifiche non salvate. Continuare?'))return;
+  _modified=false;
+  setActive('page',k);
+  closeSidebar();
+  setStatus('saving','caricamento…');
+  try{
+    await openPage(k);
+    setStatus('ok','caricato');
+    setTimeout(function(){setStatus('idle','pronto')},1500);
+  }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+
+/* ════════════════════════════════════
+   GESTIONE IMMAGINI /images/
+   ════════════════════════════════════ */
+async function openImages(){
+  if(_modified&&!confirm('Hai modifiche non salvate. Continuare?'))return;
+  _modified=false;
+  _current={type:'images'};
+  setActive('images','images');
+  closeSidebar();
+  setStatus('saving','caricamento immagini…');
+  try{
+    var list=await ghGet('images');
+    var items=Array.isArray(list)?list:[];
+    var h='<div class="editor">';
+    h+='<div class="editor-head"><h2>🖼️ Immagini — /images/</h2>';
+    h+='<span class="badge badge-idle" id="e-badge">'+items.length+' file</span>';
+    h+='<div class="editor-actions">';
+    h+='<button class="btn btn-ghost" onclick="openImageUpload()">⬆ CARICA</button>';
+    h+='<button class="btn btn-primary" onclick="openImages()">⟳ AGGIORNA</button>';
+    h+='</div></div>';
+    h+='<div class="editor-body"><div class="img-grid">';
+    if(!items.length)h+='<div class="list-empty">Nessuna immagine in /images/</div>';
+    items.forEach(function(it){h+=_imgCard(it)});
+    h+='</div></div></div>';
+    document.getElementById('main').innerHTML=h;
+    setStatus('ok','caricato');
+    setTimeout(function(){setStatus('idle','pronto')},1500);
+  }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+function _imgCard(it){
+  var name=it.name||'';
+  var size=it.size?(it.size/1024).toFixed(1)+' KB':'';
+  return '<div class="img-card">'
+    +'<img src="'+esc(it.download_url||'')+'" alt="'+esc(name)+'" loading="lazy">'
+    +'<div class="ic-name">'+esc(name)+'</div>'
+    +'<div class="ic-meta">'+size+' · '+esc(it.type||'file')+'</div>'
+    +'<div class="ic-actions">'
+    +'<button class="btn btn-ghost" onclick="copyImageUrl(\''+esc(name)+'\')">🔗 URL</button>'
+    +'<button class="btn btn-danger" onclick="deleteImage(\''+esc(name)+'\',\''+esc(it.sha)+'\')">🗑</button>'
+    +'</div></div>';
+}
+async function copyImageUrl(name){
+  try{
+    await navigator.clipboard.writeText('/images/'+name);
+    toast('Copiato: /images/'+name,'success');
+  }catch(e){toast('Errore copia: '+e.message,'error')}
+}
+async function deleteImage(name,sha){
+  if(!confirm('Eliminare definitivamente l\'immagine /images/'+name+'?'))return;
+  setStatus('saving','eliminazione…');
+  try{
+    await ghDelete('images/'+name,'admin: delete image '+name,sha);
+    toast('Immagine eliminata! Deploy in corso…','success');
+    setStatus('ok','deploying…');
+    startDeployTimer();
+    setTimeout(openImages,800);
+  }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+function openImageUpload(){
+  _current={type:'images',k:'img'};
+  openImgDialog();
+}
+
+/* ════════════════════════════════════
+   STORIA / RIPRISTINO VERSIONE
+   ════════════════════════════════════ */
+async function openHistory(){
+  if(!_current||_current.type!=='page')return;
+  if(document.getElementById('hist-modal'))return;
+  setStatus('saving','caricamento storia…');
+  try{
+    var path=CONTENT+'/pages/'+_current.k+'.json';
+    var commits=await ghCommits(path);
+    var rows=commits&&commits.length?commits.map(function(c){
+      var msg=c.commit&&c.commit.message||'';
+      var date=c.commit&&c.commit.author&&c.commit.author.date?new Date(c.commit.author.date).toLocaleString('it-IT'):'';
+      var sha=c.sha?c.sha.slice(0,8):'';
+      return '<div class="list-item" style="cursor:default">'
+        +'<div class="li-main"><div class="li-title">'+esc(msg)+'</div>'
+        +'<div class="li-sub">'+sha+' · '+esc(date)+'</div></div>'
+        +'<button class="btn btn-ghost" onclick="restoreVersion(\''+c.sha+'\')">RIPRISTINA</button></div>';
+    }).join(''):'<div class="list-empty">Nessun commit trovato</div>';
+    var d=document.createElement('div');
+    d.className='img-modal-backdrop';
+    d.id='hist-modal';
+    d.innerHTML='<div class="list-modal">'
+      +'<h3>📜 Storia — '+esc(_current.title||_current.k)+'</h3>'
+      +'<div class="list-body">'+rows+'</div>'
+      +'<div class="img-actions"><button class="btn btn-ghost" onclick="closeModal(\'hist-modal\')">Chiudi</button></div></div>';
+    d.addEventListener('click',function(e){if(e.target===d)closeModal('hist-modal')});
+    document.body.appendChild(d);
+    setStatus('idle','pronto');
+  }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+async function restoreVersion(sha){
+  if(!confirm('Ripristinare questa versione nell\'editor?\n\nNon viene salvata automaticamente: controlla il contenuto e poi premi SALVA.'))return;
+  try{
+    var d=await ghGetAt(CONTENT+'/pages/'+_current.k+'.json',sha);
+    var raw=decodeURIComponent(escape(atob(d.content)));
+    var json=JSON.parse(raw);
+    var md=document.getElementById('e-md');
+    if(md)md.value=json.content||'';
+    _current.title=json.title;_current.icon=json.icon;_current.layout=json.layout||'';
+    setTitle((json.icon||'📄')+' '+(json.title||_current.k));
+    var h2=document.querySelector('.editor-head h2');
+    if(h2)h2.textContent=json.title||_current.k;
+    var ls=document.getElementById('e-layout');
+    if(ls)ls.value=json.layout||'';
+    renderPreview();
+    _modified=true;setBadge('dirty','ripristinata — salva per applicare');
+    closeModal('hist-modal');
+    toast('Versione ripristinata nell\'editor. Premi SALVA.','success');
+  }catch(e){toast('Errore ripristino: '+e.message,'error')}
+}
+
+/* ════════════════════════════════════
+   LINK CHECKER INTERNO
+   ════════════════════════════════════ */
+var _pathMapCached=null;
+async function _getPathMap(){
+  if(_pathMapCached)return _pathMapCached;
+  var d=await ghGet('scripts/js/app.js');
+  var s=decodeURIComponent(escape(atob(d.content)));
+  var start=s.indexOf('var _pathMap = {');
+  var end=s.indexOf('};',start);
+  if(start===-1||end===-1){_pathMapCached={};return _pathMapCached}
+  var block=s.slice(start+15,end);
+  var pm={};
+  block.split('\n').forEach(function(line){
+    var m=line.match(/^\s*['"]([^'"]+)['"]\s*:\s*['"]([^'"]+)['"],?\s*$/);
+    if(m)pm[m[1]]=m[2];
+  });
+  _pathMapCached=pm;
+  return pm;
+}
+async function checkLinks(){
+  if(!_current||_current.type!=='page')return;
+  var md=document.getElementById('e-md').value;
+  var links=[];
+  var re=/(?:^|[\s("'`])(\/[a-zA-Z0-9\-_/]+)/g,m;
+  while((m=re.exec(md)))links.push(m[1].trim());
+  links=links.filter(function(l){return l.indexOf('/images/')!==0&&l.indexOf('/audio/')!==0&&l.indexOf('/scripts/')!==0});
+  if(!links.length){toast('Nessun link interno trovato nel contenuto','success');return}
+  setStatus('saving','verifica link…');
+  try{
+    var pm=await _getPathMap();
+    var bad=links.filter(function(l){
+      var p=l.replace(/^\//,'').replace(/\/+$/,'');
+      return !pm.hasOwnProperty(p);
+    });
+    var d=document.createElement('div');
+    d.className='img-modal-backdrop';
+    d.id='lk-modal';
+    var rows=bad.length?bad.map(function(l){return '<div class="list-item" style="cursor:default"><div class="li-main"><div class="li-title" style="color:var(--red)">🔗 '+esc(l)+'</div><div class="li-sub">non presente in _pathMap</div></div></div>'}).join('')
+      :'<div class="list-empty">Tutti i '+links.length+' link interni risultano validi ✓</div>';
+    d.innerHTML='<div class="list-modal">'
+      +'<h3>🔗 Link interni — '+links.length+' trovati, '+bad.length+' sospetti</h3>'
+      +'<div class="list-body">'+rows+'</div>'
+      +'<div class="img-actions"><button class="btn btn-ghost" onclick="closeModal(\'lk-modal\')">Chiudi</button></div></div>';
+    d.addEventListener('click',function(e){if(e.target===d)closeModal('lk-modal')});
+    document.body.appendChild(d);
+    setStatus('idle','pronto');
+  }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+
+/* ════════════════════════════════════
+   URL PULITO PAGINA (copia / apri sul sito)
+   ════════════════════════════════════ */
+async function _pageCleanPath(){
+  var slug=_current.k;
+  var meta=PAGES.find(function(p){return p.k===slug});
+  var id=await _getPageId(slug);
+  if(!id||id.indexOf('pag-')===0){
+    return '/'+((meta&&meta.sec)?meta.sec+'/':'')+slug;
+  }
+  try{
+    var pm=await _getPathMap();
+    for(var k in pm){if(pm[k]===id)return '/'+k}
+  }catch(e){}
+  return '/'+slug;
+}
+async function copyPageUrl(){
+  if(!_current||_current.type!=='page')return;
+  var u=location.origin+await _pageCleanPath();
+  try{await navigator.clipboard.writeText(u);toast('URL copiato: '+u,'success')}
+  catch(e){toast('Errore copia','error')}
+}
+async function openPageOnSite(){
+  if(!_current||_current.type!=='page')return;
+  var u=location.origin+await _pageCleanPath();
+  window.open(u,'_blank','noopener');
+}
+
+/* ════════════════════════════════════
+   SCHEMA PER EDITOR TABELLA (file array)
+   ════════════════════════════════════ */
+var JSON_TABLE_SCHEMAS={
+  'gallery.json':[
+    {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'icon',t:'text'},{k:'img',t:'url'},
+    {k:'race',t:'text'},{k:'class',t:'text'},{k:'level',t:'number'},{k:'guild',t:'text'},{k:'desc',t:'textarea'}
+  ],
+  'npc.json':[
+    {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'role',t:'text'},{k:'location',t:'text'},
+    {k:'race',t:'text'},{k:'alignment',t:'text'},{k:'img',t:'url'},{k:'desc',t:'textarea'}
+  ],
+  'subclasses.json':[
+    {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'class',t:'text',req:true},
+    {k:'source',t:'text'},{k:'desc',t:'textarea'},{k:'features',t:'textarea'}
+  ],
+  'species.json':[
+    {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'size',t:'text'},
+    {k:'speed',t:'text'},{k:'ability',t:'text'},{k:'traits',t:'textarea'},{k:'subraces',t:'textarea'},{k:'languages',t:'text'}
+  ],
+  'reputation.json':[
+    {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'faction',t:'text'},{k:'icon',t:'text'},
+    {k:'desc',t:'textarea'},{k:'ranks',t:'textarea'}
+  ],
+  'carousel.json':[
+    {k:'id',t:'text',req:true},{k:'title',t:'text',req:true},{k:'tag',t:'text'},
+    {k:'desc',t:'textarea'},{k:'btn1_text',t:'text'},{k:'btn1_href',t:'url'},{k:'btn2_text',t:'text'},{k:'btn2_href',t:'url'}
+  ],
+  'timeline.json':[
+    {k:'id',t:'text',req:true},{k:'year',t:'text',req:true},{k:'title',t:'text',req:true},{k:'desc',t:'textarea'}
+  ],
+  'biblioteca.json':[
+    {k:'id',t:'text',req:true},{k:'title',t:'text',req:true},{k:'author',t:'text'},{k:'category',t:'text'},
+    {k:'desc',t:'textarea'},{k:'link',t:'url'}
+  ]
+};
+function _isArrayFile(file){return file in JSON_TABLE_SCHEMAS}
+function _getSchema(file){return JSON_TABLE_SCHEMAS[file]||[]}
+
+/* ════════════════════════════════════
    DB / MESTIERE / DOC EDITORS
    ════════════════════════════════════ */
 async function openDb(file){
@@ -1011,7 +1497,7 @@ async function openDb(file){
   try{var d=await ghGet(path);content=decodeURIComponent(escape(atob(d.content)));sha=d.sha}catch(e){}
   _current={type:'db',file:file,sha:sha,label:meta?meta.l:file};
   setTitle((meta?meta.i:'📄')+' '+(meta?meta.l:file));
-  renderJsonEditor(content);
+  if(_isArrayFile(file))renderTableEditor(content,file);else renderJsonEditor(content);
 }
 async function openMestiere(file){
   var meta=MESTIERI.find(function(m){return m.file===file});
@@ -1036,6 +1522,7 @@ function renderJsonEditor(content){
   h+='<div class="editor-head"><h2>'+esc(_current.label)+'</h2>';
   h+='<span class="badge badge-idle" id="e-badge">salvato</span>';
   h+='<div class="editor-actions">';
+  h+='<button class="btn btn-ghost" onclick="switchToTable()">Tabella</button>';
   h+='<button class="btn btn-danger" id="del-btn" onclick="deleteJsonFile()">ELIMINA</button>';
   h+='<button class="btn btn-primary" id="save-btn" onclick="saveJson()">SALVA</button>';
   h+='</div></div>';
@@ -1045,19 +1532,123 @@ function renderJsonEditor(content){
   h+='</div></div></div>';
   document.getElementById('main').innerHTML=h;
 }
+function switchToTable(){
+  if(!_current||!_isArrayFile(_current.file))return;
+  try{var arr=JSON.parse(document.getElementById('e-json').value);renderTableEditor(JSON.stringify(arr),_current.file);}catch(e){toast('JSON non valido','error')}
+}
+function renderTableEditor(jsonStr,file){
+  var schema=_getSchema(file);
+  var arr=[];
+  try{arr=JSON.parse(jsonStr)}catch(e){arr=[]}
+  if(!Array.isArray(arr))arr=[];
+  var cols=schema.map(function(c){return c.k});
+  var h='<div class="editor">';
+  h+='<div class="editor-head"><h2>'+esc(_current.label)+'</h2>';
+  h+='<span class="badge badge-idle" id="e-badge">salvato</span>';
+  h+='<div class="editor-actions">';
+  h+='<button class="btn btn-ghost" onclick="renderJsonEditor(JSON.stringify(arr,null,2))">JSON</button>';
+  h+='<button class="btn btn-ghost" onclick="addTableRow()">➕ Riga</button>';
+  h+='<button class="btn btn-danger" id="del-btn" onclick="deleteJsonFile()">ELIMINA</button>';
+  h+='<button class="btn btn-primary" id="save-btn" onclick="saveTable()">SALVA</button>';
+  h+='</div></div>';
+  h+='<div class="editor-body"><div class="table-pane" style="display:flex;flex-direction:column;flex:1;overflow:auto">';
+  h+='<div class="pane-head">Editor tabella ('+arr.length+' righe)</div>';
+  h+='<div class="table-wrap" style="flex:1;overflow:auto">';
+  h+='<table class="admin-table"><thead><tr>';
+  cols.forEach(function(c){h+='<th>'+esc(c)+'</th>'});
+  h+='<th style="width:60px">Azioni</th></tr></thead><tbody id="table-body">';
+  arr.forEach(function(row,i){h+=buildTableRow(row,i,schema)});
+  h+='</tbody></table></div></div></div></div>';
+  document.getElementById('main').innerHTML=h;
+}
+function buildTableRow(row,idx,schema){
+  var h='<tr data-idx="'+idx+'">';
+  schema.forEach(function(col){
+    var val=row[col.k]!==undefined?row[col.k]:'';
+    var type=col.t==='textarea'?'textarea':('input type="'+(col.t==='number'?'number':col.t==='url'?'url':'text')+'"');
+    var req=col.req?' required':'';
+    h+='<td><'+type+' value="'+esc(String(val))+'" data-col="'+esc(col.k)+'"'+req+' style="width:100%;box-sizing:border-box;padding:4px 6px;font-family:inherit;font-size:12px;"></td>';
+  });
+  h+='<td><button class="btn btn-danger" onclick="deleteTableRow(this)" style="padding:3px 6px;font-size:10px">🗑</button></td>';
+  h+='</tr>';
+  return h;
+}
+function addTableRow(){
+  var schema=_getSchema(_current.file);
+  var tbody=document.getElementById('table-body');
+  if(!tbody)return;
+  var idx=tbody.children.length;
+  tbody.insertAdjacentHTML('beforeend',buildTableRow({},idx,schema));
+}
+function deleteTableRow(btn){
+  var tr=btn.closest('tr');
+  if(tr)tr.remove();
+  renumberTableRows();
+}
+function renumberTableRows(){
+  var tbody=document.getElementById('table-body');
+  if(!tbody)return;
+  Array.from(tbody.children).forEach(function(tr,i){tr.dataset.idx=i});
+}
+function tableToArray(){
+  var tbody=document.getElementById('table-body');
+  if(!tbody)return [];
+  var schema=_getSchema(_current.file);
+  var arr=[];
+  Array.from(tbody.children).forEach(function(tr){
+    var row={};
+    var valid=true;
+    tr.querySelectorAll('input,textarea').forEach(function(inp){
+      var col=inp.dataset.col;
+      var val=inp.value;
+      var req=inp.hasAttribute('required');
+      if(req&&!val.trim())valid=false;
+      if(val!=='')row[col]=val;
+    });
+    if(valid)arr.push(row);
+  });
+  return arr;
+}
+async function saveTable(){
+  if(!_current)return;
+  var arr=tableToArray();
+  var json=JSON.stringify(arr,null,2);
+  document.getElementById('e-json').value=json;
+  var path=CONTENT+'/db/'+_current.file;
+  setStatus('saving','verifica conflitti...');
+  if(!await _checkRemoteSha()){
+    if(!confirm('⚠️ Il file è stato modificato da un\'altra sessione. Sovrascrivere comunque?')){setStatus('idle','annullato');return}
+  }
+  setStatus('saving','salvataggio...');
+  document.getElementById('save-btn').disabled=true;
+  try{
+    var r=await ghPut(path,'admin: update '+_current.file,json,_current.sha);
+    if(r&&r.content&&r.content.sha)_current.sha=r.content.sha;
+    _modified=false;setBadge('ok','salvato');setStatus('ok','deploying...');
+    await _logAudit('save_db',_current.file,{rows:arr.length});
+    toast('Salvato! Deploy Cloudflare in corso...','success');
+    startDeployTimer();
+  }catch(e){setBadge('err','errore');setStatus('err','errore');toast(e.message,'error')}
+  document.getElementById('save-btn').disabled=false;
+}
 async function saveJson(){
   if(!_current)return;
   var content=document.getElementById('e-json').value;
   try{JSON.parse(content)}catch(e){toast('JSON non valido: '+e.message,'error');return}
   var paths={page:CONTENT+'/pages/'+_current.k+'.json',db:CONTENT+'/db/'+_current.file,mestiere:CONTENT+'/mestieri/'+_current.file,doc:CONTENT+'/docs/'+_current.file};
   var path=paths[_current.type];
+  setStatus('saving','verifica conflitti...');
+  if(!await _checkRemoteSha()){
+    if(!confirm('⚠️ Il file è stato modificato da un\'altra sessione. Sovrascrivere comunque?')){setStatus('idle','annullato');return}
+  }
   setStatus('saving','salvataggio...');
   document.getElementById('save-btn').disabled=true;
   try{
     var r=await ghPut(path,'admin: update '+(_current.file||_current.k),content,_current.sha);
     if(r&&r.content&&r.content.sha)_current.sha=r.content.sha;
     _modified=false;setBadge('ok','salvato');setStatus('ok','deploying...');
-    toast('Salvato! Deploy Cloudflare in corso (~30s)...','success');
+    await _logAudit('save_'+_current.type,_current.file||_current.k,{});
+    toast('Salvato! Deploy Cloudflare in corso...','success');
     startDeployTimer();
   }catch(e){setBadge('err','errore');setStatus('err','errore');toast(e.message,'error')}
   document.getElementById('save-btn').disabled=false;
@@ -1098,6 +1689,7 @@ function setBadge(cls,label){var b=document.getElementById('e-badge');if(b){b.cl
    ════════════════════════════════════ */
 function mdToHtml(md){
   if(!md)return'';
+  md=md.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   md=md.replace(/```(\w*)\n([\s\S]*?)```/g,'<pre><code>$2</code></pre>');
   md=md.replace(/`([^`]+)`/g,'<code>$1</code>');
   md=md.replace(/^#### (.+)$/gm,'<h4>$1</h4>');
@@ -1131,19 +1723,44 @@ function mdToHtml(md){
 var _deployInterval=null;
 function startDeployTimer(){
   if(_deployInterval)clearInterval(_deployInterval);
-  var sec=45;
   var el=document.getElementById('tb-status');
+  var start=Date.now();
+  var lastPing=0;
+  var realDeploy=false;
   el.className='topbar-status saving';
-  el.textContent='deploy in '+sec+'s...';
+  el.textContent='deploy in corso…';
+  async function pingDeploy(){
+    try{
+      var r=await fetch('/api/deploy',{credentials:'include'});
+      var j=await r.json();
+      if(j.configured){
+        realDeploy=true;
+        if(j.status==='success'){
+          clearInterval(_deployInterval);_deployInterval=null;
+          el.className='topbar-status ok';
+          el.textContent='deploy completato';
+          toast('Deploy completato! Ricarica il sito per vedere le modifiche.','success');
+          return true;
+        }
+        el.textContent='deploy: '+j.status;
+      }
+    }catch(e){}
+    return false;
+  }
   _deployInterval=setInterval(function(){
-    sec--;
+    var now=Date.now();
+    if(now-lastPing>=10000){lastPing=now;pingDeploy();}
+    var sec=Math.max(0,45-Math.round((now-start)/1000));
     if(sec<=0){
       clearInterval(_deployInterval);_deployInterval=null;
-      el.className='topbar-status ok';
-      el.textContent='deploy completato';
-      toast('Deploy completato! Ricarica il sito per vedere le modifiche.','success');
-    }else{
-      el.textContent='deploy in '+sec+'s...';
+      pingDeploy().then(function(done){
+        if(done)return;
+        el.className='topbar-status ok';
+        el.textContent='deploy completato';
+        toast('Deploy completato! Ricarica il sito per vedere le modifiche.','success');
+      });
+    }else if(!realDeploy){
+      el.textContent='deploy in '+sec+'s…';
     }
   },1000);
 }

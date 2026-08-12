@@ -112,6 +112,39 @@ menu del sito dopo il deploy.
   (`env.ARCAMIS_CACHE`), basato su `CF-Connecting-IP`.
 - Sanitizzazione XSS in `notion-render.js` (`_scrubHtmlString`, `_cleanHref`)
   e in `notion-nav.js` (`_mdToHtml` escape dell'input).
+- Login del pannello admin: prima prova il login server-side (`/api/admin`,
+  cookie di sessione HttpOnly in KV + rate limit), con fallback alla verifica
+  hash locale se `ADMIN_SECRET` non è configurato. Dopo il login viene attivata
+  la barra di amministrazione sul sito (`sessionStorage.arcadmin`).
+
+### Variabili d'ambiente Cloudflare Pages
+
+| Variabile | Uso |
+|-----------|-----|
+| `ADMIN_SECRET` | Password del pannello admin (login server-side) |
+| `GH_TOKEN` | Personal Access Token GitHub per il proxy `/api/gh` (se assente l'admin ricade sul token inserito nel browser) |
+| `CF_API_TOKEN` | Token Cloudflare (opzionale) per lo stato deploy reale in `/api/deploy` |
+| `CF_ACCOUNT_ID` | Account Cloudflare (opzionale, serve con `CF_API_TOKEN`) |
+| `CF_PAGES_PROJECT` | Nome progetto Pages, default `arcamis` (opzionale) |
+| `GH_REPO` / `GH_BRANCH` | Repo/branch usati dal proxy, default `DarkLionMoon/Arcamis` e `main` |
+
+Con `GH_TOKEN` configurato il pannello non richiede mai il Personal Access Token
+nel browser: tutte le operazioni passano da `functions/api/gh.js` (session-authenticated).
+
+## Pannello admin
+
+Oltre all'editor markdown con anteprima, il pannello offre:
+
+- **Login server-side** con "ricordami", fallback hash locale se non configurato.
+- **📜 STORIA** — cronologia commit di una pagina e ripristino di una versione
+  precedente nell'editor (poi da salvare).
+- **🔗 LINKS** — verifica che i link interni del contenuto esistano in `_pathMap`.
+- **🔗 URL / 🌐 APRI** — copia l'URL pulito della pagina o la apre sul sito.
+- **🖼️ /images/** — lista immagini con anteprima, copia URL, upload ed eliminazione.
+- **🔎 Cerca nel contenuto** — ricerca full-text nelle pagine (lazy index).
+- **Deploy status reale** via `/api/deploy` quando `CF_API_TOKEN` è configurato,
+  altrimenti countdown di fallback.
+- Sidebar off-canvas con hamburger su mobile.
 
 ## Deployment
 

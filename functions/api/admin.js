@@ -157,6 +157,20 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ entries }), { headers: cors });
   }
 
+  /* ════ AUDIT LOG (scrittura da client admin) ════ */
+  if (action === 'audit' && request.method === 'POST') {
+    let body;
+    try { body = await request.json(); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    const { action: act, target, extra, user, role } = body;
+    if (!act || !target) {
+      return new Response(JSON.stringify({ error: 'action e target richiesti' }), { status: 400, headers: cors });
+    }
+    await writeAdminLog(act, target, extra ? JSON.stringify(extra) : '');
+    return new Response(JSON.stringify({ ok: true }), { headers: cors });
+  }
+
   /* ════ SALVA COVER ════ */
   if (action === 'set_cover' && request.method === 'POST') {
     let body;
