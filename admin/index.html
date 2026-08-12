@@ -587,35 +587,30 @@ async function doLogin(){
   document.getElementById('login-err').style.display='none';
   var btn=document.querySelector('.login-btn');
   if(btn)btn.disabled=true;
-  var ok=false,role='editor',serverAuth=false;
-  /* 1. Prima prova il login server-side (cookie di sessione HttpOnly + rate limit) */
+  var ok=false,role='editor',serverAuth=false,serverReachable=true;
+  /* 1. Login server-side (crea sessione in KV + cookie HttpOnly) */
   try{
     var r=await fetch('/api/admin?action=login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:user,password:pw,remember:remember})});
     ok=r.ok;
     if(ok){var j=await r.json();role=j.role||'editor';serverAuth=true;}
-  }catch(e){ok=false}
-  /* 2. Fallback: verifica utenti in KV (multi-user) */
-  if(!ok){
-    var users=await _loadUsers();
-    var u=users.find(x=>x.username===user);
-    if(u){
-      var h=await sha256(pw);
-      if(h===u.passwordHash){
-        ok=true;role=u.role||'editor';
-      }
-    }
-  }
-  /* 3. Fallback finale: hash hardcoded (compatibilità) */
-  if(!ok){
+  }catch(e){ok=false;serverReachable=false;}
+  /* 2. Fallback hash hardcoded SOLO se il server non è raggiungibile.
+        Se il server è attivo ma rifiuta le credenziali niente login locale:
+        senza sessione server-side le operazioni (es. gestione utenti)
+        fallirebbero con "Non autenticato". */
+  if(!ok&&!serverReachable){
     var h=await sha256(pw);
     if(h===ADMIN_PW){ok=true;role='admin';}
   }
   if(!ok){
-    document.getElementById('login-err').style.display='';
+    var errEl=document.getElementById('login-err');
+    errEl.textContent=serverReachable?'Credenziali errate':'Server non raggiungibile';
+    errEl.style.display='';
     if(btn)btn.disabled=false;
     return;
   }
   if(btn)btn.disabled=false;
+  if(!serverAuth)toast('Login offline: le operazioni server-side (es. gestione utenti) non saranno disponibili','error');
   _currentUser=user;_userRole=role;
   sessionStorage.setItem('arcadmin','1');
   document.getElementById('login').style.display='none';
