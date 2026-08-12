@@ -22,7 +22,6 @@ window.addEventListener('load', function(){
     function _doPrefetch(){
       var prefetch = [
         '2f00274fdc1c8065a11ff45192aa5dcb',
-        '2f00274fdc1c800b9d8fc366e8e40c5c',
         '2dd222f22ef8413f8cb48f03bbb4f4b0',
         '2f00274fdc1c80e78ad7ce985007b7c6',
         '2f00274fdc1c806f8f17dbc6532d2211',
@@ -530,10 +529,6 @@ var _pathMap = {
   /* Regole */
   'regole/gameplay/combattimento':            '2f60274fdc1c80b7a729ef091b278682',
   'regole/gameplay/codex':                    '2f60274fdc1c80adb7a5d6beeef3e544',
-  'regole/generali':                          '2f00274fdc1c800b9d8fc366e8e40c5c',
-  'regole/generali/off-game':                 '2f10274fdc1c80368140c7aaffd80cd4',
-  'regole/generali/in-game':                  '2f10274fdc1c80ce8fccea2d4c589376',
-  'regole/generali/pvp':                      '2f10274fdc1c8042b72efc2361d6766b',
   'materiale-approvato':                      '3130274fdc1c807eb61fde24e8236659',
   /* Personaggio */
   'personaggio/come-si-inizia':               '2dd222f22ef8413f8cb48f03bbb4f4b0',

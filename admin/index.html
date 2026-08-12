@@ -338,20 +338,29 @@ function _stopAutosave(){if(_autosaveTimer){clearInterval(_autosaveTimer);_autos
 async function _loadUsers(){
   try{
     var r=await fetch('/api/admin?action=get_users',{credentials:'include'});
-    if(!r.ok)return [{username:'admin',role:'admin',passwordHash:ADMIN_PW}];
+    if(!r.ok)return [];
     return (await r.json()).users||[];
-  }catch(e){return [{username:'admin',role:'admin',passwordHash:ADMIN_PW}]}
+  }catch(e){return []}
 }
 async function _saveUsers(users){
-  try{await fetch('/api/admin?action=set_users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({users:users})})}catch(e){}
+  try{
+    var r=await fetch('/api/admin?action=set_users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({users:users})});
+    if(!r.ok){
+      var j=await r.json().catch(function(){return {}});
+      throw new Error(j.error||('Errore '+r.status));
+    }
+    return true;
+  }catch(e){
+    toast('Errore salvataggio utenti: '+e.message,'error');
+    return false;
+  }
 }
 async function _addUser(username,password,role){
   var users=await _loadUsers();
   if(users.find(u=>u.username===username))return false;
   var hash=await sha256(password);
   users.push({username:username,role:role,passwordHash:hash,created:new Date().toISOString()});
-  await _saveUsers(users);
-  return true;
+  return _saveUsers(users);
 }
 async function _updateUser(username,password,role){
   var users=await _loadUsers();
@@ -360,8 +369,7 @@ async function _updateUser(username,password,role){
   if(password)users[idx].passwordHash=await sha256(password);
   users[idx].role=role;
   users[idx].updated=new Date().toISOString();
-  await _saveUsers(users);
-  return true;
+  return _saveUsers(users);
 }
 async function _deleteUser(username){
   if(username==='admin')return false;
@@ -369,26 +377,28 @@ async function _deleteUser(username){
   var idx=users.findIndex(u=>u.username===username);
   if(idx===-1)return false;
   users.splice(idx,1);
-  await _saveUsers(users);
-  return true;
+  return _saveUsers(users);
 }
 function _can(action){
   if(_userRole==='admin')return true;
   if(action==='save'||action==='create')return _userRole==='editor'||_userRole==='admin';
-  if(action==='delete')return _userRole==='admin';
+  if(action==='delete'||action==='users')return _userRole==='admin';
   return false;
 }
 function _checkPerm(action){
   if(!_can(action)){
-    toast('Permesso negato: serve ruolo '+action==='delete'?'admin':'editor+','error');
+    toast('Permesso negato: serve ruolo '+(action==='delete'||action==='users'?'admin':'editor+'),'error');
     return false;
   }
   return true;
 }
 function openUserManagement(){
-  if(!_checkPerm('delete'))return;
+  if(!_checkPerm('users'))return;
   if(document.getElementById('um-modal'))return;
   _loadUsers().then(function(users){
+    if(!users.length){
+      toast('Nessun utente presente: clicca ➕ per crearne uno nuovo','error');
+    }
     var rows=users.map(function(u){
       return '<div class="list-item" style="cursor:default">'
         +'<div class="li-main"><div class="li-title">'+esc(u.username)+'</div>'
@@ -402,7 +412,7 @@ function openUserManagement(){
     d.id='um-modal';
     d.innerHTML='<div class="list-modal" style="width:min(560px,94vw)">'
       +'<h3>👥 Gestione Utenti</h3>'
-      +'<div class="list-body">'+rows+'</div>'
+      +'<div class="list-body">'+(rows||'<div class="list-item" style="cursor:default"><div class="li-main"><div class="li-title">Nessun utente</div><div class="li-sub">Clicca ➕ Aggiungi per creare il primo utente.</div></div></div>')+'</div>'
       +'<div class="img-actions"><button class="btn btn-primary" onclick="openAddUserModal()">➕ Aggiungi</button>'
       +'<button class="btn btn-ghost" onclick="closeModal(\'um-modal\')">Chiudi</button></div></div>';
     d.addEventListener('click',function(e){if(e.target===d)closeModal('um-modal')});
@@ -432,7 +442,7 @@ async function saveNewUser(){
   if(!user||!pass){toast('Username e password richiesti','error');return}
   var ok=await _addUser(user,pass,role);
   if(ok){toast('Utente creato','success');closeModal('au-modal');openUserManagement();}
-  else toast('Username già esistente','error');
+  else if(await _loadUsers().then(function(u){return u.find(x=>x.username===user)})){toast('Username già esistente','error')}
 }
 function editUser(username){
   if(document.getElementById('eu-modal'))return;

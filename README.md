@@ -52,8 +52,8 @@ Contenuto servito da JSON locali; API Functions come fallback Notion.
 Modifica `content/pages/<slug>.json` (campo `content`, markdown):
 
 ```bash
-git add content/pages/regole.json
-git commit -m "Aggiorna pagina regole"
+git add content/pages/materiale.json
+git commit -m "Aggiorna pagina materiale approvato"
 git push
 ```
 
@@ -177,7 +177,6 @@ Cloudflare Pages crea automaticamente un **deploy preview** per ogni branch dive
 | Pagina | ID |
 |--------|----|
 | Gameplay | `2f00274fdc1c8065a11ff45192aa5dcb` |
-| Regole | `2f00274fdc1c800b9d8fc366e8e40c5c` |
 | Materiale approvato | `3130274fdc1c807eb61fde24e8236659` |
 | Come si inizia | `2dd222f22ef8413f8cb48f03bbb4f4b0` |
 | Andando avanti | `5cea525d149f4acb9c59007bf6b3d5ff` |

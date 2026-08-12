@@ -44,7 +44,7 @@ arcamis-backup/
 │   └── ...
 └── repo/
     ├── admin/index.html
-    ├── content/pages/regole.json
+    ├── content/pages/materiale.json
     └── ...
 ```
 

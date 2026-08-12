@@ -71,7 +71,6 @@ function _mdToHtml(md){
 var _slugMap = {
   /* Regole */
   'gameplay':               '2f00274fdc1c8065a11ff45192aa5dcb',
-  'regole-generali':        '2f00274fdc1c800b9d8fc366e8e40c5c',
   'materiale-approvato':    '3130274fdc1c807eb61fde24e8236659',
   /* Personaggio */
   'come-si-inizia':         '2dd222f22ef8413f8cb48f03bbb4f4b0',
@@ -130,7 +129,6 @@ var _idToSlug = {};
 
 var _navMap = {
   '2f00274fdc1c8065a11ff45192aa5dcb': 'regole',
-  '2f00274fdc1c800b9d8fc366e8e40c5c': 'personaggio',
   '2dd222f22ef8413f8cb48f03bbb4f4b0': 'lavori',
   '2f00274fdc1c80e78ad7ce985007b7c6': 'lore',
 };

@@ -1,6 +1,5 @@
 const PAGES_TO_INDEX = [
   { id:'2f00274fdc1c8065a11ff45192aa5dcb', title:'Gameplay',                    icon:'⚔️' },
-  { id:'2f00274fdc1c800b9d8fc366e8e40c5c', title:'Regole generali',             icon:'📜' },
   { id:'3130274fdc1c807eb61fde24e8236659', title:'Materiale approvato',         icon:'📋' },
   { id:'2dd222f22ef8413f8cb48f03bbb4f4b0', title:'Come si inizia',              icon:'🌟' },
   { id:'5cea525d149f4acb9c59007bf6b3d5ff', title:'Andando avanti',              icon:'📈' },

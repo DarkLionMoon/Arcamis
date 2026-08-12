@@ -6,6 +6,17 @@ export async function onRequest(context) {
   const ADMIN_SECRET = env.ADMIN_SECRET;
   const SESSION_TTL        = 86400;          /* 24 ore  (default) */
   const SESSION_TTL_LONG   = 90 * 86400;     /* 90 giorni (ricordami) */
+  /* Hash SHA-256 della password locale hardcoded in admin/index.html
+     (fallback documentato). Viene accettato SOLO se ADMIN_SECRET non è
+     configurato, così anche il login fallback ottiene una sessione
+     server-side reale (necessaria per la gestione utenti in KV). */
+  const FALLBACK_ADMIN_HASH = 'b0b9dd19ef971d0b25d73afa6c1b1a1a52aff81b4c6259e067aa305e187119f5';
+
+  async function sha256hex(text) {
+    const data = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
 
   const cors = {
     'Access-Control-Allow-Origin': url.origin,
@@ -32,8 +43,9 @@ export async function onRequest(context) {
     try {
       const stored = await KV.get('admin_session_' + token);
       if (!stored) return false;
+      if (stored === 'valid') return true; // compatibilità con vecchie sessioni
       const session = JSON.parse(stored);
-      return session && (session === true || session.role); // compatibilità con vecchie sessioni 'valid'
+      return session && (session === true || session.role);
     } catch (e) { return false; }
   }
 
@@ -104,16 +116,22 @@ export async function onRequest(context) {
           const users = JSON.parse(usersRaw);
           const u = users.find(x => x.username === body.username);
           if (u) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(body.password);
-            const hash = await crypto.subtle.digest('SHA-256', data);
-            const hashHex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
-            if (hashHex === u.passwordHash) {
+            const hash = await sha256hex(body.password);
+            if (hash === u.passwordHash) {
               ok = true; role = u.role || 'editor';
             }
           }
         }
       } catch (_) {}
+      /* Fallback: se ADMIN_SECRET non è configurato, accetta anche la password
+         locale hardcoded così la sessione server-side viene creata davvero
+         (altrimenti la gestione utenti in KV fallirebbe con 401). */
+      if (!ok && !ADMIN_SECRET) {
+        const hash = await sha256hex(body.password);
+        if (hash === FALLBACK_ADMIN_HASH) {
+          ok = true; role = 'admin';
+        }
+      }
     }
     if (!ok) {
       await new Promise(r => setTimeout(r, 800));

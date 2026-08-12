@@ -44,7 +44,15 @@ export async function onRequest(context) {
   const token = getCookie('arc_admin');
   let authed = false;
   if (token) {
-    try { authed = (await KV.get('admin_session_' + token)) === 'valid'; } catch (_) {}
+    try {
+      const stored = await KV.get('admin_session_' + token);
+      if (stored === 'valid') {
+        authed = true; // compatibilità con vecchie sessioni
+      } else {
+        const session = JSON.parse(stored);
+        authed = !!(session && (session === true || session.role));
+      }
+    } catch (_) {}
   }
   if (!authed) {
     return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
