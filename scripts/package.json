@@ -1,0 +1,13 @@
+{
+  "name": "arcamis-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Script di utilità per Arcamis Wiki",
+  "main": "backup-kv.js",
+  "scripts": {
+    "backup": "node backup-kv.js"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.0"
+  }
+}
