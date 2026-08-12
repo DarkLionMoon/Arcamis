@@ -212,10 +212,11 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   <h1>⚔ ARCAMIS</h1>
   <div class="sub">Pannello Amministrazione</div>
   <div class="login-card">
-    <input type="password" id="login-pw" placeholder="Password..." autocomplete="off">
+    <input type="text" id="login-user" placeholder="Username" autocomplete="username">
+    <input type="password" id="login-pw" placeholder="Password..." autocomplete="current-password">
     <label class="login-remember"><input type="checkbox" id="login-remember"> Ricordami (90 giorni)</label>
     <button class="login-btn" onclick="doLogin()">ACCEDI</button>
-    <div class="login-err" id="login-err">Password errata</div>
+    <div class="login-err" id="login-err">Credenziali errate</div>
   </div>
 </div>
 
@@ -332,6 +333,141 @@ function _startAutosave(){
 function _stopAutosave(){if(_autosaveTimer){clearInterval(_autosaveTimer);_autosaveTimer=null}}
 
 /* ════════════════════════════════════
+   MULTI-USER: gestione utenti e ruoli (salvati in KV)
+   ════════════════════════════════════ */
+async function _loadUsers(){
+  try{
+    var r=await fetch('/api/admin?action=get_users',{credentials:'include'});
+    if(!r.ok)return [{username:'admin',role:'admin',passwordHash:ADMIN_PW}];
+    return (await r.json()).users||[];
+  }catch(e){return [{username:'admin',role:'admin',passwordHash:ADMIN_PW}]}
+}
+async function _saveUsers(users){
+  try{await fetch('/api/admin?action=set_users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({users:users})})}catch(e){}
+}
+async function _addUser(username,password,role){
+  var users=await _loadUsers();
+  if(users.find(u=>u.username===username))return false;
+  var hash=await sha256(password);
+  users.push({username:username,role:role,passwordHash:hash,created:new Date().toISOString()});
+  await _saveUsers(users);
+  return true;
+}
+async function _updateUser(username,password,role){
+  var users=await _loadUsers();
+  var idx=users.findIndex(u=>u.username===username);
+  if(idx===-1)return false;
+  if(password)users[idx].passwordHash=await sha256(password);
+  users[idx].role=role;
+  users[idx].updated=new Date().toISOString();
+  await _saveUsers(users);
+  return true;
+}
+async function _deleteUser(username){
+  if(username==='admin')return false;
+  var users=await _loadUsers();
+  var idx=users.findIndex(u=>u.username===username);
+  if(idx===-1)return false;
+  users.splice(idx,1);
+  await _saveUsers(users);
+  return true;
+}
+function _can(action){
+  if(_userRole==='admin')return true;
+  if(action==='save'||action==='create')return _userRole==='editor'||_userRole==='admin';
+  if(action==='delete')return _userRole==='admin';
+  return false;
+}
+function _checkPerm(action){
+  if(!_can(action)){
+    toast('Permesso negato: serve ruolo '+action==='delete'?'admin':'editor+','error');
+    return false;
+  }
+  return true;
+}
+function openUserManagement(){
+  if(!_checkPerm('delete'))return;
+  if(document.getElementById('um-modal'))return;
+  _loadUsers().then(function(users){
+    var rows=users.map(function(u){
+      return '<div class="list-item" style="cursor:default">'
+        +'<div class="li-main"><div class="li-title">'+esc(u.username)+'</div>'
+        +'<div class="li-sub">Ruolo: '+esc(u.role)+' · Creato: '+(u.created||'').slice(0,10)+'</div></div>'
+        +'<button class="btn btn-ghost" onclick="editUser(\''+esc(u.username)+'\')">Modifica</button>'
+        +(u.username!=='admin'?'<button class="btn btn-danger" onclick="deleteUserConfirm(\''+esc(u.username)+'\')">🗑</button>':'')
+        +'</div>';
+    }).join('');
+    var d=document.createElement('div');
+    d.className='img-modal-backdrop';
+    d.id='um-modal';
+    d.innerHTML='<div class="list-modal" style="width:min(560px,94vw)">'
+      +'<h3>👥 Gestione Utenti</h3>'
+      +'<div class="list-body">'+rows+'</div>'
+      +'<div class="img-actions"><button class="btn btn-primary" onclick="openAddUserModal()">➕ Aggiungi</button>'
+      +'<button class="btn btn-ghost" onclick="closeModal(\'um-modal\')">Chiudi</button></div></div>';
+    d.addEventListener('click',function(e){if(e.target===d)closeModal('um-modal')});
+    document.body.appendChild(d);
+  });
+}
+function openAddUserModal(){
+  if(document.getElementById('au-modal'))return;
+  var d=document.createElement('div');
+  d.className='img-modal-backdrop';
+  d.id='au-modal';
+  d.innerHTML='<div class="list-modal">'
+    +'<h3>➕ Aggiungi utente</h3>'
+    +'<div class="img-field"><label>Username</label><input id="au-user" placeholder="username" style="width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:5px;color:var(--white);font-size:13px;padding:9px 12px;outline:none"></div>'
+    +'<div class="img-field"><label>Password</label><input type="password" id="au-pass" placeholder="password" style="width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:5px;color:var(--white);font-size:13px;padding:9px 12px;outline:none"></div>'
+    +'<div class="img-field"><label>Ruolo</label><select id="au-role" class="layout-select" style="width:100%"><option value="editor">editor</option><option value="admin">admin</option></select></div>'
+    +'<div class="img-actions"><button class="btn btn-ghost" onclick="closeModal(\'au-modal\')">Annulla</button>'
+    +'<button class="btn btn-primary" onclick="saveNewUser()">CREA</button></div></div>';
+  d.addEventListener('click',function(e){if(e.target===d)closeModal('au-modal')});
+  document.body.appendChild(d);
+  document.getElementById('au-user').focus();
+}
+async function saveNewUser(){
+  var user=document.getElementById('au-user').value.trim();
+  var pass=document.getElementById('au-pass').value;
+  var role=document.getElementById('au-role').value;
+  if(!user||!pass){toast('Username e password richiesti','error');return}
+  var ok=await _addUser(user,pass,role);
+  if(ok){toast('Utente creato','success');closeModal('au-modal');openUserManagement();}
+  else toast('Username già esistente','error');
+}
+function editUser(username){
+  if(document.getElementById('eu-modal'))return;
+  _loadUsers().then(function(users){
+    var u=users.find(x=>x.username===username);
+    if(!u)return;
+    var d=document.createElement('div');
+    d.className='img-modal-backdrop';
+    d.id='eu-modal';
+    d.innerHTML='<div class="list-modal">'
+      +'<h3>✏️ Modifica utente: '+esc(username)+'</h3>'
+      +'<div class="img-field"><label>Nuova password (lascia vuoto per non cambiare)</label><input type="password" id="eu-pass" placeholder="password" style="width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:5px;color:var(--white);font-size:13px;padding:9px 12px;outline:none"></div>'
+      +'<div class="img-field"><label>Ruolo</label><select id="eu-role" class="layout-select" style="width:100%"><option value="editor"'+(u.role==='editor'?' selected':'')+'>editor</option><option value="admin"'+(u.role==='admin'?' selected':'')+'>admin</option></select></div>'
+      +'<div class="img-actions"><button class="btn btn-ghost" onclick="closeModal(\'eu-modal\')">Annulla</button>'
+      +'<button class="btn btn-primary" onclick="saveEditUser(\''+esc(username)+'\')">SALVA</button></div></div>';
+    d.addEventListener('click',function(e){if(e.target===d)closeModal('eu-modal')});
+    document.body.appendChild(d);
+  });
+}
+async function saveEditUser(username){
+  var pass=document.getElementById('eu-pass').value;
+  var role=document.getElementById('eu-role').value;
+  var ok=await _updateUser(username,pass||null,role);
+  if(ok){toast('Utente aggiornato','success');closeModal('eu-modal');openUserManagement();}
+  else toast('Errore','error');
+}
+function deleteUserConfirm(username){
+  if(!confirm('Eliminare utente "'+username+'"?'))return;
+  _deleteUser(username).then(function(ok){
+    if(ok){toast('Utente eliminato','success');openUserManagement();}
+    else toast('Errore (admin non eliminabile)','error');
+  });
+}
+
+/* ════════════════════════════════════
    UTILITIES
    ════════════════════════════════════ */
 function sha256(t){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')})}
@@ -432,22 +568,37 @@ async function ghCommits(path){
    AUTH
    ════════════════════════════════════ */
 document.getElementById('login-pw').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
+var _loginUser=document.getElementById('login-user');
+if(_loginUser)_loginUser.addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
 async function doLogin(){
+  var user=document.getElementById('login-user').value.trim();
   var pw=document.getElementById('login-pw').value;
   var remember=document.getElementById('login-remember')?document.getElementById('login-remember').checked:false;
   document.getElementById('login-err').style.display='none';
   var btn=document.querySelector('.login-btn');
   if(btn)btn.disabled=true;
-  var ok=false;
+  var ok=false,role='editor',serverAuth=false;
   /* 1. Prima prova il login server-side (cookie di sessione HttpOnly + rate limit) */
   try{
-    var r=await fetch('/api/admin?action=login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw,remember:remember})});
+    var r=await fetch('/api/admin?action=login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:user,password:pw,remember:remember})});
     ok=r.ok;
+    if(ok){var j=await r.json();role=j.role||'editor';serverAuth=true;}
   }catch(e){ok=false}
-  /* 2. Fallback: verifica hash client-side (compatibilità se ADMIN_SECRET non configurato) */
+  /* 2. Fallback: verifica utenti in KV (multi-user) */
+  if(!ok){
+    var users=await _loadUsers();
+    var u=users.find(x=>x.username===user);
+    if(u){
+      var h=await sha256(pw);
+      if(h===u.passwordHash){
+        ok=true;role=u.role||'editor';
+      }
+    }
+  }
+  /* 3. Fallback finale: hash hardcoded (compatibilità) */
   if(!ok){
     var h=await sha256(pw);
-    ok=(h===ADMIN_PW);
+    if(h===ADMIN_PW){ok=true;role='admin';}
   }
   if(!ok){
     document.getElementById('login-err').style.display='';
@@ -455,7 +606,7 @@ async function doLogin(){
     return;
   }
   if(btn)btn.disabled=false;
-  _currentUser='admin';_userRole='admin';
+  _currentUser=user;_userRole=role;
   sessionStorage.setItem('arcadmin','1');
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='flex';
@@ -463,6 +614,7 @@ async function doLogin(){
   var restored=_checkUnsaved();
   if(restored&&_current){_autosaveClear()}
   buildSidebar();
+  toast('Benvenuto, '+user+' ('+role+')','success');
 }
 function doLogout(){
   sessionStorage.removeItem('arcadmin');
@@ -488,6 +640,10 @@ function buildSidebar(){
   h+=sbGroup('Documenti','doc',DOCS);
   h+='<div class="sb-group"><div class="sb-label">Immagini</div>';
   h+='<div class="sb-item" data-type="images" data-key="images" onclick="openImages()"><span class="ico">🖼️</span><span class="lbl">/images/ — gestione</span></div></div>';
+  if(_userRole==='admin'){
+    h+='<div class="sb-group"><div class="sb-label">Sistema</div>';
+    h+='<div class="sb-item" data-type="users" onclick="openUserManagement()"><span class="ico">👥</span><span class="lbl">Gestione Utenti</span></div></div>';
+  }
   h+='</div>';
   document.getElementById('sidebar').innerHTML=h;
 }

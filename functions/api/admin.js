@@ -31,7 +31,9 @@ export async function onRequest(context) {
     if (!token) return false;
     try {
       const stored = await KV.get('admin_session_' + token);
-      return stored === 'valid';
+      if (!stored) return false;
+      const session = JSON.parse(stored);
+      return session && (session === true || session.role); // compatibilità con vecchie sessioni 'valid'
     } catch (e) { return false; }
   }
 
@@ -90,9 +92,32 @@ export async function onRequest(context) {
     if (await rateLimitReached()) {
       return new Response(JSON.stringify({ error: 'Troppi tentativi, riprova più tardi' }), { status: 429, headers: cors });
     }
-    if (!body.password || body.password !== ADMIN_SECRET) {
+    /* Supporta sia login con ADMIN_SECRET (single-user) che multi-user da KV */
+    let ok = false, role = 'editor';
+    if (body.password === ADMIN_SECRET) {
+      ok = true; role = 'admin';
+    } else {
+      /* Multi-user: verifica utenti in KV */
+      try {
+        const usersRaw = await KV.get('admin_users');
+        if (usersRaw) {
+          const users = JSON.parse(usersRaw);
+          const u = users.find(x => x.username === body.username);
+          if (u) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(body.password);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            const hashHex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+            if (hashHex === u.passwordHash) {
+              ok = true; role = u.role || 'editor';
+            }
+          }
+        }
+      } catch (_) {}
+    }
+    if (!ok) {
       await new Promise(r => setTimeout(r, 800));
-      return new Response(JSON.stringify({ error: 'Password errata' }), { status: 401, headers: cors });
+      return new Response(JSON.stringify({ error: 'Credenziali errate' }), { status: 401, headers: cors });
     }
     await resetRateLimit();
 
@@ -101,14 +126,48 @@ export async function onRequest(context) {
     const ttl = remember ? SESSION_TTL_LONG : SESSION_TTL;
 
     const token = genToken();
-    await KV.put('admin_session_' + token, 'valid', { expirationTtl: ttl });
+    await KV.put('admin_session_' + token, JSON.stringify({ role }), { expirationTtl: ttl });
 
     const cookieVal = 'arc_admin=' + token
       + '; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=' + ttl;
 
-    return new Response(JSON.stringify({ ok: true }), {
+    return new Response(JSON.stringify({ ok: true, role }), {
       headers: { ...cors, 'Set-Cookie': cookieVal }
     });
+  }
+
+  /* ════ GET USERS (multi-user) ════ */
+  if (action === 'get_users') {
+    const authed = await checkSession();
+    if (!authed) return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    try {
+      const raw = await KV.get('admin_users');
+      const users = raw ? JSON.parse(raw) : [];
+      /* Non restituire gli hash delle password */
+      const safeUsers = users.map(u => ({ username: u.username, role: u.role, created: u.created, updated: u.updated }));
+      return new Response(JSON.stringify({ users: safeUsers }), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ users: [] }), { headers: cors });
+    }
+  }
+
+  /* ════ SET USERS (multi-user) ════ */
+  if (action === 'set_users' && request.method === 'POST') {
+    const authed = await checkSession();
+    if (!authed) return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    let body;
+    try { body = await request.json(); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    if (!Array.isArray(body.users)) {
+      return new Response(JSON.stringify({ error: 'users array richiesto' }), { status: 400, headers: cors });
+    }
+    /* Validazione base */
+    for (const u of body.users) {
+      if (!u.username || !u.role) return new Response(JSON.stringify({ error: 'username e role richiesti' }), { status: 400, headers: cors });
+    }
+    await KV.put('admin_users', JSON.stringify(body.users));
+    return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
 
   /* ════ LOGOUT ════ */
