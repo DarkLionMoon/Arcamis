@@ -7,9 +7,10 @@ export async function onRequest(context) {
   const SESSION_TTL        = 86400;          /* 24 ore  (default) */
   const SESSION_TTL_LONG   = 90 * 86400;     /* 90 giorni (ricordami) */
   /* Hash SHA-256 della password locale hardcoded in admin/index.html
-     (fallback documentato). Viene accettato SOLO se ADMIN_SECRET non è
-     configurato, così anche il login fallback ottiene una sessione
-     server-side reale (necessaria per la gestione utenti in KV). */
+     (fallback documentato). Viene accettato anche se ADMIN_SECRET è
+     configurato, così la vecchia password continua a funzionare e il
+     login fallback ottiene una sessione server-side reale (necessaria
+     per la gestione utenti in KV). */
   const FALLBACK_ADMIN_HASH = 'b0b9dd19ef971d0b25d73afa6c1b1a1a52aff81b4c6259e067aa305e187119f5';
 
   async function sha256hex(text) {
@@ -123,10 +124,10 @@ export async function onRequest(context) {
           }
         }
       } catch (_) {}
-      /* Fallback: se ADMIN_SECRET non è configurato, accetta anche la password
-         locale hardcoded così la sessione server-side viene creata davvero
-         (altrimenti la gestione utenti in KV fallirebbe con 401). */
-      if (!ok && !ADMIN_SECRET) {
+      /* Fallback: accetta la password locale hardcoded anche se
+         ADMIN_SECRET è configurato, così la vecchia password continua
+         a funzionare e la sessione server-side viene creata davvero. */
+      if (!ok) {
         const hash = await sha256hex(body.password);
         if (hash === FALLBACK_ADMIN_HASH) {
           ok = true; role = 'admin';
