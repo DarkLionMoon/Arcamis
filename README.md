@@ -153,6 +153,25 @@ Cloudflare Pages:
 - Output directory: `/` (root)
 - Funzioni in `functions/`
 
+### Preview Deploy (staging)
+
+Cloudflare Pages crea automaticamente un **deploy preview** per ogni branch diverso da `main` (branch di produzione configurato in dashboard).
+
+**Workflow consigliato:**
+1. In Cloudflare Pages dashboard → *Settings > Build & deployments* → *Production branch*: `main`
+2. Per testare le modifiche prima del merge su `main`:
+   ```bash
+   git checkout -b preview
+   git push origin preview
+   ```
+3. Cloudflare Pages rileva il push su `preview` e crea un deploy preview all'URL tipo `https://preview.arcamis.pages.dev`
+4. Testare le modifiche sull'URL di preview
+5. Quando soddisfatti: merge `preview` → `main` (o PR) per il deploy produzione
+
+> **Nota**: non serve configurazione extra; basta che il branch non sia `main`. Il dominio preview è `https://<branch>.<project>.pages.dev`.
+
+---
+
 ## ID pagine Notion di riferimento
 
 | Pagina | ID |
