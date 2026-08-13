@@ -16,12 +16,6 @@ var _lastSavedContent = '';
 var _currentUser = null;
 var _userRole = 'admin';
 
-var DB_FILES = [
-  {file:'npc.json',l:'NPC',i:'👤'},
-  {file:'biblioteca.json',l:'Biblioteca',i:'📚'},{file:'timeline.json',l:'Timeline',i:'📅'},
-  {file:'subclasses.json',l:'Subclass',i:'🎭'},{file:'species.json',l:'Specie',i:'🧬'},
-  {file:'changelog.json',l:'Changelog',i:'📝'}
-];
 var MESTIERI = [
   {file:'alchimista.json',l:'Alchimista',i:'⚗️'},{file:'architetto.json',l:'Architetto',i:'🏛️'},
   {file:'artigiano.json',l:'Artigiano',i:'🔨'},{file:'artista.json',l:'Artista',i:'🎨'},
@@ -223,7 +217,6 @@ async function _checkRemoteSha(){
   if(!_current||!_current.sha)return true;
   try{
     var path=_current.type==='page'?CONTENT+'/pages/'+_current.k+'.json'
-      :_current.type==='db'?CONTENT+'/db/'+_current.file
       :_current.type==='mestiere'?CONTENT+'/mestieri/'+_current.file
       :CONTENT+'/docs/'+_current.file;
     var d=await ghGet(path);
@@ -373,7 +366,6 @@ function buildSidebar(){
   h+='</div>';
   h+='<div class="sb-group"><div class="sb-label">Contenuti <button class="sb-add" onclick="openNewPageModal()" title="Nuova pagina">+</button></div>';
   h+=_sbItems('Pagine wiki','page',PAGES);
-  h+=_sbItems('Database','db',DB_FILES);
   h+=_sbItems('Mestieri','mestiere',MESTIERI);
   h+=_sbItems('Documenti','doc',DOCS);
   h+='</div>';
@@ -433,7 +425,6 @@ async function openItem(el){
   setStatus('saving','caricamento...');
   try{
     if(type==='page')await openPage(key);
-    else if(type==='db')await openDb(key);
     else if(type==='mestiere')await openMestiere(key);
     else if(type==='doc')await openDoc(key);
     setStatus('ok','caricato');
@@ -464,7 +455,6 @@ async function renderDashboard(){
     +'<button class="btn btn-soft" onclick="openContentSearch()">🔎 Cerca</button>');
   h+='<div class="stat-row">';
   h+='<div class="stat" onclick="dashOpenByType(\'page\')"><div class="si">📄</div><div><div class="sn">'+PAGES.length+'</div><div class="sl">Pagine wiki</div></div></div>';
-  h+='<div class="stat" onclick="dashOpenByType(\'db\')"><div class="si blue">🗄️</div><div><div class="sn">'+DB_FILES.length+'</div><div class="sl">Database</div></div></div>';
   h+='<div class="stat" onclick="dashOpenByType(\'mestiere\')"><div class="si green">⚒️</div><div><div class="sn">'+MESTIERI.length+'</div><div class="sl">Mestieri</div></div></div>';
   h+='<div class="stat" onclick="dashOpenByType(\'doc\')"><div class="si purple">📜</div><div><div class="sn">'+DOCS.length+'</div><div class="sl">Documenti</div></div></div>';
   h+='</div>';
@@ -479,7 +469,6 @@ async function renderDashboard(){
   }
   h+='</div></div>';
   h+=_dashGrid('Pagine wiki','page',PAGES);
-  h+=_dashGrid('Database','db',DB_FILES);
   h+=_dashGrid('Mestieri','mestiere',MESTIERI);
   h+=_dashGrid('Documenti','doc',DOCS);
   h+='<div class="panel" style="margin-top:16px"><div class="panel-head"><h3>Ultime attività</h3><span class="hint">registro admin</span></div><div id="dash-act"><div class="empty" style="padding:22px"><span class="ei">⏳</span>Caricamento…</div></div></div>';
@@ -494,7 +483,6 @@ function dashOpen(el){
 function dashOpenByType(type){
   var key=null;
   if(type==='page')key=PAGES[0]&&PAGES[0].k;
-  else if(type==='db')key=DB_FILES[0]&&DB_FILES[0].file;
   else if(type==='mestiere')key=MESTIERI[0]&&MESTIERI[0].file;
   else if(type==='doc')key=DOCS[0]&&DOCS[0].file;
   if(key)openByType(type,key);
@@ -504,7 +492,7 @@ function openByType(type,key){
   setActive(type,key);
   _modified=false;
   setStatus('saving','caricamento...');
-  var p=type==='page'?openPage(key):type==='db'?openDb(key):type==='mestiere'?openMestiere(key):type==='doc'?openDoc(key):null;
+  var p=type==='page'?openPage(key):type==='mestiere'?openMestiere(key):type==='doc'?openDoc(key):null;
   if(!p)return;
   p.then(function(){setStatus('ok','caricato');setTimeout(function(){setStatus('idle','pronto')},1500)})
    .catch(function(e){setStatus('err','errore');toast(e.message,'error')});

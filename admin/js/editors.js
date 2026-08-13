@@ -222,7 +222,7 @@ function _currentHead(){
     return {icon:_current.icon||'📄',title:_current.title||_current.k||''};
   }
   if(_current&&_current.file){
-    var meta=(_current.type==='db'?DB_FILES:_current.type==='mestiere'?MESTIERI:DOCS).find(function(f){return f.file===_current.file});
+    var meta=(_current.type==='mestiere'?MESTIERI:DOCS).find(function(f){return f.file===_current.file});
     return {icon:(meta&&meta.i)||'📄',title:_current.label||''};
   }
   return {icon:'📄',title:'Anteprima'};
@@ -1052,28 +1052,6 @@ async function openPageOnSite(){
 
 /* ── SCHEMA PER EDITOR TABELLA ── */
 var JSON_TABLE_SCHEMAS={
-  'npc.json':[
-    {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'role',t:'text'},{k:'location',t:'text'},
-    {k:'race',t:'text'},{k:'alignment',t:'text'},{k:'img',t:'url'},{k:'desc',t:'textarea'}
-  ],
-  'subclasses.json':[
-    {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'class',t:'text',req:true},
-    {k:'source',t:'text'},{k:'desc',t:'textarea'},{k:'features',t:'textarea'}
-  ],
-  'species.json':[
-    {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'size',t:'text'},
-    {k:'speed',t:'text'},{k:'ability',t:'text'},{k:'traits',t:'textarea'},{k:'subraces',t:'textarea'},{k:'languages',t:'text'}
-  ],
-  'changelog.json':[
-    {k:'id',t:'text',req:true},{k:'title',t:'text'},{k:'icon',t:'text'},{k:'cover',t:'url'}
-  ],
-  'timeline.json':[
-    {k:'id',t:'text',req:true},{k:'year',t:'text',req:true},{k:'title',t:'text',req:true},{k:'desc',t:'textarea'}
-  ],
-  'biblioteca.json':[
-    {k:'id',t:'text',req:true},{k:'title',t:'text',req:true},{k:'author',t:'text'},{k:'category',t:'text'},
-    {k:'desc',t:'textarea'},{k:'link',t:'url'}
-  ],
   'alchimista.json':[
     {k:'title',t:'text',req:true},{k:'content',t:'textarea',req:true}
   ],
@@ -1112,16 +1090,6 @@ function _isArrayFile(file){return file in JSON_TABLE_SCHEMAS}
 function _getSchema(file){return JSON_TABLE_SCHEMAS[file]||[]}
 
 /* ── DB / MESTIERE / DOC EDITORS ── */
-async function openDb(file){
-  var meta=DB_FILES.find(function(d){return d.file===file});
-  var path=CONTENT+'/db/'+file;
-  var content='[]',sha=null;
-  try{var d=await ghGet(path);content=b64decode(d.content);sha=d.sha}catch(e){}
-  _current={type:'db',file:file,sha:sha,label:meta?meta.l:file};
-  setCrumb('Contenuti','Database');
-  setTitle((meta?meta.i:'📄')+' '+(meta?meta.l:file));
-  if(_isArrayFile(file))renderTableEditor(content,file);else renderJsonEditor(content);
-}
 async function openMestiere(file){
   var meta=MESTIERI.find(function(m){return m.file===file});
   var path=CONTENT+'/mestieri/'+file;
@@ -1312,7 +1280,7 @@ async function saveJson(){
 async function deleteJsonFile(){
   if(!_current||_current.type==='page')return;
   var label=_current.label||_current.file;
-  var path=_current.type==='db'?CONTENT+'/db/'+_current.file:_current.type==='mestiere'?CONTENT+'/mestieri/'+_current.file:CONTENT+'/docs/'+_current.file;
+  var path=_current.type==='mestiere'?CONTENT+'/mestieri/'+_current.file:CONTENT+'/docs/'+_current.file;
   if(!_current.sha){toast('File non esistente nel repo: '+path,'error');return}
   if(!confirm('Eliminare definitivamente il file "'+label+'" ('+path+')?\n\nAttenzione: se qualche pagina del sito lo usa, quella funzionalità si romperà. Questa operazione non è reversibile.'))return;
   var btn=document.getElementById('del-btn');
