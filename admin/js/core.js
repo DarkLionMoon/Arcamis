@@ -16,13 +16,6 @@ var _lastSavedContent = '';
 var _currentUser = null;
 var _userRole = 'admin';
 
-var MESTIERI = [
-  {file:'alchimista.json',l:'Alchimista',i:'⚗️'},{file:'architetto.json',l:'Architetto',i:'🏛️'},
-  {file:'artigiano.json',l:'Artigiano',i:'🔨'},{file:'artista.json',l:'Artista',i:'🎨'},
-  {file:'falegname.json',l:'Falegname',i:'🪚'},{file:'metallurgo.json',l:'Metallurgo',i:'⚒️'},
-  {file:'oste.json',l:'Oste',i:'🍺'},{file:'sarto.json',l:'Sarto',i:'🧵'}
-];
-
 /* ═══════════════ UTILITIES ═══════════════ */
 function sha256(t){
   return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t))
@@ -209,11 +202,9 @@ function _checkUnsaved(){
   return null;
 }
 async function _checkRemoteSha(){
-  if(!_current||!_current.sha)return true;
+  if(!_current||!_current.sha||_current.type!=='page')return true;
   try{
-    var path=_current.type==='page'?CONTENT+'/pages/'+_current.k+'.json'
-      :CONTENT+'/mestieri/'+_current.file;
-    var d=await ghGet(path);
+    var d=await ghGet(CONTENT+'/pages/'+_current.k+'.json');
     return d.sha===_current.sha;
   }catch(e){return true}
 }
@@ -360,7 +351,6 @@ function buildSidebar(){
   h+='</div>';
   h+='<div class="sb-group"><div class="sb-label">Contenuti <button class="sb-add" onclick="openNewPageModal()" title="Nuova pagina">+</button></div>';
   h+=_sbItems('Pagine wiki','page',PAGES);
-  h+=_sbItems('Mestieri','mestiere',MESTIERI);
   h+='</div>';
   h+='<div class="sb-group"><div class="sb-label">Media</div>';
   h+='<div class="sb-item" data-type="images" data-key="images" onclick="openImages()"><span class="ico">🖼️</span><span class="lbl">Immagini /images/</span></div>';
@@ -418,7 +408,6 @@ async function openItem(el){
   setStatus('saving','caricamento...');
   try{
     if(type==='page')await openPage(key);
-    else if(type==='mestiere')await openMestiere(key);
     setStatus('ok','caricato');
     setTimeout(function(){setStatus('idle','pronto')},1500);
   }catch(e){setStatus('err','errore');toast(e.message,'error')}
@@ -447,7 +436,6 @@ async function renderDashboard(){
     +'<button class="btn btn-soft" onclick="openContentSearch()">🔎 Cerca</button>');
   h+='<div class="stat-row">';
   h+='<div class="stat" onclick="dashOpenByType(\'page\')"><div class="si">📄</div><div><div class="sn">'+PAGES.length+'</div><div class="sl">Pagine wiki</div></div></div>';
-  h+='<div class="stat" onclick="dashOpenByType(\'mestiere\')"><div class="si green">⚒️</div><div><div class="sn">'+MESTIERI.length+'</div><div class="sl">Mestieri</div></div></div>';
   h+='</div>';
   h+='<div class="panel"><div class="panel-head"><h3>Azioni rapide</h3><span class="hint">scorciatoie</span></div><div class="quick-grid">';
   h+='<div class="quick" onclick="openNewPageModal()"><div class="qi">➕</div><div class="qt">Nuova pagina</div><div class="qd">Crea una sezione wiki con URL pulito</div></div>';
@@ -460,7 +448,6 @@ async function renderDashboard(){
   }
   h+='</div></div>';
   h+=_dashGrid('Pagine wiki','page',PAGES);
-  h+=_dashGrid('Mestieri','mestiere',MESTIERI);
   h+='<div class="panel" style="margin-top:16px"><div class="panel-head"><h3>Ultime attività</h3><span class="hint">registro admin</span></div><div id="dash-act"><div class="empty" style="padding:22px"><span class="ei">⏳</span>Caricamento…</div></div></div>';
   document.getElementById('main').innerHTML=h;
   _dashActivity();
@@ -473,7 +460,6 @@ function dashOpen(el){
 function dashOpenByType(type){
   var key=null;
   if(type==='page')key=PAGES[0]&&PAGES[0].k;
-  else if(type==='mestiere')key=MESTIERI[0]&&MESTIERI[0].file;
   if(key)openByType(type,key);
 }
 function openByType(type,key){
@@ -481,7 +467,7 @@ function openByType(type,key){
   setActive(type,key);
   _modified=false;
   setStatus('saving','caricamento...');
-  var p=type==='page'?openPage(key):type==='mestiere'?openMestiere(key):null;
+  var p=type==='page'?openPage(key):null;
   if(!p)return;
   p.then(function(){setStatus('ok','caricato');setTimeout(function(){setStatus('idle','pronto')},1500)})
    .catch(function(e){setStatus('err','errore');toast(e.message,'error')});
@@ -495,7 +481,7 @@ async function _dashActivity(){
     if(!box)return;
     if(!entries.length){box.innerHTML='<div class="empty" style="padding:22px"><span class="ei">🗒️</span>Nessuna attività registrata</div>';return}
     box.innerHTML=entries.map(function(e){
-      var ico=e.action==='save_page'?'📝':e.action==='save_db'||e.action==='save_mestiere'||e.action==='save_doc'?'🗄️':e.action==='cover_page'?'🖌️':'⚙️';
+      var ico=e.action==='save_page'?'📝':e.action==='cover_page'?'🖌️':'⚙️';
       return '<div class="act-item"><div class="act-dot" style="background:var(--acc)"></div>'
         +'<div class="act-main"><div class="act-t">'+ico+' <b>'+esc(e.action||'')+'</b> → '+esc(e.target||'')+'</div>'
         +'<div class="act-s">'+esc(dateFmt(e.timestamp))+'</div></div></div>';
