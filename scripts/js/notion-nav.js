@@ -7,9 +7,19 @@
 
 var navStack = [];
 
-/* ════ MARKDOWN → HTML (per JSON locali) ════ */
+/* ════ MARKDOWN → HTML (per JSON locali) ════
+   Delega a md-render.js (condiviso con l'admin, così
+   l'anteprima dell'editor è identica al sito). Se il
+   renderer condiviso non è caricato, usa il fallback legacy. */
 function _mdToHtml(md){
   if(!md) return '';
+  if(typeof window.mdRender === 'function'){
+    try{
+      var _out = window.mdRender(md);
+      if(_out) return _out;
+    }catch(_e){}
+  }
+  /* ── Fallback legacy ── */
   /* Proteggi i marker di blockquote, poi neutralizza l'HTML grezzo */
   var Q = '\u0000Q\u0000';
   md = md.replace(/^> (.*)$/gm, Q + '$1');
