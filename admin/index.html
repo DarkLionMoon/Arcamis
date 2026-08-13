@@ -357,10 +357,10 @@ var PAGES = [
   {k:"materiale-approvato", l:"Materiale Approvato", i:"📖", sec:"personaggio", c:1},
 ];
 var DB_FILES = [
-  {file:'gallery.json',l:'Galleria PG',i:'🖼️'},{file:'npc.json',l:'NPC',i:'👤'},
+  {file:'npc.json',l:'NPC',i:'👤'},
   {file:'biblioteca.json',l:'Biblioteca',i:'📚'},{file:'timeline.json',l:'Timeline',i:'📅'},
   {file:'subclasses.json',l:'Subclass',i:'🎭'},{file:'species.json',l:'Specie',i:'🧬'},
-  {file:'reputation.json',l:'Reputazione',i:'⭐'},{file:'carousel.json',l:'Carousel',i:'🎠'}
+  {file:'changelog.json',l:'Changelog',i:'📝'}
 ];
 var MESTIERI = [
   {file:'alchimista.json',l:'Alchimista',i:'⚗️'},{file:'architetto.json',l:'Architetto',i:'🏛️'},
@@ -2063,10 +2063,6 @@ async function openPageOnSite(){
    SCHEMA PER EDITOR TABELLA (file array)
    ════════════════════════════════════ */
 var JSON_TABLE_SCHEMAS={
-  'gallery.json':[
-    {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'icon',t:'text'},{k:'img',t:'url'},
-    {k:'race',t:'text'},{k:'class',t:'text'},{k:'level',t:'number'},{k:'guild',t:'text'},{k:'desc',t:'textarea'}
-  ],
   'npc.json':[
     {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'role',t:'text'},{k:'location',t:'text'},
     {k:'race',t:'text'},{k:'alignment',t:'text'},{k:'img',t:'url'},{k:'desc',t:'textarea'}
@@ -2079,13 +2075,8 @@ var JSON_TABLE_SCHEMAS={
     {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'size',t:'text'},
     {k:'speed',t:'text'},{k:'ability',t:'text'},{k:'traits',t:'textarea'},{k:'subraces',t:'textarea'},{k:'languages',t:'text'}
   ],
-  'reputation.json':[
-    {k:'id',t:'text',req:true},{k:'name',t:'text',req:true},{k:'faction',t:'text'},{k:'icon',t:'text'},
-    {k:'desc',t:'textarea'},{k:'ranks',t:'textarea'}
-  ],
-  'carousel.json':[
-    {k:'id',t:'text',req:true},{k:'title',t:'text',req:true},{k:'tag',t:'text'},
-    {k:'desc',t:'textarea'},{k:'btn1_text',t:'text'},{k:'btn1_href',t:'url'},{k:'btn2_text',t:'text'},{k:'btn2_href',t:'url'}
+  'changelog.json':[
+    {k:'id',t:'text',req:true},{k:'title',t:'text'},{k:'icon',t:'text'},{k:'cover',t:'url'}
   ],
   'timeline.json':[
     {k:'id',t:'text',req:true},{k:'year',t:'text',req:true},{k:'title',t:'text',req:true},{k:'desc',t:'textarea'}
