@@ -2,7 +2,9 @@
    custom-nav.js
    Inietta nel menu del sito le pagine
    custom create dall'admin (entries di
-   data.js con campo "sec").
+   data.js con campo "sec") e crea i
+   dropdown della top bar per le sezioni
+   definite in data.js (var SECTIONS).
    ════════════════════════════════════ */
 (function(){
   var SEC = {
@@ -11,6 +13,16 @@
     lavori:      { dd:'dd-lavori',  mn:null            },
     lore:        { dd:'dd-lore',    mn:'mn-sec-lore'   }
   };
+  var DEF_SECTIONS = [
+    {v:'regole',l:'Regole'},{v:'personaggio',l:'Personaggio'},
+    {v:'lavori',l:'Lavori'},{v:'lore',l:'Lore'}
+  ];
+
+  function _sections(){
+    return (typeof SECTIONS !== 'undefined' && Array.isArray(SECTIONS) && SECTIONS.length)
+      ? SECTIONS.filter(function(s){ return s && s.v; })
+      : DEF_SECTIONS;
+  }
 
   function _customPages(){
     return (typeof pages !== 'undefined')
@@ -38,26 +50,78 @@
     section.appendChild(el);
   }
 
+  function _ensureDesktopMenu(v, label){
+    var id = (SEC[v] && SEC[v].dd) ? SEC[v].dd : 'dd-' + v;
+    var dd = document.getElementById(id);
+    if(dd) return dd.querySelector('.tn-menu');
+    var nav = document.getElementById('tnav');
+    if(!nav) return null;
+    dd = document.createElement('div');
+    dd.className = 'tn-drop';
+    dd.id = id;
+    dd.setAttribute('role','menu');
+    var t = document.createElement('div');
+    t.className = 'tn';
+    t.setAttribute('role','menuitem');
+    t.setAttribute('aria-expanded','false');
+    t.setAttribute('tabindex','0');
+    t.textContent = label;
+    t.onclick = function(e){ toggleDd(id, e); };
+    var menu = document.createElement('div');
+    menu.className = 'tn-menu';
+    var lbl = document.createElement('div');
+    lbl.className = 'tn-menu-label';
+    lbl.textContent = label;
+    menu.appendChild(lbl);
+    dd.appendChild(t);
+    dd.appendChild(menu);
+    nav.appendChild(dd);
+    return menu;
+  }
+
+  function _ensureMobileSection(v, label){
+    if(SEC[v]){
+      var mnEl = SEC[v].mn
+        ? document.querySelector('#mobile-nav .'+SEC[v].mn)
+        : document.querySelector('#mobile-nav .mn-section--lavori');
+      return mnEl || null;
+    }
+    var mnEl = document.getElementById('mn-sec-' + v);
+    if(mnEl) return mnEl;
+    var drawer = document.getElementById('mobile-nav');
+    if(!drawer) return null;
+    mnEl = document.createElement('div');
+    mnEl.className = 'mn-section';
+    mnEl.id = 'mn-sec-' + v;
+    var lbl = document.createElement('div');
+    lbl.className = 'mn-label';
+    lbl.textContent = label;
+    mnEl.appendChild(lbl);
+    var discord = drawer.querySelector('a.mn-discord');
+    if(discord) drawer.insertBefore(mnEl, discord);
+    else drawer.appendChild(mnEl);
+    return mnEl;
+  }
+
   function inject(){
     var custom = _customPages();
-    if(!custom.length) return;
-    custom.forEach(function(p){
-      var sec = SEC[p.sec];
-      if(!sec) return;
-      var menu = sec.dd ? document.querySelector('#'+sec.dd+' .tn-menu') : null;
-      if(menu){
+    var sections = _sections();
+    var bySec = {};
+    custom.forEach(function(p){ (bySec[p.sec] = bySec[p.sec] || []).push(p); });
+    sections.forEach(function(s){
+      if(!s || !s.v) return;
+      var menu = _ensureDesktopMenu(s.v, s.l || s.v);
+      if(menu && bySec[s.v]){
         if(!menu.querySelector('.tn-item[data-cp]')){
           var div = document.createElement('div');
           div.className = 'tn-div';
           div.dataset.cp = 'sep';
           menu.appendChild(div);
         }
-        _makeDesktop(menu, p);
+        bySec[s.v].forEach(function(p){ _makeDesktop(menu, p); });
       }
-      var mn = null;
-      if(sec.mn) mn = document.querySelector('#mobile-nav .'+sec.mn);
-      else if(p.sec === 'lavori') mn = document.querySelector('#mobile-nav .mn-section--lavori');
-      if(mn) _makeMobile(mn, p);
+      var mnEl = _ensureMobileSection(s.v, s.l || s.v);
+      if(mnEl && bySec[s.v]) bySec[s.v].forEach(function(p){ _makeMobile(mnEl, p); });
     });
   }
 

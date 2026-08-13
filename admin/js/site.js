@@ -666,6 +666,22 @@ async function saveSections(){
     if(start===-1||end===-1)throw new Error('SECTIONS non trovato in admin/index.html');
     var block='var SECTIONS = [\n'+rows.map(function(r){return '  {v:'+JSON.stringify(r.v)+',l:'+JSON.stringify(r.l)+'}'}).join(',\n')+'\n];';
     await ghPut('admin/index.html','admin: update sections',s.slice(0,start)+block+s.slice(end+2),d.sha);
+    var siteRows=rows.filter(function(r){return r.v});
+    var d2=await ghGet('scripts/js/data.js');
+    var s2=b64decode(d2.content);
+    var sBlock='var SECTIONS = [\n'+siteRows.map(function(r){return '  {v:'+JSON.stringify(r.v)+',l:'+JSON.stringify(r.l)+'}'}).join(',\n')+'\n];';
+    var st=s2.indexOf('var SECTIONS = [');
+    var out;
+    if(st===-1){
+      var marker='var LAVORI = [';
+      var pos=s2.indexOf(marker);
+      if(pos===-1)pos=0;
+      out=s2.slice(0,pos)+sBlock+'\n\n'+s2.slice(pos);
+    }else{
+      var en=s2.indexOf('];',st);
+      out=s2.slice(0,st)+sBlock+s2.slice(en+2);
+    }
+    if(out!==s2)await ghPut('scripts/js/data.js','admin: update sections',out,d2.sha);
     SECTIONS.length=0;
     rows.forEach(function(r){SECTIONS.push(r)});
     toast('Sezioni salvate! Deploy in corso…','success');

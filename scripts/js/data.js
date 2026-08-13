@@ -32,6 +32,16 @@ var pages = [
 function getPage(idOrK){
   return pages.find(p => p.id === idOrK || p.k === idOrK);
 }
+
+/* ════ SEZIONI MENU (dropdown top bar) ════ */
+var SECTIONS = [
+  {v:'regole',l:'Regole'},
+  {v:'personaggio',l:'Personaggio'},
+  {v:'lavori',l:'Lavori'},
+  {v:'lore',l:'Lore'},
+  {v:'mestieri',l:'Mestieri'}
+];
+
 /* ════ LAVORI & MESTIERI ════ */
 var LAVORI = [
   { l:'Gilda avventurieri',          i:'🗡️', id:'2f00274fdc1c801b8c13cefd9e15694e' },
