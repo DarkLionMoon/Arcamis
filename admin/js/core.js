@@ -22,11 +22,6 @@ var MESTIERI = [
   {file:'falegname.json',l:'Falegname',i:'🪚'},{file:'metallurgo.json',l:'Metallurgo',i:'⚒️'},
   {file:'oste.json',l:'Oste',i:'🍺'},{file:'sarto.json',l:'Sarto',i:'🧵'}
 ];
-var DOCS = [
-  {file:'patenti.json',l:'Patenti di Arcadia',i:'⚖️'},
-  {file:'codice.json',l:'Codice Giuridico',i:'📜'},
-  {file:'come-funzionano.json',l:'Come Funzionano',i:'📖'}
-];
 
 /* ═══════════════ UTILITIES ═══════════════ */
 function sha256(t){
@@ -217,8 +212,7 @@ async function _checkRemoteSha(){
   if(!_current||!_current.sha)return true;
   try{
     var path=_current.type==='page'?CONTENT+'/pages/'+_current.k+'.json'
-      :_current.type==='mestiere'?CONTENT+'/mestieri/'+_current.file
-      :CONTENT+'/docs/'+_current.file;
+      :CONTENT+'/mestieri/'+_current.file;
     var d=await ghGet(path);
     return d.sha===_current.sha;
   }catch(e){return true}
@@ -367,7 +361,6 @@ function buildSidebar(){
   h+='<div class="sb-group"><div class="sb-label">Contenuti <button class="sb-add" onclick="openNewPageModal()" title="Nuova pagina">+</button></div>';
   h+=_sbItems('Pagine wiki','page',PAGES);
   h+=_sbItems('Mestieri','mestiere',MESTIERI);
-  h+=_sbItems('Documenti','doc',DOCS);
   h+='</div>';
   h+='<div class="sb-group"><div class="sb-label">Media</div>';
   h+='<div class="sb-item" data-type="images" data-key="images" onclick="openImages()"><span class="ico">🖼️</span><span class="lbl">Immagini /images/</span></div>';
@@ -426,7 +419,6 @@ async function openItem(el){
   try{
     if(type==='page')await openPage(key);
     else if(type==='mestiere')await openMestiere(key);
-    else if(type==='doc')await openDoc(key);
     setStatus('ok','caricato');
     setTimeout(function(){setStatus('idle','pronto')},1500);
   }catch(e){setStatus('err','errore');toast(e.message,'error')}
@@ -456,7 +448,6 @@ async function renderDashboard(){
   h+='<div class="stat-row">';
   h+='<div class="stat" onclick="dashOpenByType(\'page\')"><div class="si">📄</div><div><div class="sn">'+PAGES.length+'</div><div class="sl">Pagine wiki</div></div></div>';
   h+='<div class="stat" onclick="dashOpenByType(\'mestiere\')"><div class="si green">⚒️</div><div><div class="sn">'+MESTIERI.length+'</div><div class="sl">Mestieri</div></div></div>';
-  h+='<div class="stat" onclick="dashOpenByType(\'doc\')"><div class="si purple">📜</div><div><div class="sn">'+DOCS.length+'</div><div class="sl">Documenti</div></div></div>';
   h+='</div>';
   h+='<div class="panel"><div class="panel-head"><h3>Azioni rapide</h3><span class="hint">scorciatoie</span></div><div class="quick-grid">';
   h+='<div class="quick" onclick="openNewPageModal()"><div class="qi">➕</div><div class="qt">Nuova pagina</div><div class="qd">Crea una sezione wiki con URL pulito</div></div>';
@@ -470,7 +461,6 @@ async function renderDashboard(){
   h+='</div></div>';
   h+=_dashGrid('Pagine wiki','page',PAGES);
   h+=_dashGrid('Mestieri','mestiere',MESTIERI);
-  h+=_dashGrid('Documenti','doc',DOCS);
   h+='<div class="panel" style="margin-top:16px"><div class="panel-head"><h3>Ultime attività</h3><span class="hint">registro admin</span></div><div id="dash-act"><div class="empty" style="padding:22px"><span class="ei">⏳</span>Caricamento…</div></div></div>';
   document.getElementById('main').innerHTML=h;
   _dashActivity();
@@ -484,7 +474,6 @@ function dashOpenByType(type){
   var key=null;
   if(type==='page')key=PAGES[0]&&PAGES[0].k;
   else if(type==='mestiere')key=MESTIERI[0]&&MESTIERI[0].file;
-  else if(type==='doc')key=DOCS[0]&&DOCS[0].file;
   if(key)openByType(type,key);
 }
 function openByType(type,key){
@@ -492,7 +481,7 @@ function openByType(type,key){
   setActive(type,key);
   _modified=false;
   setStatus('saving','caricamento...');
-  var p=type==='page'?openPage(key):type==='mestiere'?openMestiere(key):type==='doc'?openDoc(key):null;
+  var p=type==='page'?openPage(key):type==='mestiere'?openMestiere(key):null;
   if(!p)return;
   p.then(function(){setStatus('ok','caricato');setTimeout(function(){setStatus('idle','pronto')},1500)})
    .catch(function(e){setStatus('err','errore');toast(e.message,'error')});

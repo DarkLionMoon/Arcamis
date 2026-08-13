@@ -2,7 +2,7 @@
    ARCAMIS ADMIN — editors.js
    Editor pagine (Markdown/anteprima/JSON), immagine/emoji/tabella,
    nuova pagina, rinomina, elimina, storia, link checker, URL pulito,
-   gestione immagini e editor DB/Mestieri/Documenti. (v2)
+   gestione immagini e editor Mestieri. (v2)
    ════════════════════════════════════════════════════════════════ */
 
 /* ── LAYOUT E TEMPLATE ── */
@@ -222,7 +222,7 @@ function _currentHead(){
     return {icon:_current.icon||'📄',title:_current.title||_current.k||''};
   }
   if(_current&&_current.file){
-    var meta=(_current.type==='mestiere'?MESTIERI:DOCS).find(function(f){return f.file===_current.file});
+    var meta=MESTIERI.find(function(f){return f.file===_current.file});
     return {icon:(meta&&meta.i)||'📄',title:_current.label||''};
   }
   return {icon:'📄',title:'Anteprima'};
@@ -1075,21 +1075,12 @@ var JSON_TABLE_SCHEMAS={
   ],
   'sarto.json':[
     {k:'title',t:'text',req:true},{k:'content',t:'textarea',req:true}
-  ],
-  'patenti.json':[
-    {k:'key',t:'text',req:true},{k:'content',t:'textarea',req:true},{k:'lastModified',t:'text'}
-  ],
-  'codice.json':[
-    {k:'key',t:'text',req:true},{k:'content',t:'textarea',req:true},{k:'lastModified',t:'text'}
-  ],
-  'come-funzionano.json':[
-    {k:'key',t:'text',req:true},{k:'content',t:'textarea',req:true},{k:'lastModified',t:'text'}
   ]
 };
 function _isArrayFile(file){return file in JSON_TABLE_SCHEMAS}
 function _getSchema(file){return JSON_TABLE_SCHEMAS[file]||[]}
 
-/* ── DB / MESTIERE / DOC EDITORS ── */
+/* ── MESTIERE EDITOR ── */
 async function openMestiere(file){
   var meta=MESTIERI.find(function(m){return m.file===file});
   var path=CONTENT+'/mestieri/'+file;
@@ -1109,19 +1100,6 @@ async function openMestiere(file){
   var content=JSON.stringify(arr,null,2);
   _current={type:'mestiere',file:file,sha:sha,label:meta?meta.l:file,raw:raw};
   setCrumb('Contenuti','Mestieri');
-  setTitle((meta?meta.i:'📄')+' '+(meta?meta.l:file));
-  renderTableEditor(content,file);
-}
-async function openDoc(file){
-  var meta=DOCS.find(function(d){return d.file===file});
-  var path=CONTENT+'/docs/'+file;
-  var raw='{}',sha=null;
-  try{var d=await ghGet(path);raw=b64decode(d.content);sha=d.sha}catch(e){}
-  var obj={};
-  try{obj=JSON.parse(raw)}catch(e){}
-  var content=JSON.stringify([obj],null,2);
-  _current={type:'doc',file:file,sha:sha,label:meta?meta.l:file,raw:raw};
-  setCrumb('Contenuti','Documenti');
   setTitle((meta?meta.i:'📄')+' '+(meta?meta.l:file));
   renderTableEditor(content,file);
 }
@@ -1235,9 +1213,6 @@ async function saveTable(){
     arr.forEach(function(r){out.push(r.content?[r.title||'',r.content]:[r.title||''])});
     json=JSON.stringify(out,null,2);
     path=CONTENT+'/mestieri/'+file;
-  }else if(_current.type==='doc'){
-    json=JSON.stringify(arr[0]||{},null,2);
-    path=CONTENT+'/docs/'+file;
   }else{
     json=JSON.stringify(arr,null,2);
     path=CONTENT+'/db/'+file;
@@ -1265,7 +1240,7 @@ async function saveJson(){
   if(!_current)return;
   var content=document.getElementById('e-json').value;
   try{JSON.parse(content)}catch(e){toast('JSON non valido: '+e.message,'error');return}
-  var paths={page:CONTENT+'/pages/'+_current.k+'.json',db:CONTENT+'/db/'+_current.file,mestiere:CONTENT+'/mestieri/'+_current.file,doc:CONTENT+'/docs/'+_current.file};
+  var paths={page:CONTENT+'/pages/'+_current.k+'.json',db:CONTENT+'/db/'+_current.file,mestiere:CONTENT+'/mestieri/'+_current.file};
   var path=paths[_current.type];
   setStatus('saving','verifica conflitti...');
   if(!await _checkRemoteSha()){
@@ -1287,7 +1262,7 @@ async function saveJson(){
 async function deleteJsonFile(){
   if(!_current||_current.type==='page')return;
   var label=_current.label||_current.file;
-  var path=_current.type==='mestiere'?CONTENT+'/mestieri/'+_current.file:CONTENT+'/docs/'+_current.file;
+  var path=CONTENT+'/mestieri/'+_current.file;
   if(!_current.sha){toast('File non esistente nel repo: '+path,'error');return}
   if(!confirm('Eliminare definitivamente il file "'+label+'" ('+path+')?\n\nAttenzione: se qualche pagina del sito lo usa, quella funzionalità si romperà. Questa operazione non è reversibile.'))return;
   var btn=document.getElementById('del-btn');
