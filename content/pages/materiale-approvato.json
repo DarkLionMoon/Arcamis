@@ -1,0 +1,8 @@
+{
+  "k": "materiale-approvato",
+  "title": "Materiale Approvato",
+  "icon": "📖",
+  "content": "## Specie\n\n- Umano (PHB)\n- Elfo (PHB)\n- Mezzorco (PHB)\n\n## Classi\n\n- Barbarian (PHB)\n- Berserker (PHB)\n- Totem Warrior (PHB)\n\n- Fighter (PHB)\n- Champion (PHB)\n- Battle Master (PHB)\n\n## Talenti\n\n- Talento 1 (PHB)\n- Talento 2 (XGE)\n- Talento 3 (TCE)\n\n## Spell\n\n- Spell 1 (PHB)\n- Spell 2 (XGE)\n- Spell 3 (TCE)\n\n> 💡 Nota su eventuali restrizioni o materiale non approvato.",
+  "layout": "materiale",
+  "lastModified": "2026-08-13T13:39:34.688Z"
+}
