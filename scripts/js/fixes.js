@@ -110,21 +110,6 @@
   }, 200);
 
    /* ════════════════════════════════
-     4. DEEP LINK CODICE GIURIDICO
-     Intercetta la navigazione popstate 
-     per la pagina specifica.
-  ════════════════════════════════ */
-  window.addEventListener('popstate', function(e) {
-    if (e.state && e.state.id === 'codice-giuridico') {
-      if (typeof window.showCodiceGiuridico === 'function') {
-        window.showCodiceGiuridico();
-        /* Impediamo che altri listener eseguano gp() sovrascrivendo la vista */
-        e.stopImmediatePropagation(); 
-      }
-    }
-  }, true); // Capture true per agire tempestivamente
-
-  /* ════════════════════════════════
      3. INIT
   ════════════════════════════════ */
   function _init() {
@@ -179,9 +164,7 @@ function buildLavoriNav() {
     if (mestieriBody) {
       mestieriBody.innerHTML = '';
       MESTIERI.forEach(function(v) {
-        var fn = v.special
-          ? function(){ closeDd(); showPatenti(); }
-          : function(k){ return function(){ closeDd(); showMestiere(k); }; }(v.k);
+        var fn = function(k){ return function(){ closeDd(); showMestiere(k); }; }(v.k);
         var el = _tnItem(v.i, v.l, fn);
         mestieriBody.appendChild(el);
       });
@@ -203,9 +186,7 @@ function buildLavoriNav() {
   if (mnMestieri) {
       mnMestieri.innerHTML = '<div class="mn-label">Mestieri</div>';
       MESTIERI.forEach(function(v) {
-        var fn = v.special
-          ? function(){ closeMobileNav(); showPatenti(); }
-          : function(k){ return function(){ closeMobileNav(); showMestiere(k); }; }(v.k);
+        var fn = function(k){ return function(){ closeMobileNav(); showMestiere(k); }; }(v.k);
         var el = _mnItem(v.i, v.l, fn);
         mnMestieri.appendChild(el);
       });

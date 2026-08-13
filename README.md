@@ -23,10 +23,7 @@ Contenuto servito da JSON locali; API Functions come fallback Notion.
 │   └── import-notion.js    ← Script export Notion → JSON (Node)
 │
 ├── content/
-│   ├── pages/*.json        ← Pagine in markdown (usate dal client)
-│   ├── docs/*.json         ← Documenti HTML da Google Docs (codice, patenti)
-│   ├── db/*.json           ← Snapshot database (riferimento, non serviti)
-│   └── mestieri/*.json     ← Dati mestieri (riferimento, non serviti)
+│   └── pages/*.json        ← Pagine in markdown (usate dal client)
 │
 ├── functions/api/*.js      ← Cloudflare Pages Functions
 ├── admin/index.html        ← Pannello amministrazione (con upload immagini in /images/)
@@ -40,12 +37,10 @@ Contenuto servito da JSON locali; API Functions come fallback Notion.
 - **Pagine**: `content/pages/<slug>.json` con campo `content` in markdown.
   Il client le legge localmente (`notion-nav.js` → `_gpRender`); se mancano,
   ricade su `/api/notion?pageId=…`.
-- **Documenti** (`codice`, `patenti`): HTML da Google Docs in `content/docs/`.
-  Renderizzati da `codice-giuridico.js` e `patenti-arcadia.js`.
 - **Database/gallerie**: serviti via API `/api/notion?dbId=…` (Notion live).
 - **Ricerca**: `/api/search`, indici costruiti con `/api/build-index`.
-- `content/db/`, `content/mestieri/` e `content/docs/come-funzionano.json`
-  non sono più letti dal client: sono mantenuti come snapshot di riferimento.
+- I mestieri e le professioni sono renderizzati dal compendio locale
+  (`mestieri-compendio.js`).
 
 ## Aggiornare una pagina
 

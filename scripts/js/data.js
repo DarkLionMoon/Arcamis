@@ -58,7 +58,6 @@ var LAVORI = [
 
 var MESTIERI = [
   { l:'Come funzionano', i:'📜', k:'come-funzionano' },
-  { l:'Patenti di Arcadia', i:'⚖️', k:'patenti-arcadia', special: true },
   { l:'Alchimista',      i:'⚗️', k:'alchimista'      },
   { l:'Architetto',      i:'🏛️', k:'architetto'      },
   { l:'Artigiano',       i:'🔨', k:'artigiano'        },
