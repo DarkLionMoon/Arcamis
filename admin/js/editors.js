@@ -1099,7 +1099,11 @@ async function openMestiere(file){
   try{
     var parsed=JSON.parse(raw);
     if(Array.isArray(parsed)){
-      parsed.forEach(function(p){if(Array.isArray(p)&&p.length>=2)arr.push({title:p[0],content:p[1]})});
+      parsed.forEach(function(p){
+        if(!Array.isArray(p))return;
+        if(p.length>=2)arr.push({title:p[0],content:p[1]});
+        else arr.push({title:p[0]||'',content:''});
+      });
     }
   }catch(e){}
   var content=JSON.stringify(arr,null,2);
@@ -1166,7 +1170,7 @@ function renderTableEditor(jsonStr,file){
     +'<table><thead><tr>'
     +cols.map(function(c){return '<th>'+esc(c)+'</th>'}).join('')
     +'<th style="width:52px">Azioni</th></tr></thead><tbody id="table-body">'
-    +arr.map(buildTableRow).join('')
+    +arr.map(function(row,idx){return buildTableRow(row,idx,schema)}).join('')
     +'</tbody></table></div></div>');
   document.getElementById('main').innerHTML=h;
 }
@@ -1174,9 +1178,12 @@ function buildTableRow(row,idx,schema){
   var h='<tr data-idx="'+idx+'">';
   schema.forEach(function(col){
     var val=row[col.k]!==undefined?row[col.k]:'';
-    var type=col.t==='textarea'?'textarea':('input type="'+(col.t==='number'?'number':col.t==='url'?'url':'text')+'"');
     var req=col.req?' required':'';
-    h+='<td><'+type+' value="'+escAttr(String(val))+'" data-col="'+esc(col.k)+'"'+req+'></td>';
+    if(col.t==='textarea'){
+      h+='<td><textarea data-col="'+esc(col.k)+'"'+req+'>'+esc(String(val))+'</textarea></td>';
+    }else{
+      h+='<td><input type="'+(col.t==='number'?'number':col.t==='url'?'url':'text')+'" value="'+escAttr(String(val))+'" data-col="'+esc(col.k)+'"'+req+'></td>';
+    }
   });
   h+='<td class="t-actions"><button class="btn btn-d btn-sm" onclick="deleteTableRow(this)">🗑</button></td>';
   h+='</tr>';
@@ -1225,7 +1232,7 @@ async function saveTable(){
   var json,path;
   if(_current.type==='mestiere'){
     var out=[];
-    arr.forEach(function(r){out.push([r.title||'',r.content||''])});
+    arr.forEach(function(r){out.push(r.content?[r.title||'',r.content]:[r.title||''])});
     json=JSON.stringify(out,null,2);
     path=CONTENT+'/mestieri/'+file;
   }else if(_current.type==='doc'){
