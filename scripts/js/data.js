@@ -26,6 +26,7 @@ var pages = [
   {k:'maestria',   l:'Maestria / Titoli',       i:'🔨', id:'2f00274fdc1c802a9babd4239d97a319'},
   {k:"la-storia-di-gandora", l:"La Storia di Gandora", i:"🐉", id:"pag-la-storia-di-gandora", sec:"lore"},
   {k:"regole-del-server", l:"Regole del Server", i:"📋", id:"pag-regole-del-server", sec:"regole"},
+  {k:"materiale-approvato", l:"Materiale Approvato", i:"📖", id:"pag-materiale-approvato", sec:"personaggio"},
 ];
 
 function getPage(idOrK){
