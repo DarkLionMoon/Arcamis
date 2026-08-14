@@ -564,7 +564,8 @@ var _pathMap = {
   'specie-homebrew':                          '2f60274fdc1c80fba671c588ba93b116',
   "lore/la-storia-di-gandora": "pag-la-storia-di-gandora",
   "regole/regole-del-server": "pag-regole-del-server",
-  "personaggio/materiale-approvato": "pag-materiale-approvato"
+  "personaggio/materiale-approvato": "pag-materiale-approvato",
+  "lore/pantheon": "pag-pantheon",
 };
 
 /* ════ DEEP LINK ════ */
