@@ -7,6 +7,11 @@
 
 var navStack = [];
 
+/* Helper HTML — esc()/attr() sono privati nell'IIFE di md-render.js,
+   quindi qui servono versioni locali per il render dei JSON locali. */
+function _siteEsc(s){return (s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function _siteAttr(s){return _siteEsc(s).replace(/"/g,'&quot;')}
+
 /* ════ MARKDOWN → HTML (per JSON locali) ════
    Delega a md-render.js (condiviso con l'admin, così
    l'anteprima dell'editor è identica al sito). Se il
@@ -333,7 +338,7 @@ async function _gpRender(id,label,icon){
         _pbody.style.maxWidth = '';
         _pbody.style.width = '';
         var _deityFooter = '<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
-          + '<div class="n-page-footer-text">Archivi di Arcamis — ' + esc(_deity.n) + '</div></div>';
+          + '<div class="n-page-footer-text">Archivi di Arcamis — ' + _siteEsc(_deity.n) + '</div></div>';
         _pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + _scrubHtmlString(_renderDeityPage(_deity)) + _deityFooter + '</div>';
         applyGlossary(_pbody);
         if(typeof afterPageRender === 'function') afterPageRender();
@@ -1040,10 +1045,10 @@ function _renderDeityPage(d){
   var ic = _panIcon(d);
   var hero = '<div class="pan-deity-hero">'
     + (d.img
-        ? '<img src="' + attr(d.img) + '" alt="' + attr(d.n) + '" loading="lazy" onerror="this.onerror=null;this.style.display=\'none\';this.parentNode.classList.add(\'hero-broken\');">'
+        ? '<img src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy" onerror="this.onerror=null;this.style.display=\'none\';this.parentNode.classList.add(\'hero-broken\');">'
         : '<div class="pan-deity-hero-none">' + ic + '</div>')
-    + '<div class="pan-deity-caption"><span class="pd-name">' + esc(d.n) + '</span>'
-    + (d.epi ? '<span class="pd-epi">' + esc(d.epi) + '</span>' : '')
+    + '<div class="pan-deity-caption"><span class="pd-name">' + _siteEsc(d.n) + '</span>'
+    + (d.epi ? '<span class="pd-epi">' + _siteEsc(d.epi) + '</span>' : '')
     + '</div></div>';
   var body = d.md ? _mdToHtml(d.md) : '';
   return '<div class="pan-deity">' + hero + '<div class="pan-deity-body">' + body + '</div></div>';
@@ -1057,16 +1062,16 @@ function _renderPantheon(md) {
   data.deities.forEach(function(d){
     var ic = _panIcon(d);
     if(!d.img){
-      html += '<div class="pan-section"><div class="pan-section-title">' + esc(d.n) + '</div>'
+      html += '<div class="pan-section"><div class="pan-section-title">' + _siteEsc(d.n) + '</div>'
         + '<div class="pan-section-body">' + _mdToHtml(d.md) + '</div></div>';
       return;
     }
     var _cfb = "this.onerror=null;this.style.display='none';this.parentNode.classList.add('pan-tile-none');";
     var go = "gp('pantheon-" + d.slug + "','" + _jsStr(d.n) + "','" + ic + "')";
     html += '<div class="pan-tile" data-ic="' + ic + '" role="button" tabindex="0" onclick="' + go + '" onkeydown="if(event.key===\'Enter\')' + go + '">'
-      + '<img class="pan-tile-img" src="' + attr(d.img) + '" alt="' + attr(d.n) + '" loading="lazy" onerror="' + _cfb + '">'
-      + '<div class="pan-tile-caption"><span class="pan-tile-name">' + esc(d.n) + '</span>'
-      + (d.epi ? '<span class="pan-tile-epi">' + esc(d.epi) + '</span>' : '')
+      + '<img class="pan-tile-img" src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy" onerror="' + _cfb + '">'
+      + '<div class="pan-tile-caption"><span class="pan-tile-name">' + _siteEsc(d.n) + '</span>'
+      + (d.epi ? '<span class="pan-tile-epi">' + _siteEsc(d.epi) + '</span>' : '')
       + '</div></div>';
   });
   html += '</div>';

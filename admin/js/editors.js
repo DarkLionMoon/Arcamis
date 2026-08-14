@@ -15,7 +15,7 @@ var LAYOUTS=[
   {v:'personaggio',l:'Personaggio — Step numerati',i:'🌟'},
   {v:'materiale',l:'Materiale — Grid classi',i:'📋'},
   {v:'wide',l:'Wide — Larghezza piena',i:'↔️'},
-  {v:'pantheon',l:'Pantheon — Schede divinita',i:'🛐'},
+  {v:'pantheon',l:'Pantheon — Griglia divinità',i:'🛐'},
   {v:'bestiario',l:'Bestiario — Schede mostri',i:'🐉'},
   {v:'timeline',l:'Timeline — Eventi cronologici',i:'📅'},
   {v:'fazioni',l:'Fazioni — Organizzazioni',i:'🏴'},
@@ -39,7 +39,7 @@ var LAYOUT_TEMPLATES={
   personaggio:'> Introduzione al processo di creazione del personaggio.\n\n---\n\n### Scegli la specie\n\n- Opzione 1\n- Opzione 2\n- Opzione 3\n\n### Scegli la classe\n\n- Opzione 1\n- Opzione 2\n- Opzione 3\n\n### Definisci il background\n\nDescrizione del background del personaggio.\n\n### Scegli i tratti\n\n- Tratto 1\n- Tratto 2\n- Tratto 3',
   materiale:'## Specie\n\n- Umano (PHB)\n- Elfo (PHB)\n- Mezzorco (PHB)\n\n## Classi\n\n- Barbarian (PHB)\n- Berserker (PHB)\n- Totem Warrior (PHB)\n\n- Fighter (PHB)\n- Champion (PHB)\n- Battle Master (PHB)\n\n## Talenti\n\n- Talento 1 (PHB)\n- Talento 2 (XGE)\n- Talento 3 (TCE)\n\n## Spell\n\n- Spell 1 (PHB)\n- Spell 2 (XGE)\n- Spell 3 (TCE)\n\n> 💡 Nota su eventuali restrizioni o materiale non approvato.',
   wide:'## Sezione 1\n\nContenuto che beneficia della larghezza piena (tabelle, mappe, colonne).\n\n> Usa il pulsante 🖼 della toolbar per inserire una mappa o un\'immagine a larghezza piena.\n\n## Tabella\n\n| Colonna 1 | Colonna 2 | Colonna 3 |\n|---|---|---|\n| Dato 1 | Dato 2 | Dato 3 |\n| Dato 4 | Dato 5 | Dato 6 |\n\n## Sezione 2\n\nAltro contenuto qui.',
-  pantheon:'## Nome della Divinita\n\nDescrizione introduttiva della divinita.\n\n- **Epiteto:** Titolo onorifico\n- **Allineamento:** Legge Buono\n- **Sfere:** Guerra, Onore\n- **Simbolo:** Descrizione del simbolo\n\n### Personalita\n\n- Tratti caratteriali, modi di fare.\n\n### Culto\n\n- **Tempio:** Tipo di tempio\n- **Rituali:** Cerimonie principali\n- **Seguaci:** Chi lo/la adora\n\n### Legami\n\nRelazioni con altre divinita.',
+  pantheon:'Divinità\n\nBreve introduzione al pantheon del tuo mondo: come sono visti gli dei, cosa fanno e cosa si aspettano dai mortali.\n\n---\n\n# Nome della Divinità\n\n![](/images/nome-divinita.jpg)\n\n> Citazione rappresentativa - Nome\n\n## Identità\n\n- **Nome:** Vero nome\n- **Epiteto:** Titolo onorifico\n- **Allineamento:** Legale Buono\n- **Sfere:** Guerra, Onore\n- **Simbolo:** Descrizione del simbolo\n\n## Personalità\n\nTratti caratteriali, modi di fare.\n\n## Culto\n\n- **Tempio:** Tipo di tempio\n- **Rituali:** Cerimonie principali\n- **Seguaci:** Chi lo/la adora\n\n---\n\n# Seconda Divinità\n\n![](/images/seconda-divinita.jpg)\n\n> Citazione - Seconda\n\n## Identità\n\n- **Nome:** Vero nome\n- **Epiteto:** Titolo onorifico\n- **Allineamento:** Caotico Buono\n- **Sfere:** Conoscenza, Tempesta\n- **Simbolo:** Descrizione del simbolo\n\n## Personalità\n\nDa scrivere\n\n## Culto\n\n- **Tempio:** Tipo di tempio\n- **Rituali:** Cerimonie principali\n- **Seguaci:** Chi lo/la adora\n\n---\n\n# Altre Figure\n\nI blocchi che iniziano con # ma NON hanno immagine diventano sezioni a tutta larghezza (es. gli Aspetti).',
   bestiario:'## Nome del Mostro\n\nBreve descrizione, habitat, pericolosita.\n\n- **Tipo:** Aberrazione\n- **Taglia:** Media\n- **Allineamento:** Qualsiasi\n- **CA:** 15\n- **PF:** 45 (10d10+10)\n- **Velocita:** 30 ft\n\n### Statistiche\n\n- **For:** 16 (+3)\n- **Des:** 14 (+2)\n- **Cos:** 15 (+2)\n- **Int:** 10 (+0)\n- **Sag:** 12 (+1)\n- **Car:** 8 (-1)\n\n### Abilita\n\n- **Percezione passiva:** 12\n- **Linguaggi:** Comune\n\n### Azioni\n\n- **Attacco:** +5, 1d8+3 taglio\n\n### Leggenda\n\n- Leggenda o folklore legato al mostro.',
   timeline:'## Cronologia\n\n> Introduzione al periodo storico.\n\n### Anno 0\n\n- **Evento 1:** Descrizione dell\'evento\n- **Evento 2:** Descrizione dell\'evento\n\n### Anno 100\n\n- **Evento 3:** Descrizione dell\'evento\n- **Evento 4:** Descrizione dell\'evento\n\n### Anno 200\n\n- **Evento 5:** Descrizione dell\'evento\n\n## Conseguenze\n\nImpatto degli eventi sul mondo.',
   fazioni:'## Nome della Fazione\n\nDescrizione introduttiva e obiettivi generali.\n\n- **Simbolo:** Descrizione del simbolo\n- **Sede:** Luogo principale\n- **Motto:** Frase rappresentativa\n- **Membri:** Numero e reclutamento\n\n### Struttura\n\n- **Leader:** Nome e ruolo\n- **Ranghi:** Come sono organizzati\n\n### Obiettivi\n\n- Obiettivo 1\n- Obiettivo 2\n- Obiettivo 3\n\n### Alleati e Nemici\n\n- **Alleati:** Chi supporta la fazione\n- **Nemici:** Chi si oppone\n\n### Storia\n\nCome e nata la fazione, eventi chiave.',
@@ -114,6 +114,7 @@ async function openPage(k){
     sha=null;
   }
   _current={type:'page',k:k,sha:sha,title:json.title,icon:json.icon,layout:json.layout||''};
+  var st=_stLayoutFor(json.layout||'');
   setCrumb('Contenuti','Pagine wiki');
   setTitle((json.icon||'📄')+' '+(json.title||k));
   var layoutOpts='';
@@ -138,13 +139,19 @@ async function openPage(k){
   h+=buildToolbar();
   h+='<div class="ed-body" id="editor-body">';
   h+='<div class="pane" id="md-pane">';
-  h+='<div class="pane-head">Markdown <span class="ph-info" id="e-stats"></span></div>';
+  h+='<div class="pane-head" id="mp-head">'+(st?'Blocchi':'Markdown')+' <span class="ph-info" id="e-stats"></span></div>';
   h+='<div class="ed-meta">';
   h+='<label>Titolo<input id="e-title" class="in mm-t" value="'+escAttr(json.title||'')+'" oninput="onMetaInput()" placeholder="Titolo pagina"></label>';
   h+='<label>Icona<input id="e-icon" class="in mm-icon" value="'+escAttr(json.icon||'')+'" oninput="onMetaInput()" maxlength="6" placeholder="📄"></label>';
   h+='<label>Layout<select id="e-layout" class="in mm-layout" onchange="onLayoutChange(this.value)">'+layoutOpts+'</select></label>';
   h+='</div>';
-  h+='<textarea id="e-md" oninput="onMdInput()" onkeydown="onMdKey(event)" placeholder="Scrivi il contenuto in Markdown...">'+esc(json.content||'')+'</textarea>';
+  if(st){
+    h+='<textarea id="e-md" style="display:none" placeholder="Contenuto Markdown (sincronizzato dai blocchi)...">'+esc(json.content||'')+'</textarea>';
+    h+='<div class="struct-head" id="struct-head"></div>';
+    h+='<div class="struct-list" id="st-list"></div>';
+  }else{
+    h+='<textarea id="e-md" oninput="onMdInput()" onkeydown="onMdKey(event)" placeholder="Scrivi il contenuto in Markdown...">'+esc(json.content||'')+'</textarea>';
+  }
   h+='</div>';
   h+='<div class="divider-v" id="e-divider"></div>';
   h+='<div class="pane" id="pv-pane">';
@@ -158,9 +165,14 @@ async function openPage(k){
   h+='<div class="ed-statusbar"><span id="e-sb">'+esc(_layoutLabel(json.layout||''))+' · autosave ogni 15s</span><span class="st-r">⌨ Ctrl+S salva · Ctrl+B grassetto · Ctrl+I corsivo · Tab indent</span></div>';
   h+='</div>';
   document.getElementById('main').innerHTML=h;
-  setViewMode(_viewMode);
-  renderPreview();
-  updateStats();
+  if(st){
+    initStructuredEditor(json.content);
+    setViewMode(_viewMode);
+  }else{
+    setViewMode(_viewMode);
+    renderPreview();
+    updateStats();
+  }
   _bindDivider();
   _bindEditorEvents();
 }
@@ -258,6 +270,7 @@ function mdToHtml(md){
   return '<p>'+md+'</p>';
 }
 function renderPreview(){
+  if(window.__stMode){if(typeof _stSyncPreview==='function')_stSyncPreview();return}
   var md=document.getElementById('e-md');var pv=document.getElementById('e-preview');
   if(!md||!pv)return;
   var hd=_currentHead();
@@ -387,6 +400,16 @@ function _bindEditorEvents(){
 function onLayoutChange(val,silent){
   _current.layout=val;
   var md=document.getElementById('e-md');
+  if(window.__stMode){
+    if(!_stLayoutFor(val))_stExit();
+    else _stSync();
+    var info=document.getElementById('e-pv-info');
+    if(info)info.textContent=_layoutLabel(val);
+    var sb=document.getElementById('e-sb');
+    if(sb)sb.textContent=_layoutLabel(val)+' · autosave ogni 15s';
+    _modified=true;setBadge('dirty','modificato');
+    return;
+  }
   var current=(md?md.value:'').trim();
   var tpl=LAYOUT_TEMPLATES[val]||'';
   if(!silent&&(!current||confirm('Vuoi applicare il template per questo layout? Il contenuto attuale verra sostituito.'))&&md&&tpl){
