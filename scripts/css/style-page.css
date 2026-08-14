@@ -616,18 +616,39 @@
 }
 
 /* ════════ PANTHEON ════════ */
-.pan-page{display:flex;flex-direction:column;gap:20px}
-.pan-card{background:rgba(200,155,60,.03);border:1px solid rgba(200,155,60,.1);border-radius:12px;padding:20px 24px;transition:border-color .15s}
-.pan-card:hover{border-color:rgba(200,155,60,.25)}
-.pan-intro{font-size:14px;line-height:1.7;color:rgba(240,230,200,.8);margin-bottom:14px}
-.pan-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:14px}
-.pan-field{display:flex;gap:8px;font-size:12.5px;padding:6px 10px;background:rgba(200,155,60,.04);border:1px solid rgba(200,155,60,.08);border-radius:6px}
-.pan-key{font-family:'Cinzel',serif;font-weight:700;color:rgba(200,155,60,.85);white-space:nowrap}
-.pan-val{color:rgba(240,230,200,.7)}
-.pan-subtitle{font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:rgba(200,155,60,.85);margin:12px 0 6px;letter-spacing:.03em;padding-bottom:6px;border-bottom:1px solid rgba(200,155,60,.1)}
-.pan-list{display:flex;flex-direction:column;gap:4px}
-.pan-list-item{font-size:12.5px;color:rgba(240,230,200,.7);padding:4px 0 4px 14px;position:relative}
-.pan-list-item::before{content:'◆';position:absolute;left:0;color:rgba(200,155,60,.4);font-size:7px;top:6px}
+.pan-page{display:flex;flex-direction:column;gap:24px}
+.pan-intro{font-size:14px;line-height:1.7;color:rgba(240,230,200,.8)}
+.pan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.pan-card{background:rgba(200,155,60,.04);border:1px solid rgba(200,155,60,.12);border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s;outline:none}
+.pan-card:hover,.pan-card:focus-visible{border-color:rgba(200,155,60,.45);transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.pan-thumb{position:relative;aspect-ratio:3/4;overflow:hidden;background:rgba(200,155,60,.06)}
+.pan-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.pan-card:hover .pan-thumb img{transform:scale(1.05)}
+.pan-thumb-none{display:flex;align-items:center;justify-content:center;font-size:64px;opacity:.7}
+.pan-section{grid-column:1/-1;margin-top:8px;padding-top:18px;border-top:1px solid rgba(200,155,60,.14)}
+.pan-section-title{font-family:'Cinzel',serif;font-size:19px;font-weight:700;letter-spacing:.05em;color:rgba(200,155,60,.9);margin-bottom:8px}
+.pan-section-body{font-size:13.5px;line-height:1.7;color:rgba(240,230,200,.75)}
+.pan-card-body{padding:12px 14px 14px;text-align:center}
+.pan-card-name{font-family:'Cinzel',serif;font-size:15px;font-weight:700;letter-spacing:.05em;color:rgba(240,230,200,.95)}
+.pan-card-epi{font-size:11px;color:rgba(200,155,60,.8);margin-top:3px;font-style:italic}
+.pan-deity{display:flex;flex-direction:column;gap:20px}
+.pan-deity-hero{position:relative;border-radius:14px;overflow:hidden;border:1px solid rgba(200,155,60,.14);background:rgba(200,155,60,.04)}
+.pan-deity-hero img{width:100%;max-height:440px;object-fit:cover;display:block}
+.pan-deity-hero-none{display:flex;align-items:center;justify-content:center;height:220px;font-size:88px;opacity:.8}
+.pan-deity-hero.hero-broken{min-height:220px}
+.pan-deity-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 38%,rgba(8,8,12,.8));pointer-events:none}
+.pan-deity-caption{position:absolute;left:20px;right:20px;bottom:16px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;z-index:1}
+.pan-deity-caption .pd-name{font-family:'Cinzel',serif;font-size:26px;font-weight:700;letter-spacing:.04em;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.75)}
+.pan-deity-caption .pd-epi{font-size:13px;color:rgba(240,230,200,.9);font-style:italic;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.pan-deity-body{font-size:14px;line-height:1.75;color:rgba(240,230,200,.82)}
+.pan-deity-body .n-h1{display:none}
+.pan-deity-body .n-h2{font-family:'Cinzel',serif;font-size:18px;color:rgba(200,155,60,.9);margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(200,155,60,.12);letter-spacing:.03em}
+.pan-deity-body .n-quote{border-left:2px solid rgba(200,155,60,.5);margin:14px 0;padding:10px 16px;font-style:italic;color:rgba(240,230,200,.75);background:rgba(200,155,60,.04);border-radius:0 8px 8px 0}
+.pan-deity-body img{border-radius:10px;max-width:100%}
+@media(max-width:700px){
+  .pan-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
+  .pan-deity-caption .pd-name{font-size:21px}
+}
 
 /* ════════ BESTIARIO ════════ */
 .bst-page{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}

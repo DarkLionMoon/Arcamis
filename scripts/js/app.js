@@ -586,16 +586,21 @@ var _pathMap = {
     /* Path automatico UUID: /p/2f00274f... */
     pid = path.replace('p/', '');
   } else if(path){
-    /* Risolvi il pathname nella mappa */
-    var resolved = _pathMap[path];
-    if(resolved){
-      pid = resolved;
-    } else if(typeof _slugMap !== 'undefined' && _slugMap[path]){
-      /* Supporto slug piatti legacy (es. /gameplay) */
-      pid = _slugMap[path];
+    /* Pagina divinità: /lore/pantheon/<slug> */
+    if(path.indexOf('lore/pantheon/') === 0){
+      pid = 'pantheon-' + path.split('/').pop();
     } else {
-      /* Pathname non mappato — trattalo come UUID diretto (es. /2f00274f...) */
-      pid = path;
+      /* Risolvi il pathname nella mappa */
+      var resolved = _pathMap[path];
+      if(resolved){
+        pid = resolved;
+      } else if(typeof _slugMap !== 'undefined' && _slugMap[path]){
+        /* Supporto slug piatti legacy (es. /gameplay) */
+        pid = _slugMap[path];
+      } else {
+        /* Pathname non mappato — trattalo come UUID diretto (es. /2f00274f...) */
+        pid = path;
+      }
     }
   } else if(qp) {
     /* Vecchio ?p= — supporto retrocompatibile */

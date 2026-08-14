@@ -160,6 +160,10 @@ function _urlForId(id){
     var key = id.replace('mestiere-', '');
     return '/mestieri/' + key;
   }
+  /* Pantheon — pagina dedicata a una divinità */
+  if(id && id.indexOf('pantheon-') === 0){
+    return '/lore/pantheon/' + id.slice(9);
+  }
   var map = _getIdToPath();
   if(map[id]) return map[id];
   /* Fallback legacy slug */
@@ -184,6 +188,7 @@ function _renderLastUpdated(isoDate){
 }
 
 var _memCache = {};
+var _pantheonData = null;
 var _scrollPositions = {};
 window.prefetchPage = function(id){
   var cacheKey = 'pg_' + id;
@@ -305,6 +310,38 @@ async function _gpRender(id,label,icon){
   var phCrumb=document.getElementById('ph-crumb');
 
   /* ═══ LOCAL JSON CHECK ═══ */
+  /* Pagine divinità del Pantheon (id speciale pantheon-<slug>) */
+  if(id.indexOf('pantheon-') === 0){
+    try{
+      var _pd = await _loadPantheonData();
+      var _deity = _pd.deities.find(function(x){ return x.slug === id.slice(9); });
+      if(_deity){
+        var _dic = _panIcon(_deity);
+        phTitle.textContent = _deity.n;
+        phIcon.textContent = _dic;
+        phEyebrow.textContent = 'Archivi di Arcamis';
+        document.title = _deity.n + ' — Arcamis';
+        phCrumb.innerHTML = buildCrumb(_deity.n);
+        var _dacc = iconAccent(_dic);
+        phHero.style.setProperty('--ph-acc', _dacc.c);
+        phHero.style.setProperty('--ph-accbg', _dacc.bg);
+        phCovbg.style.backgroundImage = '';
+        phOverlay.style.opacity = '0';
+        phIcon.style.opacity = '0.06';
+        var _pbody = document.getElementById('pbody');
+        _pbody.className = 'page-' + id;
+        _pbody.style.maxWidth = '';
+        _pbody.style.width = '';
+        var _deityFooter = '<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
+          + '<div class="n-page-footer-text">Archivi di Arcamis — ' + esc(_deity.n) + '</div></div>';
+        _pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + _scrubHtmlString(_renderDeityPage(_deity)) + _deityFooter + '</div>';
+        applyGlossary(_pbody);
+        if(typeof afterPageRender === 'function') afterPageRender();
+        return;
+      }
+    }catch(_pe){ /* fall through al renderer standard */ }
+  }
+
   var _localPage = (typeof pages !== 'undefined') ? pages.find(function(p){ return p.id === id; }) : null;
   if(_localPage && _localPage.k){
     try {
@@ -948,50 +985,92 @@ function _renderPersonaggio(md) {
 }
 
 /* ══════════════════════════════════════
-   RENDER PANTHEON — Schede divinita
+   RENDER PANTHEON — Griglia divinità +
+   pagina dedicata a ogni entità
    ══════════════════════════════════════ */
-function _renderPantheon(md) {
-  if (!md) return '';
-  var html = '';
-  var sections = md.split(/^## /m).filter(Boolean);
-  sections.forEach(function(sec) {
-    var lines = sec.split('\n');
-    var title = (lines.shift() || '').trim();
-    var body = lines.join('\n');
-    var intro = '';
-    var fields = [];
-    var lists = {};
-    var currentList = null;
-    body.split('\n').forEach(function(line) {
-      var fm = line.match(/^-\s+\*\*(.+?):?\*\*\s*:?\s*(.+)/);
-      if (fm) { fields.push({ key: fm[1], val: fm[2] }); currentList = null; return; }
-      var lm = line.match(/^###\s+(.+)/);
-      if (lm) { currentList = lm[1]; lists[currentList] = []; return; }
-      if (currentList && line.match(/^- /)) {
-        lists[currentList].push(line.replace(/^- /, ''));
-        return;
-      }
-      if (!fm && !lm && line.trim() && !intro) intro = line.trim();
+function _slugify(t){
+  return (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+}
+var _PAN_ICONS = {
+  anivia:'❄️', janna:'🌬️', morgana:'🖤', taliyah:'🪨',
+  kindred:'🐺', ornn:'🔨', volibear:'⚡', nagakabouros:'🐙',
+  diana:'🌙', kayle:'⚔️', leona:'☀️', pantheon:'🛡️', taric:'💎', zoe:'✨'
+};
+function _panIcon(d){ return _PAN_ICONS[d.slug] || '🛐'; }
+function _jsStr(s){ return (s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+function _parsePantheon(md){
+  if(!md) return { intro:'', deities:[] };
+  var blocks = md.split(/\n---\n/);
+  var intro = (blocks.shift() || '').replace(/^#\s+.+\n?/, '').trim();
+  var deities = [];
+  blocks.forEach(function(block){
+    var lines = block.split('\n');
+    var name = null, img = '', rest = [];
+    lines.forEach(function(line){
+      if(name === null && /^#\s+(.+)/.test(line)){ name = line.replace(/^#\s+/, '').trim(); return; }
+      var im = line.match(/^!\[[^\]]*\]\(([^)]+)\)/);
+      if(im && !img){ img = im[1]; return; }
+      rest.push(line);
     });
-    html += '<div class="pan-card">';
-    if (intro) html += '<div class="pan-intro">' + _mdToHtml(intro) + '</div>';
-    if (fields.length) {
-      html += '<div class="pan-fields">';
-      fields.forEach(function(f) {
-        html += '<div class="pan-field"><span class="pan-key">' + f.key + '</span><span class="pan-val">' + f.val + '</span></div>';
-      });
-      html += '</div>';
-    }
-    Object.keys(lists).forEach(function(name) {
-      html += '<div class="pan-subtitle">' + name + '</div>';
-      html += '<div class="pan-list">';
-      lists[name].forEach(function(item) {
-        html += '<div class="pan-list-item">' + item + '</div>';
-      });
-      html += '</div>';
+    if(!name) return;
+    var epi = '';
+    var epiRe = rest.join('\n').match(/-\s*\*\*Epiteto:?\*\*\s*:?\s*(.+)/);
+    if(epiRe) epi = epiRe[1].trim();
+    deities.push({
+      slug: _slugify(name),
+      n: name,
+      img: img,
+      epi: epi,
+      md: rest.join('\n').replace(/^\n+/, '').trim()
     });
-    html += '</div>';
   });
+  return { intro: intro, deities: deities };
+}
+function _loadPantheonData(){
+  if(_pantheonData) return Promise.resolve(_pantheonData);
+  return fetch('/content/pages/pantheon.json')
+    .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(j){
+      _pantheonData = _parsePantheon(j.content || '');
+      return _pantheonData;
+    });
+}
+function _renderDeityPage(d){
+  var ic = _panIcon(d);
+  var hero = '<div class="pan-deity-hero">'
+    + (d.img
+        ? '<img src="' + attr(d.img) + '" alt="' + attr(d.n) + '" loading="lazy" onerror="this.onerror=null;this.style.display=\'none\';this.parentNode.classList.add(\'hero-broken\');">'
+        : '<div class="pan-deity-hero-none">' + ic + '</div>')
+    + '<div class="pan-deity-caption"><span class="pd-name">' + esc(d.n) + '</span>'
+    + (d.epi ? '<span class="pd-epi">' + esc(d.epi) + '</span>' : '')
+    + '</div></div>';
+  var body = d.md ? _mdToHtml(d.md) : '';
+  return '<div class="pan-deity">' + hero + '<div class="pan-deity-body">' + body + '</div></div>';
+}
+function _renderPantheon(md) {
+  var data = _parsePantheon(md);
+  _pantheonData = data;
+  var html = '';
+  if(data.intro) html += '<div class="pan-intro">' + _mdToHtml(data.intro) + '</div>';
+  html += '<div class="pan-grid">';
+  data.deities.forEach(function(d){
+    var ic = _panIcon(d);
+    if(!d.img){
+      html += '<div class="pan-section"><div class="pan-section-title">' + esc(d.n) + '</div>'
+        + '<div class="pan-section-body">' + _mdToHtml(d.md) + '</div></div>';
+      return;
+    }
+    var _cfb = "this.onerror=null;var p=this.parentNode;p.classList.add('pan-thumb-none');p.innerHTML='" + ic + "';";
+    var thumb = '<div class="pan-thumb"><img src="' + attr(d.img) + '" alt="' + attr(d.n) + '" loading="lazy" onerror="' + _cfb + '"></div>';
+    var go = "gp('pantheon-" + d.slug + "','" + _jsStr(d.n) + "','" + ic + "')";
+    html += '<div class="pan-card" role="button" tabindex="0" onclick="' + go + '" onkeydown="if(event.key===\'Enter\')' + go + '">'
+      + thumb
+      + '<div class="pan-card-body"><div class="pan-card-name">' + esc(d.n) + '</div>'
+      + (d.epi ? '<div class="pan-card-epi">' + esc(d.epi) + '</div>' : '')
+      + '</div></div>';
+  });
+  html += '</div>';
   return '<div class="pan-page">' + html + '</div>';
 }
 
