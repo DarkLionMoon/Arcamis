@@ -18,6 +18,7 @@ function _stLayoutFor(layout){return layout==='pantheon'?'pantheon':null}
 function _stFold(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function _stParse(md){
   if(!md)return {heading:'Divinità',intro:'',cards:[]};
+  md=md.replace(/^\s*---\s*\n/,'');
   var blocks=md.split(/\n---\n/);
   var first=blocks.shift()||'';
   var heading='Divinità';

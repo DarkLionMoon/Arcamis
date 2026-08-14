@@ -1006,6 +1006,7 @@ function _panIcon(d){ return _PAN_ICONS[d.slug] || '🛐'; }
 function _jsStr(s){ return (s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 function _parsePantheon(md){
   if(!md) return { intro:'', deities:[] };
+  md = md.replace(/^\s*---\s*\n/, '');
   var blocks = md.split(/\n---\n/);
   var intro = (blocks.shift() || '').replace(/^#\s+.+\n?/, '').trim();
   var deities = [];
