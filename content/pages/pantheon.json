@@ -1,0 +1,8 @@
+{
+  "k": "pantheon",
+  "title": "Pantheon",
+  "icon": "🛐",
+  "content": "## Nome della Divinita\n\nDescrizione introduttiva della divinita.\n\n- **Epiteto:** Titolo onorifico\n- **Allineamento:** Legge Buono\n- **Sfere:** Guerra, Onore\n- **Simbolo:** Descrizione del simbolo\n\n### Personalita\n\n- Tratti caratteriali, modi di fare.\n\n### Culto\n\n- **Tempio:** Tipo di tempio\n- **Rituali:** Cerimonie principali\n- **Seguaci:** Chi lo/la adora\n\n### Legami\n\nRelazioni con altre divinita.",
+  "layout": "pantheon",
+  "lastModified": "2026-08-14T18:04:58.673Z"
+}
