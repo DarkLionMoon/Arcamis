@@ -485,10 +485,6 @@ function closeSubMap(id){
 
 /* ════ POPSTATE ════ */
 window.addEventListener('popstate', function(e){
-   if (state && state.id === 'reputazioni') {
-  if (typeof showReputationTable === 'function') showReputationTable();
-  return;
-}
   if(e && e.state && e.state.id){
     if(e.state.stack) navStack = JSON.parse(JSON.stringify(e.state.stack));
     if(e.state.id.startsWith('mestiere-')){
@@ -501,10 +497,6 @@ window.addEventListener('popstate', function(e){
     }
     if(e.state.id === 'societa-licenze'){
       if(typeof showSocietaLicenze === 'function') showSocietaLicenze();
-      return;
-    }
-    if(e.state.id === 'reputazioni'){
-      if(typeof showReputationTable === 'function') showReputationTable();
       return;
     }
     gp(e.state.id, e.state.label || '', e.state.icon || '', true);
@@ -568,7 +560,6 @@ var _pathMap = {
   'mappe':                                    '2f10274fdc1c80489f23c49164747770',
   'mappe/arcamis':                            '2f10274fdc1c80dca8caeb2e6de23146',
   /* Speciali */
-  'reputazioni':                              'reputazioni',
   'changelog':                                '3000274fdc1c8033a214c44a1aa7f01f',
   'sottoclassi':                              '2f70274fdc1c80e3bdc7f95f81eb9cc0',
   'specie-homebrew':                          '2f60274fdc1c80fba671c588ba93b116',
@@ -626,10 +617,6 @@ var _pathMap = {
   }
   if(pid === 'societa-licenze'){
     setTimeout(function(){ if(typeof showSocietaLicenze === 'function') showSocietaLicenze(); }, 0);
-    return;
-  }
-  if(pid === 'reputazioni'){
-    setTimeout(function(){ if(typeof showReputationTable === 'function') showReputationTable(); }, 0);
     return;
   }
   /* Pagina Notion generica */
