@@ -546,7 +546,6 @@ var _pathMap = {
   'societa-licenze':                          'societa-licenze',
   /* Lore */
   'lore/storia':                              '2f00274fdc1c806f8f17dbc6532d2211',
-  'lore/pantheon':                            '2f00274fdc1c80679bd3c3df8a1fa040',
   'lore/mondo/introduzione':                  '2f60274fdc1c80558d8fe99842377aef',
   'lore/mondo/introduzione/storia':           '2fc0274fdc1c80c4bbc1c8806f591e0f',
   'lore/mondo/esplora-dal-vivo':              '3090274fdc1c80008f0dffe3a677cb66',
@@ -565,7 +564,7 @@ var _pathMap = {
   'specie-homebrew':                          '2f60274fdc1c80fba671c588ba93b116',
   "lore/la-storia-di-gandora": "pag-la-storia-di-gandora",
   "regole/regole-del-server": "pag-regole-del-server",
-  "personaggio/materiale-approvato": "pag-materiale-approvato",
+  "personaggio/materiale-approvato": "pag-materiale-approvato"
 };
 
 /* ════ DEEP LINK ════ */
