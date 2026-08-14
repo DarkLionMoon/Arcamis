@@ -1061,13 +1061,12 @@ function _renderPantheon(md) {
         + '<div class="pan-section-body">' + _mdToHtml(d.md) + '</div></div>';
       return;
     }
-    var _cfb = "this.onerror=null;var p=this.parentNode;p.classList.add('pan-thumb-none');p.innerHTML='" + ic + "';";
-    var thumb = '<div class="pan-thumb"><img src="' + attr(d.img) + '" alt="' + attr(d.n) + '" loading="lazy" onerror="' + _cfb + '"></div>';
+    var _cfb = "this.onerror=null;this.style.display='none';this.parentNode.classList.add('pan-tile-none');";
     var go = "gp('pantheon-" + d.slug + "','" + _jsStr(d.n) + "','" + ic + "')";
-    html += '<div class="pan-card" role="button" tabindex="0" onclick="' + go + '" onkeydown="if(event.key===\'Enter\')' + go + '">'
-      + thumb
-      + '<div class="pan-card-body"><div class="pan-card-name">' + esc(d.n) + '</div>'
-      + (d.epi ? '<div class="pan-card-epi">' + esc(d.epi) + '</div>' : '')
+    html += '<div class="pan-tile" data-ic="' + ic + '" role="button" tabindex="0" onclick="' + go + '" onkeydown="if(event.key===\'Enter\')' + go + '">'
+      + '<img class="pan-tile-img" src="' + attr(d.img) + '" alt="' + attr(d.n) + '" loading="lazy" onerror="' + _cfb + '">'
+      + '<div class="pan-tile-caption"><span class="pan-tile-name">' + esc(d.n) + '</span>'
+      + (d.epi ? '<span class="pan-tile-epi">' + esc(d.epi) + '</span>' : '')
       + '</div></div>';
   });
   html += '</div>';
