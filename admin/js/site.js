@@ -682,8 +682,8 @@ async function openSettings(){
     +'<div class="kv-rows">'
     +'<div class="kv-row"><div class="kv-main"><div class="kt">GitHub</div><div class="ks">'+esc(GH_REPO)+' · ramo '+esc(GH_BRANCH)+'</div></div></div>'
     +'<div class="kv-row"><div class="kv-main"><div class="kt">Contenuti</div><div class="ks">pagine wiki sotto /content</div></div></div>'
-    +'<div class="kv-row"><div class="kv-main"><div class="kt">Sito</div><div class="ks">https://arcamis.site</div></div>'
-    +'<div class="ract"><a class="btn btn-soft btn-sm" href="https://arcamis.site" target="_blank" rel="noopener">Apri</a></div></div>'
+    +'<div class="kv-row"><div class="kv-main"><div class="kt">Sito</div><div class="ks">https://arcamis.pages.dev</div></div>'
+    +'<div class="ract"><a class="btn btn-soft btn-sm" href="https://arcamis.pages.dev" target="_blank" rel="noopener">Apri</a></div></div>'
     +'</div></div>';
   h+='<div class="panel"><div class="panel-head"><h3>Deploy</h3></div>'
     +'<div class="kv-rows">'
