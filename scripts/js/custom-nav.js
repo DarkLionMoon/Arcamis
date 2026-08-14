@@ -50,6 +50,40 @@
     section.appendChild(el);
   }
 
+  function _desktopSubHeader(menu, sub){
+    var sel = menu.querySelector('.tn-sub[data-sub="'+sub+'"]');
+    if(sel) return sel;
+    var el = document.createElement('div');
+    el.className = 'tn-sub';
+    el.dataset.sub = sub;
+    el.textContent = sub;
+    menu.appendChild(el);
+    return el;
+  }
+
+  function _mobileSubHeader(section, sub){
+    var sel = section.querySelector('.mn-sub[data-sub="'+sub+'"]');
+    if(sel) return sel;
+    var el = document.createElement('div');
+    el.className = 'mn-sub';
+    el.dataset.sub = sub;
+    el.textContent = sub;
+    section.appendChild(el);
+    return el;
+  }
+
+  /* Raggruppa le pagine per sezione e poi per sottosezione ('' = senza sub) */
+  function _buildGroups(custom){
+    var groups = {};
+    custom.forEach(function(p){
+      var sec = p.sec || '';
+      if(!groups[sec]) groups[sec] = {};
+      var sub = p.sub || '';
+      (groups[sec][sub] = groups[sec][sub] || []).push(p);
+    });
+    return groups;
+  }
+
   function _ensureDesktopMenu(v, label){
     var id = (SEC[v] && SEC[v].dd) ? SEC[v].dd : 'dd-' + v;
     var dd = document.getElementById(id);
@@ -106,22 +140,37 @@
   function inject(){
     var custom = _customPages();
     var sections = _sections();
-    var bySec = {};
-    custom.forEach(function(p){ (bySec[p.sec] = bySec[p.sec] || []).push(p); });
+    var groups = _buildGroups(custom);
     sections.forEach(function(s){
       if(!s || !s.v) return;
-      var menu = _ensureDesktopMenu(s.v, s.l || s.v);
-      if(menu && bySec[s.v]){
-        if(!menu.querySelector('.tn-item[data-cp]')){
+      var sec = s.v;
+      var subs = groups[sec] || {};
+      var menu = _ensureDesktopMenu(sec, s.l || sec);
+      var mnEl = _ensureMobileSection(sec, s.l || sec);
+      if(!menu && !mnEl) return;
+      var subKeys = Object.keys(subs).sort(function(a,b){
+        if(a==='') return -1;
+        if(b==='') return 1;
+        return 0;
+      });
+      var firstBlock = true;
+      subKeys.forEach(function(sub){
+        var pages = subs[sub];
+        if(!pages || !pages.length) return;
+        if(firstBlock && menu && !menu.querySelector('.tn-item[data-cp]')){
           var div = document.createElement('div');
           div.className = 'tn-div';
           div.dataset.cp = 'sep';
           menu.appendChild(div);
         }
-        bySec[s.v].forEach(function(p){ _makeDesktop(menu, p); });
-      }
-      var mnEl = _ensureMobileSection(s.v, s.l || s.v);
-      if(mnEl && bySec[s.v]) bySec[s.v].forEach(function(p){ _makeMobile(mnEl, p); });
+        firstBlock = false;
+        if(sub && menu) _desktopSubHeader(menu, sub);
+        if(sub && mnEl) _mobileSubHeader(mnEl, sub);
+        pages.forEach(function(p){
+          if(menu) _makeDesktop(menu, p);
+          if(mnEl) _makeMobile(mnEl, p);
+        });
+      });
     });
   }
 

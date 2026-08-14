@@ -122,6 +122,7 @@
 .mn-item{display:flex;align-items:center;gap:12px;padding:12px 24px;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--text2);cursor:pointer;transition:background .1s,color .1s;}
 .mn-item:hover{background:rgba(200,155,60,.06);color:var(--gold2)}
 .mn-ii{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.mn-sub{font-family:'Crimson Pro',serif;font-size:8px;font-weight:700;letter-spacing:.28em;color:var(--gold3);text-transform:uppercase;padding:8px 24px 2px;margin-top:4px;}
 .mn-discord{margin:12px 16px 16px;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,rgba(50,55,168,.7),rgba(88,101,242,.6));border:1px solid rgba(255,255,255,.15);color:#e0e8ff;padding:13px 20px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-decoration:none;}
 
 /* ════════════════════════════════════

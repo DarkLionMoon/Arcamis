@@ -132,7 +132,7 @@ function _auditIcon(action){
   if(action==='save_page')return '📝';
   if(action==='cover_page'||action==='set_cover'||action==='remove_cover')return '🖌️';
   if(action==='user_add'||action==='user_update'||action==='user_delete')return '👥';
-  if(action==='nav_move'||action==='nav_sec')return '🧭';
+  if(action==='nav_move'||action==='nav_sec'||action==='nav_sub')return '🧭';
   return '⚙️';
 }
 function _auditColor(action){

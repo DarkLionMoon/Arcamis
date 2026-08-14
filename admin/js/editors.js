@@ -612,6 +612,16 @@ function slugify(t){
   return (t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'');
 }
+function _subOptionsForSec(sec,cur){
+  var subs={};
+  PAGES.forEach(function(p){if(p.sec===sec&&p.sub)subs[p.sub]=1});
+  var h='<option value="">— nessuna —</option>';
+  Object.keys(subs).sort().forEach(function(k){
+    h+='<option value="'+escAttr(k)+'"'+(k===cur?' selected':'')+'>'+esc(k)+'</option>';
+  });
+  h+='<option value="__new__">➕ nuova…</option>';
+  return h;
+}
 function openNewPageModal(){
   if(document.getElementById('np-modal'))return;
   _slugTouched=false;
@@ -619,11 +629,13 @@ function openNewPageModal(){
   LAYOUTS.forEach(function(l){if(l.v)layoutOpts+='<option value="'+l.v+'">'+l.i+' '+l.l+'</option>'});
   var secOpts='';
   SECTIONS.forEach(function(s){secOpts+='<option value="'+s.v+'">'+s.l+'</option>'});
+  var subOpts=_subOptionsForSec('','');
   modalHtml('np-modal','➕ Nuova pagina / sezione',
     '<div class="fld"><label>Nome della sezione</label><input id="np-label" class="in" placeholder="es. La Gilda dei Mercanti" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
     +'<div class="fld"><label>Icona (emoji)</label><input id="np-icon" class="in" placeholder="es. 🏛️" value="📄" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
     +'<div class="fld"><label>Slug / URL</label><input id="np-slug" class="in" placeholder="auto (es. la-gilda-dei-mercanti)" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
     +'<div class="fld"><label>Sezione del menu</label><select id="np-sec" class="in">'+secOpts+'</select></div>'
+    +'<div class="fld"><label>Sottosezione (opzionale)</label><select id="np-sub" class="in">'+subOpts+'</select></div>'
     +'<div class="fld"><label>Layout</label><select id="np-layout" class="in">'+layoutOpts+'</select></div>',
     '<button class="btn btn-soft" onclick="closeNewPageModal()">Annulla</button>'
     +'<button class="btn btn-p" id="np-save" onclick="createNewPage()">CREA</button>');
@@ -632,6 +644,9 @@ function openNewPageModal(){
     if(!_slugTouched)document.getElementById('np-slug').value=slugify(label.value);
   });
   document.getElementById('np-slug').addEventListener('input',function(){_slugTouched=true});
+  document.getElementById('np-sec').addEventListener('change',function(){
+    document.getElementById('np-sub').innerHTML=_subOptionsForSec(this.value,'');
+  });
   label.focus();
 }
 function closeNewPageModal(){closeModal('np-modal')}
@@ -645,6 +660,14 @@ async function createNewPage(){
   var icon=(document.getElementById('np-icon').value||'').trim()||'📄';
   var slug=(document.getElementById('np-slug').value||'').trim()||slugify(label);
   var sec=document.getElementById('np-sec').value||'';
+  var sub=document.getElementById('np-sub').value||'';
+  if(sub==='__new__'){
+    var n=prompt('Nome della sottosezione (es. Storia, Razze, Luoghi):');
+    if(n===null)return;
+    n=n.trim();
+    if(!n){toast('Nome non valido','error');return}
+    sub=n;
+  }
   var layout=document.getElementById('np-layout').value||'';
   if(!label){toast('Inserisci un nome per la sezione','error');return}
   if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)){toast('Slug non valido: solo minuscole, numeri e trattini','error');return}
@@ -656,10 +679,10 @@ async function createNewPage(){
   try{
     var json={k:slug,title:label,icon:icon,content:buildNewPageContent(layout,label),layout:layout,lastModified:new Date().toISOString()};
     await ghPut(CONTENT+'/pages/'+slug+'.json','admin: create page '+slug,JSON.stringify(json,null,2),null);
-    await addToDataJs(slug,label,icon,id,sec);
+    await addToDataJs(slug,label,icon,id,sec,sub);
     await addToPathMap(slug,id,sec);
-    await addToAdminPages(slug,label,icon,sec);
-    PAGES.push({k:slug,l:label,i:icon,sec:sec,c:1});
+    await addToAdminPages(slug,label,icon,sec,sub);
+    PAGES.push({k:slug,l:label,i:icon,sec:sec,sub:sub,c:1});
     buildSidebar();
     closeNewPageModal();
     toast('Pagina "'+label+'" creata! Deploy in corso (~30s)...','success');
@@ -683,7 +706,7 @@ function _arrayInsert(s,marker,close,entry){
   if(before.slice(-1)!==',')before+=',';
   return before+'\n'+entry+s.slice(end);
 }
-async function addToDataJs(slug,label,icon,id,sec){
+async function addToDataJs(slug,label,icon,id,sec,sub){
   var d=await ghGet('scripts/js/data.js');
   var s=b64decode(d.content);
   var start=s.indexOf('var pages = [');
@@ -691,7 +714,7 @@ async function addToDataJs(slug,label,icon,id,sec){
   var end=s.indexOf('];',start);
   if(end===-1)throw new Error('data.js: chiusura pages non trovata');
   if(s.slice(start,end).indexOf("k:'"+slug+"'")!==-1)throw new Error('Pagina già registrata in data.js');
-  var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+', id:'+JSON.stringify(id)+', sec:'+JSON.stringify(sec)+'},\n';
+  var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+', id:'+JSON.stringify(id)+', sec:'+JSON.stringify(sec)+(sub?', sub:'+JSON.stringify(sub):'')+'},\n';
   await ghPut('scripts/js/data.js','admin: add page '+slug+' to registry',_arrayInsert(s,'var pages = [','];',entry),d.sha);
 }
 async function addToPathMap(slug,id,sec){
@@ -706,7 +729,7 @@ async function addToPathMap(slug,id,sec){
   var entry='  '+JSON.stringify(path)+': '+JSON.stringify(id)+',\n';
   await ghPut('scripts/js/app.js','admin: add page '+slug+' to path map',_arrayInsert(s,'var _pathMap = {','};',entry),d.sha);
 }
-async function addToAdminPages(slug,label,icon,sec){
+async function addToAdminPages(slug,label,icon,sec,sub){
   var d=await ghGet('admin/index.html');
   var s=b64decode(d.content);
   var start=s.indexOf('var PAGES = [');
@@ -714,7 +737,7 @@ async function addToAdminPages(slug,label,icon,sec){
   var end=s.indexOf('];',start);
   if(end===-1)throw new Error('admin: chiusura PAGES non trovata');
   if(s.slice(start,end).indexOf("k:'"+slug+"'")!==-1)throw new Error('Pagina già in PAGES');
-  var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+', sec:'+JSON.stringify(sec)+', c:1},\n';
+  var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+', sec:'+JSON.stringify(sec)+(sub?', sub:'+JSON.stringify(sub):'')+', c:1},\n';
   await ghPut('admin/index.html','admin: add page '+slug+' to sidebar',_arrayInsert(s,'var PAGES = [','];',entry),d.sha);
 }
 

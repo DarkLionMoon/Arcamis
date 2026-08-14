@@ -341,6 +341,7 @@ async function openNav(){
       var im=line.match(/i:\s*(?:"([^"]*)"|'([^']*)')/);obj.i=im?(im[1]||im[2]):'📄';
       var idm=line.match(/id:\s*(?:"([^"]*)"|'([^']*)')/);obj.id=idm?(idm[1]||idm[2]):'';
       var sm=line.match(/sec:\s*(?:"([^"]*)"|'([^']*)')/);obj.sec=sm?(sm[1]||sm[2]):'';
+      var um=line.match(/sub:\s*(?:"([^"]*)"|'([^']*)')/);obj.sub=um?(um[1]||um[2]):'';
       var pm=PAGES.find(function(p){return p.k===obj.k});
       if(pm){obj.c=pm.c;if(!obj.l)obj.l=pm.l;if(obj.i==='📄')obj.i=pm.i}
       arr.push(obj);
@@ -371,23 +372,43 @@ function _renderNav(){
   var h=viewHead('🧭','Navigazione','Ordine, sezioni e voci del menu del sito',
     '<button class="btn btn-p" onclick="openNewPageModal()">+ Nuova pagina</button>'
     +'<button class="btn btn-soft" onclick="openNav()">⟳ AGGIORNA</button>');
-  h+='<div class="panel-sub">Le frecce riordinano le card della home e il menu. Cambiare sezione aggiorna l\'URL pulito delle pagine personalizzate.</div>';
+  h+='<div class="panel-sub">Le frecce riordinano le card della home e il menu. Cambiare sezione aggiorna l\'URL pulito delle pagine personalizzate; la sottosezione serve solo a raggruppare le voci nel menu.</div>';
   secKeys.forEach(function(v){
     var items=groups[v];
     h+='<div class="panel"><div class="panel-head"><h3>'+esc(_navGroupLabel(v))+(v?' <span class="pill gold">'+esc(v)+'</span>':'')+'</h3><span class="hint">'+items.length+' voci</span></div>';
-    items.forEach(function(p,i){
-      var first=i===0,last=i===items.length-1;
-      h+='<div class="row navm">'
-        +'<div class="rico">'+p.i+'</div>'
-        +'<div class="rmain"><div class="rt">'+esc(p.l)+'</div><div class="rs">'+esc(p.k)+' · id '+esc(p.id)+'</div></div>'
-        +'<div class="ract">'
-        +'<button class="btn btn-soft btn-sm" '+(first?'disabled':'')+' onclick="navMove(\''+esc(p.k)+'\',-1)" title="Sposta su">↑</button>'
-        +'<button class="btn btn-soft btn-sm" '+(last?'disabled':'')+' onclick="navMove(\''+esc(p.k)+'\',1)" title="Sposta giù">↓</button>'
-        +'<select class="in" style="width:auto;padding:5px 8px;font-size:11px" onchange="navSetSec(\''+esc(p.k)+'\',this.value)">'+_secOptions(p.sec)+'</select>'
-        +'<button class="btn btn-soft btn-sm" onclick="navOpen(\''+esc(p.k)+'\')" title="Apri editor">✏️</button>'
-        +'<button class="btn btn-soft btn-sm" onclick="navRename(\''+esc(p.k)+'\')" title="Rinomina">🔄</button>'
-        +(p.c?'<button class="btn btn-d btn-sm" onclick="navDelete(\''+esc(p.k)+'\')" title="Elimina">🗑</button>':'')
-        +'</div></div>';
+    var subs={};
+    items.forEach(function(p){var s=p.sub||'';(subs[s]=subs[s]||[]).push(p)});
+    var subKeys=Object.keys(subs);
+    subKeys.sort(function(a,b){
+      if(a==='')return -1;
+      if(b==='')return 1;
+      return 0;
+    });
+    subKeys.forEach(function(sub){
+      var subItems=subs[sub];
+      if(sub){
+        h+='<div class="navm nav-sub" style="padding:8px 12px 2px 12px;border-bottom:none">'
+          +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<span style="font-size:11px">🗂</span>'
+          +'<span class="pill" style="background:rgba(200,155,60,.1);color:var(--gold)">'+esc(sub)+'</span>'
+          +'<span class="hint" style="font-size:10px">'+subItems.length+' voci</span>'
+          +'</div></div>';
+      }
+      subItems.forEach(function(p,i){
+        var first=i===0,last=i===subItems.length-1;
+        h+='<div class="row navm">'
+          +'<div class="rico">'+p.i+'</div>'
+          +'<div class="rmain"><div class="rt">'+esc(p.l)+'</div><div class="rs">'+esc(p.k)+' · id '+esc(p.id)+(p.sub?' · '+esc(p.sub):'')+'</div></div>'
+          +'<div class="ract">'
+          +'<button class="btn btn-soft btn-sm" '+(first?'disabled':'')+' onclick="navMove(\''+esc(p.k)+'\',-1)" title="Sposta su">↑</button>'
+          +'<button class="btn btn-soft btn-sm" '+(last?'disabled':'')+' onclick="navMove(\''+esc(p.k)+'\',1)" title="Sposta giù">↓</button>'
+          +'<select class="in" style="width:auto;padding:5px 8px;font-size:11px" onchange="navSetSec(\''+esc(p.k)+'\',this.value)">'+_secOptions(p.sec)+'</select>'
+          +'<select class="in" style="width:auto;padding:5px 8px;font-size:11px" onchange="navSetSub(\''+esc(p.k)+'\',this.value)" title="Sottosezione">'+_subOptions(v,p.sub)+'</select>'
+          +'<button class="btn btn-soft btn-sm" onclick="navOpen(\''+esc(p.k)+'\')" title="Apri editor">✏️</button>'
+          +'<button class="btn btn-soft btn-sm" onclick="navRename(\''+esc(p.k)+'\')" title="Rinomina">🔄</button>'
+          +(p.c?'<button class="btn btn-d btn-sm" onclick="navDelete(\''+esc(p.k)+'\')" title="Elimina">🗑</button>':'')
+          +'</div></div>';
+      });
     });
     h+='</div>';
   });
@@ -400,10 +421,25 @@ function _secOptions(cur){
   });
   return h;
 }
+function _subOptions(sec,cur){
+  var subs={};
+  _navData.pages.forEach(function(p){
+    if((p.sec||'')===sec&&p.sub)subs[p.sub]=1;
+  });
+  var keys=Object.keys(subs).sort();
+  var h='<option value="">— nessuna —</option>';
+  if(cur&&keys.indexOf(cur)===-1){h+='<option value="'+escAttr(cur)+'" selected>'+esc(cur)+'</option>'}
+  keys.forEach(function(k){
+    h+='<option value="'+escAttr(k)+'"'+(k===cur?' selected':'')+'>'+esc(k)+'</option>';
+  });
+  h+='<option value="__new__">➕ nuova…</option>';
+  return h;
+}
 function _pagesToText(arr){
   return arr.map(function(p){
     var base='  {k:'+JSON.stringify(p.k)+', l:'+JSON.stringify(p.l)+', i:'+JSON.stringify(p.i)+', id:'+JSON.stringify(p.id)+'';
     if(p.sec)base+=', sec:'+JSON.stringify(p.sec);
+    if(p.sub)base+=', sub:'+JSON.stringify(p.sub);
     return base+'}';
   }).join(',\n');
 }
@@ -431,7 +467,9 @@ async function navMove(slug,dir){
   if(target<0||target>=_navData.pages.length)return;
   var cur=_navData.pages[idx].sec||'';
   var nxt=_navData.pages[target].sec||'';
-  if(cur!==nxt)return;
+  var curS=_navData.pages[idx].sub||'';
+  var nxtS=_navData.pages[target].sub||'';
+  if(cur!==nxt||curS!==nxtS)return;
   _swapInNav(slug,_navData.pages[target].k);
   setStatus('saving','salvataggio ordine…');
   try{
@@ -488,6 +526,51 @@ async function navSetSec(slug,newSec){
     setStatus('ok','deploying…');
     startDeployTimer();
     await _logAudit('nav_sec',slug,{sec:newSec});
+    _renderNav();
+  }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+async function navSetSub(slug,val){
+  var p=_navData.pages.find(function(x){return x.k===slug});
+  if(!p)return;
+  if(val==='__new__'){
+    var name=prompt('Nome della sottosezione (es. Storia, Razze, Luoghi):');
+    if(name===null)return;
+    name=name.trim();
+    if(!name){toast('Nome non valido','error');return}
+    val=name;
+  }
+  if(val===p.sub)return;
+  p.sub=val||'';
+  var pi=PAGES.find(function(x){return x.k===slug});
+  if(pi)pi.sub=val||'';
+  setStatus('saving','salvataggio sottosezione…');
+  try{
+    await _writeDataPages(_navData.pages);
+    if(pi){
+      var d=await ghGet('admin/index.html');
+      var s=b64decode(d.content);
+      var lines=s.split('\n');
+      var start2=s.indexOf('var PAGES = [');
+      var idx2=-1;
+      for(var i=0;i<lines.length;i++){
+        if(new RegExp('k:["\']'+slug+'["\']').test(lines[i])&&s.indexOf(lines[i])>start2){idx2=i;break}
+      }
+      if(idx2!==-1){
+        var line=lines[idx2];
+        if(val){
+          if(line.indexOf('sub:"')!==-1)line=line.replace(/sub:"[^"]*"/,'sub:"'+val+'"');
+          else line=line.replace(/},\s*$/,', sub:"'+val+'"}');
+        }else{
+          line=line.replace(/,\s*sub:"[^"]*"/,'');
+        }
+        lines[idx2]=line;
+        await ghPut('admin/index.html','admin: set sub '+slug+' = '+(val||''),lines.join('\n'),d.sha);
+      }
+    }
+    toast('Sottosezione aggiornata! Deploy in corso…','success');
+    setStatus('ok','deploying…');
+    startDeployTimer();
+    await _logAudit('nav_sub',slug,{sub:val});
     _renderNav();
   }catch(e){setStatus('err','errore');toast(e.message,'error')}
 }
