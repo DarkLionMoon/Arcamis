@@ -149,8 +149,7 @@ function buildLavoriNav() {
   var ddMenu = document.querySelector('#dd-lavori .tn-menu--acc');
   if (ddMenu) {
     var bodies = ddMenu.querySelectorAll('.tn-acc-body');
-    var lavoriBody   = bodies[0];
-    var mestieriBody = bodies[1];
+    var lavoriBody = bodies[0];
 
     if (lavoriBody) {
       lavoriBody.innerHTML = '';
@@ -160,20 +159,10 @@ function buildLavoriNav() {
         lavoriBody.appendChild(el);
       });
     }
-
-    if (mestieriBody) {
-      mestieriBody.innerHTML = '';
-      MESTIERI.forEach(function(v) {
-        var fn = function(k){ return function(){ closeDd(); showMestiere(k); }; }(v.k);
-        var el = _tnItem(v.i, v.l, fn);
-        mestieriBody.appendChild(el);
-      });
-    }
   }
 
   // ── Mobile drawer ──
   var mnLavori   = document.querySelector('#mobile-nav .mn-section--lavori');
-  var mnMestieri = document.querySelector('#mobile-nav .mn-section--mestieri');
 
   if (mnLavori) {
     mnLavori.innerHTML = '<div class="mn-label">Lavori</div>';
@@ -182,15 +171,6 @@ function buildLavoriNav() {
       mnLavori.appendChild(el);
     });
   }
-
-  if (mnMestieri) {
-      mnMestieri.innerHTML = '<div class="mn-label">Mestieri</div>';
-      MESTIERI.forEach(function(v) {
-        var fn = function(k){ return function(){ closeMobileNav(); showMestiere(k); }; }(v.k);
-        var el = _mnItem(v.i, v.l, fn);
-        mnMestieri.appendChild(el);
-      });
-    }
 }
 
 function _tnItem(icon, label, fn) {
