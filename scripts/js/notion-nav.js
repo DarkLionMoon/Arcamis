@@ -1020,6 +1020,9 @@ function _parsePantheon(md){
       rest.push(line);
     });
     if(!name) return;
+    var pos = null;
+    var posm = img.match(/#(\d{1,3})[.,](\d{1,3})$/);
+    if(posm) pos = [parseInt(posm[1],10), parseInt(posm[2],10)];
     var epi = '';
     var epiRe = rest.join('\n').match(/-\s*\*\*Epiteto:?\*\*\s*:?\s*(.+)/);
     if(epiRe) epi = epiRe[1].trim();
@@ -1027,6 +1030,7 @@ function _parsePantheon(md){
       slug: _slugify(name),
       n: name,
       img: img,
+      pos: pos,
       epi: epi,
       md: rest.join('\n').replace(/^\n+/, '').trim()
     });
@@ -1046,7 +1050,9 @@ function _renderDeityPage(d){
   var ic = _panIcon(d);
   var hero = '<div class="pan-deity-hero">'
     + (d.img
-        ? '<img src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy" onerror="this.onerror=null;this.style.display=\'none\';this.parentNode.classList.add(\'hero-broken\');">'
+        ? '<img src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy"'
+          + (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '')
+          + ' onerror="this.onerror=null;this.style.display=\'none\';this.parentNode.classList.add(\'hero-broken\');">'
         : '<div class="pan-deity-hero-none">' + ic + '</div>')
     + '<div class="pan-deity-caption"><span class="pd-name">' + _siteEsc(d.n) + '</span>'
     + (d.epi ? '<span class="pd-epi">' + _siteEsc(d.epi) + '</span>' : '')
@@ -1070,7 +1076,9 @@ function _renderPantheon(md) {
     var _cfb = "this.onerror=null;this.style.display='none';this.parentNode.classList.add('pan-tile-none');";
     var go = "gp('pantheon-" + d.slug + "','" + _jsStr(d.n) + "','" + ic + "')";
     html += '<div class="pan-tile" data-ic="' + ic + '" role="button" tabindex="0" onclick="' + go + '" onkeydown="if(event.key===\'Enter\')' + go + '">'
-      + '<img class="pan-tile-img" src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy" onerror="' + _cfb + '">'
+      + '<img class="pan-tile-img" src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy"'
+      + (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '')
+      + ' onerror="' + _cfb + '">'
       + '<div class="pan-tile-caption"><span class="pan-tile-name">' + _siteEsc(d.n) + '</span>'
       + (d.epi ? '<span class="pan-tile-epi">' + _siteEsc(d.epi) + '</span>' : '')
       + '</div></div>';

@@ -70,6 +70,23 @@ I layout a card sono renderizzati da `_renderSchede` in `notion-nav.js`
 (markdown → card con campi `- **Chiave:** valore`); gli altri da
 renderer dedicati (`_renderPantheon`, `_renderBestiario`, …).
 
+L'editor a blocchi (`admin/js/structured.js`) copre **due modalità**:
+- `pantheon`: blocchi divinità/sezioni con immagine, citazione, identità,
+  personalità e culto (separati da `---` nel markdown);
+- schede a card: `bestiario`, `fazioni`, `oggetti` e i layout a card
+  `sessione`, `quest`, `npc`, `spell`, `specie`, `citta`, `evento` — ogni
+  blocco produce `## Titolo` + campi `- **Chiave:** valore` + sezioni `###`.
+
+Sui layout strutturati si può passare in qualsiasi momento dall'editor a
+blocchi al markdown grezzo col pulsante **✍ Markdown** / **🧱 Blocchi**
+in toolbar (il markdown viene sempre risincronizzato).
+
+Per le immagini delle divinità, **trascinando** sull'anteprima si sceglie la
+parte visibile nella card: la posizione viene salvata come frammento
+`![](...#30,70)` (percentuali orizzontale, verticale) e applicata lato sito
+come `object-position` sia nelle tile del pantheon che nell'hero della
+scheda divinità.
+
 Nel pannello admin, il selettore Layout in alto a destra applica il template
 predefinito del layout scelto (chiede conferma se c'è già contenuto).
 

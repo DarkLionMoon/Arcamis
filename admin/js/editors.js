@@ -178,6 +178,9 @@ async function openPage(k){
 }
 function buildToolbar(){
   var h='<div class="ed-toolbar" id="e-toolbar">';
+  if(_current&&_current.layout&&_stLayoutFor(_current.layout)){
+    h+='<button class="btn btn-soft btn-sm" onclick="_stToggle()" title="Passa all\'editor a blocchi">🧱 Blocchi</button>';
+  }
   EDITOR_TB.forEach(function(g){
     g.forEach(function(cmd){
       h+='<button class="tb-btn2" data-cmd="'+cmd+'" title="'+EDITOR_TB_TITLE[cmd]+'">'+EDITOR_TB_LABEL[cmd]+'</button>';
@@ -401,8 +404,18 @@ function onLayoutChange(val,silent){
   _current.layout=val;
   var md=document.getElementById('e-md');
   if(window.__stMode){
-    if(!_stLayoutFor(val))_stExit();
-    else _stSync();
+    var _prevKind=_stKind;
+    _stSetKind(val);
+    if(!_stLayoutFor(val)){
+      _stExit();
+    }else{
+      if(_prevKind!==_stKind){
+        var _raw=md?md.value:'';
+        initStructuredEditor(_raw);
+      }else{
+        _stSync();
+      }
+    }
     var info=document.getElementById('e-pv-info');
     if(info)info.textContent=_layoutLabel(val);
     var sb=document.getElementById('e-sb');
@@ -420,6 +433,8 @@ function onLayoutChange(val,silent){
   if(info)info.textContent=_layoutLabel(val);
   var sb=document.getElementById('e-sb');
   if(sb)sb.textContent=_layoutLabel(val)+' · autosave ogni 15s';
+  var tb=document.getElementById('e-toolbar');
+  if(tb&&tb.parentNode){tb.outerHTML=buildToolbar();setViewMode(_viewMode)}
 }
 function wrapMd(before,after){
   var ta=document.getElementById('e-md');if(!ta)return;

@@ -1,22 +1,46 @@
 /* ════════════════════════════════════════════════════════════════
    ARCAMIS ADMIN — structured.js
-   Editor a blocchi per i layout strutturati (attualmente Pantheon).
+   Editor a blocchi per i layout strutturati.
 
-   Converte il markdown della pagina in blocchi editabili (divinità /
-   sezioni), mostra un'anteprima IDENTICA alla griglia del sito e
-   rigenera il markdown nel formato che notion-nav.js (site) si aspetta
-   (_parsePantheon: blocchi separati da "---", "# Nome", immagine,
-   citazione, "## Identità", "## Personalità", "## Culto").
+   Due modalità:
+   - 'pantheon': divinità/sezioni con immagine, citazione, identità,
+     personalità, culto. Markdown compatibile con _parsePantheon del
+     sito (blocchi separati da "---", "# Nome", "## Identità", …).
+   - 'schede': schede a card per i layout sessione/quest/npc/spell/
+     specie/citta/evento/bestiario/fazioni/oggetti. Markdown nel
+     formato "## Titolo" + "- **Chiave:** valore" + "### Sezione"
+     letto dai renderer _renderSchede/_renderBestiario/_renderFazioni/
+     _renderOggetti del sito.
    ════════════════════════════════════════════════════════════════ */
 
 var _stMode=false;
+var _stKind='pantheon';
+var _ST_SCHE_LAYOUTS=['sessione','quest','npc','spell','specie','citta','evento','bestiario','fazioni','oggetti'];
 
-/* Layout supportati dall'editor a blocchi (per ora solo Pantheon). */
-function _stLayoutFor(layout){return layout==='pantheon'?'pantheon':null}
+/* Layout supportati dall'editor a blocchi. */
+function _stLayoutFor(layout){
+  if(layout==='pantheon')return 'pantheon';
+  if(_ST_SCHE_LAYOUTS.indexOf(layout)!==-1)return 'schede';
+  return null;
+}
+function _stSetKind(layout){
+  _stKind=_stLayoutFor(layout)||'pantheon';
+}
 
 /* ── PARSE markdown → blocchi ── */
 function _stFold(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+function _stImgPos(src){
+  var m=String(src||'').match(/#(\d{1,3})[.,](\d{1,3})$/);
+  return m?[+m[1],+m[2]]:null;
+}
+function _stImgPosAttr(pos){
+  return pos?'#'+Math.round(pos[0])+','+Math.round(pos[1]):'';
+}
 function _stParse(md){
+  if(_stKind==='schede')return _stParseSchede(md);
+  return _stParsePantheon(md);
+}
+function _stParsePantheon(md){
   if(!md)return {heading:'Divinità',intro:'',cards:[]};
   md=md.replace(/^\s*---\s*\n/,'');
   var blocks=md.split(/\n---\n/);
@@ -41,6 +65,8 @@ function _stParse(md){
       rest.push(line);
     }
     if(!name)return;
+    var pos=null;
+    if(img){var pm=_stImgPos(img);if(pm){pos=pm;img=img.replace(/#[\d.,]+$/,'');}}
     var ident=[],personality='',cult='',extra=[];
     var lines2=rest.join('\n').replace(/^\n+/,'').trim().split('\n');
     var sec=null,buf=[];
@@ -59,7 +85,7 @@ function _stParse(md){
       buf.push(lines2[j]);
     }
     flush();
-    cards.push({type:img?'deity':'section',name:name,img:img,quote:quote,
+    cards.push({type:img?'deity':'section',name:name,img:img,pos:pos,quote:quote,
       ident:ident,personality:personality,cult:cult,extra:extra.join('\n\n')});
   });
   return {heading:heading,intro:intro,cards:cards};
@@ -73,8 +99,54 @@ function _stParseIdent(t){
   return pairs;
 }
 
+/* ── PARSE schede (sessione/quest/npc/spell/specie/citta/evento/bestiario/fazioni/oggetti) ── */
+function _stParseSchede(md){
+  var cards=[];
+  if(!md)return {heading:'',intro:'',cards:[]};
+  var sections=md.split(/^## /m).filter(Boolean);
+  sections.forEach(function(sec){
+    var lines=sec.split('\n');
+    var name=(lines.shift()||'').trim().replace(/^#\s+/,'');
+    var intro=[],fields=[],blocks=[],cur=null,buf=[];
+    function flushBlock(){
+      if(cur!==null)blocks.push({name:cur,md:buf.join('\n').trim()});
+      buf=[];cur=null;
+    }
+    lines.forEach(function(line){
+      var fm=line.match(/^\s*-\s*\*\*(.+?):?\*\*\s*:?\s*(.*)$/);
+      if(fm){flushBlock();fields.push([fm[1].trim().replace(/:$/,''),fm[2].trim()]);return;}
+      var bm=line.match(/^###\s+(.+)/);
+      if(bm){flushBlock();cur=bm[1].trim();return;}
+      if(cur!==null){buf.push(line);return;}
+      if(line.trim())intro.push(line);
+    });
+    flushBlock();
+    cards.push({name:name,intro:intro.join('\n').trim(),fields:fields,blocks:blocks});
+  });
+  return {heading:'',intro:'',cards:cards};
+}
+
+/* ── BUILD schede → markdown ── */
+function _stBuildSchede(data){
+  var out='';
+  (data.cards||[]).forEach(function(c){
+    if(out)out+='\n\n';
+    out+='## '+(c.name||'Scheda');
+    if(c.intro)out+='\n\n'+c.intro;
+    if(c.fields&&c.fields.length){
+      out+='\n\n'+c.fields.map(function(f){return '- **'+f[0]+':** '+f[1]}).join('\n');
+    }
+    (c.blocks||[]).forEach(function(b){
+      out+='\n\n### '+b.name;
+      if(b.md)out+='\n\n'+b.md;
+    });
+  });
+  return out;
+}
+
 /* ── BUILD blocchi → markdown (formato compatibile con il sito) ── */
 function _stBuildMd(data){
+  if(_stKind==='schede')return _stBuildSchede(data);
   var out='# '+(data.heading||'Divinità')+'\n\n'+(data.intro||'');
   data.cards.forEach(function(c){
     out+='\n\n---\n\n'+_stBuildCard(c);
@@ -83,7 +155,7 @@ function _stBuildMd(data){
 }
 function _stBuildCard(c){
   var b='# '+(c.name||'');
-  if(c.img)b+='\n\n!['+(c.name||'')+']('+c.img+')';
+  if(c.img)b+='\n\n!['+(c.name||'')+']('+c.img+_stImgPosAttr(c.pos)+')';
   if(c.quote)b+='\n\n> '+c.quote;
   if(c.ident&&c.ident.length){
     b+='\n\n## Identità\n\n'+c.ident.map(function(p){return '- **'+p[0]+':** '+p[1]}).join('\n');
@@ -107,6 +179,7 @@ function _stMd(md){
   return md.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 }
 function _stPreviewHTML(data){
+  if(_stKind==='schede')return _stPreviewSchede(data);
   var h='<div class="pan-page">';
   if(data.intro)h+='<div class="pan-intro">'+_stMd(data.intro)+'</div>';
   h+='<div class="pan-grid">';
@@ -118,7 +191,8 @@ function _stPreviewHTML(data){
     }
     var epi=_stEpi(c);
     h+='<div class="pan-tile" style="cursor:default">'
-      +'<img class="pan-tile-img" src="'+escAttr(c.img)+'" alt="'+escAttr(c.name)+'" loading="lazy">'
+      +'<img class="pan-tile-img" src="'+escAttr(c.img)+'" alt="'+escAttr(c.name)+'" loading="lazy"'
+      +(c.pos?' style="object-position:'+c.pos[0]+'% '+c.pos[1]+'%"':'')+'>'
       +'<div class="pan-tile-caption"><span class="pan-tile-name">'+esc(c.name)+'</span>'
       +(epi?'<span class="pan-tile-epi">'+esc(epi)+'</span>':'')+'</div></div>';
   });
@@ -126,8 +200,34 @@ function _stPreviewHTML(data){
   return h;
 }
 
+/* ── ANTEPRIMA schede (stessa resa del sito: card _renderSchede/_renderBestiario) ── */
+function _stPreviewSchede(data){
+  var h='<div class="sch-page">';
+  (data.cards||[]).forEach(function(c){
+    h+='<div class="sch-card" style="margin-bottom:16px;border:1px solid var(--line);border-radius:var(--rad);padding:14px">';
+    h+='<div class="sch-title" style="font-family:var(--brand);color:var(--acc2);font-size:17px;font-weight:700">'+esc(c.name)+'</div>';
+    if(c.intro)h+='<div class="sch-intro" style="margin:8px 0">'+_stMd(c.intro)+'</div>';
+    if(c.fields&&c.fields.length){
+      h+='<div class="sch-fields" style="display:flex;flex-direction:column;gap:4px;margin:8px 0">';
+      c.fields.forEach(function(f){
+        h+='<div class="sch-field"><span class="sch-key" style="color:var(--acc2);font-weight:700">'+esc(f[0])+'</span>'
+          +'<span class="sch-val">'+esc(f[1])+'</span></div>';
+      });
+      h+='</div>';
+    }
+    (c.blocks||[]).forEach(function(b){
+      h+='<div class="sch-block-title" style="font-weight:700;color:var(--acc);margin-top:10px">'+esc(b.name)+'</div>';
+      h+='<div class="sch-block-body">'+_stMd(b.md)+'</div>';
+    });
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
+
 /* ── CARD blocco ── */
 function _stCardHTML(c,i){
+  if(_stKind==='schede')return _stSchedeCardHTML(c,i);
   var rows=(c.ident&&c.ident.length?c.ident:[['Nome',''],['Epiteto',''],['Allineamento',''],['Sfere',''],['Simbolo','']])
     .map(function(p){return '<div class="st-kv"><input class="in k" value="'+escAttr(p[0])+'" placeholder="Campo" oninput="_stSync()">'
       +'<input class="in v" value="'+escAttr(p[1])+'" placeholder="Valore" oninput="_stSync()">'
@@ -143,14 +243,23 @@ function _stCardHTML(c,i){
     +'<div class="st-card-body">'
     +'<div class="st-row">'
     +'<div class="st-imgbox">'
+    +'<div class="st-img-wrap" id="st-imgwrap-'+i+'"'
+    +(c.img?' title="Trascina per scegliere la parte visibile nella card" onmousedown="_stPosDown(event,'+i+')"':'')
+    +'>'
     +(c.img
-        ?'<img class="st-img" id="st-img-'+i+'" src="'+escAttr(c.img)+'" alt="'+escAttr(c.name)+'">'
+        ?'<img class="st-img" id="st-img-'+i+'" src="'+escAttr(c.img)+'" alt="'+escAttr(c.name)+'"'
+          +(c.pos?' style="object-position:'+c.pos[0]+'% '+c.pos[1]+'%"':'')+'>'
         :'<div class="st-img st-img-empty" id="st-img-'+i+'">🛐</div>')
+    +'<div class="st-pos-mark" id="st-posmark-'+i+'" style="left:'+(c.pos?c.pos[0]:50)+'%;top:'+(c.pos?c.pos[1]:50)+'%;display:'+(c.pos?'block':'none')+'"></div>'
+    +'</div>'
     +'<input type="hidden" class="st-imgval" id="st-imgval-'+i+'" value="'+escAttr(c.img||'')+'">'
+    +'<input type="hidden" class="st-posval" id="st-posval-'+i+'" value="'+(c.pos?c.pos[0]+','+c.pos[1]:'')+'">'
     +'<div class="st-img-actions">'
     +'<button type="button" class="btn btn-soft btn-sm" onclick="_stPick('+i+')">🖼 Scegli</button>'
     +'<button type="button" class="btn btn-soft btn-sm" onclick="_stClearImg('+i+')">✕</button>'
-    +'</div></div>'
+    +'</div>'
+    +'<div class="st-pos-hint">Trascina sull\'immagine per il ritaglio</div>'
+    +'</div>'
     +'<div class="st-fields">'
     +'<label>Citazione<input class="in st-quote" value="'+escAttr(c.quote)+'" placeholder="Frase rappresentativa…" oninput="_stSync()"></label>'
     +'<p class="st-hint">Senza immagine il blocco diventa una sezione a tutta larghezza (es. gli Aspetti).</p>'
@@ -164,8 +273,41 @@ function _stCardHTML(c,i){
     +'</div></div>';
 }
 
+/* ── CARD blocco — schede (titolo + intro + campi + sezioni ###) ── */
+function _stSchedeCardHTML(c,i){
+  var fields=(c.fields&&c.fields.length?c.fields:[['','']])
+    .map(function(p){return '<div class="st-kv"><input class="in k" value="'+escAttr(p[0])+'" placeholder="Chiave" oninput="_stSync()">'
+      +'<input class="in v" value="'+escAttr(p[1])+'" placeholder="Valore" oninput="_stSync()">'
+      +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Rimuovi campo" onclick="_stDelRow(this)">✕</button></div>';}).join('');
+  var blocks=(c.blocks||[]).map(function(b,j){
+    return '<div class="st-block">'
+      +'<div class="st-block-head"><input class="in st-bname" value="'+escAttr(b.name)+'" placeholder="Titolo sezione" oninput="_stSync()">'
+      +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Rimuovi sezione" onclick="_stDelBlock(this)">✕</button></div>'
+      +'<textarea class="in st-ta st-bmd" oninput="_stSync()" placeholder="Contenuto (markdown)">'+esc(b.md)+'</textarea>'
+      +'</div>';
+  }).join('');
+  return '<div class="st-card" data-i="'+i+'">'
+    +'<div class="st-card-head"><span class="st-idx">'+(i+1)+'</span>'
+    +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Titolo della scheda" oninput="_stSync()">'
+    +'<span class="st-head-actions">'
+    +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta su" onclick="_stMove('+i+',-1)">↑</button>'
+    +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta giù" onclick="_stMove('+i+',1)">↓</button>'
+    +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Elimina scheda" onclick="_stDelete('+i+')">🗑</button>'
+    +'</span></div>'
+    +'<div class="st-card-body">'
+    +'<label class="st-ta-l">Descrizione / intro<textarea class="in st-ta st-intro" oninput="_stSync()" placeholder="Breve descrizione della scheda…">'+esc(c.intro)+'</textarea></label>'
+    +'<div class="st-sub">Campi</div>'
+    +'<div class="st-kvrows" id="st-ident-'+i+'">'+fields+'</div>'
+    +'<button type="button" class="btn btn-soft btn-sm" onclick="_stAddIdent('+i+')">＋ campo</button>'
+    +'<div class="st-sub">Sezioni (###)</div>'
+    +'<div class="st-blockrows" id="st-blocks-'+i+'">'+blocks+'</div>'
+    +'<button type="button" class="btn btn-soft btn-sm" onclick="_stAddBlock('+i+')">＋ sezione</button>'
+    +'</div></div>';
+}
+
 /* ── RENDERING dell'editor ── */
 function _stRead(){
+  if(_stKind==='schede')return _stReadSchede();
   var heading='Divinità';
   var hd=document.getElementById('st-heading');
   if(hd&&hd.value.trim())heading=hd.value.trim();
@@ -175,12 +317,15 @@ function _stRead(){
     var img=c.querySelector('.st-imgval').value;
     var name=c.querySelector('.st-name').value.trim();
     if(!name)name=img?'Divinità '+(idx+1):'Sezione '+(idx+1);
+    var pos=null;
+    var pv=c.querySelector('.st-posval');
+    if(pv&&pv.value){var pp=pv.value.split(',');pos=[+pp[0],+pp[1]];}
     var ident=[];
     c.querySelectorAll('.st-kv').forEach(function(kv){
       var k=kv.querySelector('.k').value.trim();
       if(k)ident.push([k,kv.querySelector('.v').value.trim()]);
     });
-    cards.push({type:img?'deity':'section',name:name,img:img,
+    cards.push({type:img?'deity':'section',name:name,img:img,pos:pos,
       quote:c.querySelector('.st-quote').value.trim(),
       ident:ident,
       personality:c.querySelector('.st-personality').value,
@@ -188,6 +333,27 @@ function _stRead(){
       extra:c.querySelector('.st-extra').value});
   });
   return {heading:heading,intro:intro,cards:cards};
+}
+function _stReadSchede(){
+  var cards=[];
+  document.querySelectorAll('#st-list .st-card').forEach(function(c,idx){
+    var name=c.querySelector('.st-name').value.trim();
+    if(!name)name='Scheda '+(idx+1);
+    var fields=[];
+    c.querySelectorAll('.st-kv').forEach(function(kv){
+      var k=kv.querySelector('.k').value.trim();
+      if(k)fields.push([k,kv.querySelector('.v').value.trim()]);
+    });
+    var blocks=[];
+    c.querySelectorAll('.st-block').forEach(function(b){
+      var bn=b.querySelector('.st-bname').value.trim();
+      var bm=b.querySelector('.st-bmd').value;
+      if(bn||bm)blocks.push({name:bn||'Sezione',md:bm});
+    });
+    var introEl=c.querySelector('.st-intro');
+    cards.push({name:name,intro:introEl?introEl.value:'',fields:fields,blocks:blocks});
+  });
+  return {heading:'',intro:'',cards:cards};
 }
 function _stRender(data){
   var list=document.getElementById('st-list');if(!list)return;
@@ -218,13 +384,19 @@ function _stSyncPreview(){_stPreview(_stRead())}
 
 function initStructuredEditor(content){
   _stMode=true;window.__stMode=true;
+  _stKind=_stLayoutFor(_current.layout)||'pantheon';
   var data=_stParse(content||'');
+  var ta=document.getElementById('e-md');if(ta)ta.style.display='none';
+  var sh=document.getElementById('struct-head');if(sh)sh.style.display='';
+  var sl=document.getElementById('st-list');if(sl)sl.style.display='';
   var head=document.getElementById('struct-head');
   if(head){
-    head.innerHTML='<div class="st-intro-box">'
-      +'<label class="st-ta-l">Titolo introduzione<input class="in" id="st-heading" value="'+escAttr(data.heading)+'" style="max-width:220px" oninput="_stSync()"></label>'
-      +'<label class="st-ta-l">Testo introduttivo (prima della griglia)<textarea class="in st-ta" id="st-intro" oninput="_stSync()" placeholder="Introduzione al pantheon…">'+esc(data.intro)+'</textarea></label>'
-      +'</div>';
+    head.innerHTML=_stKind==='schede'
+      ?'<div class="st-intro-box"><p class="st-hint" style="margin:0">Schede a card: ogni scheda ha titolo, descrizione, campi e sezioni. L\'anteprima e il salvataggio usano il formato del sito (<code>## Titolo</code> + <code>- **Chiave:** valore</code> + <code>### Sezione</code>).</p></div>'
+      :'<div class="st-intro-box">'
+        +'<label class="st-ta-l">Titolo introduzione<input class="in" id="st-heading" value="'+escAttr(data.heading)+'" style="max-width:220px" oninput="_stSync()"></label>'
+        +'<label class="st-ta-l">Testo introduttivo (prima della griglia)<textarea class="in st-ta" id="st-intro" oninput="_stSync()" placeholder="Introduzione al pantheon…">'+esc(data.intro)+'</textarea></label>'
+        +'</div>';
   }
   _stRender(data);
   var ph=document.querySelector('#md-pane .pane-head');
@@ -232,8 +404,11 @@ function initStructuredEditor(content){
   var tb=document.getElementById('e-toolbar');
   if(tb&&tb.parentNode){
     tb.outerHTML='<div class="ed-toolbar" id="e-toolbar">'
-      +'<button class="btn btn-p btn-sm" onclick="_stAdd(\'deity\')">➕ Divinità</button>'
-      +'<button class="btn btn-soft btn-sm" onclick="_stAdd(\'section\')">➕ Sezione</button>'
+      +'<button class="btn btn-soft btn-sm" onclick="_stToggle()" title="Passa al markdown grezzo">✍ Markdown</button>'
+      +(_stKind==='schede'
+        ?'<button class="btn btn-p btn-sm" onclick="_stAdd(\'card\')">➕ Scheda</button>'
+        :'<button class="btn btn-p btn-sm" onclick="_stAdd(\'deity\')">➕ Divinità</button>'
+         +'<button class="btn btn-soft btn-sm" onclick="_stAdd(\'section\')">➕ Sezione</button>')
       +'<span class="tb-spacer"></span>'
       +'<span class="view-switch">'
       +'<button class="tb-btn2" data-view="split" title="Blocchi + anteprima">SPLIT</button>'
@@ -242,8 +417,15 @@ function initStructuredEditor(content){
       +'</span></div>';
   }
   var sb=document.getElementById('e-sb');
-  if(sb)sb.textContent=_layoutLabel(_current.layout)+' · editor a blocchi · anteprima griglia';
+  if(sb)sb.textContent=_layoutLabel(_current.layout)+' · editor a blocchi · '+
+    (_stKind==='schede'?'schede a card':'griglia divinità');
   _stSync();
+}
+function _stToggle(){
+  var ta=document.getElementById('e-md');if(!ta)return;
+  if(_stMode){_stExit();}
+  else{initStructuredEditor(ta.value);}
+  setViewMode(_viewMode);
 }
 function _stExit(){
   _stMode=false;window.__stMode=false;
@@ -272,10 +454,14 @@ function _stDelete(i){
 }
 function _stAdd(type){
   var data=_stRead();
-  data.cards.push({type:type,name:type==='section'?'Nuova sezione':'Nuova divinità',
-    img:type==='deity'?'':'',quote:'',
-    ident:[['Nome',''],['Epiteto',''],['Allineamento',''],['Sfere',''],['Simbolo','']],
-    personality:'',cult:'',extra:''});
+  if(_stKind==='schede'){
+    data.cards.push({name:'Nuova scheda',intro:'',fields:[['','']],blocks:[]});
+  }else{
+    data.cards.push({type:type,name:type==='section'?'Nuova sezione':'Nuova divinità',
+      img:type==='deity'?'':'',quote:'',
+      ident:[['Nome',''],['Epiteto',''],['Allineamento',''],['Sfere',''],['Simbolo','']],
+      personality:'',cult:'',extra:''});
+  }
   _stRender(data);_stSync();
   var cards=document.querySelectorAll('#st-list .st-card');
   var last=cards[cards.length-1];
@@ -292,6 +478,19 @@ function _stAddIdent(i){
 }
 function _stDelRow(btn){
   var kv=btn.closest('.st-kv');if(kv)kv.remove();
+  _stSync();
+}
+function _stAddBlock(i){
+  var box=document.getElementById('st-blocks-'+i);if(!box)return;
+  var div=document.createElement('div');div.className='st-block';
+  div.innerHTML='<div class="st-block-head"><input class="in st-bname" placeholder="Titolo sezione" oninput="_stSync()">'
+    +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Rimuovi sezione" onclick="_stDelBlock(this)">✕</button></div>'
+    +'<textarea class="in st-ta st-bmd" oninput="_stSync()" placeholder="Contenuto (markdown)"></textarea>';
+  box.appendChild(div);_stSync();
+  var bn=div.querySelector('.st-bname');if(bn)bn.focus();
+}
+function _stDelBlock(btn){
+  var b=btn.closest('.st-block');if(b)b.remove();
   _stSync();
 }
 
@@ -355,6 +554,12 @@ function _stSetImg(i,url){
       }else{im.src=url;}
     }
   }
+  var wrap=document.getElementById('st-imgwrap-'+i);
+  if(wrap&&url){
+    wrap.setAttribute('onmousedown','_stPosDown(event,'+i+')');
+    wrap.setAttribute('title','Trascina per scegliere la parte visibile nella card');
+  }
+  _stPosSetVal(i,[50,50]);
   _stSync();
 }
 function _stClearImg(i){
@@ -366,5 +571,43 @@ function _stClearImg(i){
     d.className='st-img st-img-empty';d.id='st-img-'+i;d.textContent='🛐';
     im.parentNode.insertBefore(d,im);im.remove();
   }
+  var wrap=document.getElementById('st-imgwrap-'+i);
+  if(wrap){wrap.removeAttribute('onmousedown');wrap.removeAttribute('title');}
+  _stPosSetVal(i,null);
   _stSync();
+}
+function _stPosSetVal(i,pos){
+  var m=document.getElementById('st-posmark-'+i);
+  var v=document.getElementById('st-posval-'+i);
+  var im=document.getElementById('st-img-'+i);
+  if(pos){
+    if(m){m.style.display='block';m.style.left=pos[0]+'%';m.style.top=pos[1]+'%';}
+    if(v)v.value=pos[0]+','+pos[1];
+    if(im)im.style.objectPosition=pos[0]+'% '+pos[1]+'%';
+  }else{
+    if(m)m.style.display='none';
+    if(v)v.value='';
+    if(im)im.style.objectPosition='';
+  }
+}
+function _stPosDown(e,i){
+  if(e.button!==0)return;
+  e.preventDefault();
+  var wrap=document.getElementById('st-imgwrap-'+i);if(!wrap)return;
+  _stPosSet(i,e);
+  function onMove(ev){_stPosSet(i,ev)}
+  function onUp(){
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+    _stSync();
+  }
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onUp);
+}
+function _stPosSet(i,e){
+  var wrap=document.getElementById('st-imgwrap-'+i);if(!wrap)return;
+  var r=wrap.getBoundingClientRect();
+  var x=Math.max(0,Math.min(100,Math.round((e.clientX-r.left)/r.width*100)));
+  var y=Math.max(0,Math.min(100,Math.round((e.clientY-r.top)/r.height*100)));
+  _stPosSetVal(i,[x,y]);
 }
