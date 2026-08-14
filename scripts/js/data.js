@@ -35,10 +35,10 @@ function getPage(idOrK){
 
 /* ════ SEZIONI MENU (dropdown top bar) ════ */
 var SECTIONS = [
-  {v:'regole',l:'Regole'},
-  {v:'personaggio',l:'Personaggio'},
-  {v:'lavori',l:'Lavori'},
-  {v:'lore',l:'Lore'}
+  {v:"regole",l:"Regole"},
+  {v:"personaggio",l:"Personaggio"},
+  {v:"lavori",l:"Lavori"},
+  {v:"lore",l:"Lore"}
 ];
 
 /* ════ LAVORI ════ */
