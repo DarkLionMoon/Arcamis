@@ -423,6 +423,11 @@ function initStructuredEditor(content){
         +'</div>';
   }
   _stRender(data);
+  if(data.cards.length>5){
+    _stCollapseAll(true);
+    var first=document.querySelector('#st-list .st-card');
+    if(first)first.classList.remove('closed');
+  }
   var ph=document.querySelector('#md-pane .pane-head');
   if(ph)ph.innerHTML='Blocchi <span class="ph-info" id="e-stats"></span>'
     +'<button type="button" class="btn btn-soft btn-sm" title="Comprimi tutte le card" onclick="_stCollapseAll(true)">⤴ Comprimi</button>'
