@@ -7,7 +7,6 @@ var ROOT = '2f00274fdc1c801a9b39d8d69800f7a8';
 var GUILD = '1348723468157456425';
 
 var pages = [
-  {k:'inizia',     l:'Come si inizia',           i:'🌟', id:'2dd222f22ef8413f8cb48f03bbb4f4b0'},
   {k:'avanti',     l:'Andando avanti',           i:'📈', id:'5cea525d149f4acb9c59007bf6b3d5ff'},
   {k:'biblioteca', l:'Biblioteca',              i:'📚', id:'2f00274fdc1c8089bfe6c24434d53b67'},
   {k:'farmacia',   l:'Bottega farmaceutica',    i:'🧪', id:'3090274fdc1c8013a183dfc31297c477'},
@@ -26,7 +25,7 @@ var pages = [
   {k:"la-storia-di-gandora", l:"La Storia di Gandora", i:"🐉", id:"pag-la-storia-di-gandora", sec:"lore", sub:"Storia"},
   {k:"regole-del-server", l:"Regole del Server", i:"📋", id:"pag-regole-del-server", sec:"regole"},
   {k:"materiale-approvato", l:"Materiale Approvato", i:"📖", id:"pag-materiale-approvato", sec:"personaggio", sub:"Regole"},
-  {k:"pantheon", l:"Pantheon", i:"🛐", id:"pag-pantheon", sec:"lore"},
+  {k:"pantheon", l:"Pantheon", i:"🛐", id:"pag-pantheon", sec:"lore"}
 ];
 
 function getPage(idOrK){
