@@ -56,7 +56,8 @@ var LAYOUT_TEMPLATES={
   evento:'## Nome dell\'Evento\n\nBreve descrizione dell\'evento.\n\n- **Data:** [data]\n- **Luogo:** [luogo]\n- **Organizzatori:** Chi lo promuove\n\n### Antefatti\n\nCosa e successo prima dell\'evento.\n\n### Svolgimento\n\nCome si e svolto l\'evento.\n\n### Partecipanti\n\n- Persona 1: ruolo\n- Persona 2: ruolo\n\n### Conseguenze\n\nEffetti dell\'evento sul mondo o sulla storia.'
 };
 
-var _viewMode='split';
+var _viewMode='md';
+var _prevView='md';
 var _mdSplit=50;
 var _tocOffsets=[];
 var _undo=[],_redo=[],_undoBase=null,_lastUndoTs=0;
@@ -161,7 +162,7 @@ async function openPage(k){
   h+='</div>';
   h+='<div class="md-outline" id="e-outline"><div class="ol-head">☰ Sommario</div><div class="ol-body" id="e-ol-body"></div></div>';
   h+='</div>';
-  h+='<iframe id="site-frame"></iframe><div id="site-hint"><span>🔎 Anteprima del sito</span><span class="sh-k">· usa SPLIT per tornare all\'editor</span></div>';
+  h+='<iframe id="site-frame"></iframe><div id="site-hint"><span>🔎 Anteprima del sito</span><span class="sh-k">· clicca SITO per tornare all\'editor</span></div>';
   h+='<div class="json-pane" id="json-pane"><div class="pane-head">JSON</div><textarea id="e-json"></textarea></div>';
   h+='<div class="ed-statusbar"><span id="e-sb">'+esc(_layoutLabel(json.layout||''))+' · Autosave ogni 15s · SALVA / Ctrl+S salva subito</span><span class="st-r">⌨ Ctrl+B grassetto · Ctrl+I corsivo · Tab indent</span></div>';
   h+='</div>';
@@ -192,7 +193,6 @@ function buildToolbar(){
   h+='<button class="tb-btn2" id="tb-outline" title="Sommario sezioni" onclick="toggleOutline()">☰</button>';
   h+='<span class="view-switch">';
   h+='<button class="tb-btn2" data-view="md" title="Solo markdown">SCRIVI</button>';
-  h+='<button class="tb-btn2" data-view="split" title="Markdown + anteprima">SPLIT</button>';
   h+='<button class="tb-btn2" data-view="pv" title="Solo anteprima">VEDI</button>';
   h+='<button class="tb-btn2" data-view="site" title="Come appare sul sito">SITO</button>';
   h+='</span>';
@@ -312,6 +312,12 @@ function updateStats(){
   st.textContent=words+' parole · '+md.value.split('\n').length+' righe';
 }
 function setViewMode(m){
+  var eb=document.getElementById('editor-body');
+  if(eb&&eb.classList.contains('no-preview')&&m==='pv')m='md';
+  if(m==='site'){
+    if(_viewMode==='site'){m=_prevView||'md';}
+    else{_prevView=_viewMode;}
+  }
   _viewMode=m;
   var tb=document.getElementById('e-toolbar');
   if(tb){var vs=tb.querySelectorAll('[data-view]');for(var i=0;i<vs.length;i++)vs[i].classList.toggle('active',vs[i].getAttribute('data-view')===m)}

@@ -162,7 +162,7 @@ document.addEventListener('keydown',function(e){
 });
 (function(){
   var dv=localStorage.getItem('arc_view_default');
-  if(dv==='md'||dv==='pv'||dv==='split')_viewMode=dv;
+  if(dv==='md'||dv==='pv')_viewMode=dv;
   var user=sessionStorage.getItem('arcadmin');
   if(user){
     _currentUser=sessionStorage.getItem('arcadmin_user')||'admin';

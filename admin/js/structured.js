@@ -329,16 +329,20 @@ function _stRead(){
   var intro=document.getElementById('st-intro')?document.getElementById('st-intro').value:'';
   var cards=[];
   document.querySelectorAll('#st-list .st-card').forEach(function(c,idx){
-    var img=c.querySelector('.st-imgval').value;
-    var name=c.querySelector('.st-name').value.trim();
+    var iv=c.querySelector('.st-imgval');
+    var img=iv?iv.value:'';
+    var nv=c.querySelector('.st-name');
+    var name=nv?nv.value.trim():'';
     if(!name)name=img?'Divinità '+(idx+1):'Sezione '+(idx+1);
     var pos=null;
     var pv=c.querySelector('.st-posval');
     if(pv&&pv.value){var pp=pv.value.split(',');pos=[+pp[0],+pp[1]];}
     var ident=[];
     c.querySelectorAll('.st-kv').forEach(function(kv){
-      var k=kv.querySelector('.k').value.trim();
-      if(k)ident.push([k,kv.querySelector('.v').value.trim()]);
+      var ke=kv.querySelector('.k');
+      var ve=kv.querySelector('.v');
+      var k=ke?ke.value.trim():'';
+      if(k)ident.push([k,ve?ve.value.trim():'']);
     });
     cards.push({type:img?'deity':'section',name:name,img:img,pos:pos,
       quote:(function(q){return q?q.value.trim():''})(c.querySelector('.st-quote')),
@@ -352,12 +356,15 @@ function _stRead(){
 function _stReadSchede(){
   var cards=[];
   document.querySelectorAll('#st-list .st-card').forEach(function(c,idx){
-    var name=c.querySelector('.st-name').value.trim();
+    var nv=c.querySelector('.st-name');
+    var name=nv?nv.value.trim():'';
     if(!name)name='Scheda '+(idx+1);
     var fields=[];
     c.querySelectorAll('.st-kv').forEach(function(kv){
-      var k=kv.querySelector('.k').value.trim();
-      if(k)fields.push([k,kv.querySelector('.v').value.trim()]);
+      var ke=kv.querySelector('.k');
+      var ve=kv.querySelector('.v');
+      var k=ke?ke.value.trim():'';
+      if(k)fields.push([k,ve?ve.value.trim():'']);
     });
     var blocks=[];
     c.querySelectorAll('.st-block').forEach(function(b){
@@ -385,6 +392,8 @@ function _stCommit(data){
 }
 function _stPreview(data){
   var pv=document.getElementById('e-preview');if(!pv)return;
+  var body=document.getElementById('editor-body');
+  if(body&&body.classList.contains('no-preview'))return;
   var hd=_currentHead();
   pv.innerHTML='<div class="e-pv"><div class="e-pv-head"><span class="epv-icon">'+hd.icon+'</span><div>'
     +'<div class="epv-title">'+esc(hd.title)+'</div><div class="epv-sub">'+esc(_current.k||'')+'</div></div></div>'
@@ -400,6 +409,8 @@ function _stSyncPreview(){_stPreview(_stRead())}
 function initStructuredEditor(content){
   _stMode=true;window.__stMode=true;
   _stKind=_stLayoutFor(_current.layout)||'pantheon';
+  var eb=document.getElementById('editor-body');
+  if(eb)eb.classList.add('no-preview');
   var data=_stParse(content||'');
   var ta=document.getElementById('e-md');if(ta)ta.style.display='none';
   var sh=document.getElementById('struct-head');if(sh)sh.style.display='';
@@ -426,8 +437,6 @@ function initStructuredEditor(content){
          +'<button class="btn btn-soft btn-sm" onclick="_stAdd(\'section\')">➕ Sezione</button>')
       +'<span class="tb-spacer"></span>'
       +'<span class="view-switch">'
-      +'<button class="tb-btn2" data-view="split" title="Blocchi + anteprima">SPLIT</button>'
-      +'<button class="tb-btn2" data-view="pv" title="Solo anteprima">VEDI</button>'
       +'<button class="tb-btn2" data-view="site" title="Come appare sul sito">SITO</button>'
       +'</span></div>';
   }
@@ -444,6 +453,8 @@ function _stToggle(){
 }
 function _stExit(){
   _stMode=false;window.__stMode=false;
+  var eb=document.getElementById('editor-body');
+  if(eb)eb.classList.remove('no-preview');
   var ta=document.getElementById('e-md');if(ta)ta.style.display='';
   var sh=document.getElementById('struct-head');if(sh)sh.style.display='none';
   var sl=document.getElementById('st-list');if(sl)sl.style.display='none';

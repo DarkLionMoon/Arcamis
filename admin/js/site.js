@@ -674,7 +674,7 @@ async function openSettings(){
   closeSidebar();
   setCrumb('Sito','Impostazioni');
   setTitle('Impostazioni');
-  var defaultView=localStorage.getItem('arc_view_default')||'split';
+  var defaultView=localStorage.getItem('arc_view_default')||'md';
   var h=viewHead('⚙️','Impostazioni','Configurazione di sezioni, editor e deploy',
     '<button class="btn btn-p" onclick="openSettings()">⟳ AGGIORNA</button>');
   h+='<div class="panel"><div class="panel-head"><h3>Sezioni del menu</h3><span class="hint">usate per raggruppare pagine e generare gli URL</span></div>'
@@ -695,7 +695,6 @@ async function openSettings(){
   h+='<div class="panel"><div class="panel-head"><h3>Editor pagine</h3><span class="hint">preferenze salvate in questo browser</span></div>'
     +'<div class="se-grid"><div class="fld"><label>Vista predefinita dell\'editor</label>'
     +'<select id="set-view" class="in" onchange="setViewPref(this.value)">'
-    +'<option value="split"'+(defaultView==='split'?' selected':'')+'>Split (scrivi + anteprima)</option>'
     +'<option value="md"'+(defaultView==='md'?' selected':'')+'>Solo Markdown</option>'
     +'<option value="pv"'+(defaultView==='pv'?' selected':'')+'>Solo anteprima</option>'
     +'</select></div></div>'
