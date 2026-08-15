@@ -7,7 +7,6 @@ var ROOT = '2f00274fdc1c801a9b39d8d69800f7a8';
 var GUILD = '1348723468157456425';
 
 var pages = [
-  {k:'avanti',     l:'Andando avanti',           i:'📈', id:'5cea525d149f4acb9c59007bf6b3d5ff'},
   {k:'biblioteca', l:'Biblioteca',              i:'📚', id:'2f00274fdc1c8089bfe6c24434d53b67'},
   {k:'farmacia',   l:'Bottega farmaceutica',    i:'🧪', id:'3090274fdc1c8013a183dfc31297c477'},
   {k:'arcamis',    l:'Arcamis',                 i:'🏰', id:'3090274fdc1c80e1a365ce1c36873455'},
