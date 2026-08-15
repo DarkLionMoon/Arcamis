@@ -129,11 +129,11 @@ async function openPage(k){
   h+='<div class="grow"></div>';
   h+='<div class="ed-actions">';
   h+='<button class="btn btn-soft btn-sm" onclick="toggleJson()" title="Modifica il JSON grezzo della pagina">JSON</button>';
-  h+='<button class="btn btn-soft btn-sm" onclick="openHistory()" title="Cronologia commit e ripristino versione">📜 Storia</button>';
-  h+='<button class="btn btn-soft btn-sm" onclick="checkLinks()" title="Verifica i link interni del contenuto">🔗 Link</button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="openHistory()" title="Cronologia commit e ripristino versione">📜 <span class="lbl">Storia</span></button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="checkLinks()" title="Verifica i link interni del contenuto">🔗 <span class="lbl">Link</span></button>';
   h+='<button class="btn btn-soft btn-sm" onclick="copyPageUrl()" title="Copia URL pulito della pagina">URL</button>';
-  h+='<button class="btn btn-soft btn-sm" onclick="openPageOnSite()" title="Apri la pagina sul sito in una nuova scheda">🌐 Apri</button>';
-  h+='<button class="btn btn-soft btn-sm" onclick="openRenameModal()" title="Rinomina sezione / pagina">✏️ Rinomina</button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="openPageOnSite()" title="Apri la pagina sul sito in una nuova scheda">🌐 <span class="lbl">Apri</span></button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="openRenameModal()" title="Rinomina sezione / pagina">✏️ <span class="lbl">Rinomina</span></button>';
   h+='<span class="ed-sep"></span>';
   h+='<button class="btn btn-d btn-sm" id="del-btn" onclick="deletePage()" title="Elimina questa pagina (azione irreversibile)">ELIMINA</button>';
   h+='<button class="btn btn-p btn-sm" id="save-btn" onclick="savePage()" title="Salva subito (Ctrl+S)">SALVA</button>';
