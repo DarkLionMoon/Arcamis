@@ -7,7 +7,6 @@ var ROOT = '2f00274fdc1c801a9b39d8d69800f7a8';
 var GUILD = '1348723468157456425';
 
 var pages = [
-  {k:'materiale',  l:'Materiale approvato',      i:'📋', id:'3130274fdc1c807eb61fde24e8236659'},
   {k:'inizia',     l:'Come si inizia',           i:'🌟', id:'2dd222f22ef8413f8cb48f03bbb4f4b0'},
   {k:'avanti',     l:'Andando avanti',           i:'📈', id:'5cea525d149f4acb9c59007bf6b3d5ff'},
   {k:'biblioteca', l:'Biblioteca',              i:'📚', id:'2f00274fdc1c8089bfe6c24434d53b67'},
@@ -22,16 +21,29 @@ var pages = [
   {k:'locanda',    l:'Locanda',                 i:'🍺', id:'2f00274fdc1c80faa99eda064ef0fabc'},
   {k:'ospedale',   l:'Ospedale',                i:'⚕️', id:'2f00274fdc1c807aa03cc6cbeb3687cc'},
   {k:'sartoria',   l:'Sartoria',                i:'🧵', id:'2ff0274fdc1c8035bad4f0b6ab705192'},
-  {k:'pantheon',   l:'Pantheon',                i:'🛐', id:'2f00274fdc1c80679bd3c3df8a1fa040'},
   {k:'changelog',  l:'Changelog',               i:'📝', id:'3000274fdc1c8033a214c44a1aa7f01f'},
   {k:'maestria',   l:'Maestria / Titoli',       i:'🔨', id:'2f00274fdc1c802a9babd4239d97a319'},
-  {k:"la-storia-di-gandora", l:"La Storia di Gandora", i:"🐉", id:"pag-la-storia-di-gandora", sec:"lore"}
+  {k:"la-storia-di-gandora", l:"La Storia di Gandora", i:"🐉", id:"pag-la-storia-di-gandora", sec:"lore", sub:"Storia"},
+  {k:"regole-del-server", l:"Regole del Server", i:"📋", id:"pag-regole-del-server", sec:"regole"},
+  {k:"materiale-approvato", l:"Materiale Approvato", i:"📖", id:"pag-materiale-approvato", sec:"personaggio", sub:"Regole"},
+  {k:"pantheon", l:"Pantheon", i:"🛐", id:"pag-pantheon", sec:"lore"},
 ];
 
 function getPage(idOrK){
   return pages.find(p => p.id === idOrK || p.k === idOrK);
 }
-/* ════ LAVORI & MESTIERI ════ */
+
+/* ════ SEZIONI MENU (dropdown top bar) ════ */
+var SECTIONS = [
+  {v:"regole",l:"Regole"},
+  {v:"personaggio",l:"Personaggio"},
+  {v:"lavori",l:"Lavori"},
+  {v:"lore",l:"Lore"},
+  {v:"mestieri",l:"Mestieri"},
+  {v:"homebrew",l:"Homebrew"}
+];
+
+/* ════ LAVORI ════ */
 var LAVORI = [
   { l:'Gilda avventurieri',          i:'🗡️', id:'2f00274fdc1c801b8c13cefd9e15694e' },
   { l:'Locanda',                     i:'🍺', id:'2f00274fdc1c80faa99eda064ef0fabc' },
@@ -43,17 +55,4 @@ var LAVORI = [
   { l:'Ospedale',                    i:'⚕️', id:'2f00274fdc1c807aa03cc6cbeb3687cc' },
   { l:'Sartoria',                    i:'🧵', id:'2ff0274fdc1c8035bad4f0b6ab705192' },
   { l:'Tribunale',                   i:'⚖️', id:'3460274fdc1c800c8b3bf9a53d0cbf59' },
-];
-
-var MESTIERI = [
-  { l:'Come funzionano', i:'📜', k:'come-funzionano' },
-  { l:'Patenti di Arcadia', i:'⚖️', k:'patenti-arcadia', special: true },
-  { l:'Alchimista',      i:'⚗️', k:'alchimista'      },
-  { l:'Architetto',      i:'🏛️', k:'architetto'      },
-  { l:'Artigiano',       i:'🔨', k:'artigiano'        },
-  { l:'Artista',         i:'🎨', k:'artista'          },
-  { l:'Falegname',       i:'🪚', k:'falegname'        },
-  { l:'Metallurgo',      i:'⚒️', k:'metallurgo'       },
-  { l:'Oste',            i:'🍺', k:'oste'             },
-  { l:'Sarto',           i:'🧵', k:'sarto'            },
 ];

@@ -66,6 +66,16 @@
       /* ── Bottoni CTA ── */
       if (data.btns && data.btns.length) {
         var btnsEl = slideEl.querySelectorAll('.sbtn');
+        if (data.btns.length > btnsEl.length) {
+          var host = btnsEl.length ? btnsEl[0].parentNode : (slideEl.querySelector('.scnt') || slideEl);
+          for (var k = btnsEl.length; k < data.btns.length; k++) {
+            var n = document.createElement('div');
+            n.className = 'sbtn';
+            n.style.cursor = 'pointer';
+            host.appendChild(n);
+          }
+          btnsEl = slideEl.querySelectorAll('.sbtn');
+        }
         data.btns.forEach(function(btn, bi) {
           var el = btnsEl[bi];
           if (!el) return;

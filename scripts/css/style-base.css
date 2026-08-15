@@ -133,6 +133,12 @@ nav#tnav{display:flex;align-items:stretch}
 }
 /* Divider */
 .tn-div{height:1px;margin:4px 0;background:linear-gradient(90deg,transparent,rgba(200,155,60,.14) 20%,rgba(200,155,60,.14) 80%,transparent)}
+/* Subsection label */
+.tn-sub{
+  padding:7px 16px 4px;
+  font-family:'Crimson Pro',serif;font-size:8px;font-weight:700;letter-spacing:.28em;
+  color:var(--gold3);text-transform:uppercase;
+}
 /* Item */
 .tn-item{
   display:flex;align-items:center;gap:10px;padding:9px 16px;

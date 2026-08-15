@@ -485,34 +485,18 @@ function closeSubMap(id){
 
 /* ════ POPSTATE ════ */
 window.addEventListener('popstate', function(e){
-   if (state && state.id === 'reputazioni') {
-  if (typeof showReputationTable === 'function') showReputationTable();
-  return;
-}
   if(e && e.state && e.state.id){
     if(e.state.stack) navStack = JSON.parse(JSON.stringify(e.state.stack));
     if(e.state.id.startsWith('mestiere-')){
       if(typeof showMestiere === 'function') showMestiere(e.state.id.replace('mestiere-', ''));
       return;
     }
-    if(e.state.id === 'codice-giuridico'){
-      if(typeof showCodiceGiuridico === 'function') showCodiceGiuridico();
-      return;
-    }
-      if(e.state.id === 'patenti-arcadia'){
-  if(typeof showPatenti === 'function') showPatenti();
-  return;
-}
     if(e.state.id === 'mestieri-compendio'){
       if(typeof showMestieriCompendio === 'function') showMestieriCompendio();
       return;
     }
     if(e.state.id === 'societa-licenze'){
       if(typeof showSocietaLicenze === 'function') showSocietaLicenze();
-      return;
-    }
-    if(e.state.id === 'reputazioni'){
-      if(typeof showReputationTable === 'function') showReputationTable();
       return;
     }
     gp(e.state.id, e.state.label || '', e.state.icon || '', true);
@@ -529,7 +513,6 @@ var _pathMap = {
   /* Regole */
   'regole/gameplay/combattimento':            '2f60274fdc1c80b7a729ef091b278682',
   'regole/gameplay/codex':                    '2f60274fdc1c80adb7a5d6beeef3e544',
-  'materiale-approvato':                      '3130274fdc1c807eb61fde24e8236659',
   /* Personaggio */
   'personaggio/come-si-inizia':               '2dd222f22ef8413f8cb48f03bbb4f4b0',
   'personaggio/andando-avanti':               '5cea525d149f4acb9c59007bf6b3d5ff',
@@ -563,7 +546,6 @@ var _pathMap = {
   'societa-licenze':                          'societa-licenze',
   /* Lore */
   'lore/storia':                              '2f00274fdc1c806f8f17dbc6532d2211',
-  'lore/pantheon':                            '2f00274fdc1c80679bd3c3df8a1fa040',
   'lore/mondo/introduzione':                  '2f60274fdc1c80558d8fe99842377aef',
   'lore/mondo/introduzione/storia':           '2fc0274fdc1c80c4bbc1c8806f591e0f',
   'lore/mondo/esplora-dal-vivo':              '3090274fdc1c80008f0dffe3a677cb66',
@@ -577,13 +559,13 @@ var _pathMap = {
   'mappe':                                    '2f10274fdc1c80489f23c49164747770',
   'mappe/arcamis':                            '2f10274fdc1c80dca8caeb2e6de23146',
   /* Speciali */
-  'codice-giuridico':                         'codice-giuridico',
-  'patenti-arcadia':                          'patenti-arcadia',
-  'reputazioni':                              'reputazioni',
   'changelog':                                '3000274fdc1c8033a214c44a1aa7f01f',
   'sottoclassi':                              '2f70274fdc1c80e3bdc7f95f81eb9cc0',
   'specie-homebrew':                          '2f60274fdc1c80fba671c588ba93b116',
-  "lore/la-storia-di-gandora": "pag-la-storia-di-gandora"
+  "lore/la-storia-di-gandora": "pag-la-storia-di-gandora",
+  "regole/regole-del-server": "pag-regole-del-server",
+  "personaggio/materiale-approvato": "pag-materiale-approvato",
+  "lore/pantheon": "pag-pantheon",
 };
 
 /* ════ DEEP LINK ════ */
@@ -604,16 +586,21 @@ var _pathMap = {
     /* Path automatico UUID: /p/2f00274f... */
     pid = path.replace('p/', '');
   } else if(path){
-    /* Risolvi il pathname nella mappa */
-    var resolved = _pathMap[path];
-    if(resolved){
-      pid = resolved;
-    } else if(typeof _slugMap !== 'undefined' && _slugMap[path]){
-      /* Supporto slug piatti legacy (es. /gameplay) */
-      pid = _slugMap[path];
+    /* Pagina divinità: /lore/pantheon/<slug> */
+    if(path.indexOf('lore/pantheon/') === 0){
+      pid = 'pantheon-' + path.split('/').pop();
     } else {
-      /* Pathname non mappato — trattalo come UUID diretto (es. /2f00274f...) */
-      pid = path;
+      /* Risolvi il pathname nella mappa */
+      var resolved = _pathMap[path];
+      if(resolved){
+        pid = resolved;
+      } else if(typeof _slugMap !== 'undefined' && _slugMap[path]){
+        /* Supporto slug piatti legacy (es. /gameplay) */
+        pid = _slugMap[path];
+      } else {
+        /* Pathname non mappato — trattalo come UUID diretto (es. /2f00274f...) */
+        pid = path;
+      }
     }
   } else if(qp) {
     /* Vecchio ?p= — supporto retrocompatibile */
@@ -629,24 +616,12 @@ var _pathMap = {
     return;
   }
   /* Pagine speciali JS */
-  if(pid === 'codice-giuridico'){
-    setTimeout(function(){ if(typeof showCodiceGiuridico === 'function') showCodiceGiuridico(); }, 0);
-    return;
-  }
-   if(pid === 'patenti-arcadia'){
-  setTimeout(function(){ if(typeof showPatenti === 'function') showPatenti(); }, 0);
-  return;
-}
   if(pid === 'mestieri-compendio'){
     setTimeout(function(){ if(typeof showMestieriCompendio === 'function') showMestieriCompendio(); }, 0);
     return;
   }
   if(pid === 'societa-licenze'){
     setTimeout(function(){ if(typeof showSocietaLicenze === 'function') showSocietaLicenze(); }, 0);
-    return;
-  }
-  if(pid === 'reputazioni'){
-    setTimeout(function(){ if(typeof showReputationTable === 'function') showReputationTable(); }, 0);
     return;
   }
   /* Pagina Notion generica */

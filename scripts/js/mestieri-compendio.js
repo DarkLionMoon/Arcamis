@@ -959,16 +959,16 @@ function _cmpRenderSideNav() {
   if (_cmpCurrentMestiere === -1) { el.innerHTML = ''; return; }
   var m = _CMP_MESTIERI[_cmpCurrentMestiere];
   var html = '<div class="cmp-sidenav-title">Sezioni</div>';
-  html += '<button class="cmp-sidenav-btn' + (_cmpCurrentSection === 'intro' ? ' active' : '') + '" onclick="_cmpSetSection('intro')">📖 Introduzione</button>';
+  html += '<button class="cmp-sidenav-btn' + (_cmpCurrentSection === 'intro' ? ' active' : '') + '" onclick="_cmpSetSection(\'intro\')">📖 Introduzione</button>';
   for (var j = 0; j < m.livelli.length; j++) {
     var lv = m.livelli[j];
     var key = 'lv' + lv.lv;
-    html += '<button class="cmp-sidenav-btn' + (_cmpCurrentSection === key ? ' active' : '') + '" onclick="_cmpSetSection('' + key + '')">⬟ Livello ' + lv.lv + '</button>';
+    html += '<button class="cmp-sidenav-btn' + (_cmpCurrentSection === key ? ' active' : '') + '" onclick="_cmpSetSection(\'' + key + '\')">⬟ Livello ' + lv.lv + '</button>';
   }
   if (m.id === 'artista') {
-    html += '<button class="cmp-sidenav-btn' + (_cmpCurrentSection === 'pergamene' ? ' active' : '') + '" onclick="_cmpSetSection('pergamene')">📜 Pergamene Magiche</button>';
+    html += '<button class="cmp-sidenav-btn' + (_cmpCurrentSection === 'pergamene' ? ' active' : '') + '" onclick="_cmpSetSection(\'pergamene\')">📜 Pergamene Magiche</button>';
   }
-  html += '<button class="cmp-sidenav-btn' + (_cmpCurrentSection === 'mat' ? ' active' : '') + '" onclick="_cmpSetSection('mat')">💎 Materiali Speciali</button>';
+  html += '<button class="cmp-sidenav-btn' + (_cmpCurrentSection === 'mat' ? ' active' : '') + '" onclick="_cmpSetSection(\'mat\')">💎 Materiali Speciali</button>';
   el.innerHTML = html;
 }
 
@@ -1025,12 +1025,12 @@ function _cmpRenderIntro(m) {
     html += '<li>LV ' + (i+1) + ': <strong style="color:rgba(200,155,60,.9)">' + m.materLav[i] + ' MO</strong> a Downtime</li>';
   }
   html += '</ul></div>';
-  html += '<div class="cmp-rule-box"><h4>📚 Imparare un Progetto</h4><p>Richiede lo stesso tempo e monete d'oro pari ai materiali necessari per la creazione dell'oggetto.</p></div>';
+  html += '<div class="cmp-rule-box"><h4>📚 Imparare un Progetto</h4><p>Richiede lo stesso tempo e monete d’oro pari ai materiali necessari per la creazione dell’oggetto.</p></div>';
   html += '<div class="cmp-rule-box"><h4>🤝 Collaborazione</h4><p>Consentita fino a <strong style="color:rgba(200,155,60,.9)">3 persone</strong> per oggetto.</p></div>';
   html += '<div class="cmp-rule-box"><h4>⬆️ Aumentare di Livello</h4><p>Solo tramite corso da NPC o giocatori del livello desiderato.</p></div>';
   html += '</div></div>';
   html += '<div class="cmp-ornament">· · · ⚜ · · ·</div>';
-  html += '<p style="color:rgba(200,155,60,.35);font-style:italic;margin-bottom:20px;font-family:'Crimson Pro',serif;font-size:15px">Seleziona un livello nella barra laterale per visualizzare gli oggetti craftabili, oppure consulta i Materiali Speciali in fondo.</p>';
+  html += '<p style="color:rgba(200,155,60,.35);font-style:italic;margin-bottom:20px;font-family:&quot;Crimson Pro&quot;,serif;font-size:15px">Seleziona un livello nella barra laterale per visualizzare gli oggetti craftabili, oppure consulta i Materiali Speciali in fondo.</p>';
   return html;
 }
 
@@ -1081,7 +1081,7 @@ function _cmpRenderPergamene() {
   function dtPClass(v) { if (v >= 40) return 'dt-hard'; if (v >= 15) return 'dt-medium'; if (v >= 5) return 'dt-light'; return ''; }
   var html = '<div class="cmp-lv-header"><div class="cmp-lv-badge">📜</div><div><h3>🎨 Artista — Pergamene Magiche</h3><p>Creazione di pergamene incantate tramite Downtime</p></div></div>';
   html += '<div class="cmp-intro-card" style="margin-bottom:24px">';
-  html += '<h4 style="color:rgba(200,155,60,.9);font-family:'Cinzel',serif;margin-bottom:10px">📖 Come funziona</h4>';
+  html += '<h4 style="color:rgba(200,155,60,.9);font-family:&quot;Cinzel&quot;,serif;margin-bottom:10px">📖 Come funziona</h4>';
   html += '<p style="color:rgba(220,200,160,.7);font-size:15px;line-height:1.7">Come Artista ed Incantatore hai la possibilità di scrivere delle <strong style="color:rgba(200,155,60,.9)">pergamene magiche</strong>.</p>';
   html += '<div class="cmp-rules-grid" style="margin-top:16px">';
   html += '<div class="cmp-rule-box"><h4>📄 Materiali</h4><p>Servono <strong style="color:rgba(200,155,60,.9)">Carta Incantata</strong> e <strong style="color:rgba(200,155,60,.9)">Inchiostro Magico</strong>.</p></div>';

@@ -123,11 +123,12 @@ function _scrubHtmlString(html){
   /* Handler JS (on*) — mantieni solo i pattern generati dal renderer */
   html = html.replace(/\son\w+\s*=\s*(("[^"]*")|('[^']*')|[^\s>]+)/gi, function(m){
     var nameM = m.match(/^(\s*on\w+)\s*=/i);
-    var name = nameM ? nameM[1].replace(/^on/i, '').toLowerCase() : '';
+    var name = nameM ? nameM[1].replace(/^\s*on/i, '').toLowerCase() : '';
     var valM = m.match(/=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
     var val = (valM && (valM[1] || valM[2] || valM[3])) ? (valM[1] || valM[2] || valM[3]) : '';
     if(name === 'click' && /^(gp|arcZoom|spSelectGroup|spSelectTab|dbLocNav|showHome|gpBack)\(/.test(val)) return m;
-    if(name === 'error' && val.indexOf('this.parentElement.style.display') > -1) return m;
+    if(name === 'error' && (val.indexOf('this.parentElement.style.display') > -1 || /this\.parent(?:Element|Node)\.classList\.add\(/.test(val))) return m;
+    if(name === 'keydown' && /^if\(event\.key==='Enter'\)gp\(/.test(val)) return m;
     return '';
   });
   /* URL non sicuri in href/src/srcdoc */
