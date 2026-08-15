@@ -234,6 +234,7 @@ function _stCardHTML(c,i){
       +'<div class="st-card-head"><span class="st-idx">'+(i+1)+'</span>'
       +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Nome della sezione" oninput="_stSync()">'
       +'<span class="st-head-actions">'
+      +'<button type="button" class="btn btn-soft btn-icon btn-sm st-collapse" title="Comprimi/espandi" onclick="_stCollapse('+i+')">▾</button>'
       +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta su" onclick="_stMove('+i+',-1)">↑</button>'
       +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta giù" onclick="_stMove('+i+',1)">↓</button>'
       +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Elimina blocco" onclick="_stDelete('+i+')">🗑</button>'
@@ -250,6 +251,7 @@ function _stCardHTML(c,i){
     +'<div class="st-card-head"><span class="st-idx">'+(i+1)+'</span>'
     +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Nome della divinità / sezione" oninput="_stSync()">'
     +'<span class="st-head-actions">'
+    +'<button type="button" class="btn btn-soft btn-icon btn-sm st-collapse" title="Comprimi/espandi" onclick="_stCollapse('+i+')">▾</button>'
     +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta su" onclick="_stMove('+i+',-1)">↑</button>'
     +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta giù" onclick="_stMove('+i+',1)">↓</button>'
     +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Elimina blocco" onclick="_stDelete('+i+')">🗑</button>'
@@ -300,6 +302,7 @@ function _stSchedeCardHTML(c,i){
     +'<div class="st-card-head"><span class="st-idx">'+(i+1)+'</span>'
     +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Titolo della scheda" oninput="_stSync()">'
     +'<span class="st-head-actions">'
+    +'<button type="button" class="btn btn-soft btn-icon btn-sm st-collapse" title="Comprimi/espandi" onclick="_stCollapse('+i+')">▾</button>'
     +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta su" onclick="_stMove('+i+',-1)">↑</button>'
     +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta giù" onclick="_stMove('+i+',1)">↓</button>'
     +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Elimina scheda" onclick="_stDelete('+i+')">🗑</button>'
@@ -421,7 +424,9 @@ function initStructuredEditor(content){
   }
   _stRender(data);
   var ph=document.querySelector('#md-pane .pane-head');
-  if(ph)ph.innerHTML='Blocchi <span class="ph-info" id="e-stats"></span>';
+  if(ph)ph.innerHTML='Blocchi <span class="ph-info" id="e-stats"></span>'
+    +'<button type="button" class="btn btn-soft btn-sm" title="Comprimi tutte le card" onclick="_stCollapseAll(true)">⤴ Comprimi</button>'
+    +'<button type="button" class="btn btn-soft btn-sm" title="Espandi tutte le card" onclick="_stCollapseAll(false)">⤵ Espandi</button>';
   var tb=document.getElementById('e-toolbar');
   if(tb&&tb.parentNode){
     tb.outerHTML='<div class="ed-toolbar" id="e-toolbar">'
@@ -472,6 +477,15 @@ function _stDelete(i){
   var data=_stRead();
   data.cards.splice(i,1);
   _stRender(data);_stSync();
+}
+function _stCollapse(i){
+  var c=document.querySelector('#st-list .st-card[data-i="'+i+'"]');
+  if(c)c.classList.toggle('closed');
+}
+function _stCollapseAll(closed){
+  document.querySelectorAll('#st-list .st-card').forEach(function(c){
+    c.classList.toggle('closed',!!closed);
+  });
 }
 function _stAdd(type){
   var data=_stRead();
