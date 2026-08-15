@@ -260,8 +260,13 @@ function mdToHtml(md){
   md=md.replace(/^---$/gm,'<hr>');
   md=md.replace(/^- (.+)$/gm,'<li>$1</li>');
   md=md.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
-  md=md.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>');
-  md=md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,'<img src="$2" alt="$1" style="max-width:100%;border-radius:4px">');
+  function _safeUrl(u){
+    u=(u||'').trim();
+    if(/^\s*(javascript|data|vbscript):/i.test(u))return '#';
+    return u.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  md=md.replace(/\[([^\]]+)\]\(([^)]+)\)/g,function(m,txt,url){return '<a href="'+_safeUrl(url)+'" target="_blank" rel="noopener noreferrer">'+txt+'</a>'});
+  md=md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,function(m,alt,url){return '<img src="'+_safeUrl(url)+'" alt="'+alt.replace(/"/g,'&quot;')+'" style="max-width:100%;border-radius:4px">'});
   md=md.replace(/((?:^\|.*\|[^\n]*\n?)+)/gm,function(m,t){
     var rows=t.trim().split('\n').filter(function(r){return !/^\|[\s\-:|]+\|$/.test(r)});
     if(!rows.length)return m;
@@ -278,7 +283,7 @@ function renderPreview(){
   var md=document.getElementById('e-md');var pv=document.getElementById('e-preview');
   if(!md||!pv)return;
   var hd=_currentHead();
-  pv.innerHTML='<div class="e-pv"><div class="e-pv-head"><span class="epv-icon">'+hd.icon+'</span><div><div class="epv-title">'+esc(hd.title)+'</div><div class="epv-sub">'+esc(_current.k||'')+'</div></div></div>'+mdToHtml(md.value)+'</div>';
+  pv.innerHTML='<div class="e-pv"><div class="e-pv-head"><span class="epv-icon">'+esc(hd.icon)+'</span><div><div class="epv-title">'+esc(hd.title)+'</div><div class="epv-sub">'+esc(_current.k||'')+'</div></div></div>'+mdToHtml(md.value)+'</div>';
   var todos=pv.querySelectorAll('.n-todo');
   var tl=[];var ls=md.value.split('\n');
   for(var i=0;i<ls.length;i++){if(/^\s*[-*+]\s+\[[ xX]\]\s?/.test(ls[i]))tl.push(i)}
@@ -1151,8 +1156,8 @@ function _imgCard(it){
     +'<div class="ic-body"><div class="ic-name">'+esc(name)+'</div>'
     +'<div class="ic-meta">'+size+' · '+esc(it.type||'file')+'</div>'
     +'<div class="ic-actions">'
-    +'<button class="btn btn-soft btn-sm" onclick="copyImageUrl(\''+esc(name)+'\')">🔗 URL</button>'
-    +'<button class="btn btn-d btn-sm" onclick="deleteImage(\''+esc(name)+'\',\''+esc(it.sha)+'\')">🗑</button>'
+    +'<button class="btn btn-soft btn-sm" onclick="copyImageUrl(\''+escJsAttr(name)+'\')">🔗 URL</button>'
+    +'<button class="btn btn-d btn-sm" onclick="deleteImage(\''+escJsAttr(name)+'\',\''+esc(it.sha)+'\')">🗑</button>'
     +'</div></div></div>';
 }
 async function copyImageUrl(name){

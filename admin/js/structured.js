@@ -393,7 +393,7 @@ function _stPreview(data){
   var body=document.getElementById('editor-body');
   if(body&&body.classList.contains('no-preview'))return;
   var hd=_currentHead();
-  pv.innerHTML='<div class="e-pv"><div class="e-pv-head"><span class="epv-icon">'+hd.icon+'</span><div>'
+  pv.innerHTML='<div class="e-pv"><div class="e-pv-head"><span class="epv-icon">'+esc(hd.icon)+'</span><div>'
     +'<div class="epv-title">'+esc(hd.title)+'</div><div class="epv-sub">'+esc(_current.k||'')+'</div></div></div>'
     +_stPreviewHTML(data)+'</div>';
 }
@@ -566,7 +566,7 @@ function stPickFilter(q){
   var sel=items.filter(function(it){return !q||(it.name||'').toLowerCase().indexOf(q)!==-1});
   if(!sel.length){grid.innerHTML='<div class="list-empty">Nessun risultato</div>';return}
   grid.innerHTML=sel.map(function(it){
-    return '<div class="pick-item" onclick="stPickChoose(\''+escAttr(it.name)+'\')">'
+    return '<div class="pick-item" onclick="stPickChoose(\''+escJsAttr(it.name)+'\')">'
       +'<img class="pick-thumb" src="'+escAttr(it.download_url||'')+'" alt="'+escAttr(it.name)+'" loading="lazy">'
       +'<div class="pick-name">'+esc(it.name)+'</div></div>';
   }).join('');

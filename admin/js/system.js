@@ -5,6 +5,7 @@
 
 /* ═══════════════ GESTIONE UTENTI ═══════════════ */
 async function openUserManagement(){
+  if(!_checkPerm('users'))return;
   if(_modified&&!confirm('Hai modifiche non salvate. Continuare?'))return;
   _modified=false;
   _current=null;
@@ -15,6 +16,7 @@ async function openUserManagement(){
   setStatus('saving','caricamento utenti…');
   try{
     var users=await _loadUsers();
+    window.__usersForEdit=users;
     var h=viewHead('👥','Gestione utenti','Account che possono accedere al pannello', 
       '<button class="btn btn-p" onclick="openAddUserModal()">+ NUOVO UTENTE</button>');
     h+='<div class="panel"><div class="panel-head"><h3>Account</h3><span class="hint">'+users.length+' utenti · password salvate come hash SHA-256</span></div>';
@@ -26,8 +28,8 @@ async function openUserManagement(){
         +'<div class="cmain"><div class="ct">'+esc(u.username)+(isMe?' <span class="pill blue">te</span>':'')+'</div>'
         +'<div class="cs">ruolo: '+esc(u.role||'editor')+(u.updated?' · aggiornato '+esc(dateFmt(u.updated)):'')+'</div></div>'
         +'<div class="ract">'
-        +'<button class="btn btn-soft btn-sm" onclick="openEditUserModal(\''+esc(u.username)+'\')">✏️</button>'
-        +(u.username!==_currentUser?'<button class="btn btn-d btn-sm" onclick="deleteUserConfirm(\''+esc(u.username)+'\')">🗑</button>':'')
+        +'<button class="btn btn-soft btn-sm" onclick="openEditUserModal(\''+escJsAttr(u.username)+'\')">✏️</button>'
+        +(u.username!==_currentUser?'<button class="btn btn-d btn-sm" onclick="deleteUserConfirm(\''+escJsAttr(u.username)+'\')">🗑</button>':'')
         +'</div></div>';
     });
     h+='</div>';
@@ -48,11 +50,13 @@ function openAddUserModal(){
   document.getElementById('au-user').focus();
 }
 async function saveNewUser(){
+  if(!_checkPerm('users'))return;
   var username=(document.getElementById('au-user').value||'').trim().toLowerCase();
   var password=document.getElementById('au-pass').value;
   var role=document.getElementById('au-role').value;
   var st=document.getElementById('au-st');
   if(!username||username.length<3){if(st){st.textContent='Username: almeno 3 caratteri';st.className='md-status err'}return}
+  if(!/^[a-z0-9._-]+$/.test(username)){if(st){st.textContent='Username: solo minuscole, numeri, punto, trattino, underscore';st.className='md-status err'}return}
   if(password.length<6){if(st){st.textContent='Password: almeno 6 caratteri';st.className='md-status err'}return}
   var ok=await _addUser(username,password,role);
   if(st){st.textContent=ok?'✓ Utente creato':'✕ Errore (username già esistente?)';st.className='md-status '+(ok?'ok':'err')}
@@ -78,6 +82,7 @@ function openEditUserModal(username){
   document.getElementById('eu-pass').focus();
 }
 async function saveEditUser(){
+  if(!_checkPerm('users'))return;
   var username=document.getElementById('eu-user').value;
   var password=document.getElementById('eu-pass').value;
   var role=document.getElementById('eu-role').value;
@@ -93,6 +98,7 @@ async function saveEditUser(){
   }
 }
 async function deleteUserConfirm(username){
+  if(!_checkPerm('users'))return;
   if(!confirm('Eliminare l\'utente "'+username+'"?\n\nNon potrà più accedere al pannello.'))return;
   var ok=await _deleteUser(username);
   if(ok){
@@ -128,7 +134,6 @@ async function openAudit(){
   }catch(e){setStatus('err','errore');toast('Registro non disponibile: '+e.message,'error')}
 }
 function _auditIcon(action){
-  if(action==='save_page')return '📝';
   if(action==='save_page')return '📝';
   if(action==='cover_page'||action==='set_cover'||action==='remove_cover')return '🖌️';
   if(action==='user_add'||action==='user_update'||action==='user_delete')return '👥';

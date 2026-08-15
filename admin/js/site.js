@@ -249,11 +249,11 @@ async function openCovers(){
       var cur=covers[p.id]||'';
       h+='<div class="cover-row">'
         +'<div class="cover-thumb" id="cvt-'+esc(p.id)+'" style="'+(cur?'background-image:url(\''+escAttr(cur)+'\')':'')+'">'+(cur?'':'🖼')+'</div>'
-        +'<div class="cmain"><div class="ct">'+p.i+' '+esc(p.l)+'</div>'
+        +'<div class="cmain"><div class="ct">'+esc(p.i)+' '+esc(p.l)+'</div>'
         +'<div class="cs">'+esc(p.k)+' · id '+esc(p.id)+(cur?' · cover attiva':'')+'</div></div>'
         +'<div class="ract">'
-        +'<button class="btn btn-soft btn-sm" onclick="openCoverModal(\''+esc(p.id)+'\',\''+esc(p.l)+'\',\''+escAttr(cur)+'\')">Imposta</button>'
-        +(cur?'<button class="btn btn-d btn-sm" onclick="removeCover(\''+esc(p.id)+'\')">✕</button>':'')
+        +'<button class="btn btn-soft btn-sm" onclick="openCoverModal(\''+escJsAttr(p.id)+'\',\''+escJsAttr(p.l)+'\',\''+escJsAttr(cur)+'\')">Imposta</button>'
+        +(cur?'<button class="btn btn-d btn-sm" onclick="removeCover(\''+escJsAttr(p.id)+'\')">✕</button>':'')
         +'</div></div>';
     });
     h+='</div>';
@@ -420,16 +420,16 @@ function _renderNav(){
       subItems.forEach(function(p,i){
         var first=i===0,last=i===subItems.length-1;
         h+='<div class="row navm">'
-          +'<div class="rico">'+p.i+'</div>'
+          +'<div class="rico">'+esc(p.i)+'</div>'
           +'<div class="rmain"><div class="rt">'+esc(p.l)+'</div><div class="rs">'+esc(p.k)+' · id '+esc(p.id)+(p.sub?' · '+esc(p.sub):'')+'</div></div>'
           +'<div class="ract">'
-          +'<button class="btn btn-soft btn-sm" '+(first?'disabled':'')+' onclick="navMove(\''+esc(p.k)+'\',-1)" title="Sposta su">↑</button>'
-          +'<button class="btn btn-soft btn-sm" '+(last?'disabled':'')+' onclick="navMove(\''+esc(p.k)+'\',1)" title="Sposta giù">↓</button>'
-          +'<select class="in" style="width:auto;padding:5px 8px;font-size:11px" onchange="navSetSec(\''+esc(p.k)+'\',this.value)">'+_secOptions(p.sec)+'</select>'
-          +'<select class="in" style="width:auto;padding:5px 8px;font-size:11px" onchange="navSetSub(\''+esc(p.k)+'\',this.value)" title="Sottosezione">'+_subOptions(v,p.sub)+'</select>'
-          +'<button class="btn btn-soft btn-sm" onclick="navOpen(\''+esc(p.k)+'\')" title="Apri editor">✏️</button>'
-          +'<button class="btn btn-soft btn-sm" onclick="navRename(\''+esc(p.k)+'\')" title="Rinomina">🔄</button>'
-          +(p.c?'<button class="btn btn-d btn-sm" onclick="navDelete(\''+esc(p.k)+'\')" title="Elimina">🗑</button>':'')
+          +'<button class="btn btn-soft btn-sm" '+(first?'disabled':'')+' onclick="navMove(\''+escJsAttr(p.k)+'\',-1)" title="Sposta su">↑</button>'
+          +'<button class="btn btn-soft btn-sm" '+(last?'disabled':'')+' onclick="navMove(\''+escJsAttr(p.k)+'\',1)" title="Sposta giù">↓</button>'
+          +'<select class="in" style="width:auto;padding:5px 8px;font-size:11px" onchange="navSetSec(\''+escJsAttr(p.k)+'\',this.value)">'+_secOptions(p.sec)+'</select>'
+          +'<select class="in" style="width:auto;padding:5px 8px;font-size:11px" onchange="navSetSub(\''+escJsAttr(p.k)+'\',this.value)" title="Sottosezione">'+_subOptions(v,p.sub)+'</select>'
+          +'<button class="btn btn-soft btn-sm" onclick="navOpen(\''+escJsAttr(p.k)+'\')" title="Apri editor">✏️</button>'
+          +'<button class="btn btn-soft btn-sm" onclick="navRename(\''+escJsAttr(p.k)+'\')" title="Rinomina">🔄</button>'
+          +(p.c?'<button class="btn btn-d btn-sm" onclick="navDelete(\''+escJsAttr(p.k)+'\')" title="Elimina">🗑</button>':'')
           +'</div></div>';
       });
     });
@@ -581,8 +581,8 @@ async function navSetSub(slug,val){
       if(idx2!==-1){
         var line=lines[idx2];
         if(val){
-          if(line.indexOf('sub:"')!==-1)line=line.replace(/sub:"[^"]*"/,'sub:"'+val+'"');
-          else line=line.replace(/},\s*$/,', sub:"'+val+'"}');
+          if(line.indexOf('sub:"')!==-1)line=line.replace(/sub:"[^"]*"/,'sub:'+JSON.stringify(val));
+          else line=line.replace(/},\s*$/,', sub:'+JSON.stringify(val)+'}');
         }else{
           line=line.replace(/,\s*sub:"[^"]*"/,'');
         }
@@ -603,10 +603,10 @@ function navRename(slug){
   var p=_navData.pages.find(function(x){return x.k===slug});
   if(!p)return;
   modalHtml('nr-modal','🔄 Rinomina — '+esc(p.k),
-    '<div class="fld"><label>Nome</label><input id="nr-label" class="in" value="'+escAttr(p.l)+'" onkeydown="if(event.key===\'Enter\')navSaveRename(\''+esc(p.k)+'\')"></div>'
+    '<div class="fld"><label>Nome</label><input id="nr-label" class="in" value="'+escAttr(p.l)+'" onkeydown="if(event.key===\'Enter\')navSaveRename(\''+escJsAttr(p.k)+'\')"></div>'
     +'<div class="fld"><label>Icona (emoji)</label><input id="nr-icon" class="in" value="'+escAttr(p.i)+'"></div>',
     '<button class="btn btn-soft" onclick="closeModal(\'nr-modal\')">Annulla</button>'
-    +'<button class="btn btn-p" onclick="navSaveRename(\''+esc(p.k)+'\')">RINOMINA</button>');
+    +'<button class="btn btn-p" onclick="navSaveRename(\''+escJsAttr(p.k)+'\')">RINOMINA</button>');
   document.getElementById('nr-label').focus();
 }
 async function navSaveRename(slug){

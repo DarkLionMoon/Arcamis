@@ -23,6 +23,16 @@ function sha256(t){
 }
 function esc(t){var d=document.createElement('span');d.textContent=(t==null?'':t);return d.innerHTML}
 function escAttr(t){return esc(t).replace(/"/g,'&quot;')}
+/* Per valori di testo libero (titoli, etichette, nomi) usati come argomento
+   stringa singola dentro onclick="fn('...')" ecc. esc()/escAttr() non bastano:
+   non escapano l'apice ('), quindi un apostrofo nel testo rompe la stringa JS
+   e permette di iniettare codice eseguibile. Questa funzione escapa prima il
+   backslash e l'apice per il contesto JS, poi il resto per il contesto HTML. */
+function escJsAttr(t){
+  return String(t==null?'':t)
+    .replace(/\\/g,'\\\\').replace(/'/g,"\\'")
+    .replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 function toast(msg,type){
   var el=document.createElement('div');
   el.className='toast '+(type||'');
@@ -372,8 +382,8 @@ function buildSidebar(){
 function _sbItems(label,type,items){
   var h='<div class="sb-label">'+label+'</div>';
   items.forEach(function(it){
-    h+='<div class="sb-item" data-type="'+type+'" data-key="'+(it.k||it.file)+'" onclick="openItem(this)">';
-    h+='<span class="ico">'+it.i+'</span><span class="lbl">'+it.l+'</span></div>';
+    h+='<div class="sb-item" data-type="'+type+'" data-key="'+escAttr(it.k||it.file)+'" onclick="openItem(this)">';
+    h+='<span class="ico">'+esc(it.i)+'</span><span class="lbl">'+esc(it.l)+'</span></div>';
   });
   return h;
 }
@@ -418,9 +428,9 @@ function _dashGrid(label,type,items){
   if(!items||!items.length)return '';
   var h='<div class="panel" style="margin-top:16px"><div class="panel-head"><h3>'+label+'</h3><span class="hint">'+items.length+' voci</span></div>';
   items.forEach(function(it){
-    h+='<div class="row" data-type="'+type+'" data-key="'+(it.k||it.file)+'" onclick="dashOpen(this)">'
-      +'<div class="rico">'+it.i+'</div><div class="rmain"><div class="rt">'+it.l+'</div>'
-      +'<div class="rs">'+(it.k||it.file)+'</div></div>'
+    h+='<div class="row" data-type="'+type+'" data-key="'+escAttr(it.k||it.file)+'" onclick="dashOpen(this)">'
+      +'<div class="rico">'+esc(it.i)+'</div><div class="rmain"><div class="rt">'+esc(it.l)+'</div>'
+      +'<div class="rs">'+esc(it.k||it.file)+'</div></div>'
       +'<div class="ract"><span style="color:var(--dim)">›</span></div></div>';
   });
   return h+'</div>';
