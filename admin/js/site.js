@@ -86,6 +86,16 @@ async function openCarousel(){
 function _carBtnsVal(idx,covers){
   try{return JSON.parse(covers[SLIDES_DEF[idx].key+'_btns']||'null')}catch(e){return null}
 }
+function _carBtnHtml(idx,bi,b){
+  return '<div class="cs-btni">'
+    +'<input id="cs-btl-'+idx+'-'+bi+'" class="in" placeholder="Etichetta bottone" value="'+escAttr(b.label!==undefined?b.label:b.defLabel)+'">'
+    +'<input id="cs-bth-'+idx+'-'+bi+'" class="in" placeholder="https://… o onclick…" value="'+escAttr(b.href!==undefined?b.href:b.defHref)+'">'
+    +'<button type="button" class="btn btn-d btn-sm" title="Rimuovi bottone" onclick="carDelBtn('+idx+','+bi+')">✕</button>'
+    +'</div>';
+}
+function _carBtnsHtml(idx,list){
+  return (list||[]).map(function(b,bi){return _carBtnHtml(idx,bi,b)}).join('');
+}
 function _carSlideHtml(idx,covers){
   var s=SLIDES_DEF[idx];
   var key=s.key;
@@ -95,14 +105,7 @@ function _carSlideHtml(idx,covers){
   var tag=meta.tag||s.defTag;
   var tit=meta.tit||s.defTit;
   var desc=meta.desc||s.defDesc;
-  var btns=_carBtnsVal(idx,covers);
-  var btnsHtml='';
-  var list=btns||s.btns;
-  for(var bi=0;bi<list.length;bi++){
-    var b=list[bi];
-    btnsHtml+='<div class="fld"><label>Bottoni '+bi+': etichetta</label><input id="cs-btl-'+idx+'-'+bi+'" class="in" value="'+escAttr(b.label!==undefined?b.label:b.defLabel)+'"></div>'
-      +'<div class="fld"><label>…e link / onclick</label><input id="cs-bth-'+idx+'-'+bi+'" class="in" value="'+escAttr(b.href!==undefined?b.href:b.defHref)+'" placeholder="https://… o onclick…"></div>';
-  }
+  var list=_carBtnsVal(idx,covers)||s.btns;
   return '<div class="slide-edit">'
     +'<div class="se-head"><div class="vhi">'+idx+'</div><h3>'+esc(s.label)+'</h3>'
     +'<span class="pill '+(curImg?'gold':'gray')+'" style="margin-left:auto">'+(curImg?'immagine ok':'nessuna immagine')+'</span></div>'
@@ -114,10 +117,15 @@ function _carSlideHtml(idx,covers){
     +'<div class="fld"><label>Titolo (grande)</label><input id="cs-tit-'+idx+'" class="in" value="'+escAttr(tit)+'"></div>'
     +'</div>'
     +'<div class="fld" style="margin-top:10px"><label>Descrizione (paragrafo sotto il titolo)</label><textarea id="cs-desc-'+idx+'" class="in" rows="2">'+esc(desc)+'</textarea></div>'
+    +'<div class="se-btns">'
+    +'<label class="se-lb">Bottoni della slide</label>'
+    +'<div class="cs-btns" id="cs-btns-'+idx+'">'+_carBtnsHtml(idx,list)+'</div>'
+    +'<button class="btn btn-soft btn-sm" onclick="carAddBtn('+idx+')">➕ Aggiungi bottone</button>'
+    +'</div>'
     +'<div class="se-actions">'
     +'<button class="btn btn-soft btn-sm" onclick="carSaveImg('+idx+')">Salva sfondo</button>'
     +'<button class="btn btn-soft btn-sm" onclick="carSaveText('+idx+')">Salva testi</button>'
-    +'<button class="btn btn-soft btn-sm" onclick="carSaveBtns('+idx+','+list.length+')">Salva bottoni</button>'
+    +'<button class="btn btn-soft btn-sm" onclick="carSaveBtns('+idx+')">Salva bottoni</button>'
     +'<button class="btn btn-d btn-sm" onclick="carRemoveImg('+idx+')">Rimuovi sfondo</button>'
     +'</div>'
     +'<div class="se-status" id="cs-st-'+idx+'"></div>'
@@ -187,19 +195,34 @@ async function carSaveText(idx){
   _carStatus(idx,ok?'✓ Testi salvati':'✕ Errore',ok);
   toast(ok?'Testi slide '+(idx+1)+' salvati ✓':'Errore',ok);
 }
-async function carSaveBtns(idx,count){
+async function carSaveBtns(idx){
   var key=SLIDES_DEF[idx].key;
   var btns=[];
-  for(var i=0;i<count;i++){
-    btns.push({
-      label:(document.getElementById('cs-btl-'+idx+'-'+i).value||'').trim(),
-      href:(document.getElementById('cs-bth-'+idx+'-'+i).value||'').trim()
-    });
-  }
+  document.querySelectorAll('#cs-btns-'+idx+' .cs-btni').forEach(function(row){
+    var l=row.querySelector('input');
+    var h=row.querySelectorAll('input')[1];
+    var label=(l&&l.value||'').trim();
+    var href=(h&&h.value||'').trim();
+    if(label||href)btns.push({label:label,href:href});
+  });
   _carStatus(idx,'Salvataggio…','');
   var ok=await arcSave(key+'_btns',JSON.stringify(btns));
   _carStatus(idx,ok?'✓ Bottoni salvati':'✕ Errore',ok);
   toast(ok?'Bottoni slide '+(idx+1)+' salvati ✓':'Errore',ok);
+}
+function carAddBtn(idx){
+  var box=document.getElementById('cs-btns-'+idx);
+  if(!box)return;
+  var n=0;
+  box.querySelectorAll('[id^="cs-btl-'+idx+'-"]').forEach(function(inp){
+    var bi=parseInt(inp.id.split('-').pop(),10);
+    if(!isNaN(bi)&&bi>=n)n=bi+1;
+  });
+  box.insertAdjacentHTML('beforeend',_carBtnHtml(idx,n,{label:'',href:''}));
+}
+function carDelBtn(idx,bi){
+  var el=document.getElementById('cs-btl-'+idx+'-'+bi);
+  if(el&&el.parentNode)el.parentNode.remove();
 }
 
 /* ════════════════════════════════════
