@@ -514,7 +514,6 @@ var _pathMap = {
   'regole/gameplay/combattimento':            '2f60274fdc1c80b7a729ef091b278682',
   'regole/gameplay/codex':                    '2f60274fdc1c80adb7a5d6beeef3e544',
   /* Personaggio */
-  'personaggio/come-si-inizia':               '2dd222f22ef8413f8cb48f03bbb4f4b0',
   'personaggio/andando-avanti':               '5cea525d149f4acb9c59007bf6b3d5ff',
   'maestria-titoli':                          '2f00274fdc1c802a9babd4239d97a319',
   /* Homebrew */
@@ -565,7 +564,7 @@ var _pathMap = {
   "lore/la-storia-di-gandora": "pag-la-storia-di-gandora",
   "regole/regole-del-server": "pag-regole-del-server",
   "personaggio/materiale-approvato": "pag-materiale-approvato",
-  "lore/pantheon": "pag-pantheon",
+  "lore/pantheon": "pag-pantheon"
 };
 
 /* ════ DEEP LINK ════ */
