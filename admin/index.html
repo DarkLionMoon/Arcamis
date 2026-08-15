@@ -187,13 +187,14 @@ button{font-family:inherit}
 .empty .ei{font-size:30px;margin-bottom:10px;display:block}
 
 /* ── Editor ── */
-.ed-view{display:flex;flex-direction:column;height:calc(100vh - 52px - 42px);margin:-22px -26px 0}
+.ed-view{display:flex;flex-direction:column;height:calc(100vh - 52px - 42px);margin:-22px -26px 0;position:relative}
 .ed-head{flex-shrink:0;display:flex;align-items:center;gap:12px;padding:10px 26px;background:var(--bg2);border-bottom:1px solid var(--line);flex-wrap:wrap}
 .ed-head .ed-title{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700;min-width:0}
 .ed-head .ed-title .eti{font-size:17px}
 .ed-head .ed-title .etp{font-size:10.5px;color:var(--dim);font-family:var(--mono);font-weight:400}
 .ed-head .grow{flex:1}
 .ed-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.ed-actions .ed-sep{width:1px;height:20px;background:var(--line);margin:0 4px}
 .ed-toolbar{flex-shrink:0;display:flex;align-items:center;gap:2px;padding:6px 26px;background:var(--bg2);border-bottom:1px solid var(--line);flex-wrap:wrap}
 .tb-btn2{width:29px;height:27px;display:inline-flex;align-items:center;justify-content:center;background:none;border:1px solid transparent;border-radius:6px;color:var(--mut);font-size:12.5px;cursor:pointer;font-weight:600}
 .tb-btn2:hover{background:var(--panel);color:var(--txt)}
@@ -223,7 +224,9 @@ button{font-family:inherit}
 .ol-item{display:block;width:100%;text-align:left;background:none;border:none;color:var(--mut);font-size:12px;padding:5px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ol-item:hover{background:var(--panel2);color:var(--acc2)}
 .ol-item.h3{padding-left:20px}.ol-item.h4{padding-left:30px}
-#site-frame{flex:1;border:none;background:#fff;display:none}
+#site-frame{flex:1;border:none;background:var(--bg);display:none}
+#site-hint{position:absolute;top:10px;right:14px;z-index:30;display:none;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.05em;color:#cdd3de;background:rgba(8,10,14,.78);border:1px solid var(--line);border-radius:8px;padding:7px 12px;backdrop-filter:blur(4px)}
+#site-hint .sh-k{color:var(--acc2)}
 .json-pane{display:none;flex-direction:column;flex:1;min-width:0;min-height:0}
 .json-pane.active{display:flex}
 .json-pane textarea{flex:1;resize:none;border:none;outline:none;background:var(--bg);color:var(--acc2);font-family:var(--mono);font-size:12px;line-height:1.6;padding:14px 16px}
@@ -380,6 +383,9 @@ button{font-family:inherit}
 .st-imgbox{flex-shrink:0;width:150px;display:flex;flex-direction:column;gap:6px}
 .st-img-wrap{position:relative;width:150px;height:188px;border-radius:10px;border:1px solid var(--line2);background:var(--panel3);overflow:hidden;cursor:crosshair;user-select:none;flex-shrink:0}
 .st-img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.st-img-wrap.img-broken{display:flex;align-items:center;justify-content:center;background:var(--panel3)}
+.st-img-wrap.img-broken::after{content:'🖼';font-size:40px;opacity:.5}
+.st-img-wrap.img-broken .st-img{display:none}
 .st-img-empty{display:flex;align-items:center;justify-content:center;font-size:48px;opacity:.7}
 .st-pos-mark{position:absolute;width:16px;height:16px;border:2px solid #fff;border-radius:50%;background:rgba(0,0,0,.35);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 6px rgba(0,0,0,.4);transform:translate(-50%,-50%);pointer-events:none}
 .st-pos-hint{font-size:10px;color:var(--dim);line-height:1.4}
@@ -469,7 +475,7 @@ button{font-family:inherit}
     <div id="tb-crumb"><span class="cr">Admin</span></div>
     <div class="tb-right">
       <span id="tb-status" class="idle">pronto</span>
-      <a class="tb-btn" href="https://arcamis.pages.dev" target="_blank" rel="noopener" title="Apri il sito">🌐 Sito</a>
+      <a class="tb-btn" href="https://arcamis.pages.dev" target="_blank" rel="noopener" title="Apri il sito in una nuova scheda">🌐 Apri sito</a>
       <div class="tb-user" id="tb-user"></div>
     </div>
   </header>

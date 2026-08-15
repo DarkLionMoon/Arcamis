@@ -192,6 +192,7 @@ function _stPreviewHTML(data){
     var epi=_stEpi(c);
     h+='<div class="pan-tile" style="cursor:default">'
       +'<img class="pan-tile-img" src="'+escAttr(c.img)+'" alt="'+escAttr(c.name)+'" loading="lazy"'
+      +' onerror="this.onerror=null;this.style.display=\'none\'"'
       +(c.pos?' style="object-position:'+c.pos[0]+'% '+c.pos[1]+'%"':'')+'>'
       +'<div class="pan-tile-caption"><span class="pan-tile-name">'+esc(c.name)+'</span>'
       +(epi?'<span class="pan-tile-epi">'+esc(epi)+'</span>':'')+'</div></div>';
@@ -228,6 +229,19 @@ function _stPreviewSchede(data){
 /* ── CARD blocco ── */
 function _stCardHTML(c,i){
   if(_stKind==='schede')return _stSchedeCardHTML(c,i);
+  if(!c.img){
+    return '<div class="st-card st-card-sec" data-i="'+i+'">'
+      +'<div class="st-card-head"><span class="st-idx">'+(i+1)+'</span>'
+      +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Nome della sezione" oninput="_stSync()">'
+      +'<span class="st-head-actions">'
+      +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta su" onclick="_stMove('+i+',-1)">↑</button>'
+      +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta giù" onclick="_stMove('+i+',1)">↓</button>'
+      +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Elimina blocco" onclick="_stDelete('+i+')">🗑</button>'
+      +'</span></div>'
+      +'<div class="st-card-body">'
+      +'<label class="st-ta-l">Contenuto della sezione (markdown)<textarea class="in st-ta st-extra" oninput="_stSync()" placeholder="Scrivi qui la sezione…">'+esc(c.extra)+'</textarea></label>'
+      +'</div></div>';
+  }
   var rows=(c.ident&&c.ident.length?c.ident:[['Nome',''],['Epiteto',''],['Allineamento',''],['Sfere',''],['Simbolo','']])
     .map(function(p){return '<div class="st-kv"><input class="in k" value="'+escAttr(p[0])+'" placeholder="Campo" oninput="_stSync()">'
       +'<input class="in v" value="'+escAttr(p[1])+'" placeholder="Valore" oninput="_stSync()">'
@@ -248,6 +262,7 @@ function _stCardHTML(c,i){
     +'>'
     +(c.img
         ?'<img class="st-img" id="st-img-'+i+'" src="'+escAttr(c.img)+'" alt="'+escAttr(c.name)+'"'
+          +' onerror="this.onerror=null;this.style.display=\'none\';this.parentNode.classList.add(\'img-broken\')"'
           +(c.pos?' style="object-position:'+c.pos[0]+'% '+c.pos[1]+'%"':'')+'>'
         :'<div class="st-img st-img-empty" id="st-img-'+i+'">🛐</div>')
     +'<div class="st-pos-mark" id="st-posmark-'+i+'" style="left:'+(c.pos?c.pos[0]:50)+'%;top:'+(c.pos?c.pos[1]:50)+'%;display:'+(c.pos?'block':'none')+'"></div>'
@@ -326,11 +341,11 @@ function _stRead(){
       if(k)ident.push([k,kv.querySelector('.v').value.trim()]);
     });
     cards.push({type:img?'deity':'section',name:name,img:img,pos:pos,
-      quote:c.querySelector('.st-quote').value.trim(),
+      quote:(function(q){return q?q.value.trim():''})(c.querySelector('.st-quote')),
       ident:ident,
-      personality:c.querySelector('.st-personality').value,
-      cult:c.querySelector('.st-cult').value,
-      extra:c.querySelector('.st-extra').value});
+      personality:(function(t){return t?t.value:''})(c.querySelector('.st-personality')),
+      cult:(function(t){return t?t.value:''})(c.querySelector('.st-cult')),
+      extra:(function(t){return t?t.value:''})(c.querySelector('.st-extra'))});
   });
   return {heading:heading,intro:intro,cards:cards};
 }

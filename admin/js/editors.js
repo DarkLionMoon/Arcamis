@@ -127,14 +127,15 @@ async function openPage(k){
   h+='<span class="badge badge-idle" id="e-badge">salvato</span>';
   h+='<div class="grow"></div>';
   h+='<div class="ed-actions">';
-  h+='<button class="btn btn-soft btn-sm" onclick="toggleJson()" title="Modifica JSON grezzo">JSON</button>';
-  h+='<button class="btn btn-soft btn-sm" onclick="openHistory()" title="Cronologia commit e ripristino versione">📜</button>';
-  h+='<button class="btn btn-soft btn-sm" onclick="checkLinks()" title="Verifica i link interni del contenuto">🔗</button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="toggleJson()" title="Modifica il JSON grezzo della pagina">JSON</button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="openHistory()" title="Cronologia commit e ripristino versione">📜 Storia</button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="checkLinks()" title="Verifica i link interni del contenuto">🔗 Link</button>';
   h+='<button class="btn btn-soft btn-sm" onclick="copyPageUrl()" title="Copia URL pulito della pagina">URL</button>';
-  h+='<button class="btn btn-soft btn-sm" onclick="openPageOnSite()" title="Apri la pagina sul sito">🌐</button>';
-  h+='<button class="btn btn-soft btn-sm" onclick="openRenameModal()" title="Rinomina sezione / pagina">✏️</button>';
-  h+='<button class="btn btn-d btn-sm" id="del-btn" onclick="deletePage()">ELIMINA</button>';
-  h+='<button class="btn btn-p btn-sm" id="save-btn" onclick="savePage()">SALVA</button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="openPageOnSite()" title="Apri la pagina sul sito in una nuova scheda">🌐 Apri</button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="openRenameModal()" title="Rinomina sezione / pagina">✏️ Rinomina</button>';
+  h+='<span class="ed-sep"></span>';
+  h+='<button class="btn btn-d btn-sm" id="del-btn" onclick="deletePage()" title="Elimina questa pagina (azione irreversibile)">ELIMINA</button>';
+  h+='<button class="btn btn-p btn-sm" id="save-btn" onclick="savePage()" title="Salva subito (Ctrl+S)">SALVA</button>';
   h+='</div></div>';
   h+=buildToolbar();
   h+='<div class="ed-body" id="editor-body">';
@@ -160,9 +161,9 @@ async function openPage(k){
   h+='</div>';
   h+='<div class="md-outline" id="e-outline"><div class="ol-head">☰ Sommario</div><div class="ol-body" id="e-ol-body"></div></div>';
   h+='</div>';
-  h+='<iframe id="site-frame"></iframe>';
+  h+='<iframe id="site-frame"></iframe><div id="site-hint"><span>🔎 Anteprima del sito</span><span class="sh-k">· usa SPLIT per tornare all\'editor</span></div>';
   h+='<div class="json-pane" id="json-pane"><div class="pane-head">JSON</div><textarea id="e-json"></textarea></div>';
-  h+='<div class="ed-statusbar"><span id="e-sb">'+esc(_layoutLabel(json.layout||''))+' · autosave ogni 15s</span><span class="st-r">⌨ Ctrl+S salva · Ctrl+B grassetto · Ctrl+I corsivo · Tab indent</span></div>';
+  h+='<div class="ed-statusbar"><span id="e-sb">'+esc(_layoutLabel(json.layout||''))+' · Autosave ogni 15s · SALVA / Ctrl+S salva subito</span><span class="st-r">⌨ Ctrl+B grassetto · Ctrl+I corsivo · Tab indent</span></div>';
   h+='</div>';
   document.getElementById('main').innerHTML=h;
   if(st){
@@ -317,8 +318,10 @@ function setViewMode(m){
   var body=document.getElementById('editor-body');if(!body)return;
   var mdP=document.getElementById('md-pane'),pvP=document.getElementById('pv-pane');
   var div=document.getElementById('e-divider'),frame=document.getElementById('site-frame');
+  var hint=document.getElementById('site-hint');
   if(m==='site'){
     body.style.display='none';
+    if(hint)hint.style.display='flex';
     if(frame){
       frame.style.display='block';
       if(_current&&_current.k){
@@ -328,6 +331,7 @@ function setViewMode(m){
     return;
   }
   if(frame)frame.style.display='none';
+  if(hint)hint.style.display='none';
   body.style.display='flex';
   if(m==='md'){
     if(mdP){mdP.style.display='flex';mdP.style.flex='1 1 auto'}
@@ -419,7 +423,7 @@ function onLayoutChange(val,silent){
     var info=document.getElementById('e-pv-info');
     if(info)info.textContent=_layoutLabel(val);
     var sb=document.getElementById('e-sb');
-    if(sb)sb.textContent=_layoutLabel(val)+' · autosave ogni 15s';
+    if(sb)sb.textContent=_layoutLabel(val)+' · Autosave ogni 15s · SALVA / Ctrl+S salva subito';
     _modified=true;setBadge('dirty','modificato');
     return;
   }
@@ -432,7 +436,7 @@ function onLayoutChange(val,silent){
   var info=document.getElementById('e-pv-info');
   if(info)info.textContent=_layoutLabel(val);
   var sb=document.getElementById('e-sb');
-  if(sb)sb.textContent=_layoutLabel(val)+' · autosave ogni 15s';
+  if(sb)sb.textContent=_layoutLabel(val)+' · Autosave ogni 15s · SALVA / Ctrl+S salva subito';
   var tb=document.getElementById('e-toolbar');
   if(tb&&tb.parentNode){tb.outerHTML=buildToolbar();setViewMode(_viewMode)}
 }
