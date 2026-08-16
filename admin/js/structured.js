@@ -80,14 +80,23 @@ function _stUpdateUndoButtons(){
 function _stCanUndo(){return _stHistoryIdx>0}
 function _stCanRedo(){return _stHistoryIdx<_stHistory.length-1}
 
-/* Layout supportati dall'editor a blocchi. */
+/* Layout supportati dall'editor a blocchi.
+   'pantheon' → griglia divinità (solo layout pantheon)
+   'schede'   → card generiche (tutti gli altri layout) */
 function _stLayoutFor(layout){
   if(layout==='pantheon')return 'pantheon';
   if(_ST_SCHE_LAYOUTS.indexOf(layout)!==-1)return 'schede';
   return null;
 }
+/* Kind da usare quando l'editor a blocchi è attivo per il layout dato.
+   L'editor a blocchi è disponibile su OGNI pagina: pantheon usa la sua
+   griglia, qualsiasi altro layout usa l'editor a schede generico. */
+function _stEditorKind(layout){
+  if(layout==='pantheon')return 'pantheon';
+  return 'schede';
+}
 function _stSetKind(layout){
-  _stKind=_stLayoutFor(layout)||'pantheon';
+  _stKind=_stEditorKind(layout);
 }
 
 /* ── PARSE markdown → blocchi ── */
@@ -162,15 +171,16 @@ function _stParseIdent(t){
   return pairs;
 }
 
-/* ── PARSE schede (sessione/quest/npc/spell/specie/citta/evento/bestiario/fazioni/oggetti) ── */
+/* ── PARSE schede (sessione/quest/npc/spell/specie/citta/evento/bestiario/fazioni/oggetti + generico) ── */
 function _stParseSchede(md){
   var cards=[];
   if(!md)return {heading:'',intro:'',cards:[]};
-  var sections=md.split(/^## /m).filter(Boolean);
-  sections.forEach(function(sec){
+  var parts=md.split(/^## /m);
+  var intro=(parts.shift()||'').trim();
+  parts.filter(Boolean).forEach(function(sec){
     var lines=sec.split('\n');
     var name=(lines.shift()||'').trim().replace(/^#\s+/,'');
-    var intro=[],fields=[],blocks=[],cur=null,buf=[];
+    var intro2=[],fields=[],blocks=[],cur=null,buf=[];
     function flushBlock(){
       if(cur!==null)blocks.push({name:cur,md:buf.join('\n').trim()});
       buf=[];cur=null;
@@ -181,17 +191,18 @@ function _stParseSchede(md){
       var bm=line.match(/^###\s+(.+)/);
       if(bm){flushBlock();cur=bm[1].trim();return;}
       if(cur!==null){buf.push(line);return;}
-      if(line.trim())intro.push(line);
+      if(line.trim())intro2.push(line);
     });
     flushBlock();
-    cards.push({name:name,intro:intro.join('\n').trim(),fields:fields,blocks:blocks});
+    cards.push({name:name,intro:intro2.join('\n').trim(),fields:fields,blocks:blocks});
   });
-  return {heading:'',intro:'',cards:cards};
+  return {heading:'',intro:intro,cards:cards};
 }
 
 /* ── BUILD schede → markdown ── */
 function _stBuildSchede(data){
   var out='';
+  if(data.intro&&data.intro.trim())out+=data.intro.trim();
   (data.cards||[]).forEach(function(c){
     if(out)out+='\n\n';
     out+='## '+(c.name||'Scheda');
@@ -267,6 +278,7 @@ function _stPreviewHTML(data){
 /* ── ANTEPRIMA schede (stessa resa del sito: card _renderSchede/_renderBestiario) ── */
 function _stPreviewSchede(data){
   var h='<div class="sch-page">';
+  if(data.intro)h+='<div class="sch-intro">'+_stMd(data.intro)+'</div>';
   (data.cards||[]).forEach(function(c){
     h+='<div class="sch-card" style="margin-bottom:16px;border:1px solid var(--line);border-radius:var(--rad);padding:14px">';
     h+='<div class="sch-title" style="font-family:var(--brand);color:var(--acc2);font-size:17px;font-weight:700">'+esc(c.name)+'</div>';
@@ -453,17 +465,19 @@ function _stReadSchede(){
     var introEl=c.querySelector('.st-intro');
     cards.push({name:name,intro:introEl?introEl.value:'',fields:fields,blocks:blocks});
   });
-  return {heading:'',intro:'',cards:cards};
+  var pageIntro=document.getElementById('st-schede-intro');
+  return {heading:'',intro:pageIntro?(pageIntro.value||''):'',cards:cards};
 }
 function _stRender(data){
   var collapsed=[];
   document.querySelectorAll('#st-list .st-card.closed').forEach(function(c){
     collapsed.push(+(c.getAttribute('data-i')||0));
   });
-  var list=document.getElementById('st-list');if(!list)return;
-  list.innerHTML=data.cards.map(function(c,i){return _stCardHTML(c,i)}).join('');
+  var grid=document.getElementById('st-grid');
+  if(!grid)return;
+  grid.innerHTML=data.cards.map(function(c,i){return _stCardHTML(c,i)}).join('');
   if(collapsed.length){
-    var cards=list.querySelectorAll('.st-card');
+    var cards=grid.querySelectorAll('.st-card');
     for(var j=0;j<cards.length;j++){
       if(collapsed.indexOf(j)!==-1)cards[j].classList.add('closed');
     }
@@ -507,17 +521,36 @@ function _stSyncPreview(){_stPreview(_stRead())}
 
 function initStructuredEditor(content){
   _stMode=true;window.__stMode=true;
-  _stKind=_stLayoutFor(_current.layout)||'pantheon';
+  _stKind=_stEditorKind(_current.layout);
   var eb=document.getElementById('editor-body');
   if(eb)eb.classList.remove('no-preview');
   var data=_stParse(content||'');
-  var ta=document.getElementById('e-md');if(ta)ta.style.display='none';
+  var ta=document.getElementById('e-md');
+  if(ta)ta.style.display='none';
+  var pane=document.getElementById('md-pane');
+  if(pane){
+    if(!document.getElementById('struct-head')){
+      var dh=document.createElement('div');
+      dh.className='struct-head';dh.id='struct-head';
+      pane.insertBefore(dh,ta?ta.nextSibling:null);
+    }
+    if(!document.getElementById('st-list')){
+      var dl=document.createElement('div');
+      dl.className='struct-list';dl.id='st-list';
+      pane.insertBefore(dl,document.getElementById('struct-head').nextSibling);
+    }
+    if(!document.getElementById('st-grid')){
+      var dg=document.createElement('div');
+      dg.className='st-grid';dg.id='st-grid';
+      document.getElementById('st-list').appendChild(dg);
+    }
+  }
   var sh=document.getElementById('struct-head');if(sh)sh.style.display='';
   var sl=document.getElementById('st-list');if(sl)sl.style.display='';
   var head=document.getElementById('struct-head');
   if(head){
     head.innerHTML=_stKind==='schede'
-      ?'<div class="st-intro-box"><p class="st-hint" style="margin:0">Schede a card: ogni scheda ha titolo, descrizione, campi e sezioni. L\'anteprima e il salvataggio usano il formato del sito (<code>## Titolo</code> + <code>- **Chiave:** valore</code> + <code>### Sezione</code>).</p></div>'
+      ?_stSchedeIntroHTML(data)
       :'<div class="st-intro-box">'
         +'<label class="st-ta-l">Titolo introduzione<input class="in" id="st-heading" value="'+escAttr(data.heading)+'" style="max-width:220px" oninput="_stSync()"></label>'
         +'<label class="st-ta-l">Testo introduttivo (prima della griglia)<textarea class="in st-ta" id="st-intro" oninput="_stSync()" placeholder="Introduzione al pantheon…">'+esc(data.intro)+'</textarea></label>'
@@ -583,6 +616,19 @@ function initStructuredEditor(content){
     (_stKind==='schede'?'schede a card':'griglia divinità');
   _stSync();
 }
+/* Header schede: il campo "testo introduttivo" è mostrato solo per i layout
+   che sul sito renderizzano markdown pieno (non-schede nativi), dove il testo
+   prima di ## viene effettivamente renderizzato. */
+function _stSchedeIntroHTML(data){
+  var native=_ST_SCHE_LAYOUTS.indexOf(_current.layout)!==-1;
+  if(native){
+    return '<div class="st-intro-box"><p class="st-hint" style="margin:0">Schede a card: ogni scheda ha titolo, descrizione, campi e sezioni. L\'anteprima e il salvataggio usano il formato del sito (<code>## Titolo</code> + <code>- **Chiave:** valore</code> + <code>### Sezione</code>).</p></div>';
+  }
+  return '<div class="st-intro-box">'
+    +'<label class="st-ta-l">Testo introduttivo (prima delle schede)<textarea class="in st-ta" id="st-schede-intro" oninput="_stSync()" placeholder="Testo prima della prima scheda…">'+esc(data.intro)+'</textarea></label>'
+    +'<p class="st-hint" style="margin:0">L\'editor a blocchi di questa pagina usa card generiche: <code>## Titolo</code> + <code>- **Chiave:** valore</code> + <code>### Sezione</code>, formattazione markdown pienamente compatibile col sito. Il testo sopra compare prima delle card.</p></div>';
+}
+
 function _stToggle(){
   var ta=document.getElementById('e-md');if(!ta)return;
   if(_stMode){_stExit();}

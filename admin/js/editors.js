@@ -180,8 +180,8 @@ async function openPage(k){
 }
 function buildToolbar(){
   var h='<div class="ed-toolbar" id="e-toolbar">';
-  if(_current&&_current.layout&&_stLayoutFor(_current.layout)){
-    h+='<button class="btn btn-soft btn-sm" onclick="_stToggle()" title="Passa all\'editor a blocchi">🧱 Blocchi</button>';
+  if(_current){
+    h+='<button class="btn btn-soft btn-sm" onclick="_stToggle()" title="Passa all\'editor a blocchi (disponibile su ogni pagina)">🧱 Blocchi</button>';
   }
   EDITOR_TB.forEach(function(g){
     g.forEach(function(cmd){
@@ -419,18 +419,8 @@ function onLayoutChange(val,silent){
   _current.layout=val;
   var md=document.getElementById('e-md');
   if(window.__stMode){
-    var _prevKind=_stKind;
     _stSetKind(val);
-    if(!_stLayoutFor(val)){
-      _stExit();
-    }else{
-      if(_prevKind!==_stKind){
-        var _raw=md?md.value:'';
-        initStructuredEditor(_raw);
-      }else{
-        _stSync();
-      }
-    }
+    initStructuredEditor(md?md.value:'');
     var info=document.getElementById('e-pv-info');
     if(info)info.textContent=_layoutLabel(val);
     var sb=document.getElementById('e-sb');
