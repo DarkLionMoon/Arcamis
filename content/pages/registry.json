@@ -1,176 +1,857 @@
 {
   "root": "2f00274fdc1c801a9b39d8d69800f7a8",
   "guild": "1348723468157456425",
-
   "pages": [
-    { "k": "biblioteca",          "l": "Biblioteca",                "i": "📚", "id": "2f00274fdc1c8089bfe6c24434d53b67",   "menu": true, "admin": true, "export": true, "index": true, "root": true, "path": "lavori/biblioteca",          "slug": "biblioteca" },
-    { "k": "farmacia",            "l": "Bottega farmaceutica",      "i": "🧪", "id": "3090274fdc1c8013a183dfc31297c477",   "menu": true, "admin": true, "export": true },
-    { "k": "arcamis",             "l": "Arcamis",                   "i": "🏰", "id": "3090274fdc1c80e1a365ce1c36873455",   "menu": true, "admin": true, "export": true, "root": true },
-    { "k": "selva",               "l": "Selva Fogliabruna",         "i": "🍂", "id": "30d0274fdc1c800999feeb0ca6669b22",   "menu": true, "admin": true, "export": true, "root": true },
-    { "k": "foresta",             "l": "Foresta Smarrimento",       "i": "🌲", "id": "30d0274fdc1c8016b113d5c2d7662d8f",   "menu": true, "admin": true, "export": true, "root": true },
-    { "k": "volonx",              "l": "Volonx",                    "i": "🏔️", "id": "30d0274fdc1c804b9cb7e366f02bd635",   "menu": true, "admin": true, "export": true, "root": true },
-    { "k": "arpax",               "l": "Arpax",                     "i": "🦅", "id": "30d0274fdc1c807eb443f55071f00844",   "menu": true, "admin": true, "export": true },
-    { "k": "deserto",             "l": "Deserto del Crepuscolo",    "i": "🔥", "id": "2f00274fdc1c805ca01ec57f18d2ffee",   "menu": true, "admin": true, "export": true, "index": true, "root": true, "path": "lavori/forgia",             "slug": "forgia" },
-    { "k": "gilda",               "l": "Gilda degli avventurieri",  "i": "🗡️", "id": "2f00274fdc1c801b8c13cefd9e15694e",   "menu": true, "admin": true, "export": true, "index": true, "root": true, "path": "lavori/gilda-avventurieri", "slug": "gilda-avventurieri" },
-    { "k": "locanda",             "l": "Locanda",                   "i": "🍺", "id": "2f00274fdc1c80faa99eda064ef0fabc",   "menu": true, "admin": true, "export": true, "index": true, "root": true, "path": "lavori/locanda",            "slug": "locanda" },
-    { "k": "ospedale",            "l": "Ospedale",                  "i": "⚕️", "id": "2f00274fdc1c807aa03cc6cbeb3687cc",   "menu": true, "admin": true, "export": true, "index": true, "root": true, "path": "lavori/ospedale",           "slug": "ospedale" },
-    { "k": "sartoria",            "l": "Sartoria",                  "i": "🧵", "id": "2ff0274fdc1c8035bad4f0b6ab705192",   "menu": true, "admin": true, "export": true, "index": true, "root": true, "path": "lavori/sartoria",           "slug": "sartoria" },
-    { "k": "changelog",           "l": "Changelog",                 "i": "📝", "id": "3000274fdc1c8033a214c44a1aa7f01f",   "menu": true, "root": true, "path": "changelog",                "slug": "changelog" },
-    { "k": "maestria",            "l": "Maestria / Titoli",         "i": "🔨", "id": "2f00274fdc1c802a9babd4239d97a319",   "menu": true, "admin": true, "export": true, "index": true, "root": true, "path": "maestria-titoli",           "slug": "maestria-titoli" },
-    { "k": "la-storia-di-gandora","l": "La Storia di Gandora",      "i": "🐉", "id": "pag-la-storia-di-gandora", "sec": "lore", "sub": "Storia", "c": 1, "menu": true, "admin": true, "path": "lore/la-storia-di-gandora" },
-    { "k": "regole-del-server",   "l": "Regole del Server",         "i": "📋", "id": "pag-regole-del-server", "sec": "regole", "c": 1, "menu": true, "admin": true, "path": "regole/regole-del-server" },
-    { "k": "materiale-approvato", "l": "Materiale Approvato",       "i": "📖", "id": "pag-materiale-approvato", "sec": "personaggio", "sub": "Regole", "c": 1, "menu": true, "admin": true, "path": "personaggio/materiale-approvato" },
-    { "k": "pantheon",            "l": "Pantheon",                  "i": "🛐", "id": "pag-pantheon", "sec": "lore", "c": 1, "menu": true, "admin": true, "path": "lore/pantheon" },
-    { "k": "gameplay",            "l": "Gameplay",                  "i": "⚔️", "id": "2f00274fdc1c8065a11ff45192aa5dcb",   "export": true, "index": true, "root": true, "slug": "gameplay" },
-    { "k": "materiale",           "l": "Materiale approvato",       "i": "📋", "id": "3130274fdc1c807eb61fde24e8236659",   "export": true, "index": true, "root": true, "slug": "materiale-approvato" },
-    { "k": "galleria",            "l": "Galleria PG",               "i": "🖼️", "id": "2fd0274fdc1c80d8b948c4133f874f28",   "export": true, "slug": "galleria-pg" },
-    { "k": "bottega-farmaceutica","l": "Bottega farmaceutica",      "i": "💊", "id": "2f00274fdc1c801c9697e75caa8d5f13",   "index": true, "root": true, "path": "lavori/bottega-farmaceutica", "slug": "bottega-farmaceutica" },
-    { "k": "caserma",             "l": "Caserma",                   "i": "🛡️", "id": "2ff0274fdc1c80688dd6c2b293a1f626",   "index": true, "root": true, "path": "lavori/caserma",             "slug": "caserma" },
-    { "k": "corporazione-costruttori", "l": "Corporazione dei costruttori", "i": "🔨", "id": "2ff0274fdc1c80769a4ae243f22f0582", "index": true, "root": true, "path": "lavori/corporazione-costruttori", "slug": "corporazione-costruttori" },
-    { "k": "tribunale",           "l": "Tribunale",                 "i": "⚖️", "id": "3460274fdc1c800c8b3bf9a53d0cbf59",   "index": true },
-    { "k": "storia",              "l": "Storia del mondo",          "i": "📖", "id": "2f00274fdc1c806f8f17dbc6532d2211",   "index": true, "root": true, "path": "lore/storia",                "slug": "storia-del-mondo" },
-    { "k": "pantheon-root",      "l": "Pantheon",                  "i": "🛐", "id": "2f00274fdc1c80679bd3c3df8a1fa040",   "export": true, "index": true, "root": true, "slug": "pantheon" },
-    { "k": "mappe",               "l": "Mappe",                     "i": "🗺️", "id": "2f10274fdc1c80489f23c49164747770",   "index": true, "root": true, "path": "mappe",                     "slug": "mappe" },
-    { "k": "homebrew",            "l": "Homebrew",                  "i": "⚗️", "id": "2f00274fdc1c80e78ad7ce985007b7c6",   "index": true, "root": true, "path": "homebrew",                  "slug": "homebrew" },
-    { "k": "vigilius",            "l": "Vigilius",                  "i": "🏛️", "id": "31f0274fdc1c8059a923c73da185a0e3",   "root": true },
-    { "k": "galeton",             "l": "Galeton",                   "i": "🏘️", "id": "31f0274fdc1c8019945af2b26306462f",   "root": true },
-    { "k": "lago-di-gromot",      "l": "Lago di Gromot",            "i": "🌊", "id": "30d0274fdc1c803387c4fda013b857e9",   "root": true },
-    { "k": "forte-vigilus",       "l": "Forte Vigilus",             "i": "🛡️", "id": "30d0274fdc1c8090aee7ed0430170414",   "root": true },
-    { "k": "riva-di-ferro",       "l": "Riva di Ferro",             "i": "⚓", "id": "31f0274fdc1c8075b0dec2e2a6bc359e",    "root": true },
-    { "k": "fumofosco",           "l": "Fumofosco",                 "i": "🌫️", "id": "31f0274fdc1c805b89b8f0678463e615",   "root": true },
-    { "k": "rovine-di-kaldur",    "l": "Rovine di Kaldur",          "i": "🏚️", "id": "31f0274fdc1c808191abe4df86d176e6",   "root": true }
+    {
+      "k": "biblioteca",
+      "l": "Biblioteca",
+      "i": "📚",
+      "id": "2f00274fdc1c8089bfe6c24434d53b67",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "index": true,
+      "root": true,
+      "path": "lavori/biblioteca",
+      "slug": "biblioteca"
+    },
+    {
+      "k": "farmacia",
+      "l": "Bottega farmaceutica",
+      "i": "🧪",
+      "id": "3090274fdc1c8013a183dfc31297c477",
+      "menu": true,
+      "admin": true,
+      "export": true
+    },
+    {
+      "k": "arcamis",
+      "l": "Arcamis",
+      "i": "🏰",
+      "id": "3090274fdc1c80e1a365ce1c36873455",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "root": true
+    },
+    {
+      "k": "selva",
+      "l": "Selva Fogliabruna",
+      "i": "🍂",
+      "id": "30d0274fdc1c800999feeb0ca6669b22",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "root": true
+    },
+    {
+      "k": "foresta",
+      "l": "Foresta Smarrimento",
+      "i": "🌲",
+      "id": "30d0274fdc1c8016b113d5c2d7662d8f",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "root": true
+    },
+    {
+      "k": "volonx",
+      "l": "Volonx",
+      "i": "🏔️",
+      "id": "30d0274fdc1c804b9cb7e366f02bd635",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "root": true
+    },
+    {
+      "k": "arpax",
+      "l": "Arpax",
+      "i": "🦅",
+      "id": "30d0274fdc1c807eb443f55071f00844",
+      "menu": true,
+      "admin": true,
+      "export": true
+    },
+    {
+      "k": "deserto",
+      "l": "Deserto del Crepuscolo",
+      "i": "🔥",
+      "id": "2f00274fdc1c805ca01ec57f18d2ffee",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "index": true,
+      "root": true,
+      "path": "lavori/forgia",
+      "slug": "forgia"
+    },
+    {
+      "k": "gilda",
+      "l": "Gilda degli avventurieri",
+      "i": "🗡️",
+      "id": "2f00274fdc1c801b8c13cefd9e15694e",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "index": true,
+      "root": true,
+      "path": "lavori/gilda-avventurieri",
+      "slug": "gilda-avventurieri"
+    },
+    {
+      "k": "locanda",
+      "l": "Locanda",
+      "i": "🍺",
+      "id": "2f00274fdc1c80faa99eda064ef0fabc",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "index": true,
+      "root": true,
+      "path": "lavori/locanda",
+      "slug": "locanda"
+    },
+    {
+      "k": "ospedale",
+      "l": "Ospedale",
+      "i": "⚕️",
+      "id": "2f00274fdc1c807aa03cc6cbeb3687cc",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "index": true,
+      "root": true,
+      "path": "lavori/ospedale",
+      "slug": "ospedale"
+    },
+    {
+      "k": "sartoria",
+      "l": "Sartoria",
+      "i": "🧵",
+      "id": "2ff0274fdc1c8035bad4f0b6ab705192",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "index": true,
+      "root": true,
+      "path": "lavori/sartoria",
+      "slug": "sartoria"
+    },
+    {
+      "k": "changelog",
+      "l": "Changelog",
+      "i": "📝",
+      "id": "3000274fdc1c8033a214c44a1aa7f01f",
+      "menu": true,
+      "root": true,
+      "path": "changelog",
+      "slug": "changelog"
+    },
+    {
+      "k": "maestria",
+      "l": "Maestria / Titoli",
+      "i": "🔨",
+      "id": "2f00274fdc1c802a9babd4239d97a319",
+      "menu": true,
+      "admin": true,
+      "export": true,
+      "index": true,
+      "root": true,
+      "path": "maestria-titoli",
+      "slug": "maestria-titoli"
+    },
+    {
+      "k": "la-storia-di-gandora",
+      "l": "La Storia di Gandora",
+      "i": "🐉",
+      "id": "pag-la-storia-di-gandora",
+      "sec": "lore",
+      "sub": "Storia",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/la-storia-di-gandora"
+    },
+    {
+      "k": "regole-del-server",
+      "l": "Regole del Server",
+      "i": "📋",
+      "id": "pag-regole-del-server",
+      "sec": "regole",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "regole/regole-del-server"
+    },
+    {
+      "k": "materiale-approvato",
+      "l": "Materiale Approvato",
+      "i": "📖",
+      "id": "pag-materiale-approvato",
+      "sec": "personaggio",
+      "sub": "Regole",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "personaggio/materiale-approvato"
+    },
+    {
+      "k": "pantheon",
+      "l": "Pantheon",
+      "i": "🛐",
+      "id": "pag-pantheon",
+      "sec": "lore",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/pantheon"
+    },
+    {
+      "k": "gameplay",
+      "l": "Gameplay",
+      "i": "⚔️",
+      "id": "2f00274fdc1c8065a11ff45192aa5dcb",
+      "export": true,
+      "index": true,
+      "root": true,
+      "slug": "gameplay"
+    },
+    {
+      "k": "materiale",
+      "l": "Materiale approvato",
+      "i": "📋",
+      "id": "3130274fdc1c807eb61fde24e8236659",
+      "export": true,
+      "index": true,
+      "root": true,
+      "slug": "materiale-approvato"
+    },
+    {
+      "k": "galleria",
+      "l": "Galleria PG",
+      "i": "🖼️",
+      "id": "2fd0274fdc1c80d8b948c4133f874f28",
+      "export": true,
+      "slug": "galleria-pg"
+    },
+    {
+      "k": "bottega-farmaceutica",
+      "l": "Bottega farmaceutica",
+      "i": "💊",
+      "id": "2f00274fdc1c801c9697e75caa8d5f13",
+      "index": true,
+      "root": true,
+      "path": "lavori/bottega-farmaceutica",
+      "slug": "bottega-farmaceutica"
+    },
+    {
+      "k": "caserma",
+      "l": "Caserma",
+      "i": "🛡️",
+      "id": "2ff0274fdc1c80688dd6c2b293a1f626",
+      "index": true,
+      "root": true,
+      "path": "lavori/caserma",
+      "slug": "caserma"
+    },
+    {
+      "k": "corporazione-costruttori",
+      "l": "Corporazione dei costruttori",
+      "i": "🔨",
+      "id": "2ff0274fdc1c80769a4ae243f22f0582",
+      "index": true,
+      "root": true,
+      "path": "lavori/corporazione-costruttori",
+      "slug": "corporazione-costruttori"
+    },
+    {
+      "k": "tribunale",
+      "l": "Tribunale",
+      "i": "⚖️",
+      "id": "3460274fdc1c800c8b3bf9a53d0cbf59",
+      "index": true
+    },
+    {
+      "k": "storia",
+      "l": "Storia del mondo",
+      "i": "📖",
+      "id": "2f00274fdc1c806f8f17dbc6532d2211",
+      "index": true,
+      "root": true,
+      "path": "lore/storia",
+      "slug": "storia-del-mondo"
+    },
+    {
+      "k": "pantheon-root",
+      "l": "Pantheon",
+      "i": "🛐",
+      "id": "2f00274fdc1c80679bd3c3df8a1fa040",
+      "export": true,
+      "index": true,
+      "root": true,
+      "slug": "pantheon"
+    },
+    {
+      "k": "mappe",
+      "l": "Mappe",
+      "i": "🗺️",
+      "id": "2f10274fdc1c80489f23c49164747770",
+      "index": true,
+      "root": true,
+      "path": "mappe",
+      "slug": "mappe"
+    },
+    {
+      "k": "homebrew",
+      "l": "Homebrew",
+      "i": "⚗️",
+      "id": "2f00274fdc1c80e78ad7ce985007b7c6",
+      "index": true,
+      "root": true,
+      "path": "homebrew",
+      "slug": "homebrew"
+    },
+    {
+      "k": "vigilius",
+      "l": "Vigilius",
+      "i": "🏛️",
+      "id": "31f0274fdc1c8059a923c73da185a0e3",
+      "root": true
+    },
+    {
+      "k": "galeton",
+      "l": "Galeton",
+      "i": "🏘️",
+      "id": "31f0274fdc1c8019945af2b26306462f",
+      "root": true
+    },
+    {
+      "k": "lago-di-gromot",
+      "l": "Lago di Gromot",
+      "i": "🌊",
+      "id": "30d0274fdc1c803387c4fda013b857e9",
+      "root": true
+    },
+    {
+      "k": "forte-vigilus",
+      "l": "Forte Vigilus",
+      "i": "🛡️",
+      "id": "30d0274fdc1c8090aee7ed0430170414",
+      "root": true
+    },
+    {
+      "k": "riva-di-ferro",
+      "l": "Riva di Ferro",
+      "i": "⚓",
+      "id": "31f0274fdc1c8075b0dec2e2a6bc359e",
+      "root": true
+    },
+    {
+      "k": "fumofosco",
+      "l": "Fumofosco",
+      "i": "🌫️",
+      "id": "31f0274fdc1c805b89b8f0678463e615",
+      "root": true
+    },
+    {
+      "k": "rovine-di-kaldur",
+      "l": "Rovine di Kaldur",
+      "i": "🏚️",
+      "id": "31f0274fdc1c808191abe4df86d176e6",
+      "root": true
+    }
   ],
-
   "sections": [
-    { "v": "regole", "l": "Regole", "pages": ["2f00274fdc1c8065a11ff45192aa5dcb"] },
-    { "v": "personaggio", "l": "Personaggio" },
-    { "v": "lore", "l": "Lore", "pages": ["2f00274fdc1c80e78ad7ce985007b7c6"] },
-    { "v": "mestieri", "l": "Mestieri" },
-    { "v": "homebrew", "l": "Homebrew" },
-    { "v": "", "l": "— Nessuna (solo URL) —", "adminOnly": true }
+    {
+      "v": "regole",
+      "l": "Regole",
+      "pages": [
+        "2f00274fdc1c8065a11ff45192aa5dcb"
+      ]
+    },
+    {
+      "v": "personaggio",
+      "l": "Personaggio"
+    },
+    {
+      "v": "lore",
+      "l": "Lore",
+      "pages": [
+        "2f00274fdc1c80e78ad7ce985007b7c6"
+      ]
+    },
+    {
+      "v": "mestieri",
+      "l": "Mestieri"
+    },
+    {
+      "v": "homebrew",
+      "l": "Homebrew"
+    },
+    {
+      "v": "",
+      "l": "— Nessuna (solo URL) —",
+      "adminOnly": true
+    }
   ],
-
   "lavori": [
-    { "l": "Gilda avventurieri", "i": "🗡️", "id": "2f00274fdc1c801b8c13cefd9e15694e" },
-    { "l": "Locanda", "i": "🍺", "id": "2f00274fdc1c80faa99eda064ef0fabc" },
-    { "l": "Forgia", "i": "🔥", "id": "2f00274fdc1c805ca01ec57f18d2ffee" },
-    { "l": "Biblioteca", "i": "📚", "id": "2f00274fdc1c8089bfe6c24434d53b67" },
-    { "l": "Bottega farmaceutica", "i": "💊", "id": "2f00274fdc1c801c9697e75caa8d5f13" },
-    { "l": "Caserma", "i": "🛡️", "id": "2ff0274fdc1c80688dd6c2b293a1f626" },
-    { "l": "Corporazione dei costruttori", "i": "🔨", "id": "2ff0274fdc1c80769a4ae243f22f0582" },
-    { "l": "Ospedale", "i": "⚕️", "id": "2f00274fdc1c807aa03cc6cbeb3687cc" },
-    { "l": "Sartoria", "i": "🧵", "id": "2ff0274fdc1c8035bad4f0b6ab705192" },
-    { "l": "Tribunale", "i": "⚖️", "id": "3460274fdc1c800c8b3bf9a53d0cbf59" }
+    {
+      "l": "Gilda avventurieri",
+      "i": "🗡️",
+      "id": "2f00274fdc1c801b8c13cefd9e15694e"
+    },
+    {
+      "l": "Locanda",
+      "i": "🍺",
+      "id": "2f00274fdc1c80faa99eda064ef0fabc"
+    },
+    {
+      "l": "Forgia",
+      "i": "🔥",
+      "id": "2f00274fdc1c805ca01ec57f18d2ffee"
+    },
+    {
+      "l": "Biblioteca",
+      "i": "📚",
+      "id": "2f00274fdc1c8089bfe6c24434d53b67"
+    },
+    {
+      "l": "Bottega farmaceutica",
+      "i": "💊",
+      "id": "2f00274fdc1c801c9697e75caa8d5f13"
+    },
+    {
+      "l": "Caserma",
+      "i": "🛡️",
+      "id": "2ff0274fdc1c80688dd6c2b293a1f626"
+    },
+    {
+      "l": "Corporazione dei costruttori",
+      "i": "🔨",
+      "id": "2ff0274fdc1c80769a4ae243f22f0582"
+    },
+    {
+      "l": "Ospedale",
+      "i": "⚕️",
+      "id": "2f00274fdc1c807aa03cc6cbeb3687cc"
+    },
+    {
+      "l": "Sartoria",
+      "i": "🧵",
+      "id": "2ff0274fdc1c8035bad4f0b6ab705192"
+    },
+    {
+      "l": "Tribunale",
+      "i": "⚖️",
+      "id": "3460274fdc1c800c8b3bf9a53d0cbf59"
+    }
   ],
-
   "legacySlugs": [
-    { "slug": "biblioteca-scoperta", "id": "3040274fdc1c80ed816ef58f6a6b6f21" },
-    { "slug": "specie-homebrew", "id": "2f60274fdc1c80fba671c588ba93b116" },
-    { "slug": "sottoclassi", "id": "2f70274fdc1c80e3bdc7f95f81eb9cc0" }
+    {
+      "slug": "biblioteca-scoperta",
+      "id": "3040274fdc1c80ed816ef58f6a6b6f21"
+    },
+    {
+      "slug": "specie-homebrew",
+      "id": "2f60274fdc1c80fba671c588ba93b116"
+    },
+    {
+      "slug": "sottoclassi",
+      "id": "2f70274fdc1c80e3bdc7f95f81eb9cc0"
+    }
   ],
-
   "layoutDatabases": [
-    { "id": "2f60274fdc1c80b7a729ef091b278682", "layout": "regole" },
-    { "id": "2f60274fdc1c80adb7a5d6beeef3e544", "layout": "regole" },
-    { "id": "2f00274fdc1c806f8f17dbc6532d2211", "layout": "lore" },
-    { "id": "2f60274fdc1c80558d8fe99842377aef", "layout": "lore" },
-    { "id": "2fc0274fdc1c80c4bbc1c8806f591e0f", "layout": "lore" },
-    { "id": "3090274fdc1c80008f0dffe3a677cb66", "layout": "lore" },
-    { "id": "30d0274fdc1c805cbbc2daf73b5f3a66", "layout": "lore" },
-    { "id": "3040274fdc1c80ed816ef58f6a606f21", "layout": "lore" },
-    { "id": "2fb0274fdc1c8073addaf1d5a3e9768b", "layout": "lore" },
-    { "id": "2fb0274fdc1c8080b07bd553e953c88d", "layout": "lore" },
-    { "id": "2f90274fdc1c8015bf95f52c4e7681b8", "layout": "lore" },
-    { "id": "2f00274fdc1c80e78ad7ce985007b7c6", "layout": "lore" },
-    { "id": "2f00274fdc1c801b8c13cefd9e15694e", "layout": "lavoro" },
-    { "id": "2f00274fdc1c80faa99eda064ef0fabc", "layout": "lavoro" },
-    { "id": "2f00274fdc1c805ca01ec57f18d2ffee", "layout": "lavoro" },
-    { "id": "2f00274fdc1c8089bfe6c24434d53b67", "layout": "lavoro" },
-    { "id": "2f00274fdc1c801c9697e75caa8d5f13", "layout": "lavoro" },
-    { "id": "2ff0274fdc1c80688dd6c2b293a1f626", "layout": "lavoro" },
-    { "id": "2ff0274fdc1c80769a4ae243f22f0582", "layout": "lavoro" },
-    { "id": "2f00274fdc1c807aa03cc6cbeb3687cc", "layout": "lavoro" },
-    { "id": "2ff0274fdc1c8035bad4f0b6ab705192", "layout": "lavoro" },
-    { "id": "3130274fdc1c807eb61fde24e8236659", "layout": "materiale" },
-    { "id": "2f00274fdc1c80679bd3c3df8a1fa040", "layout": "lore" },
-    { "id": "2f70274fdc1c803ca5cafa97ca1817cd", "layout": "bestiario" },
-    { "id": "2f10274fdc1c80dca8caeb2e6de23146", "layout": "fazioni" },
-    { "id": "2ff0274fdc1c807ea473db02ac4ae391", "layout": "oggetti" },
-    { "id": "3350274fdc1c808fba5ed9ad1f3b4bb4", "layout": "oggetti" },
-    { "id": "2f70274fdc1c80e3bdc7f95f81eb9cc0", "layout": "glossario" },
-    { "id": "2fd0274fdc1c80038889fc072a360bae", "layout": "galleria" },
-    { "id": "3400274fdc1c80178db3dcf6ba7098aa", "layout": "tabelle" },
-    { "id": "2fc0274fdc1c800f8ac0d6d03b255cad", "layout": "timeline" }
+    {
+      "id": "2f60274fdc1c80b7a729ef091b278682",
+      "layout": "regole"
+    },
+    {
+      "id": "2f60274fdc1c80adb7a5d6beeef3e544",
+      "layout": "regole"
+    },
+    {
+      "id": "2f00274fdc1c806f8f17dbc6532d2211",
+      "layout": "lore"
+    },
+    {
+      "id": "2f60274fdc1c80558d8fe99842377aef",
+      "layout": "lore"
+    },
+    {
+      "id": "2fc0274fdc1c80c4bbc1c8806f591e0f",
+      "layout": "lore"
+    },
+    {
+      "id": "3090274fdc1c80008f0dffe3a677cb66",
+      "layout": "lore"
+    },
+    {
+      "id": "30d0274fdc1c805cbbc2daf73b5f3a66",
+      "layout": "lore"
+    },
+    {
+      "id": "3040274fdc1c80ed816ef58f6a606f21",
+      "layout": "lore"
+    },
+    {
+      "id": "2fb0274fdc1c8073addaf1d5a3e9768b",
+      "layout": "lore"
+    },
+    {
+      "id": "2fb0274fdc1c8080b07bd553e953c88d",
+      "layout": "lore"
+    },
+    {
+      "id": "2f90274fdc1c8015bf95f52c4e7681b8",
+      "layout": "lore"
+    },
+    {
+      "id": "2f00274fdc1c80e78ad7ce985007b7c6",
+      "layout": "lore"
+    },
+    {
+      "id": "2f00274fdc1c801b8c13cefd9e15694e",
+      "layout": "lavoro"
+    },
+    {
+      "id": "2f00274fdc1c80faa99eda064ef0fabc",
+      "layout": "lavoro"
+    },
+    {
+      "id": "2f00274fdc1c805ca01ec57f18d2ffee",
+      "layout": "lavoro"
+    },
+    {
+      "id": "2f00274fdc1c8089bfe6c24434d53b67",
+      "layout": "lavoro"
+    },
+    {
+      "id": "2f00274fdc1c801c9697e75caa8d5f13",
+      "layout": "lavoro"
+    },
+    {
+      "id": "2ff0274fdc1c80688dd6c2b293a1f626",
+      "layout": "lavoro"
+    },
+    {
+      "id": "2ff0274fdc1c80769a4ae243f22f0582",
+      "layout": "lavoro"
+    },
+    {
+      "id": "2f00274fdc1c807aa03cc6cbeb3687cc",
+      "layout": "lavoro"
+    },
+    {
+      "id": "2ff0274fdc1c8035bad4f0b6ab705192",
+      "layout": "lavoro"
+    },
+    {
+      "id": "3130274fdc1c807eb61fde24e8236659",
+      "layout": "materiale"
+    },
+    {
+      "id": "2f00274fdc1c80679bd3c3df8a1fa040",
+      "layout": "lore"
+    },
+    {
+      "id": "2f70274fdc1c803ca5cafa97ca1817cd",
+      "layout": "bestiario"
+    },
+    {
+      "id": "2f10274fdc1c80dca8caeb2e6de23146",
+      "layout": "fazioni"
+    },
+    {
+      "id": "2ff0274fdc1c807ea473db02ac4ae391",
+      "layout": "oggetti"
+    },
+    {
+      "id": "3350274fdc1c808fba5ed9ad1f3b4bb4",
+      "layout": "oggetti"
+    },
+    {
+      "id": "2f70274fdc1c80e3bdc7f95f81eb9cc0",
+      "layout": "glossario"
+    },
+    {
+      "id": "2fd0274fdc1c80038889fc072a360bae",
+      "layout": "galleria"
+    },
+    {
+      "id": "3400274fdc1c80178db3dcf6ba7098aa",
+      "layout": "tabelle"
+    },
+    {
+      "id": "2fc0274fdc1c800f8ac0d6d03b255cad",
+      "layout": "timeline"
+    }
   ],
-
   "pathOverrides": [
-    { "path": "regole/gameplay/combattimento", "id": "2f60274fdc1c80b7a729ef091b278682" },
-    { "path": "regole/gameplay/codex", "id": "2f60274fdc1c80adb7a5d6beeef3e544" },
-    { "path": "homebrew/specie-hb", "id": "2f00274fdc1c81a1bc4ddbf500704b80" },
-    { "path": "homebrew/classi-hb", "id": "2f70274fdc1c803ca5cafa97ca1817cd" },
-    { "path": "homebrew/mscge", "id": "2ff0274fdc1c8054a400c64b1fdd2ab9" },
-    { "path": "mestieri/guida", "id": "mestiere-come-funzionano" },
-    { "path": "mestieri/alchimista", "id": "mestiere-alchimista" },
-    { "path": "mestieri/architetto", "id": "mestiere-architetto" },
-    { "path": "mestieri/artigiano", "id": "mestiere-artigiano" },
-    { "path": "mestieri/artista", "id": "mestiere-artista" },
-    { "path": "mestieri/falegname", "id": "mestiere-falegname" },
-    { "path": "mestieri/metallurgo", "id": "mestiere-metallurgo" },
-    { "path": "mestieri/oste", "id": "mestiere-oste" },
-    { "path": "mestieri/sarto", "id": "mestiere-sarto" },
-    { "path": "mestieri/compendio", "id": "mestieri-compendio" },
-    { "path": "societa-licenze", "id": "societa-licenze" },
-    { "path": "lore/mondo/introduzione", "id": "2f60274fdc1c80558d8fe99842377aef" },
-    { "path": "lore/mondo/introduzione/storia", "id": "2fc0274fdc1c80c4bbc1c8806f591e0f" },
-    { "path": "lore/mondo/esplora-dal-vivo", "id": "3090274fdc1c80008f0dffe3a677cb66" },
-    { "path": "lore/mondo/esplora-dal-vivo/marche-di-arcamis", "id": "30d0274fdc1c805cbbc2daf73b5f3a66" },
-    { "path": "lore/mondo/extra", "id": "3410274fdc1c805d891bcbda6364e0ad" },
-    { "path": "lore/mondo/bibliografia", "id": "3040274fdc1c80ed816ef58f6a606f21" },
-    { "path": "lore/mondo/linguaggi", "id": "2fb0274fdc1c8073addaf1d5a3e9768b" },
-    { "path": "lore/mondo/pde", "id": "2fb0274fdc1c8080b07bd553e953c88d" },
-    { "path": "lore/mondo/npc", "id": "2f90274fdc1c8015bf95f52c4e7681b8" },
-    { "path": "mappe/arcamis", "id": "2f10274fdc1c80dca8caeb2e6de23146" },
-    { "path": "personaggio/andando-avanti", "id": "5cea525d149f4acb9c59007bf6b3d5ff" },
-    { "path": "sottoclassi", "id": "2f70274fdc1c80e3bdc7f95f81eb9cc0" },
-    { "path": "specie-homebrew", "id": "2f60274fdc1c80fba671c588ba93b116" }
+    {
+      "path": "regole/gameplay/combattimento",
+      "id": "2f60274fdc1c80b7a729ef091b278682"
+    },
+    {
+      "path": "regole/gameplay/codex",
+      "id": "2f60274fdc1c80adb7a5d6beeef3e544"
+    },
+    {
+      "path": "homebrew/specie-hb",
+      "id": "2f00274fdc1c81a1bc4ddbf500704b80"
+    },
+    {
+      "path": "homebrew/classi-hb",
+      "id": "2f70274fdc1c803ca5cafa97ca1817cd"
+    },
+    {
+      "path": "homebrew/mscge",
+      "id": "2ff0274fdc1c8054a400c64b1fdd2ab9"
+    },
+    {
+      "path": "mestieri/guida",
+      "id": "mestiere-come-funzionano"
+    },
+    {
+      "path": "mestieri/alchimista",
+      "id": "mestiere-alchimista"
+    },
+    {
+      "path": "mestieri/architetto",
+      "id": "mestiere-architetto"
+    },
+    {
+      "path": "mestieri/artigiano",
+      "id": "mestiere-artigiano"
+    },
+    {
+      "path": "mestieri/artista",
+      "id": "mestiere-artista"
+    },
+    {
+      "path": "mestieri/falegname",
+      "id": "mestiere-falegname"
+    },
+    {
+      "path": "mestieri/metallurgo",
+      "id": "mestiere-metallurgo"
+    },
+    {
+      "path": "mestieri/oste",
+      "id": "mestiere-oste"
+    },
+    {
+      "path": "mestieri/sarto",
+      "id": "mestiere-sarto"
+    },
+    {
+      "path": "mestieri/compendio",
+      "id": "mestieri-compendio"
+    },
+    {
+      "path": "societa-licenze",
+      "id": "societa-licenze"
+    },
+    {
+      "path": "lore/mondo/introduzione",
+      "id": "2f60274fdc1c80558d8fe99842377aef"
+    },
+    {
+      "path": "lore/mondo/introduzione/storia",
+      "id": "2fc0274fdc1c80c4bbc1c8806f591e0f"
+    },
+    {
+      "path": "lore/mondo/esplora-dal-vivo",
+      "id": "3090274fdc1c80008f0dffe3a677cb66"
+    },
+    {
+      "path": "lore/mondo/esplora-dal-vivo/marche-di-arcamis",
+      "id": "30d0274fdc1c805cbbc2daf73b5f3a66"
+    },
+    {
+      "path": "lore/mondo/extra",
+      "id": "3410274fdc1c805d891bcbda6364e0ad"
+    },
+    {
+      "path": "lore/mondo/bibliografia",
+      "id": "3040274fdc1c80ed816ef58f6a606f21"
+    },
+    {
+      "path": "lore/mondo/linguaggi",
+      "id": "2fb0274fdc1c8073addaf1d5a3e9768b"
+    },
+    {
+      "path": "lore/mondo/pde",
+      "id": "2fb0274fdc1c8080b07bd553e953c88d"
+    },
+    {
+      "path": "lore/mondo/npc",
+      "id": "2f90274fdc1c8015bf95f52c4e7681b8"
+    },
+    {
+      "path": "mappe/arcamis",
+      "id": "2f10274fdc1c80dca8caeb2e6de23146"
+    },
+    {
+      "path": "personaggio/andando-avanti",
+      "id": "5cea525d149f4acb9c59007bf6b3d5ff"
+    },
+    {
+      "path": "sottoclassi",
+      "id": "2f70274fdc1c80e3bdc7f95f81eb9cc0"
+    },
+    {
+      "path": "specie-homebrew",
+      "id": "2f60274fdc1c80fba671c588ba93b116"
+    }
   ],
-
   "databases": [
-    { "name": "gallery", "label": "Galleria PG", "dbId": "2fd0274fdc1c80038889fc072a360bae" },
-    { "name": "npc", "label": "NPC", "dbId": "3320274fdc1c805090becb2a5a0414e1" },
-    { "name": "biblioteca", "label": "Biblioteca", "dbId": "3040274fdc1c80e0a0dccfa9761bff55" },
-    { "name": "timeline", "label": "Timeline", "dbId": "2fc0274fdc1c800f8ac0d6d03b255cad" },
-    { "name": "subclasses", "label": "Subclass", "dbId": "2f70274fdc1c80e3bdc7f95f81eb9cc0" },
-    { "name": "species", "label": "Specie", "dbId": "3350274fdc1c808fba5ed9ad1f3b4bb4" }
+    {
+      "name": "gallery",
+      "label": "Galleria PG",
+      "dbId": "2fd0274fdc1c80038889fc072a360bae"
+    },
+    {
+      "name": "npc",
+      "label": "NPC",
+      "dbId": "3320274fdc1c805090becb2a5a0414e1"
+    },
+    {
+      "name": "biblioteca",
+      "label": "Biblioteca",
+      "dbId": "3040274fdc1c80e0a0dccfa9761bff55"
+    },
+    {
+      "name": "timeline",
+      "label": "Timeline",
+      "dbId": "2fc0274fdc1c800f8ac0d6d03b255cad"
+    },
+    {
+      "name": "subclasses",
+      "label": "Subclass",
+      "dbId": "2f70274fdc1c80e3bdc7f95f81eb9cc0"
+    },
+    {
+      "name": "species",
+      "label": "Specie",
+      "dbId": "3350274fdc1c808fba5ed9ad1f3b4bb4"
+    }
   ],
-
   "indexDatabases": [
-    { "id": "2fd0274fdc1c80038889fc072a360bae", "label": "Galleria PG" },
-    { "id": "2f60274fdc1c80fba671c588ba93b116", "label": "Specie HB" },
-    { "id": "2ff0274fdc1c807ea473db02ac4ae391", "label": "Specie HB alt" },
-    { "id": "2f70274fdc1c80e3bdc7f95f81eb9cc0", "label": "Sottoclassi HB" },
-    { "id": "3350274fdc1c808fba5ed9ad1f3b4bb4", "label": "Classi HB" },
-    { "id": "3040274fdc1c80e0a0dccfa9761bff55", "label": "Biblioteca" },
-    { "id": "2f90274fdc1c8015bf95f52c4e7681b8", "label": "NPC" }
+    {
+      "id": "2fd0274fdc1c80038889fc072a360bae",
+      "label": "Galleria PG"
+    },
+    {
+      "id": "2f60274fdc1c80fba671c588ba93b116",
+      "label": "Specie HB"
+    },
+    {
+      "id": "2ff0274fdc1c807ea473db02ac4ae391",
+      "label": "Specie HB alt"
+    },
+    {
+      "id": "2f70274fdc1c80e3bdc7f95f81eb9cc0",
+      "label": "Sottoclassi HB"
+    },
+    {
+      "id": "3350274fdc1c808fba5ed9ad1f3b4bb4",
+      "label": "Classi HB"
+    },
+    {
+      "id": "3040274fdc1c80e0a0dccfa9761bff55",
+      "label": "Biblioteca"
+    },
+    {
+      "id": "2f90274fdc1c8015bf95f52c4e7681b8",
+      "label": "NPC"
+    }
   ],
-
   "sitemap": [
-    { "path": "regole/gameplay", "changefreq": "weekly", "priority": "0.9" },
-    { "path": "personaggio/galleria-pg", "changefreq": "weekly", "priority": "0.7" },
-    { "path": "lore/storia", "changefreq": "monthly", "priority": "0.8" },
-    { "path": "lore/pantheon", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "homebrew", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "lavori/gilda-avventurieri", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "lavori/locanda", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "lavori/forgia", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "lavori/biblioteca", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "lavori/bottega-farmaceutica", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "lavori/caserma", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "lavori/ospedale", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "lavori/sartoria", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "mappe", "changefreq": "monthly", "priority": "0.6" },
-    { "path": "changelog", "changefreq": "weekly", "priority": "0.5" },
-    { "path": "maestria-titoli", "changefreq": "monthly", "priority": "0.6" },
-    { "path": "materiale-approvato", "changefreq": "monthly", "priority": "0.6" }
+    {
+      "path": "regole/gameplay",
+      "changefreq": "weekly",
+      "priority": "0.9"
+    },
+    {
+      "path": "personaggio/galleria-pg",
+      "changefreq": "weekly",
+      "priority": "0.7"
+    },
+    {
+      "path": "lore/storia",
+      "changefreq": "monthly",
+      "priority": "0.8"
+    },
+    {
+      "path": "lore/pantheon",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "homebrew",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "lavori/gilda-avventurieri",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "lavori/locanda",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "lavori/forgia",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "lavori/biblioteca",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "lavori/bottega-farmaceutica",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "lavori/caserma",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "lavori/ospedale",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "lavori/sartoria",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "mappe",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "changelog",
+      "changefreq": "weekly",
+      "priority": "0.5"
+    },
+    {
+      "path": "maestria-titoli",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "materiale-approvato",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    }
   ]
 }
