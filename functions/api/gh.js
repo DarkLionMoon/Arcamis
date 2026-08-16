@@ -15,7 +15,12 @@
 export async function onRequest(context) {
   const { request, env } = context;
   const KV = env.ARCAMIS_CACHE;
-  const GH_TOKEN = env.GH_TOKEN || '';
+  /* Token GitHub: prioritario l'env GH_TOKEN (segreto di Cloudflare Pages),
+     altrimenti il token salvato dall'admin in KV (azione set_gh_token). */
+  let GH_TOKEN = env.GH_TOKEN || '';
+  if (!GH_TOKEN && KV) {
+    try { GH_TOKEN = (await KV.get('gh_token')) || ''; } catch (_) {}
+  }
   const GH_REPO = env.GH_REPO || 'DarkLionMoon/Arcamis';
   const GH_BRANCH = env.GH_BRANCH || 'main';
 
@@ -58,7 +63,7 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
   }
   if (!GH_TOKEN) {
-    return new Response(JSON.stringify({ error: 'GH_TOKEN non configurato' }), { status: 501, headers: cors });
+    return new Response(JSON.stringify({ error: 'GH_TOKEN non configurato: imposta la variabile d\'ambiente GH_TOKEN in Cloudflare Pages oppure configuralo da Admin → Impostazioni → Repository → GitHub token' }), { status: 501, headers: cors });
   }
 
   const action = body.action;

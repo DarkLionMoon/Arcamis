@@ -50,6 +50,19 @@ export async function onRequest(context) {
     } catch (e) { return false; }
   }
 
+  /* ── Helper: ruolo della sessione corrente (o null) ── */
+  async function sessionRole() {
+    const token = getCookie('arc_admin');
+    if (!token) return null;
+    try {
+      const stored = await KV.get('admin_session_' + token);
+      if (!stored) return null;
+      if (stored === 'valid') return 'admin';
+      const session = JSON.parse(stored);
+      return (session && session.role) || null;
+    } catch (e) { return null; }
+  }
+
   /* ── Helper: genera token casuale ── */
   function genToken() {
     const arr = new Uint8Array(32);
@@ -226,6 +239,35 @@ export async function onRequest(context) {
   const authed = await checkSession();
   if (!authed) {
     return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+  }
+
+  /* ════ STATO GITHUB TOKEN ════ */
+  if (action === 'gh_token_status') {
+    const stored = KV ? await KV.get('gh_token') : null;
+    const configured = !!(env.GH_TOKEN || stored);
+    return new Response(JSON.stringify({
+      configured: configured,
+      source: env.GH_TOKEN ? 'env' : (stored ? 'kv' : 'none'),
+      canAdmin: (await sessionRole()) === 'admin'
+    }), { headers: cors });
+  }
+
+  /* ════ CONFIGURA GITHUB TOKEN (solo admin) ════ */
+  if (action === 'set_gh_token' && request.method === 'POST') {
+    if ((await sessionRole()) !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Richiede ruolo admin' }), { status: 403, headers: cors });
+    }
+    let body;
+    try { body = await request.json(); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    const ghToken = (body.token || '').trim();
+    if (!ghToken) {
+      return new Response(JSON.stringify({ error: 'token mancante' }), { status: 400, headers: cors });
+    }
+    await KV.put('gh_token', ghToken);
+    await writeAdminLog('set_gh_token', 'gh_token', 'configurato');
+    return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
 
   /* ════ GET LOG ════ */

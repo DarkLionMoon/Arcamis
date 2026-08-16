@@ -704,6 +704,8 @@ async function openSettings(){
     +'<div class="kv-rows">'
     +'<div class="kv-row"><div class="kv-main"><div class="kt">GitHub</div><div class="ks">'+esc(GH_REPO)+' · ramo '+esc(GH_BRANCH)+'</div></div></div>'
     +'<div class="kv-row"><div class="kv-main"><div class="kt">Contenuti</div><div class="ks">pagine wiki sotto /content</div></div></div>'
+    +'<div class="kv-row"><div class="kv-main"><div class="kt">GitHub token</div><div class="ks" id="gh-token-st">verifica…</div></div>'
+    +'<div class="ract"><button class="btn btn-soft btn-sm" onclick="openGHTokenModal()">Configura</button></div></div>'
     +'<div class="kv-row"><div class="kv-main"><div class="kt">Sito</div><div class="ks">https://arcamis.pages.dev</div></div>'
     +'<div class="ract"><a class="btn btn-soft btn-sm" href="https://arcamis.pages.dev" target="_blank" rel="noopener">Apri</a></div></div>'
     +'</div></div>';
@@ -716,6 +718,41 @@ async function openSettings(){
   h+='</div>';
   document.getElementById('main').innerHTML=h;
   pingDeployStatus();
+  refreshGHTokenStatus();
+}
+async function refreshGHTokenStatus(){
+  var el=document.getElementById('gh-token-st');
+  if(!el)return;
+  try{
+    var r=await fetch('/api/admin?action=gh_token_status',{credentials:'include'});
+    var j=await r.json();
+    if(j.configured)el.textContent=j.source==='env'?'Configurato (variabile d\'ambiente)':'Configurato (server)';
+    else el.textContent='Non configurato — il proxy GitHub non funziona';
+  }catch(e){el.textContent='non verificabile'}
+}
+function openGHTokenModal(){
+  var id='gh-token-modal';
+  modalHtml(id,'🔑 GitHub token',
+    '<div class="fld"><label>Personal Access Token (scope repo)</label>'
+    +'<input id="gh-token-in" class="in" type="password" placeholder="ghp_…" autocomplete="off" style="font-family:var(--mono)"></div>'
+    +'<div class="panel-sub">Il token viene salvato solo lato server (KV ARCAMIS_CACHE) e usato dal proxy /api/gh; non esce mai dal server. Generane uno con scope minimo in GitHub → Settings → Developer settings → Personal access tokens (classic, permesso repo).</div>'
+    +'<div class="md-status" id="gh-token-st-msg"></div>',
+    '<button class="btn btn-soft" onclick="closeModal(\''+id+'\')">Annulla</button>'
+    +'<button class="btn btn-p" onclick="saveGhToken()">SALVA</button>');
+}
+async function saveGhToken(){
+  var st=document.getElementById('gh-token-st-msg');
+  var inp=document.getElementById('gh-token-in');
+  var token=inp?(inp.value||'').trim():'';
+  if(!token){if(st){st.textContent='Inserisci il token';st.className='md-status err'};return}
+  try{
+    var r=await fetch('/api/admin?action=set_gh_token',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:token})});
+    var j=await r.json();
+    if(!r.ok)throw new Error(j.error||('Errore '+r.status));
+    closeModal('gh-token-modal');
+    toast('Token GitHub salvato','success');
+    refreshGHTokenStatus();
+  }catch(e){if(st){st.textContent='Errore: '+e.message;st.className='md-status err'}}
 }
 async function pingDeployStatus(){
   var el=document.getElementById('dep-status');
