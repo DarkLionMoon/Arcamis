@@ -678,12 +678,14 @@ async function openSettings(){
   var h=viewHead('⚙️','Impostazioni','Configurazione di sezioni, editor e deploy',
     '<button class="btn btn-p" onclick="openSettings()">⟳ AGGIORNA</button>');
   h+='<div class="panel"><div class="panel-head"><h3>Sezioni del menu</h3><span class="hint">usate per raggruppare pagine e generare gli URL</span></div>'
-    +'<div class="panel-sub">Le sezioni compaiono nel menu del sito e nella creazione di nuove pagine. Elimina una riga per togliere la sezione (le modifiche valgono dopo SALVA SEZIONI).</div>'
+    +'<div class="panel-sub">Le sezioni compaiono nel menu del sito e nella creazione di nuove pagine. Elimina una riga per togliere la sezione, usa ↑/↓ per riordinare (le modifiche valgono dopo SALVA SEZIONI).</div>'
     +'<div class="kv-rows" id="sec-rows">';
   SECTIONS.forEach(function(s,i){
     h+='<div class="kv-row" id="sec-row-'+i+'">'
       +'<div class="kv-main"><input id="sec-l-'+i+'" class="in" value="'+escAttr(s.l)+'" placeholder="Etichetta"></div>'
       +'<input id="sec-v-'+i+'" class="in" style="width:170px;font-family:var(--mono)" value="'+escAttr(s.v)+'" placeholder="valore URL">'
+      +'<button class="btn btn-soft btn-sm" title="Sposta su" onclick="moveSection('+i+',-1)">↑</button>'
+      +'<button class="btn btn-soft btn-sm" title="Sposta giù" onclick="moveSection('+i+',1)">↓</button>'
       +'<button class="btn btn-d btn-sm" title="Elimina sezione" onclick="delSection('+i+')">✕</button>'
       +'</div>';
   });
@@ -779,7 +781,18 @@ function addSection(){
     '<div class="kv-row" id="sec-row-'+i+'">'
     +'<div class="kv-main"><input id="sec-l-'+i+'" class="in" value="" placeholder="Etichetta sezione"></div>'
     +'<input id="sec-v-'+i+'" class="in" style="width:170px;font-family:var(--mono)" value="" placeholder="valore URL">'
-    +'<button class="btn btn-d btn-sm" onclick="delSection('+i+')">✕</button></div>');
+    +'<button class="btn btn-soft btn-sm" title="Sposta su" onclick="moveSection('+i+',-1)">↑</button>'
+    +'<button class="btn btn-soft btn-sm" title="Sposta giù" onclick="moveSection('+i+',1)">↓</button>'
+    +'<button class="btn btn-d btn-sm" title="Elimina sezione" onclick="delSection('+i+')">✕</button></div>');
+}
+function moveSection(i,dir){
+  var row=document.getElementById('sec-row-'+i);
+  if(!row)return;
+  var sib=dir<0?row.previousElementSibling:row.nextElementSibling;
+  if(!sib)return;
+  var wrap=document.getElementById('sec-rows');
+  if(dir<0)wrap.insertBefore(row,sib);
+  else wrap.insertBefore(sib,row);
 }
 function delSection(i){
   var row=document.getElementById('sec-row-'+i);
@@ -803,10 +816,11 @@ async function saveSections(){
   try{
     var d=await ghGet('admin/index.html');
     var s=b64decode(d.content);
-    var start=s.indexOf('var SECTIONS = [');
+    var marker='window.ArcAdmin.sections = [';
+    var start=s.indexOf(marker);
     var end=s.indexOf('];',start);
-    if(start===-1||end===-1)throw new Error('SECTIONS non trovato in admin/index.html');
-    var block='var SECTIONS = [\n'+rows.map(function(r){return '  {v:'+JSON.stringify(r.v)+',l:'+JSON.stringify(r.l)+'}'}).join(',\n')+'\n];';
+    if(start===-1||end===-1)throw new Error('Sezioni non trovate in admin/index.html');
+    var block='window.ArcAdmin.sections = [\n'+rows.map(function(r){return '  {v:'+JSON.stringify(r.v)+',l:'+JSON.stringify(r.l)+'}'}).join(',\n')+'\n];';
     await ghPut('admin/index.html','admin: update sections',s.slice(0,start)+block+s.slice(end+2),d.sha);
     var siteRows=rows.filter(function(r){return r.v});
     var d2=await ghGet('scripts/js/data.js');
