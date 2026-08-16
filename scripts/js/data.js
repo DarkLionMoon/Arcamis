@@ -13,7 +13,6 @@ var pages = [
   {k:'selva',l:'Selva Fogliabruna',i:'🍂',id:'30d0274fdc1c800999feeb0ca6669b22'},
   {k:'foresta',l:'Foresta Smarrimento',i:'🌲',id:'30d0274fdc1c8016b113d5c2d7662d8f'},
   {k:'volonx',l:'Volonx',i:'🏔️',id:'30d0274fdc1c804b9cb7e366f02bd635'},
-  {k:'arpax',l:'Arpax',i:'🦅',id:'30d0274fdc1c807eb443f55071f00844'},
   {k:'deserto',l:'Deserto del Crepuscolo',i:'🔥',id:'2f00274fdc1c805ca01ec57f18d2ffee'},
   {k:'gilda',l:'Gilda degli avventurieri',i:'🗡️',id:'2f00274fdc1c801b8c13cefd9e15694e'},
   {k:'locanda',l:'Locanda',i:'🍺',id:'2f00274fdc1c80faa99eda064ef0fabc'},
