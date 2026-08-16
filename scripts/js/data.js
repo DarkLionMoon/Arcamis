@@ -7,7 +7,6 @@ var ROOT = '2f00274fdc1c801a9b39d8d69800f7a8';
 var GUILD = '1348723468157456425';
 
 var pages = [
-  {k:'farmacia',l:'Bottega farmaceutica',i:'🧪',id:'3090274fdc1c8013a183dfc31297c477'},
   {k:'arcamis',l:'Arcamis',i:'🏰',id:'3090274fdc1c80e1a365ce1c36873455'},
   {k:'selva',l:'Selva Fogliabruna',i:'🍂',id:'30d0274fdc1c800999feeb0ca6669b22'},
   {k:'foresta',l:'Foresta Smarrimento',i:'🌲',id:'30d0274fdc1c8016b113d5c2d7662d8f'},
