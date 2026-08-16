@@ -1,23 +1,21 @@
 const PAGES_TO_INDEX = [
-  { id:'2f00274fdc1c8065a11ff45192aa5dcb', title:'Gameplay',                    icon:'⚔️' },
-  { id:'3130274fdc1c807eb61fde24e8236659', title:'Materiale approvato',         icon:'📋' },
-  { id:'2dd222f22ef8413f8cb48f03bbb4f4b0', title:'Come si inizia',              icon:'🌟' },
-  { id:'5cea525d149f4acb9c59007bf6b3d5ff', title:'Andando avanti',              icon:'📈' },
-  { id:'2f00274fdc1c801b8c13cefd9e15694e', title:'Gilda avventurieri',          icon:'🗡️' },
-  { id:'2f00274fdc1c80faa99eda064ef0fabc', title:'Locanda',                     icon:'🍺' },
-  { id:'2f00274fdc1c805ca01ec57f18d2ffee', title:'Forgia',                      icon:'🔥' },
-  { id:'2f00274fdc1c8089bfe6c24434d53b67', title:'Biblioteca',                  icon:'📚' },
-  { id:'2f00274fdc1c801c9697e75caa8d5f13', title:'Bottega farmaceutica',        icon:'💊' },
-  { id:'2ff0274fdc1c80688dd6c2b293a1f626', title:'Caserma',                     icon:'🛡️' },
-  { id:'2ff0274fdc1c80769a4ae243f22f0582', title:'Corporazione dei costruttori',icon:'🔨' },
-  { id:'2f00274fdc1c807aa03cc6cbeb3687cc', title:'Ospedale',                    icon:'⚕️' },
-  { id:'2ff0274fdc1c8035bad4f0b6ab705192', title:'Sartoria',                    icon:'🧵' },
-  { id:'3460274fdc1c800c8b3bf9a53d0cbf59', title:'Tribunale',                   icon:'⚖️' },
-  { id:'2f00274fdc1c806f8f17dbc6532d2211', title:'Storia del mondo',            icon:'📖' },
-  { id:'2f00274fdc1c80679bd3c3df8a1fa040', title:'Pantheon',                    icon:'🛐' },
-  { id:'2f10274fdc1c80489f23c49164747770', title:'Mappe',                       icon:'🗺️' },
-  { id:'2f00274fdc1c802a9babd4239d97a319', title:'Maestria / Titoli',           icon:'🏅' },
-  { id:'2f00274fdc1c80e78ad7ce985007b7c6', title:'Homebrew',                    icon:'⚗️' },
+  { id:'2f00274fdc1c8089bfe6c24434d53b67', title:'Biblioteca', icon:'📚' },
+  { id:'2f00274fdc1c805ca01ec57f18d2ffee', title:'Deserto del Crepuscolo', icon:'🔥' },
+  { id:'2f00274fdc1c801b8c13cefd9e15694e', title:'Gilda degli avventurieri', icon:'🗡️' },
+  { id:'2f00274fdc1c80faa99eda064ef0fabc', title:'Locanda', icon:'🍺' },
+  { id:'2f00274fdc1c807aa03cc6cbeb3687cc', title:'Ospedale', icon:'⚕️' },
+  { id:'2ff0274fdc1c8035bad4f0b6ab705192', title:'Sartoria', icon:'🧵' },
+  { id:'2f00274fdc1c802a9babd4239d97a319', title:'Maestria / Titoli', icon:'🔨' },
+  { id:'2f00274fdc1c8065a11ff45192aa5dcb', title:'Gameplay', icon:'⚔️' },
+  { id:'3130274fdc1c807eb61fde24e8236659', title:'Materiale approvato', icon:'📋' },
+  { id:'2f00274fdc1c801c9697e75caa8d5f13', title:'Bottega farmaceutica', icon:'💊' },
+  { id:'2ff0274fdc1c80688dd6c2b293a1f626', title:'Caserma', icon:'🛡️' },
+  { id:'2ff0274fdc1c80769a4ae243f22f0582', title:'Corporazione dei costruttori', icon:'🔨' },
+  { id:'3460274fdc1c800c8b3bf9a53d0cbf59', title:'Tribunale', icon:'⚖️' },
+  { id:'2f00274fdc1c806f8f17dbc6532d2211', title:'Storia del mondo', icon:'📖' },
+  { id:'2f00274fdc1c80679bd3c3df8a1fa040', title:'Pantheon', icon:'🛐' },
+  { id:'2f10274fdc1c80489f23c49164747770', title:'Mappe', icon:'🗺️' },
+  { id:'2f00274fdc1c80e78ad7ce985007b7c6', title:'Homebrew', icon:'⚗️' }
 ];
 
 const DATABASES_TO_INDEX = [
@@ -27,7 +25,7 @@ const DATABASES_TO_INDEX = [
   { id:'2f70274fdc1c80e3bdc7f95f81eb9cc0', label:'Sottoclassi HB' },
   { id:'3350274fdc1c808fba5ed9ad1f3b4bb4', label:'Classi HB' },
   { id:'3040274fdc1c80e0a0dccfa9761bff55', label:'Biblioteca' },
-  { id:'2f90274fdc1c8015bf95f52c4e7681b8', label:'NPC' },
+  { id:'2f90274fdc1c8015bf95f52c4e7681b8', label:'NPC' }
 ];
 
 async function fetchBlocks(pageId, token) {

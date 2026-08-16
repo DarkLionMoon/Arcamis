@@ -84,34 +84,27 @@ function _mdToHtml(md){
 
 /* ════ SLUG MAP (legacy — usata per retrocompatibilità ?p= ) ════ */
 var _slugMap = {
-  /* Regole */
-  'gameplay':               '2f00274fdc1c8065a11ff45192aa5dcb',
-  'materiale-approvato':    '3130274fdc1c807eb61fde24e8236659',
-  /* Personaggio */
-  'come-si-inizia':         '2dd222f22ef8413f8cb48f03bbb4f4b0',
-  'andando-avanti':         '5cea525d149f4acb9c59007bf6b3d5ff',
-  'galleria-pg':            '2fd0274fdc1c80d8b948c4133f874f28',
-  'homebrew':               '2f00274fdc1c80e78ad7ce985007b7c6',
-  'maestria-titoli':        '2f00274fdc1c802a9babd4239d97a319',
-  /* Lavori */
-  'gilda-avventurieri':     '2f00274fdc1c801b8c13cefd9e15694e',
-  'locanda':                '2f00274fdc1c80faa99eda064ef0fabc',
-  'forgia':                 '2f00274fdc1c805ca01ec57f18d2ffee',
-  'biblioteca':             '2f00274fdc1c8089bfe6c24434d53b67',
-  'bottega-farmaceutica':   '2f00274fdc1c801c9697e75caa8d5f13',
-  'caserma':                '2ff0274fdc1c80688dd6c2b293a1f626',
-  'corporazione-costruttori':'2ff0274fdc1c80769a4ae243f22f0582',
-  'ospedale':               '2f00274fdc1c807aa03cc6cbeb3687cc',
-  'sartoria':               '2ff0274fdc1c8035bad4f0b6ab705192',
-  /* Lore */
-  'storia-del-mondo':       '2f00274fdc1c806f8f17dbc6532d2211',
-  'pantheon':               '2f00274fdc1c80679bd3c3df8a1fa040',
-  'mappe':                  '2f10274fdc1c80489f23c49164747770',
-  'changelog':              '3000274fdc1c8033a214c44a1aa7f01f',
-  /* Gallerie/Speciali */
-  'biblioteca-scoperta':    '3040274fdc1c80ed816ef58f6a6b6f21',
-  'specie-homebrew':        '2f60274fdc1c80fba671c588ba93b116',
-  'sottoclassi':            '2f70274fdc1c80e3bdc7f95f81eb9cc0',
+  'biblioteca': '2f00274fdc1c8089bfe6c24434d53b67',
+  'forgia': '2f00274fdc1c805ca01ec57f18d2ffee',
+  'gilda-avventurieri': '2f00274fdc1c801b8c13cefd9e15694e',
+  'locanda': '2f00274fdc1c80faa99eda064ef0fabc',
+  'ospedale': '2f00274fdc1c807aa03cc6cbeb3687cc',
+  'sartoria': '2ff0274fdc1c8035bad4f0b6ab705192',
+  'changelog': '3000274fdc1c8033a214c44a1aa7f01f',
+  'maestria-titoli': '2f00274fdc1c802a9babd4239d97a319',
+  'gameplay': '2f00274fdc1c8065a11ff45192aa5dcb',
+  'materiale-approvato': '3130274fdc1c807eb61fde24e8236659',
+  'galleria-pg': '2fd0274fdc1c80d8b948c4133f874f28',
+  'bottega-farmaceutica': '2f00274fdc1c801c9697e75caa8d5f13',
+  'caserma': '2ff0274fdc1c80688dd6c2b293a1f626',
+  'corporazione-costruttori': '2ff0274fdc1c80769a4ae243f22f0582',
+  'storia-del-mondo': '2f00274fdc1c806f8f17dbc6532d2211',
+  'pantheon': '2f00274fdc1c80679bd3c3df8a1fa040',
+  'mappe': '2f10274fdc1c80489f23c49164747770',
+  'homebrew': '2f00274fdc1c80e78ad7ce985007b7c6',
+  'biblioteca-scoperta': '3040274fdc1c80ed816ef58f6a6b6f21',
+  'specie-homebrew': '2f60274fdc1c80fba671c588ba93b116',
+  'sottoclassi': '2f70274fdc1c80e3bdc7f95f81eb9cc0'
 };
 
 /* ════ ID → PATH MAP (UUID / id-speciale → pathname pulito) ════
@@ -144,8 +137,7 @@ var _idToSlug = {};
 
 var _navMap = {
   '2f00274fdc1c8065a11ff45192aa5dcb': 'regole',
-  '2dd222f22ef8413f8cb48f03bbb4f4b0': 'lavori',
-  '2f00274fdc1c80e78ad7ce985007b7c6': 'lore',
+  '2f00274fdc1c80e78ad7ce985007b7c6': 'lore'
 };
 
 function _navKeyForPage(id){
@@ -173,10 +165,84 @@ function _urlForId(id){
   if(map[id]) return map[id];
   /* Fallback legacy slug */
   if(_idToSlug[id]) return '/' + _idToSlug[id];
-  /* Nessuna mappa — genera path automatico da UUID */
+/* Nessuna mappa — genera path automatico da UUID */
 return '/p/' + id;
 }
+
+/* ════ DETECT PAGE LAYOUT FROM NOTION DATA ════ */
+var _LAYOUT_DB_MAP = {
+  '2f60274fdc1c80b7a729ef091b278682': 'regole',
+  '2f60274fdc1c80adb7a5d6beeef3e544': 'regole',
+  '2f00274fdc1c806f8f17dbc6532d2211': 'lore',
+  '2f60274fdc1c80558d8fe99842377aef': 'lore',
+  '2fc0274fdc1c80c4bbc1c8806f591e0f': 'lore',
+  '3090274fdc1c80008f0dffe3a677cb66': 'lore',
+  '30d0274fdc1c805cbbc2daf73b5f3a66': 'lore',
+  '3040274fdc1c80ed816ef58f6a606f21': 'lore',
+  '2fb0274fdc1c8073addaf1d5a3e9768b': 'lore',
+  '2fb0274fdc1c8080b07bd553e953c88d': 'lore',
+  '2f90274fdc1c8015bf95f52c4e7681b8': 'lore',
+  '2f00274fdc1c80e78ad7ce985007b7c6': 'lore',
+  '2f00274fdc1c801b8c13cefd9e15694e': 'lavoro',
+  '2f00274fdc1c80faa99eda064ef0fabc': 'lavoro',
+  '2f00274fdc1c805ca01ec57f18d2ffee': 'lavoro',
+  '2f00274fdc1c8089bfe6c24434d53b67': 'lavoro',
+  '2f00274fdc1c801c9697e75caa8d5f13': 'lavoro',
+  '2ff0274fdc1c80688dd6c2b293a1f626': 'lavoro',
+  '2ff0274fdc1c80769a4ae243f22f0582': 'lavoro',
+  '2f00274fdc1c807aa03cc6cbeb3687cc': 'lavoro',
+  '2ff0274fdc1c8035bad4f0b6ab705192': 'lavoro',
+  '3130274fdc1c807eb61fde24e8236659': 'materiale',
+  '2f00274fdc1c80679bd3c3df8a1fa040': 'lore',
+  '2f70274fdc1c803ca5cafa97ca1817cd': 'bestiario',
+  '2f10274fdc1c80dca8caeb2e6de23146': 'fazioni',
+  '2ff0274fdc1c807ea473db02ac4ae391': 'oggetti',
+  '3350274fdc1c808fba5ed9ad1f3b4bb4': 'oggetti',
+  '2f70274fdc1c80e3bdc7f95f81eb9cc0': 'glossario',
+  '2fd0274fdc1c80038889fc072a360bae': 'galleria',
+  '3400274fdc1c80178db3dcf6ba7098aa': 'tabelle',
+  '2fc0274fdc1c800f8ac0d6d03b255cad': 'timeline'
+};
+
+function _detectPageLayout(pg, blocks, pageId, navKey) {
+  /* 1. Check parent database mapping */
+  var parentDb = pg.parent && pg.parent.database_id ? pg.parent.database_id.replace(/-/g, '') : null;
+  if (parentDb && _LAYOUT_DB_MAP[parentDb]) {
+    return _LAYOUT_DB_MAP[parentDb];
+  }
   
+  /* 2. Check direct page ID mapping */
+  if (_LAYOUT_DB_MAP[pageId]) {
+    return _LAYOUT_DB_MAP[pageId];
+  }
+  
+  /* 3. Check nav key (from breadcrumb hierarchy) */
+  if (navKey) {
+    if (navKey === 'regole') return 'regole';
+    if (navKey === 'lavori') return 'lavoro';
+    if (navKey === 'lore') return 'lore';
+    if (navKey === 'personaggio') return 'personaggio';
+  }
+  
+  /* 4. Check page icon for hints */
+  var icon = pg.icon && pg.icon.emoji ? pg.icon.emoji : '';
+  if (['📜', '📖', '📚', '🗒️', '🏛️', '📋'].indexOf(icon) > -1) return 'lore';
+  if (['⚔️', '🗡️', '🛡️', '⚡', '🐉', '💀', '🔥'].indexOf(icon) > -1) return 'bestiario';
+  if (['🏰', '🏛️', '⚖️', '👑', '🏴'].indexOf(icon) > -1) return 'fazioni';
+  if (['💰', '💎', '🗝️', '🔮', '⚗️', '📦', '🎒'].indexOf(icon) > -1) return 'oggetti';
+  if (['📝', '📐', '📏', '📊', '🗂️'].indexOf(icon) > -1) return 'tabelle';
+  if (['🎭', '🎨', '🖼️', '📷', '🎬'].indexOf(icon) > -1) return 'galleria';
+  
+  /* 5. Check content blocks for patterns */
+  var hasTable = blocks.some(function(b) { return b.type === 'table'; });
+  if (hasTable) return 'tabelle';
+  
+  var hasGallery = blocks.some(function(b) { return b.type === 'child_database' || b.type === 'collection_view'; });
+  if (hasGallery) return 'galleria';
+  
+  /* 6. Default */
+  return 'default';
+}
 
 function _renderLastUpdated(isoDate){
   if(!isoDate) return;
@@ -334,7 +400,7 @@ async function _gpRender(id,label,icon){
         phOverlay.style.opacity = '0';
         phIcon.style.opacity = '0.06';
         var _pbody = document.getElementById('pbody');
-        _pbody.className = 'page-' + id;
+        _pbody.className = 'page-' + id + ' page-lore';
         _pbody.style.maxWidth = '';
         _pbody.style.width = '';
         var _deityFooter = '<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
@@ -390,7 +456,8 @@ async function _gpRender(id,label,icon){
             _localHtml = (_localPage.k === 'materiale') ? _renderMateriale(_localJson.content) : (_localPage.k === 'regole' || _localPage.k === 'gameplay') ? _renderRegole(_localJson.content) : (_localPage.k === 'inizia' || _localPage.k === 'avanti') ? _renderPersonaggio(_localJson.content) : (_localPage.k === 'gilda' || _localPage.k === 'locanda' || _localPage.k === 'farmacia' || _localPage.k === 'biblioteca' || _localPage.k === 'ospedale' || _localPage.k === 'sartoria' || _localPage.k === 'deserto') ? _renderLavoro(_localJson.content, _localJson.title) : (_localPage.k === 'pantheon' || _localPage.k === 'maestria' || _localPage.k === 'arcamis' || _localPage.k === 'selva' || _localPage.k === 'foresta' || _localPage.k === 'volonx' || _localPage.k === 'arpax' || _localPage.k === 'galleria') ? _renderLore(_localJson.content, _localJson.title, _localJson.icon) : _mdToHtml(_localJson.content);
           }
           var pbody = document.getElementById('pbody');
-          pbody.className = 'page-' + id;
+          var layoutClass = _layout || 'default';
+          pbody.className = 'page-' + id + ' page-' + layoutClass;
           pbody.style.maxWidth = '';
           pbody.style.width = '';
           if(_layout === 'wide') { pbody.style.maxWidth = 'none'; pbody.style.width = '100%'; }
@@ -443,6 +510,9 @@ async function _gpRender(id,label,icon){
     var ptitle=ta.map(function(t){return t.plain_text}).join('')||label||'Pagina';
     var picon=pg.icon&&pg.icon.emoji?pg.icon.emoji:(icon||'📄');
 
+    /* Determine page layout type from Notion properties */
+    var pageLayout = _detectPageLayout(pg, bl, id, _navKeyForPage(id));
+
     phTitle.textContent=ptitle;
     phIcon.textContent=picon;
     phEyebrow.textContent='Archivi di Arcamis';
@@ -483,7 +553,7 @@ async function _gpRender(id,label,icon){
 
     var html=renderBlocks(bl,true);
     var pbody=document.getElementById('pbody');
-    pbody.className='page-'+id;
+    pbody.className='page-'+id+' page-'+pageLayout;
     pbody.style.maxWidth='';
     pbody.style.width='';
     var emptyHtml='<div class="n-empty"><div class="n-empty-icon">'+picon+'</div>'
