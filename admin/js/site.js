@@ -814,13 +814,26 @@ async function saveSections(){
   setStatus('saving','salvataggio sezioni…');
   if(st){st.textContent='Salvataggio…';st.className='md-status'}
   try{
+    var d0=await ghGet('content/pages/registry.json');
+    var reg=JSON.parse(b64decode(d0.content));
+    var byV={};
+    (reg.sections||[]).forEach(function(s){byV[s.v]=s});
+    reg.sections=rows.map(function(r){
+      var prev=byV[r.v]||{};
+      var s={v:r.v,l:r.l};
+      if(prev.pages)s.pages=prev.pages;
+      if(r.v===''||prev.adminOnly)s.adminOnly=true;
+      return s;
+    });
+    var regOut=JSON.stringify(reg,null,2)+'\n';
+    if(regOut!==b64decode(d0.content))await ghPut('content/pages/registry.json','admin: update sections',regOut,d0.sha);
     var d=await ghGet('admin/index.html');
     var s=b64decode(d.content);
     var marker='window.ArcAdmin.sections = [';
     var start=s.indexOf(marker);
     var end=s.indexOf('];',start);
     if(start===-1||end===-1)throw new Error('Sezioni non trovate in admin/index.html');
-    var block='window.ArcAdmin.sections = [\n'+rows.map(function(r){return '  {v:'+JSON.stringify(r.v)+',l:'+JSON.stringify(r.l)+'}'}).join(',\n')+'\n];';
+    var block='window.ArcAdmin.sections = [\n'+rows.map(function(r){return '{v:'+JSON.stringify(r.v)+',l:'+JSON.stringify(r.l)+'}'}).join(',\n')+'\n];';
     await ghPut('admin/index.html','admin: update sections',s.slice(0,start)+block+s.slice(end+2),d.sha);
     var siteRows=rows.filter(function(r){return r.v});
     var d2=await ghGet('scripts/js/data.js');
