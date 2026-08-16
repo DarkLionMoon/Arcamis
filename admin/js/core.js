@@ -1,14 +1,12 @@
 /* ════════════════════════════════════════════════════════════════
    ARCAMIS ADMIN — core.js
-   Config, stato, API GitHub, autenticazione, sidebar, dashboard,
-   ricerca contenuto, deploy timer. (v2)
+   Config, stato, API GitHub (proxy server-side), autenticazione,
+   sidebar, dashboard, ricerca contenuto, deploy timer. (v3)
    ════════════════════════════════════════════════════════════════ */
-var ADMIN_PW = 'b0b9dd19ef971d0b25d73afa6c1b1a1a52aff81b4c6259e067aa305e187119f5';
-var GH_REPO = 'DarkLionMoon/Arcamis';
-var GH_BRANCH = 'main';
-var CONTENT = 'content';
+var GH_REPO = ArcAdmin.CONFIG.repo;
+var GH_BRANCH = ArcAdmin.CONFIG.branch;
+var CONTENT = ArcAdmin.CONFIG.content;
 
-var _token = localStorage.getItem('arcamis_gh_token') || null;
 var _modified = false;
 var _current = null;
 var _autosaveTimer = null;
@@ -92,21 +90,10 @@ function modalHtml(id,title,bodyHtml,actionsHtml,size){
   return d;
 }
 
-/* ═══════════════ API GITHUB ═══════════════ */
-function _authHeaders(){
-  return {'Authorization':'token '+_token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};
-}
-async function _api(url,opts){
-  var r=await fetch(url,opts);
-  if(r.status===401){
-    _token=prompt('Token GitHub non valido o revocato. Inserisci un nuovo Personal Access Token:');
-    if(!_token){_token='';localStorage.removeItem('arcamis_gh_token');throw new Error('GitHub API 401 - token mancante')}
-    localStorage.setItem('arcamis_gh_token',_token);
-    opts.headers['Authorization']='token '+_token;
-    r=await fetch(url,opts);
-  }
-  return r;
-}
+/* ═══════════════ API GITHUB (proxy server-side) ═══════════════
+   Tutte le operazioni passano da /api/gh, che verifica la sessione
+   admin via cookie e usa il token server-side (GH_TOKEN): nessun
+   Personal Access Token viene mai esposto al browser. */
 async function ghProxy(action,payload){
   var r=await fetch('/api/gh',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:action,payload:payload})});
   if(!r.ok){
@@ -116,75 +103,23 @@ async function ghProxy(action,payload){
   return (await r.json()).data;
 }
 async function ghGet(path){
-  try{return await ghProxy('get',{path:path})}
-  catch(e){
-    var r=await _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path+'?ref='+GH_BRANCH,{headers:_authHeaders()});
-    if(!r.ok)throw new Error('GitHub API '+r.status);
-    return r.json();
-  }
+  return ghProxy('get',{path:path});
 }
 async function ghGetAt(path,ref){
-  try{return await ghProxy('get',{path:path,ref:ref})}
-  catch(e){
-    var r=await _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path+'?ref='+ref,{headers:_authHeaders()});
-    if(!r.ok)throw new Error('GitHub API '+r.status);
-    return r.json();
-  }
+  return ghProxy('get',{path:path,ref:ref});
 }
 async function ghPut(path,msg,content,sha){
-  try{return await ghProxy('put',{path:path,message:msg,content:btoa(unescape(encodeURIComponent(content))),sha:sha||null})}
-  catch(e){
-    var headers=_authHeaders();
-    async function put(s){
-      var body={message:msg,content:btoa(unescape(encodeURIComponent(content))),branch:GH_BRANCH};
-      if(s)body.sha=s;
-      return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)});
-    }
-    var r=await put(sha);
-    if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
-    if(!r.ok)throw new Error('GitHub API '+r.status);
-    return r.json();
-  }
+  return ghProxy('put',{path:path,message:msg,content:btoa(unescape(encodeURIComponent(content))),sha:sha||null});
 }
 async function ghPutBinary(path,msg,dataUri){
   var m=dataUri.match(/^data:[^;]+;base64,(.*)$/);
-  var b64=m?m[1]:dataUri;
-  try{return await ghProxy('binary',{path:path,message:msg,content:b64,sha:null})}
-  catch(e){
-    var headers=_authHeaders();
-    async function put(s){
-      var body={message:msg,content:b64,branch:GH_BRANCH};
-      if(s)body.sha=s;
-      return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'PUT',headers:headers,body:JSON.stringify(body)});
-    }
-    var r=await put(null);
-    if(r.status===409){var f=await ghGet(path);r=await put(f.sha)}
-    if(!r.ok)throw new Error('GitHub API '+r.status);
-    return r.json();
-  }
+  return ghProxy('binary',{path:path,message:msg,content:(m?m[1]:dataUri),sha:null});
 }
 async function ghDelete(path,msg,sha){
-  try{return await ghProxy('delete',{path:path,message:msg,sha:sha})}
-  catch(e){
-    var headers=_authHeaders();
-    async function del(s){
-      var body={message:msg,branch:GH_BRANCH};
-      if(s)body.sha=s;
-      return _api('https://api.github.com/repos/'+GH_REPO+'/contents/'+path,{method:'DELETE',headers:headers,body:JSON.stringify(body)});
-    }
-    var r=await del(sha);
-    if(r.status===409){var f=await ghGet(path);r=await del(f.sha)}
-    if(!r.ok)throw new Error('GitHub API '+r.status);
-    return r.json();
-  }
+  return ghProxy('delete',{path:path,message:msg,sha:sha});
 }
 async function ghCommits(path){
-  try{return await ghProxy('commits',{path:path,per_page:25})}
-  catch(e){
-    var r=await _api('https://api.github.com/repos/'+GH_REPO+'/commits?path='+encodeURIComponent(path)+'&per_page=25&sha='+GH_BRANCH,{headers:_authHeaders()});
-    if(!r.ok)throw new Error('GitHub API '+r.status);
-    return r.json();
-  }
+  return ghProxy('commits',{path:path,per_page:25});
 }
 function b64decode(s){return decodeURIComponent(escape(atob(s)))}
 function b64encode(s){return btoa(unescape(encodeURIComponent(s)))}
@@ -305,17 +240,13 @@ async function doLogin(){
   document.getElementById('login-err').style.display='none';
   var btn=document.getElementById('login-btn');
   if(btn)btn.disabled=true;
-  var ok=false,role='editor',serverAuth=false,serverReachable=true;
+  var ok=false,role='editor',serverReachable=true;
   try{
     var r=await fetch('/api/admin?action=login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({username:user,password:pw,remember:remember})});
     ok=r.ok;
-    if(ok){var j=await r.json();role=j.role||'editor';serverAuth=true;}
+    if(ok){var j=await r.json();role=j.role||'editor';}
   }catch(e){ok=false;serverReachable=false;}
-  if(!ok&&!serverReachable){
-    var h=await sha256(pw);
-    if(h===ADMIN_PW){ok=true;role='admin';}
-  }
   if(!ok){
     var errEl=document.getElementById('login-err');
     errEl.textContent=serverReachable?'Credenziali errate':'Server non raggiungibile';
@@ -324,7 +255,6 @@ async function doLogin(){
     return;
   }
   if(btn)btn.disabled=false;
-  if(!serverAuth)toast('Login offline: le operazioni server-side (es. gestione utenti) non saranno disponibili','error');
   _currentUser=user;_userRole=role;
   sessionStorage.setItem('arcadmin','1');
   document.getElementById('login').classList.add('hide');
@@ -345,7 +275,6 @@ function doLogout(){
   fetch('/api/admin?action=logout',{method:'POST',credentials:'include'}).catch(function(){});
   _stopAutosave();_autosaveClear();
   _currentUser=null;_userRole='admin';
-  _token=null;localStorage.removeItem('arcamis_gh_token');
   document.getElementById('app').style.display='none';
   document.getElementById('login').classList.remove('hide');
   document.getElementById('login-pw').value='';
@@ -619,3 +548,28 @@ function startDeployTimer(){
     }
   },1000);
 }
+
+/* ═══════════════ REGISTRAZIONE NAMESPACE ═══════════════ */
+ArcAdmin.state.user = _currentUser;
+ArcAdmin.state.role = _userRole;
+ArcAdmin.register('core', {
+  config: function(){return {repo:GH_REPO,branch:GH_BRANCH,content:CONTENT};},
+  api: {
+    get: ghGet, getAt: ghGetAt, put: ghPut, putBinary: ghPutBinary,
+    del: ghDelete, commits: ghCommits, proxy: ghProxy
+  },
+  auth: { login: doLogin, logout: doLogout },
+  ui: {
+    toast: toast, setStatus: setStatus, setBadge: setBadge,
+    setCrumb: setCrumb, setTitle: setTitle, modal: modalHtml,
+    closeModal: closeModal, viewHead: viewHead, dateFmt: dateFmt,
+    esc: esc, escAttr: escAttr, escJsAttr: escJsAttr
+  },
+  nav: { buildSidebar: buildSidebar, renderDashboard: renderDashboard },
+  session: {
+    user: function(){return _currentUser;},
+    role: function(){return _userRole;},
+    can: _can
+  },
+  audit: _logAudit
+});

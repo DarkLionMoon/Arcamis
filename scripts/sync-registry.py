@@ -12,10 +12,209 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 ROOT_DIR = SCRIPT_DIR.parent
 REGISTRY_PATH = ROOT_DIR / 'content' / 'pages' / 'registry.json'
+PAGES_DIR = ROOT_DIR / 'content' / 'pages'
+SCHEMA_DIR = ROOT_DIR / 'content' / 'schemas'
+REGISTRY_SCHEMA_PATH = SCHEMA_DIR / 'registry.schema.json'
+PAGE_SCHEMA_PATH = SCHEMA_DIR / 'page.schema.json'
 
 def load_registry():
     with open(REGISTRY_PATH, 'r', encoding='utf-8') as f:
         return json.load(f)
+
+def load_json(path, what):
+    with open(path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+# ════════════════════════════════════════════════════════════════
+#  VALIDAZIONE — schema JSON + integrità + link contenuti
+#  (pure Python: nessuna dipendenza esterna richiesta)
+# ════════════════════════════════════════════════════════════════
+
+def schema_error(path, msg):
+    return f"{path}: {msg}"
+
+def _type_matches(node, t):
+    if t == 'string':
+        return isinstance(node, str)
+    if t == 'boolean':
+        return isinstance(node, bool)
+    if t == 'integer':
+        return isinstance(node, int) and not isinstance(node, bool)
+    if t == 'number':
+        return isinstance(node, (int, float)) and not isinstance(node, bool)
+    if t == 'object':
+        return isinstance(node, dict)
+    if t == 'array':
+        return isinstance(node, list)
+    return True
+
+def _validate_node(node, schema, path, errors):
+    stype = schema.get('type')
+    if isinstance(stype, list):
+        if not any(_type_matches(node, t) for t in stype):
+            errors.append(schema_error(path, f"atteso {stype}, trovato {type(node).__name__}"))
+        return
+    if stype == 'object':
+        if not isinstance(node, dict):
+            errors.append(schema_error(path, f"atteso oggetto, trovato {type(node).__name__}"))
+            return
+        for req in schema.get('required', []):
+            if req not in node:
+                errors.append(schema_error(path, f"campo obbligatorio mancante: '{req}'"))
+        props = schema.get('properties', {})
+        for key, value in node.items():
+            if key in props:
+                _validate_node(value, props[key], f"{path}.{key}", errors)
+            elif schema.get('additionalProperties') is False:
+                errors.append(schema_error(path, f"proprietà non prevista: '{key}'"))
+    elif stype == 'array':
+        if not isinstance(node, list):
+            errors.append(schema_error(path, f"atteso array, trovato {type(node).__name__}"))
+            return
+        items = schema.get('items', {})
+        for i, value in enumerate(node):
+            _validate_node(value, items, f"{path}[{i}]", errors)
+    elif stype == 'string':
+        if not isinstance(node, str):
+            errors.append(schema_error(path, f"attesa stringa, trovato {type(node).__name__}"))
+        elif 'enum' in schema and node not in schema['enum']:
+            errors.append(schema_error(path, f"valore '{node}' non tra {schema['enum']}"))
+        elif 'pattern' in schema and not re.match(schema['pattern'], node):
+            errors.append(schema_error(path, f"'{node}' non rispetta il pattern {schema['pattern']}"))
+    elif stype == 'boolean':
+        if not isinstance(node, bool):
+            errors.append(schema_error(path, f"atteso boolean, trovato {type(node).__name__}"))
+    elif stype == 'integer':
+        if isinstance(node, bool) or not isinstance(node, int):
+            errors.append(schema_error(path, f"atteso intero, trovato {type(node).__name__}"))
+    elif stype == 'number':
+        if isinstance(node, bool) or not isinstance(node, (int, float)):
+            errors.append(schema_error(path, f"atteso numero, trovato {type(node).__name__}"))
+
+def validate_schema(reg, errors):
+    """Valida registry.json e i file pagina contro i rispettivi schemi."""
+    if REGISTRY_SCHEMA_PATH.exists():
+        schema = load_json(REGISTRY_SCHEMA_PATH, 'registry.schema.json')
+        _validate_node(reg, schema, 'registry.json', errors)
+    else:
+        errors.append(f"Schema registry mancante: {REGISTRY_SCHEMA_PATH}")
+
+    page_schema = load_json(PAGE_SCHEMA_PATH, 'page.schema.json') if PAGE_SCHEMA_PATH.exists() else None
+    if page_schema is None:
+        errors.append(f"Schema pagina mancante: {PAGE_SCHEMA_PATH}")
+        return
+
+    for f in sorted(PAGES_DIR.glob('*.json')):
+        if f.name == 'registry.json':
+            continue
+        try:
+            page = load_json(f, f.name)
+        except json.JSONDecodeError as e:
+            errors.append(schema_error(f.name, f"JSON non valido: {e}"))
+            continue
+        _validate_node(page, page_schema, f.name, errors)
+        if page.get('k') and page['k'] + '.json' != f.name:
+            errors.append(schema_error(f.name, f"la chiave 'k' ({page['k']}) non corrisponde al nome file"))
+
+def find_dups(items, key, label):
+    seen, dups = set(), set()
+    for it in items:
+        v = it.get(key)
+        if v in seen:
+            dups.add(v)
+        seen.add(v)
+    return dups
+
+def validate_integrity(reg, errors, warnings):
+    """Cross-reference registry: duplicati, riferimenti orfani, file mancanti/estranei."""
+    pages = reg.get('pages', [])
+    ids = {p['id'] for p in pages}
+    keys = {p['k'] for p in pages}
+
+    for v in find_dups(pages, 'k', 'chiave "k"'):
+        warnings.append(f"registry.json: chiave \"k\" duplicata: '{v}' (verifica che le pipeline admin/export non collidano)")
+    for label, key in (('id', 'id'), ('slug', 'slug'), ('path', 'path')):
+        for v in find_dups([p for p in pages if p.get(key)], key, label):
+            errors.append(f"registry.json: {label} duplicato: '{v}'")
+
+    def check_refs(items, ref_key, where):
+        for it in items:
+            rid = it if isinstance(it, str) else it.get(ref_key)
+            if rid and rid not in ids:
+                errors.append(f"registry.json: riferimento orfano a id '{rid}' in {where}")
+
+    for s in reg.get('sections', []):
+        check_refs(s.get('pages', []), 'pages', f"sections['{s.get('v')}']")
+    check_refs(reg.get('lavori', []), 'id', 'lavori')
+
+    known_paths = set()
+    for p in pages:
+        if p.get('path'):
+            if p['path'] in known_paths:
+                errors.append(f"registry.json: path duplicato: '{p['path']}'")
+            known_paths.add(p['path'])
+    for po in reg.get('pathOverrides', []):
+        if po.get('path') in known_paths:
+            errors.append(f"registry.json: path '{po['path']}' di pathOverrides in conflitto con un path di pagina")
+        known_paths.add(po.get('path'))
+
+    for p in pages:
+        if p.get('admin') and not (PAGES_DIR / (p['k'] + '.json')).exists():
+            errors.append(f"registry.json: pagina admin '{p['k']}' senza file locale content/pages/{p['k']}.json")
+
+    for f in sorted(PAGES_DIR.glob('*.json')):
+        if f.name == 'registry.json':
+            continue
+        k = f.stem
+        if k not in keys:
+            errors.append(f"file orfano: content/pages/{f.name} non presente nel registry")
+
+def validate_content_links(errors, warnings):
+    """Verifica che immagini e link markdown nei contenuti puntino a file esistenti."""
+    img_rx = re.compile(r'!\[[^\]]*\]\(([^)]+)\)')
+    link_rx = re.compile(r'(?<!!)\[[^\]]*\]\(([^)]+)\)')
+    refs = {}
+    for f in sorted(PAGES_DIR.glob('*.json')):
+        if f.name == 'registry.json':
+            continue
+        page = load_json(f, f.name)
+        content = page.get('content') or ''
+        for m in img_rx.finditer(content):
+            url = m.group(1).split('#')[0]
+            if url.startswith(('http://', 'https://', 'data:', 'mailto:', '#')):
+                continue
+            refs.setdefault(url, []).append((f.name, 'img'))
+        for m in link_rx.finditer(content):
+            url = m.group(1).split('#')[0]
+            if url.startswith(('http://', 'https://', 'data:', 'mailto:', '#')):
+                continue
+            refs.setdefault(url, []).append((f.name, 'link'))
+
+    for url, uses in refs.items():
+        path = url.split('#')[0]
+        if not path.startswith('/'):
+            warnings.append(f"contenuto: riferimento relativo senza '/' iniziale: '{url[:60]}…' (usato in {uses[0][0]})")
+            continue
+        rel = Path(path[1:])
+        if not (ROOT_DIR / rel).exists():
+            warnings.append(f"contenuto: riferimento mancante '{url}' (usato in {uses[0][0]})")
+
+def validate_all(reg):
+    """Esegue tutte le validazioni. Ritorna (errors, warnings)."""
+    errors, warnings = [], []
+    validate_schema(reg, errors)
+    validate_integrity(reg, errors, warnings)
+    validate_content_links(errors, warnings)
+    return errors, warnings
+
+def run_validation(reg):
+    errors, warnings = validate_all(reg)
+    for w in warnings:
+        print(f"⚠ {w}")
+    for e in errors:
+        print(f"✗ {e}")
+    print(f"\nValidazione: {len(errors)} errori, {len(warnings)} avvisi")
+    return errors
 
 def escape_js(s):
     return (str(s)
@@ -185,7 +384,16 @@ def replace_between(content, pattern, replacement):
     return regex.sub(replacement, content)
 
 def main():
+    check_mode = '--check' in sys.argv
     reg = load_registry()
+
+    errors = run_validation(reg)
+    if errors:
+        print('✗ Validazione fallita: generazione interrotta.')
+        return 1
+    if check_mode:
+        print('✓ OK: registry e pagine validi.')
+        return 0
 
     # 1. scripts/js/data.js
     write_file('scripts/js/data.js', generate_data_js(reg))
@@ -268,19 +476,19 @@ def main():
     )
     write_file('export/index.html', export_html)
 
-    # 7. admin/index.html inline script
+    # 7. admin/index.html inline script (namespace ArcAdmin)
     admin_path = ROOT_DIR / 'admin' / 'index.html'
     admin_html = admin_path.read_text(encoding='utf-8')
     adm_pages, adm_sections = generate_admin_inline(reg)
     admin_html = replace_between(
         admin_html,
-        r'var PAGES = \[[\s\S]*?\n\];',
-        f"var PAGES = [\n{',\n'.join(adm_pages)}\n];"
+        r'window\.ArcAdmin\.pages = \[[\s\S]*?\n\];',
+        f"window.ArcAdmin.pages = [\n{',\n'.join(adm_pages)}\n];"
     )
     admin_html = replace_between(
         admin_html,
-        r'var SECTIONS = \[[\s\S]*?\n\];',
-        f"var SECTIONS = [\n{',\n'.join(adm_sections)}\n];"
+        r'window\.ArcAdmin\.sections = \[[\s\S]*?\n\];',
+        f"window.ArcAdmin.sections = [\n{',\n'.join(adm_sections)}\n];"
     )
     write_file('admin/index.html', admin_html)
 
@@ -288,6 +496,7 @@ def main():
     write_file('sitemap.xml', generate_sitemap(reg))
 
     print('\n✓ All artifacts generated successfully!')
+    return 0
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

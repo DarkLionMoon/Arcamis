@@ -930,3 +930,18 @@ function _stPosSet(i,e){
   var y=Math.max(0,Math.min(100,Math.round((e.clientY-r.top)/r.height*100)));
   _stPosSetVal(i,[x,y]);
 }
+
+/* ═══════════════ REGISTRAZIONE NAMESPACE ═══════════════ */
+ArcAdmin.register('structured', {
+  setKind: _stSetKind,
+  read: _stRead,
+  commit: _stCommit,
+  sync: _stSync,
+  syncWithUndo: _stSyncWithUndo,
+  syncPreview: _stSyncPreview,
+  undo: _stUndo,
+  redo: _stRedo,
+  parse: _stParse,
+  buildMd: _stBuildMd,
+  preview: _stPreview
+});

@@ -799,3 +799,25 @@ async function saveSections(){
     if(st){st.textContent='✕ '+e.message;st.className='md-status err'}
   }
 }
+
+/* ═══════════════ REGISTRAZIONE NAMESPACE ═══════════════ */
+ArcAdmin.register('site', {
+  save: arcSave,
+  getCovers: arcGetCovers,
+  uploadImage: arcUploadImage,
+  openCarousel: openCarousel,
+  carSlideUpload: carSlideUpload,
+  carSaveImg: carSaveImg,
+  carRemoveImg: carRemoveImg,
+  carSaveText: carSaveText,
+  carSaveBtns: carSaveBtns,
+  openCovers: openCovers,
+  openCoverModal: openCoverModal,
+  coverFile: coverFile,
+  saveCover: saveCover,
+  removeCover: removeCover,
+  openNav: openNav,
+  navMove: navMove,
+  navSetSec: navSetSec,
+  navSetSub: navSetSub
+});

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://arcamis.pages.dev/schemas/page.schema.json",
+  "title": "Arcamis page",
+  "description": "File singolo di una pagina admin (content/pages/<k>.json), salvato dall'editor.",
+  "type": "object",
+  "required": ["k", "title", "icon", "content", "lastModified"],
+  "properties": {
+    "k": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Chiave univoca della pagina (nome file)" },
+    "title": { "type": "string", "minLength": 1 },
+    "icon": { "type": "string" },
+    "content": { "type": "string" },
+    "layout": { "type": "string", "enum": ["", "generico", "pantheon", "wide", "materiale"] },
+    "lastModified": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

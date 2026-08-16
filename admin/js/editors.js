@@ -1181,3 +1181,21 @@ function openImageUpload(){
   _current={type:'images',k:'img'};
   openImgDialog();
 }
+
+/* ═══════════════ REGISTRAZIONE NAMESPACE ═══════════════ */
+ArcAdmin.register('editors', {
+  openPage: openPage,
+  savePage: savePage,
+  runCmd: runCmd,
+  setViewMode: setViewMode,
+  onLayoutChange: onLayoutChange,
+  toggleOutline: toggleOutline,
+  wrapMd: wrapMd,
+  insMd: insMd,
+  openImages: openImages,
+  openImgDialog: openImgDialog,
+  renderPreview: renderPreview,
+  onMdInput: onMdInput,
+  onMetaInput: onMetaInput,
+  onMdKey: onMdKey
+});

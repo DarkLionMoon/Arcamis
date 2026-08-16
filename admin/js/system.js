@@ -186,3 +186,15 @@ document.addEventListener('keydown',function(e){
     }).catch(function(){});
   }
 })();
+
+/* ═══════════════ REGISTRAZIONE NAMESPACE ═══════════════ */
+ArcAdmin.register('system', {
+  openUsers: openUserManagement,
+  openAudit: openAudit,
+  addUserModal: openAddUserModal,
+  saveNewUser: saveNewUser,
+  editUserModal: openEditUserModal,
+  saveEditUser: saveEditUser,
+  deleteUser: deleteUserConfirm,
+  auditFilter: audFilter
+});
