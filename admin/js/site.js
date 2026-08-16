@@ -678,13 +678,13 @@ async function openSettings(){
   var h=viewHead('⚙️','Impostazioni','Configurazione di sezioni, editor e deploy',
     '<button class="btn btn-p" onclick="openSettings()">⟳ AGGIORNA</button>');
   h+='<div class="panel"><div class="panel-head"><h3>Sezioni del menu</h3><span class="hint">usate per raggruppare pagine e generare gli URL</span></div>'
-    +'<div class="panel-sub">Le sezioni compaiono nel menu del sito e nella creazione di nuove pagine. La prima voce (vuota) = solo URL.</div>'
+    +'<div class="panel-sub">Le sezioni compaiono nel menu del sito e nella creazione di nuove pagine. Elimina una riga per togliere la sezione (le modifiche valgono dopo SALVA SEZIONI).</div>'
     +'<div class="kv-rows" id="sec-rows">';
   SECTIONS.forEach(function(s,i){
-    h+='<div class="kv-row">'
+    h+='<div class="kv-row" id="sec-row-'+i+'">'
       +'<div class="kv-main"><input id="sec-l-'+i+'" class="in" value="'+escAttr(s.l)+'" placeholder="Etichetta"></div>'
       +'<input id="sec-v-'+i+'" class="in" style="width:170px;font-family:var(--mono)" value="'+escAttr(s.v)+'" placeholder="valore URL">'
-      +(i===0?'':'<button class="btn btn-d btn-sm" onclick="delSection('+i+')">✕</button>')
+      +'<button class="btn btn-d btn-sm" title="Elimina sezione" onclick="delSection('+i+')">✕</button>'
       +'</div>';
   });
   h+='</div>'
