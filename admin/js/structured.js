@@ -17,6 +17,25 @@ var _stMode=false;
 var _stKind='pantheon';
 var _ST_SCHE_LAYOUTS=['sessione','quest','npc','spell','specie','citta','evento','bestiario','fazioni','oggetti'];
 
+/* Template di campi precompilati per ogni layout a schede. */
+var _ST_TEMPLATES={
+  sessione:['Titolo','Data','Partecipanti','Luogo'],
+  quest:['Titolo','Tipo','Premio','Stato'],
+  npc:['Nome','Razza','Classe / Livello','Allineamento'],
+  spell:['Nome','Scuola','Livello','Tempo di lancio','Componenti'],
+  specie:['Nome','Tratti','Altezza','Aspettativa di vita'],
+  citta:['Nome','Popolazione','Governo','Distretti'],
+  evento:['Nome','Data','Luogo'],
+  bestiario:['Nome','Tipo','CR','Allineamento'],
+  fazioni:['Nome','Ideologia','Membri','Base'],
+  oggetti:['Nome','Tipo','Proprietà','Note']
+};
+function _stTemplateFields(){
+  var t=_ST_TEMPLATES[_current.layout];
+  if(!t)return [['','']];
+  return t.map(function(k){return [k,'']});
+}
+
 /* ── UNDO / REDO ── */
 var _stHistory=[];
 var _stHistoryIdx=-1;
@@ -282,6 +301,7 @@ function _stCardHTML(c,i){
       +'<span class="st-idx">'+(i+1)+'</span>'
       +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Nome della sezione" oninput="_stSync()">'
       +'<span class="st-head-actions">'
+      +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Trasforma in divinità (aggiungi immagine)" onclick="_stPick('+i+')">🖼</button>'
       +'<button type="button" class="btn btn-soft btn-icon btn-sm st-collapse" title="Comprimi/espandi" onclick="_stCollapse('+i+')">▾</button>'
       +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Duplica blocco" onclick="_stDuplicate('+i+')">⧉</button>'
       +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta su" onclick="_stMove('+i+',-1)">↑</button>'
@@ -304,6 +324,7 @@ function _stCardHTML(c,i){
     +'<span class="st-idx">'+(i+1)+'</span>'
     +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Nome della divinità / sezione" oninput="_stSync()">'
     +'<span class="st-head-actions">'
+    +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Trasforma in sezione (rimuovi immagine)" onclick="_stConvertToSection('+i+')">➖</button>'
     +'<button type="button" class="btn btn-soft btn-icon btn-sm st-collapse" title="Comprimi/espandi" onclick="_stCollapse('+i+')">▾</button>'
     +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Duplica blocco" onclick="_stDuplicate('+i+')">⧉</button>'
     +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Sposta su" onclick="_stMove('+i+',-1)">↑</button>'
@@ -435,8 +456,19 @@ function _stReadSchede(){
   return {heading:'',intro:'',cards:cards};
 }
 function _stRender(data){
+  var collapsed=[];
+  document.querySelectorAll('#st-list .st-card.closed').forEach(function(c){
+    collapsed.push(+(c.getAttribute('data-i')||0));
+  });
   var list=document.getElementById('st-list');if(!list)return;
   list.innerHTML=data.cards.map(function(c,i){return _stCardHTML(c,i)}).join('');
+  if(collapsed.length){
+    var cards=list.querySelectorAll('.st-card');
+    for(var j=0;j<cards.length;j++){
+      if(collapsed.indexOf(j)!==-1)cards[j].classList.add('closed');
+    }
+  }
+  _stApplyFilter();
 }
 function _stCommit(data){
   var md=_stBuildMd(data);
@@ -446,17 +478,17 @@ function _stCommit(data){
   try{_autosaveStore(md)}catch(e2){}
   var st=document.getElementById('e-stats');
   if(st)st.textContent=data.cards.length+' blocchi';
+  _stShowWarnings(data);
 }
 function _stCommitSilent(data){
   var md=_stBuildMd(data);
   var e=document.getElementById('e-md');
   if(e){e.value=md;_lastSavedContent=md;}
   try{_autosaveStore(md)}catch(e2){}
+  _stShowWarnings(data);
 }
 function _stPreview(data){
   var pv=document.getElementById('e-preview');if(!pv)return;
-  var body=document.getElementById('editor-body');
-  if(body&&body.classList.contains('no-preview'))return;
   var hd=_currentHead();
   pv.innerHTML='<div class="e-pv"><div class="e-pv-head"><span class="epv-icon">'+esc(hd.icon)+'</span><div>'
     +'<div class="epv-title">'+esc(hd.title)+'</div><div class="epv-sub">'+esc(_current.k||'')+'</div></div></div>'
@@ -477,7 +509,7 @@ function initStructuredEditor(content){
   _stMode=true;window.__stMode=true;
   _stKind=_stLayoutFor(_current.layout)||'pantheon';
   var eb=document.getElementById('editor-body');
-  if(eb)eb.classList.add('no-preview');
+  if(eb)eb.classList.remove('no-preview');
   var data=_stParse(content||'');
   var ta=document.getElementById('e-md');if(ta)ta.style.display='none';
   var sh=document.getElementById('struct-head');if(sh)sh.style.display='';
@@ -503,8 +535,17 @@ function initStructuredEditor(content){
   document.addEventListener('keydown',_stKeyHandler);
   var ph=document.querySelector('#md-pane .pane-head');
   if(ph)ph.innerHTML='Blocchi <span class="ph-info" id="e-stats"></span>'
+    +'<input id="st-filter" class="in" placeholder="Filtra blocchi…" oninput="stFilter(this.value)" style="max-width:150px;margin-right:8px">'
     +'<button type="button" class="btn btn-soft btn-sm" title="Comprimi tutte le card" onclick="_stCollapseAll(true)">⤴ Comprimi</button>'
     +'<button type="button" class="btn btn-soft btn-sm" title="Espandi tutte le card" onclick="_stCollapseAll(false)">⤵ Espandi</button>';
+  var wb=document.getElementById('md-pane');
+  var wtb=document.getElementById('e-toolbar');
+  if(wb&&wtb&&wtb.parentNode===wb&&!document.getElementById('st-warn')){
+    var wd=document.createElement('div');
+    wd.id='st-warn';
+    wd.style.cssText='display:none;margin:6px 14px 0;padding:6px 10px;border-radius:var(--rad);background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.35);color:var(--warn,#d9a514);font-size:12px;line-height:1.6';
+    wb.insertBefore(wd,wtb.nextSibling);
+  }
   var tb=document.getElementById('e-toolbar');
   if(tb&&tb.parentNode){
     tb.outerHTML='<div class="ed-toolbar" id="e-toolbar">'
@@ -532,6 +573,8 @@ function initStructuredEditor(content){
       +'</div>'
       +'<span class="tb-sep2"></span>'
       +'<span class="view-switch">'
+      +'<button class="tb-btn2" data-view="md" title="Solo blocchi">SCRIVI</button>'
+      +'<button class="tb-btn2" data-view="pv" title="Solo anteprima">VEDI</button>'
       +'<button class="tb-btn2" data-view="site" title="Come appare sul sito">SITO</button>'
       +'</span></div>';
   }
@@ -554,6 +597,40 @@ function _stKeyHandler(e){
   else if(mod&&(e.key==='y'||(e.key==='z'&&e.shiftKey))){e.preventDefault();_stRedo();}
   else if(mod&&e.key==='b'){e.preventDefault();_stInsertFormat('**','testo');}
   else if(mod&&e.key==='i'){e.preventDefault();_stInsertFormat('*_','testo');}
+  else if(mod&&e.key==='Enter'){e.preventDefault();_stKeyAdd();}
+  else if(mod&&e.key==='d'){e.preventDefault();_stKeyDuplicate();}
+}
+function _stFocusedIdx(){
+  var el=document.activeElement;
+  if(!el)return -1;
+  var card=el.closest?el.closest('.st-card'):null;
+  return card?+(card.getAttribute('data-i')||0):-1;
+}
+function _stKeyAdd(){
+  _stPushUndo();
+  var idx=_stFocusedIdx();
+  var data=_stRead();
+  if(_stKind==='schede'){
+    var tmpl=_stTemplateFields();
+    data.cards.splice(idx>=0?idx+1:data.cards.length,0,{name:'Nuova scheda',intro:'',fields:tmpl,blocks:[]});
+  }else{
+    var type='deity';
+    if(idx>=0&&data.cards[idx]&&!data.cards[idx].img)type='section';
+    data.cards.splice(idx>=0?idx+1:data.cards.length,0,{type:type,name:type==='section'?'Nuova sezione':'Nuova divinità',
+      img:type==='deity'?'':'',quote:'',
+      ident:[['Nome',''],['Epiteto',''],['Allineamento',''],['Sfere',''],['Simbolo','']],
+      personality:'',cult:'',extra:''});
+  }
+  _stRender(data);_stSync();
+  var cards=document.querySelectorAll('#st-list .st-card');
+  var last=cards[idx>=0?idx+1:cards.length-1];
+  if(last){var nm=last.querySelector('.st-name');if(nm){nm.focus();nm.select();}}
+}
+function _stKeyDuplicate(){
+  var idx=_stFocusedIdx();
+  if(idx<0)idx=_stRead().cards.length-1;
+  if(idx<0)return;
+  _stDuplicate(idx);
 }
 function _stExit(){
   _stMode=false;window.__stMode=false;
@@ -565,9 +642,68 @@ function _stExit(){
   var sl=document.getElementById('st-list');if(sl)sl.style.display='none';
   var ph=document.querySelector('#md-pane .pane-head');
   if(ph)ph.innerHTML='Markdown <span class="ph-info" id="e-stats"></span>';
+  var wd=document.getElementById('st-warn');
+  if(wd)wd.remove();
+  _stFilterQ='';
   var tb=document.getElementById('e-toolbar');
   if(tb&&tb.parentNode)tb.outerHTML=buildToolbar();
   renderPreview();updateStats();
+}
+
+/* ── VALIDAZIONE E AVVISI ── */
+function _stValidate(data){
+  var warn=[];
+  var seen={};
+  (data.cards||[]).forEach(function(c){
+    var n=(c.name||'').trim();
+    if(n)seen[n]=(seen[n]||0)+1;
+  });
+  (data.cards||[]).forEach(function(c,i){
+    var n=(c.name||'').trim()||'blocco '+(i+1);
+    if(!(c.name||'').trim())warn.push('Il blocco '+(i+1)+' non ha un nome');
+    else if(seen[(c.name||'').trim()]>1)warn.push('«'+c.name.trim()+'» è ripetuto '+seen[(c.name||'').trim()]+' volte');
+    if(_stKind!=='schede'&&c.type==='deity'&&!c.img)warn.push('«'+(c.name||'').trim()+'» è marcata come divinità ma non ha immagine');
+    if(_stKind==='schede'&&!_stCardHasContent(c))warn.push('La scheda «'+n+'» è vuota');
+  });
+  return warn;
+}
+function _stShowWarnings(data){
+  var w=document.getElementById('st-warn');
+  var st=document.getElementById('e-stats');
+  var warn=_stValidate(data);
+  if(st)st.textContent=data.cards.length+' blocchi'+(warn.length?' · '+warn.length+' avvisi':'');
+  if(w){
+    if(!warn.length){w.style.display='none';return}
+    w.style.display='block';
+    w.innerHTML='⚠ '+(warn.length===1?'1 avviso':warn.length+' avvisi')+': '+warn.map(function(x){return esc(x)}).join(' · ');
+  }
+}
+function _stCardHasContent(c){
+  if(!c)return false;
+  if((c.name||'').trim()||(c.intro||'').trim()||(c.extra||'').trim()||(c.quote||'').trim()||(c.personality||'').trim()||(c.cult||'').trim())return true;
+  if(c.img)return true;
+  if(c.ident&&c.ident.some(function(p){return p[0]||p[1]}))return true;
+  if(c.fields&&c.fields.some(function(p){return p[0]||p[1]}))return true;
+  if(c.blocks&&c.blocks.some(function(b){return (b.name||'').trim()||(b.md||'').trim()}))return true;
+  return false;
+}
+
+/* ── FILTRO BLOCCHI ── */
+var _stFilterQ='';
+function stFilter(q){
+  _stFilterQ=(q||'').toLowerCase();
+  _stApplyFilter();
+}
+function _stCardText(card){
+  var t=card.textContent||'';
+  card.querySelectorAll('input,textarea').forEach(function(el){t+=' '+el.value});
+  return t;
+}
+function _stApplyFilter(){
+  document.querySelectorAll('#st-list .st-card').forEach(function(c){
+    if(!_stFilterQ){c.style.display='';return}
+    c.style.display=_stCardText(c).toLowerCase().indexOf(_stFilterQ)===-1?'none':'';
+  });
 }
 
 /* ── MANIPOLAZIONE BLOCCHI ── */
@@ -580,8 +716,10 @@ function _stMove(i,dir){
   _stRender(data);_stSync();
 }
 function _stDelete(i){
-  _stPushUndo();
   var data=_stRead();
+  var c=data.cards[i];
+  if(c&&_stCardHasContent(c)&&!confirm('Eliminare il blocco «'+((c.name||'').trim()||('blocco '+(i+1)))+'»?'))return;
+  _stPushUndo();
   data.cards.splice(i,1);
   _stRender(data);_stSync();
 }
@@ -598,7 +736,7 @@ function _stAdd(type){
   _stPushUndo();
   var data=_stRead();
   if(_stKind==='schede'){
-    data.cards.push({name:'Nuova scheda',intro:'',fields:[['','']],blocks:[]});
+    data.cards.push({name:'Nuova scheda',intro:'',fields:_stTemplateFields(),blocks:[]});
   }else{
     data.cards.push({type:type,name:type==='section'?'Nuova sezione':'Nuova divinità',
       img:type==='deity'?'':'',quote:'',
@@ -639,6 +777,17 @@ function _stDelBlock(btn){
   _stPushUndo();
   var b=btn.closest('.st-block');if(b)b.remove();
   _stSync();
+}
+
+/* ── CONVERTI SEZIONE ↔ DIVINITÀ ── */
+function _stConvertToSection(i){
+  _stPushUndo();
+  var data=_stRead();
+  var c=data.cards[i];
+  if(!c)return;
+  c.img='';c.pos=null;c.type='section';
+  _stRender(data);_stSync();
+  toast('Convertito in sezione','success');
 }
 
 /* ── DUPLICA BLOCCO ── */
@@ -822,6 +971,10 @@ function _stPick(i){
     '<div class="fld"><label>Cerca in /images/</label><input id="st-pick-q" class="in" placeholder="Filtra per nome…" oninput="stPickFilter(this.value)"></div>'
     +'<div class="fld"><label>URL diretto</label><div style="display:flex;gap:6px"><input id="st-pick-url" class="in" placeholder="/images/… oppure https://…" onkeydown="if(event.key===\'Enter\')stPickUrl('+i+')">'
     +'<button class="btn btn-p btn-sm" onclick="stPickUrl('+i+')">Usa</button></div></div>'
+    +'<label class="st-pick-drop" id="st-pick-drop" for="st-pick-file"'
+    +' ondragover="event.preventDefault()" ondragenter="event.preventDefault()" ondrop="stPickDrop(event)">'
+    +'Trascina qui un\'immagine dal dispositivo oppure <span style="text-decoration:underline">sfoglia…</span>'
+    +'<input id="st-pick-file" type="file" accept="image/*" style="display:none" onchange="stPickUpload(this.files)"></label>'
     +'<div class="or">oppure scegli dall\'archivio</div>'
     +'<div class="pick-grid" id="st-pick-grid"><div class="list-empty">Caricamento…</div></div>',
     '<button class="btn btn-soft" onclick="closeModal(\'st-pick-modal\')">Annulla</button>');
@@ -859,6 +1012,48 @@ function stPickUrl(i){
   if(!url){toast('Inserisci un URL','error');return}
   _stSetImg(i,url);
   closeModal('st-pick-modal');
+}
+function stPickDrop(ev){
+  ev.preventDefault();
+  if(!ev.dataTransfer||!ev.dataTransfer.files||!ev.dataTransfer.files.length)return;
+  stPickUpload(ev.dataTransfer.files);
+}
+function stPickUpload(files){
+  if(!files||!files.length)return;
+  var file=files[0];
+  if(!/^image\//.test(file.type)){toast('Il file selezionato non è un\'immagine','error');return}
+  var reader=new FileReader();
+  reader.onload=function(){
+    var name=(file.name||'immagine').toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/-+/g,'-');
+    var dataUri=reader.result;
+    toast('Caricamento '+name+'…');
+    ghPutBinary('/images/'+name,'admin: upload '+name,dataUri)
+      .then(function(){
+        toast('Immagine caricata','success');
+        _stSetImg(_stPickTarget,'/images/'+name);
+        closeModal('st-pick-modal');
+      })
+      .catch(function(e){
+        var msg=((e&&e.message)||'').toString();
+        if(/422|already exists|already\.committed/i.test(msg)){
+          var parts=name.split('.');
+          var base=parts.length>1?parts.slice(0,-1).join('.'):name;
+          var ext=parts.length>1?'.'+parts[parts.length-1]:'';
+          var name2=base+'-'+Date.now()+ext;
+          toast('Nome occupato, riprovo come '+name2+'…');
+          ghPutBinary('/images/'+name2,'admin: upload '+name2,dataUri)
+            .then(function(){
+              toast('Immagine caricata','success');
+              _stSetImg(_stPickTarget,'/images/'+name2);
+              closeModal('st-pick-modal');
+            })
+            .catch(function(e2){toast('Errore upload: '+(((e2&&e2.message)||'n/d')),'error')});
+        }else{
+          toast('Errore upload: '+(((e&&e.message)||'n/d')),'error');
+        }
+      });
+  };
+  reader.readAsDataURL(file);
 }
 function _stSetImg(i,url){
   var v=document.getElementById('st-imgval-'+i);
