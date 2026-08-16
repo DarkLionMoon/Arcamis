@@ -50,7 +50,6 @@ window.addEventListener('popstate', function(e){
    Usata dal deep link per risolvere il path al caricamento della pagina.
 ════════════════════════════════ */
 var _pathMap = {
-  'lavori/biblioteca': '2f00274fdc1c8089bfe6c24434d53b67',
   'lavori/forgia': '2f00274fdc1c805ca01ec57f18d2ffee',
   'lavori/gilda-avventurieri': '2f00274fdc1c801b8c13cefd9e15694e',
   'lavori/locanda': '2f00274fdc1c80faa99eda064ef0fabc',
