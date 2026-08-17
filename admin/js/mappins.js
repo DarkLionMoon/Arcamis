@@ -2,9 +2,11 @@
    ARCAMIS ADMIN — mappins.js
    Editor visuale puntine mappa: carica/salva da KV, click per
    aggiungere, drag per spostare, form per editare/eliminare.
+   Supporta anche il cambio dell'immagine della mappa.
    ════════════════════════════════════════════════════════════════ */
 
 var MAP_PINS = [];
+var MAP_IMAGE_URL = '/mappa.webp';
 var _mapDirty = false;
 var _mapDragPin = null;
 var _mapDragOffset = { x: 0, y: 0 };
@@ -37,32 +39,43 @@ function _mapTypeOptions(selected) {
   }).join('');
 }
 
-/* ════ CARICA PUNTINE DA API ════ */
+/* ════ CARICA DA API ════ */
 async function _loadMapPins() {
   try {
     var r = await fetch('/api/mappins', { credentials: 'include' });
     var j = await r.json();
     MAP_PINS = j.pins || [];
+    MAP_IMAGE_URL = j.mapImage || '/mappa.webp';
     return MAP_PINS;
   } catch (e) {
     MAP_PINS = [];
+    MAP_IMAGE_URL = '/mappa.webp';
     return MAP_PINS;
   }
 }
 
-/* ════ SALVA PUNTINE SU API ════ */
+/* ════ SALVA SU API ════ */
 async function _saveMapPins() {
+  var payload = { pins: MAP_PINS };
+
+  /* Salva immagine mappa se cambiata */
+  var imgInput = document.getElementById('me-map-image');
+  if (imgInput) {
+    payload.mapImage = imgInput.value.trim() || '/mappa.webp';
+  }
+
   try {
     var r = await fetch('/api/mappins', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pins: MAP_PINS })
+      body: JSON.stringify(payload)
     });
     var j = await r.json();
     if (j.ok) {
       _mapDirty = false;
-      ArcAdmin.module('core').ui.toast('Puntine salvate in KV', 'success');
+      if (imgInput) MAP_IMAGE_URL = imgInput.value.trim() || '/mappa.webp';
+      ArcAdmin.module('core').ui.toast('Salvato in KV', 'success');
       ArcAdmin.module('core').audit('save_mappins', 'map', { count: MAP_PINS.length });
     } else {
       ArcAdmin.module('core').ui.toast('Errore: ' + (j.error || 'sconosciuto'), 'error');
@@ -96,9 +109,23 @@ function openMapEditor() {
       + '<button class="btn btn-soft" onclick="_mapAddPin()">+ Nuova puntina</button>'
     );
     h += '<div class="panel-sub">Clicca sulla mappa per aggiungere una puntina. Trascina per spostare. Click su una puntina per editarla.</div>';
+
+    /* Pannello immagine mappa */
+    h += '<div class="panel" style="margin-bottom:16px">';
+    h += '<div class="panel-head"><h3>Immagine mappa</h3><span class="hint">URL dell\'immagine di sfondo</span></div>';
+    h += '<div style="display:flex;gap:10px;align-items:center">';
+    h += '<input id="me-map-image" class="in" style="flex:1" value="' + escAttr(MAP_IMAGE_URL) + '" placeholder="/mappa.webp">';
+    h += '<button class="btn btn-soft btn-sm" onclick="_previewMapImage()">Anteprima</button>';
+    h += '<button class="btn btn-soft btn-sm" onclick="_uploadMapImage()">Carica file</button>';
+    h += '<input type="file" id="me-map-file" accept="image/*" style="display:none" onchange="_handleMapFileUpload(this)">';
+    h += '</div>';
+    h += '<div id="me-map-preview" style="margin-top:10px;display:none"><img src="" style="max-width:100%;max-height:200px;border-radius:6px;border:1px solid var(--line)"></div>';
+    h += '</div>';
+
+    /* Mappa + sidebar puntine */
     h += '<div class="map-editor-wrap">';
     h += '  <div class="map-editor-container" id="map-editor-container">';
-    h += '    <img src="/mappa.webp" alt="Mappa" id="map-editor-img" draggable="false"/>';
+    h += '    <img src="' + escAttr(MAP_IMAGE_URL) + '" alt="Mappa" id="map-editor-img" draggable="false"/>';
     h += '    <div class="map-editor-pins" id="map-editor-pins"></div>';
     h += '  </div>';
     h += '  <div class="map-editor-sidebar" id="map-editor-sidebar">';
@@ -116,6 +143,49 @@ function openMapEditor() {
     setStatus('ok', 'mappa caricata');
     setTimeout(function() { setStatus('idle', 'pronto'); }, 1500);
   });
+}
+
+/* ════ CAMBIA IMMAGINE MAPPA ════ */
+function _previewMapImage() {
+  var url = document.getElementById('me-map-image').value.trim();
+  if (!url) { ArcAdmin.module('core').ui.toast('Inserisci un URL', 'error'); return; }
+  var box = document.getElementById('me-map-preview');
+  var img = box.querySelector('img');
+  img.src = url;
+  box.style.display = '';
+  /* Aggiorna anche l'editor */
+  var editorImg = document.getElementById('map-editor-img');
+  if (editorImg) editorImg.src = url;
+}
+
+function _uploadMapImage() {
+  document.getElementById('me-map-file').click();
+}
+
+async function _handleMapFileUpload(input) {
+  var file = input.files[0];
+  if (!file) return;
+  setStatus('saving', 'caricamento immagine…');
+  try {
+    var dataUri = await new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function() { resolve(reader.result); };
+      reader.onerror = function() { reject(new Error('Lettura file fallita')); };
+      reader.readAsDataURL(file);
+    });
+    var name = 'map-' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    await ghPutBinary('images/' + name, 'admin: upload map image ' + name, dataUri);
+    var url = '/images/' + name;
+    document.getElementById('me-map-image').value = url;
+    var editorImg = document.getElementById('map-editor-img');
+    if (editorImg) editorImg.src = url;
+    ArcAdmin.module('core').ui.toast('Immagine caricata: ' + url, 'success');
+  } catch (e) {
+    ArcAdmin.module('core').ui.toast('Errore caricamento: ' + e.message, 'error');
+  }
+  setStatus('ok', 'caricato');
+  setTimeout(function() { setStatus('idle', 'pronto'); }, 1500);
+  input.value = '';
 }
 
 /* ════ RENDER PUNTINE SULLA MAPPA ════ */
@@ -265,7 +335,7 @@ function _mapEditPin(idx) {
     + '</div>'
     + '<div class="grid-2">'
     + '<div class="fld"><label>Sub-mappa</label><input id="mef-sub" class="in" placeholder="foglia, smari…" value="' + escAttr(pin.sub || '') + '"></div>'
-    + '<div class="fld"><label>Page ID Notion</label><input id="mef-pageid" class="in" placeholder="opzionale" value="' + escAttr(pin.pageId || '') + '"></div>'
+    + '<div class="fld"><label>Page ID Notion</label><input id="mef-pageid" class="in" placeholder="ID pagina wiki" value="' + escAttr(pin.pageId || '') + '"></div>'
     + '</div>'
     + '<div class="fld"><label><input type="checkbox" id="mef-explored"' + (pin.explored ? ' checked' : '') + '> Esplorata</label></div>'
     + '</div>';
@@ -280,7 +350,6 @@ function _mapEditPin(idx) {
 
   var modal = ArcAdmin.module('core').ui.modal(id, '📍 ' + pin.name, body, actions);
 
-  /* Update preview on type change */
   var typeSelect = document.getElementById('mef-type');
   if (typeSelect) {
     typeSelect.addEventListener('change', function() {

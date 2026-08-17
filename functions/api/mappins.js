@@ -1,7 +1,7 @@
 /* ════════════════════════════════════════════════════════════════
    MAP PINS API — Cloudflare Function
-   GET  (pubblico)  → restituisce tutte le puntine della mappa
-   POST (admin auth)→ salva/aggiunge/rimuove puntine in KV
+   GET  (pubblico)  → restituisce puntine + immagine mappa
+   POST (admin auth)→ salva puntine + immagine mappa in KV
    ════════════════════════════════════════════════════════════════ */
 export async function onRequest(context) {
   const { request, env } = context;
@@ -18,9 +18,10 @@ export async function onRequest(context) {
     return new Response(null, { headers: cors });
   }
 
-  const KV_KEY = 'map_pins';
+  const KV_PINS = 'map_pins';
+  const KV_MAP_IMAGE = 'map_image_url';
+  const DEFAULT_MAP = '/mappa.webp';
 
-  /* ── Fallback pins (hardcoded, usati se KV è vuoto) ── */
   const FALLBACK_PINS = [
     { id:'mpin-arcamis', left:'87.76%', top:'28.53%', type:'city', name:'Arcamis', desc:'Città portuale delle Marche. Porto, commercio, avventura.', explored:true, sub:'', pageId:'3090274fdc1c80e1a365ce1c36873455' },
     { id:'mpin-selvafoglia', left:'78.58%', top:'24.05%', type:'forest', name:'Selva Fogliabruna', desc:'Alberi troppo vecchi. Chi entra non sempre torna.', explored:true, sub:'foglia', pageId:'30d0274fdc1c800999feeb0ca6669b22' },
@@ -35,7 +36,6 @@ export async function onRequest(context) {
     { id:'mpin-kaldur', left:'48.09%', top:'69.85%', type:'ruin', name:'Rovine di Kaldur', desc:'Una civiltà è finita qui. Le pietre bruciano ancora.', explored:true, sub:'', pageId:'31f0274fdc1c808191abe4df86d176e6' }
   ];
 
-  /* ── Helper: verifica sessione admin ── */
   async function checkSession() {
     const header = request.headers.get('Cookie') || '';
     const match = header.match(/(?:^|;\s*)arc_admin=([^;]+)/);
@@ -49,21 +49,26 @@ export async function onRequest(context) {
     } catch (e) { return false; }
   }
 
-  /* ── GET: restituisce le puntine ── */
+  /* ── GET: puntine + mappa ── */
   if (request.method === 'GET') {
+    let pins, mapImage;
     try {
-      const raw = await KV.get(KV_KEY, 'text');
-      if (raw) {
-        const pins = JSON.parse(raw);
-        return new Response(JSON.stringify({ pins, source: 'kv' }), { headers: cors });
-      }
-    } catch (e) {}
+      const raw = await KV.get(KV_PINS, 'text');
+      pins = raw ? JSON.parse(raw) : null;
+    } catch (e) { pins = null; }
+    if (!pins) pins = FALLBACK_PINS;
 
-    /* Fallback: puntine hardcoded */
-    return new Response(JSON.stringify({ pins: FALLBACK_PINS, source: 'fallback' }), { headers: cors });
+    try {
+      mapImage = await KV.get(KV_MAP_IMAGE, 'text');
+    } catch (e) { mapImage = null; }
+
+    return new Response(JSON.stringify({
+      pins: pins,
+      mapImage: mapImage || DEFAULT_MAP
+    }), { headers: cors });
   }
 
-  /* ── POST: salva le puntine (admin only) ── */
+  /* ── POST: salva puntine + mappa (admin only) ── */
   if (request.method === 'POST') {
     const authed = await checkSession();
     if (!authed) {
@@ -75,23 +80,39 @@ export async function onRequest(context) {
       return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
     }
 
-    const { pins } = body;
-    if (!Array.isArray(pins)) {
-      return new Response(JSON.stringify({ error: 'pins array richiesto' }), { status: 400, headers: cors });
-    }
+    const errors = [];
 
-    /* Validazione base */
-    for (const p of pins) {
-      if (!p.id || !p.name || p.left == null || p.top == null) {
-        return new Response(JSON.stringify({ error: 'Ogni pin deve avere id, name, left, top' }), { status: 400, headers: cors });
+    if (body.pins !== undefined) {
+      if (!Array.isArray(body.pins)) {
+        errors.push('pins deve essere un array');
+      } else {
+        for (const p of body.pins) {
+          if (!p.id || !p.name || p.left == null || p.top == null) {
+            errors.push('Ogni pin deve avere id, name, left, top');
+            break;
+          }
+        }
       }
     }
 
+    if (errors.length) {
+      return new Response(JSON.stringify({ error: errors.join('; ') }), { status: 400, headers: cors });
+    }
+
     try {
-      await KV.put(KV_KEY, JSON.stringify(pins));
-      return new Response(JSON.stringify({ ok: true, count: pins.length }), { headers: cors });
+      if (body.pins !== undefined) {
+        await KV.put(KV_PINS, JSON.stringify(body.pins));
+      }
+      if (body.mapImage !== undefined) {
+        if (body.mapImage && body.mapImage !== DEFAULT_MAP) {
+          await KV.put(KV_MAP_IMAGE, body.mapImage);
+        } else {
+          await KV.delete(KV_MAP_IMAGE);
+        }
+      }
+      return new Response(JSON.stringify({ ok: true }), { headers: cors });
     } catch (e) {
-      return new Response(JSON.stringify({ error: 'Errore salvataggio KV: ' + e.message }), { status: 500, headers: cors });
+      return new Response(JSON.stringify({ error: 'Errore salvataggio: ' + e.message }), { status: 500, headers: cors });
     }
   }
 

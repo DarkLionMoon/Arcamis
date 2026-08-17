@@ -174,18 +174,23 @@ window.onAfterPageRender(function(){
     });
   }
 
-  /* Carica puntine da API, altrimenti usa fallback */
+  /* Carica puntine + mappa da API */
   var container = document.getElementById('dynamic-pins');
+  var mapImg = document.querySelector('#arcamis-map img');
   if(container){
     fetch('/api/mappins')
       .then(function(r){ return r.json(); })
       .then(function(d){
         var pins = d.pins || [];
-        if(!pins.length) return;
-        container.innerHTML = pins.map(_renderPinHTML).join('');
-        _bindPinEvents();
+        if(pins.length){
+          container.innerHTML = pins.map(_renderPinHTML).join('');
+          _bindPinEvents();
+        }
+        if(d.mapImage && mapImg){
+          mapImg.src = d.mapImage;
+        }
       })
-      .catch(function(){ /* fallback: niente, i pin non sono nel DOM */ });
+      .catch(function(){});
   }
 
   /* Sub-map locations */
