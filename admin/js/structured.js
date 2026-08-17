@@ -15,7 +15,7 @@
 
 var _stMode=false;
 var _stKind='pantheon';
-var _ST_SCHE_LAYOUTS=['sessione','quest','npc','spell','specie','citta','evento','bestiario','fazioni','oggetti','generico','lore','regole','personaggio','materiale','wide','timeline','glossario','galleria','tabelle'];
+var _ST_SCHE_LAYOUTS=['sessione','quest','npc','spell','specie','citta','evento','bestiario','fazioni','oggetti','generico','lore','regole','lavoro','personaggio','materiale','wide','timeline','glossario','galleria','tabelle'];
 
 /* Template di campi precompilati per ogni layout a schede. */
 var _ST_TEMPLATES={
@@ -32,6 +32,7 @@ var _ST_TEMPLATES={
   generico:['Titolo','Sottotitolo'],
   lore:['Nome','Tipo','Popolazione'],
   regole:['Titolo','Categoria','Priorità'],
+  lavoro:['Nome','Stipendio base','Requisiti'],
   personaggio:['Titolo','Passo','Descrizione'],
   materiale:['Nome','Fonte','Categoria'],
   wide:['Titolo','Descrizione'],

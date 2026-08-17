@@ -406,6 +406,7 @@ async function _gpRender(id,label,icon){
           var _layout = _localJson.layout || '';
           if(_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
           else if(_layout === 'regole') _localHtml = _renderRegole(_localJson.content);
+          else if(_layout === 'lavoro') _localHtml = _renderLavoro(_localJson.content);
           else if(_layout === 'personaggio') _localHtml = _renderPersonaggio(_localJson.content);
           else if(_layout === 'lore') _localHtml = _renderLore(_localJson.content, _localJson.title, _localJson.icon);
           else if(_layout === 'pantheon') _localHtml = _renderPantheon(_localJson.content);
@@ -900,6 +901,69 @@ function _renderLore(md, title, icon) {
   });
 
   return '<div class="lore-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER LAVORO
+   Scheda lavoro con sezioni a griglia,
+   supporto immagini e blockquote evidenziati.
+   ══════════════════════════════════════ */
+function _renderLavoro(md) {
+  if (!md) return '';
+  var html = '';
+
+  /* Split per --- */
+  var blocks = md.split(/\n---\n/);
+
+  /* Primo blocco: titolo + intro + eventuale immagine */
+  var first = (blocks.shift() || '').trim();
+  if (first) {
+    var lines = first.split('\n');
+    var title = '';
+    var intro = [];
+    var image = '';
+    lines.forEach(function(line) {
+      var hm = line.match(/^#\s+(.+)/);
+      if (hm && !title) { title = hm[1].trim(); return; }
+      var imgM = line.match(/!\[[^\]]*\]\(([^)]+)\)/);
+      if (imgM) { image = imgM[1]; return; }
+      if (line.trim()) intro.push(line);
+    });
+    if (title) html += '<div class="lv-title">' + esc(title) + '</div>';
+    if (image) html += '<div class="lv-hero"><img src="' + esc(image) + '" alt="' + esc(title) + '" loading="lazy"/></div>';
+    if (intro.length) html += '<div class="lv-intro">' + _mdToHtml(intro.join('\n')) + '</div>';
+  }
+
+  /* Sezioni ## */
+  var sections = [];
+  blocks.forEach(function(block) {
+    var lines = block.split('\n');
+    var header = '';
+    var body = [];
+    var image = '';
+    lines.forEach(function(line) {
+      var hm = line.match(/^##\s+(.+)/);
+      if (hm) { header = hm[1].trim(); return; }
+      var imgM = line.match(/!\[[^\]]*\]\(([^)]+)\)/);
+      if (imgM) { image = imgM[1]; return; }
+      if (line.trim()) body.push(line);
+    });
+    if (header) sections.push({ title: header, body: body.join('\n'), image: image });
+  });
+
+  if (sections.length) {
+    html += '<div class="lv-sections">';
+    sections.forEach(function(sec) {
+      html += '<div class="lv-card">';
+      if (sec.image) html += '<div class="lv-card-img"><img src="' + esc(sec.image) + '" alt="' + esc(sec.title) + '" loading="lazy"/></div>';
+      html += '<div class="lv-card-title">' + esc(sec.title) + '</div>';
+      html += '<div class="lv-card-body">' + _mdToHtml(sec.body) + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  return '<div class="lv-page">' + html + '</div>';
 }
 
 /* ══════════════════════════════════════
