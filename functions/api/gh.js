@@ -25,7 +25,7 @@ export async function onRequest(context) {
   const GH_BRANCH = env.GH_BRANCH || 'main';
 
   const cors = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': new URL(request.url).origin,
     'Content-Type': 'application/json',
     'Vary': 'Cookie'
   };
@@ -68,6 +68,12 @@ export async function onRequest(context) {
 
   const action = body.action;
   const p = body.payload || {};
+
+  /* ── Blocca path traversal ── */
+  if (p.path && (p.path.includes('..') || p.path.startsWith('/') || p.path.includes('\\'))) {
+    return new Response(JSON.stringify({ error: 'Path non valido' }), { status: 400, headers: cors });
+  }
+
   const api = 'https://api.github.com/repos/' + GH_REPO;
   const headers = {
     'Authorization': 'token ' + GH_TOKEN,

@@ -4,14 +4,8 @@ export async function onRequest(context) {
   const action = url.searchParams.get('action');
   const KV = env.ARCAMIS_CACHE;
   const ADMIN_SECRET = env.ADMIN_SECRET;
-  const SESSION_TTL        = 86400;          /* 24 ore  (default) */
+   const SESSION_TTL        = 86400;          /* 24 ore  (default) */
   const SESSION_TTL_LONG   = 90 * 86400;     /* 90 giorni (ricordami) */
-  /* Hash SHA-256 della password locale hardcoded in admin/index.html
-     (fallback documentato). Viene accettato anche se ADMIN_SECRET è
-     configurato, così la vecchia password continua a funzionare e il
-     login fallback ottiene una sessione server-side reale (necessaria
-     per la gestione utenti in KV). */
-  const FALLBACK_ADMIN_HASH = 'b0b9dd19ef971d0b25d73afa6c1b1a1a52aff81b4c6259e067aa305e187119f5';
 
   async function sha256hex(text) {
     const data = new TextEncoder().encode(text);
@@ -137,15 +131,6 @@ export async function onRequest(context) {
           }
         }
       } catch (_) {}
-      /* Fallback: accetta la password locale hardcoded anche se
-         ADMIN_SECRET è configurato, così la vecchia password continua
-         a funzionare e la sessione server-side viene creata davvero. */
-      if (!ok) {
-        const hash = await sha256hex(body.password);
-        if (hash === FALLBACK_ADMIN_HASH) {
-          ok = true; role = 'admin';
-        }
-      }
     }
     if (!ok) {
       await new Promise(r => setTimeout(r, 800));
@@ -187,6 +172,8 @@ export async function onRequest(context) {
   if (action === 'set_users' && request.method === 'POST') {
     const authed = await checkSession();
     if (!authed) return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    const role = await sessionRole();
+    if (role !== 'admin') return new Response(JSON.stringify({ error: 'Solo admin possono gestire gli utenti' }), { status: 403, headers: cors });
     let body;
     try { body = await request.json(); } catch (e) {
       return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });

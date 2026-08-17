@@ -8,6 +8,7 @@
 /* ════ CAROUSEL HOME ════ */
 var _slideIdx = 0;
 var _carTimer = null;
+function _escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function _applySlide(){
   var track = document.getElementById('ctrack');
   if(track) track.style.transform = 'translateX(-' + (_slideIdx * 33.3333) + '%)';
@@ -57,7 +58,7 @@ function _applyCovers(covers){
     try {
       var meta = JSON.parse(covers[key+'_meta']);
       if(meta.tag){ var tagEl = slideEls[i].querySelector('.stag'); if(tagEl) tagEl.textContent = meta.tag; }
-      if(meta.tit){ var titEl = slideEls[i].querySelector('.stit'); if(titEl) titEl.innerHTML = meta.tit.replace(/\n/g,'<br>'); }
+      if(meta.tit){ var titEl = slideEls[i].querySelector('.stit'); if(titEl) titEl.innerHTML = _escH(meta.tit).replace(/&#10;/g,'<br>'); }
     } catch(e){}
   });
   ['carousel_0','carousel_1','carousel_2'].forEach(function(key, i){
@@ -70,7 +71,7 @@ function _applyCovers(covers){
       var btnEls = btnRow.querySelectorAll('.sbtn');
       btns.forEach(function(b, bi){
         if(!btnEls[bi]) return;
-        if(b.label) btnEls[bi].innerHTML = (btnEls[bi].querySelector('svg') ? btnEls[bi].querySelector('svg').outerHTML + ' ' : '') + b.label;
+        if(b.label) btnEls[bi].innerHTML = (btnEls[bi].querySelector('svg') ? btnEls[bi].querySelector('svg').outerHTML + ' ' : '') + _escH(b.label);
         if(b.href){
           btnEls[bi].setAttribute('href', b.href);
           if(btnEls[bi].tagName !== 'A') btnEls[bi].onclick = function(){ window.open(b.href,'_blank'); };
@@ -190,9 +191,9 @@ function closeSubMap(id){
         }
         list.innerHTML = members.map(function(m){
           return '<div class="roster-member">'
-            +'<img class="roster-avatar" src="'+m.avatar_url+'" alt="'+m.username+'" onerror="this.style.display=\'none\'">'
-            +'<div><div class="roster-name">'+m.username+'</div>'
-            +(m.game ? '<div class="roster-game">'+m.game.name+'</div>' : '')
+            +'<img class="roster-avatar" src="'+_escH(m.avatar_url)+'" alt="'+_escH(m.username)+'" onerror="this.style.display=\'none\'">'
+            +'<div><div class="roster-name">'+_escH(m.username)+'</div>'
+            +(m.game ? '<div class="roster-game">'+_escH(m.game.name)+'</div>' : '')
             +'</div></div>';
         }).join('');
       })

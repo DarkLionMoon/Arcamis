@@ -12,7 +12,7 @@ var _current = null;
 var _autosaveTimer = null;
 var _lastSavedContent = '';
 var _currentUser = null;
-var _userRole = 'admin';
+var _userRole = 'viewer';
 
 /* ═══════════════ UTILITIES ═══════════════ */
 function sha256(t){
@@ -274,7 +274,7 @@ function doLogout(){
   sessionStorage.removeItem('arcadmin');
   fetch('/api/admin?action=logout',{method:'POST',credentials:'include'}).catch(function(){});
   _stopAutosave();_autosaveClear();
-  _currentUser=null;_userRole='admin';
+  _currentUser=null;_userRole='viewer';
   document.getElementById('app').style.display='none';
   document.getElementById('login').classList.remove('hide');
   document.getElementById('login-pw').value='';

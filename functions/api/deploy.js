@@ -1,17 +1,42 @@
 /*
   ARCAMIS — /api/deploy
   Stato dell'ultimo deploy Cloudflare Pages.
-  Richiede le env var CF_API_TOKEN e CF_ACCOUNT_ID (e opzionale
-  CF_PAGES_PROJECT, default "arcamis"). Se non configurato risponde
-  {configured:false} e l'admin usa il countdown di fallback.
+  Richiede sessione admin valida. Le env var CF_API_TOKEN e CF_ACCOUNT_ID
+  devono essere configurate in Cloudflare Pages. Se non configurato
+  risponde {configured:false} e l'admin usa il countdown di fallback.
 */
 export async function onRequest(context) {
-  const { env } = context;
+  const { env, request } = context;
   const CF_TOKEN = env.CF_API_TOKEN || '';
   const CF_ACCOUNT = env.CF_ACCOUNT_ID || '';
   const CF_PROJECT = env.CF_PAGES_PROJECT || 'arcamis';
 
-  const cors = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
+  const origin = new URL(request.url).origin;
+  const cors = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Vary': 'Cookie' };
+
+  /* ── Verifica sessione admin ── */
+  const KV = env.ARCAMIS_CACHE;
+  function getCookie(name) {
+    const header = request.headers.get('Cookie') || '';
+    const match = header.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+  const token = getCookie('arc_admin');
+  let authed = false;
+  if (token && KV) {
+    try {
+      const stored = await KV.get('admin_session_' + token);
+      if (stored === 'valid') {
+        authed = true;
+      } else {
+        const session = JSON.parse(stored);
+        authed = !!(session && session.role);
+      }
+    } catch (_) {}
+  }
+  if (!authed) {
+    return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+  }
 
   if (!CF_TOKEN || !CF_ACCOUNT) {
     return new Response(JSON.stringify({ configured: false }), { headers: cors });

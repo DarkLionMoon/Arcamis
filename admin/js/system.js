@@ -171,7 +171,7 @@ document.addEventListener('keydown',function(e){
   var user=sessionStorage.getItem('arcadmin');
   if(user){
     _currentUser=sessionStorage.getItem('arcadmin_user')||'admin';
-    _userRole=sessionStorage.getItem('arcadmin_role')||'admin';
+    _userRole=sessionStorage.getItem('arcadmin_role')||'viewer';
     fetch('/api/admin?action=check',{credentials:'include'}).then(function(r){return r.json()}).then(function(j){
       if(j&&j.ok){
         document.getElementById('login').classList.add('hide');
