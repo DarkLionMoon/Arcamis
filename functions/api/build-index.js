@@ -32,11 +32,7 @@ export async function onRequest(context) {
     { id: '3130274fdc1c807eb61fde24e8236659', title: 'Materiale approvato', icon: '📋' },
     { id: '2ff0274fdc1c80769a4ae243f22f0582', title: 'Corporazione dei costruttori', icon: '🔨' },
     { id: '2f00274fdc1c80679bd3c3df8a1fa040', title: 'Pantheon', icon: '🛐' },
-    { id: '2f10274fdc1c80489f23c49164747770', title: 'Mappe', icon: '🗺️' },
-    { id: '31f0274fdc1c8059a923c73da185a0e3', title: 'Vigilius', icon: '🏛️' },
-    { id: '31f0274fdc1c8019945af2b26306462f', title: 'Galeton', icon: '🏘️' },
-    { id: '30d0274fdc1c803387c4fda013b857e9', title: 'Lago di Gromot', icon: '🌊' },
-    { id: '31f0274fdc1c8075b0dec2e2a6bc359e', title: 'Riva di Ferro', icon: '⚓' }
+    { id: '2f10274fdc1c80489f23c49164747770', title: 'Mappe', icon: '🗺️' }
   ];
 
   /* ── Helper: estrai testo plain dai blocchi ── */
