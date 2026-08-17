@@ -84,7 +84,6 @@ function _mdToHtml(md){
 
 /* ════ SLUG MAP (legacy — usata per retrocompatibilità ?p= ) ════ */
 var _slugMap = {
-  'gilda-avventurieri': '2f00274fdc1c801b8c13cefd9e15694e',
   'changelog': '3000274fdc1c8033a214c44a1aa7f01f',
   'maestria-titoli': '2f00274fdc1c802a9babd4239d97a319',
   'gameplay': '2f00274fdc1c8065a11ff45192aa5dcb',
@@ -178,7 +177,6 @@ var _LAYOUT_DB_MAP = {
   '2fb0274fdc1c8080b07bd553e953c88d': 'lore',
   '2f90274fdc1c8015bf95f52c4e7681b8': 'lore',
   '2f00274fdc1c80e78ad7ce985007b7c6': 'lore',
-  '2f00274fdc1c801b8c13cefd9e15694e': 'lavoro',
   '2f00274fdc1c801c9697e75caa8d5f13': 'lavoro',
   '2ff0274fdc1c80688dd6c2b293a1f626': 'lavoro',
   '2ff0274fdc1c80769a4ae243f22f0582': 'lavoro',
