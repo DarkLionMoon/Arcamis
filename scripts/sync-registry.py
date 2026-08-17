@@ -339,18 +339,17 @@ def generate_export_index(reg):
 def generate_admin_inline(reg):
     pages = []
     for p in reg['pages']:
-        if p.get('admin'):
-            obj = f"{{k:'{p['k']}',l:'{escape_js(p['l'])}',i:'{p['i']}'"
-            if p.get('adminId'):
-                obj += f",id:'{p['adminId']}'"
-            if p.get('sec'):
-                obj += f",sec:'{p['sec']}'"
-                if p.get('sub'):
-                    obj += f",sub:'{escape_js(p['sub'])}'"
-            if p.get('c'):
-                obj += f",c:{p['c']}"
-            obj += '}'
-            pages.append(obj)
+        obj = f"{{k:'{p['k']}',l:'{escape_js(p['l'])}',i:'{p['i']}'"
+        if p.get('adminId'):
+            obj += f",id:'{p['adminId']}'"
+        if p.get('sec'):
+            obj += f",sec:'{p['sec']}'"
+            if p.get('sub'):
+                obj += f",sub:'{escape_js(p['sub'])}'"
+        if p.get('c'):
+            obj += f",c:{p['c']}"
+        obj += '}'
+        pages.append(obj)
 
     sections = [f'{{v:"{s["v"]}",l:"{escape_js(s["l"])}"}}' for s in reg['sections']]
     return pages, sections
