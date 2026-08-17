@@ -112,16 +112,6 @@
       "path": "lore/pantheon"
     },
     {
-      "k": "gameplay",
-      "l": "Gameplay",
-      "i": "⚔️",
-      "id": "2f00274fdc1c8065a11ff45192aa5dcb",
-      "export": true,
-      "index": true,
-      "root": true,
-      "slug": "gameplay"
-    },
-    {
       "k": "materiale",
       "l": "Materiale approvato",
       "i": "📋",
@@ -146,9 +136,7 @@
     {
       "v": "regole",
       "l": "Regole",
-      "pages": [
-        "2f00274fdc1c8065a11ff45192aa5dcb"
-      ]
+      "pages": []
     },
     {
       "v": "personaggio",
