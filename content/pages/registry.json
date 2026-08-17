@@ -3,16 +3,6 @@
   "guild": "1348723468157456425",
   "pages": [
     {
-      "k": "arcamis",
-      "l": "Arcamis",
-      "i": "🏰",
-      "id": "3090274fdc1c80e1a365ce1c36873455",
-      "menu": true,
-      "admin": true,
-      "export": true,
-      "root": true
-    },
-    {
       "k": "selva",
       "l": "Selva Fogliabruna",
       "i": "🍂",
