@@ -53,19 +53,6 @@
       "slug": "changelog"
     },
     {
-      "k": "maestria",
-      "l": "Maestria / Titoli",
-      "i": "🔨",
-      "id": "2f00274fdc1c802a9babd4239d97a319",
-      "menu": true,
-      "admin": true,
-      "export": true,
-      "index": true,
-      "root": true,
-      "path": "maestria-titoli",
-      "slug": "maestria-titoli"
-    },
-    {
       "k": "la-storia-di-gandora",
       "l": "La Storia di Gandora",
       "i": "🐉",
