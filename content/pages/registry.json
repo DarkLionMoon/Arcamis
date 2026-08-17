@@ -132,16 +132,6 @@
       "slug": "materiale-approvato"
     },
     {
-      "k": "corporazione-costruttori",
-      "l": "Corporazione dei costruttori",
-      "i": "🔨",
-      "id": "2ff0274fdc1c80769a4ae243f22f0582",
-      "index": true,
-      "root": true,
-      "path": "lavori/corporazione-costruttori",
-      "slug": "corporazione-costruttori"
-    },
-    {
       "k": "pantheon-root",
       "l": "Pantheon",
       "i": "🛐",
@@ -236,10 +226,6 @@
     {
       "id": "2f90274fdc1c8015bf95f52c4e7681b8",
       "layout": "lore"
-    },
-    {
-      "id": "2ff0274fdc1c80769a4ae243f22f0582",
-      "layout": "lavoro"
     },
     {
       "id": "3130274fdc1c807eb61fde24e8236659",
