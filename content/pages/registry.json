@@ -69,19 +69,6 @@
       "slug": "locanda"
     },
     {
-      "k": "ospedale",
-      "l": "Ospedale",
-      "i": "⚕️",
-      "id": "2f00274fdc1c807aa03cc6cbeb3687cc",
-      "menu": true,
-      "admin": true,
-      "export": true,
-      "index": true,
-      "root": true,
-      "path": "lavori/ospedale",
-      "slug": "ospedale"
-    },
-    {
       "k": "sartoria",
       "l": "Sartoria",
       "i": "🧵",
@@ -382,11 +369,6 @@
       "id": "2ff0274fdc1c80769a4ae243f22f0582"
     },
     {
-      "l": "Ospedale",
-      "i": "⚕️",
-      "id": "2f00274fdc1c807aa03cc6cbeb3687cc"
-    },
-    {
       "l": "Sartoria",
       "i": "🧵",
       "id": "2ff0274fdc1c8035bad4f0b6ab705192"
@@ -478,10 +460,6 @@
     },
     {
       "id": "2ff0274fdc1c80769a4ae243f22f0582",
-      "layout": "lavoro"
-    },
-    {
-      "id": "2f00274fdc1c807aa03cc6cbeb3687cc",
       "layout": "lavoro"
     },
     {
