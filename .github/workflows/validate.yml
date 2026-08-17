@@ -25,13 +25,3 @@ jobs:
 
       - name: Validate (sync-registry --check)
         run: python3 scripts/sync-registry.py --check
-
-      - name: Verify generated artifacts are idempotent
-        run: |
-          python3 scripts/sync-registry.py
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "✗ I generati non sono allineati: esegui scripts/sync-registry.py e committa."
-            git status --porcelain
-            exit 1
-          fi
-          echo "✓ Artifact allineati con il registry."

@@ -722,9 +722,7 @@ async function createNewPage(){
   try{
     var json={k:slug,title:label,icon:icon,content:buildNewPageContent(layout,label),layout:layout,lastModified:new Date().toISOString()};
     await ghPut(CONTENT+'/pages/'+slug+'.json','admin: create page '+slug,JSON.stringify(json,null,2),null);
-    await addToDataJs(slug,label,icon,id,sec,sub);
-    await addToPathMap(slug,id,sec);
-    await addToAdminPages(slug,label,icon,sec,sub);
+    await addToRegistry(slug,label,icon,'pag-'+slug,sec,sub);
     PAGES.push({k:slug,l:label,i:icon,sec:sec,sub:sub,c:1});
     buildSidebar();
     closeNewPageModal();
@@ -749,41 +747,6 @@ function _arrayInsert(s,marker,close,entry){
   if(before.slice(-1)!==',')before+=',';
   return before+'\n'+entry+s.slice(end);
 }
-async function addToDataJs(slug,label,icon,id,sec,sub){
-  var d=await ghGet('scripts/js/data.js');
-  var s=b64decode(d.content);
-  var start=s.indexOf('var pages = [');
-  if(start===-1)throw new Error('data.js: "var pages" non trovato');
-  var end=s.indexOf('];',start);
-  if(end===-1)throw new Error('data.js: chiusura pages non trovata');
-  if(s.slice(start,end).indexOf("k:'"+slug+"'")!==-1)throw new Error('Pagina già registrata in data.js');
-  var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+', id:'+JSON.stringify(id)+', sec:'+JSON.stringify(sec)+(sub?', sub:'+JSON.stringify(sub):'')+'},\n';
-  await ghPut('scripts/js/data.js','admin: add page '+slug+' to registry',_arrayInsert(s,'var pages = [','];',entry),d.sha);
-}
-async function addToPathMap(slug,id,sec){
-  var d=await ghGet('scripts/js/app.js');
-  var s=b64decode(d.content);
-  var start=s.indexOf('var _pathMap = {');
-  if(start===-1)throw new Error('app.js: "_pathMap" non trovato');
-  var end=s.indexOf('};',start);
-  if(end===-1)throw new Error('app.js: chiusura _pathMap non trovata');
-  var path=sec?(sec+'/'+slug):slug;
-  if(s.slice(start,end).indexOf("'"+path+"'")!==-1)throw new Error('URL già registrato: /'+path);
-  var entry='  '+JSON.stringify(path)+': '+JSON.stringify(id)+',\n';
-  await ghPut('scripts/js/app.js','admin: add page '+slug+' to path map',_arrayInsert(s,'var _pathMap = {','};',entry),d.sha);
-}
-async function addToAdminPages(slug,label,icon,sec,sub){
-  var d=await ghGet('admin/index.html');
-  var s=b64decode(d.content);
-  var start=s.indexOf('var PAGES = [');
-  if(start===-1)throw new Error('admin: "var PAGES" non trovato');
-  var end=s.indexOf('];',start);
-  if(end===-1)throw new Error('admin: chiusura PAGES non trovata');
-  if(s.slice(start,end).indexOf("k:'"+slug+"'")!==-1)throw new Error('Pagina già in PAGES');
-  var entry='  {k:'+JSON.stringify(slug)+', l:'+JSON.stringify(label)+', i:'+JSON.stringify(icon)+', sec:'+JSON.stringify(sec)+(sub?', sub:'+JSON.stringify(sub):'')+', c:1},\n';
-  await ghPut('admin/index.html','admin: add page '+slug+' to sidebar',_arrayInsert(s,'var PAGES = [','];',entry),d.sha);
-}
-
 /* ── ELIMINA PAGINA / SEZIONE ── */
 function _removeLine(s,re){
   var lines=s.split('\n');
@@ -801,23 +764,47 @@ function _cleanLastComma(s,marker,close){
   if(before.slice(-1)!==',')return s;
   return before.slice(0,-1)+'\n'+close+s.slice(end+close.length);
 }
-async function removeFromDataJs(slug){
-  var d=await ghGet('scripts/js/data.js');
-  var s=b64decode(d.content);
-  var r=_removeLine(s,new RegExp('k:["\']'+slug+'["\']'));
-  if(r.found)await ghPut('scripts/js/data.js','admin: remove page '+slug+' from registry',_cleanLastComma(r.s,'var pages = [','];'),d.sha);
+async function removeFromRegistry(slug){
+  var d=await ghGet('content/pages/registry.json');
+  var reg=JSON.parse(b64decode(d.content));
+  if(!Array.isArray(reg.pages))reg.pages=[];
+  var pg=reg.pages.find(function(p){return p.k===slug});
+  var id=pg?pg.id:null;
+  var before=JSON.stringify(reg);
+  reg.pages=reg.pages.filter(function(p){return p.k!==slug});
+  (reg.sections||[]).forEach(function(s){
+    if(Array.isArray(s.pages))s.pages=s.pages.filter(function(x){return x!==id});
+  });
+  if(id){
+    if(Array.isArray(reg.lavori))reg.lavori=reg.lavori.filter(function(w){return w.id!==id});
+    if(Array.isArray(reg.legacySlugs))reg.legacySlugs=reg.legacySlugs.filter(function(x){return x.id!==id});
+    if(Array.isArray(reg.layoutDatabases))reg.layoutDatabases=reg.layoutDatabases.filter(function(x){return x.id!==id});
+    if(Array.isArray(reg.pathOverrides))reg.pathOverrides=reg.pathOverrides.filter(function(x){return x.id!==id});
+    (reg.indexDatabases||[]).forEach(function(db){
+      if(Array.isArray(db.ids))db.ids=db.ids.filter(function(x){return x!==id});
+    });
+  }
+  var out=JSON.stringify(reg,null,2)+'\n';
+  if(out!==before)await ghPut('content/pages/registry.json','admin: remove page '+slug+' from registry',out,d.sha);
 }
-async function removeFromPathMap(id){
-  var d=await ghGet('scripts/js/app.js');
-  var s=b64decode(d.content);
-  var r=_removeLine(s,new RegExp('["\']\\s*:\\s*["\']'+id+'["\']'));
-  if(r.found)await ghPut('scripts/js/app.js','admin: remove page '+id+' from path map',_cleanLastComma(r.s,'var _pathMap = {','};'),d.sha);
+async function addToRegistry(slug,label,icon,id,sec,sub){
+  var d=await ghGet('content/pages/registry.json');
+  var reg=JSON.parse(b64decode(d.content));
+  if(!Array.isArray(reg.pages))reg.pages=[];
+  var entry={k:slug,l:label,i:icon,id:id,c:1,menu:true,admin:true};
+  if(sec)entry.sec=sec;
+  if(sub)entry.sub=sub;
+  entry.path=sec?sec+'/'+slug:slug;
+  reg.pages.push(entry);
+  await ghPut('content/pages/registry.json','admin: add page '+slug+' to registry',JSON.stringify(reg,null,2)+'\n',d.sha);
 }
-async function removeFromAdminPages(slug){
-  var d=await ghGet('admin/index.html');
-  var s=b64decode(d.content);
-  var r=_removeLine(s,new RegExp('k:["\']'+slug+'["\']'));
-  if(r.found)await ghPut('admin/index.html','admin: remove page '+slug+' from sidebar',_cleanLastComma(r.s,'var PAGES = [','];'),d.sha);
+async function renameInRegistry(slug,label,icon){
+  var d=await ghGet('content/pages/registry.json');
+  var reg=JSON.parse(b64decode(d.content));
+  var p=reg.pages.find(function(x){return x.k===slug});
+  if(!p)throw new Error('registry: pagina '+slug+' non trovata');
+  p.l=label;p.i=icon;
+  await ghPut('content/pages/registry.json','admin: rename page '+slug,JSON.stringify(reg,null,2)+'\n',d.sha);
 }
 async function deletePage(){
   if(!_current||_current.type!=='page')return;
@@ -835,9 +822,7 @@ async function deletePage(){
   try{
     var id=await _getPageId(slug);
     if(_current.sha)await ghDelete(CONTENT+'/pages/'+slug+'.json','admin: delete page '+slug,_current.sha);
-    await removeFromDataJs(slug);
-    await removeFromPathMap(id);
-    await removeFromAdminPages(slug);
+    await removeFromRegistry(slug);
     if(id&&id.indexOf('pag-')!==0)await removeFromIndex(slug,id);
     for(var i=0;i<PAGES.length;i++){if(PAGES[i].k===slug){PAGES.splice(i,1);break}}
     _modified=false;
@@ -858,42 +843,17 @@ async function deletePage(){
 /* ── RINOMINA SEZIONE / PAGINA ── */
 async function _getPageId(slug){
   try{
-    var d=await ghGet('scripts/js/data.js');
-    var s=b64decode(d.content);
-    var m=s.match(new RegExp("k:[\"']"+slug+"[\"'][^}]*?id:[\"']([^\"']+)[\"']"));
-    return m?m[1]:null;
+    var d=await ghGet('content/pages/registry.json');
+    var reg=JSON.parse(b64decode(d.content));
+    var p=reg.pages.find(function(x){return x.k===slug});
+    return p?p.id:null;
   }catch(e){return null}
 }
 function _replaceKV(line,key,val){
   var v=JSON.stringify(val);
   return line.replace(new RegExp(key+":(\"[^\"]*\"|'[^']*')"),key+":"+v);
 }
-async function renameInDataJs(slug,label,icon){
-  var d=await ghGet('scripts/js/data.js');
-  var s=b64decode(d.content);
-  var lines=s.split('\n');
-  var idx=-1;
-  for(var i=0;i<lines.length;i++){if(new RegExp('k:["\']'+slug+'["\']').test(lines[i])){idx=i;break}}
-  if(idx===-1)throw new Error('data.js: pagina '+slug+' non trovata');
-  lines[idx]=_replaceKV(lines[idx],'l',label);
-  lines[idx]=_replaceKV(lines[idx],'i',icon);
-  await ghPut('scripts/js/data.js','admin: rename page '+slug,lines.join('\n'),d.sha);
-}
-async function renameInAdminPages(slug,label,icon){
-  var d=await ghGet('admin/index.html');
-  var s=b64decode(d.content);
-  var lines=s.split('\n');
-  var start=s.indexOf('var PAGES = [');
-  if(start===-1)throw new Error('admin: "var PAGES" non trovato');
-  var idx=-1;
-  for(var i=0;i<lines.length;i++){
-    if(new RegExp('k:["\']'+slug+'["\']').test(lines[i])&&s.indexOf(lines[i])>start){idx=i;break}
-  }
-  if(idx===-1)throw new Error('admin: pagina '+slug+' non trovata in PAGES');
-  lines[idx]=_replaceKV(lines[idx],'l',label);
-  lines[idx]=_replaceKV(lines[idx],'i',icon);
-  await ghPut('admin/index.html','admin: rename page '+slug+' in sidebar',lines.join('\n'),d.sha);
-}
+
 function _gpArg(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function _rewriteIndexForPage(html,id,label,icon){
   var L=_gpArg(label),I=_gpArg(icon),LH=esc(label),IH=esc(icon);
@@ -963,8 +923,7 @@ async function saveRename(){
       var r=await ghPut(CONTENT+'/pages/'+slug+'.json','admin: rename page '+slug,JSON.stringify(json,null,2),d.sha);
       if(r&&r.content&&r.content.sha)_current.sha=r.content.sha;
     }
-    await renameInDataJs(slug,label,icon);
-    await renameInAdminPages(slug,label,icon);
+    await renameInRegistry(slug,label,icon);
     var mi=PAGES.find(function(p){return p.k===slug});
     if(mi){mi.l=label;mi.i=icon}
     if(id&&id.indexOf('pag-')!==0)await renameInIndex(slug,id,label,icon);

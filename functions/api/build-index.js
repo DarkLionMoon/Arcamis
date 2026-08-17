@@ -22,12 +22,10 @@ export async function onRequest(context) {
 
   /* ── Pagine di primo livello (da data.js — hardcoded qui per semplicità) ── */
   const ROOT_PAGES = [
-    { id: '2f00274fdc1c8089bfe6c24434d53b67', title: 'Biblioteca', icon: '📚' },
     { id: '3090274fdc1c80e1a365ce1c36873455', title: 'Arcamis', icon: '🏰' },
     { id: '30d0274fdc1c800999feeb0ca6669b22', title: 'Selva Fogliabruna', icon: '🍂' },
     { id: '30d0274fdc1c8016b113d5c2d7662d8f', title: 'Foresta Smarrimento', icon: '🌲' },
     { id: '30d0274fdc1c804b9cb7e366f02bd635', title: 'Volonx', icon: '🏔️' },
-    { id: '2f00274fdc1c805ca01ec57f18d2ffee', title: 'Deserto del Crepuscolo', icon: '🔥' },
     { id: '2f00274fdc1c801b8c13cefd9e15694e', title: 'Gilda degli avventurieri', icon: '🗡️' },
     { id: '2f00274fdc1c80faa99eda064ef0fabc', title: 'Locanda', icon: '🍺' },
     { id: '2f00274fdc1c807aa03cc6cbeb3687cc', title: 'Ospedale', icon: '⚕️' },

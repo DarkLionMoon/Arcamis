@@ -40,8 +40,6 @@ var SECTIONS = [
 var LAVORI = [
   { l:'Gilda avventurieri', i:'🗡️', id:'2f00274fdc1c801b8c13cefd9e15694e' },
   { l:'Locanda', i:'🍺', id:'2f00274fdc1c80faa99eda064ef0fabc' },
-  { l:'Forgia', i:'🔥', id:'2f00274fdc1c805ca01ec57f18d2ffee' },
-  { l:'Biblioteca', i:'📚', id:'2f00274fdc1c8089bfe6c24434d53b67' },
   { l:'Bottega farmaceutica', i:'💊', id:'2f00274fdc1c801c9697e75caa8d5f13' },
   { l:'Caserma', i:'🛡️', id:'2ff0274fdc1c80688dd6c2b293a1f626' },
   { l:'Corporazione dei costruttori', i:'🔨', id:'2ff0274fdc1c80769a4ae243f22f0582' },

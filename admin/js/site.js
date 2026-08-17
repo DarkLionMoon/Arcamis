@@ -466,14 +466,19 @@ function _pagesToText(arr){
     return base+'}';
   }).join(',\n');
 }
-async function _writeDataPages(arr){
-  var d=await ghGet('scripts/js/data.js');
-  var s=b64decode(d.content);
-  var start=s.indexOf('var pages = [');
-  var end=s.indexOf('];',start);
-  if(start===-1||end===-1)throw new Error('data.js: registro pages non trovato');
-  var out=s.slice(0,start)+'var pages = [\n'+_pagesToText(arr)+'\n];'+s.slice(end+2);
-  await ghPut('scripts/js/data.js','admin: reorder/update nav',out,d.sha);
+async function _writeRegistryPages(arr){
+  var d=await ghGet('content/pages/registry.json');
+  var reg=JSON.parse(b64decode(d.content));
+  var byK={};
+  (reg.pages||[]).forEach(function(p){byK[p.k]=p});
+  arr.forEach(function(x){
+    var p=byK[x.k];
+    if(p){p.sec=x.sec||'';if(x.sub!==undefined)p.sub=x.sub||''}
+  });
+  var ordered=arr.map(function(x){return byK[x.k]}).filter(Boolean);
+  var remaining=(reg.pages||[]).filter(function(p){return arr.every(function(x){return x.k!==p.k})});
+  reg.pages=ordered.concat(remaining);
+  await ghPut('content/pages/registry.json','admin: update nav',JSON.stringify(reg,null,2)+'\n',d.sha);
 }
 function _swapInNav(a,b){
   var idx=_navData.pages.findIndex(function(p){return p.k===a});
@@ -496,7 +501,7 @@ async function navMove(slug,dir){
   _swapInNav(slug,_navData.pages[target].k);
   setStatus('saving','salvataggio ordine…');
   try{
-    await _writeDataPages(_navData.pages);
+    await _writeRegistryPages(_navData.pages);
     _navData.raw=null;
     toast('Ordine aggiornato! Deploy in corso…','success');
     setStatus('ok','deploying…');
@@ -509,42 +514,12 @@ async function navSetSec(slug,newSec){
   if(!confirm('Cambiare la sezione di "'+slug+'" in "'+(_sectionLabel(newSec)||'principale')+'"?\n\nPer le pagine personalizzate cambierà anche l\'URL pulito.'))return;
   var p=_navData.pages.find(function(x){return x.k===slug});
   if(!p)return;
-  var oldSec=p.sec||'';
   p.sec=newSec||'';
   var pi=PAGES.find(function(x){return x.k===slug});
   if(pi)pi.sec=newSec||'';
   setStatus('saving','salvataggio sezione…');
   try{
-    await _writeDataPages(_navData.pages);
-    if(pi&&p.id&&p.id.indexOf('pag-')===0){
-      var pm=await _getPathMap();
-      var oldPath=oldSec?(oldSec+'/'+slug):slug;
-      var newPath=newSec?(newSec+'/'+slug):slug;
-      var d=await ghGet('scripts/js/app.js');
-      var s=b64decode(d.content);
-      var out=s;
-      var r=_removeLine(out,new RegExp("['\"]"+oldPath+"['\"]\\s*:\\s*['\"]"+p.id+"['\"]"));
-      if(r.found)out=r.s;
-      if(out.indexOf("'"+newPath+"'")===-1){
-        out=_arrayInsert(out,'var _pathMap = {','};','  '+JSON.stringify(newPath)+': '+JSON.stringify(p.id)+',\n');
-      }
-      if(out!==s)await ghPut('scripts/js/app.js','admin: move page '+slug+' to /'+newPath,out,d.sha);
-    }
-    if(pi){
-      await renameInAdminPages(slug,pi.l,pi.i);
-      var d2=await ghGet('admin/index.html');
-      var s2=b64decode(d2.content);
-      var lines=s2.split('\n');
-      var start2=s2.indexOf('var PAGES = [');
-      var idx2=-1;
-      for(var i=0;i<lines.length;i++){
-        if(new RegExp('k:["\']'+slug+'["\']').test(lines[i])&&s2.indexOf(lines[i])>start2){idx2=i;break}
-      }
-      if(idx2!==-1){
-        lines[idx2]=lines[idx2].replace(/sec:"[^"]*"/,'sec:"'+newSec+'"');
-        await ghPut('admin/index.html','admin: set section '+slug+' = '+newSec,lines.join('\n'),d2.sha);
-      }
-    }
+    await _writeRegistryPages(_navData.pages);
     toast('Sezione aggiornata! Deploy in corso…','success');
     setStatus('ok','deploying…');
     startDeployTimer();
@@ -568,28 +543,7 @@ async function navSetSub(slug,val){
   if(pi)pi.sub=val||'';
   setStatus('saving','salvataggio sottosezione…');
   try{
-    await _writeDataPages(_navData.pages);
-    if(pi){
-      var d=await ghGet('admin/index.html');
-      var s=b64decode(d.content);
-      var lines=s.split('\n');
-      var start2=s.indexOf('var PAGES = [');
-      var idx2=-1;
-      for(var i=0;i<lines.length;i++){
-        if(new RegExp('k:["\']'+slug+'["\']').test(lines[i])&&s.indexOf(lines[i])>start2){idx2=i;break}
-      }
-      if(idx2!==-1){
-        var line=lines[idx2];
-        if(val){
-          if(line.indexOf('sub:"')!==-1)line=line.replace(/sub:"[^"]*"/,'sub:'+JSON.stringify(val));
-          else line=line.replace(/},\s*$/,', sub:'+JSON.stringify(val)+'}');
-        }else{
-          line=line.replace(/,\s*sub:"[^"]*"/,'');
-        }
-        lines[idx2]=line;
-        await ghPut('admin/index.html','admin: set sub '+slug+' = '+(val||''),lines.join('\n'),d.sha);
-      }
-    }
+    await _writeRegistryPages(_navData.pages);
     toast('Sottosezione aggiornata! Deploy in corso…','success');
     setStatus('ok','deploying…');
     startDeployTimer();
@@ -622,8 +576,7 @@ async function navSaveRename(slug){
     var json=JSON.parse(b64decode(d.content));
     json.title=label;json.icon=icon;
     await ghPut(CONTENT+'/pages/'+slug+'.json','admin: rename page '+slug,JSON.stringify(json,null,2),d.sha);
-    await renameInDataJs(slug,label,icon);
-    await renameInAdminPages(slug,label,icon);
+    await renameInRegistry(slug,label,icon);
     var mi=PAGES.find(function(p){return p.k===slug});
     if(mi){mi.l=label;mi.i=icon}
     if(id&&id.indexOf('pag-')!==0)await renameInIndex(slug,id,label,icon);
@@ -649,9 +602,8 @@ async function navDelete(slug){
       var d=await ghGet(CONTENT+'/pages/'+slug+'.json');
       await ghDelete(CONTENT+'/pages/'+slug+'.json','admin: delete page '+slug,d.sha);
     }catch(e){}
-    await removeFromDataJs(slug);
-    if(id)await removeFromPathMap(id);
-    await removeFromAdminPages(slug);
+    await removeFromRegistry(slug);
+    if(id&&id.indexOf('pag-')!==0)await removeFromIndex(slug,id);
     for(var i=0;i<PAGES.length;i++){if(PAGES[i].k===slug){PAGES.splice(i,1);break}}
     for(var j=0;j<_navData.pages.length;j++){if(_navData.pages[j].k===slug){_navData.pages.splice(j,1);break}}
     buildSidebar();
@@ -827,30 +779,6 @@ async function saveSections(){
     });
     var regOut=JSON.stringify(reg,null,2)+'\n';
     if(regOut!==b64decode(d0.content))await ghPut('content/pages/registry.json','admin: update sections',regOut,d0.sha);
-    var d=await ghGet('admin/index.html');
-    var s=b64decode(d.content);
-    var marker='window.ArcAdmin.sections = [';
-    var start=s.indexOf(marker);
-    var end=s.indexOf('];',start);
-    if(start===-1||end===-1)throw new Error('Sezioni non trovate in admin/index.html');
-    var block='window.ArcAdmin.sections = [\n'+rows.map(function(r){return '{v:'+JSON.stringify(r.v)+',l:'+JSON.stringify(r.l)+'}'}).join(',\n')+'\n];';
-    await ghPut('admin/index.html','admin: update sections',s.slice(0,start)+block+s.slice(end+2),d.sha);
-    var siteRows=rows.filter(function(r){return r.v});
-    var d2=await ghGet('scripts/js/data.js');
-    var s2=b64decode(d2.content);
-    var sBlock='var SECTIONS = [\n'+siteRows.map(function(r){return '  {v:'+JSON.stringify(r.v)+',l:'+JSON.stringify(r.l)+'}'}).join(',\n')+'\n];';
-    var st=s2.indexOf('var SECTIONS = [');
-    var out;
-    if(st===-1){
-      var marker='var LAVORI = [';
-      var pos=s2.indexOf(marker);
-      if(pos===-1)pos=0;
-      out=s2.slice(0,pos)+sBlock+'\n\n'+s2.slice(pos);
-    }else{
-      var en=s2.indexOf('];',st);
-      out=s2.slice(0,st)+sBlock+s2.slice(en+2);
-    }
-    if(out!==s2)await ghPut('scripts/js/data.js','admin: update sections',out,d2.sha);
     SECTIONS.length=0;
     rows.forEach(function(r){SECTIONS.push(r)});
     toast('Sezioni salvate! Deploy in corso…','success');

@@ -1,6 +1,4 @@
 const PAGES_TO_INDEX = [
-  { id:'2f00274fdc1c8089bfe6c24434d53b67', title:'Biblioteca', icon:'📚' },
-  { id:'2f00274fdc1c805ca01ec57f18d2ffee', title:'Deserto del Crepuscolo', icon:'🔥' },
   { id:'2f00274fdc1c801b8c13cefd9e15694e', title:'Gilda degli avventurieri', icon:'🗡️' },
   { id:'2f00274fdc1c80faa99eda064ef0fabc', title:'Locanda', icon:'🍺' },
   { id:'2f00274fdc1c807aa03cc6cbeb3687cc', title:'Ospedale', icon:'⚕️' },

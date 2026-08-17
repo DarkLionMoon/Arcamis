@@ -1,0 +1,40 @@
+name: Sync generated artifacts
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    name: Regenerate generated artifacts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate (sync-registry --check)
+        run: python3 scripts/sync-registry.py --check
+
+      - name: Generate artifacts
+        run: python3 scripts/sync-registry.py
+
+      - name: Commit generated artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: rigenera artifact da registry.json"
+            git pull --rebase
+            git push
+          else
+            echo "✓ Generated artifacts are up to date."
+          fi

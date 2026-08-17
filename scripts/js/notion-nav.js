@@ -84,8 +84,6 @@ function _mdToHtml(md){
 
 /* ════ SLUG MAP (legacy — usata per retrocompatibilità ?p= ) ════ */
 var _slugMap = {
-  'biblioteca': '2f00274fdc1c8089bfe6c24434d53b67',
-  'forgia': '2f00274fdc1c805ca01ec57f18d2ffee',
   'gilda-avventurieri': '2f00274fdc1c801b8c13cefd9e15694e',
   'locanda': '2f00274fdc1c80faa99eda064ef0fabc',
   'ospedale': '2f00274fdc1c807aa03cc6cbeb3687cc',
@@ -185,8 +183,6 @@ var _LAYOUT_DB_MAP = {
   '2f00274fdc1c80e78ad7ce985007b7c6': 'lore',
   '2f00274fdc1c801b8c13cefd9e15694e': 'lavoro',
   '2f00274fdc1c80faa99eda064ef0fabc': 'lavoro',
-  '2f00274fdc1c805ca01ec57f18d2ffee': 'lavoro',
-  '2f00274fdc1c8089bfe6c24434d53b67': 'lavoro',
   '2f00274fdc1c801c9697e75caa8d5f13': 'lavoro',
   '2ff0274fdc1c80688dd6c2b293a1f626': 'lavoro',
   '2ff0274fdc1c80769a4ae243f22f0582': 'lavoro',

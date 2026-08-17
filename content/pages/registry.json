@@ -3,28 +3,6 @@
   "guild": "1348723468157456425",
   "pages": [
     {
-      "k": "biblioteca",
-      "l": "Biblioteca",
-      "i": "📚",
-      "id": "2f00274fdc1c8089bfe6c24434d53b67",
-      "menu": true,
-      "admin": true,
-      "export": true,
-      "index": true,
-      "root": true,
-      "path": "lavori/biblioteca",
-      "slug": "biblioteca"
-    },
-    {
-      "k": "farmacia",
-      "l": "Bottega farmaceutica",
-      "i": "🧪",
-      "id": "3090274fdc1c8013a183dfc31297c477",
-      "menu": true,
-      "admin": true,
-      "export": true
-    },
-    {
       "k": "arcamis",
       "l": "Arcamis",
       "i": "🏰",
@@ -63,28 +41,6 @@
       "admin": true,
       "export": true,
       "root": true
-    },
-    {
-      "k": "arpax",
-      "l": "Arpax",
-      "i": "🦅",
-      "id": "30d0274fdc1c807eb443f55071f00844",
-      "menu": true,
-      "admin": true,
-      "export": true
-    },
-    {
-      "k": "deserto",
-      "l": "Deserto del Crepuscolo",
-      "i": "🔥",
-      "id": "2f00274fdc1c805ca01ec57f18d2ffee",
-      "menu": true,
-      "admin": true,
-      "export": true,
-      "index": true,
-      "root": true,
-      "path": "lavori/forgia",
-      "slug": "forgia"
     },
     {
       "k": "gilda",
@@ -372,7 +328,8 @@
     },
     {
       "v": "personaggio",
-      "l": "Personaggio"
+      "l": "Personaggio",
+      "pages": []
     },
     {
       "v": "lore",
@@ -383,16 +340,19 @@
     },
     {
       "v": "mestieri",
-      "l": "Mestieri"
+      "l": "Mestieri",
+      "pages": []
     },
     {
       "v": "homebrew",
-      "l": "Homebrew"
+      "l": "Homebrew",
+      "pages": []
     },
     {
       "v": "",
       "l": "— Nessuna (solo URL) —",
-      "adminOnly": true
+      "adminOnly": true,
+      "pages": []
     }
   ],
   "lavori": [
@@ -405,16 +365,6 @@
       "l": "Locanda",
       "i": "🍺",
       "id": "2f00274fdc1c80faa99eda064ef0fabc"
-    },
-    {
-      "l": "Forgia",
-      "i": "🔥",
-      "id": "2f00274fdc1c805ca01ec57f18d2ffee"
-    },
-    {
-      "l": "Biblioteca",
-      "i": "📚",
-      "id": "2f00274fdc1c8089bfe6c24434d53b67"
     },
     {
       "l": "Bottega farmaceutica",
@@ -516,14 +466,6 @@
     },
     {
       "id": "2f00274fdc1c80faa99eda064ef0fabc",
-      "layout": "lavoro"
-    },
-    {
-      "id": "2f00274fdc1c805ca01ec57f18d2ffee",
-      "layout": "lavoro"
-    },
-    {
-      "id": "2f00274fdc1c8089bfe6c24434d53b67",
       "layout": "lavoro"
     },
     {
@@ -740,31 +682,38 @@
   "indexDatabases": [
     {
       "id": "2fd0274fdc1c80038889fc072a360bae",
-      "label": "Galleria PG"
+      "label": "Galleria PG",
+      "ids": []
     },
     {
       "id": "2f60274fdc1c80fba671c588ba93b116",
-      "label": "Specie HB"
+      "label": "Specie HB",
+      "ids": []
     },
     {
       "id": "2ff0274fdc1c807ea473db02ac4ae391",
-      "label": "Specie HB alt"
+      "label": "Specie HB alt",
+      "ids": []
     },
     {
       "id": "2f70274fdc1c80e3bdc7f95f81eb9cc0",
-      "label": "Sottoclassi HB"
+      "label": "Sottoclassi HB",
+      "ids": []
     },
     {
       "id": "3350274fdc1c808fba5ed9ad1f3b4bb4",
-      "label": "Classi HB"
+      "label": "Classi HB",
+      "ids": []
     },
     {
       "id": "3040274fdc1c80e0a0dccfa9761bff55",
-      "label": "Biblioteca"
+      "label": "Biblioteca",
+      "ids": []
     },
     {
       "id": "2f90274fdc1c8015bf95f52c4e7681b8",
-      "label": "NPC"
+      "label": "NPC",
+      "ids": []
     }
   ],
   "sitemap": [
