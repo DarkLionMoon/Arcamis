@@ -59,7 +59,8 @@
       "menu": true,
       "admin": true,
       "sec": "personaggio",
-      "path": "personaggio/lavori"
+      "path": "personaggio/lavori",
+      "sub": ""
     }
   ],
   "sections": [
