@@ -23,7 +23,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "regole/regole-del-server"
+      "path": "regole/regole-del-server",
+      "sub": ""
     },
     {
       "k": "materiale-approvato",
@@ -31,7 +32,7 @@
       "i": "📖",
       "id": "pag-materiale-approvato",
       "sec": "personaggio",
-      "sub": "Regole",
+      "sub": "",
       "c": 1,
       "menu": true,
       "admin": true,
@@ -46,7 +47,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/pantheon"
+      "path": "lore/pantheon",
+      "sub": ""
     }
   ],
   "sections": [
