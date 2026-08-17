@@ -49,6 +49,17 @@
       "admin": true,
       "path": "lore/pantheon",
       "sub": ""
+    },
+    {
+      "k": "lavori",
+      "l": "Lavori",
+      "i": "📄",
+      "id": "pag-lavori",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "sec": "personaggio",
+      "path": "personaggio/lavori"
     }
   ],
   "sections": [
