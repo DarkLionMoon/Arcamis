@@ -86,7 +86,6 @@ function _mdToHtml(md){
 var _slugMap = {
   'gilda-avventurieri': '2f00274fdc1c801b8c13cefd9e15694e',
   'locanda': '2f00274fdc1c80faa99eda064ef0fabc',
-  'ospedale': '2f00274fdc1c807aa03cc6cbeb3687cc',
   'sartoria': '2ff0274fdc1c8035bad4f0b6ab705192',
   'changelog': '3000274fdc1c8033a214c44a1aa7f01f',
   'maestria-titoli': '2f00274fdc1c802a9babd4239d97a319',
@@ -186,7 +185,6 @@ var _LAYOUT_DB_MAP = {
   '2f00274fdc1c801c9697e75caa8d5f13': 'lavoro',
   '2ff0274fdc1c80688dd6c2b293a1f626': 'lavoro',
   '2ff0274fdc1c80769a4ae243f22f0582': 'lavoro',
-  '2f00274fdc1c807aa03cc6cbeb3687cc': 'lavoro',
   '2ff0274fdc1c8035bad4f0b6ab705192': 'lavoro',
   '3130274fdc1c807eb61fde24e8236659': 'materiale',
   '2f00274fdc1c80679bd3c3df8a1fa040': 'lore',
