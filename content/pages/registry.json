@@ -169,16 +169,6 @@
       "index": true
     },
     {
-      "k": "storia",
-      "l": "Storia del mondo",
-      "i": "📖",
-      "id": "2f00274fdc1c806f8f17dbc6532d2211",
-      "index": true,
-      "root": true,
-      "path": "lore/storia",
-      "slug": "storia-del-mondo"
-    },
-    {
       "k": "pantheon-root",
       "l": "Pantheon",
       "i": "🛐",
@@ -300,10 +290,6 @@
     {
       "id": "2f60274fdc1c80adb7a5d6beeef3e544",
       "layout": "regole"
-    },
-    {
-      "id": "2f00274fdc1c806f8f17dbc6532d2211",
-      "layout": "lore"
     },
     {
       "id": "2f60274fdc1c80558d8fe99842377aef",
