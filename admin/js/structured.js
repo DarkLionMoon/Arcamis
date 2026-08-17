@@ -15,7 +15,7 @@
 
 var _stMode=false;
 var _stKind='pantheon';
-var _ST_SCHE_LAYOUTS=['sessione','quest','npc','spell','specie','citta','evento','bestiario','fazioni','oggetti'];
+var _ST_SCHE_LAYOUTS=['sessione','quest','npc','spell','specie','citta','evento','bestiario','fazioni','oggetti','generico','lore','regole','personaggio','materiale','wide','timeline','glossario','galleria','tabelle'];
 
 /* Template di campi precompilati per ogni layout a schede. */
 var _ST_TEMPLATES={
@@ -28,7 +28,17 @@ var _ST_TEMPLATES={
   evento:['Nome','Data','Luogo'],
   bestiario:['Nome','Tipo','CR','Allineamento'],
   fazioni:['Nome','Ideologia','Membri','Base'],
-  oggetti:['Nome','Tipo','Proprietà','Note']
+  oggetti:['Nome','Tipo','Proprietà','Note'],
+  generico:['Titolo','Sottotitolo'],
+  lore:['Nome','Tipo','Popolazione'],
+  regole:['Titolo','Categoria','Priorità'],
+  personaggio:['Titolo','Passo','Descrizione'],
+  materiale:['Nome','Fonte','Categoria'],
+  wide:['Titolo','Descrizione'],
+  timeline:['Epoca','Anno','Evento'],
+  glossario:['Termine','Definizione','Categoria'],
+  galleria:['Titolo','Descrizione','Immagine'],
+  tabelle:['Titolo','Colonne','Righe']
 };
 function _stTemplateFields(){
   var t=_ST_TEMPLATES[_current.layout];

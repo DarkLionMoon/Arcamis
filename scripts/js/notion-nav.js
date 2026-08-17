@@ -407,7 +407,6 @@ async function _gpRender(id,label,icon){
           if(_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
           else if(_layout === 'regole') _localHtml = _renderRegole(_localJson.content);
           else if(_layout === 'personaggio') _localHtml = _renderPersonaggio(_localJson.content);
-          else if(_layout === 'lavoro') _localHtml = _renderLavoro(_localJson.content, _localJson.title);
           else if(_layout === 'lore') _localHtml = _renderLore(_localJson.content, _localJson.title, _localJson.icon);
           else if(_layout === 'pantheon') _localHtml = _renderPantheon(_localJson.content);
           else if(_layout === 'bestiario') _localHtml = _renderBestiario(_localJson.content);
@@ -421,7 +420,7 @@ async function _gpRender(id,label,icon){
           else if(_layout === 'wide') { _localHtml = _mdToHtml(_localJson.content); }
           else {
             /* Auto-detect by page key (legacy fallback) */
-            _localHtml = (_localPage.k === 'materiale') ? _renderMateriale(_localJson.content) : (_localPage.k === 'regole' || _localPage.k === 'gameplay') ? _renderRegole(_localJson.content) : (_localPage.k === 'inizia' || _localPage.k === 'avanti') ? _renderPersonaggio(_localJson.content) : (_localPage.k === 'gilda' || _localPage.k === 'locanda' || _localPage.k === 'farmacia' || _localPage.k === 'biblioteca' || _localPage.k === 'ospedale' || _localPage.k === 'sartoria' || _localPage.k === 'deserto') ? _renderLavoro(_localJson.content, _localJson.title) : (_localPage.k === 'pantheon' || _localPage.k === 'maestria' || _localPage.k === 'arcamis' || _localPage.k === 'selva' || _localPage.k === 'foresta' || _localPage.k === 'volonx' || _localPage.k === 'arpax' || _localPage.k === 'galleria') ? _renderLore(_localJson.content, _localJson.title, _localJson.icon) : _mdToHtml(_localJson.content);
+            _localHtml = (_localPage.k === 'materiale') ? _renderMateriale(_localJson.content) : (_localPage.k === 'regole' || _localPage.k === 'gameplay') ? _renderRegole(_localJson.content) : (_localPage.k === 'inizia' || _localPage.k === 'avanti') ? _renderPersonaggio(_localJson.content) : (_localPage.k === 'pantheon' || _localPage.k === 'maestria' || _localPage.k === 'arcamis' || _localPage.k === 'selva' || _localPage.k === 'foresta' || _localPage.k === 'volonx' || _localPage.k === 'arpax' || _localPage.k === 'galleria') ? _renderLore(_localJson.content, _localJson.title, _localJson.icon) : _mdToHtml(_localJson.content);
           }
           var pbody = document.getElementById('pbody');
           var layoutClass = _layout || 'default';
@@ -901,69 +900,6 @@ function _renderLore(md, title, icon) {
   });
 
   return '<div class="lore-page">' + html + '</div>';
-}
-
-/* ══════════════════════════════════════
-   RENDER LAVORO / GILDE
-   Scheda lavoro con stipendio e regole
-   ══════════════════════════════════════ */
-function _renderLavoro(md, title) {
-  if (!md) return '';
-  var html = '';
-
-  /* Split in blocchi separati da --- */
-  var blocks = md.split(/\n---\n/);
-
-  /* Primo blocco: intro */
-  var introBlock = (blocks.shift() || '').trim();
-  if (introBlock) {
-    /* Rimuovi immagini dall'intro (sono link Notion non funzionanti) */
-    var cleanIntro = introBlock.replace(/!\[[^\]]*\]\([^)]+\)/g, '').trim();
-    if (cleanIntro) {
-      html += '<div class="lavoro-intro">' + _mdToHtml(cleanIntro) + '</div>';
-    }
-  }
-
-  /* Sezioni con ### */
-  var sections = [];
-  blocks.forEach(function(block) {
-    var lines = block.split('\n');
-    var headerMatch = null;
-    var body = [];
-    lines.forEach(function(line) {
-      var hm = line.match(/^###\s+(.+)/);
-      if (hm) {
-        headerMatch = hm[1];
-      } else if (line.trim()) {
-        body.push(line);
-      }
-    });
-    if (headerMatch) {
-      sections.push({ title: headerMatch, body: body.join('\n') });
-    }
-  });
-
-  /* Se ci sono sezioni,entalle in card */
-  if (sections.length) {
-    html += '<div class="lavoro-sections">';
-    sections.forEach(function(sec) {
-      html += '<div class="lavoro-section">';
-      html += '<div class="lavoro-section-title">' + sec.title + '</div>';
-      html += '<div class="lavoro-section-body">' + _mdToHtml(sec.body) + '</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  /* Se non ci sono sezioni ###, usa tutto come body */
-  if (sections.length === 0 && blocks.length) {
-    var remaining = blocks.join('\n---\n').trim();
-    if (remaining) {
-      html += '<div class="lavoro-body">' + _mdToHtml(remaining) + '</div>';
-    }
-  }
-
-  return '<div class="lavoro-page">' + html + '</div>';
 }
 
 /* ══════════════════════════════════════
