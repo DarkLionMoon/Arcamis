@@ -51,7 +51,6 @@ window.addEventListener('popstate', function(e){
 ════════════════════════════════ */
 var _pathMap = {
   'changelog': '3000274fdc1c8033a214c44a1aa7f01f',
-  'maestria-titoli': '2f00274fdc1c802a9babd4239d97a319',
   'lore/la-storia-di-gandora': 'pag-la-storia-di-gandora',
   'regole/regole-del-server': 'pag-regole-del-server',
   'personaggio/materiale-approvato': 'pag-materiale-approvato',

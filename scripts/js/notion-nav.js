@@ -85,8 +85,6 @@ function _mdToHtml(md){
 /* ════ SLUG MAP (legacy — usata per retrocompatibilità ?p= ) ════ */
 var _slugMap = {
   'changelog': '3000274fdc1c8033a214c44a1aa7f01f',
-  'maestria-titoli': '2f00274fdc1c802a9babd4239d97a319',
-  'materiale-approvato': '3130274fdc1c807eb61fde24e8236659',
   'pantheon': '2f00274fdc1c80679bd3c3df8a1fa040',
   'biblioteca-scoperta': '3040274fdc1c80ed816ef58f6a6b6f21',
   'specie-homebrew': '2f60274fdc1c80fba671c588ba93b116',
@@ -166,7 +164,6 @@ var _LAYOUT_DB_MAP = {
   '2fb0274fdc1c8073addaf1d5a3e9768b': 'lore',
   '2fb0274fdc1c8080b07bd553e953c88d': 'lore',
   '2f90274fdc1c8015bf95f52c4e7681b8': 'lore',
-  '3130274fdc1c807eb61fde24e8236659': 'materiale',
   '2f00274fdc1c80679bd3c3df8a1fa040': 'lore',
   '2f70274fdc1c803ca5cafa97ca1817cd': 'bestiario',
   '2f10274fdc1c80dca8caeb2e6de23146': 'fazioni',

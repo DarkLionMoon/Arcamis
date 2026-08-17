@@ -1,6 +1,4 @@
 const PAGES_TO_INDEX = [
-  { id:'2f00274fdc1c802a9babd4239d97a319', title:'Maestria / Titoli', icon:'🔨' },
-  { id:'3130274fdc1c807eb61fde24e8236659', title:'Materiale approvato', icon:'📋' },
   { id:'2f00274fdc1c80679bd3c3df8a1fa040', title:'Pantheon', icon:'🛐' }
 ];
 
