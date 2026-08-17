@@ -47,17 +47,6 @@
       "menu": true,
       "admin": true,
       "path": "lore/pantheon"
-    },
-    {
-      "k": "lavori-nella-land",
-      "l": "Lavori nella Land",
-      "i": "📄",
-      "id": "pag-lavori-nella-land",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "sec": "lavori",
-      "path": "lavori/lavori-nella-land"
     }
   ],
   "sections": [
