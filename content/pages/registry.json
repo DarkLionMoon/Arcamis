@@ -99,16 +99,6 @@
       "path": "lore/pantheon"
     },
     {
-      "k": "materiale",
-      "l": "Materiale approvato",
-      "i": "📋",
-      "id": "3130274fdc1c807eb61fde24e8236659",
-      "export": true,
-      "index": true,
-      "root": true,
-      "slug": "materiale-approvato"
-    },
-    {
       "k": "pantheon-root",
       "l": "Pantheon",
       "i": "🛐",
@@ -201,10 +191,6 @@
     {
       "id": "2f90274fdc1c8015bf95f52c4e7681b8",
       "layout": "lore"
-    },
-    {
-      "id": "3130274fdc1c807eb61fde24e8236659",
-      "layout": "materiale"
     },
     {
       "id": "2f00274fdc1c80679bd3c3df8a1fa040",
