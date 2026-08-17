@@ -27,8 +27,6 @@ export async function onRequest(context) {
     { id: '30d0274fdc1c8016b113d5c2d7662d8f', title: 'Foresta Smarrimento', icon: '🌲' },
     { id: '30d0274fdc1c804b9cb7e366f02bd635', title: 'Volonx', icon: '🏔️' },
     { id: '2f00274fdc1c801b8c13cefd9e15694e', title: 'Gilda degli avventurieri', icon: '🗡️' },
-    { id: '2f00274fdc1c80faa99eda064ef0fabc', title: 'Locanda', icon: '🍺' },
-    { id: '2ff0274fdc1c8035bad4f0b6ab705192', title: 'Sartoria', icon: '🧵' },
     { id: '3000274fdc1c8033a214c44a1aa7f01f', title: 'Changelog', icon: '📝' },
     { id: '2f00274fdc1c802a9babd4239d97a319', title: 'Maestria / Titoli', icon: '🔨' },
     { id: '2f00274fdc1c8065a11ff45192aa5dcb', title: 'Gameplay', icon: '⚔️' },

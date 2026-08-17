@@ -51,8 +51,6 @@ window.addEventListener('popstate', function(e){
 ════════════════════════════════ */
 var _pathMap = {
   'lavori/gilda-avventurieri': '2f00274fdc1c801b8c13cefd9e15694e',
-  'lavori/locanda': '2f00274fdc1c80faa99eda064ef0fabc',
-  'lavori/sartoria': '2ff0274fdc1c8035bad4f0b6ab705192',
   'changelog': '3000274fdc1c8033a214c44a1aa7f01f',
   'maestria-titoli': '2f00274fdc1c802a9babd4239d97a319',
   'lore/la-storia-di-gandora': 'pag-la-storia-di-gandora',

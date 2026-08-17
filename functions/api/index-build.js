@@ -1,7 +1,5 @@
 const PAGES_TO_INDEX = [
   { id:'2f00274fdc1c801b8c13cefd9e15694e', title:'Gilda degli avventurieri', icon:'🗡️' },
-  { id:'2f00274fdc1c80faa99eda064ef0fabc', title:'Locanda', icon:'🍺' },
-  { id:'2ff0274fdc1c8035bad4f0b6ab705192', title:'Sartoria', icon:'🧵' },
   { id:'2f00274fdc1c802a9babd4239d97a319', title:'Maestria / Titoli', icon:'🔨' },
   { id:'2f00274fdc1c8065a11ff45192aa5dcb', title:'Gameplay', icon:'⚔️' },
   { id:'3130274fdc1c807eb61fde24e8236659', title:'Materiale approvato', icon:'📋' },

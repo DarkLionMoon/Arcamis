@@ -12,8 +12,6 @@ var pages = [
   {k:'foresta',l:'Foresta Smarrimento',i:'🌲',id:'30d0274fdc1c8016b113d5c2d7662d8f'},
   {k:'volonx',l:'Volonx',i:'🏔️',id:'30d0274fdc1c804b9cb7e366f02bd635'},
   {k:'gilda',l:'Gilda degli avventurieri',i:'🗡️',id:'2f00274fdc1c801b8c13cefd9e15694e'},
-  {k:'locanda',l:'Locanda',i:'🍺',id:'2f00274fdc1c80faa99eda064ef0fabc'},
-  {k:'sartoria',l:'Sartoria',i:'🧵',id:'2ff0274fdc1c8035bad4f0b6ab705192'},
   {k:'changelog',l:'Changelog',i:'📝',id:'3000274fdc1c8033a214c44a1aa7f01f'},
   {k:'maestria',l:'Maestria / Titoli',i:'🔨',id:'2f00274fdc1c802a9babd4239d97a319'},
   {k:'la-storia-di-gandora',l:'La Storia di Gandora',i:'🐉',id:'pag-la-storia-di-gandora',sec:'lore',sub:'Storia'},
@@ -38,10 +36,8 @@ var SECTIONS = [
 /* ════ LAVORI ════ */
 var LAVORI = [
   { l:'Gilda avventurieri', i:'🗡️', id:'2f00274fdc1c801b8c13cefd9e15694e' },
-  { l:'Locanda', i:'🍺', id:'2f00274fdc1c80faa99eda064ef0fabc' },
   { l:'Bottega farmaceutica', i:'💊', id:'2f00274fdc1c801c9697e75caa8d5f13' },
   { l:'Caserma', i:'🛡️', id:'2ff0274fdc1c80688dd6c2b293a1f626' },
   { l:'Corporazione dei costruttori', i:'🔨', id:'2ff0274fdc1c80769a4ae243f22f0582' },
-  { l:'Sartoria', i:'🧵', id:'2ff0274fdc1c8035bad4f0b6ab705192' },
   { l:'Tribunale', i:'⚖️', id:'3460274fdc1c800c8b3bf9a53d0cbf59' }
 ];
