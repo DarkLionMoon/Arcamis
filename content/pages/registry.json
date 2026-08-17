@@ -97,16 +97,6 @@
       "menu": true,
       "admin": true,
       "path": "lore/pantheon"
-    },
-    {
-      "k": "pantheon-root",
-      "l": "Pantheon",
-      "i": "🛐",
-      "id": "2f00274fdc1c80679bd3c3df8a1fa040",
-      "export": true,
-      "index": true,
-      "root": true,
-      "slug": "pantheon"
     }
   ],
   "sections": [
@@ -190,10 +180,6 @@
     },
     {
       "id": "2f90274fdc1c8015bf95f52c4e7681b8",
-      "layout": "lore"
-    },
-    {
-      "id": "2f00274fdc1c80679bd3c3df8a1fa040",
       "layout": "lore"
     },
     {
