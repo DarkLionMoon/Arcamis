@@ -56,19 +56,6 @@
       "slug": "gilda-avventurieri"
     },
     {
-      "k": "sartoria",
-      "l": "Sartoria",
-      "i": "🧵",
-      "id": "2ff0274fdc1c8035bad4f0b6ab705192",
-      "menu": true,
-      "admin": true,
-      "export": true,
-      "index": true,
-      "root": true,
-      "path": "lavori/sartoria",
-      "slug": "sartoria"
-    },
-    {
       "k": "changelog",
       "l": "Changelog",
       "i": "📝",
@@ -351,11 +338,6 @@
       "id": "2ff0274fdc1c80769a4ae243f22f0582"
     },
     {
-      "l": "Sartoria",
-      "i": "🧵",
-      "id": "2ff0274fdc1c8035bad4f0b6ab705192"
-    },
-    {
       "l": "Tribunale",
       "i": "⚖️",
       "id": "3460274fdc1c800c8b3bf9a53d0cbf59"
@@ -438,10 +420,6 @@
     },
     {
       "id": "2ff0274fdc1c80769a4ae243f22f0582",
-      "layout": "lavoro"
-    },
-    {
-      "id": "2ff0274fdc1c8035bad4f0b6ab705192",
       "layout": "lavoro"
     },
     {
