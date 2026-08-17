@@ -36,10 +36,7 @@ export async function onRequest(context) {
     { id: '31f0274fdc1c8059a923c73da185a0e3', title: 'Vigilius', icon: '🏛️' },
     { id: '31f0274fdc1c8019945af2b26306462f', title: 'Galeton', icon: '🏘️' },
     { id: '30d0274fdc1c803387c4fda013b857e9', title: 'Lago di Gromot', icon: '🌊' },
-    { id: '30d0274fdc1c8090aee7ed0430170414', title: 'Forte Vigilus', icon: '🛡️' },
-    { id: '31f0274fdc1c8075b0dec2e2a6bc359e', title: 'Riva di Ferro', icon: '⚓' },
-    { id: '31f0274fdc1c805b89b8f0678463e615', title: 'Fumofosco', icon: '🌫️' },
-    { id: '31f0274fdc1c808191abe4df86d176e6', title: 'Rovine di Kaldur', icon: '🏚️' }
+    { id: '31f0274fdc1c8075b0dec2e2a6bc359e', title: 'Riva di Ferro', icon: '⚓' }
   ];
 
   /* ── Helper: estrai testo plain dai blocchi ── */
