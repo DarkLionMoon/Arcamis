@@ -126,31 +126,69 @@ window.onAfterPageRender(function(){
 
 /* ════ MAPPA INTERATTIVA ════ */
 (function(){
-  var tip = document.getElementById('map-tip');
-  document.querySelectorAll('.mpin').forEach(function(pin){
-    pin.addEventListener('mouseenter', function(){
-      if(!tip) return;
-      document.getElementById('mt-name').textContent = pin.getAttribute('data-name')||'';
-      document.getElementById('mt-desc').textContent = pin.getAttribute('data-desc')||'';
-      var explored = pin.getAttribute('data-explored') === 'true';
-      var hint = document.getElementById('mt-hint');
-      if(hint) hint.textContent = explored ? 'Clicca per aprire' : 'Inesplorato';
-      tip.classList.add('visible');
-      var map = document.getElementById('arcamis-map');
-      var pr = pin.getBoundingClientRect();
-      var mr = map ? map.getBoundingClientRect() : {left:0,top:0};
-      tip.style.left = (pr.left - mr.left + pr.width/2) + 'px';
-      tip.style.top  = (pr.top  - mr.top  - 10) + 'px';
+  var _mpTypes = {
+    city:    {c:'rgba(220,175,60,.95)',  g:'rgba(220,175,60,.8)'},
+    village: {c:'rgba(200,155,60,.85)',  g:'rgba(200,155,60,.65)'},
+    fort:    {c:'rgba(190,130,50,.85)',  g:'rgba(190,130,50,.65)'},
+    forest:  {c:'rgba(60,200,80,.85)',   g:'rgba(60,200,80,.65)'},
+    water:   {c:'rgba(80,160,240,.85)',  g:'rgba(80,160,240,.65)'},
+    ruin:    {c:'rgba(150,80,240,.85)',  g:'rgba(150,80,240,.7)'},
+    fog:     {c:'rgba(140,100,240,.85)', g:'rgba(140,100,240,.7)'}
+  };
+
+  function _renderPinHTML(pin) {
+    var t = _mpTypes[pin.type] || _mpTypes.village;
+    var cls = 'mpin t-' + (pin.type || 'village');
+    var exp = pin.explored ? 'true' : 'false';
+    var attrs = 'class="'+cls+'" data-explored="'+exp+'" style="left:'+pin.left+';top:'+pin.top+';--pc:'+t.c+';--pg:'+t.g+'"'
+      +' data-id="'+(pin.pageId||'')+'" data-name="'+(pin.name||'').replace(/"/g,'&quot;')+'"'
+      +' data-desc="'+(pin.desc||'').replace(/"/g,'&quot;')+'" data-sub="'+(pin.sub||'')+'"';
+    return '<div '+attrs+'><div class="mpin-ring"></div><div class="mpin-dot"></div></div>';
+  }
+
+  function _bindPinEvents() {
+    var tip = document.getElementById('map-tip');
+    document.querySelectorAll('#dynamic-pins .mpin').forEach(function(pin){
+      pin.addEventListener('mouseenter', function(){
+        if(!tip) return;
+        document.getElementById('mt-name').textContent = pin.getAttribute('data-name')||'';
+        document.getElementById('mt-desc').textContent = pin.getAttribute('data-desc')||'';
+        var explored = pin.getAttribute('data-explored') === 'true';
+        var hint = document.getElementById('mt-hint');
+        if(hint) hint.textContent = explored ? 'Clicca per aprire' : 'Inesplorato';
+        tip.classList.add('vis');
+        var map = document.getElementById('arcamis-map');
+        var pr = pin.getBoundingClientRect();
+        var mr = map ? map.getBoundingClientRect() : {left:0,top:0};
+        tip.style.left = (pr.left - mr.left + pr.width/2) + 'px';
+        tip.style.top  = (pr.top  - mr.top  - 10) + 'px';
+      });
+      pin.addEventListener('mouseleave', function(){ if(tip) tip.classList.remove('vis'); });
+      pin.addEventListener('click', function(){
+        var id   = pin.getAttribute('data-id');
+        var name = pin.getAttribute('data-name');
+        var sub  = pin.getAttribute('data-sub');
+        if(sub){ closeSubMap(null); var panel = document.getElementById('sub-'+sub); if(panel) panel.classList.add('open'); return; }
+        if(id) gp(id, name, '📍');
+      });
     });
-    pin.addEventListener('mouseleave', function(){ if(tip) tip.classList.remove('visible'); });
-    pin.addEventListener('click', function(){
-      var id   = pin.getAttribute('data-id');
-      var name = pin.getAttribute('data-name');
-      var sub  = pin.getAttribute('data-sub');
-      if(sub){ closeSubMap(null); var panel = document.getElementById('sub-'+sub); if(panel) panel.classList.add('open'); return; }
-      if(id) gp(id, name, pin.querySelector('.mpin-dot') ? '📍' : '📄');
-    });
-  });
+  }
+
+  /* Carica puntine da API, altrimenti usa fallback */
+  var container = document.getElementById('dynamic-pins');
+  if(container){
+    fetch('/api/mappins')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        var pins = d.pins || [];
+        if(!pins.length) return;
+        container.innerHTML = pins.map(_renderPinHTML).join('');
+        _bindPinEvents();
+      })
+      .catch(function(){ /* fallback: niente, i pin non sono nel DOM */ });
+  }
+
+  /* Sub-map locations */
   document.querySelectorAll('.mloc').forEach(function(loc){
     loc.addEventListener('click', function(){
       var id   = loc.getAttribute('data-id');
