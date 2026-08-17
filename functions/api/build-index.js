@@ -22,7 +22,7 @@ export async function onRequest(context) {
 
   /* ── Pagine di primo livello (da data.js — hardcoded qui per semplicità) ── */
   const ROOT_PAGES = [
-    { id: '30d0274fdc1c804b9cb7e366f02bd635', title: 'Volonx', icon: '🏔️' }
+
   ];
 
   /* ── Helper: estrai testo plain dai blocchi ── */
