@@ -88,7 +88,6 @@ var _slugMap = {
   'maestria-titoli': '2f00274fdc1c802a9babd4239d97a319',
   'gameplay': '2f00274fdc1c8065a11ff45192aa5dcb',
   'materiale-approvato': '3130274fdc1c807eb61fde24e8236659',
-  'galleria-pg': '2fd0274fdc1c80d8b948c4133f874f28',
   'bottega-farmaceutica': '2f00274fdc1c801c9697e75caa8d5f13',
   'caserma': '2ff0274fdc1c80688dd6c2b293a1f626',
   'corporazione-costruttori': '2ff0274fdc1c80769a4ae243f22f0582',
