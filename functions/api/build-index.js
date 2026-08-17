@@ -28,11 +28,8 @@ export async function onRequest(context) {
     { id: '30d0274fdc1c804b9cb7e366f02bd635', title: 'Volonx', icon: '🏔️' },
     { id: '3000274fdc1c8033a214c44a1aa7f01f', title: 'Changelog', icon: '📝' },
     { id: '2f00274fdc1c802a9babd4239d97a319', title: 'Maestria / Titoli', icon: '🔨' },
-    { id: '2f00274fdc1c8065a11ff45192aa5dcb', title: 'Gameplay', icon: '⚔️' },
     { id: '3130274fdc1c807eb61fde24e8236659', title: 'Materiale approvato', icon: '📋' },
-    { id: '2ff0274fdc1c80769a4ae243f22f0582', title: 'Corporazione dei costruttori', icon: '🔨' },
-    { id: '2f00274fdc1c80679bd3c3df8a1fa040', title: 'Pantheon', icon: '🛐' },
-    { id: '2f10274fdc1c80489f23c49164747770', title: 'Mappe', icon: '🗺️' }
+    { id: '2f00274fdc1c80679bd3c3df8a1fa040', title: 'Pantheon', icon: '🛐' }
   ];
 
   /* ── Helper: estrai testo plain dai blocchi ── */

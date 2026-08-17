@@ -1,11 +1,7 @@
 const PAGES_TO_INDEX = [
   { id:'2f00274fdc1c802a9babd4239d97a319', title:'Maestria / Titoli', icon:'🔨' },
-  { id:'2f00274fdc1c8065a11ff45192aa5dcb', title:'Gameplay', icon:'⚔️' },
   { id:'3130274fdc1c807eb61fde24e8236659', title:'Materiale approvato', icon:'📋' },
-  { id:'2ff0274fdc1c80769a4ae243f22f0582', title:'Corporazione dei costruttori', icon:'🔨' },
-  { id:'3460274fdc1c800c8b3bf9a53d0cbf59', title:'Tribunale', icon:'⚖️' },
-  { id:'2f00274fdc1c80679bd3c3df8a1fa040', title:'Pantheon', icon:'🛐' },
-  { id:'2f10274fdc1c80489f23c49164747770', title:'Mappe', icon:'🗺️' }
+  { id:'2f00274fdc1c80679bd3c3df8a1fa040', title:'Pantheon', icon:'🛐' }
 ];
 
 const DATABASES_TO_INDEX = [

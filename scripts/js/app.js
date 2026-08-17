@@ -56,8 +56,6 @@ var _pathMap = {
   'regole/regole-del-server': 'pag-regole-del-server',
   'personaggio/materiale-approvato': 'pag-materiale-approvato',
   'lore/pantheon': 'pag-pantheon',
-  'lavori/corporazione-costruttori': '2ff0274fdc1c80769a4ae243f22f0582',
-  'mappe': '2f10274fdc1c80489f23c49164747770',
   'regole/gameplay/combattimento': '2f60274fdc1c80b7a729ef091b278682',
   'regole/gameplay/codex': '2f60274fdc1c80adb7a5d6beeef3e544',
   'homebrew/specie-hb': '2f00274fdc1c81a1bc4ddbf500704b80',
