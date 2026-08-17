@@ -56,19 +56,6 @@
       "slug": "gilda-avventurieri"
     },
     {
-      "k": "locanda",
-      "l": "Locanda",
-      "i": "🍺",
-      "id": "2f00274fdc1c80faa99eda064ef0fabc",
-      "menu": true,
-      "admin": true,
-      "export": true,
-      "index": true,
-      "root": true,
-      "path": "lavori/locanda",
-      "slug": "locanda"
-    },
-    {
       "k": "sartoria",
       "l": "Sartoria",
       "i": "🧵",
@@ -349,11 +336,6 @@
       "id": "2f00274fdc1c801b8c13cefd9e15694e"
     },
     {
-      "l": "Locanda",
-      "i": "🍺",
-      "id": "2f00274fdc1c80faa99eda064ef0fabc"
-    },
-    {
       "l": "Bottega farmaceutica",
       "i": "💊",
       "id": "2f00274fdc1c801c9697e75caa8d5f13"
@@ -444,10 +426,6 @@
     },
     {
       "id": "2f00274fdc1c801b8c13cefd9e15694e",
-      "layout": "lavoro"
-    },
-    {
-      "id": "2f00274fdc1c80faa99eda064ef0fabc",
       "layout": "lavoro"
     },
     {
