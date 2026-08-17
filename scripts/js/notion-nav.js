@@ -84,7 +84,6 @@ function _mdToHtml(md){
 
 /* ════ SLUG MAP (legacy — usata per retrocompatibilità ?p= ) ════ */
 var _slugMap = {
-  'changelog': '3000274fdc1c8033a214c44a1aa7f01f',
   'biblioteca-scoperta': '3040274fdc1c80ed816ef58f6a6b6f21',
   'specie-homebrew': '2f60274fdc1c80fba671c588ba93b116',
   'sottoclassi': '2f70274fdc1c80e3bdc7f95f81eb9cc0'

@@ -50,7 +50,6 @@ window.addEventListener('popstate', function(e){
    Usata dal deep link per risolvere il path al caricamento della pagina.
 ════════════════════════════════ */
 var _pathMap = {
-  'changelog': '3000274fdc1c8033a214c44a1aa7f01f',
   'lore/la-storia-di-gandora': 'pag-la-storia-di-gandora',
   'regole/regole-del-server': 'pag-regole-del-server',
   'personaggio/materiale-approvato': 'pag-materiale-approvato',

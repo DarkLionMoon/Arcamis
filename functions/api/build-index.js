@@ -22,10 +22,7 @@ export async function onRequest(context) {
 
   /* ── Pagine di primo livello (da data.js — hardcoded qui per semplicità) ── */
   const ROOT_PAGES = [
-    { id: '30d0274fdc1c800999feeb0ca6669b22', title: 'Selva Fogliabruna', icon: '🍂' },
-    { id: '30d0274fdc1c8016b113d5c2d7662d8f', title: 'Foresta Smarrimento', icon: '🌲' },
-    { id: '30d0274fdc1c804b9cb7e366f02bd635', title: 'Volonx', icon: '🏔️' },
-    { id: '3000274fdc1c8033a214c44a1aa7f01f', title: 'Changelog', icon: '📝' }
+    { id: '30d0274fdc1c804b9cb7e366f02bd635', title: 'Volonx', icon: '🏔️' }
   ];
 
   /* ── Helper: estrai testo plain dai blocchi ── */
