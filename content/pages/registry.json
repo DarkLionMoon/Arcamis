@@ -300,6 +300,10 @@
       ]
     },
     {
+      "v": "lavori",
+      "l": "Lavori"
+    },
+    {
       "v": "mestieri",
       "l": "Mestieri",
       "pages": []
@@ -307,12 +311,6 @@
     {
       "v": "homebrew",
       "l": "Homebrew",
-      "pages": []
-    },
-    {
-      "v": "",
-      "l": "— Nessuna (solo URL) —",
-      "adminOnly": true,
       "pages": []
     }
   ],
