@@ -8,8 +8,7 @@ const PAGES_TO_INDEX = [
   { id:'3460274fdc1c800c8b3bf9a53d0cbf59', title:'Tribunale', icon:'⚖️' },
   { id:'2f00274fdc1c806f8f17dbc6532d2211', title:'Storia del mondo', icon:'📖' },
   { id:'2f00274fdc1c80679bd3c3df8a1fa040', title:'Pantheon', icon:'🛐' },
-  { id:'2f10274fdc1c80489f23c49164747770', title:'Mappe', icon:'🗺️' },
-  { id:'2f00274fdc1c80e78ad7ce985007b7c6', title:'Homebrew', icon:'⚗️' }
+  { id:'2f10274fdc1c80489f23c49164747770', title:'Mappe', icon:'🗺️' }
 ];
 
 const DATABASES_TO_INDEX = [

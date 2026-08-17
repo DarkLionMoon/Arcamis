@@ -36,7 +36,6 @@ export async function onRequest(context) {
     { id: '2f00274fdc1c806f8f17dbc6532d2211', title: 'Storia del mondo', icon: '📖' },
     { id: '2f00274fdc1c80679bd3c3df8a1fa040', title: 'Pantheon', icon: '🛐' },
     { id: '2f10274fdc1c80489f23c49164747770', title: 'Mappe', icon: '🗺️' },
-    { id: '2f00274fdc1c80e78ad7ce985007b7c6', title: 'Homebrew', icon: '⚗️' },
     { id: '31f0274fdc1c8059a923c73da185a0e3', title: 'Vigilius', icon: '🏛️' },
     { id: '31f0274fdc1c8019945af2b26306462f', title: 'Galeton', icon: '🏘️' },
     { id: '30d0274fdc1c803387c4fda013b857e9', title: 'Lago di Gromot', icon: '🌊' },

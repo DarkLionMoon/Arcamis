@@ -94,7 +94,6 @@ var _slugMap = {
   'storia-del-mondo': '2f00274fdc1c806f8f17dbc6532d2211',
   'pantheon': '2f00274fdc1c80679bd3c3df8a1fa040',
   'mappe': '2f10274fdc1c80489f23c49164747770',
-  'homebrew': '2f00274fdc1c80e78ad7ce985007b7c6',
   'biblioteca-scoperta': '3040274fdc1c80ed816ef58f6a6b6f21',
   'specie-homebrew': '2f60274fdc1c80fba671c588ba93b116',
   'sottoclassi': '2f70274fdc1c80e3bdc7f95f81eb9cc0'
@@ -129,8 +128,7 @@ var _idToSlug = {};
 })();
 
 var _navMap = {
-  '2f00274fdc1c8065a11ff45192aa5dcb': 'regole',
-  '2f00274fdc1c80e78ad7ce985007b7c6': 'lore'
+  '2f00274fdc1c8065a11ff45192aa5dcb': 'regole'
 };
 
 function _navKeyForPage(id){
@@ -175,7 +173,6 @@ var _LAYOUT_DB_MAP = {
   '2fb0274fdc1c8073addaf1d5a3e9768b': 'lore',
   '2fb0274fdc1c8080b07bd553e953c88d': 'lore',
   '2f90274fdc1c8015bf95f52c4e7681b8': 'lore',
-  '2f00274fdc1c80e78ad7ce985007b7c6': 'lore',
   '2f00274fdc1c801c9697e75caa8d5f13': 'lavoro',
   '2ff0274fdc1c80688dd6c2b293a1f626': 'lavoro',
   '2ff0274fdc1c80769a4ae243f22f0582': 'lavoro',
