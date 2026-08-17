@@ -277,17 +277,6 @@
       "i": "🏚️",
       "id": "31f0274fdc1c808191abe4df86d176e6",
       "root": true
-    },
-    {
-      "k": "lavori",
-      "l": "Lavori",
-      "i": "📄",
-      "id": "pag-lavori",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "sec": "lavori",
-      "path": "lavori/lavori"
     }
   ],
   "sections": [
