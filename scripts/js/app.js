@@ -80,7 +80,6 @@ var _pathMap = {
   'lore/mondo/pde': '2fb0274fdc1c8080b07bd553e953c88d',
   'lore/mondo/npc': '2f90274fdc1c8015bf95f52c4e7681b8',
   'mappe/arcamis': '2f10274fdc1c80dca8caeb2e6de23146',
-  'personaggio/andando-avanti': '5cea525d149f4acb9c59007bf6b3d5ff',
   'sottoclassi': '2f70274fdc1c80e3bdc7f95f81eb9cc0',
   'specie-homebrew': '2f60274fdc1c80fba671c588ba93b116'
 };
