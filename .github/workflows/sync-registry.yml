@@ -3,14 +3,21 @@ name: Sync generated artifacts
 on:
   push:
     branches: [main]
+    paths:
+      - 'content/pages/registry.json'
+      - 'content/pages/**/*.json'
 
 permissions:
   contents: write
 
 jobs:
   sync:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     name: Regenerate generated artifacts
+    concurrency:
+      group: sync-registry
+      cancel-in-progress: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
