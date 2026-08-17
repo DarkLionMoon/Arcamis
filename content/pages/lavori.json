@@ -1,0 +1,8 @@
+{
+  "k": "lavori",
+  "title": "Lavori",
+  "icon": "📄",
+  "content": "# Nome del Lavoro\n\nDescrizione generale del lavoro, atmosfera e regole base.\n\n---\n\n## Stipendio\n\nLo stipendio dipende da:\n\nA) Livello del PG\n\n> • Apprendista (Livelli 1-5) = 15 mo base\n> • Professionista (Livelli 6-12) = 25 mo base\n> • Mastro (Livelli 13-20) = 35 mo base\n\nB) Giorni di lavoro\n\n> • I primi 5 giorni: stipendio base\n> • Dopo 5 giorni: bonus stock extra\n\nC) Modificatore caratteristica\n\n> • **INT** o **CHA** a seconda del lavoro\n\n## Requisiti\n\n- Requisito 1\n- Requisito 2\n- Requisito 3\n\n## Regole\n\n- Regola 1\n- Regola 2",
+  "layout": "lavoro",
+  "lastModified": "2026-08-17T17:00:41.936Z"
+}
