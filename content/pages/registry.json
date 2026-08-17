@@ -43,19 +43,6 @@
       "root": true
     },
     {
-      "k": "gilda",
-      "l": "Gilda degli avventurieri",
-      "i": "🗡️",
-      "id": "2f00274fdc1c801b8c13cefd9e15694e",
-      "menu": true,
-      "admin": true,
-      "export": true,
-      "index": true,
-      "root": true,
-      "path": "lavori/gilda-avventurieri",
-      "slug": "gilda-avventurieri"
-    },
-    {
       "k": "changelog",
       "l": "Changelog",
       "i": "📝",
@@ -373,10 +360,6 @@
     {
       "id": "2f00274fdc1c80e78ad7ce985007b7c6",
       "layout": "lore"
-    },
-    {
-      "id": "2f00274fdc1c801b8c13cefd9e15694e",
-      "layout": "lavoro"
     },
     {
       "id": "2f00274fdc1c801c9697e75caa8d5f13",
