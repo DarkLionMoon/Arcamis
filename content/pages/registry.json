@@ -142,16 +142,6 @@
       "slug": "bottega-farmaceutica"
     },
     {
-      "k": "caserma",
-      "l": "Caserma",
-      "i": "🛡️",
-      "id": "2ff0274fdc1c80688dd6c2b293a1f626",
-      "index": true,
-      "root": true,
-      "path": "lavori/caserma",
-      "slug": "caserma"
-    },
-    {
       "k": "corporazione-costruttori",
       "l": "Corporazione dei costruttori",
       "i": "🔨",
@@ -325,10 +315,6 @@
     },
     {
       "id": "2f00274fdc1c801c9697e75caa8d5f13",
-      "layout": "lavoro"
-    },
-    {
-      "id": "2ff0274fdc1c80688dd6c2b293a1f626",
       "layout": "lavoro"
     },
     {
