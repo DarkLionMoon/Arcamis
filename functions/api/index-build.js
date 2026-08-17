@@ -1,5 +1,5 @@
 const PAGES_TO_INDEX = [
-  { id:'2f00274fdc1c80679bd3c3df8a1fa040', title:'Pantheon', icon:'🛐' }
+
 ];
 
 const DATABASES_TO_INDEX = [

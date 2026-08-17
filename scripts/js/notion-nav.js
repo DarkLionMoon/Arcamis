@@ -85,7 +85,6 @@ function _mdToHtml(md){
 /* ════ SLUG MAP (legacy — usata per retrocompatibilità ?p= ) ════ */
 var _slugMap = {
   'changelog': '3000274fdc1c8033a214c44a1aa7f01f',
-  'pantheon': '2f00274fdc1c80679bd3c3df8a1fa040',
   'biblioteca-scoperta': '3040274fdc1c80ed816ef58f6a6b6f21',
   'specie-homebrew': '2f60274fdc1c80fba671c588ba93b116',
   'sottoclassi': '2f70274fdc1c80e3bdc7f95f81eb9cc0'
@@ -164,7 +163,6 @@ var _LAYOUT_DB_MAP = {
   '2fb0274fdc1c8073addaf1d5a3e9768b': 'lore',
   '2fb0274fdc1c8080b07bd553e953c88d': 'lore',
   '2f90274fdc1c8015bf95f52c4e7681b8': 'lore',
-  '2f00274fdc1c80679bd3c3df8a1fa040': 'lore',
   '2f70274fdc1c803ca5cafa97ca1817cd': 'bestiario',
   '2f10274fdc1c80dca8caeb2e6de23146': 'fazioni',
   '2ff0274fdc1c807ea473db02ac4ae391': 'oggetti',

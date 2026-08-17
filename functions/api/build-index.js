@@ -26,8 +26,7 @@ export async function onRequest(context) {
     { id: '30d0274fdc1c800999feeb0ca6669b22', title: 'Selva Fogliabruna', icon: '🍂' },
     { id: '30d0274fdc1c8016b113d5c2d7662d8f', title: 'Foresta Smarrimento', icon: '🌲' },
     { id: '30d0274fdc1c804b9cb7e366f02bd635', title: 'Volonx', icon: '🏔️' },
-    { id: '3000274fdc1c8033a214c44a1aa7f01f', title: 'Changelog', icon: '📝' },
-    { id: '2f00274fdc1c80679bd3c3df8a1fa040', title: 'Pantheon', icon: '🛐' }
+    { id: '3000274fdc1c8033a214c44a1aa7f01f', title: 'Changelog', icon: '📝' }
   ];
 
   /* ── Helper: estrai testo plain dai blocchi ── */
