@@ -10,7 +10,8 @@ var pages = [
   {k:'la-storia-di-gandora',l:'La Storia di Gandora',i:'🐉',id:'pag-la-storia-di-gandora',sec:'lore',sub:'Storia'},
   {k:'regole-del-server',l:'Regole del Server',i:'📋',id:'pag-regole-del-server',sec:'regole'},
   {k:'materiale-approvato',l:'Materiale Approvato',i:'📖',id:'pag-materiale-approvato',sec:'personaggio',sub:'Regole'},
-  {k:'pantheon',l:'Pantheon',i:'🛐',id:'pag-pantheon',sec:'lore'}
+  {k:'pantheon',l:'Pantheon',i:'🛐',id:'pag-pantheon',sec:'lore'},
+  {k:'lavori-nella-land',l:'Lavori nella Land',i:'📄',id:'pag-lavori-nella-land',sec:'lavori'}
 ];
 
 function getPage(idOrK){
