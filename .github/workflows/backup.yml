@@ -12,26 +12,39 @@ jobs:
   backup:
     runs-on: ubuntu-latest
     name: Backup KV + Repo to R2
+    env:
+      CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_REPO: ${{ github.repository }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check secrets
+        id: check
+        run: |
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ] || [ -z "$KV_NAMESPACE_ID" ]; then
+            echo "⚠️  Secrets mancanti (CF_API_TOKEN, CF_ACCOUNT_ID, KV_NAMESPACE_ID). Backup saltato."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node
+        if: steps.check.outputs.configured == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install dependencies
+        if: steps.check.outputs.configured == 'true'
         run: npm ci
         working-directory: scripts
 
       - name: Run backup
-        env:
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          GH_REPO: ${{ github.repository }}
+        if: steps.check.outputs.configured == 'true'
         run: node backup-kv.js
         working-directory: scripts
