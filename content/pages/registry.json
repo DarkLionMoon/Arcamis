@@ -3,16 +3,6 @@
   "guild": "1348723468157456425",
   "pages": [
     {
-      "k": "foresta",
-      "l": "Foresta Smarrimento",
-      "i": "🌲",
-      "id": "30d0274fdc1c8016b113d5c2d7662d8f",
-      "menu": true,
-      "admin": true,
-      "export": true,
-      "root": true
-    },
-    {
       "k": "volonx",
       "l": "Volonx",
       "i": "🏔️",
