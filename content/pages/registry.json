@@ -157,16 +157,6 @@
       "index": true,
       "root": true,
       "slug": "pantheon"
-    },
-    {
-      "k": "mappe",
-      "l": "Mappe",
-      "i": "🗺️",
-      "id": "2f10274fdc1c80489f23c49164747770",
-      "index": true,
-      "root": true,
-      "path": "mappe",
-      "slug": "mappe"
     }
   ],
   "sections": [
