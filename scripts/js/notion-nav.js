@@ -266,23 +266,8 @@ function buildCrumb(currentLabel){
   return h;
 }
 
-/* ════ SOMMARIO LATERALE (ToC) ════ */
-var _tocCache = null;
-var _tocTs = 0;
-function _fetchTocSetting(){
-  var now = Date.now();
-  if(_tocCache !== null && (now - _tocTs) < 60000) return Promise.resolve(_tocCache);
-  return fetch('/api/admin?action=get_site_settings')
-    .then(function(r){ return r.json(); })
-    .then(function(j){
-      _tocCache = !!(j.settings && j.settings.showToc);
-      _tocTs = Date.now();
-      return _tocCache;
-    })
-    .catch(function(){ _tocCache = false; _tocTs = Date.now(); return false; });
-}
-function _invalidateTocCache(){ _tocCache = null; _tocTs = 0; }
-function _maybeBuildToc(pbody){
+/* ════ SOMMARIO LATERALE (ToC) — per-pagina ════ */
+function _maybeBuildToc(pbody, showToc){
   var old = pbody.querySelector('.toc-wrap');
   if(old) old.remove();
   var nc = pbody.querySelector('.nc');
@@ -292,42 +277,40 @@ function _maybeBuildToc(pbody){
   nc.parentNode.insertBefore(wrap, nc);
   wrap.appendChild(nc);
 
-  _fetchTocSetting().then(function(enabled){
-    if(!enabled){ wrap.classList.remove('toc-active'); return; }
-    wrap.classList.add('toc-active');
-    var headings = nc.querySelectorAll('h2, h3, .n-h2, .n-h3');
-    if(headings.length < 2){ wrap.classList.remove('toc-active'); return; }
-    var nav = document.createElement('nav');
-    nav.className = 'toc-sidebar';
-    var ul = document.createElement('ul');
-    headings.forEach(function(h, i){
-      var id = 'toc-h-' + i;
-      h.id = id;
-      var li = document.createElement('li');
-      li.className = 'toc-lvl-' + (h.tagName === 'H3' || h.classList.contains('n-h3') ? '2' : '1');
-      var a = document.createElement('a');
-      a.href = '#' + id;
-      a.textContent = h.textContent.trim();
-      a.addEventListener('click', function(e){
-        e.preventDefault();
-        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-      li.appendChild(a);
-      ul.appendChild(li);
+  if(!showToc){ return; }
+  wrap.classList.add('toc-active');
+  var headings = nc.querySelectorAll('h2, h3, .n-h2, .n-h3');
+  if(headings.length < 2){ wrap.classList.remove('toc-active'); return; }
+  var nav = document.createElement('nav');
+  nav.className = 'toc-sidebar';
+  var ul = document.createElement('ul');
+  headings.forEach(function(h, i){
+    var id = 'toc-h-' + i;
+    h.id = id;
+    var li = document.createElement('li');
+    li.className = 'toc-lvl-' + (h.tagName === 'H3' || h.classList.contains('n-h3') ? '2' : '1');
+    var a = document.createElement('a');
+    a.href = '#' + id;
+    a.textContent = h.textContent.trim();
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      h.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-    nav.appendChild(ul);
-    wrap.insertBefore(nav, nc);
-    var tocLinks = nav.querySelectorAll('a');
-    var observer = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if(entry.isIntersecting){
-          var idx = entry.target.id.replace('toc-h-','');
-          tocLinks.forEach(function(l,i){ l.classList.toggle('active', i == idx); });
-        }
-      });
-    }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
-    headings.forEach(function(h){ observer.observe(h); });
+    li.appendChild(a);
+    ul.appendChild(li);
   });
+  nav.appendChild(ul);
+  wrap.insertBefore(nav, nc);
+  var tocLinks = nav.querySelectorAll('a');
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        var idx = entry.target.id.replace('toc-h-','');
+        tocLinks.forEach(function(l,i){ l.classList.toggle('active', i == idx); });
+      }
+    });
+  }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+  headings.forEach(function(h){ observer.observe(h); });
 }
 
 /* ════ OPEN PAGE — gp() ════ */
@@ -439,7 +422,7 @@ async function _gpRender(id,label,icon){
           + '<div class="n-page-footer-text">Archivi di Arcamis — ' + _siteEsc(_deity.n) + '</div></div>';
         _pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + _scrubHtmlString(_renderDeityPage(_deity)) + _deityFooter + '</div>';
         applyGlossary(_pbody);
-        _maybeBuildToc(_pbody);
+        _maybeBuildToc(_pbody, false);
         if(typeof afterPageRender === 'function') afterPageRender();
         return;
       }
@@ -501,7 +484,7 @@ async function _gpRender(id,label,icon){
             + '<div class="n-page-footer-text">Archivi di Arcamis — ' + ptitle + '</div></div>';
           pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + (_scrubHtmlString(_localHtml || '') || _emptyHtml) + _footer + '</div>';
           applyGlossary(pbody);
-          _maybeBuildToc(pbody);
+          _maybeBuildToc(pbody, !!_localJson.toc);
           if(typeof afterPageRender === 'function') afterPageRender();
           return;
         }
@@ -634,7 +617,7 @@ async function _gpRender(id,label,icon){
     });
     initFadeIn(pbody);
     setTimeout(function(){ _initCarouselArrows(pbody); },200);
-    _maybeBuildToc(pbody);
+    _maybeBuildToc(pbody, false);
 
     _setNavFromPage(id);
     if(data.page)_renderLastUpdated(data.page.last_edited_time);

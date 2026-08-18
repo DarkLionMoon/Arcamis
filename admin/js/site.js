@@ -653,11 +653,6 @@ async function openSettings(){
     +'<option value="pv"'+(defaultView==='pv'?' selected':'')+'>Solo anteprima</option>'
     +'</select></div></div>'
     +'<div class="panel-sub" style="margin-top:10px">Scorciatoie: Ctrl+S salva · Ctrl+B grassetto · Ctrl+I corsivo · Ctrl+Z annulla · Tab indenta.</div></div>';
-  h+='<div class="panel"><div class="panel-head"><h3>Funzionalità del sito</h3><span class="hint">impostazioni globali visibili ai visitatori</span></div>'
-    +'<div class="kv-rows">'
-    +'<div class="kv-row"><div class="kv-main"><div class="kt">Sommario laterale</div><div class="ks">Mostra un indice con i link alle sezioni nella barra laterale di ogni pagina</div></div>'
-    +'<div class="ract"><label class="toggle"><input type="checkbox" id="set-toc" onchange="saveSiteSetting(\'showToc\',this.checked)"><span class="slider"></span></label></div></div>'
-    +'</div></div>';
   h+='<div class="grid-2">';
   h+='<div class="panel"><div class="panel-head"><h3>Repository</h3></div>'
     +'<div class="kv-rows">'
@@ -678,31 +673,6 @@ async function openSettings(){
   document.getElementById('main').innerHTML=h;
   pingDeployStatus();
   refreshGHTokenStatus();
-  loadSiteSettings();
-}
-async function loadSiteSettings(){
-  try{
-    var r=await fetch('/api/admin?action=get_site_settings',{credentials:'include'});
-    var j=await r.json();
-    var s=j.settings||{};
-    var toc=document.getElementById('set-toc');
-    if(toc)toc.checked=!!s.showToc;
-  }catch(e){}
-}
-async function saveSiteSetting(key,value){
-  try{
-    var r=await fetch('/api/admin?action=get_site_settings',{credentials:'include'});
-    var j=await r.json();
-    var s=j.settings||{};
-    s[key]=value;
-    await fetch('/api/admin?action=set_site_settings',{
-      method:'POST',
-      credentials:'include',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({settings:s})
-    });
-    toast('Impostazione salvata');
-  }catch(e){toast('Errore salvataggio','err');}
 }
 async function refreshGHTokenStatus(){
   var el=document.getElementById('gh-token-st');

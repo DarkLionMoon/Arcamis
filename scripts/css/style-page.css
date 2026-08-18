@@ -37,6 +37,7 @@
 
 /* Page body */
 #pbody{padding:36px clamp(20px,5vw,44px) 60px;max-width:860px;margin:0 auto;width:100%}
+#pbody:has(.toc-active){max-width:1120px}
 
 /* ── Hero accent color ── */
 .ph-topline{background:linear-gradient(90deg,transparent,var(--ph-acc,var(--gold3)),transparent)!important;opacity:.6!important}
@@ -738,4 +739,5 @@
 .toc-sidebar::-webkit-scrollbar-thumb{background:rgba(200,155,60,.15);border-radius:3px}
 @media(max-width:900px){
   .toc-sidebar{display:none}
+  #pbody:has(.toc-active){max-width:860px}
 }

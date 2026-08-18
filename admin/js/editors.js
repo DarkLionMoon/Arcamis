@@ -114,7 +114,7 @@ async function openPage(k){
     json={k:k,title:meta?meta.l:k,icon:meta?meta.i:'📄',content:'# '+(meta?meta.l:k)+'\n\nInserisci il contenuto qui...',lastModified:new Date().toISOString()};
     sha=null;
   }
-  _current={type:'page',k:k,sha:sha,title:json.title,icon:json.icon,layout:json.layout||''};
+  _current={type:'page',k:k,sha:sha,title:json.title,icon:json.icon,layout:json.layout||'',toc:!!json.toc};
   var st=_stLayoutFor(json.layout||'');
   setCrumb('Contenuti','Pagine wiki');
   setTitle((json.icon||'📄')+' '+(json.title||k));
@@ -146,6 +146,7 @@ async function openPage(k){
   h+='<label>Titolo<input id="e-title" class="in mm-t" value="'+escAttr(json.title||'')+'" oninput="onMetaInput()" placeholder="Titolo pagina"></label>';
   h+='<label>Icona<input id="e-icon" class="in mm-icon" value="'+escAttr(json.icon||'')+'" oninput="onMetaInput()" maxlength="6" placeholder="📄"></label>';
   h+='<label>Layout<select id="e-layout" class="in mm-layout" onchange="onLayoutChange(this.value)">'+layoutOpts+'</select></label>';
+  h+='<label class="ed-toc-toggle">Sommario<input type="checkbox" id="e-toc" '+(json.toc?'checked':'')+' onchange="_current.toc=this.checked"></label>';
   h+='</div>';
   if(st){
     h+='<textarea id="e-md" style="display:none" placeholder="Contenuto Markdown (sincronizzato dai blocchi)...">'+esc(json.content||'')+'</textarea>';
@@ -473,7 +474,7 @@ async function savePage(){
   var md=document.getElementById('e-md').value;
   _current.title=getTitle()||_current.title;
   _current.icon=getIcon()||_current.icon;
-  var json={k:_current.k,title:_current.title,icon:_current.icon,content:md,layout:_current.layout||'',lastModified:new Date().toISOString()};
+  var json={k:_current.k,title:_current.title,icon:_current.icon,content:md,layout:_current.layout||'',toc:!!_current.toc,lastModified:new Date().toISOString()};
   var path=CONTENT+'/pages/'+_current.k+'.json';
   setStatus('saving','verifica conflitti...');
   if(!await _checkRemoteSha()){
