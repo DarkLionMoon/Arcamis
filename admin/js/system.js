@@ -160,9 +160,7 @@ function audFilter(q){var b=document.getElementById('aud-body');if(b)b.innerHTML
 /* ═══════════════ BOOT ═══════════════ */
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
-    ['img-modal','hist-modal','lk-modal','cs-modal','np-modal','rn-modal','nr-modal','cv-modal','au-modal','eu-modal'].forEach(function(id){
-      closeModal(id);
-    });
+    document.querySelectorAll('.md-backdrop').forEach(function(el){el.remove()});
   }
 });
 (function(){

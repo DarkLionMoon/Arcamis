@@ -725,6 +725,7 @@ async function createNewPage(){
     await ghPut(CONTENT+'/pages/'+slug+'.json','admin: create page '+slug,JSON.stringify(json,null,2),null);
     await addToRegistry(slug,label,icon,'pag-'+slug,sec,sub);
     PAGES.push({k:slug,l:label,i:icon,sec:sec,sub:sub,c:1});
+    _contentIndex=null;
     buildSidebar();
     closeNewPageModal();
     toast('Pagina "'+label+'" creata! Deploy in corso (~30s)...','success');
@@ -827,6 +828,7 @@ async function deletePage(){
     if(id&&id.indexOf('pag-')!==0)await removeFromIndex(slug,id);
     for(var i=0;i<PAGES.length;i++){if(PAGES[i].k===slug){PAGES.splice(i,1);break}}
     _modified=false;
+    _contentIndex=null;
     _current=null;
     buildSidebar();
     document.getElementById('main').innerHTML='<div class="empty"><span class="ei">🗑</span>'+esc(label)+' eliminata</div>';
