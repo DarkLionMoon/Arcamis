@@ -103,6 +103,7 @@ function runCmd(cmd){if(EDITOR_CMDS[cmd])EDITOR_CMDS[cmd]()}
 
 /* ── APERTURA PAGINA ── */
 async function openPage(k){
+  _mapActive=false;
   var meta=PAGES.find(function(p){return p.k===k});
   var path=CONTENT+'/pages/'+k+'.json';
   var json,sha;
@@ -420,6 +421,11 @@ function onLayoutChange(val,silent){
   _current.layout=val;
   var md=document.getElementById('e-md');
   if(window.__stMode){
+    if(!silent&&!confirm('Cambiare layout? I blocchi verranno riparseti con il nuovo template. Le modifiche non salvate andranno perse.')){
+      var ls=document.getElementById('e-layout');
+      if(ls)ls.value=_current.layout||'';
+      return;
+    }
     _stSetKind(val);
     initStructuredEditor(md?md.value:'');
     var info=document.getElementById('e-pv-info');
@@ -508,7 +514,7 @@ function openImgDialog(){
     +'<div class="fld"><label>URL immagine</label><input id="img-url" class="in" type="url" placeholder="https://… oppure /images/…" onkeydown="if(event.key===\'Enter\')insertImgFromUrl()">'
     +'<div class="md-actions" style="padding:6px 0 0;border:none"><button class="btn btn-soft btn-sm" onclick="insertImgFromUrl()">Usa URL</button></div></div>'
     +'<div class="or">oppure carica dal PC</div>'
-    +'<div class="upload-zone"><input type="file" id="img-file" accept="image/*" onchange="imgFileSelected(this)"><span class="uzi">🖼</span>Scegli un file immagine<br><small style="color:var(--dim)">viene compresso e caricato su /images/</small></div>'
+    +'<div class="upload-zone"><input type="file" id="img-file" accept="image/*" aria-label="Carica immagine dal PC" onchange="imgFileSelected(this)"><span class="uzi">🖼</span>Scegli un file immagine<br><small style="color:var(--dim)">viene compresso e caricato su /images/</small></div>'
     +'<img id="img-preview" class="img-prev" alt="anteprima">'
     +'<div class="md-status" id="img-status"></div>',
     '<button class="btn btn-soft" onclick="closeImgDialog()">Annulla</button>'
@@ -519,18 +525,18 @@ function openImgDialog(){
 function closeImgDialog(){closeModal('img-modal')}
 var _emojiList=['📜','📖','⚔️','🛡️','🏰','🐉','🔮','💀','🗺️','🏹','🗡️','🪄','🧙','🧝','🧟','👑','💰','🔔','⏳','🔥','❄️','⚡','🌙','☀️','⭐','🌿','🕯️','🍷','🍞','🪙','⚒️','🎯','🎲','🧵','🪶','💍','⚗️','🌊','🏔️','🌲','🦌','🐺','🦅','🐎','🧊','🌋','🕸️','🦇','🪓','🛶','🏕️','🎪','📯','⚖️','🗝️','🧭','👁️','🗿','🍖','🫙','🧂'];
 function openEmojiDialog(){
-  if(document.getElementById('img-modal'))return;
+  if(document.getElementById('emoji-modal'))return;
   var grid=_emojiList.map(function(e){return '<button type="button" class="em-cell" data-emoji="'+e+'">'+e+'</button>'}).join('');
-  modalHtml('img-modal','😀 Inserisci emoji','<div class="em-grid">'+grid+'</div>','<button class="btn btn-soft" onclick="closeImgDialog()">Annulla</button>');
-  var cells=document.querySelectorAll('#img-modal .em-cell');
-  for(var i=0;i<cells.length;i++)cells[i].addEventListener('click',function(){insMd(this.getAttribute('data-emoji'));closeImgDialog()});
+  modalHtml('emoji-modal','😀 Inserisci emoji','<div class="em-grid">'+grid+'</div>','<button class="btn btn-soft" onclick="closeModal(\'emoji-modal\')">Annulla</button>');
+  var cells=document.querySelectorAll('#emoji-modal .em-cell');
+  for(var i=0;i<cells.length;i++)cells[i].addEventListener('click',function(){insMd(this.getAttribute('data-emoji'));closeModal('emoji-modal')});
 }
 function openTableDialog(){
-  if(document.getElementById('img-modal'))return;
-  modalHtml('img-modal','⊞ Inserisci tabella',
+  if(document.getElementById('table-modal'))return;
+  modalHtml('table-modal','⊞ Inserisci tabella',
     '<div class="fld"><label>Colonne</label><input id="tbl-cols" class="in" type="number" min="1" max="12" value="3"></div>'
     +'<div class="fld"><label>Righe</label><input id="tbl-rows" class="in" type="number" min="1" max="30" value="3"></div>',
-    '<button class="btn btn-soft" onclick="closeImgDialog()">Annulla</button>'
+    '<button class="btn btn-soft" onclick="closeModal(\'table-modal\')">Annulla</button>'
     +'<button class="btn btn-p" onclick="insertTable()">Inserisci</button>');
   var c=document.getElementById('tbl-cols');
   if(c)c.focus();
@@ -544,7 +550,7 @@ function insertTable(){
   for(var i=1;i<r;i++)txt+='\n|'+pad;
   txt+='\n';
   insMd(txt);
-  closeImgDialog();
+  closeModal('table-modal');
 }
 function imgFileSelected(input){
   var file=input.files&&input.files[0];

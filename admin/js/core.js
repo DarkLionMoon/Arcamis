@@ -301,12 +301,6 @@ async function doLogin(){
   window.addEventListener('beforeunload',function(e){
     if(_modified){e.preventDefault();e.returnValue=''}
   });
-  var restored=_checkUnsaved();
-  if(restored&&_current){
-    var md=document.getElementById('e-md')||document.getElementById('e-json');
-    if(md)md.value=restored;
-    _autosaveClear();
-  }
   buildSidebar();
   renderDashboard();
   toast('Benvenuto, '+user+' ('+role+')','success');
@@ -408,6 +402,7 @@ function _dashGrid(label,type,items){
 }
 async function renderDashboard(){
   _current=null;
+  _mapActive=false;
   setCrumb('Dashboard','');
   setTitle('Panoramica');
   setStatus('idle','pronto');
@@ -458,15 +453,19 @@ async function _dashActivity(){
   try{
     var r=await fetch('/api/admin?action=get_log',{credentials:'include'});
     var j=await r.json();
-    var entries=(j.entries||[]).slice(0,6);
+    var all=(j.entries||[]);
+    var entries=all.slice(0,10);
     if(!box)return;
     if(!entries.length){box.innerHTML='<div class="empty" style="padding:22px"><span class="ei">🗒️</span>Nessuna attività registrata</div>';return}
-    box.innerHTML=entries.map(function(e){
+    var h=entries.map(function(e){
       var ico=e.action==='save_page'?'📝':e.action==='cover_page'?'🖌️':'⚙️';
+      var user=e.user?' <span style="color:var(--dim);font-size:10px">'+esc(e.user)+'</span>':'';
       return '<div class="act-item"><div class="act-dot" style="background:var(--acc)"></div>'
-        +'<div class="act-main"><div class="act-t">'+ico+' <b>'+esc(e.action||'')+'</b> → '+esc(e.target||'')+'</div>'
+        +'<div class="act-main"><div class="act-t">'+ico+' <b>'+esc(e.action||'')+'</b> → '+esc(e.target||'')+user+'</div>'
         +'<div class="act-s">'+esc(dateFmt(e.timestamp))+'</div></div></div>';
     }).join('');
+    if(all.length>10)h+='<div style="text-align:center;padding:8px"><button class="btn btn-soft btn-sm" onclick="openAudit()">Vedi tutto ('+all.length+')</button></div>';
+    box.innerHTML=h;
   }catch(e){
     if(box)box.innerHTML='<div class="empty" style="padding:22px"><span class="ei">⚠️</span>Registro non disponibile</div>';
   }

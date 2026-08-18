@@ -112,7 +112,7 @@ function _carSlideHtml(idx,covers){
     +'<div class="se-prev" id="cs-prev-'+idx+'" style="'+(curImg?'background-image:url(\''+escAttr(curImg)+'\')':'')+'">'+(curImg?'':'Nessuna immagine')+'</div>'
     +'<div class="se-grid">'
     +'<div class="fld"><label>Sfondo — URL</label><input id="cs-img-'+idx+'" class="in" value="'+escAttr(curImg)+'" oninput="document.getElementById(\'cs-prev-'+idx+'\').style.backgroundImage=this.value?\'url(\'+this.value+\')\':\'none\';document.getElementById(\'cs-prev-'+idx+'\').textContent=this.value?\'\':\'Nessuna immagine\'" placeholder="https://… o /images/…"></div>'
-    +'<div class="fld"><label>Sfondo — carica dal PC</label><div class="upload-zone" style="padding:10px"><input type="file" accept="image/*" onchange="carSlideUpload(event,'+idx+')"><span class="uzi">🖼</span>Compressa e caricata su /images/</div></div>'
+    +'<div class="fld"><label>Sfondo — carica dal PC</label><div class="upload-zone" style="padding:10px"><input type="file" accept="image/*" aria-label="Carica immagine sfondo slide" onchange="carSlideUpload(event,'+idx+')"><span class="uzi">🖼</span>Compressa e caricata su /images/</div></div>'
     +'<div class="fld"><label>Tag (piccolo sopra)</label><input id="cs-tag-'+idx+'" class="in" value="'+escAttr(tag)+'"></div>'
     +'<div class="fld"><label>Titolo (grande)</label><input id="cs-tit-'+idx+'" class="in" value="'+escAttr(tit)+'"></div>'
     +'</div>'
@@ -286,7 +286,7 @@ function openCoverModal(pageId,label,cur){
   _coverCur={id:pageId,label:label};
   modalHtml('cv-modal','🖌️ Cover — '+esc(label),
     '<div class="fld"><label>URL immagine</label><input id="cv-url" class="in" value="'+escAttr(cur)+'" oninput="document.getElementById(\'cv-prev\').style.backgroundImage=this.value?\'url(\'+this.value+\')\':\'\'"></div>'
-    +'<div class="fld"><label>Oppure carica dal PC</label><div class="upload-zone"><input type="file" accept="image/*" onchange="coverFile(event)"><span class="uzi">🖼</span>Compressa e caricata su /images/</div></div>'
+    +'<div class="fld"><label>Oppure carica dal PC</label><div class="upload-zone"><input type="file" accept="image/*" aria-label="Carica immagine cover pagina" onchange="coverFile(event)"><span class="uzi">🖼</span>Compressa e caricata su /images/</div></div>'
     +'<div class="cover-thumb" id="cv-prev" style="width:100%;height:120px;'+(cur?'background-image:url(\''+escAttr(cur)+'\')':'')+'">'+(cur?'':'Nessuna immagine')+'</div>'
     +'<div class="md-status" id="cv-st"></div>',
     '<button class="btn btn-soft" onclick="closeModal(\'cv-modal\')">Annulla</button>'
@@ -622,6 +622,7 @@ async function openSettings(){
   if(_modified&&!confirm('Hai modifiche non salvate. Continuare?'))return;
   _modified=false;
   _current=null;
+  _secCount=null;
   setActive('settings');
   closeSidebar();
   setCrumb('Sito','Impostazioni');

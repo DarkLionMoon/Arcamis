@@ -10,6 +10,7 @@ var MAP_IMAGE_URL = '/mappa.webp';
 var _mapDirty = false;
 var _mapDragPin = null;
 var _mapDragOffset = { x: 0, y: 0 };
+var _mapActive = false;
 
 var MAP_PIN_TYPES = [
   { v: 'city',    l: 'Città',       c: 'rgba(220,175,60,.95)',  g: 'rgba(220,175,60,.8)' },
@@ -95,6 +96,7 @@ function openMapEditor() {
   if (_modified && !confirm('Hai modifiche non salvate. Continuare?')) return;
   _modified = false;
   _current = null;
+  _mapActive = true;
   setActive('mappins');
   closeSidebar();
   setCrumb('Sito', 'Editor Mappa');
@@ -117,7 +119,7 @@ function openMapEditor() {
     h += '<input id="me-map-image" class="in" style="flex:1" value="' + escAttr(MAP_IMAGE_URL) + '" placeholder="/mappa.webp">';
     h += '<button class="btn btn-soft btn-sm" onclick="_previewMapImage()">Anteprima</button>';
     h += '<button class="btn btn-soft btn-sm" onclick="_uploadMapImage()">Carica file</button>';
-    h += '<input type="file" id="me-map-file" accept="image/*" style="display:none" onchange="_handleMapFileUpload(this)">';
+    h += '<input type="file" id="me-map-file" accept="image/*" aria-label="Carica nuova immagine mappa" style="display:none" onchange="_handleMapFileUpload(this)">';
     h += '</div>';
     h += '<div id="me-map-preview" style="margin-top:10px;display:none"><img src="" style="max-width:100%;max-height:200px;border-radius:6px;border:1px solid var(--line)"></div>';
     h += '</div>';
@@ -240,7 +242,7 @@ function _renderMapPins() {
 
 /* ════ DRAG & DROP ════ */
 document.addEventListener('mousemove', function(e) {
-  if (!_mapDragPin) return;
+  if (!_mapActive || !_mapDragPin) return;
   var container = document.getElementById('map-editor-container');
   if (!container) return;
   var imgRect = container.getBoundingClientRect();
@@ -252,7 +254,7 @@ document.addEventListener('mousemove', function(e) {
   _mapDragPin.style.top = y.toFixed(2) + '%';
 });
 document.addEventListener('touchmove', function(e) {
-  if (!_mapDragPin || e.touches.length !== 1) return;
+  if (!_mapActive || !_mapDragPin || e.touches.length !== 1) return;
   e.preventDefault();
   var container = document.getElementById('map-editor-container');
   if (!container) return;
@@ -267,10 +269,10 @@ document.addEventListener('touchmove', function(e) {
 }, {passive: false});
 
 document.addEventListener('mouseup', function() {
-  _mapEndDrag();
+  if (_mapActive) _mapEndDrag();
 });
 document.addEventListener('touchend', function() {
-  _mapEndDrag();
+  if (_mapActive) _mapEndDrag();
 });
 function _mapEndDrag() {
   if (!_mapDragPin) return;

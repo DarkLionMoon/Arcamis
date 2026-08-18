@@ -1092,7 +1092,7 @@ function _stPick(i){
     +'<label class="st-pick-drop" id="st-pick-drop" for="st-pick-file"'
     +' ondragover="event.preventDefault()" ondragenter="event.preventDefault()" ondrop="stPickDrop(event)">'
     +'Trascina qui un\'immagine dal dispositivo oppure <span style="text-decoration:underline">sfoglia…</span>'
-    +'<input id="st-pick-file" type="file" accept="image/*" style="display:none" onchange="stPickUpload(this.files)"></label>'
+    +'<input id="st-pick-file" type="file" accept="image/*" aria-label="Carica immagine per il blocco" style="display:none" onchange="stPickUpload(this.files)"></label>'
     +'<div class="or">oppure scegli dall\'archivio</div>'
     +'<div class="pick-grid" id="st-pick-grid"><div class="list-empty">Caricamento…</div></div>',
     '<button class="btn btn-soft" onclick="closeModal(\'st-pick-modal\')">Annulla</button>');
