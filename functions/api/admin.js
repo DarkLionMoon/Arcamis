@@ -207,6 +207,20 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ ok }), { headers: cors });
   }
 
+  /* ════ SITE SETTINGS — scrittura admin ════ */
+  if (action === 'set_site_settings' && request.method === 'POST') {
+    if ((await sessionRole()) !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
+    }
+    let body;
+    try { body = await request.json(); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    await KV.put('site_settings', JSON.stringify(body.settings || {}));
+    await writeAdminLog('set_site_settings', 'site_settings', JSON.stringify(body.settings));
+    return new Response(JSON.stringify({ ok: true }), { headers: cors });
+  }
+
   /* ════ LEGGI TUTTE LE COVER ADMIN — pubblica ════ */
   if (action === 'get_covers') {
     try {
@@ -219,6 +233,17 @@ export async function onRequest(context) {
       return new Response(JSON.stringify({ covers }), { headers: cors });
     } catch (e) {
       return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    }
+  }
+
+  /* ════ SITE SETTINGS — lettura pubblica ════ */
+  if (action === 'get_site_settings') {
+    try {
+      const raw = await KV.get('site_settings');
+      const settings = raw ? JSON.parse(raw) : {};
+      return new Response(JSON.stringify({ settings }), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ settings: {} }), { headers: cors });
     }
   }
 

@@ -266,6 +266,70 @@ function buildCrumb(currentLabel){
   return h;
 }
 
+/* ════ SOMMARIO LATERALE (ToC) ════ */
+var _tocCache = null;
+var _tocTs = 0;
+function _fetchTocSetting(){
+  var now = Date.now();
+  if(_tocCache !== null && (now - _tocTs) < 60000) return Promise.resolve(_tocCache);
+  return fetch('/api/admin?action=get_site_settings')
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      _tocCache = !!(j.settings && j.settings.showToc);
+      _tocTs = Date.now();
+      return _tocCache;
+    })
+    .catch(function(){ _tocCache = false; _tocTs = Date.now(); return false; });
+}
+function _invalidateTocCache(){ _tocCache = null; _tocTs = 0; }
+function _maybeBuildToc(pbody){
+  var old = pbody.querySelector('.toc-wrap');
+  if(old) old.remove();
+  var nc = pbody.querySelector('.nc');
+  if(!nc) return;
+  var wrap = document.createElement('div');
+  wrap.className = 'toc-wrap';
+  nc.parentNode.insertBefore(wrap, nc);
+  wrap.appendChild(nc);
+
+  _fetchTocSetting().then(function(enabled){
+    if(!enabled){ wrap.classList.remove('toc-active'); return; }
+    wrap.classList.add('toc-active');
+    var headings = nc.querySelectorAll('h2, h3, .n-h2, .n-h3');
+    if(headings.length < 2){ wrap.classList.remove('toc-active'); return; }
+    var nav = document.createElement('nav');
+    nav.className = 'toc-sidebar';
+    var ul = document.createElement('ul');
+    headings.forEach(function(h, i){
+      var id = 'toc-h-' + i;
+      h.id = id;
+      var li = document.createElement('li');
+      li.className = 'toc-lvl-' + (h.tagName === 'H3' || h.classList.contains('n-h3') ? '2' : '1');
+      var a = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = h.textContent.trim();
+      a.addEventListener('click', function(e){
+        e.preventDefault();
+        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+    nav.appendChild(ul);
+    wrap.insertBefore(nav, nc);
+    var tocLinks = nav.querySelectorAll('a');
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var idx = entry.target.id.replace('toc-h-','');
+          tocLinks.forEach(function(l,i){ l.classList.toggle('active', i == idx); });
+        }
+      });
+    }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+    headings.forEach(function(h){ observer.observe(h); });
+  });
+}
+
 /* ════ OPEN PAGE — gp() ════ */
 async function gp(id,label,icon,_fromPop){
   if(!id||id==='undefined'||id==='null')return;
@@ -375,6 +439,7 @@ async function _gpRender(id,label,icon){
           + '<div class="n-page-footer-text">Archivi di Arcamis — ' + _siteEsc(_deity.n) + '</div></div>';
         _pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + _scrubHtmlString(_renderDeityPage(_deity)) + _deityFooter + '</div>';
         applyGlossary(_pbody);
+        _maybeBuildToc(_pbody);
         if(typeof afterPageRender === 'function') afterPageRender();
         return;
       }
@@ -436,6 +501,7 @@ async function _gpRender(id,label,icon){
             + '<div class="n-page-footer-text">Archivi di Arcamis — ' + ptitle + '</div></div>';
           pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + (_scrubHtmlString(_localHtml || '') || _emptyHtml) + _footer + '</div>';
           applyGlossary(pbody);
+          _maybeBuildToc(pbody);
           if(typeof afterPageRender === 'function') afterPageRender();
           return;
         }
@@ -568,6 +634,7 @@ async function _gpRender(id,label,icon){
     });
     initFadeIn(pbody);
     setTimeout(function(){ _initCarouselArrows(pbody); },200);
+    _maybeBuildToc(pbody);
 
     _setNavFromPage(id);
     if(data.page)_renderLastUpdated(data.page.last_edited_time);
@@ -904,9 +971,9 @@ function _renderLore(md, title, icon) {
 }
 
 /* ══════════════════════════════════════
-   RENDER LAVORO
-   Scheda lavoro con sezioni a griglia,
-   supporto immagini e blockquote evidenziati.
+   RENDER LAVORO (stile Pantheon)
+   Griglia di tiles con immagine + overlay,
+   seguita dal contenuto delle sezioni.
    ══════════════════════════════════════ */
 function _renderLavoro(md) {
   if (!md) return '';
@@ -915,49 +982,64 @@ function _renderLavoro(md) {
   /* Split per --- */
   var blocks = md.split(/\n---\n/);
 
-  /* Primo blocco: titolo + intro + eventuale immagine */
+  /* Primo blocco: titolo + intro + eventuale immagine hero */
   var first = (blocks.shift() || '').trim();
   if (first) {
     var lines = first.split('\n');
     var title = '';
     var intro = [];
-    var image = '';
     lines.forEach(function(line) {
       var hm = line.match(/^#\s+(.+)/);
       if (hm && !title) { title = hm[1].trim(); return; }
-      var imgM = line.match(/!\[[^\]]*\]\(([^)]+)\)/);
-      if (imgM) { image = imgM[1]; return; }
       if (line.trim()) intro.push(line);
     });
     if (title) html += '<div class="lv-title">' + esc(title) + '</div>';
-    if (image) html += '<div class="lv-hero"><img src="' + esc(image) + '" alt="' + esc(title) + '" loading="lazy"/></div>';
     if (intro.length) html += '<div class="lv-intro">' + _mdToHtml(intro.join('\n')) + '</div>';
   }
 
-  /* Sezioni ## */
+  /* Sezioni ## → tiles stile Pantheon */
   var sections = [];
   blocks.forEach(function(block) {
     var lines = block.split('\n');
     var header = '';
     var body = [];
     var image = '';
+    var subtitle = '';
     lines.forEach(function(line) {
       var hm = line.match(/^##\s+(.+)/);
       if (hm) { header = hm[1].trim(); return; }
       var imgM = line.match(/!\[[^\]]*\]\(([^)]+)\)/);
       if (imgM) { image = imgM[1]; return; }
+      var subM = line.match(/^[-*]\s+\*\*(.+?)\*\*\s*:?\s*(.*)/);
+      if (subM && !subtitle) { subtitle = subM[2].trim() || subM[1].trim(); }
       if (line.trim()) body.push(line);
     });
-    if (header) sections.push({ title: header, body: body.join('\n'), image: image });
+    if (header) sections.push({ title: header, body: body.join('\n'), image: image, subtitle: subtitle });
   });
 
+  /* Griglia tiles */
   if (sections.length) {
+    html += '<div class="lv-grid">';
+    sections.forEach(function(sec, i) {
+      html += '<a class="lv-tile" href="#lv-sec-' + i + '">';
+      if (sec.image) {
+        html += '<img class="lv-tile-img" src="' + esc(sec.image) + '" alt="' + esc(sec.title) + '" loading="lazy"/>';
+      } else {
+        html += '<div class="lv-tile-none"></div>';
+      }
+      html += '<div class="lv-tile-cap">';
+      html += '<div class="lv-tile-name">' + esc(sec.title) + '</div>';
+      if (sec.subtitle) html += '<div class="lv-tile-sub">' + esc(sec.subtitle) + '</div>';
+      html += '</div></a>';
+    });
+    html += '</div>';
+
+    /* Corpo sezioni sotto la griglia */
     html += '<div class="lv-sections">';
-    sections.forEach(function(sec) {
-      html += '<div class="lv-card">';
-      if (sec.image) html += '<div class="lv-card-img"><img src="' + esc(sec.image) + '" alt="' + esc(sec.title) + '" loading="lazy"/></div>';
-      html += '<div class="lv-card-title">' + esc(sec.title) + '</div>';
-      html += '<div class="lv-card-body">' + _mdToHtml(sec.body) + '</div>';
+    sections.forEach(function(sec, i) {
+      html += '<div class="lv-section" id="lv-sec-' + i + '">';
+      html += '<div class="lv-sec-title">' + esc(sec.title) + '</div>';
+      html += '<div class="lv-sec-body">' + _mdToHtml(sec.body) + '</div>';
       html += '</div>';
     });
     html += '</div>';
