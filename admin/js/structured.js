@@ -15,6 +15,7 @@
 
 var _stMode=false;
 var _stKind='pantheon';
+var _stPreBlockContent='';
 var _ST_SCHE_LAYOUTS=['sessione','quest','npc','spell','specie','citta','evento','bestiario','fazioni','oggetti','generico','lore','regole','lavoro','personaggio','materiale','wide','timeline','glossario','galleria','tabelle'];
 
 /* Template di campi precompilati per ogni layout a schede. */
@@ -320,7 +321,7 @@ function _stCardHTML(c,i){
       +'ondragstart="_stDragStart(event,'+i+')" ondragend="_stDragEnd(event)"'
       +'ondragover="_stDragOver(event,'+i+')" ondragleave="_stDragLeave(event,'+i+')"'
       +'ondrop="_stDrop(event,'+i+')">'
-      +'<div class="st-card-head"><span class="st-drag-handle" title="Trascina per riordinare">⠿</span>'
+      +'<div class="st-card-head"><span class="st-drag-handle" title="Trascina per riordinare" ontouchstart="_stTouchDragStart(event,'+i+')">⠿</span>'
       +'<span class="st-idx">'+(i+1)+'</span>'
       +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Nome della sezione" oninput="_stSync()">'
       +'<span class="st-head-actions">'
@@ -343,7 +344,7 @@ function _stCardHTML(c,i){
     +'ondragstart="_stDragStart(event,'+i+')" ondragend="_stDragEnd(event)"'
     +'ondragover="_stDragOver(event,'+i+')" ondragleave="_stDragLeave(event,'+i+')"'
     +'ondrop="_stDrop(event,'+i+')">'
-    +'<div class="st-card-head"><span class="st-drag-handle" title="Trascina per riordinare">⠿</span>'
+    +'<div class="st-card-head"><span class="st-drag-handle" title="Trascina per riordinare" ontouchstart="_stTouchDragStart(event,'+i+')">⠿</span>'
     +'<span class="st-idx">'+(i+1)+'</span>'
     +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Nome della divinità / sezione" oninput="_stSync()">'
     +'<span class="st-head-actions">'
@@ -400,7 +401,7 @@ function _stSchedeCardHTML(c,i){
     +'ondragstart="_stDragStart(event,'+i+')" ondragend="_stDragEnd(event)"'
     +'ondragover="_stDragOver(event,'+i+')" ondragleave="_stDragLeave(event,'+i+')"'
     +'ondrop="_stDrop(event,'+i+')">'
-    +'<div class="st-card-head"><span class="st-drag-handle" title="Trascina per riordinare">⠿</span>'
+    +'<div class="st-card-head"><span class="st-drag-handle" title="Trascina per riordinare" ontouchstart="_stTouchDragStart(event,'+i+')">⠿</span>'
     +'<span class="st-idx">'+(i+1)+'</span>'
     +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Titolo della scheda" oninput="_stSync()">'
     +'<span class="st-head-actions">'
@@ -532,6 +533,7 @@ function _stSyncPreview(){_stPreview(_stRead())}
 
 function initStructuredEditor(content){
   _stMode=true;window.__stMode=true;
+  _stPreBlockContent=content||'';
   _stKind=_stEditorKind(_current.layout);
   var eb=document.getElementById('editor-body');
   if(eb)eb.classList.remove('no-preview');
@@ -695,6 +697,11 @@ function _stExit(){
   var eb=document.getElementById('editor-body');
   if(eb)eb.classList.remove('no-preview');
   var ta=document.getElementById('e-md');if(ta)ta.style.display='';
+  if(ta&&_stPreBlockContent&&_stPreBlockContent!==ta.value){
+    _undo.push(_stPreBlockContent);if(_undo.length>60)_undo.shift();_redo=[];
+    _undoBase=_stPreBlockContent;
+  }
+  _stPreBlockContent='';
   var sh=document.getElementById('struct-head');if(sh)sh.style.display='none';
   var sl=document.getElementById('st-list');if(sl)sl.style.display='none';
   var ph=document.querySelector('#md-pane .pane-head');
@@ -883,6 +890,60 @@ function _stDragEnd(e){
   _stDragIdx=-1;
   _stDragOverIdx=-1;
 }
+/* Touch-based drag reordering for cards */
+var _stTouchDrag={active:false,startY:0,idx:-1,ghost:null};
+function _stTouchDragStart(e,i){
+  if(e.touches.length!==1)return;
+  var handle=e.target.closest('.st-drag-handle');
+  if(!handle)return;
+  e.preventDefault();
+  var t=e.touches[0];
+  _stTouchDrag={active:true,startY:t.clientY,idx:i,ghost:null};
+  var card=handle.closest('.st-card');
+  if(card)card.classList.add('dragging');
+}
+function _stTouchDragMove(e){
+  if(!_stTouchDrag.active)return;
+  var t=e.touches[0];
+  var cards=document.querySelectorAll('#st-list .st-card');
+  cards.forEach(function(c){
+    c.classList.remove('drag-over-top','drag-over-bottom');
+    var r=c.getBoundingClientRect();
+    var ci=parseInt(c.dataset.i,10);
+    if(ci===_stTouchDrag.idx)return;
+    if(t.clientY>=r.top&&t.clientY<=r.bottom){
+      var mid=r.top+r.height/2;
+      if(t.clientY<mid)c.classList.add('drag-over-top');
+      else c.classList.add('drag-over-bottom');
+    }
+  });
+}
+function _stTouchDragEnd(e){
+  if(!_stTouchDrag.active)return;
+  var fromIdx=_stTouchDrag.idx;
+  document.querySelectorAll('.st-card').forEach(function(c){
+    c.classList.remove('dragging','drag-over-top','drag-over-bottom');
+  });
+  var toIdx=-1;
+  var cards=document.querySelectorAll('#st-list .st-card');
+  cards.forEach(function(c){
+    if(c.classList.contains('drag-over-top')||c.classList.contains('drag-over-bottom')){
+      toIdx=parseInt(c.dataset.i,10);
+    }
+  });
+  _stTouchDrag={active:false,startY:0,idx:-1,ghost:null};
+  if(fromIdx<0||toIdx<0||fromIdx===toIdx)return;
+  _stPushUndo();
+  var data=_stRead();
+  var card=data.cards.splice(fromIdx,1)[0];
+  var insertAt=toIdx;
+  if(fromIdx<toIdx)insertAt--;
+  data.cards.splice(insertAt,0,card);
+  _stRender(data);
+  _stSync();
+}
+document.addEventListener('touchmove',_stTouchDragMove,{passive:false});
+document.addEventListener('touchend',_stTouchDragEnd);
 function _stDragOver(e,i){
   e.preventDefault();
   e.dataTransfer.dropEffect='move';
@@ -1084,7 +1145,7 @@ function stPickUpload(files){
     var name=(file.name||'immagine').toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/-+/g,'-');
     var dataUri=reader.result;
     toast('Caricamento '+name+'…');
-    ghPutBinary('/images/'+name,'admin: upload '+name,dataUri)
+    ghPutBinary('images/'+name,'admin: upload '+name,dataUri)
       .then(function(){
         toast('Immagine caricata','success');
         _stSetImg(_stPickTarget,'/images/'+name);
@@ -1128,6 +1189,7 @@ function _stSetImg(i,url){
   var wrap=document.getElementById('st-imgwrap-'+i);
   if(wrap&&url){
     wrap.setAttribute('onmousedown','_stPosDown(event,'+i+')');
+    wrap.setAttribute('ontouchstart','_stPosTouchDown(event,'+i+')');
     wrap.setAttribute('title','Trascina per scegliere la parte visibile nella card');
   }
   _stPosSetVal(i,[50,50]);
@@ -1175,11 +1237,36 @@ function _stPosDown(e,i){
   document.addEventListener('mousemove',onMove);
   document.addEventListener('mouseup',onUp);
 }
+function _stPosTouchDown(e,i){
+  if(e.touches.length!==1)return;
+  e.preventDefault();
+  var wrap=document.getElementById('st-imgwrap-'+i);if(!wrap)return;
+  _stPosTouchSet(i,e.touches[0]);
+  function onMove(ev){
+    if(ev.touches.length!==1)return;
+    ev.preventDefault();
+    _stPosTouchSet(i,ev.touches[0]);
+  }
+  function onUp(){
+    document.removeEventListener('touchmove',onMove);
+    document.removeEventListener('touchend',onUp);
+    _stSync();
+  }
+  document.addEventListener('touchmove',onMove,{passive:false});
+  document.addEventListener('touchend',onUp);
+}
 function _stPosSet(i,e){
   var wrap=document.getElementById('st-imgwrap-'+i);if(!wrap)return;
   var r=wrap.getBoundingClientRect();
   var x=Math.max(0,Math.min(100,Math.round((e.clientX-r.left)/r.width*100)));
   var y=Math.max(0,Math.min(100,Math.round((e.clientY-r.top)/r.height*100)));
+  _stPosSetVal(i,[x,y]);
+}
+function _stPosTouchSet(i,t){
+  var wrap=document.getElementById('st-imgwrap-'+i);if(!wrap)return;
+  var r=wrap.getBoundingClientRect();
+  var x=Math.max(0,Math.min(100,Math.round((t.clientX-r.left)/r.width*100)));
+  var y=Math.max(0,Math.min(100,Math.round((t.clientY-r.top)/r.height*100)));
   _stPosSetVal(i,[x,y]);
 }
 

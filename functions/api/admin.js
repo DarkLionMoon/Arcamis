@@ -57,6 +57,19 @@ export async function onRequest(context) {
     } catch (e) { return null; }
   }
 
+  /* ── Helper: utente della sessione corrente ── */
+  async function sessionUser() {
+    const token = getCookie('arc_admin');
+    if (!token) return null;
+    try {
+      const stored = await KV.get('admin_session_' + token);
+      if (!stored) return null;
+      if (stored === 'valid') return 'admin';
+      const session = JSON.parse(stored);
+      return (session && session.user) || 'admin';
+    } catch (e) { return null; }
+  }
+
   /* ── Helper: genera token casuale ── */
   function genToken() {
     const arr = new Uint8Array(32);
@@ -65,7 +78,7 @@ export async function onRequest(context) {
   }
 
   /* ── Helper: scrivi log entry ── */
-  async function writeAdminLog(action, target, extra) {
+  async function writeAdminLog(action, target, extra, user) {
     try {
       const LOG_KEY = 'admin_log';
       const MAX_ENTRIES = 50;
@@ -78,6 +91,7 @@ export async function onRequest(context) {
         action:    action,
         target:    target || '',
         extra:     extra  || '',
+        user:      user   || '',
         timestamp: new Date().toISOString()
       });
       existing = existing.slice(0, MAX_ENTRIES);
@@ -143,7 +157,7 @@ export async function onRequest(context) {
     const ttl = remember ? SESSION_TTL_LONG : SESSION_TTL;
 
     const token = genToken();
-    await KV.put('admin_session_' + token, JSON.stringify({ role }), { expirationTtl: ttl });
+    await KV.put('admin_session_' + token, JSON.stringify({ role, user: body.username || 'admin' }), { expirationTtl: ttl });
 
     const cookieVal = 'arc_admin=' + token
       + '; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=' + ttl;
@@ -295,11 +309,12 @@ export async function onRequest(context) {
     try { body = await request.json(); } catch (e) {
       return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
     }
-    const { action: act, target, extra, user, role } = body;
+    const { action: act, target, extra } = body;
     if (!act || !target) {
       return new Response(JSON.stringify({ error: 'action e target richiesti' }), { status: 400, headers: cors });
     }
-    await writeAdminLog(act, target, extra ? JSON.stringify(extra) : '');
+    const sessUser = await sessionUser();
+    await writeAdminLog(act, target, extra ? JSON.stringify(extra) : '', sessUser);
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
 

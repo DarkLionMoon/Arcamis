@@ -383,6 +383,15 @@ button{font-family:inherit}
   .ed-view{max-width:1560px;margin:-22px auto -60px}
 }
 
+/* Mobile (≤700px): editor a pannello singolo, split-pane nascosto */
+@media(max-width:700px){
+  .ed-body{flex-direction:column!important}
+  .ed-body .pane{min-width:100%!important;flex:1 1 100%!important}
+  .ed-body .divider-v{display:none!important}
+  .ed-body #pv-pane{display:none!important}
+  .ed-body.no-preview .pane,.ed-body:not(.no-preview) .pane:first-child{display:flex!important}
+}
+
 /* ═══════════════ EDITOR A BLOCCHI (Pantheon) ═══════════════ */
 .struct-head{flex-shrink:0;padding:7px 14px;border-bottom:1px solid var(--line);background:var(--bg2);overflow-y:auto;max-height:34%}
 .struct-head .in{font-size:12.5px;padding:6px 9px}

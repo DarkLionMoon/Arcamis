@@ -273,6 +273,31 @@ var LAVORI = [
   {',\n  '.join(lavori)}
 ];"""
 
+def generate_data_json(reg):
+    """Generate a dedicated JSON file for the admin panel, avoiding JS regex parsing."""
+    pages = []
+    for p in reg['pages']:
+        if not p.get('menu'):
+            continue
+        obj = {'k': p['k'], 'l': p['l'], 'i': p['i'], 'id': p['id']}
+        if p.get('sec'):
+            obj['sec'] = p['sec']
+        if p.get('sub'):
+            obj['sub'] = p['sub']
+        pages.append(obj)
+
+    sections = [{'v': s['v'], 'l': s['l']} for s in reg['sections'] if not s.get('adminOnly')]
+    lavori = [{'l': w['l'], 'i': w['i'], 'id': w['id']} for w in reg['lavori']]
+
+    data = {
+        'root': reg['root'],
+        'guild': reg['guild'],
+        'pages': pages,
+        'sections': sections,
+        'lavori': lavori
+    }
+    return json.dumps(data, ensure_ascii=False, indent=2) + '\n'
+
 def generate_notion_nav_parts(reg):
     slug_entries = []
     for p in reg['pages']:
@@ -396,6 +421,9 @@ def main():
 
     # 1. scripts/js/data.js
     write_file('scripts/js/data.js', generate_data_js(reg))
+
+    # 1b. scripts/js/data.json (dedicated JSON for admin)
+    write_file('scripts/js/data.json', generate_data_json(reg))
 
     # 2. notion-nav.js - replace _slugMap, _LAYOUT_DB_MAP, _navMap
     notion_nav_path = SCRIPT_DIR / 'js' / 'notion-nav.js'

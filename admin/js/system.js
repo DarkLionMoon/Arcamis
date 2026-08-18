@@ -174,6 +174,7 @@ document.addEventListener('keydown',function(e){
     _userRole=sessionStorage.getItem('arcadmin_role')||'viewer';
     fetch('/api/admin?action=check',{credentials:'include'}).then(function(r){return r.json()}).then(function(j){
       if(j&&j.ok){
+        if(j.role){_userRole=j.role;sessionStorage.setItem('arcadmin_role',j.role);}
         document.getElementById('login').classList.add('hide');
         document.getElementById('app').style.display='flex';
         document.getElementById('sb-name').textContent=_currentUser;

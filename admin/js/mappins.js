@@ -213,6 +213,16 @@ function _renderMapPins() {
       _mapDragOffset.y = e.clientY - rect.top - rect.height / 2;
       el.classList.add('dragging');
     });
+    el.addEventListener('touchstart', function(e) {
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+      _mapDragPin = el;
+      var t = e.touches[0];
+      var rect = el.getBoundingClientRect();
+      _mapDragOffset.x = t.clientX - rect.left - rect.width / 2;
+      _mapDragOffset.y = t.clientY - rect.top - rect.height / 2;
+      el.classList.add('dragging');
+    }, {passive: false});
 
     /* Click per editare */
     el.addEventListener('click', function(e) {
@@ -241,8 +251,28 @@ document.addEventListener('mousemove', function(e) {
   _mapDragPin.style.left = x.toFixed(2) + '%';
   _mapDragPin.style.top = y.toFixed(2) + '%';
 });
+document.addEventListener('touchmove', function(e) {
+  if (!_mapDragPin || e.touches.length !== 1) return;
+  e.preventDefault();
+  var container = document.getElementById('map-editor-container');
+  if (!container) return;
+  var t = e.touches[0];
+  var imgRect = container.getBoundingClientRect();
+  var x = ((t.clientX - imgRect.left - _mapDragOffset.x) / imgRect.width * 100);
+  var y = ((t.clientY - imgRect.top - _mapDragOffset.y) / imgRect.height * 100);
+  x = Math.max(0, Math.min(100, x));
+  y = Math.max(0, Math.min(100, y));
+  _mapDragPin.style.left = x.toFixed(2) + '%';
+  _mapDragPin.style.top = y.toFixed(2) + '%';
+}, {passive: false});
 
 document.addEventListener('mouseup', function() {
+  _mapEndDrag();
+});
+document.addEventListener('touchend', function() {
+  _mapEndDrag();
+});
+function _mapEndDrag() {
   if (!_mapDragPin) return;
   var idx = parseInt(_mapDragPin.dataset.idx, 10);
   if (!isNaN(idx) && MAP_PINS[idx]) {
@@ -251,15 +281,14 @@ document.addEventListener('mouseup', function() {
     _mapDirty = true;
     _mapDragPin.classList.remove('dragging');
     _mapDragPin.classList.add('was-dragged');
-    setTimeout(function() {
-      if (_mapDragPin) _mapDragPin.classList.remove('was-dragged');
-      _mapDragPin = null;
-    }, 50);
+    var ref = _mapDragPin;
+    _mapDragPin = null;
+    setTimeout(function() { ref.classList.remove('was-dragged'); }, 50);
     _renderPinList();
   } else {
     _mapDragPin = null;
   }
-});
+}
 
 /* ════ CLICK SULLA MAPPA PER AGGIUNGERE ════ */
 function _mapBindClick() {

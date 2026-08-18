@@ -35,6 +35,8 @@ function toast(msg,type){
   var el=document.createElement('div');
   el.className='toast '+(type||'');
   el.textContent=msg;
+  el.setAttribute('role','alert');
+  el.setAttribute('aria-live','assertive');
   document.getElementById('toast').appendChild(el);
   setTimeout(function(){el.classList.add('out');setTimeout(function(){el.remove()},250)},3500);
 }
@@ -87,6 +89,15 @@ function modalHtml(id,title,bodyHtml,actionsHtml,size){
     +'<div class="md-actions">'+(actionsHtml||'')+'</div></div>';
   d.addEventListener('click',function(e){if(e.target===d)closeModal(id)});
   document.body.appendChild(d);
+  var modal=d.querySelector('.md');
+  var focusable=modal.querySelectorAll('button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])');
+  if(focusable.length)focusable[0].focus();
+  d.addEventListener('keydown',function(e){
+    if(e.key!=='Tab')return;
+    var first=focusable[0],last=focusable[focusable.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+  });
   return d;
 }
 
@@ -123,6 +134,27 @@ async function ghCommits(path){
 }
 function b64decode(s){return decodeURIComponent(escape(atob(s)))}
 function b64encode(s){return btoa(unescape(encodeURIComponent(s)))}
+
+/* ═══════════════ GH LOCK/QUEUE ═══════════════ */
+var _ghQueue=[];var _ghBusy=false;
+function _ghEnqueue(fn){
+  return new Promise(function(resolve,reject){
+    _ghQueue.push({fn:fn,resolve:resolve,reject:reject});
+    _ghDrain();
+  });
+}
+function _ghDrain(){
+  if(_ghBusy||!_ghQueue.length)return;
+  _ghBusy=true;
+  var job=_ghQueue.shift();
+  job.fn().then(job.resolve).catch(job.reject).finally(function(){_ghBusy=false;_ghDrain()});
+}
+function ghPutQueued(path,msg,content,sha){
+  return _ghEnqueue(function(){return ghPut(path,msg,content,sha)});
+}
+function ghDeleteQueued(path,msg,sha){
+  return _ghEnqueue(function(){return ghDelete(path,msg,sha)});
+}
 
 /* ═══════════════ AUTOSAVE & MULTI-UTENTE ═══════════════ */
 function _autosaveKey(){
@@ -257,6 +289,8 @@ async function doLogin(){
   if(btn)btn.disabled=false;
   _currentUser=user;_userRole=role;
   sessionStorage.setItem('arcadmin','1');
+  sessionStorage.setItem('arcadmin_user',user);
+  sessionStorage.setItem('arcadmin_role',role);
   document.getElementById('login').classList.add('hide');
   document.getElementById('app').style.display='flex';
   document.getElementById('sb-name').textContent=user;
@@ -264,8 +298,15 @@ async function doLogin(){
   document.getElementById('sb-ava').textContent=(user.charAt(0)||'?').toUpperCase();
   document.getElementById('tb-user').innerHTML='<div class="tb-ava">'+esc((user.charAt(0)||'?').toUpperCase())+'</div><div style="display:none"></div>';
   _startAutosave();
+  window.addEventListener('beforeunload',function(e){
+    if(_modified){e.preventDefault();e.returnValue=''}
+  });
   var restored=_checkUnsaved();
-  if(restored&&_current){_autosaveClear()}
+  if(restored&&_current){
+    var md=document.getElementById('e-md')||document.getElementById('e-json');
+    if(md)md.value=restored;
+    _autosaveClear();
+  }
   buildSidebar();
   renderDashboard();
   toast('Benvenuto, '+user+' ('+role+')','success');
