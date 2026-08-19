@@ -369,25 +369,47 @@ document.addEventListener('click', function(e){
   if(panel && !panel.contains(e.target) && btn && !btn.contains(e.target)) toggleHelpPanel();
 });
 
-/* ════════ MAINTENANCE BANNER ════════ */
+/* ════════ SITE SETTINGS (banner + disclaimer) ════════ */
 (function(){
-  var MAINT_KEY = 'arc_maint_dismissed';
+  var BANNER_KEY = 'arc_maint_dismissed';
+  var DISCLAIMER_KEY = 'arc_disclaimer_accepted';
   var banner = document.getElementById('maint-banner');
-  if(!banner) return;
-  var dismissed = localStorage.getItem(MAINT_KEY);
+  var overlay = document.getElementById('disclaimer-overlay');
+  var bannerDismissed = localStorage.getItem(BANNER_KEY);
+  var disclaimerAccepted = localStorage.getItem(DISCLAIMER_KEY);
+
+  function _showBanner(s){
+    if(!banner) return;
+    if(!s.banner_enabled){ banner.style.display = 'none'; return; }
+    var txt = banner.querySelector('.maint-text');
+    if(txt && s.banner_text) txt.textContent = s.banner_text;
+    if(!bannerDismissed){
+      banner.removeAttribute('style');
+      banner.style.display = '';
+      if(!s.disclaimer_enabled || disclaimerAccepted){
+        document.body.classList.add('maint-shift');
+      }
+    }
+  }
+  function _showDisclaimer(s){
+    if(!overlay) return;
+    if(disclaimerAccepted || !s.disclaimer_enabled){ overlay.style.display = 'none'; return; }
+    var txt = document.getElementById('disclaimer-text');
+    if(txt && s.disclaimer_text) txt.textContent = s.disclaimer_text;
+    overlay.style.display = 'flex';
+  }
+
   fetch('/api/admin?action=get_site_settings')
     .then(function(r){ return r.json(); })
     .then(function(j){
       var s = j.settings || {};
-      if(!s.banner_enabled){ banner.style.display = 'none'; return; }
-      var txt = banner.querySelector('.maint-text');
-      if(txt && s.banner_text) txt.textContent = s.banner_text;
-      if(!dismissed){
-        banner.style.display = '';
-        document.body.classList.add('maint-shift');
-      }
+      _showBanner(s);
+      _showDisclaimer(s);
     })
-    .catch(function(){ banner.style.display = 'none'; });
+    .catch(function(){
+      if(banner) banner.style.display = 'none';
+      if(overlay) overlay.style.display = 'none';
+    });
 })();
 function dismissMaintBanner(){
   var banner = document.getElementById('maint-banner');
@@ -395,9 +417,27 @@ function dismissMaintBanner(){
     banner.style.opacity = '0';
     banner.style.transform = 'translateY(-100%)';
     banner.style.transition = 'opacity .25s, transform .25s';
-    setTimeout(function(){ banner.style.display = 'none'; }, 260);
+    setTimeout(function(){
+      banner.style.display = 'none';
+      banner.removeAttribute('style');
+    }, 260);
   }
   document.body.classList.remove('maint-shift');
   localStorage.setItem('arc_maint_dismissed', '1');
+}
+
+/* ════════ DISCLAIMER OVERLAY ════════ */
+function acceptDisclaimer(){
+  var overlay = document.getElementById('disclaimer-overlay');
+  if(overlay){
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity .3s';
+    setTimeout(function(){ overlay.style.display = 'none'; }, 310);
+  }
+  localStorage.setItem('arc_disclaimer_accepted', '1');
+  var banner = document.getElementById('maint-banner');
+  if(banner && banner.style.display !== 'none'){
+    document.body.classList.add('maint-shift');
+  }
 }
 

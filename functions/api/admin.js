@@ -221,7 +221,7 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ ok }), { headers: cors });
   }
 
-  /* ════ SITE SETTINGS — scrittura admin ════ */
+  /* ════ SITE SETTINGS — scrittura admin (merge) ════ */
   if (action === 'set_site_settings' && request.method === 'POST') {
     if ((await sessionRole()) !== 'admin') {
       return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
@@ -230,7 +230,13 @@ export async function onRequest(context) {
     try { body = await request.json(); } catch (e) {
       return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
     }
-    await KV.put('site_settings', JSON.stringify(body.settings || {}));
+    let existing = {};
+    try {
+      const raw = await KV.get('site_settings');
+      if (raw) existing = JSON.parse(raw);
+    } catch (e) {}
+    const merged = Object.assign(existing, body.settings || {});
+    await KV.put('site_settings', JSON.stringify(merged));
     await writeAdminLog('set_site_settings', 'site_settings', JSON.stringify(body.settings));
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }

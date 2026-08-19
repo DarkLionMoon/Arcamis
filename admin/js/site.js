@@ -665,6 +665,17 @@ async function openSettings(){
     +'<div class="se-actions" style="margin-top:10px">'
     +'<button class="btn btn-p btn-sm" onclick="saveBanner()">SALVA BANNER</button>'
     +'<span class="md-status" id="banner-st" style="margin-left:auto"></span></div></div>';
+  h+='<div class="panel"><div class="panel-head"><h3>Disclaimer / Progetto fanmade</h3><span class="hint">overlay mostrato prima di entrare nel sito</span></div>'
+    +'<div class="kv-rows">'
+    +'<div class="kv-row"><div class="kv-main"><div class="kt">Mostra disclaimer</div><div class="ks">mostra un overlay prima di accedere al sito (una tantum)</div></div>'
+    +'<label class="toggle"><input type="checkbox" id="set-disclaimer-on"><span class="slider"></span></label></div>'
+    +'</div>'
+    +'<div class="se-grid" style="margin-top:12px"><div class="fld" style="grid-column:1/-1"><label>Testo del disclaimer</label>'
+    +'<textarea id="set-disclaimer-text" class="in" rows="5" style="width:100%;resize:vertical" placeholder="Arcamis è un progetto fanmade non ufficiale..."></textarea>'
+    +'</div></div>'
+    +'<div class="se-actions" style="margin-top:10px">'
+    +'<button class="btn btn-p btn-sm" onclick="saveDisclaimer()">SALVA DISCLAIMER</button>'
+    +'<span class="md-status" id="disclaimer-st" style="margin-left:auto"></span></div></div>';
   h+='<div class="grid-2">';
   h+='<div class="panel"><div class="panel-head"><h3>Repository</h3></div>'
     +'<div class="kv-rows">'
@@ -685,7 +696,7 @@ async function openSettings(){
   document.getElementById('main').innerHTML=h;
   pingDeployStatus();
   refreshGHTokenStatus();
-  loadBannerSettings();
+  loadSiteSettings();
 }
 async function refreshGHTokenStatus(){
   var el=document.getElementById('gh-token-st');
@@ -697,26 +708,42 @@ async function refreshGHTokenStatus(){
     else el.textContent='Non configurato — il proxy GitHub non funziona';
   }catch(e){el.textContent='non verificabile'}
 }
-async function loadBannerSettings(){
+async function loadSiteSettings(){
   try{
     var r=await fetch('/api/admin?action=get_site_settings',{credentials:'include'});
     var j=await r.json();
     var s=j.settings||{};
-    var onEl=document.getElementById('set-banner-on');
-    var txtEl=document.getElementById('set-banner-text');
-    if(onEl)onEl.checked=!!s.banner_enabled;
-    if(txtEl)txtEl.value=s.banner_text||'';
+    var bOn=document.getElementById('set-banner-on');
+    var bTxt=document.getElementById('set-banner-text');
+    if(bOn)bOn.checked=!!s.banner_enabled;
+    if(bTxt)bTxt.value=s.banner_text||'';
+    var dOn=document.getElementById('set-disclaimer-on');
+    var dTxt=document.getElementById('set-disclaimer-text');
+    if(dOn)dOn.checked=!!s.disclaimer_enabled;
+    if(dTxt)dTxt.value=s.disclaimer_text||'';
   }catch(e){}
 }
 async function saveBanner(){
-  var onEl=document.getElementById('set-banner-on');
-  var txtEl=document.getElementById('set-banner-text');
+  var bOn=document.getElementById('set-banner-on');
+  var bTxt=document.getElementById('set-banner-text');
   var st=document.getElementById('banner-st');
-  if(!onEl||!txtEl)return;
-  var settings={banner_enabled:onEl.checked,banner_text:txtEl.value.trim()};
+  if(!bOn||!bTxt)return;
   if(st)st.textContent='Salvataggio…';
   try{
-    var r=await fetch('/api/admin?action=set_site_settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({settings:settings})});
+    var r=await fetch('/api/admin?action=set_site_settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({settings:{banner_enabled:bOn.checked,banner_text:bTxt.value.trim()}})});
+    var j=await r.json();
+    if(j.ok){if(st){st.textContent='✓';setTimeout(function(){st.textContent='';},2000);}}
+    else{if(st)st.textContent='Errore';}
+  }catch(e){if(st)st.textContent='Errore di rete';}
+}
+async function saveDisclaimer(){
+  var dOn=document.getElementById('set-disclaimer-on');
+  var dTxt=document.getElementById('set-disclaimer-text');
+  var st=document.getElementById('disclaimer-st');
+  if(!dOn||!dTxt)return;
+  if(st)st.textContent='Salvataggio…';
+  try{
+    var r=await fetch('/api/admin?action=set_site_settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({settings:{disclaimer_enabled:dOn.checked,disclaimer_text:dTxt.value.trim()}})});
     var j=await r.json();
     if(j.ok){if(st){st.textContent='✓';setTimeout(function(){st.textContent='';},2000);}}
     else{if(st)st.textContent='Errore';}
