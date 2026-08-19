@@ -2,8 +2,7 @@
    ARCAMIS — fixes.js
    Fix vari:
    - Breadcrumb reset su navigazione navbar
-   - Tab attivo mestieri su popstate/deeplink
-════════════════════════════════════ */
+═════════════════════════════════════ */
 
 (function() {
 
@@ -59,58 +58,8 @@
     });
   }
 
-  /* ════════════════════════════════
-     2. TAB ATTIVO MESTIERI
-     Quando si naviga a un mestiere
-     via popstate o deeplink, il tab
-     attivo viene ripristinato.
-     
-     Salviamo l'ultimo tab attivo
-     per ogni mestiere in memoria.
-  ════════════════════════════════ */
-  var _mestiereLastTab = {}; /* { 'alchimista': 'LV 1', ... } */
-
-  /* Patch msTabClick per salvare il tab attivo */
-  var _origMsTabClick = null;
-  var _mcPatchInterval = setInterval(function() {
-    if (typeof window.msTabClick === 'undefined') return;
-    clearInterval(_mcPatchInterval);
-
-    _origMsTabClick = window.msTabClick;
-    window.msTabClick = function(el) {
-      /* Trova la chiave mestiere corrente dall'URL */
-      var params = new URLSearchParams(location.search);
-      var pid = params.get('p') || '';
-      var key = pid.replace('mestiere-', '');
-      if (key) _mestiereLastTab[key] = el.getAttribute('data-tab');
-      if (_origMsTabClick) _origMsTabClick(el);
-    };
-  }, 200);
-
-  /* Patch showMestiere per ripristinare il tab */
-  var _smPatchInterval = setInterval(function() {
-    if (typeof window.showMestiere === 'undefined') return;
-    clearInterval(_smPatchInterval);
-
-    var _origShowMestiere = window.showMestiere;
-    window.showMestiere = function(key) {
-      _origShowMestiere(key);
-      /* Dopo il render, ripristina il tab se era stato salvato */
-      var lastTab = _mestiereLastTab[key];
-      if (!lastTab || lastTab === 'Introduzione') return;
-      setTimeout(function() {
-        var tabs = document.querySelectorAll('.ms-tab');
-        tabs.forEach(function(tab) {
-          if (tab.getAttribute('data-tab') === lastTab) {
-            tab.click();
-          }
-        });
-      }, 150);
-    };
-  }, 200);
-
    /* ════════════════════════════════
-     3. INIT
+     2. INIT
   ════════════════════════════════ */
   function _init() {
     _attachNavReset();

@@ -27,18 +27,6 @@
 window.addEventListener('popstate', function(e){
   if(e && e.state && e.state.id){
     if(e.state.stack) navStack = JSON.parse(JSON.stringify(e.state.stack));
-    if(e.state.id.startsWith('mestiere-')){
-      if(typeof showMestiere === 'function') showMestiere(e.state.id.replace('mestiere-', ''));
-      return;
-    }
-    if(e.state.id === 'mestieri-compendio'){
-      if(typeof showMestieriCompendio === 'function') showMestieriCompendio();
-      return;
-    }
-    if(e.state.id === 'societa-licenze'){
-      if(typeof showSocietaLicenze === 'function') showSocietaLicenze();
-      return;
-    }
     gp(e.state.id, e.state.label || '', e.state.icon || '', true);
   } else {
     if(typeof showHome === 'function') showHome();
@@ -54,35 +42,7 @@ var _pathMap = {
   'regole/regole-del-server': 'pag-regole-del-server',
   'personaggio/materiale-approvato': 'pag-materiale-approvato',
   'lore/pantheon': 'pag-pantheon',
-  'personaggio/lavori': 'pag-lavori',
-  'regole/gameplay/combattimento': '2f60274fdc1c80b7a729ef091b278682',
-  'regole/gameplay/codex': '2f60274fdc1c80adb7a5d6beeef3e544',
-  'homebrew/specie-hb': '2f00274fdc1c81a1bc4ddbf500704b80',
-  'homebrew/classi-hb': '2f70274fdc1c803ca5cafa97ca1817cd',
-  'homebrew/mscge': '2ff0274fdc1c8054a400c64b1fdd2ab9',
-  'mestieri/guida': 'mestiere-come-funzionano',
-  'mestieri/alchimista': 'mestiere-alchimista',
-  'mestieri/architetto': 'mestiere-architetto',
-  'mestieri/artigiano': 'mestiere-artigiano',
-  'mestieri/artista': 'mestiere-artista',
-  'mestieri/falegname': 'mestiere-falegname',
-  'mestieri/metallurgo': 'mestiere-metallurgo',
-  'mestieri/oste': 'mestiere-oste',
-  'mestieri/sarto': 'mestiere-sarto',
-  'mestieri/compendio': 'mestieri-compendio',
-  'societa-licenze': 'societa-licenze',
-  'lore/mondo/introduzione': '2f60274fdc1c80558d8fe99842377aef',
-  'lore/mondo/introduzione/storia': '2fc0274fdc1c80c4bbc1c8806f591e0f',
-  'lore/mondo/esplora-dal-vivo': '3090274fdc1c80008f0dffe3a677cb66',
-  'lore/mondo/esplora-dal-vivo/marche-di-arcamis': '30d0274fdc1c805cbbc2daf73b5f3a66',
-  'lore/mondo/extra': '3410274fdc1c805d891bcbda6364e0ad',
-  'lore/mondo/bibliografia': '3040274fdc1c80ed816ef58f6a606f21',
-  'lore/mondo/linguaggi': '2fb0274fdc1c8073addaf1d5a3e9768b',
-  'lore/mondo/pde': '2fb0274fdc1c8080b07bd553e953c88d',
-  'lore/mondo/npc': '2f90274fdc1c8015bf95f52c4e7681b8',
-  'mappe/arcamis': '2f10274fdc1c80dca8caeb2e6de23146',
-  'sottoclassi': '2f70274fdc1c80e3bdc7f95f81eb9cc0',
-  'specie-homebrew': '2f60274fdc1c80fba671c588ba93b116'
+  'personaggio/lavori': 'pag-lavori'
 };
 
 /* ════ DEEP LINK ════ */
@@ -111,9 +71,6 @@ var _pathMap = {
       var resolved = _pathMap[path];
       if(resolved){
         pid = resolved;
-      } else if(typeof _slugMap !== 'undefined' && _slugMap[path]){
-        /* Supporto slug piatti legacy (es. /gameplay) */
-        pid = _slugMap[path];
       } else {
         /* Pathname non mappato — trattalo come UUID diretto (es. /2f00274f...) */
         pid = path;
@@ -121,26 +78,11 @@ var _pathMap = {
     }
   } else if(qp) {
     /* Vecchio ?p= — supporto retrocompatibile */
-    pid = (typeof _slugMap !== 'undefined' && _slugMap[qp]) ? _slugMap[qp] : qp;
+    pid = qp;
   }
 
   if(!pid) return;
 
-  /* Mestieri */
-  if(pid.startsWith('mestiere-')){
-    var key = pid.replace('mestiere-', '');
-    setTimeout(function(){ if(typeof showMestiere === 'function') showMestiere(key); }, 0);
-    return;
-  }
-  /* Pagine speciali JS */
-  if(pid === 'mestieri-compendio'){
-    setTimeout(function(){ if(typeof showMestieriCompendio === 'function') showMestieriCompendio(); }, 0);
-    return;
-  }
-  if(pid === 'societa-licenze'){
-    setTimeout(function(){ if(typeof showSocietaLicenze === 'function') showSocietaLicenze(); }, 0);
-    return;
-  }
   /* Pagina Notion generica */
   var pg = getPage(pid) || {l:'Pagina', i:'📄', id:pid};
   gp(pg.id, pg.l, pg.i, true);

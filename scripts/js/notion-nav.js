@@ -82,13 +82,6 @@ function _mdToHtml(md){
   return '<p class="n-p">' + md + '</p>';
 }
 
-/* ════ SLUG MAP (legacy — usata per retrocompatibilità ?p= ) ════ */
-var _slugMap = {
-  'biblioteca-scoperta': '3040274fdc1c80ed816ef58f6a6b6f21',
-  'specie-homebrew': '2f60274fdc1c80fba671c588ba93b116',
-  'sottoclassi': '2f70274fdc1c80e3bdc7f95f81eb9cc0'
-};
-
 /* ════ ID → PATH MAP (UUID / id-speciale → pathname pulito) ════
    Generata da _pathMap in app.js, ma definiamo qui la versione
    inversa per usarla nel pushState di gp().
@@ -109,14 +102,6 @@ function _getIdToPath(){
   return _idToPath;
 }
 
-/* Mappa inversa id→slug legacy (per fallback) */
-var _idToSlug = {};
-(function(){
-  Object.keys(_slugMap).forEach(function(slug){
-    _idToSlug[_slugMap[slug]] = slug;
-  });
-})();
-
 var _navMap = {
 
 };
@@ -133,43 +118,19 @@ function _setNavFromPage(id){ setNav(_navKeyForPage(id)); }
 
 /* Costruisce l'URL pulito per un dato id */
 function _urlForId(id){
-  /* Mestieri — id speciale */
-  if(id && id.startsWith('mestiere-')){
-    var key = id.replace('mestiere-', '');
-    return '/mestieri/' + key;
-  }
   /* Pantheon — pagina dedicata a una divinità */
   if(id && id.indexOf('pantheon-') === 0){
     return '/lore/pantheon/' + id.slice(9);
   }
   var map = _getIdToPath();
   if(map[id]) return map[id];
-  /* Fallback legacy slug */
-  if(_idToSlug[id]) return '/' + _idToSlug[id];
 /* Nessuna mappa — genera path automatico da UUID */
 return '/p/' + id;
 }
 
 /* ════ DETECT PAGE LAYOUT FROM NOTION DATA ════ */
 var _LAYOUT_DB_MAP = {
-  '2f60274fdc1c80b7a729ef091b278682': 'regole',
-  '2f60274fdc1c80adb7a5d6beeef3e544': 'regole',
-  '2f60274fdc1c80558d8fe99842377aef': 'lore',
-  '2fc0274fdc1c80c4bbc1c8806f591e0f': 'lore',
-  '3090274fdc1c80008f0dffe3a677cb66': 'lore',
-  '30d0274fdc1c805cbbc2daf73b5f3a66': 'lore',
-  '3040274fdc1c80ed816ef58f6a606f21': 'lore',
-  '2fb0274fdc1c8073addaf1d5a3e9768b': 'lore',
-  '2fb0274fdc1c8080b07bd553e953c88d': 'lore',
-  '2f90274fdc1c8015bf95f52c4e7681b8': 'lore',
-  '2f70274fdc1c803ca5cafa97ca1817cd': 'bestiario',
-  '2f10274fdc1c80dca8caeb2e6de23146': 'fazioni',
-  '2ff0274fdc1c807ea473db02ac4ae391': 'oggetti',
-  '3350274fdc1c808fba5ed9ad1f3b4bb4': 'oggetti',
-  '2f70274fdc1c80e3bdc7f95f81eb9cc0': 'glossario',
-  '2fd0274fdc1c80038889fc072a360bae': 'galleria',
-  '3400274fdc1c80178db3dcf6ba7098aa': 'tabelle',
-  '2fc0274fdc1c800f8ac0d6d03b255cad': 'timeline'
+
 };
 
 function _detectPageLayout(pg, blocks, pageId, navKey) {

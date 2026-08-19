@@ -22,9 +22,7 @@ function getPage(idOrK){
 var SECTIONS = [
   {v:"regole",l:"Regole"},
   {v:"personaggio",l:"Personaggio"},
-  {v:"lore",l:"Lore"},
-  {v:"mestieri",l:"Mestieri"},
-  {v:"homebrew",l:"Homebrew"}
+  {v:"lore",l:"Lore"}
 ];
 
 /* ════ LAVORI ════ */

@@ -3,13 +3,7 @@ const PAGES_TO_INDEX = [
 ];
 
 const DATABASES_TO_INDEX = [
-  { id:'2fd0274fdc1c80038889fc072a360bae', label:'Galleria PG' },
-  { id:'2f60274fdc1c80fba671c588ba93b116', label:'Specie HB' },
-  { id:'2ff0274fdc1c807ea473db02ac4ae391', label:'Specie HB alt' },
-  { id:'2f70274fdc1c80e3bdc7f95f81eb9cc0', label:'Sottoclassi HB' },
-  { id:'3350274fdc1c808fba5ed9ad1f3b4bb4', label:'Classi HB' },
-  { id:'3040274fdc1c80e0a0dccfa9761bff55', label:'Biblioteca' },
-  { id:'2f90274fdc1c8015bf95f52c4e7681b8', label:'NPC' }
+
 ];
 
 async function fetchBlocks(pageId, token) {
