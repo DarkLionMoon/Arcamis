@@ -654,6 +654,17 @@ async function openSettings(){
     +'<option value="pv"'+(defaultView==='pv'?' selected':'')+'>Solo anteprima</option>'
     +'</select></div></div>'
     +'<div class="panel-sub" style="margin-top:10px">Scorciatoie: Ctrl+S salva · Ctrl+B grassetto · Ctrl+I corsivo · Ctrl+Z annulla · Tab indenta.</div></div>';
+  h+='<div class="panel"><div class="panel-head"><h3>Banner del sito</h3><span class="hint">messaggio mostrato prima di entrare nel sito</span></div>'
+    +'<div class="kv-rows">'
+    +'<div class="kv-row"><div class="kv-main"><div class="kt">Mostra banner</div><div class="ks">visualizza un banner fisso in cima al sito</div></div>'
+    +'<label class="toggle"><input type="checkbox" id="set-banner-on"><span class="slider"></span></label></div>'
+    +'</div>'
+    +'<div class="se-grid" style="margin-top:12px"><div class="fld" style="grid-column:1/-1"><label>Testo del banner</label>'
+    +'<textarea id="set-banner-text" class="in" rows="2" style="width:100%;resize:vertical" placeholder="Sito in manutenzione — alcune funzionalità potrebbero non essere disponibili"></textarea>'
+    +'</div></div>'
+    +'<div class="se-actions" style="margin-top:10px">'
+    +'<button class="btn btn-p btn-sm" onclick="saveBanner()">SALVA BANNER</button>'
+    +'<span class="md-status" id="banner-st" style="margin-left:auto"></span></div></div>';
   h+='<div class="grid-2">';
   h+='<div class="panel"><div class="panel-head"><h3>Repository</h3></div>'
     +'<div class="kv-rows">'
@@ -674,6 +685,7 @@ async function openSettings(){
   document.getElementById('main').innerHTML=h;
   pingDeployStatus();
   refreshGHTokenStatus();
+  loadBannerSettings();
 }
 async function refreshGHTokenStatus(){
   var el=document.getElementById('gh-token-st');
@@ -684,6 +696,31 @@ async function refreshGHTokenStatus(){
     if(j.configured)el.textContent=j.source==='env'?'Configurato (variabile d\'ambiente)':'Configurato (server)';
     else el.textContent='Non configurato — il proxy GitHub non funziona';
   }catch(e){el.textContent='non verificabile'}
+}
+async function loadBannerSettings(){
+  try{
+    var r=await fetch('/api/admin?action=get_site_settings',{credentials:'include'});
+    var j=await r.json();
+    var s=j.settings||{};
+    var onEl=document.getElementById('set-banner-on');
+    var txtEl=document.getElementById('set-banner-text');
+    if(onEl)onEl.checked=!!s.banner_enabled;
+    if(txtEl)txtEl.value=s.banner_text||'';
+  }catch(e){}
+}
+async function saveBanner(){
+  var onEl=document.getElementById('set-banner-on');
+  var txtEl=document.getElementById('set-banner-text');
+  var st=document.getElementById('banner-st');
+  if(!onEl||!txtEl)return;
+  var settings={banner_enabled:onEl.checked,banner_text:txtEl.value.trim()};
+  if(st)st.textContent='Salvataggio…';
+  try{
+    var r=await fetch('/api/admin?action=set_site_settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({settings:settings})});
+    var j=await r.json();
+    if(j.ok){if(st){st.textContent='✓';setTimeout(function(){st.textContent='';},2000);}}
+    else{if(st)st.textContent='Errore';}
+  }catch(e){if(st)st.textContent='Errore di rete';}
 }
 function openGHTokenModal(){
   var id='gh-token-modal';

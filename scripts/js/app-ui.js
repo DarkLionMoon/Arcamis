@@ -374,10 +374,20 @@ document.addEventListener('click', function(e){
   var MAINT_KEY = 'arc_maint_dismissed';
   var banner = document.getElementById('maint-banner');
   if(!banner) return;
-  if(!localStorage.getItem(MAINT_KEY)){
-    banner.style.display = '';
-    document.body.classList.add('maint-shift');
-  }
+  var dismissed = localStorage.getItem(MAINT_KEY);
+  fetch('/api/admin?action=get_site_settings')
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      var s = j.settings || {};
+      if(!s.banner_enabled){ banner.style.display = 'none'; return; }
+      var txt = banner.querySelector('.maint-text');
+      if(txt && s.banner_text) txt.textContent = s.banner_text;
+      if(!dismissed){
+        banner.style.display = '';
+        document.body.classList.add('maint-shift');
+      }
+    })
+    .catch(function(){ banner.style.display = 'none'; });
 })();
 function dismissMaintBanner(){
   var banner = document.getElementById('maint-banner');
