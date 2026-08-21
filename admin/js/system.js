@@ -124,10 +124,13 @@ async function openAudit(){
     var j=await r.json();
     _auditEntries=j.entries||[];
     var h=viewHead('📋','Registro attività','Ultime attività degli admin (30 giorni)', 
-      '<input id="aud-q" class="in" style="width:200px" placeholder="Filtra…" oninput="audFilter(this.value)">'
+      '<input id="aud-q" class="in" style="width:200px" placeholder="Filtra…" oninput="audFilter()">'
+      +'<input id="aud-from" class="in" style="width:130px" type="date" oninput="audFilter()" title="Data inizio">'
+      +'<input id="aud-to" class="in" style="width:130px" type="date" oninput="audFilter()" title="Data fine">'
+      +'<button class="btn btn-soft btn-sm" onclick="exportAuditCSV()">📥 CSV</button>'
       +'<button class="btn btn-p" onclick="openAudit()">⟳ AGGIORNA</button>');
-    h+='<div class="panel"><div class="panel-head"><h3>Eventi</h3><span class="hint">'+_auditEntries.length+' registrati</span></div>'
-      +'<div id="aud-body">'+_auditRender('')+'</div></div>';
+    h+='<div class="panel"><div class="panel-head"><h3>Eventi</h3><span class="hint" id="aud-count">'+_auditEntries.length+' registrati</span></div>'
+      +'<div id="aud-body">'+_auditRender('','','')+'</div></div>';
     document.getElementById('main').innerHTML=h;
     setStatus('ok','caricato');
     setTimeout(function(){setStatus('idle','pronto')},1500);
@@ -145,9 +148,13 @@ function _auditColor(action){
   if(action.indexOf('create')!==-1)return 'var(--grn)';
   return 'var(--acc)';
 }
-function _auditRender(q){
+function _auditRender(q,from,to){
   var entries=_auditEntries;
   if(q){q=q.toLowerCase();entries=entries.filter(function(e){return (e.action||'').toLowerCase().indexOf(q)!==-1||(e.target||'').toLowerCase().indexOf(q)!==-1})}
+  if(from){entries=entries.filter(function(e){return e.timestamp&&e.timestamp>=from})}
+  if(to){entries=entries.filter(function(e){return e.timestamp&&e.timestamp<=to+'T23:59:59'})}
+  var cnt=document.getElementById('aud-count');
+  if(cnt)cnt.textContent=entries.length+' filtrati';
   if(!entries.length)return '<div class="empty"><span class="ei">🗒️</span>Nessun evento'+(q?' per "'+esc(q)+'"':'')+'</div>';
   return entries.map(function(e){
     return '<div class="act-item"><div class="act-dot" style="background:'+_auditColor(e.action)+'"></div>'
@@ -155,7 +162,32 @@ function _auditRender(q){
       +'<div class="act-s">'+esc(dateFmt(e.timestamp))+(e.extra?' · '+esc(e.extra):'')+'</div></div></div>';
   }).join('');
 }
-function audFilter(q){var b=document.getElementById('aud-body');if(b)b.innerHTML=_auditRender(q)}
+function audFilter(){
+  var q=(document.getElementById('aud-q')||{}).value||'';
+  var from=(document.getElementById('aud-from')||{}).value||'';
+  var to=(document.getElementById('aud-to')||{}).value||'';
+  var b=document.getElementById('aud-body');
+  if(b)b.innerHTML=_auditRender(q,from,to);
+}
+function exportAuditCSV(){
+  var q=(document.getElementById('aud-q')||{}).value||'';
+  var from=(document.getElementById('aud-from')||{}).value||'';
+  var to=(document.getElementById('aud-to')||{}).value||'';
+  var entries=_auditEntries;
+  if(q){q=q.toLowerCase();entries=entries.filter(function(e){return (e.action||'').toLowerCase().indexOf(q)!==-1||(e.target||'').toLowerCase().indexOf(q)!==-1})}
+  if(from)entries=entries.filter(function(e){return e.timestamp&&e.timestamp>=from});
+  if(to)entries=entries.filter(function(e){return e.timestamp&&e.timestamp<=to+'T23:59:59'});
+  var csv='Data,Azione,Target,Utente,Ruolo,Extra\n';
+  entries.forEach(function(e){
+    csv+='"'+(e.timestamp||'")","'+(e.action||'").replace(/"/g,'""')+'","'+(e.target||'").replace(/"/g,'""')+'","'+(e.user||'").replace(/"/g,'""')+'","'+(e.role||'").replace(/"/g,'""')+'","'+((typeof e.extra==='string'?e.extra:JSON.stringify(e.extra||''))).replace(/"/g,'""')+'"\n';
+  });
+  var blob=new Blob([csv],{type:'text/csv'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='arcamis-audit-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  toast('Audit log esportato come CSV','success');
+}
 
 /* ═══════════════ BOOT ═══════════════ */
 document.addEventListener('keydown',function(e){
@@ -173,6 +205,7 @@ document.addEventListener('keydown',function(e){
     fetch('/api/admin?action=check',{credentials:'include'}).then(function(r){return r.json()}).then(function(j){
       if(j&&j.ok){
         if(j.role){_userRole=j.role;sessionStorage.setItem('arcadmin_role',j.role);}
+        _fetchCsrf();
         document.getElementById('login').classList.add('hide');
         document.getElementById('app').style.display='flex';
         document.getElementById('sb-name').textContent=_currentUser;
@@ -195,5 +228,6 @@ ArcAdmin.register('system', {
   editUserModal: openEditUserModal,
   saveEditUser: saveEditUser,
   deleteUser: deleteUserConfirm,
-  auditFilter: audFilter
+  auditFilter: audFilter,
+  exportAuditCSV: exportAuditCSV
 });

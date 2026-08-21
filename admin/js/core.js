@@ -13,6 +13,7 @@ var _autosaveTimer = null;
 var _lastSavedContent = '';
 var _currentUser = null;
 var _userRole = 'viewer';
+var _csrfToken = null;
 
 /* ═══════════════ UTILITIES ═══════════════ */
 function sha256(t){
@@ -101,12 +102,29 @@ function modalHtml(id,title,bodyHtml,actionsHtml,size){
   return d;
 }
 
+/* ═══════════════ CSRF TOKEN ═══════════════ */
+async function _fetchCsrf(){
+  try{
+    var r=await fetch('/api/admin?action=get_csrf',{credentials:'include'});
+    if(r.ok){var j=await r.json();_csrfToken=j.token||null;}
+  }catch(e){}
+}
+async function _authPost(url,body){
+  return fetch(url,{
+    method:'POST',credentials:'include',
+    headers:{'Content-Type':'application/json','X-CSRF-Token':_csrfToken||''},
+    body:JSON.stringify(body)
+  });
+}
+
 /* ═══════════════ API GITHUB (proxy server-side) ═══════════════
    Tutte le operazioni passano da /api/gh, che verifica la sessione
    admin via cookie e usa il token server-side (GH_TOKEN): nessun
    Personal Access Token viene mai esposto al browser. */
 async function ghProxy(action,payload){
-  var r=await fetch('/api/gh',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:action,payload:payload})});
+  var hdrs={'Content-Type':'application/json'};
+  if(_csrfToken)hdrs['X-CSRF-Token']=_csrfToken;
+  var r=await fetch('/api/gh',{method:'POST',credentials:'include',headers:hdrs,body:JSON.stringify({action:action,payload:payload})});
   if(!r.ok){
     var j=await r.json().catch(function(){return {}});
     throw new Error(j.error||('GH proxy '+r.status));
@@ -288,6 +306,7 @@ async function doLogin(){
   }
   if(btn)btn.disabled=false;
   _currentUser=user;_userRole=role;
+  await _fetchCsrf();
   sessionStorage.setItem('arcadmin','1');
   sessionStorage.setItem('arcadmin_user',user);
   sessionStorage.setItem('arcadmin_role',role);
@@ -393,11 +412,26 @@ function _dashGrid(label,type,items){
   if(!items||!items.length)return '';
   var h='<div class="panel" style="margin-top:16px"><div class="panel-head"><h3>'+label+'</h3><span class="hint">'+items.length+' voci</span></div>';
   items.forEach(function(it){
-    h+='<div class="row" data-type="'+type+'" data-key="'+escAttr(it.k||it.file)+'" onclick="dashOpen(this)">'
+    var k=escAttr(it.k||it.file);
+    var cb=(_bulkMode&&type==='page')?'<input type="checkbox" class="bulk-cb" data-key="'+k+'" '+(typeof _bulkSelected!=='undefined'&&_bulkSelected[k]?'checked':'')+' onclick="event.stopPropagation();toggleBulkItem(this)">':'';
+    var click=_bulkMode&&type==='page'?'':' onclick="dashOpen(this)"';
+    h+='<div class="row" data-type="'+type+'" data-key="'+k+'"'+click+'>'
+      +cb
       +'<div class="rico">'+esc(it.i)+'</div><div class="rmain"><div class="rt">'+esc(it.l)+'</div>'
       +'<div class="rs">'+esc(it.k||it.file)+'</div></div>'
       +'<div class="ract"><span style="color:var(--dim)">›</span></div></div>';
   });
+  if(_bulkMode&&type==='page'){
+    var secOpts='<option value="">Muovi a sezione…</option>';
+    if(typeof SECTIONS!=='undefined')SECTIONS.forEach(function(s){secOpts+='<option value="'+escAttr(s.v)+'">'+esc(s.l)+'</option>'});
+    h+='<div id="bulk-bar" style="padding:10px 16px;display:flex;gap:8px;align-items:center;border-top:1px solid var(--line)">'
+      +'<span class="hint" id="bulk-count">0 selezionate</span>'
+      +'<div class="grow"></div>'
+      +'<button class="btn btn-d btn-sm" onclick="bulkDelete()">Elimina selezionate</button>'
+      +'<select class="in" id="bulk-section" style="width:auto;padding:5px 8px;font-size:11px">'+secOpts+'</select>'
+      +'<button class="btn btn-soft btn-sm" onclick="bulkMove(document.getElementById(\'bulk-section\').value)">Muovi</button>'
+      +'</div>';
+  }
   return h+'</div>';
 }
 async function renderDashboard(){
@@ -409,9 +443,13 @@ async function renderDashboard(){
   var admin=_userRole==='admin';
   var h=viewHead('🏠','Dashboard','Panoramica del contenuto di Arcamis', 
     '<button class="btn btn-p" onclick="openNewPageModal()">+ Nuova pagina</button>'
-    +'<button class="btn btn-soft" onclick="openContentSearch()">🔎 Cerca</button>');
+    +'<button class="btn btn-soft" onclick="openImportModal()">📥 IMPORTA</button>'
+    +'<button class="btn btn-soft" onclick="exportAllPages()">📤 ESPORTA</button>'
+    +'<button class="btn btn-soft" onclick="openContentSearch()">🔎 Cerca</button>'
+    +'<button class="btn btn-soft" id="bulk-toggle" onclick="toggleBulkMode()">GESTISCI</button>');
   h+='<div class="stat-row">';
   h+='<div class="stat" onclick="dashOpenByType(\'page\')"><div class="si">📄</div><div><div class="sn">'+PAGES.length+'</div><div class="sl">Pagine wiki</div></div></div>';
+  h+='<div class="stat" id="dash-total-views"><div class="si">👁️</div><div><div class="sn">…</div><div class="sl">Visualizzazioni totali</div></div></div>';
   h+='</div>';
   h+='<div class="panel"><div class="panel-head"><h3>Azioni rapide</h3><span class="hint">scorciatoie</span></div><div class="quick-grid">';
   h+='<div class="quick" onclick="openNewPageModal()"><div class="qi">➕</div><div class="qt">Nuova pagina</div><div class="qd">Crea una sezione wiki con URL pulito</div></div>';
@@ -419,6 +457,7 @@ async function renderDashboard(){
   h+='<div class="quick" onclick="openCarousel()"><div class="qi">🎠</div><div class="qt">Carousel homepage</div><div class="qd">Slide, testi e bottoni della home</div></div>';
   h+='<div class="quick" onclick="openNav()"><div class="qi">🧭</div><div class="qt">Navigazione</div><div class="qd">Ordina e organizza le voci del menu</div></div>';
   h+='<div class="quick" onclick="openImages()"><div class="qi">🖼️</div><div class="qt">Immagini</div><div class="qd">Carica e gestisci /images/</div></div>';
+  h+='<div class="quick" onclick="openBackupModal()"><div class="qi">💾</div><div class="qt">Backup</div><div class="qd">Esporta tutto il contenuto come JSON</div></div>';
   if(admin){
     h+='<div class="quick" onclick="openCovers()"><div class="qi">🖌️</div><div class="qt">Cover pagine</div><div class="qd">Sfondi delle card sulla home</div></div>';
   }
@@ -427,6 +466,7 @@ async function renderDashboard(){
   h+='<div class="panel" style="margin-top:16px"><div class="panel-head"><h3>Ultime attività</h3><span class="hint">registro admin</span></div><div id="dash-act"><div class="empty" style="padding:22px"><span class="ei">⏳</span>Caricamento…</div></div></div>';
   document.getElementById('main').innerHTML=h;
   _dashActivity();
+  _loadTotalViews();
 }
 function dashOpen(el){
   if(_modified&&!confirm('Hai modifiche non salvate. Continuare?'))return;
@@ -543,6 +583,45 @@ async function openSearchHit(k){
   }catch(e){setStatus('err','errore');toast(e.message,'error')}
 }
 
+/* ═══════════════ ANALYTICS ═══════════════ */
+async function _loadTotalViews(){
+  try{
+    var r=await fetch('/api/admin?action=get_analytics',{credentials:'include'});
+    var j=await r.json();
+    var total=j.total||0;
+    var el=document.getElementById('dash-total-views');
+    if(el)el.querySelector('.sn').textContent=total.toLocaleString('it-IT');
+  }catch(e){}
+}
+
+/* ═══════════════ BACKUP / EXPORT ═══════════════ */
+async function openBackupModal(){
+  modalHtml('backup-modal','💾 Backup contenuti',
+    '<div id="backup-body" style="padding:20px;text-align:center"><div style="color:var(--dim)">⏳ Preparazione backup…</div></div>',
+    '<button class="btn btn-soft" onclick="closeModal(\'backup-modal\')">Chiudi</button>');
+  try{
+    var r=await fetch('/api/admin?action=backup_content',{credentials:'include'});
+    var j=await r.json();
+    if(!Array.isArray(j))throw new Error(j.error||'Backup fallito');
+    var json=JSON.stringify(j,null,2);
+    var blob=new Blob([json],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var d=new Date().toISOString().slice(0,10);
+    var fname='arcamis-backup-'+d+'.json';
+    var body=document.getElementById('backup-body');
+    if(body){
+      body.innerHTML='<div style="padding:10px">✅ Backup pronto: <b>'+j.length+'</b> pagine</div>'
+        +'<a class="btn btn-p" href="'+url+'" download="'+fname+'" onclick="setTimeout(function(){closeModal(\'backup-modal\')},1000)">⬇ SCARICA '+esc(fname)+'</a>';
+    }
+    toast('Backup pronto! Scarica il file.','success');
+    await _logAudit('backup','all',{});
+  }catch(e){
+    var body=document.getElementById('backup-body');
+    if(body)body.innerHTML='<div style="padding:10px;color:var(--red)">❌ Errore: '+esc(e.message)+'</div>';
+    toast('Errore backup: '+e.message,'error');
+  }
+}
+
 /* ═══════════════ DEPLOY TIMER ═══════════════ */
 var _deployInterval=null;
 function startDeployTimer(){
@@ -612,5 +691,8 @@ ArcAdmin.register('core', {
     role: function(){return _userRole;},
     can: _can
   },
-  audit: _logAudit
+  audit: _logAudit,
+  csrf: { fetch: _fetchCsrf, token: function(){return _csrfToken;}, authPost: _authPost },
+  backup: { openModal: openBackupModal },
+  analytics: { loadTotalViews: _loadTotalViews }
 });

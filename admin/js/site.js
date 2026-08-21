@@ -676,6 +676,19 @@ async function openSettings(){
     +'<div class="se-actions" style="margin-top:10px">'
     +'<button class="btn btn-p btn-sm" onclick="saveDisclaimer()">SALVA DISCLAIMER</button>'
     +'<span class="md-status" id="disclaimer-st" style="margin-left:auto"></span></div></div>';
+  h+='<div class="panel"><div class="panel-head"><h3>Notifiche Discord</h3><span class="hint">webhook per notifiche automatiche</span></div>'
+    +'<div class="kv-rows">'
+    +'<div class="kv-row"><div class="kv-main"><div class="kt">Abilita webhook</div><div class="ks">invia notifiche Discord su eventi admin</div></div>'
+    +'<label class="toggle"><input type="checkbox" id="set-webhook-on"><span class="slider"></span></label></div>'
+    +'</div>'
+    +'<div class="se-grid" style="margin-top:12px"><div class="fld" style="grid-column:1/-1"><label>URL webhook Discord</label>'
+    +'<input id="set-webhook-url" class="in" placeholder="https://discord.com/api/webhooks/…" style="width:100%;font-family:var(--mono)"></div></div>'
+    +'<div class="se-actions" style="margin-top:10px">'
+    +'<button class="btn btn-soft btn-sm" onclick="testWebhook()">TEST</button>'
+    +'<button class="btn btn-p btn-sm" onclick="saveWebhook()">SALVA WEBHOOK</button>'
+    +'<span class="md-status" id="webhook-st" style="margin-left:auto"></span></div></div>';
+  h+='<div class="panel"><div class="panel-head"><h3>Statistiche</h3><span class="hint">panoramica visitatori</span></div>'
+    +'<div id="analytics-body"><div class="empty" style="padding:22px"><span class="ei">⏳</span>Caricamento…</div></div></div>';
   h+='<div class="grid-2">';
   h+='<div class="panel"><div class="panel-head"><h3>Repository</h3></div>'
     +'<div class="kv-rows">'
@@ -697,6 +710,8 @@ async function openSettings(){
   pingDeployStatus();
   refreshGHTokenStatus();
   loadSiteSettings();
+  loadWebhookStatus();
+  loadAnalytics();
 }
 async function refreshGHTokenStatus(){
   var el=document.getElementById('gh-token-st');
@@ -857,6 +872,93 @@ async function saveSections(){
   }
 }
 
+/* ════════════════════════════════════
+   WEBHOOK DISCORD
+   ════════════════════════════════════ */
+async function loadWebhookStatus(){
+  try{
+    var r=await fetch('/api/admin?action=get_webhook',{credentials:'include'});
+    var j=await r.json();
+    var w=j.webhook||{};
+    var on=document.getElementById('set-webhook-on');
+    var url=document.getElementById('set-webhook-url');
+    if(on)on.checked=!!w.enabled;
+    if(url)url.value=w.url||'';
+  }catch(e){}
+}
+async function saveWebhook(){
+  var on=document.getElementById('set-webhook-on');
+  var url=document.getElementById('set-webhook-url');
+  var st=document.getElementById('webhook-st');
+  if(!on||!url)return;
+  if(st){st.textContent='Salvataggio…';st.className='md-status'}
+  try{
+    var r=await _authPost('/api/admin?action=set_webhook',{enabled:on.checked,url:url.value.trim()});
+    var j=await r.json();
+    if(!j.ok)throw new Error(j.error||'Errore');
+    if(st){st.textContent='✓ Salvato';st.className='md-status ok'}
+    setTimeout(function(){if(st)st.textContent='';},2000);
+    toast('Webhook Discord salvato','success');
+  }catch(e){if(st){st.textContent='✕ '+e.message;st.className='md-status err'}}
+}
+async function testWebhook(){
+  var st=document.getElementById('webhook-st');
+  if(st){st.textContent='Invio test…';st.className='md-status'}
+  try{
+    var r=await _authPost('/api/admin?action=test_webhook',{});
+    var j=await r.json();
+    if(!j.ok)throw new Error(j.error||'Invio fallito');
+    if(st){st.textContent='✓ Messaggio inviato! Controlla Discord';st.className='md-status ok'}
+    setTimeout(function(){if(st)st.textContent='';},3000);
+    toast('Test inviato su Discord','success');
+  }catch(e){if(st){st.textContent='✕ '+e.message;st.className='md-status err'}}
+}
+
+/* ════════════════════════════════════
+   ANALYTICS PANEL
+   ════════════════════════════════════ */
+async function loadAnalytics(){
+  var box=document.getElementById('analytics-body');
+  try{
+    var r=await fetch('/api/admin?action=get_analytics',{credentials:'include'});
+    var j=await r.json();
+    var pages=j.pages||[];
+    var total=j.total||0;
+    if(!box)return;
+    if(!pages.length){box.innerHTML='<div class="empty" style="padding:22px"><span class="ei">📊</span>Nessun dato disponibile</div>';return}
+    var h='<div class="kv-rows">'
+      +'<div class="kv-row"><div class="kv-main"><div class="kt">Visualizzazioni totali</div><div class="ks">'+total.toLocaleString('it-IT')+'</div></div></div>'
+      +'</div>';
+    h+='<div class="panel-head" style="margin-top:12px"><h3 style="font-size:12px">Pagine più visitate</h3></div>';
+    var top=pages.sort(function(a,b){return (b.views||0)-(a.views||0)}).slice(0,10);
+    top.forEach(function(p,i){
+      h+='<div class="act-item"><div class="act-dot" style="background:var(--acc)"></div>'
+        +'<div class="act-main"><div class="act-t"><b>#'+(i+1)+'</b> '+esc(p.pageKey||'')+'</div>'
+        +'<div class="act-s">'+(p.views||0)+' visualizzazioni</div></div></div>';
+    });
+    box.innerHTML=h;
+  }catch(e){if(box)box.innerHTML='<div class="empty" style="padding:22px"><span class="ei">⚠️</span>Statistiche non disponibili</div>'}
+}
+
+/* ════════════════════════════════════
+   MEDIA ORGANIZATION (images helpers)
+   ════════════════════════════════════ */
+var _imgSortBy='name';
+var _imgViewMode='grid';
+var _imgFilter='';
+function _imgSortItems(items,by){
+  var arr=items.slice();
+  if(by==='name')arr.sort(function(a,b){return (a.name||'').localeCompare(b.name||'')});
+  else if(by==='date')arr.sort(function(a,b){return (b.lastModified||'').localeCompare(a.lastModified||'')});
+  else if(by==='size')arr.sort(function(a,b){return (b.size||0)-(a.size||0)});
+  return arr;
+}
+function _imgFilterItems(items,q){
+  if(!q)return items;
+  q=q.toLowerCase();
+  return items.filter(function(it){return (it.name||'').toLowerCase().indexOf(q)!==-1});
+}
+
 /* ═══════════════ REGISTRAZIONE NAMESPACE ═══════════════ */
 ArcAdmin.register('site', {
   save: arcSave,
@@ -876,5 +978,12 @@ ArcAdmin.register('site', {
   openNav: openNav,
   navMove: navMove,
   navSetSec: navSetSec,
-  navSetSub: navSetSub
+  navSetSub: navSetSub,
+  openSettings: openSettings,
+  saveWebhook: saveWebhook,
+  testWebhook: testWebhook,
+  loadWebhookStatus: loadWebhookStatus,
+  loadAnalytics: loadAnalytics,
+  imgSort: _imgSortItems,
+  imgFilter: _imgFilterItems
 });

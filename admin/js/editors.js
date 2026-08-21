@@ -61,6 +61,8 @@ var _prevView='md';
 var _mdSplit=50;
 var _tocOffsets=[];
 var _undo=[],_redo=[],_undoBase=null,_lastUndoTs=0;
+var _bulkMode=false;
+var _bulkSelected={};
 
 /* ── COMANDI EDITOR ── */
 function _snapUndo(){
@@ -127,8 +129,12 @@ async function openPage(k){
   h+='<div class="ed-head">';
   h+='<div class="ed-title"><span class="eti" id="ed-icon">'+esc(json.icon||'📄')+'</span><span id="ed-title">'+esc(json.title||k)+'</span><span class="etp">pages/'+esc(k)+'</span></div>';
   h+='<span class="badge badge-idle" id="e-badge">salvato</span>';
+  h+='<span class="badge badge-draft" id="e-draft-badge" style="display:none">BOZZA</span>';
   h+='<div class="grow"></div>';
   h+='<div class="ed-actions">';
+  h+='<button class="btn btn-soft btn-sm" onclick="saveDraft()" title="Salva come bozza (non pubblicata)">💾 <span class="lbl">SALVA BOZZA</span></button>';
+  h+='<button class="btn btn-p btn-sm" id="publish-btn" onclick="publishDraft()" style="display:none" title="Pubblica bozza come versione live">🚀 <span class="lbl">PUBBLICA</span></button>';
+  h+='<span class="ed-sep"></span>';
   h+='<button class="btn btn-soft btn-sm" onclick="toggleJson()" title="Modifica il JSON grezzo della pagina">JSON</button>';
   h+='<button class="btn btn-soft btn-sm" onclick="openHistory()" title="Cronologia commit e ripristino versione">📜 <span class="lbl">Storia</span></button>';
   h+='<button class="btn btn-soft btn-sm" onclick="checkLinks()" title="Verifica i link interni del contenuto">🔗 <span class="lbl">Link</span></button>';
@@ -162,11 +168,11 @@ async function openPage(k){
   h+='<div class="pane-head">Anteprima <span class="ph-info" id="e-pv-info">'+esc(_layoutLabel(json.layout||''))+'</span></div>';
   h+='<div id="e-preview"></div>';
   h+='</div>';
-  h+='<div class="md-outline" id="e-outline"><div class="ol-head">☰ Sommario</div><div class="ol-body" id="e-ol-body"></div></div>';
+  h+='<div class="md-outline" id="e-outline"><div class="ol-head"><span>☰ Sommario</span><button class="ol-close" onclick="toggleOutline()" title="Chiudi sommario">✕</button></div><div class="ol-body" id="e-ol-body"></div></div>';
   h+='</div>';
   h+='<iframe id="site-frame"></iframe><div id="site-hint"><span>🔎 Anteprima del sito</span><span class="sh-k">· clicca SITO per tornare all\'editor</span></div>';
   h+='<div class="json-pane" id="json-pane"><div class="pane-head">JSON</div><textarea id="e-json"></textarea></div>';
-  h+='<div class="ed-statusbar"><span id="e-sb">'+esc(_layoutLabel(json.layout||''))+' · Autosave ogni 15s · SALVA / Ctrl+S salva subito</span><span class="st-r">⌨ Ctrl+B grassetto · Ctrl+I corsivo · Tab indent</span></div>';
+  h+='<div class="ed-statusbar"><span id="e-sb">'+esc(_layoutLabel(json.layout||''))+' · Autosave ogni 15s · SALVA / Ctrl+S salva subito</span><span class="st-r">Ctrl+B grassetto · Ctrl+I corsivo · Ctrl+H cerca · Ctrl+G riga · Ctrl+Shift+F schermo intero</span></div>';
   h+='</div>';
   document.getElementById('main').innerHTML=h;
   if(st){
@@ -179,6 +185,9 @@ async function openPage(k){
   }
   _bindDivider();
   _bindEditorEvents();
+  _bindEditorKeys();
+  _bindSyncScroll();
+  _checkDraftStatus();
 }
 function buildToolbar(){
   var h='<div class="ed-toolbar" id="e-toolbar">';
@@ -217,6 +226,7 @@ function onMdKey(e){
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='i'){e.preventDefault();runCmd('italic');return}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();runCmd(e.shiftKey?'redo':'undo');return}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();runCmd('redo');return}
+  if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&_autoPair(e,ta)){onMdInput();return}
   if(e.key==='Tab'){
     e.preventDefault();
     var s=ta.selectionStart,en=ta.selectionEnd,val=ta.value;
@@ -304,7 +314,7 @@ function buildOutline(){
     _tocOffsets.push({el:el,off:off});
     h+='<button class="ol-item '+tag+'" data-off="'+off+'" title="'+esc(txt)+'">'+esc(txt)+'</button>';
   }
-  body.innerHTML=h||'<div style="padding:0 10px;color:var(--dim);font-size:10px">Nessuna sezione</div>';
+  body.innerHTML=h||'<div style="padding:10px;color:var(--dim);font-size:11px">Nessuna sezione</div>';
 }
 function jumpToLine(off){var pv=document.getElementById('e-preview');if(pv){pv.scrollTop=off-90;pv.focus()}}
 function toggleOutline(){
@@ -315,8 +325,12 @@ function toggleOutline(){
 }
 function updateStats(){
   var md=document.getElementById('e-md');var st=document.getElementById('e-stats');if(!md||!st)return;
-  var words=(md.value.trim()===''?0:md.value.trim().split(/\s+/).length);
-  st.textContent=words+' parole · '+md.value.split('\n').length+' righe';
+  var val=md.value;
+  var words=(val.trim()===''?0:val.trim().split(/\s+/).length);
+  var chars=val.length;
+  var lines=val.split('\n').length;
+  var mins=Math.max(1,Math.round(words/200));
+  st.textContent=words+' parole · '+chars+' caratteri · '+lines+' righe · ~'+mins+' min lettura';
 }
 function setViewMode(m){
   var eb=document.getElementById('editor-body');
@@ -416,6 +430,18 @@ function _bindEditorEvents(){
     }
   });
   window.addEventListener('resize',function(){if(document.getElementById('e-preview'))buildOutline()});
+  var pv=document.getElementById('e-preview');
+  if(pv){
+    pv.addEventListener('scroll',function(){
+      var ol=document.getElementById('e-outline');if(!ol||!ol.classList.contains('open'))return;
+      var items=ol.querySelectorAll('.ol-item');if(!items.length)return;
+      var scrollTop=pv.scrollTop;var bestIdx=0;
+      for(var i=0;i<_tocOffsets.length;i++){
+        if(_tocOffsets[i].off-60<=scrollTop)bestIdx=i;
+      }
+      for(var j=0;j<items.length;j++)items[j].classList.toggle('active',j===bestIdx);
+    });
+  }
 }
 function onLayoutChange(val,silent){
   _current.layout=val;
@@ -503,6 +529,67 @@ async function savePage(){
     if(edIcon)edIcon.textContent=_current.icon||'📄';
   }catch(e){setBadge('err','errore');setStatus('err','errore');toast(e.message,'error')}
   if(btn)btn.disabled=false;
+}
+
+/* ── DRAFT / PUBLISH ── */
+async function _checkDraftStatus(){
+  if(!_current||_current.type!=='page')return;
+  try{
+    var r=await fetch('/api/admin?action=get_draft&pageKey='+encodeURIComponent(_current.k),{credentials:'include'});
+    var j=await r.json();
+    var badge=document.getElementById('e-draft-badge');
+    var pub=document.getElementById('publish-btn');
+    if(j&&j.draft){
+      if(badge)badge.style.display='';
+      if(pub)pub.style.display='';
+    }else{
+      if(badge)badge.style.display='none';
+      if(pub)pub.style.display='none';
+    }
+  }catch(e){}
+}
+async function saveDraft(){
+  if(!_current||_current.type!=='page')return;
+  var md=document.getElementById('e-md');
+  var content=md?md.value:'';
+  var title=getTitle()||_current.title;
+  var icon=getIcon()||_current.icon;
+  var layout=_current.layout||'';
+  setStatus('saving','salvataggio bozza...');
+  try{
+    var r=await _authPost('/api/admin?action=save_draft',{pageKey:_current.k,content:content,title:title,icon:icon,layout:layout});
+    var j=await r.json();
+    if(!j.ok)throw new Error(j.error||'Errore bozza');
+    var badge=document.getElementById('e-draft-badge');
+    if(badge)badge.style.display='';
+    var pub=document.getElementById('publish-btn');
+    if(pub)pub.style.display='';
+    setBadge('ok','bozza salvata');
+    setStatus('ok','bozza salvata');
+    setTimeout(function(){setStatus('idle','pronto')},1500);
+    toast('Bozza salvata! Non è ancora visibile sul sito.','success');
+    await _logAudit('save_draft',_current.k,{});
+  }catch(e){setStatus('err','errore');toast('Errore bozza: '+e.message,'error')}
+}
+async function publishDraft(){
+  if(!_current||_current.type!=='page')return;
+  if(!confirm('Pubblicare questa bozza?\n\nLa versione attuale sul sito verrà sostituita con il contenuto della bozza e partirà il deploy.'))return;
+  setStatus('saving','pubblicazione...');
+  try{
+    var r=await _authPost('/api/admin?action=publish_draft',{pageKey:_current.k});
+    var j=await r.json();
+    if(!j.ok)throw new Error(j.error||'Errore pubblicazione');
+    var badge=document.getElementById('e-draft-badge');
+    if(badge)badge.style.display='none';
+    var pub=document.getElementById('publish-btn');
+    if(pub)pub.style.display='none';
+    setBadge('ok','pubblicato');
+    setStatus('ok','deploying...');
+    toast('Bozza pubblicata! Deploy in corso…','success');
+    startDeployTimer();
+    await _logAudit('publish_draft',_current.k,{});
+    openPage(_current.k);
+  }catch(e){setStatus('err','errore');toast('Errore pubblicazione: '+e.message,'error')}
 }
 
 /* ── INSERIMENTO IMMAGINI ── */
@@ -968,19 +1055,49 @@ async function openHistory(){
   try{
     var path=CONTENT+'/pages/'+_current.k+'.json';
     var commits=await ghCommits(path);
-    var rows=commits&&commits.length?commits.map(function(c){
+    var rows=commits&&commits.length?commits.map(function(c,i){
       var msg=c.commit&&c.commit.message||'';
       var date=c.commit&&c.commit.author&&c.commit.author.date?new Date(c.commit.author.date).toLocaleString('it-IT'):'';
       var sha=c.sha?c.sha.slice(0,8):'';
+      var prevSha=(i<commits.length-1)?commits[i+1].sha:'';
+      var diffBtn=prevSha?'<button class="btn btn-soft btn-sm" onclick="showDiff(\''+prevSha+'\',\''+c.sha+'\')">DIFF</button>':'';
       return '<div class="row" style="cursor:default;background:var(--panel);border:1px solid var(--line)">'
         +'<div class="rmain"><div class="rt">'+esc(msg)+'</div><div class="rs">'+sha+' · '+esc(date)+'</div></div>'
-        +'<button class="btn btn-soft btn-sm" onclick="restoreVersion(\''+c.sha+'\')">RIPRISTINA</button></div>';
+        +'<div class="ract">'+diffBtn
+        +'<button class="btn btn-soft btn-sm" onclick="restoreVersion(\''+c.sha+'\')">RIPRISTINA</button></div></div>';
     }).join(''):'<div class="list-empty">Nessun commit trovato</div>';
     modalHtml('hist-modal','📜 Storia — '+esc(_current.title||_current.k),
       '<div class="list-body">'+rows+'</div>',
       '<button class="btn btn-soft" onclick="closeModal(\'hist-modal\')">Chiudi</button>');
     setStatus('idle','pronto');
   }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+async function showDiff(sha1,sha2){
+  setStatus('saving','calcolo diff…');
+  try{
+    var r=await _authPost('/api/admin?action=get_diff',{sha1:sha1,sha2:sha2,path:CONTENT+'/pages/'+_current.k+'.json'});
+    var j=await r.json();
+    if(!j.ok)throw new Error(j.error||'Diff non disponibile');
+    var lines=j.diff||[];
+    var h='<div class="diff-view" style="font-family:var(--mono);font-size:12px;max-height:60vh;overflow-y:auto;padding:0">';
+    h+='<div style="padding:8px 12px;border-bottom:1px solid var(--line);color:var(--dim);font-size:11px">'
+      +sha1.slice(0,8)+' → '+sha2.slice(0,8)+'</div>';
+    if(!lines.length){
+      h+='<div style="padding:16px;text-align:center;color:var(--dim)">Nessuna differenza</div>';
+    }else{
+      lines.forEach(function(ln){
+        var cls='',prefix=' ';
+        if(ln[0]==='+'){cls='diff-add';prefix='+'}
+        else if(ln[0]==='-'){cls='diff-del';prefix='-'}
+        else if(ln[0]==='@'){cls='diff-hunk';prefix=' '}
+        h+='<div class="'+cls+'" style="padding:2px 12px;white-space:pre-wrap;border-bottom:1px solid rgba(255,255,255,0.03)">'+esc(prefix+ln.slice(1))+'</div>';
+      });
+    }
+    h+='</div>';
+    modalHtml('diff-modal','🔀 Diff — '+_current.k,h,
+      '<button class="btn btn-soft" onclick="closeModal(\'diff-modal\')">Chiudi</button>','md-wide');
+  }catch(e){toast('Errore diff: '+e.message,'error')}
+  setStatus('idle','pronto');
 }
 async function restoreVersion(sha){
   if(!confirm('Ripristinare questa versione nell\'editor?\n\nNon viene salvata automaticamente: controlla il contenuto e poi premi SALVA.'))return;
@@ -1097,14 +1214,60 @@ async function openImages(){
     var h=viewHead('🖼️','Immagini','Archivio condiviso in /images/', 
       '<button class="btn btn-soft" onclick="openImageUpload()">⬆ CARICA</button>'
       +'<button class="btn btn-p" onclick="openImages()">⟳ AGGIORNA</button>');
-    h+='<div class="img-grid">';
-    if(!items.length)h+='<div class="empty"><span class="ei">🖼️</span>Nessuna immagine in /images/</div>';
-    items.forEach(function(it){h+=_imgCard(it)});
+    h+='<div class="img-controls" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;padding:8px 16px;background:var(--panel);border:1px solid var(--line);border-radius:8px">';
+    h+='<input id="img-search" class="in" style="width:200px" placeholder="Cerca immagine…" oninput="_imgFilter=this.value;openImages()" value="'+escAttr(_imgFilter)+'">';
+    h+='<select id="img-sort" class="in" style="width:auto;padding:5px 8px;font-size:11px" onchange="_imgSortBy=this.value;openImages()">';
+    h+='<option value="name"'+(_imgSortBy==='name'?' selected':'')+'>Nome</option>';
+    h+='<option value="date"'+(_imgSortBy==='date'?' selected':'')+'>Data</option>';
+    h+='<option value="size"'+(_imgSortBy==='size'?' selected':'')+'>Dimensione</option>';
+    h+='</select>';
+    h+='<button class="btn btn-soft btn-sm" onclick="_imgViewMode=_imgViewMode===\'grid\'?\'list\':\'grid\';openImages()">'+(_imgViewMode==='grid'?'☰ Lista':'▦ Griglia')+'</button>';
     h+='</div>';
+    if(_imgFilter)items=_imgFilterItems(items,_imgFilter);
+    if(_imgSortBy!=='name')items=_imgSortItems(items,_imgSortBy);
+    if(_imgViewMode==='list'){
+      h+='<div class="panel"><div class="panel-head"><h3>Immagini</h3><span class="hint">'+items.length+' file</span></div>';
+      if(!items.length)h+='<div class="empty"><span class="ei">🖼️</span>Nessuna immagine in /images/</div>';
+      items.forEach(function(it){
+        var name=it.name||'';
+        var size=it.size?(it.size/1024).toFixed(1)+' KB':'';
+        h+='<div class="row">'
+          +'<div class="rico" style="overflow:hidden;width:40px;height:40px;border-radius:4px"><img src="'+esc(it.download_url||'')+'" alt="" style="width:100%;height:100%;object-fit:cover"></div>'
+          +'<div class="rmain"><div class="rt img-rename" contenteditable="true" spellcheck="false" data-original="'+escAttr(name)+'" data-sha="'+escAttr(it.sha||'')+'" onblur="renameImage(this)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}">'+esc(name)+'</div>'
+          +'<div class="rs">'+size+' · '+esc(it.type||'file')+'</div></div>'
+          +'<div class="ract">'
+          +'<button class="btn btn-soft btn-sm" onclick="copyImageUrl(\''+escJsAttr(name)+'\')">🔗 URL</button>'
+          +'<button class="btn btn-d btn-sm" onclick="deleteImage(\''+escJsAttr(name)+'\',\''+esc(it.sha)+'\')">🗑</button>'
+          +'</div></div>';
+      });
+      h+='</div>';
+    }else{
+      h+='<div class="img-grid">';
+      if(!items.length)h+='<div class="empty"><span class="ei">🖼️</span>Nessuna immagine in /images/</div>';
+      items.forEach(function(it){h+=_imgCard(it)});
+      h+='</div>';
+    }
     document.getElementById('main').innerHTML=h;
     setStatus('ok','caricato');
     setTimeout(function(){setStatus('idle','pronto')},1500);
   }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+async function renameImage(el){
+  var oldName=el.getAttribute('data-original');
+  var newName=(el.textContent||'').trim();
+  var sha=el.getAttribute('data-sha');
+  if(!newName||newName===oldName){el.textContent=oldName;return}
+  setStatus('saving','rinomina…');
+  try{
+    var d=await ghGet('images/'+oldName);
+    var content=d.content;
+    await ghDelete('images/'+oldName,'admin: rename image '+oldName,sha);
+    await ghPut('images/'+newName,'admin: rename image '+oldName+' → '+newName,atob(content),null);
+    el.setAttribute('data-original',newName);
+    toast('Immagine rinominata: '+newName,'success');
+    setStatus('ok','rinominato');
+    setTimeout(function(){setStatus('idle','pronto')},1500);
+  }catch(e){setStatus('err','errore');toast('Errore rinomina: '+e.message,'error');el.textContent=oldName}
 }
 function _imgCard(it){
   var name=it.name||'';
@@ -1140,6 +1303,331 @@ function openImageUpload(){
   openImgDialog();
 }
 
+/* ── BULK OPERATIONS ── */
+function toggleBulkMode(){
+  _bulkMode=!_bulkMode;
+  _bulkSelected={};
+  var btn=document.getElementById('bulk-toggle');
+  if(btn)btn.className=_bulkMode?'btn btn-p btn-sm':'btn btn-soft';
+  renderDashboard();
+}
+function toggleBulkItem(cb){
+  var k=cb.getAttribute('data-key');
+  if(cb.checked)_bulkSelected[k]=1;else delete _bulkSelected[k];
+  var count=Object.keys(_bulkSelected).length;
+  var el=document.getElementById('bulk-count');
+  if(el)el.textContent=count+' selezionate';
+}
+async function bulkDelete(){
+  var keys=Object.keys(_bulkSelected);
+  if(!keys.length){toast('Seleziona almeno una pagina','error');return}
+  if(!confirm('Eliminare '+keys.length+' pagina/e selezionate?\n\nOperazione irreversibile.'))return;
+  setStatus('saving','eliminazione…');
+  var ok=0,err=0;
+  for(var i=0;i<keys.length;i++){
+    try{
+      var path=CONTENT+'/pages/'+keys[i]+'.json';
+      var d=await ghGet(path);
+      await ghDelete(path,'admin: bulk delete '+keys[i],d.sha);
+      await removeFromRegistry(keys[i]);
+      var id=await _getPageId(keys[i]);
+      if(id&&id.indexOf('pag-')!==0)await removeFromIndex(keys[i],id);
+      for(var j=0;j<PAGES.length;j++){if(PAGES[j].k===keys[i]){PAGES.splice(j,1);break}}
+      ok++;
+    }catch(e){err++}
+  }
+  _bulkSelected={};
+  _bulkMode=false;
+  buildSidebar();
+  setStatus('ok','eliminato '+ok+'/'+keys.length);
+  toast(ok+' pagine eliminate'+(err?', '+err+' errori':''),'success');
+  renderDashboard();
+  startDeployTimer();
+}
+async function bulkMove(sec){
+  var keys=Object.keys(_bulkSelected);
+  if(!keys.length){toast('Seleziona almeno una pagina','error');return}
+  if(!sec){toast('Seleziona una sezione di destinazione','error');return}
+  if(!confirm('Muovere '+keys.length+' pagina/e nella sezione "'+sec+'"?'))return;
+  setStatus('saving','spostamento…');
+  var ok=0,err=0;
+  for(var i=0;i<keys.length;i++){
+    try{
+      var meta=PAGES.find(function(p){return p.k===keys[i]});
+      if(meta){meta.sec=sec;meta.path=sec+'/'+keys[i]}
+      ok++;
+    }catch(e){err++}
+  }
+  try{
+    var d=await ghGet('content/pages/registry.json');
+    var reg=JSON.parse(b64decode(d.content));
+    keys.forEach(function(k){
+      var p=(reg.pages||[]).find(function(x){return x.k===k});
+      if(p){p.sec=sec;p.path=sec+'/'+k}
+    });
+    await ghPut('content/pages/registry.json','admin: bulk move to '+sec,JSON.stringify(reg,null,2)+'\n',d.sha);
+  }catch(e){}
+  _bulkSelected={};
+  _bulkMode=false;
+  buildSidebar();
+  setStatus('ok','spostato '+ok+'/'+keys.length);
+  toast(ok+' pagine spostate in '+sec,'success');
+  renderDashboard();
+  startDeployTimer();
+}
+
+/* ── IMPORT / EXPORT ── */
+function openImportModal(){
+  modalHtml('import-modal','📥 Importa pagine',
+    '<div class="fld"><label>Seleziona file JSON di backup</label>'
+    +'<input type="file" id="import-file" accept=".json" class="in" onchange="previewImport(this)"></div>'
+    +'<div id="import-preview" style="margin-top:10px"></div>',
+    '<button class="btn btn-soft" onclick="closeModal(\'import-modal\')">Annulla</button>'
+    +'<button class="btn btn-p" id="import-btn" onclick="doImport()" disabled>IMPORTA</button>');
+}
+var _importData=null;
+function previewImport(input){
+  var file=input.files&&input.files[0];
+  var preview=document.getElementById('import-preview');
+  var btn=document.getElementById('import-btn');
+  if(!file||!preview){_importData=null;return}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var j=JSON.parse(e.target.result);
+      var pages=j.pages||j.data&&j.data.pages||[];
+      if(typeof pages==='object'&&!Array.isArray(pages))pages=Object.keys(pages).map(function(k){return pages[k]});
+      _importData=j;
+      preview.innerHTML='<div class="hint">'+pages.length+' pagine trovate nel backup</div>';
+      if(btn)btn.disabled=false;
+      toast('File valido: '+pages.length+' pagine','success');
+    }catch(e){
+      _importData=null;
+      preview.innerHTML='<div style="color:var(--red)">❌ File non valido: '+esc(e.message)+'</div>';
+      if(btn)btn.disabled=true;
+    }
+  };
+  reader.readAsText(file);
+}
+async function doImport(){
+  if(!_importData)return;
+  var btn=document.getElementById('import-btn');
+  if(btn)btn.disabled=true;
+  setStatus('saving','importazione…');
+  var imported=0,skipped=0;
+  try{
+    var pages=_importData.pages||_importData.data&&_importData.data.pages||[];
+    for(var i=0;i<pages.length;i++){
+      var pg=pages[i];
+      var k=pg.k||pg.slug||'';
+      if(!k)continue;
+      if(PAGES.some(function(p){return p.k===k})){skipped++;continue}
+      var label=pg.title||pg.l||k;
+      var icon=pg.icon||pg.i||'📄';
+      var content=pg.content||'';
+      var layout=pg.layout||'';
+      var json={k:k,title:label,icon:icon,content:content,layout:layout,lastModified:new Date().toISOString()};
+      await ghPut(CONTENT+'/pages/'+k+'.json','admin: import page '+k,JSON.stringify(json,null,2),null);
+      await addToRegistry(k,label,icon,'pag-'+k,pg.sec||'',pg.sub||'');
+      PAGES.push({k:k,l:label,i:icon,sec:pg.sec||'',sub:pg.sub||'',c:1});
+      imported++;
+    }
+    _contentIndex=null;
+    buildSidebar();
+    closeModal('import-modal');
+    toast(imported+' pagine importate'+(skipped?', '+skipped+' saltate':''),'success');
+    setStatus('ok','importato '+imported);
+    startDeployTimer();
+  }catch(e){
+    setStatus('err','errore');
+    toast('Errore import: '+e.message,'error');
+  }
+  if(btn)btn.disabled=false;
+}
+async function exportAllPages(){
+  setStatus('saving','esportazione…');
+  try{
+    var all=[];
+    for(var i=0;i<PAGES.length;i++){
+      try{
+        var d=await ghGet(CONTENT+'/pages/'+PAGES[i].k+'.json');
+        var json=JSON.parse(b64decode(d.content));
+        all.push(json);
+      }catch(e){}
+    }
+    var blob=new Blob([JSON.stringify({pages:all,exportDate:new Date().toISOString()},null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download='arcamis-export-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    toast('Esportato '+all.length+' pagine','success');
+    setStatus('ok','esportato '+all.length);
+  }catch(e){setStatus('err','errore');toast('Errore esportazione: '+e.message,'error')}
+}
+
+/* ── FIND & REPLACE ── */
+function openFindReplace(){
+  if(document.getElementById('fr-modal'))return;
+  modalHtml('fr-modal','🔍 Trova e sostituisci',
+    '<div class="fld"><label>Trova</label><input id="fr-find" class="in" placeholder="Testo da cercare…" onkeydown="if(event.key===\'Enter\')findNext()"></div>'
+    +'<div class="fld"><label>Sostituisci con</label><input id="fr-repl" class="in" placeholder="Testo sostitutivo…" onkeydown="if(event.key===\'Enter\')findNext()"></div>'
+    +'<div class="fr-info" id="fr-info"></div>'
+    +'<div class="fr-btns">'
+    +'<button class="btn btn-soft btn-sm" onclick="findPrev()" title="Risultato precedente (Shift+Enter)">↑ Prev</button>'
+    +'<button class="btn btn-soft btn-sm" onclick="findNext()" title="Risultato successivo (Enter)">↓ Next</button>'
+    +'<button class="btn btn-soft btn-sm" onclick="replaceCurrent()" title="Sostituisci selezione">Sostituisci</button>'
+    +'<button class="btn btn-soft btn-sm" onclick="replaceAll()" title="Sostituisci tutti">Sostituisci tutti</button>'
+    +'</div>',
+    '<button class="btn btn-soft" onclick="closeModal(\'fr-modal\')">Chiudi</button>');
+  var fi=document.getElementById('fr-find');if(fi){fi.focus();fi.select();}
+}
+var _frMatches=[];var _frIdx=-1;
+function _frSearch(){
+  var q=(document.getElementById('fr-find')||{}).value||'';
+  var ta=document.getElementById('e-md');if(!ta||!q){_frMatches=[];_frIdx=-1;return}
+  var val=ta.value;_frMatches=[];
+  var lower=val.toLowerCase(),lq=q.toLowerCase();
+  var pos=0;
+  while(pos<val.length){
+    var idx=lower.indexOf(lq,pos);
+    if(idx===-1)break;
+    _frMatches.push(idx);
+    pos=idx+1;
+  }
+  _frIdx=_frMatches.length?0:-1;
+  _frHighlight(ta);
+  var info=document.getElementById('fr-info');
+  if(info)info.textContent=_frMatches.length?(_frMatches.length+' risultati'+(_frIdx>=0?' — '+((_frIdx+1))+'/'+_frMatches.length:'')):'Nessun risultato';
+}
+function _frHighlight(ta){
+  if(_frIdx<0||!_frMatches.length)return;
+  var start=_frMatches[_frIdx];
+  var q=(document.getElementById('fr-find')||{}).value||'';
+  ta.focus();
+  ta.selectionStart=start;ta.selectionEnd=start+q.length;
+  var lines=ta.value.substring(0,start).split('\n');
+  var line=lines.length-1;
+  var lineHeight=parseFloat(getComputedStyle(ta).lineHeight)||21;
+  ta.scrollTop=Math.max(0,line*lineHeight-ta.clientHeight/3);
+}
+function findNext(){_frSearch();if(!_frMatches.length)return;var ta=document.getElementById('e-md');if(!ta)return;_frIdx=(_frIdx+1)%_frMatches.length;var info=document.getElementById('fr-info');if(info)info.textContent=(_frIdx+1)+'/'+_frMatches.length;_frHighlight(ta)}
+function findPrev(){_frSearch();if(!_frMatches.length)return;var ta=document.getElementById('e-md');if(!ta)return;_frIdx=(_frIdx-1+_frMatches.length)%_frMatches.length;var info=document.getElementById('fr-info');if(info)info.textContent=(_frIdx+1)+'/'+_frMatches.length;_frHighlight(ta)}
+function replaceCurrent(){
+  var ta=document.getElementById('e-md');var q=(document.getElementById('fr-find')||{}).value||'';var r=(document.getElementById('fr-repl')||{}).value;
+  if(!ta||!q||_frIdx<0||!_frMatches.length)return;
+  var start=_frMatches[_frIdx];ta.value=ta.value.substring(0,start)+r+ta.value.substring(start+q.length);
+  _frSearch();onMdInput();
+}
+function replaceAll(){
+  var ta=document.getElementById('e-md');var q=(document.getElementById('fr-find')||{}).value||'';var r=(document.getElementById('fr-repl')||{}).value;
+  if(!ta||!q)return;
+  var re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+  var count=(ta.value.match(re)||[]).length;
+  if(!count){toast('Nessun risultato','error');return}
+  ta.value=ta.value.replace(re,r);onMdInput();_frSearch();
+  toast('Sostituiti '+count+' occorrenze','success');
+}
+function _frKeyHandler(e){
+  if(!document.getElementById('fr-modal'))return;
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();findNext()}
+  if(e.key==='Enter'&&e.shiftKey){e.preventDefault();findPrev()}
+  if(e.key==='Escape'){closeModal('fr-modal')}
+  _frSearch();
+}
+
+/* ── GO TO LINE ── */
+function openGoToLine(){
+  if(document.getElementById('gtl-modal'))return;
+  var ta=document.getElementById('e-md');
+  var total=ta?(ta.value.split('\n').length):1;
+  modalHtml('gtl-modal','📍 Vai alla riga',
+    '<div class="fld"><label>Riga (1–'+total+')</label><input id="gtl-line" class="in" type="number" min="1" max="'+total+'" value="1" onkeydown="if(event.key===\'Enter\')goToLine()"></div>',
+    '<button class="btn btn-soft" onclick="closeModal(\'gtl-modal\')">Annulla</button>'
+    +'<button class="btn btn-p" onclick="goToLine()">VAI</button>');
+  var inp=document.getElementById('gtl-line');if(inp){inp.focus();inp.select();}
+}
+function goToLine(){
+  var ta=document.getElementById('e-md');var inp=document.getElementById('gtl-line');
+  if(!ta||!inp)return;
+  var n=parseInt(inp.value,10);var total=ta.value.split('\n').length;
+  if(isNaN(n)||n<1||n>total){toast('Numero riga non valido (1–'+total+')','error');return}
+  var pos=0;for(var i=0;i<n-1;i++){pos=ta.value.indexOf('\n',pos)+1;if(pos<=0)pos=ta.value.length}
+  ta.focus();ta.selectionStart=pos;ta.selectionEnd=pos;
+  var lineHeight=parseFloat(getComputedStyle(ta).lineHeight)||21;
+  ta.scrollTop=Math.max(0,(n-1)*lineHeight-ta.clientHeight/3);
+  closeModal('gtl-modal');
+}
+
+/* ── SYNCED SCROLL ── */
+function _bindSyncScroll(){
+  var ta=document.getElementById('e-md');var pv=document.getElementById('e-preview');
+  if(!ta||!pv)return;
+  var syncing=false;
+  ta.addEventListener('scroll',function(){
+    if(syncing)return;syncing=true;
+    var pct=ta.scrollTop/(ta.scrollHeight-ta.clientHeight||1);
+    pv.scrollTop=pct*(pv.scrollHeight-pv.clientHeight);
+    requestAnimationFrame(function(){syncing=false});
+  });
+}
+
+/* ── FULL-SCREEN / DISTRACTION-FREE MODE ── */
+function toggleFullScreen(){
+  var app=document.getElementById('app');
+  if(!app)return;
+  app.classList.toggle('full-screen');
+  var isFS=app.classList.contains('full-screen');
+  if(isFS){
+    document.getElementById('sidebar').style.display='none';
+    document.getElementById('topbar').style.display='none';
+    var ol=document.getElementById('e-outline');if(ol)ol.classList.remove('open');
+    var sb=document.getElementById('e-sb');
+    if(sb)sb.innerHTML='<span class="fs-hint">Esc o Ctrl+Shift+F per uscire</span>';
+  }else{
+    document.getElementById('sidebar').style.display='';
+    document.getElementById('topbar').style.display='';
+    var sb2=document.getElementById('e-sb');
+    if(sb2)sb2.textContent=_layoutLabel(_current?_current.layout:'')+' · Autosave ogni 15s · SALVA / Ctrl+S salva subito';
+  }
+}
+
+/* ── AUTO-PAIR BRACKETS / BACKTICKS ── */
+var _autoPairMap={'(':'(',')','{':'}','[':']','`':'`','*':'*','_':'_','"':'"',"'":"'"};
+function _autoPair(e,ta){
+  if(e.ctrlKey||e.metaKey||e.altKey)return false;
+  var ch=e.key;if(!_autoPairMap[ch])return false;
+  var s=ta.selectionStart,en=ta.selectionEnd;
+  if(s!==en){
+    var sel=ta.value.substring(s,en);
+    ta.value=ta.value.substring(0,s)+ch+sel+_autoPairMap[ch]+ta.value.substring(en);
+    ta.selectionStart=s+1;ta.selectionEnd=en+1;
+    e.preventDefault();return true;
+  }
+  if(ch===_autoPairMap[ch]){
+    var next=ta.value[en]||'';
+    if(next===ch){ta.selectionStart=en+1;ta.selectionEnd=en+1;e.preventDefault();return true}
+  }
+  var nextChar=ta.value[en]||'';
+  if(/[a-zA-Z0-9]/.test(nextChar))return false;
+  ta.value=ta.value.substring(0,s)+ch+_autoPairMap[ch]+ta.value.substring(en);
+  ta.selectionStart=s+1;ta.selectionEnd=s+1;
+  e.preventDefault();return true;
+}
+
+/* ── ENHANCED KEY HANDLER ── */
+var _editorKeyBound=false;
+function _bindEditorKeys(){
+  if(_editorKeyBound)return;_editorKeyBound=true;
+  document.addEventListener('keydown',function(ev){
+    if(!document.getElementById('e-md'))return;
+    var ta=document.getElementById('e-md');if(!ta)return;
+    var mod=ev.ctrlKey||ev.metaKey;
+    if(mod&&ev.key.toLowerCase()==='h'&&!ev.shiftKey){ev.preventDefault();openFindReplace();return}
+    if(mod&&ev.key.toLowerCase()==='g'){ev.preventDefault();openGoToLine();return}
+    if(mod&&ev.shiftKey&&ev.key.toLowerCase()==='f'){ev.preventDefault();toggleFullScreen();return}
+  });
+}
+
 /* ═══════════════ REGISTRAZIONE NAMESPACE ═══════════════ */
 ArcAdmin.register('editors', {
   openPage: openPage,
@@ -1155,5 +1643,14 @@ ArcAdmin.register('editors', {
   renderPreview: renderPreview,
   onMdInput: onMdInput,
   onMetaInput: onMetaInput,
-  onMdKey: onMdKey
+  onMdKey: onMdKey,
+  saveDraft: saveDraft,
+  publishDraft: publishDraft,
+  showDiff: showDiff,
+  toggleBulkMode: toggleBulkMode,
+  bulkDelete: bulkDelete,
+  bulkMove: bulkMove,
+  openImportModal: openImportModal,
+  exportAllPages: exportAllPages,
+  renameImage: renameImage
 });
