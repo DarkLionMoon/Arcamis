@@ -19,20 +19,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check secrets
+        id: check
+        run: |
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "⚠️  Secrets mancanti (CF_API_TOKEN, CF_ACCOUNT_ID): deploy GitHub saltato. Il sito si aggiorna tramite l'integrazione Git di Cloudflare Pages."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+
       - name: Setup Node
+        if: steps.check.outputs.configured == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install Wrangler
+        if: steps.check.outputs.configured == 'true'
         run: npm install -g wrangler@latest
 
       - name: Build (noop for static)
+        if: steps.check.outputs.configured == 'true'
         run: |
           echo "Static site - no build step required"
           ls -la
 
       - name: Deploy to Cloudflare Pages
+        if: steps.check.outputs.configured == 'true'
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
