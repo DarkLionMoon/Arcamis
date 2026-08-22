@@ -2,5 +2,4 @@
 /export   /export/   301
 /p/:id    /index.html    200
 /content/*    /content/:splat    200
-/schede/*    /schede/index.html    200
 /*    /index.html    200

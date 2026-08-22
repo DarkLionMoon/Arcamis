@@ -273,15 +273,3 @@
     init();
   }
 })();
-
-/* ═══════════════ SCHEDA PG: visibilità sezione (config admin) ═══════════════ */
-(function(){
-  function applySchedeVisibility(cfg){
-    var link=document.querySelector('#dd-pg .tn-item[href="/schede/"]');
-    if(link) link.style.display=(cfg&&cfg.abilitata===false)?'none':'';
-  }
-  fetch('/api/schede/config',{credentials:'include'})
-    .then(function(r){return r.ok?r.json():null;})
-    .then(applySchedeVisibility)
-    .catch(function(){});
-})();
