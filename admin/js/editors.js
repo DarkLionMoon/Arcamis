@@ -1592,7 +1592,7 @@ function toggleFullScreen(){
 }
 
 /* ── AUTO-PAIR BRACKETS / BACKTICKS ── */
-var _autoPairMap={'(':'(',')','{':'}','[':']','`':'`','*':'*','_':'_','"':'"',"'":"'"};
+var _autoPairMap={'(':')','{':'}','[':']','`':'`','*':'*','_':'_','"':'"',"'":"'"};
 function _autoPair(e,ta){
   if(e.ctrlKey||e.metaKey||e.altKey)return false;
   var ch=e.key;if(!_autoPairMap[ch])return false;

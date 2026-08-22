@@ -179,7 +179,7 @@ function exportAuditCSV(){
   if(to)entries=entries.filter(function(e){return e.timestamp&&e.timestamp<=to+'T23:59:59'});
   var csv='Data,Azione,Target,Utente,Ruolo,Extra\n';
   entries.forEach(function(e){
-    csv+='"'+(e.timestamp||'")","'+(e.action||'").replace(/"/g,'""')+'","'+(e.target||'").replace(/"/g,'""')+'","'+(e.user||'").replace(/"/g,'""')+'","'+(e.role||'").replace(/"/g,'""')+'","'+((typeof e.extra==='string'?e.extra:JSON.stringify(e.extra||''))).replace(/"/g,'""')+'"\n';
+    csv+='"'+(e.timestamp||'')+'","'+(e.action||'').replace(/"/g,'""')+'","'+(e.target||'').replace(/"/g,'""')+'","'+(e.user||'').replace(/"/g,'""')+'","'+(e.role||'').replace(/"/g,'""')+'","'+((typeof e.extra==='string'?e.extra:JSON.stringify(e.extra||''))).replace(/"/g,'""')+'"\n';
   });
   var blob=new Blob([csv],{type:'text/csv'});
   var url=URL.createObjectURL(blob);
