@@ -1,0 +1,1719 @@
+[
+ {
+  "nome": "Artefice",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d8",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Costituzione, Intelligenza, Scegli 2, Arcano, Indagare, Medicina, Natura, Percezione, Rapidità di Mano, Storia",
+  "competenze1Liv": "Armi Semplici, 1 Strumento (Strumento da Artigiano)",
+  "competenzeMulticlasse": "Armature Leggere, Armature Medie, Scudo, 2 Strumenti (Arnesi da Scasso, Strumenti da Inventore)",
+  "tipoIncantatore": "Incantatore Artefice",
+  "caratteristicaIncantatore": "Intelligenza",
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Incantesimi",
+   "1° Invenzione Magica (1)",
+   "2° Infondere negli Ogg. (2) **",
+   "3° Lo Strum. più Appropriato",
+   "6° Maestria negli Strumenti",
+   "7° Lampo di Genio (1)",
+   "10° Adepto degli Ogg. Magici",
+   "11° Ogg. che Custod. l'Inc. (2)",
+   "14° Sapiente degli Oggetti Magici",
+   "18° Maestro degli Ogg. Magici",
+   "20° Anima dell'Artificio"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Alchimista",
+    "privilegi": [
+     "3° Competenza negli Strumenti",
+     "3° Incantesimi da Alchimista",
+     "3° Elisir Sperimentale (1)",
+     "5° Alchemico Sapiente (+1)",
+     "9° Reagenti Riparatori",
+     "15° Padronanza Chimica"
+    ]
+   },
+   {
+    "nome": "Armaiolo",
+    "privilegi": [
+     "3° Strumenti del Mestiere",
+     "3° Incantesimi da Armaiolo",
+     "3° Armatura Arcana",
+     "5° Modello di Armatura",
+     "5° Attacco Extra",
+     "9° Modifiche all'Armatura",
+     "15° Armatura Perfetta"
+    ]
+   },
+   {
+    "nome": "Artigliere",
+    "privilegi": [
+     "3° Competenza negli Strumenti",
+     "3° Incantesimi da Artigliere",
+     "3° Cannone Mistico",
+     "5° Arma da Fuoco Arcana (d8)",
+     "9° Cannone Esplosivo",
+     "15° Posizione Fortificata"
+    ]
+   },
+   {
+    "nome": "Fabbro da Guerra",
+    "privilegi": [
+     "3° Competenza negli Strumenti",
+     "3° Incantesimi da fabbro da battaglia",
+     "3° Pronto per la Battaglia",
+     "5° Difensore d'Acciaio",
+     "5° Attacco Extra",
+     "9° Scossa Arcana (1)",
+     "15° Difensore Migliorato"
+    ]
+   }
+  ]
+ },
+ {
+  "nome": "Barbaro",
+  "difesaSenzaArmatura": "10+des+cos",
+  "dadoVita": "d12",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Forza, Costituzione, Scegli 2, Addestrare Animali, Atletica, Intimidire, Natura, Percezione, Sopravvivenza",
+  "competenze1Liv": "Armi Semplici, Armature Leggere, Armature Medie",
+  "competenzeMulticlasse": "Armi Marziali, Scudo",
+  "tipoIncantatore": null,
+  "caratteristicaIncantatore": null,
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Difesa senza Armatura",
+   "1° Ira ()",
+   "1° Maestria nelle Armi (0)",
+   "2° Attacco Irruento",
+   "2° Percezione del Pericolo",
+   "3° Conoscenza Primordiale",
+   "5° Attacco Extra",
+   "5° Movimento Veloce (+3m)",
+   "7° Istinto Ferino",
+   "7° Balzo Istintivo",
+   "9° Colpo Brutale",
+   "11° Ira Implacabile",
+   "13° Colpo Brutale Migliorato",
+   "15° Ira Persistente",
+   "17° Colpo Brutale Migliorato",
+   "18° Potere Indomabile",
+   "20° Campione Primordiale"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Albero del Mondo",
+    "privilegi": [
+     "3° Vitalità dell'Albero",
+     "6° Rami dell'Albero",
+     "10° Radici Combattenti",
+     "14° Viaggio Lungo l'Albero"
+    ],
+    "nomeVisualizzato": "Cammino dell'"
+   },
+   {
+    "nome": "Tempesta",
+    "privilegi": [
+     "3° Aura Tempestosa (Deserto|Mare|Tundra) *",
+     "6° Anima Tempestosa",
+     "10° Tempesta Protettrice",
+     "14° Furia della Tempesta"
+    ],
+    "nomeVisualizzato": "Cammino dell'Araldo della"
+   },
+   {
+    "nome": "Berserker",
+    "privilegi": [
+     "3° Frenesia (+d6)",
+     "6° Ira Irragionevole",
+     "10° Ritorsione",
+     "14° Presenza Intimidatoria"
+    ],
+    "nomeVisualizzato": "Cammino del"
+   },
+   {
+    "nome": "Bestia",
+    "privilegi": [
+     "3° Forma della Bestia",
+     "6° Anima Bestiale (Nuoto|Scalata|Salto) *",
+     "10° Furia Contagiosa ()",
+     "14° Chiamata alla Caccia (1)"
+    ],
+    "nomeVisualizzato": "Cammino della"
+   },
+   {
+    "nome": "Cuore Selvaggio",
+    "privilegi": [
+     "3° Linguaggio degli Animali",
+     "3° Ira delle Terre Selvagge",
+     "6° Aspetto delle Terre Selvagge (Gufo|Pantera|Salmone) *",
+     "10° Oratore della Natura",
+     "14° Potere delle Terre Selvagge"
+    ],
+    "nomeVisualizzato": "Cammino del"
+   },
+   {
+    "nome": "Furia Combattente",
+    "privilegi": [
+     "3° Restrizione: Solo Nani",
+     "3° Armatura della Furia Combattente",
+     "6° Trasporto Irruento (1)",
+     "10° Carica della Furia Combattente",
+     "14° Vendetta Chiodata"
+    ],
+    "nomeVisualizzato": "Cammino della"
+   },
+   {
+    "nome": "Giganti",
+    "privilegi": [
+     "3° Potere dei Giganti",
+     "3° Scempio del Gigante",
+     "6° Mannaia Elementale (1d6)",
+     "10° Impeto Possente",
+     "14° Colosso Demiurgico"
+    ],
+    "nomeVisualizzato": "Cammino dei"
+   },
+   {
+    "nome": "Ancestrale",
+    "privilegi": [
+     "3° Protettori Ancestrali",
+     "6° Spiriti Protettori (2d6)",
+     "10° Consultare gli Spiriti",
+     "14° Antenati Vendicativi"
+    ],
+    "nomeVisualizzato": "Cammino del Guardiano"
+   },
+   {
+    "nome": "Magia Selvaggia",
+    "privilegi": [
+     "3° Consapevolezza Magica ()",
+     "3° Impeto Selvaggio",
+     "6° Magia Corroborante ()",
+     "10° Contraccolpo Instabile",
+     "14° Impeto Controllato"
+    ],
+    "nomeVisualizzato": "Cammino della"
+   },
+   {
+    "nome": "Zelota",
+    "privilegi": [
+     "3° Furia Divina (d6+0)",
+     "3° Guerriero degli Dei (FALSEd12)",
+     "6° Concentrazione Fanatica",
+     "10° Presenza Zelante",
+     "14° Ira degli Dei"
+    ],
+    "nomeVisualizzato": "Cammino dello"
+   }
+  ]
+ },
+ {
+  "nome": "Bardo",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d8",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Destrezza, Carisma, Scegli 2, Acrobazia, Addestrare Animali, Arcano, Atletica, Furtività, Inganno, Indagare, Intimidire, Intrattenere, Intuizione, Indagare, Medicina, Natura, Percezione, Persuasione, Rapidità di Mano, Religione, Sopravvivenza, Storia",
+  "competenze1Liv": "Armi Semplici, 2 Strumenti (Strumento Musicale)",
+  "competenzeMulticlasse": "Armature Leggere, 1 abilità, Acrobazia, Addestrare Animali, Arcano, Atletica, Furtività, Inganno, Intimidire, Intrattenere, Intuizione, Indagare, Medicina, Natura, Percezione, Persuasione, Rapidità di Mano, Religione, Sopravvivenza, 1 Strumento (Strumento Musicale)",
+  "tipoIncantatore": "Incantatore Pieno",
+  "caratteristicaIncantatore": "Carisma",
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Incantesimi",
+   "1° Ispirazione Bardica (1d)",
+   "2° Factotum (0)",
+   "2° Maestria",
+   "5° Fonte di Ispirazione",
+   "7° Controfascino",
+   "9° Maestria",
+   "10° Segreti Magici",
+   "18° Ispirazione Superiore",
+   "20° Parole della Creazione"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Creazione",
+    "privilegi": [
+     "3° Granello di Potenziale",
+     "3° Compimento della Creazione (Medio)",
+     "6° Creazione Animata",
+     "14° Crescendo Creativo"
+    ],
+    "nomeVisualizzato": "Collegio della"
+   },
+   {
+    "nome": "Danza",
+    "difesaSenzaArmatura": "10+des+car+noscudo",
+    "privilegi": [
+     "3° Movimento di Piedi Impressionanti",
+     "3° Movimento Ispiratore",
+     "6° Passi Coordinati",
+     "14° Elusione Coordinata"
+    ],
+    "nomeVisualizzato": "Collegio della"
+   },
+   {
+    "nome": "Eloquenza",
+    "privilegi": [
+     "3° Arte Oratoria",
+     "3° Parole Inquietanti",
+     "6° Ispirazione Infallibile",
+     "14° Linguaggio Universale"
+    ],
+    "nomeVisualizzato": "Collegio dell'"
+   },
+   {
+    "nome": "Incanto",
+    "privilegi": [
+     "3° Magia Ammaliatrice",
+     "3° Mantello di Ispirazione",
+     "6° Manto della Maestosità",
+     "14° Maestà Inviolabile"
+    ],
+    "nomeVisualizzato": "Collegio dell'"
+   },
+   {
+    "nome": "Sapienza",
+    "privilegi": [
+     "3° Competenze Bonus",
+     "3° Parole Taglienti",
+     "6° Scoperte Magiche",
+     "14° Abilità Impareggiabile"
+    ],
+    "nomeVisualizzato": "Collegio della"
+   },
+   {
+    "nome": "Spade",
+    "privilegi": [
+     "3° Competenze Bonus",
+     "3° Stile di Combattimento *",
+     "6° Virtuosismo Della Lama",
+     "6° Attacco extra",
+     "14° Virtuosismo del Maestro (d6)"
+    ],
+    "nomeVisualizzato": "Collegio delle"
+   },
+   {
+    "nome": "Spiriti",
+    "privilegi": [
+     "3° Focus Spirituale",
+     "3° Storie dell’Aldilà",
+     "3° Sussurri Guidanti",
+     "6° Sessione Spirituale",
+     "14° Connessione Mistica"
+    ],
+    "nomeVisualizzato": "Collegio degli"
+   },
+   {
+    "nome": "Sussurri",
+    "privilegi": [
+     "3° Lame Psichiche (+2d6)",
+     "3° Parole di Terrore",
+     "6° Manto di Sussurri",
+     "14° Conoscenze dell'Ombra"
+    ],
+    "nomeVisualizzato": "Collegio dei"
+   },
+   {
+    "nome": "Valore",
+    "privilegi": [
+     "3° Addestramento Marziale",
+     "3° Ispirazione in Combattimento",
+     "6° Attacco Extra",
+     "14° Magia da Battaglia"
+    ],
+    "nomeVisualizzato": "Collegio del"
+   }
+  ]
+ },
+ {
+  "nome": "Chierico",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d8",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Saggezza, Carisma, Scegli 2, Intuizione, Medicina, Persuasione, Religione, Storia",
+  "competenze1Liv": "Armi Semplici",
+  "competenzeMulticlasse": "Armature Leggere, Armature Medie, Scudo",
+  "tipoIncantatore": "Incantatore Pieno",
+  "caratteristicaIncantatore": "Saggezza",
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Incantesimi",
+   "1° Ordine Divino (Protettore|Taumaturgo) *",
+   "2° Incanalare Divinità (0)",
+   "5° Bruciare i Non Morti (1d8)",
+   "7° Colpi Benedetti (Incantatore Potente|Colpo Divino) *",
+   "10° Intervento Divino",
+   "14° Colpi Benedetti Migliorati",
+   "20° Intervento Divino Migliorato"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Ambizione",
+    "privilegi": [
+     "3° Fiamma Guardiana (1)",
+     "3° Incanalare Divinità: Invocare la duplicità",
+     "3° Incantesimi del Dominio",
+     "6° Incanalare Divinità: Mantello dell’Ombra",
+     "17° Duplicità migliorata"
+    ]
+   },
+   {
+    "nome": "Arcano",
+    "privilegi": [
+     "3° Iniziato Arcano",
+     "3° Incantesimi del Dominio",
+     "3° Abiurazione ArcanaFALSE",
+     "6° Spezza Incantesimi",
+     "17° Maestria nell'Arcano"
+    ],
+    "nomeVisualizzato": "Dominio dell'"
+   },
+   {
+    "nome": "Conoscienza",
+    "privilegi": [
+     "3° Benedizioni della Conoscenza",
+     "3° Incantesimi del Dominio",
+     "3° Conoscenze Secolari",
+     "6° Lettura del Pensiero",
+     "17° Visioni del Passato (1 min)"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Crepuscolo",
+    "privilegi": [
+     "3° Occhi della Notte",
+     "3° Benedizione del Vigilante",
+     "3° Incantesimi del Dominio",
+     "3° Santuario del Crepuscolo",
+     "6° Passi nella Notte ()",
+     "17° Sudario del Crepuscolo"
+    ],
+    "nomeVisualizzato": "Dominio del"
+   },
+   {
+    "nome": "Forgia",
+    "privilegi": [
+     "3° Benedizione della Forgia",
+     "3° Incantesimi del Dominio",
+     "3° Benedizione dell'Artigiano",
+     "6° Anima della Forgia",
+     "17° Santo della Forgia e del Fuoco"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Forza",
+    "privilegi": [
+     "3° Incantesimi del Dominio",
+     "3° Competenza bonus",
+     "3° Accolito della Forza",
+     "3° Incanalare Divinità: Impresa della Forza",
+     "6° Incanalare Divinità: la benedizione di Rhonas",
+     "17° Avatar da battaglia"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Guerra",
+    "privilegi": [
+     "3° Sacerdote di Guerra (1)",
+     "3° Incantesimi del Dominio",
+     "3° Colpo Guidato",
+     "6° Benedizione del Dio della Guerra",
+     "17° Avatar della Battaglia"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Inganno",
+    "privilegi": [
+     "3° Benedizione dell'Ingannatore",
+     "3° Incantesimi del Dominio",
+     "3° Invocare Duplicato",
+     "6° Scambio dell'Ingannatore",
+     "17° Duplicato Migliorato"
+    ],
+    "nomeVisualizzato": "Dominio dell'"
+   },
+   {
+    "nome": "Luce",
+    "privilegi": [
+     "3° Fulgore dell'Alba",
+     "3° Incantesimi del Dominio",
+     "3° Lampo di Interdizione (1)",
+     "6° Lampo Migliorato (2d6+-)",
+     "17° Corona di Luce (1)"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Morte",
+    "privilegi": [
+     "3° Mietitore",
+     "3° Incantesimi del Dominio",
+     "3° Tocco della Morte (5)",
+     "6° Distruzione Inevitabile",
+     "17° Mietitore Migliorato"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Natura",
+    "privilegi": [
+     "3° Accolito della Natura",
+     "3° Incantesimi del Dominio",
+     "3° Charme su Animali e Vegetali",
+     "6° Mitigare Elementi",
+     "17° Maestro della Natura"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Ordine",
+    "privilegi": [
+     "3° Voce dell'Autorità",
+     "3° Incantesimi del Dominio",
+     "3° Pretesa dell'Ordine",
+     "6° Incarnazione della Legge (1)",
+     "17° Ira dell'Ordine"
+    ],
+    "nomeVisualizzato": "Dominio dell'"
+   },
+   {
+    "nome": "Pace",
+    "privilegi": [
+     "3° Strumento di Pace",
+     "3° Legame Incoraggiante ()",
+     "3° Incantesimi del Dominio",
+     "3° Balsamo della Pace",
+     "6° Legame Protettivo",
+     "17° Legame Espansivo"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Solidarietà",
+    "privilegi": [
+     "3° Competenze Aggiuntive",
+     "3° L'azione di solidarietà (1)",
+     "3° Incanalare Divinità: preservare la vita",
+     "3° Incantesimi del Dominio",
+     "6° Incanalare Divinità: la benedizione di Oketra",
+     "17° Guarigione suprema"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Tempesta",
+    "privilegi": [
+     "3° Collera della Tempesta (1)",
+     "3° Incantesimi del Dominio",
+     "3° Collera Distruttiva",
+     "6° Colpo del Tuono e del Fulmine",
+     "17° Nato dalla Tempesta"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Tomba",
+    "privilegi": [
+     "3° Cerchio di Mortalità",
+     "3° Occhi della Tomba (1)",
+     "3° Incantesimi del Dominio",
+     "3° Verso la Tomba",
+     "6° Sentinella alla Porta della Morte (1)",
+     "17° Custode delle Anime"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Vita",
+    "privilegi": [
+     "3° Discepolo della Vita",
+     "3° Incantesimi del Dominio",
+     "3° Preservare Vita (0)",
+     "6° Guaritore Benedetto",
+     "17° Guarigione Suprema"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   },
+   {
+    "nome": "Zelo",
+    "privilegi": [
+     "3° Incantesimi del Dominio",
+     "3° Competenze bonus",
+     "3° Sacerdote Zelante(1)",
+     "3° Incanalare Divinità: consumare fervore",
+     "6° Colpo clamoroso",
+     "17° Tripudio di gloria",
+     "fiammata di gloria"
+    ],
+    "nomeVisualizzato": "Dominio della"
+   }
+  ]
+ },
+ {
+  "nome": "Druido",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d8",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Intelligenza, Saggezza, Scegli 2, Addestrare Animali, Arcano, Intuizione, Medicina, Natura, Percezione, Religione, Sopravvivenza",
+  "competenze1Liv": "Armi Semplici, 1 Strumento (Kit da Erborista)",
+  "competenzeMulticlasse": "Armature Leggere, Scudo, Druidico",
+  "tipoIncantatore": "Incantatore Pieno",
+  "caratteristicaIncantatore": "Saggezza",
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Druidico",
+   "1° Incantesimi",
+   "1° Ordine Primordiale (Guardiano|Incantatore) *",
+   "2° Compagno Selvatico",
+   "2° Forma Selvatica (2) ****",
+   "5° Rinascita Selvaggia",
+   "7° Furia Elementale (Incantatore Potente|Colpo Primordiale) *",
+   "15° Furia Elementale Migliorata",
+   "18° Incantesimi Bestiali",
+   "20° Arcidruido"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Contaminazione",
+    "privilegi": [
+     "3° Terra Profana",
+     "3° Forma Contaminata",
+     "6° Chiamata dei Semi d'Ombra",
+     "10° Evocazione Ripugnante",
+     "14° Incarnazione della Corruzione"
+    ],
+    "nomeVisualizzato": "Circolo della"
+   },
+   {
+    "nome": "Fuocoselvaggio",
+    "privilegi": [
+     "3° Incantesimi del Circolo",
+     "3° Evoca Spirito della Fiamma",
+     "6° Legame migliorato (d8)",
+     "10° Fiamme della Vita ()",
+     "14° Resistenza ardente"
+    ],
+    "nomeVisualizzato": "Circolo del"
+   },
+   {
+    "nome": "Mare",
+    "privilegi": [
+     "3° Incantesimi del Circolo",
+     "3° Ira del Mare (1d6)",
+     "6° Affinità Acquatica",
+     "10° Nato dalla Tempesta",
+     "14° Dono Oceanico"
+    ],
+    "nomeVisualizzato": "Circolo del"
+   },
+   {
+    "nome": "Luna",
+    "privilegi": [
+     "3° Incantesimi del Circolo",
+     "3° Forme del Circolo (GS 0)",
+     "6° Forme del Circolo Migliorate",
+     "10° Passo al Chiaro di Luna (1)",
+     "14° Forma Lunare (+2d10)"
+    ],
+    "nomeVisualizzato": "Circolo della"
+   },
+   {
+    "nome": "Sogni",
+    "privilegi": [
+     "3° Balsamo della Corte dell'Estate (0d6)",
+     "6° Focolare della Luce Lunare e dell'Ombra",
+     "10° Sentieri Nascosti (1)",
+     "14° Viandante dei Sogni"
+    ],
+    "nomeVisualizzato": "Circolo dei"
+   },
+   {
+    "nome": "Spore",
+    "privilegi": [
+     "3° Incantesimi del Circolo",
+     "3° Alone di Spore (1d4)",
+     "3° Entità Simbiotica",
+     "6° Infestazione Funginea (1)",
+     "10° Diffusione di Spore",
+     "14° Corpo fungino"
+    ],
+    "nomeVisualizzato": "Circolo delle"
+   },
+   {
+    "nome": "Stelle",
+    "privilegi": [
+     "3° Carta Celeste (1)",
+     "3° Forma Siderale (1d8)",
+     "6° Profezia Cosmica (1)",
+     "10° Costellazioni Scintillanti",
+     "14° Manto di Stelle"
+    ],
+    "nomeVisualizzato": "Circolo delle"
+   },
+   {
+    "nome": "Terra",
+    "privilegi": [
+     "3° Incantesimi del Circolo (Arida|Polare|Mite|Tropicale) *",
+     "3° Aiuto della Terra (2d6)",
+     "6° Recupero naturale (0)",
+     "10° Interdizione della Natura",
+     "14° Rifugio della Natura"
+    ],
+    "nomeVisualizzato": "Circolo della"
+   }
+  ]
+ },
+ {
+  "nome": "Guerriero",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d10",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Forza, Costituzione, Scegli 2, Acrobazia, Addestrare Animali, Atletica, Intimidire, Intuizione, Percezione, Persuasione, Sopravvivenza, Storia",
+  "competenze1Liv": "Armature Pesanti",
+  "competenzeMulticlasse": "Armature Leggere, Armature Medie, Scudo, Armi Marziali",
+  "tipoIncantatore": null,
+  "caratteristicaIncantatore": null,
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Stile di Combattimento",
+   "1° Recuperare Energie (2)",
+   "1° Maestria nelle Armi (0)",
+   "2° Azione Impetuosa (1)",
+   "2° Mente Tattica",
+   "5° Attacco Extra",
+   "5° Cambio Tattico",
+   "9° Indomito (1)",
+   "9° Maestro Tattico",
+   "11° Due Attacchi Extra",
+   "13° Attacchi Studiati",
+   "20° Tre Attacchi Extra"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Arciere Arcano",
+    "privilegi": [
+     "3° Conoscenze dell'Arciere dell’Arcano (Prestidigitazione|Artificio Druidico)*",
+     "3° Tiro Arcano (2) **",
+     "7° Freccia Magica",
+     "7° Tiro Curvo",
+     "15° Tiro Sempre Pronto"
+    ]
+   },
+   {
+    "nome": "Psi",
+    "privilegi": [
+     "3° Potere Psionico (4d6)",
+     "7° Adepto Telecinetico",
+     "10° Scudo Mentale",
+     "15° Baluardo della Forza",
+     "18° Maestro Telecinetico"
+    ]
+   },
+   {
+    "nome": "Campione",
+    "privilegi": [
+     "#VALUE!"
+    ]
+   },
+   {
+    "nome": "Eco",
+    "privilegi": [
+     "3° Manifestare l'Eco",
+     "3° Incarnazione Scatenata (1)",
+     "7° Avatar Eco",
+     "10° Ombra Martire",
+     "15° Potenziale di Recupero (2d6+1)",
+     "18° Legione dell'Uno"
+    ],
+    "nomeVisualizzato": "Cavaliere dell'"
+   },
+   {
+    "nome": "Mistico",
+    "privilegi": [
+     "3° Incantesimi",
+     "3° Arma Vincolata",
+     "7° Magia da Guerra",
+     "10° Colpo Mistico",
+     "15° Carica Arcana",
+     "18° Magia da Guerra Migliorata"
+    ],
+    "nomeVisualizzato": "Cavaliere"
+   },
+   {
+    "nome": "Errante",
+    "privilegi": [
+     "3° Competenza Bonus",
+     "3° Nato in Sella",
+     "3° Marchio Incrollabile (1)",
+     "7° Manovra Protettrice (1)",
+     "10° Manovra di Posizione",
+     "15° Carica Frontale",
+     "18° Difensore Vigile"
+    ],
+    "nomeVisualizzato": "Cavaliere"
+   },
+   {
+    "nome": "Battaglia",
+    "privilegi": [
+     "3° Superiorità di Combattimento (d8)",
+     "3° Manovre (3) ***",
+     "3° Dadi di Superiorità (4)",
+     "3° Studioso di Guerra",
+     "7° Conosci il Tuo Nemico",
+     "10° Superiorità di Combattimento Migliorata",
+     "15° Implacabile (d8)",
+     "18° Superiorità di Combattimento Definitiva"
+    ],
+    "nomeVisualizzato": "Maestro di"
+   },
+   {
+    "nome": "Drago Purpora",
+    "privilegi": [
+     "3° Grido di Incoraggiamento",
+     "7° Inviato Reale",
+     "10° Ispirazione Impetuosa (1)",
+     "15° Baluardo"
+    ],
+    "nomeVisualizzato": "Cavaliere dei"
+   },
+   {
+    "nome": "Runico",
+    "privilegi": [
+     "3° Competenze Bonus",
+     "3° Intagliatore di Rune (2) **",
+     "7° Potenza del Gigante (; 1d6)",
+     "7° Scudo Runico ()",
+     "10° Statura Torreggiante",
+     "15° Maestro delle Rune",
+     "18° Colosso Runico"
+    ],
+    "nomeVisualizzato": "Cavaliere"
+   },
+   {
+    "nome": "Samurai",
+    "privilegi": [
+     "3° Competenza Bonus",
+     "3° Spirito Combattivo (5hp)",
+     "7° Cortigiano Elegante (Intelligenza|Saggezza|Carisma) *",
+     "10° Spirito Instancabile",
+     "15° Colpo Rapido",
+     "18° Forza di fronte alla Morte"
+    ]
+   }
+  ]
+ },
+ {
+  "nome": "Monaco",
+  "difesaSenzaArmatura": "10+des+sag+noscudo",
+  "dadoVita": "d8",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Forza, Destrezza, Scegli 2, Acrobazia, Atletica, Furtività, Intuizione, Religione, Storia",
+  "competenze1Liv": "1 Strumento (Strumento da Artigiano o Strumento Musicale), Armi Semplici, Spada Corta, Scimitarra, Balestra a Mano",
+  "competenzeMulticlasse": null,
+  "tipoIncantatore": null,
+  "caratteristicaIncantatore": null,
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "#VALUE!"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Solare",
+    "privilegi": [
+     "#VALUE!"
+    ],
+    "nomeVisualizzato": "Via dell'Anima"
+   },
+   {
+    "nome": "Drago Ascendente",
+    "privilegi": [
+     "3° Discepolo Draconico",
+     "3° Soffio del Drago (2d6)",
+     "6° Ali Spiegate ()",
+     "11° Aspetto del Dragone",
+     "17° Aspetto Ascendente"
+    ],
+    "nomeVisualizzato": "Via del"
+   },
+   {
+    "nome": "Kensei",
+    "privilegi": [
+     "3° Cammino del Kensei (2)",
+     "6° Tutt'Uno con la Lama",
+     "11° Affilare la Lama",
+     "17° Precisione Infallibile"
+    ],
+    "nomeVisualizzato": "Via del"
+   },
+   {
+    "nome": "Lunga Morte",
+    "privilegi": [
+     "#VALUE!"
+    ],
+    "nomeVisualizzato": "Via della"
+   },
+   {
+    "nome": "Maestro Ubriaco",
+    "privilegi": [
+     "3° Competenze Bonus",
+     "3° Tecnica dell'Ubriaco",
+     "6° Ondeggio dell'Ubriaco",
+     "11° Fortuna dell’Ubriacone",
+     "17° Frenesia Intossicata"
+    ],
+    "nomeVisualizzato": "Via del"
+   },
+   {
+    "nome": "Mano Aperta",
+    "privilegi": [
+     "3° Tecnica della Mano Aperta",
+     "6° Integrità del Corpo(1)",
+     "11° Passo Rapido",
+     "17° Palmo Tremante"
+    ],
+    "nomeVisualizzato": "Via della"
+   },
+   {
+    "nome": "Misericordia",
+    "privilegi": [
+     "3° Mano del Dolore",
+     "3° Mano Guaritrice",
+     "3° Strumenti di Misericordia",
+     "6° Tocco del Medico",
+     "11° Raffica di Guarigione e Dolore (1)",
+     "17° Mano della Misericordia Suprema"
+    ],
+    "nomeVisualizzato": "Guerriero della"
+   },
+   {
+    "nome": "Ombra",
+    "privilegi": [
+     "3° Guerriero d'Ombra",
+     "6° Passo d'Ombra",
+     "11° Passo d'ombra Migliorato",
+     "17° Manto d'Ombre"
+    ],
+    "nomeVisualizzato": "Guerriero dell'"
+   },
+   {
+    "nome": "Elementi",
+    "privilegi": [
+     "3° Affinità Elementale",
+     "3° Manipolazione degli Elementi",
+     "6° Esplosione Elementale",
+     "11° Passo degli Elementi",
+     "17° Epitome Elementale"
+    ],
+    "nomeVisualizzato": "Guerriero degli"
+   },
+   {
+    "nome": "Astrale",
+    "privilegi": [
+     "3° Braccia del Sé Astrale",
+     "6° Volto del Sé Astrale",
+     "11° Corpo del Sé Astrale",
+     "17° Sé Astrale Risvegliato"
+    ],
+    "nomeVisualizzato": "Via del Sè"
+   }
+  ]
+ },
+ {
+  "nome": "Paladino",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d10",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Saggezza, Carisma, Scegli 2, Atletica, Intimidire, Intuizione, Medicina, Persuasione, Religione",
+  "competenze1Liv": "Armature Pesanti",
+  "competenzeMulticlasse": "Armature Leggere, Armature Medie, Scudo, Armi Semplici, Armi Marziali",
+  "tipoIncantatore": "Mezzo Incantatore",
+  "caratteristicaIncantatore": "Carisma",
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Imposizione delle Mani (0)",
+   "1° Incantesimi",
+   "1° Maestria nelle Armi (2)",
+   "2° Stile di Combattimento",
+   "2° Punizione del Paladino",
+   "3° Incanalare Divinità (0)",
+   "5° Attacco Extra",
+   "5° Destriero Fedele",
+   "6° Aura di Protezione",
+   "9° Rinnegare i Nemici",
+   "10° Aura di Coraggio",
+   "11° Colpi Radiosi",
+   "14° Tocco Purificatore",
+   "18° Espansione dell'Aura"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Antichi",
+    "privilegi": [
+     "3° Incantesimi del giuramento",
+     "3° Incanalare Divinità",
+     "3° Ira della Natura",
+     "7° Aura di Interdizione",
+     "15° Sentinella Imperitura",
+     "20° Campione degli Antichi"
+    ],
+    "nomeVisualizzato": "Giuramento degli"
+   },
+   {
+    "nome": "Apostata",
+    "privilegi": [
+     "3° Incantesimi del giuramento",
+     "3° Incanalare Divinità",
+     "3° Pentimento dell'Apostata",
+     "7° Aura di Odio (1)",
+     "15° Resistenza Soprannaturale",
+     "20° Signore del Terrore"
+    ]
+   },
+   {
+    "nome": "Conquista",
+    "privilegi": [
+     "3° Incantesimi del giuramento",
+     "3° Incanalare Divinità",
+     "7° Aura di Conquista",
+     "15° Intimorire Sprezzante (1)",
+     "20° Conquistatore Invincibile"
+    ],
+    "nomeVisualizzato": "Giuramento della"
+   },
+   {
+    "nome": "Corona",
+    "privilegi": [
+     "3° Incantesimi del giuramento",
+     "3° Incanalare Divinità",
+     "7° Affiliazione al Divino",
+     "15° Spirito Incontrollabile",
+     "20° Campione esaltato"
+    ],
+    "nomeVisualizzato": "Giuramento della"
+   },
+   {
+    "nome": "Devozione",
+    "privilegi": [
+     "3° Incantesimi del Giuramento",
+     "3° Incanalare Divinità (1)",
+     "7° Aura di Devozione",
+     "15° Punizione della Protezione",
+     "20° Nube Sacra"
+    ],
+    "nomeVisualizzato": "Giuramento della"
+   },
+   {
+    "nome": "Gloria",
+    "privilegi": [
+     "3° Incantesimi del giuramento",
+     "3° Atleta Impareggiabile",
+     "3° Punizione ispiratrice",
+     "7° Aura di Alacrità",
+     "15° Difesa Gloriosa (1"
+    ],
+    "nomeVisualizzato": "Giuramento della"
+   },
+   {
+    "nome": "Osservatori",
+    "privilegi": [
+     "3° Incantesimi del giuramento",
+     "3° Incanalare Divinità",
+     "7° Aura della Sentinella ()",
+     "15° Punizione Solerte (2d6+-)",
+     "20° Baluardo dei Mortali"
+    ],
+    "nomeVisualizzato": "Giuramento degli"
+   },
+   {
+    "nome": "Redenzione",
+    "privilegi": [
+     "3° Incantesimi del giuramento",
+     "3° Incanalare Divinità",
+     "7° Aura del Guardiano",
+     "15° Spirito Protettivo (1d6+0)",
+     "20° Emissario di Redenzione"
+    ],
+    "nomeVisualizzato": "Giuramento della"
+   },
+   {
+    "nome": "Vendetta",
+    "privilegi": [
+     "3° Incantesimi del giuramento",
+     "3° Incanalare Divinità",
+     "3° Giuramento di Inimicizia",
+     "7° Vendicatore Implacabile",
+     "15° Anima di Vendetta",
+     "20° Angelo Vendicatore"
+    ],
+    "nomeVisualizzato": "Giuramento della"
+   }
+  ]
+ },
+ {
+  "nome": "Ranger",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d10",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Forza, Destrezza, Scegli 2, Addestrare Animali, Atletica, Furtività, Intuizione, Indagare, Natura, Percezione, Sopravvivenza",
+  "competenze1Liv": null,
+  "competenzeMulticlasse": "Armature Leggere, Armature Medie, Scudo, Armi Semplici, Armi Marziali, 1 abilità, Addestrare Animali, Atletica, Furtività, Intuizione, Indagare, Natura, Percezione, Sopravvivenza",
+  "tipoIncantatore": "Mezzo Incantatore",
+  "caratteristicaIncantatore": "Saggezza",
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Incantesimi",
+   "1° Avversario Prescelto (1)",
+   "1° Maestria nelle Armi (2)",
+   "2° Esperto Esploratore",
+   "2° Stile di Combattimento",
+   "5° Attacco Extra",
+   "6° Girovago",
+   "9° Maestria",
+   "10° Instancabile (1; 1d8+1)",
+   "13° Cacciatore Implacabile",
+   "14° Velo della Natura (1)",
+   "17° Cacciatore Preciso",
+   "18° Sensi Ferini",
+   "20° Sterminatore di Nemici (d10)"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Cacciatore",
+    "privilegi": [
+     "3° Preda del Cacciatore (Sterminatore di Colossi|Devastatore dell'Orda) *",
+     "3° Conoscienze del cacciatore",
+     "7° Tattiche Difensive (Sfuggire all'Orda|Difesa dal Multiattacco) *",
+     "11° Preda del Cacciatore Migliorato",
+     "15° Tattiche Difensive Migliorate"
+    ]
+   },
+   {
+    "nome": "Tenebre",
+    "privilegi": [
+     "3° Imboscata Terrificante (-; 2d6)",
+     "3° Magia degli Inseguitori Oscuri",
+     "3° Vista dell'Ombra",
+     "7° Mente di Ferro (Saggezza|Intelligenza|Carisma) *",
+     "11° Raffica del Cacciatore",
+     "15° Schivata dell'Ombra"
+    ],
+    "nomeVisualizzato": "Cacciatore delle"
+   },
+   {
+    "nome": "Sciami",
+    "privilegi": [
+     "3° Sciame Riunito (1d6)",
+     "3° Magia del Custode degli Sciami",
+     "7° Marea Avvolgente ()",
+     "11° Sciame Possente",
+     "15° Dispersione Brulicante ()"
+    ],
+    "nomeVisualizzato": "Custode degli"
+   },
+   {
+    "nome": "Draghi",
+    "privilegi": [
+     "3° Dono Draconico",
+     "3° Compagno Drago",
+     "7° Legame di Zanna e Scaglia (1d6)",
+     "11° Soffio del Drago (8d6)",
+     "15° Legame Perfetto (2d6)"
+    ],
+    "nomeVisualizzato": "Guardiano dei"
+   },
+   {
+    "nome": "Bestie",
+    "privilegi": [
+     "3° Compagno Primordiale",
+     "7° Addestramento Straordinario",
+     "11° Furia Bestiale",
+     "15° Condividere Incantesimi"
+    ],
+    "nomeVisualizzato": "Signore delle"
+   },
+   {
+    "nome": "Mostri",
+    "privilegi": [
+     "3° Magia dello Sterminatore di Mostri",
+     "3° Percezione del Cacciatore (1)",
+     "3° Preda dell'Uccisore",
+     "7° Difesa Soprannaturale (1d6)",
+     "11° Nemesi degli Incantatori",
+     "15° Contrattacco dell'Uccisore"
+    ],
+    "nomeVisualizzato": "Uccisore di"
+   },
+   {
+    "nome": "Orizzonte",
+    "privilegi": [
+     "3° Magia del Camminatore dei Piani",
+     "3° Individuazione dei Portali",
+     "3° Combattente Planare (1d8)",
+     "7° Passo Etereo",
+     "11° Colpo Distante",
+     "15° Difesa Spettrale"
+    ],
+    "nomeVisualizzato": "Viandante dell'"
+   },
+   {
+    "nome": "Fatato",
+    "privilegi": [
+     "3° Magia del Viandante Fatato",
+     "3° Colpi Terribili (1d4)",
+     "3° Fascino Ultraterreno (+1)",
+     "7° Scambio Seducente",
+     "11° Rinforzi Fatati",
+     "15° Viandante Velato (1)"
+    ],
+    "nomeVisualizzato": "Viandante"
+   }
+  ]
+ },
+ {
+  "nome": "Ladro",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d8",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Destrezza, Intelligenza, Scegli 3, Acrobazia, Atletica, Furtività, Inganno, Intimidire, Intuizione, Indagare, Percezione, Persuasione, Rapidità di Mano",
+  "competenze1Liv": "Armi Semplici, Balestra a Mano, Frusta, Spada Corta, Scimitarra, Stocco",
+  "competenzeMulticlasse": "Armature Leggere, 1 abilità, Acrobazia, Atletica, Furtività, Inganno, Intimidire, Intuizione, Indagare, Percezione, Persuasione, Rapidità di Mano, Gergo Ladresco, 1 extra, 1 Strumento (Arnesi da Scasso)",
+  "tipoIncantatore": null,
+  "caratteristicaIncantatore": null,
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Attacco Furtivo (0d6)",
+   "1° Gergo Ladresco",
+   "1° Maestria",
+   "1° Maestria nelle Armi (2)",
+   "2° Azione Scaltra",
+   "3° Mira Stabile",
+   "5° Colpo Scaltro",
+   "5° Schivata Prodigiosa",
+   "6° Maestria",
+   "7° Dote Affidabile",
+   "7° Elusione",
+   "11° Colpo Scaltro Migliorato",
+   "14° Colpi Subdoli",
+   "15° Mente Sfuggente",
+   "18° Inafferrabile",
+   "20° Colpo di Fortuna"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Anima",
+    "privilegi": [
+     "3° Potere Psionico (d6)",
+     "3° Lame Psichiche",
+     "9° Lame dell’Anima",
+     "13° Velo Psionico",
+     "17° Mente Lacerata"
+    ],
+    "nomeVisualizzato": "Lama dell'"
+   },
+   {
+    "nome": "Arcano",
+    "privilegi": [
+     "3° Incantesimi",
+     "3° Gioco di Prestigio della Mano Magica",
+     "9° Imboscata Magica",
+     "13° Ingannatore Versatile",
+     "17° Ladro di Incantesimi"
+    ],
+    "nomeVisualizzato": "Mistificatore"
+   },
+   {
+    "nome": "Assassino",
+    "privilegi": [
+     "3° Assassinare",
+     "3° Strumenti dell'Assassino",
+     "9° Maestro Infiltrato",
+     "13° Arma Velenosa (2d6)",
+     "17° Colpo Mortale"
+    ]
+   },
+   {
+    "nome": "Esploratore",
+    "privilegi": [
+     "3° Schermagliatore",
+     "3° Survivalista",
+     "9° Mobilità Superiore",
+     "13° Maestro di Imboscate",
+     "17° Colpo Improvviso"
+    ]
+   },
+   {
+    "nome": "Fantasma",
+    "privilegi": [
+     "3° Sussurri dei Morti",
+     "3° Lamenti dalla Tomba ()",
+     "9° Pegni dei Defunti ()",
+     "13° Cammino Fantasma (10 min)",
+     "17° Compagno della Morte"
+    ]
+   },
+   {
+    "nome": "Furfante",
+    "privilegi": [
+     "3° Mani Veloci",
+     "3° Lavoro al Secondo Piano",
+     "9° Furtività Suprema",
+     "13° Usare Oggetto Magico",
+     "17° Riflessi da Furfante"
+    ]
+   },
+   {
+    "nome": "Indagatore",
+    "privilegi": [
+     "3° Orecchio per l'Inganno",
+     "3° Combattimento Acuto",
+     "9° Occhio di Lince",
+     "13° Occhio Infallibile (1)",
+     "17° Individuare i Punti Deboli (+3d6)"
+    ]
+   },
+   {
+    "nome": "Pianificatore",
+    "privilegi": [
+     "3° Maestro di Intrighi",
+     "9° Manipolatore Intuitivo",
+     "13° Fuorviare",
+     "17° Anima Ingannevole"
+    ]
+   },
+   {
+    "nome": "Spadaccino",
+    "privilegi": [
+     "3° Gioco di Gambe",
+     "3° Audacia del Fanfarone",
+     "9° Spavalderia",
+     "13° Manovra Elegante",
+     "17° Maestro Duellante"
+    ]
+   }
+  ]
+ },
+ {
+  "nome": "Stregone",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d6",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Costituzione, Carisma, Scegli 2, Arcano, Inganno, Intimidire, Intuizione, Persuasione, Religione",
+  "competenze1Liv": "Armi Semplici",
+  "competenzeMulticlasse": null,
+  "tipoIncantatore": "Incantatore Pieno",
+  "caratteristicaIncantatore": "Carisma",
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Incantesimi",
+   "1° Stregoneria Innata (2)",
+   "2° Fonte di Magia (0)",
+   "2° Metamagia (0)",
+   "5° Ristorazione Stregonesca (0)",
+   "7° Incarnazione della Stregoneria",
+   "20° Apoteosi Arcana"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Aberrante",
+    "privilegi": [
+     "3° Incantesimi psionici",
+     "3° Conversazione Telepatica (0 min)",
+     "6° Stregoneria Psionica",
+     "6° Difese Psichiche",
+     "14° Rivelazione della Carne (10 min)",
+     "18° Implosione Distorcente (3d10)"
+    ],
+    "nomeVisualizzato": "Mente"
+   },
+   {
+    "nome": "Anima Divina",
+    "privilegi": [
+     "3° Magia Divina (Buona|Malvagia|Legale|Caotica|Neutrale) *",
+     "3° Prescelto dagli Dei (2d4)",
+     "6° Guarigione Potenziata",
+     "14° Ali Ultraterrene",
+     "18° Recupero Ultraterreno"
+    ]
+   },
+   {
+    "nome": "Anima Meccanica",
+    "privilegi": [
+     "3° Magia Meccanica",
+     "3° Ripristino dell'Equilibrio (1)",
+     "6° Bastione della Legge (1d8->5d8)",
+     "14° Trance dell’Ordine",
+     "18° Cavalleria Meccanica"
+    ]
+   },
+   {
+    "nome": "Draconica",
+    "difesaSenzaArmatura": "10+car+des",
+    "privilegi": [
+     "3° Stregoneria Draconica",
+     "3° Resilienza Draconica",
+     "6° Affinità Elementale (Acido|Fuoco|Freddo|Fulmine|Veleno) *",
+     "14° Ali di Drago",
+     "18° Compagno Draconico"
+    ],
+    "nomeVisualizzato": "Discendenza"
+   },
+   {
+    "nome": "Lunare",
+    "privilegi": [
+     "3° Incarnazione Lunare",
+     "3° Fuoco Lunare",
+     "6° Benedizione della Luna",
+     "6° Crescente e Calante",
+     "14° Potenziamento Lunare",
+     "18° Fenomeno Lunare"
+    ],
+    "nomeVisualizzato": "Stregoneria"
+   },
+   {
+    "nome": "Magia Selvaggia",
+    "privilegi": [
+     "3° Impulso di Magia Selvaggia",
+     "3° Onde di Caos",
+     "6° Piegare la Fortuna (1d4)",
+     "14° Caos Controllato",
+     "18° Impulso Domato"
+    ]
+   },
+   {
+    "nome": "Ombre",
+    "privilegi": [
+     "3° Occhi dell'Oscuro",
+     "3° Forza della Tomba",
+     "6° Segugio dei Presagi Nefasti (5 min)",
+     "14° Camminare nelle Ombre",
+     "18° Forma d'Ombra (1 min)"
+    ],
+    "nomeVisualizzato": "Magia delle"
+   },
+   {
+    "nome": "Piromanzia",
+    "privilegi": [
+     "3° Cuore di Fuoco (0)",
+     "6° Fuoco nelle Vene",
+     "14° Furia del Piromante (0)",
+     "18° Anima Infuocata"
+    ],
+    "nomeVisualizzato": "della"
+   },
+   {
+    "nome": "Tempesta",
+    "privilegi": [
+     "#VALUE!"
+    ],
+    "nomeVisualizzato": "Stregoneria della"
+   }
+  ]
+ },
+ {
+  "nome": "Warlock",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d8",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Saggezza, Carisma, Scegli 2, Arcano, Inganno, Intimidire, Indagare, Natura, Religione, Storia",
+  "competenze1Liv": "Armi Semplici",
+  "competenzeMulticlasse": "Armature Leggere",
+  "tipoIncantatore": "Magia del Patto",
+  "caratteristicaIncantatore": "Carisma",
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Suppliche Occulte (0)",
+   "1° Magia del Patto",
+   "2° Astuzia Magica",
+   "9° Contatto con il Patrono",
+   "11° Arcanum Mistico (6°)",
+   "13° Arcanum Mistico (7°)",
+   "15° Arcanum Mistico (8°)",
+   "17° Arcanum Mistico (9°)",
+   "20° Maestro Occulto"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Celestiale",
+    "privilegi": [
+     "#VALUE!"
+    ],
+    "nomeVisualizzato": "Patrono"
+   },
+   {
+    "nome": "Fatato",
+    "privilegi": [
+     "3° Incantesimi Arcifatati",
+     "3° Passo della Fata (1)",
+     "6° Fuga Velata",
+     "10° Difese Seducenti",
+     "14° Magia Incantatrice"
+    ],
+    "nomeVisualizzato": "Patrono il Signore"
+   },
+   {
+    "nome": "Genio",
+    "privilegi": [
+     "3° Lista Ampliata degli Incantesimi (Genio: Dao|Djinni|Efreeti|Marid) *",
+     "3° Recipiente del Genio (0 ore)",
+     "3° Ira del Genio (+)",
+     "6° Dono Elementale ()",
+     "10° Santuario del Recipiente",
+     "14° Desiderio Limitato"
+    ],
+    "nomeVisualizzato": "Patrono"
+   },
+   {
+    "nome": "Grande Antico",
+    "privilegi": [
+     "#VALUE!"
+    ],
+    "nomeVisualizzato": "Patrono"
+   },
+   {
+    "nome": "Immondo",
+    "privilegi": [
+     "#VALUE!"
+    ],
+    "nomeVisualizzato": "Patrono"
+   },
+   {
+    "nome": "Imperituro",
+    "privilegi": [
+     "3° Lista Ampliata degli Incantesimi",
+     "3° In Mezzo ai Morti",
+     "6° Sfida la Morte (1d8+-)",
+     "10° Natura Immortale",
+     "14° Vita Indistruttibile (1d8+0)"
+    ],
+    "nomeVisualizzato": "Patrono"
+   },
+   {
+    "nome": "Insondabile",
+    "privilegi": [
+     "3° Lista Ampliata degli Incantesimi",
+     "3° Tentacoli delle Profondità (;1d8)",
+     "3° Dono del Mare",
+     "6° Anima Oceanica",
+     "6° Spirale Guardiana (-1d8)",
+     "10° Presa dei Tentacoli (0 temp.)",
+     "14° Immersione Insondabile"
+    ],
+    "nomeVisualizzato": "Patrono"
+   },
+   {
+    "nome": "Lama del Sortilegio",
+    "privilegi": [
+     "3° Lista Ampliata degli Incantesimi",
+     "3° Maledizione della Lama del Sortilegio (+)",
+     "3° Combattente del Sortilegio",
+     "6° Spettro Maledetto (+0)",
+     "10° Armatura dei Sortilegi (d6)",
+     "14° Maestro dei Sortilegi"
+    ],
+    "nomeVisualizzato": "Patrono"
+   },
+   {
+    "nome": "Non Morto",
+    "privilegi": [
+     "3° Lista Ampliata degli Incantesimi",
+     "3° Forma del Terrore (; 1d10+0 temp.)",
+     "6° Tocco della Tomba",
+     "10° Spoglie Mortali (2d10+0)",
+     "14° Proiezione dello Spirito"
+    ],
+    "nomeVisualizzato": "Patrono"
+   }
+  ]
+ },
+ {
+  "nome": "Mago",
+  "difesaSenzaArmatura": null,
+  "dadoVita": "d6",
+  "bonusIniziativa": null,
+  "hpPerLivello": null,
+  "tsEcompetenze": "Intelligenza, Saggezza, Scegli 2, Arcano, Intuizione, Indagare, Medicina, Religione, Storia",
+  "competenze1Liv": "Armi Semplici",
+  "competenzeMulticlasse": null,
+  "tipoIncantatore": "Incantatore Pieno",
+  "caratteristicaIncantatore": "Intelligenza",
+  "movimentoExtra": null,
+  "velocitaAumentata": null,
+  "privilegi": [
+   "1° Adepto dei Rituali",
+   "1° Incantesimi",
+   "1° Recupero Arcano",
+   "2° Studioso",
+   "5° Incantesimo Memorizzato",
+   "18° Maestria negli Incantesimi",
+   "20° Incantesimi Personali"
+  ],
+  "sottoclassi": [
+   {
+    "nome": "Lama",
+    "privilegi": [
+     "3° Arte della Guerra e del Canto",
+     "3° Melodia della Lama ()",
+     "6° Attacco Extra",
+     "10° Canzone di Difesa",
+     "14° Canzone di Vittoria (+-)"
+    ],
+    "nomeVisualizzato": "Cantore della"
+   },
+   {
+    "nome": "Abiuratore",
+    "privilegi": [
+     "#VALUE!"
+    ],
+    "nomeVisualizzato": "Scuola di"
+   },
+   {
+    "nome": "Invocatore",
+    "privilegi": [
+     "3° Invocatore Sapiente (-)",
+     "3° Trucchetto Potente",
+     "6° Plasmare Incantesimi",
+     "10° Invocazione Potente (+-)",
+     "14° Saturazione Magica"
+    ],
+    "nomeVisualizzato": "Scuola di"
+   },
+   {
+    "nome": "Divinatore",
+    "privilegi": [
+     "3° Divinatore Sapiente (-)",
+     "3° Portento (2d20)",
+     "6° Divinazione Esperta",
+     "10° Terzo Occhio",
+     "14° Portento Migliorato"
+    ],
+    "nomeVisualizzato": "Scuola di"
+   },
+   {
+    "nome": "Illusionista",
+    "privilegi": [
+     "3° Illusionista Sapiente (-)",
+     "3° Illusioni Migliorate",
+     "6° Allucinazione di Creature",
+     "10° Sosia Illusorio",
+     "14° Realtà Illusoria (1 min.)"
+    ],
+    "nomeVisualizzato": "Scuola di"
+   },
+   {
+    "nome": "Cronomanzia",
+    "privilegi": [
+     "3° Spostamento Cronologico (2)",
+     "3° Consapevolezza Temporale",
+     "6° Stasi Momentanea (1)",
+     "10° Sospensione Arcana (1 ora)",
+     "14° Futuro Convergente"
+    ],
+    "nomeVisualizzato": "Scuola di"
+   },
+   {
+    "nome": "Gravimanzia",
+    "privilegi": [
+     "3° Regolare Densità (Grande)",
+     "6° Fonte di Gravità",
+     "10° Attrazione Violenta (1)",
+     "14° Orizzonte degli Eventi"
+    ],
+    "nomeVisualizzato": "Scuola di"
+   },
+   {
+    "nome": "Ammaliatore",
+    "privilegi": [
+     "#VALUE!"
+    ],
+    "nomeVisualizzato": "Scuola di"
+   },
+   {
+    "nome": "Evocatore",
+    "privilegi": [
+     "3° Evocatore Sapiente (-)",
+     "3° Evocazione Minore (90 cm; 5 kg; 1 ora)",
+     "6° Trasposizione Benevola",
+     "10° Evocazione Focalizzata",
+     "14° Evocazioni Perduranti (30 temp.)"
+    ],
+    "nomeVisualizzato": "Scuola di"
+   },
+   {
+    "nome": "Necromante",
+    "privilegi": [
+     "3° Necromante Sapiente (-)",
+     "3° Raccolto Macabro",
+     "6° Servitori Non Morti (+0 hp; +)",
+     "10° Impervio alla Non Morte",
+     "14° Comandare Non Morti"
+    ],
+    "nomeVisualizzato": "Scuola di"
+   },
+   {
+    "nome": "Trasmutatore",
+    "privilegi": [
+     "3° Trasmutatore Sapiente (-)",
+     "3° Alchimia Minore (1 ora)",
+     "6° Pietra del Trasmutatore",
+     "10° Mutaforma",
+     "14° Maestro Trasmutatore"
+    ],
+    "nomeVisualizzato": "Scuola di"
+   },
+   {
+    "nome": "Guerra",
+    "privilegi": [
+     "3° Deviazione Arcana (+2 CA; +4 TS)",
+     "3° Ingegno Tattico",
+     "6° Impulso di Potere (1; +0)",
+     "10° Magia Durevole",
+     "14° Sudario di Deviazione (0)"
+    ],
+    "nomeVisualizzato": "Scuola della Magia da"
+   },
+   {
+    "nome": "Scribi",
+    "privilegi": [
+     "3° Calamo Incantato",
+     "3° Libro degli incantesimi Risvegliato",
+     "6° Mente Manifesta ()",
+     "10° Scrivano Arcano",
+     "14° Comunione con il Testo (3d6)"
+    ],
+    "nomeVisualizzato": "Ordine degli"
+   }
+  ]
+ }
+]

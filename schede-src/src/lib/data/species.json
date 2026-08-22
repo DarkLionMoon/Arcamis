@@ -1,0 +1,3491 @@
+[
+ {
+  "nome": "Aarakocra",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "9, Volo 9",
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Artigli 1d6 slashing",
+  "incantesimiPreparati": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Volo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Artigli",
+    "dettaglio": null
+   },
+   {
+    "livello": 3,
+    "nome": "Richiamo del vento",
+    "dettaglio": "Folata di Vento"
+   }
+  ]
+ },
+ {
+  "nome": "Aasimar",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza celestiale\nHai resistenza ai danni Necrotic e Radiant",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Resistenza Celestiale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Imposizione delle Mani",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Portatore di Luce",
+    "dettaglio": null
+   },
+   {
+    "livello": 3,
+    "nome": "Rivelazione Celeste",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Autognomo",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "armaturaNaturale": "13+des",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "2 Strumenti",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Involucro Corazzato",
+    "dettaglio": "- CA"
+   },
+   {
+    "livello": 1,
+    "nome": "Costruito per il Successo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Macchina per Guarire",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Natura Meccanica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Riposo della Sentinella",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Design Specializzato",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Aven (Falco)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "4.5, volo 9",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Occhio di Falco\nHai competenza nell'abilità Percezione",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Volo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Occhio di Falco",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Aven (Ibis)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "4.5, volo 9",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Benedizione di Kefnet\npuò aggiungere metà del suo bonus di competenza, arrotondato per difetto, a ogni prova di caratteristica su intelligenza da lui effettuata che non includa già il suo bonus di competenza",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Volo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Benedizione di Kefnet",
+    "dettaglio": "+0)\""
+   }
+  ]
+ },
+ {
+  "nome": "Cangiante",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Istinti del cangiante\nHai competenza in due delle seguenti abilità a tua scelta: Inganno, Intimidire, Intrattenere, Intuizione o Persuasione",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Istinti del Cangiante",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Cambiare Aspetto",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Centauro",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 12,
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Zoccoli 1d6 bludgeoning",
+  "altriPrivilegi": "Affinità Naturale\nHai competenza in una delle seguenti abilità a tua scelta: Addestrare Animali, Medicina, Natura, Sopravvivenza\n\nCostituzione Equina\nConsidera il tuo personaggio di una taglia più grande quando determini la sua capacità di carico e il peso che può spingere, trascinare o sollevare",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Carica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Struttura Equina",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Zoccoli",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Affinità Naturale",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Coboldo (Astuzia)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Astuzia\nHai competenza in una delle seguenti abilità a tua scelta: Arcano, Investigare, Medicina, Rapidità di mano, Sopravvivenza",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Grido Draconico",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Eredità dei Coboldi",
+    "dettaglio": "Astuzia"
+   }
+  ]
+ },
+ {
+  "nome": "Coboldo (Sfida)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Grido Draconico",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Eredità dei Coboldi",
+    "dettaglio": "Sfida"
+   }
+  ]
+ },
+ {
+  "nome": "Coboldo (Stregoneria Draconica)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Grido Draconico",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Eredità dei Coboldi",
+    "dettaglio": "Stregoneria Draconica"
+   }
+  ]
+ },
+ {
+  "nome": "Dhampir (Specie)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "10.5, scalata 10.5",
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Morso 1d4 piercing",
+  "altriPrivilegi": "Eredità Ancestrale\nSei competente in due abilità a tua scelta",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Eredità Ancestrale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Natura Immortale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Movimenti del Ragno",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Morso Vampirico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Ametista)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Force",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Ametista"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Mente Psionica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Draconica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo della Gemma",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Argento)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Cold",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Argento"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza ai Danni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo Draconico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Bianco)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Cold",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Bianco"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza ai Danni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo Draconico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Blu)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Lightning",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Blu"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza ai Danni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo Draconico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Bronzo)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Lightning",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Bronzo"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza ai Danni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo Draconico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Cristallo)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni Radiant",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Cristallo"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Mente Psionica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Draconica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo della Gemma",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Nero)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Acid",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Nero"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza ai Danni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo Draconico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Oro)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Fire",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Oro"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza ai Danni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo Draconico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Ottone)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Fire",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Ottone"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza ai Danni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo Draconico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Rame)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Acid",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Rame"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza ai Danni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo Draconico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Ravenite)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Assalto Vendicativo",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Rosso)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Fire",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Rosso"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza ai Danni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo Draconico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Sangue Draconico)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Presenza Imponente",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Smeraldo)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni Psychic",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Smeraldo"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Mente Psionica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Draconica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo della Gemma",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Topazio)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni Necrotic",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Topazio"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Mente Psionica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Draconica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo della Gemma",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Verde)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Poison",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Verde"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza ai Danni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo Draconico",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Dragonide (Zaffiro)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza draconica\nHai resistenza ai danni da Thunder",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Discendenza Draconica",
+    "dettaglio": "Zaffiro"
+   },
+   {
+    "livello": 1,
+    "nome": "Arma a Soffio",
+    "dettaglio": ", 4d10"
+   },
+   {
+    "livello": 1,
+    "nome": "Mente Psionica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Draconica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 5,
+    "nome": "Volo della Gemma",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Duergar",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resilienza nanica\nDispone di vantaggio sui tiri salvezza eseguiti per evitare o terminare la condizione avvelenato su se stesso. Inoltre, possiede la resistenza ai danni da Poison",
+  "linguaggi": "Comune, 2 extra",
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "36 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Resilienza Nanica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Fortezza Psionica",
+    "dettaglio": null
+   },
+   {
+    "livello": 3,
+    "nome": "Magia Duergar",
+    "dettaglio": "Ingrandire/Ridurre; Invisibilità"
+   }
+  ]
+ },
+ {
+  "nome": "Eladrin",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Sensi Acuti\nHai competenza nell'abilità Percezione",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Acuti",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Trance",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Passo Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 3,
+    "nome": "Potenziamento Passo Fatato",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Elfo (Drow)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Sensi Acuti\nHai competenza in una delle seguenti abilità a tua scelta: Intuizione, Percezione, Sopravvivenza",
+  "trucchetti": 1,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "36 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Acuti",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Trance",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Lignaggio Elfico",
+    "dettaglio": "Luci Danzanti"
+   },
+   {
+    "livello": 3,
+    "nome": "Lignaggio Elfico",
+    "dettaglio": "Luminescenza"
+   },
+   {
+    "livello": 5,
+    "nome": "Lignaggio Elfico",
+    "dettaglio": "Oscurità"
+   }
+  ]
+ },
+ {
+  "nome": "Elfo (Marchio dell'Ombra)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Sensi Acuti\nHai competenza nell'abilità Percezione",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Acuti",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Trance",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Intuizione Acuta",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Modellare le Ombre",
+    "dettaglio": "Illusione Minore"
+   },
+   {
+    "livello": 3,
+    "nome": "Modellare le Ombre",
+    "dettaglio": "Invisibilità"
+   }
+  ]
+ },
+ {
+  "nome": "Elfo (Pallido)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Sensi Acuti\nHai competenza nell'abilità Percezione",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Acuti",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Incisivi",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Benedizione del Tessitore della Luna",
+    "dettaglio": "Luce; Sonno; Invisibilità"
+   }
+  ]
+ },
+ {
+  "nome": "Elfo (Alto)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Sensi Acuti\nHai competenza in una delle seguenti abilità a tua scelta: Intuizione, Percezione, Sopravvivenza",
+  "trucchetti": 1,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Acuti",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Trance",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Lignaggio Elfico",
+    "dettaglio": "Prestidigitazione"
+   },
+   {
+    "livello": 3,
+    "nome": "Lignaggio Elfico",
+    "dettaglio": "Individuazione del Magico"
+   },
+   {
+    "livello": 5,
+    "nome": "Lignaggio Elfico",
+    "dettaglio": "Passo Velato"
+   }
+  ]
+ },
+ {
+  "nome": "Elfo Astrale",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Sensi Acuti\nHai competenza nell'abilità Percezione\n\nTrance Astrale\nOgni volta che finisci una Trance, hai competenza in una abilità a tua scelta e 1 Strumento",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Acuti",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Trance Astrale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Fuoco Astrale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Passo delle Stelle",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Elfo (Boschi)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 10.5,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Sensi Acuti\nHai competenza in una delle seguenti abilità a tua scelta: Intuizione, Percezione, Sopravvivenza",
+  "trucchetti": 1,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Acuti",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Trance",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Lignaggio Elfico",
+    "dettaglio": "Artificio Druidico"
+   },
+   {
+    "livello": 3,
+    "nome": "Lignaggio Elfico",
+    "dettaglio": "Passo Veloce"
+   },
+   {
+    "livello": 5,
+    "nome": "Lignaggio Elfico",
+    "dettaglio": "Passare senza Tracce"
+   }
+  ]
+ },
+ {
+  "nome": "Elfo del Mare",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "9, Nuoto 9",
+  "resistenze": "Figlio del Mare\nHai resistenza ai danni da Cold",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Sensi Acuti\nHai competenza nell'abilità Percezione",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Figlio del Mare",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Amico del Mare",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Acuti",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Trance",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Eteride",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Nato dall'Etere\nDispone di resistenza ai danni Necrotic",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Minaccioso\nHai competenza nell'abilità Intimidire",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Nato dall’Etere",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Minaccioso",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Fata",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "9, volo 9",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Volo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Magia delle Fate",
+    "dettaglio": "Artificio Druidico"
+   },
+   {
+    "livello": 3,
+    "nome": "Magia delle Fate",
+    "dettaglio": "Luminescenza"
+   },
+   {
+    "livello": 5,
+    "nome": "Magia delle Fate",
+    "dettaglio": "Ingrandire/Ridurre"
+   }
+  ]
+ },
+ {
+  "nome": "Firbolg",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Costituzione Robusta\nConsidera il tuo personaggio di una taglia più grande quando determini la sua capacità di carico e il peso che può spingere, trascinare o sollevare",
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Magia Firbolg",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Passo Invisibile",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Corporatura Possente",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Lingua delle Bestie e delle Piante",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Forgiato",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "armaturaNaturale": "10+des+1",
+  "velocita": 9,
+  "resistenze": "Resilienza dei costrutti\nDispone di vantaggio ai tiri salvezza contro avvelenamento e possiede resistenza ai danni da Poison",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Modello Specializzato\nHai competenza in un'abilità e 1 strumento a tua scelta",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Resistenza del Forgiato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Riposo della Sentinella",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Protezione Integrata",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Modello Specializzato",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Genasi (Acqua)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "9, Nuoto 9",
+  "resistenze": "Resistenza all'Acido\nHai resistenza ai danni da Acid",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza all'Acido",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Anfibio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Richiamo dell’Onda",
+    "dettaglio": "Fiotto Acido"
+   },
+   {
+    "livello": 3,
+    "nome": "Richiamo dell’Onda",
+    "dettaglio": "Creare o Distruggere Acqua"
+   },
+   {
+    "livello": 5,
+    "nome": "Richiamo dell’Onda",
+    "dettaglio": "Camminare sull'Acqua"
+   }
+  ]
+ },
+ {
+  "nome": "Genasi (Aria)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 10.5,
+  "resistenze": "Resistenza al Fulmine\nHai resistenza ai danni da Lightning",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Respiro Infinito",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza al Fulmine",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Mischiarsi con il Vento",
+    "dettaglio": "Stretta Folgorante"
+   },
+   {
+    "livello": 3,
+    "nome": "Mischiarsi con il Vento",
+    "dettaglio": "Caduta Morbida"
+   },
+   {
+    "livello": 5,
+    "nome": "Mischiarsi con il Vento",
+    "dettaglio": "Levitazione"
+   }
+  ]
+ },
+ {
+  "nome": "Genasi (Fuoco)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza al Fuoco\nHai resistenza ai danni da Fire",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza al Fuoco",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Raggiungere la Fiamma",
+    "dettaglio": "Produrre Fiamma"
+   },
+   {
+    "livello": 3,
+    "nome": "Raggiungere la Fiamma",
+    "dettaglio": "Mani Brucianti"
+   },
+   {
+    "livello": 5,
+    "nome": "Raggiungere la Fiamma",
+    "dettaglio": "Lama Infuocata"
+   }
+  ]
+ },
+ {
+  "nome": "Genasi (Terra)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "incantesimiPreparati": "1",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Andatura di Terra",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Fondersi con la Pietra",
+    "dettaglio": null
+   },
+   {
+    "livello": 5,
+    "nome": "Fondersi con la Pietra",
+    "dettaglio": "Passare senza Tracce"
+   }
+  ]
+ },
+ {
+  "nome": "Giff",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "competenzeArmiArmature": "Armi da Fuoco",
+  "altriPrivilegi": "Costituzione da Ippopotamo\nHai vantaggio a tutte le prove caratteristica su Forza e tiri salvezza su Forza. In più considera il tuo personaggio di una taglia più grande quando determini la sua capacità di carico e il peso che può spingere, trascinare o sollevare",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scintilla Astrale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Padronanza delle Armi da Fuoco",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Struttura da Ippopotamo",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Githyanki",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resilienza psichica\nHai resistenza ai danni Psychic",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Conoscenza Astrale\nHai competenza in una abilità, arma o strumento a tua scelta",
+  "trucchetti": 1,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Conoscenza Astrale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Psichica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Psionici Githyanki",
+    "dettaglio": "Mano Magica"
+   },
+   {
+    "livello": 3,
+    "nome": "Psionici Githyanki",
+    "dettaglio": "Passo Velato"
+   },
+   {
+    "livello": 5,
+    "nome": "Psionici Githyanki",
+    "dettaglio": "Saltare"
+   }
+  ]
+ },
+ {
+  "nome": "Githzerai",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resilienza psichica\nHai resistenza ai danni Psychic",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Disciplina Mentale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Psichica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Psionica Githzerai",
+    "dettaglio": "Mano Magica"
+   },
+   {
+    "livello": 3,
+    "nome": "Psionica Githzerai",
+    "dettaglio": "Scudo"
+   },
+   {
+    "livello": 5,
+    "nome": "Psionica Githzerai",
+    "dettaglio": "Individuazione dei Pensieri"
+   }
+  ]
+ },
+ {
+  "nome": "Gnomo (Marchio della Scrittura)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 7.5,
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Astuzia Gnomesca",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Talento dello Scriba",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Intuizione dello Scriba",
+    "dettaglio": "Messaggio; Comprensione dei Linguaggi"
+   },
+   {
+    "livello": 3,
+    "nome": "Intuizione dello Scriba",
+    "dettaglio": "Bocca Magica"
+   }
+  ]
+ },
+ {
+  "nome": "Gnomo (Boschi)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Hai vantaggio sui tiri salvezza su Intelligenza, Saggezza e Carisma",
+  "trucchetti": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Astuzia Gnomesca",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Lignaggio Gnomesco",
+    "dettaglio": "Boschi"
+   }
+  ]
+ },
+ {
+  "nome": "Gnomo delle Profondità (Svirfneblin)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "36 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Astuzia Gnomesca",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Camuffamento dei Svirfneblin",
+    "dettaglio": null
+   },
+   {
+    "livello": 3,
+    "nome": "Camuffamento di Pietra",
+    "dettaglio": "Camuffare se Stesso"
+   },
+   {
+    "livello": 5,
+    "nome": "Camuffamento di Pietra",
+    "dettaglio": "Anti-Individuazione"
+   }
+  ]
+ },
+ {
+  "nome": "Gnomo (Rocce)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Hai vantaggio sui tiri salvezza su Intelligenza, Saggezza e Carisma",
+  "trucchetti": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Astuzia Gnomesca",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Lignaggio Gnomesco",
+    "dettaglio": "Rocce"
+   }
+  ]
+ },
+ {
+  "nome": "Goblin",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Furia dei Piccoli",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Fuga Agile",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Goliath",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 10.5,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Costituzione Robusta",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Antenato Gigante",
+    "dettaglio": "Nuvole|Fuoco|Gelo|Colline|Pietra|Tempesta)*"
+   },
+   {
+    "livello": 1,
+    "nome": "Corporatura Possente",
+    "dettaglio": null
+   },
+   {
+    "livello": 5,
+    "nome": "Forma Grande",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Grung",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "7.5, scalata 7.5",
+  "resistenze": "Immunità al Veleno\nHai immunità ai danni da Poison e alla condizione di avvelenato",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Allerta Arborea\nHai competenza nell'abilità Percezione",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Allerta Arborea",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Anfibio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Immunità al Veleno",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Pelle Velenosa",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Balzo da Fermo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Dipendenza da Acqua",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Hadozee",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Sensi Acuti\nHai competenza nell'abilità Percezione\n\nVersatilità nelle Abilità\nHai competenza in due abilità o strumenti a tua scelta",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Piedi Destrorsi",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Planare",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resilienza Hadozee",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Halfling",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Coraggioso",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Agilità Halfling",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Fortuna",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Furtività Innata",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Halfling (Marchio dell'Ospitalità)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 7.5,
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Coraggioso",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Agilità Halfling",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Fortuna",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sempre Ospitale",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Magia del Locandiere",
+    "dettaglio": "Prestidigitazione; Purificare Cibo e Bevande; Servitore Inosservato"
+   }
+  ]
+ },
+ {
+  "nome": "Halfling (Marchio della Guarigione)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 7.5,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Coraggioso",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Agilità Halfling",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Fortuna",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Intuito Medico",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Tocco Guaritore",
+    "dettaglio": "Cura Ferite"
+   },
+   {
+    "livello": 3,
+    "nome": "Tocco Guaritore",
+    "dettaglio": "Ristorare Inferiore"
+   }
+  ]
+ },
+ {
+  "nome": "Hobgoblin",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Dono Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 3,
+    "nome": "Dono Fatato",
+    "dettaglio": "Ospitalità|Passaggio|Astuzia)*"
+   },
+   {
+    "livello": 1,
+    "nome": "Fortuna dai molti",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Kalashtar",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Disciplina Mentale\nHai resistenza ai danni Psychic",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Mente Duplice\nHai vantaggio a tutti i tiri salvezza su Saggezza",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Mente Duplice",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Disciplina Mentale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Legame Mentale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Separato dai Sogni",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Kender",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Curiosità Kender\nHai competenza in una delle seguenti abilità a tua scelta: Indagare, Intuizione, Furtività, Sopravvivenza e Rapidità di Mano",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Senza Paura",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Curiosità Kender",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Provocazione",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Kenku",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "A Memoria di Kenku\nHai competenza in due abilità a tua scelta",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Esperti Duplicatori",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Richiamo del Kenku",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Mimica",
+    "dettaglio": null
+   },
+   {
+    "livello": 20,
+    "nome": "Si il kenku funziona così",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Kor",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "9, scalata 9",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Scalata Kor\nHai competenza nell'abilità Atletica e Acrobazia",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Arrampicata Kor",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Coraggioso",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Fortunato",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Leonin",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 10.5,
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Artigli 1d4 slashing",
+  "altriPrivilegi": "Istinto da Cacciatore\nHai competenza in una delle seguenti abilità a tua scelta: Atletica, Intimidire, Percezione e Sopravvivenza",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Artigli",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Istinto del Cacciatore",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Ruggito Scoraggiante",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Leporidion (Harengon)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Riflessi Leprini",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Leporini",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Zampa di Coniglio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Salto del Coniglio",
+    "dettaglio": "0m;"
+   }
+  ]
+ },
+ {
+  "nome": "Locathah",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "armaturaNaturale": "12+des",
+  "velocita": "9, Nuoto 9",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Osservatore e Atletico\nHai competenza nell'abilità Atletica e Percezione",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "#VALUE!",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Lossodonte",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "armaturaNaturale": "12+cos",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Costituzione Robusta\nConsidera il tuo personaggio di una taglia più grande quando determini la sua capacità di carico e il peso che può spingere, trascinare o sollevare",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "#VALUE!",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Lucertoloide",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "armaturaNaturale": "13+des",
+  "velocita": "9, Nuoto 9",
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Morso 1d6 slashing",
+  "altriPrivilegi": "Intuizione della natura\nHai competenza in due delle seguenti abilità a tua scelta: Addestrare Animali, Medicine, Nature, Percezione, Furtività, e Sopravvivenza",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "#VALUE!",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Mezzelfo",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Versatilità nelle Abilità\nHai competenza in due abilità a tua scelta",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Versatilità nelle Abilità",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Mezzelfo (Marchio dell'Individuazione)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Intuito Deduttivo",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Individuazione Magica",
+    "dettaglio": "Individuazione del Magico; Individuazione delle Malattie e dei Veleni"
+   },
+   {
+    "livello": 3,
+    "nome": "Individuazione Magica",
+    "dettaglio": "Vedere Invisibilità"
+   }
+  ]
+ },
+ {
+  "nome": "Mezzelfo (Marchio della Tempesta)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Dono della Tempesta\nHai resistenza ai danni da Fulmine",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Intuito del Timoniere del Vento",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Dono della Tempesta",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Venti di Prua",
+    "dettaglio": "Folata"
+   },
+   {
+    "livello": 3,
+    "nome": "Venti di Prua",
+    "dettaglio": "Folata di Vento"
+   }
+  ]
+ },
+ {
+  "nome": "Mezzelfo (Variante; Discendente Drow)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Magia Drow",
+    "dettaglio": "Luci Danzanti"
+   },
+   {
+    "livello": 3,
+    "nome": "Magia Drow",
+    "dettaglio": "Luminescenza"
+   },
+   {
+    "livello": 5,
+    "nome": "Magia Drow",
+    "dettaglio": "Oscurità"
+   }
+  ]
+ },
+ {
+  "nome": "Mezzelfo (Variante; Discendente Elfi del Sole o Luna, Armi)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "competenzeArmiArmature": "Spada Lunga, Spada Corta, Arco Corto, Arco Lungo",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Competenza nelle Armi",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Mezzelfo (Variante; Discendente Elfi del Sole o Luna, Trucchetto)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Trucchetto",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Mezzelfo (Variante; Discendente Elfo Acquatico)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "9, Nuoto 9",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Mezzelfo (Variante; Discendente Elfo dei Boschi; Piede Lesto)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 10.5,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Piede Lesto",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Mezzelfo (Variante; Discendente Elfo dei Boschi; Maschera della Selva)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Maschera della Selva",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Mezzorco",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Minaccioso\nHai competenza nell'abilità Intimidire",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Minaccioso",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Tenacia Implacabile",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Attacchi Selvaggi",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Mezzorco (Marchio della Scoperta)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Intuito del Cacciatore",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Magia dello Scopritore",
+    "dettaglio": "Marchio del Cacciatore"
+   },
+   {
+    "livello": 3,
+    "nome": "Magia dello Scopritore",
+    "dettaglio": "Localizza Oggetto"
+   }
+  ]
+ },
+ {
+  "nome": "Minotauro",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Corna 1d6 bludgeoning",
+  "altriPrivilegi": "Imposing Presence\nHai competenza with one of the following skills of your choice: Intimidire o Persuasione",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Corna",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Incornata Furiosa",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Corna Martellanti",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Memoria Labirintica",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Morfico",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Morso 1d6 piercing",
+  "altriPrivilegi": "Istinto Bestiale\nHai competenza in due delle seguenti abilità a tua scelta: Acrobazia, Atletica, Intimidire, Sopravvivenza",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Istinti Animaleschi",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Mutamento",
+    "dettaglio": "Pellebestiale|Zannelunghe|Passorapido|Cacciaselvaggia)*"
+   }
+  ]
+ },
+ {
+  "nome": "Naga",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Immunità al Veleno\nHai immunità ai danni da Poison e alla condizione di avvelenato",
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Morso 1d4 piercing",
+  "altriPrivilegi": "1 Strumento (Sostanze da Avvelenatore)",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Slancio Prorompente",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Armi Naturali",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Immunità al Veleno",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Affinità con il Veleno",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Nano",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "hpBonus": 1,
+  "resistenze": "Resilienza nanica\nHai resistenza ai danni da Poison. Inoltre, hai vantaggio sui tiri salvezza che effettui per evitare o terminare la condizione avvelenato.",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "36 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Resilienza Nanica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Robustezza dei Nani",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Esperto Minatore",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Nano (Marchio dell'Interdizione)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 7.5,
+  "resistenze": "Resilienza nanica\nDispone di vantaggio sui tiri salvezza eseguiti per evitare o terminare la condizione avvelenato su te stesso. Inoltre, possiede la resistenza ai danni da Poison",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Resilienza Nanica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Intuito del Guardiano",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Interdizioni e Sigilli",
+    "dettaglio": "Allarme; Armatura Magica"
+   },
+   {
+    "livello": 3,
+    "nome": "Interdizioni e Sigilli",
+    "dettaglio": "Serratura Arcana"
+   }
+  ]
+ },
+ {
+  "nome": "Orco",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "36 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Scarica di Adrenalina",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Tenacia Implacabile",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Owlin",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "9, volo 9",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Piume Silenziose\nHai competenza nell'abilità Furtività",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "36 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Volo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Piume Silenziose",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Plasmoide",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resilienza Naturale\nDispone di vantaggio sui tiri salvezza eseguiti per evitare o terminare la condizione avvelenato su te stesso. Inoltre possiede resistenza ai danni da Acid e Poison",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Amorfo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Trattenere il Respiro",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Naturale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Modellare Sé Stessi",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Rinato (Specie)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Natura Immortale\nDispone di vantaggio sui tiri salvezza eseguiti per evitare o terminare la condizione avvelenato su te stesso. Inoltre, possiede la resistenza ai danni da Poison",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Eredità Ancestrale\nHai competenza in due abilità a tua scelta",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Eredità Ancestrale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Natura senza Morte",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Conoscenze di una Vita Passata",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Sangue Strigo (Specie)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Eredità Ancestrale\nSei competente in due abilità a tua scelta",
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Eredità Ancestrale",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Magia Maledetta",
+    "dettaglio": "Alterare Sé Stesso; Sortilegio"
+   },
+   {
+    "livello": 1,
+    "nome": "Ninnolo Inquietante",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Satiro",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Corna 1d6 bludgeoning",
+  "altriPrivilegi": "Gaudente\nHai competenza nell'abilità Intrattenere e Persuasione\n\n1 Strumento (Musicale)",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Ariete",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Magica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Salti Gioiosi",
+    "dettaglio": "d8"
+   },
+   {
+    "livello": 1,
+    "nome": "Festaiolo",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Shadar-Kai",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza necrotica\nHai resistenza ai danni Necrotic",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Sensi Acuti\nHai competenza nell'abilità Percezione",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Benedizione della Regina dei Corvi",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Sensi Acuti",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Necrotica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Trance",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Ibrido Simic",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "9",
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Miglioramento Animale",
+    "dettaglio": "Planata della Manta|Scalatore Agile|Adattamento Subacqueo|Appendici Afferranti|Carapace|Sputo Acido)**"
+   }
+  ]
+ },
+ {
+  "nome": "Sirena",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "7.5, volo 9",
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Credo Acquatico del Navigatore\nHai competenza nell'abilità Sopravvivenza\n\n1 Strumento (Strumenti da Navigatore)",
+  "trucchetti": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Volo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Canzone della Sirena",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Tabaxi",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "9, Scalata 9",
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Artigli 1d6 slashing",
+  "altriPrivilegi": "Talenti Felini\nHai competenza nell'abilità Percezione e Furtività",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Artigli del Gatto",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Talento Felino",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Agilità Felina",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   }
+  ]
+ },
+ {
+  "nome": "Thri-kreen",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "armaturaNaturale": "13+des",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "#VALUE!",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Tiefling (Abissale)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza Infernale\nPossiede resistenza ai danni da Poison.",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 2,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Presenza Ultraterrena",
+    "dettaglio": "Taumaturgia"
+   },
+   {
+    "livello": 1,
+    "nome": "Lignaggio Infernale",
+    "dettaglio": "Spruzzo Velenoso"
+   },
+   {
+    "livello": 3,
+    "nome": "Lignaggio Infernale",
+    "dettaglio": "Raggio di Infermità"
+   },
+   {
+    "livello": 5,
+    "nome": "Lignaggio Infernale",
+    "dettaglio": "Blocca Persone"
+   }
+  ]
+ },
+ {
+  "nome": "Tiefling\n(Ctonio)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza Infernale\nPossiede resistenza ai danni da Necrotic.",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 2,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Presenza Ultraterrena",
+    "dettaglio": "Taumaturgia"
+   },
+   {
+    "livello": 1,
+    "nome": "Lignaggio Infernale",
+    "dettaglio": "Tocco Gelido"
+   },
+   {
+    "livello": 3,
+    "nome": "Lignaggio Infernale",
+    "dettaglio": "Vita Falsata"
+   },
+   {
+    "livello": 5,
+    "nome": "Lignaggio Infernale",
+    "dettaglio": "Raggio di Affaticamento"
+   }
+  ]
+ },
+ {
+  "nome": "Tiefling (Infernale)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resistenza Infernale\nPossiede resistenza ai danni da Fire.",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 2,
+  "incantesimiPreparati": 2,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Presenza Ultraterrena",
+    "dettaglio": "Taumaturgia"
+   },
+   {
+    "livello": 1,
+    "nome": "Lignaggio Infernale",
+    "dettaglio": "Dardo di Fuoco"
+   },
+   {
+    "livello": 3,
+    "nome": "Lignaggio Infernale",
+    "dettaglio": "Intimorire Infernale"
+   },
+   {
+    "livello": 5,
+    "nome": "Lignaggio Infernale",
+    "dettaglio": "Oscurità"
+   }
+  ]
+ },
+ {
+  "nome": "Tortuga",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "armaturaNaturale": 17,
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "attacchiNaturali": "Artigli 1d6 slashing",
+  "altriPrivilegi": "Intuizione della Natura\nHai competenza in due delle seguenti abilità a tua scelta: Addestrare Animali, Medicine, Nature, Percezione, Furtività, e Sopravvivenza",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Artigli",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Trattenere il Fiato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Armatura Naturale",
+    "dettaglio": "17 CA"
+   },
+   {
+    "livello": 1,
+    "nome": "Difesa a Guscio",
+    "dettaglio": "+4 CA"
+   },
+   {
+    "livello": 1,
+    "nome": "Conoscenze della Natura",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Tritone",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": "9, Nuoto 9",
+  "resistenze": "Guardiano degli Abissi\nPossiedi resistenza ai danni da Cold",
+  "linguaggi": "Comune, 2 extra",
+  "incantesimiPreparati": 3,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Anfibio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Emissario del Mare",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Guardiani delle Profondità",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Controllo dell'Aria e dell'Acqua",
+    "dettaglio": "Nube di Nebbia"
+   },
+   {
+    "livello": 3,
+    "nome": "Controllo dell'Aria e dell'Acqua",
+    "dettaglio": "Folata di Vento"
+   },
+   {
+    "livello": 5,
+    "nome": "Controllo dell'Aria e dell'Acqua",
+    "dettaglio": "Camminare sull'Acqua"
+   }
+  ]
+ },
+ {
+  "nome": "Umano",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Abilità\nHai competenza in una abilità a tua scelta",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Pieno di Risorse",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Abile",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Versatile",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Umano (Marchio del Passaggio)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 10.5,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Velocità del Corriere",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Movimento Intuitivo",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Passaggio Magico",
+    "dettaglio": "Passo Velato"
+   }
+  ]
+ },
+ {
+  "nome": "Umano (Marchio dell'Addestramento)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Intuito Selvaggio",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Legame Primordiale",
+    "dettaglio": "Amicizia con gli Animali; Parlare con gli Animali"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 3,
+    "nome": "Più Grossi Sono",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Umano (Marchio della Costruzione)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Dono del Costruttore\nHai competenza in 1 Strumento (Artigiano)",
+  "trucchetti": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Dono del Costruttore",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Intuito dell'Artigiano",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Fabbro Magico",
+    "dettaglio": "Riparare; Arma Magica"
+   }
+  ]
+ },
+ {
+  "nome": "Umano (Marchio della Scoperta)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Intuito del Cacciatore",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Magia dello Scopritore",
+    "dettaglio": "Marchio del Cacciatore"
+   },
+   {
+    "livello": 3,
+    "nome": "Magia dello Scopritore",
+    "dettaglio": "Localizza Oggetto"
+   }
+  ]
+ },
+ {
+  "nome": "Umano (Marchio della Sentinella)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Guardiano Vigile.1° Intuito della Sentinella",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi del Marchio",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Scudo del Guardiano",
+    "dettaglio": "Scudo"
+   }
+  ]
+ },
+ {
+  "nome": "Urgoblin",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Furtivo\nHai competenza nell'abilità Furtività\n\nCostituzione Robusta\nConsidera il tuo personaggio di una taglia più grande quando determini la sua capacità di carico e il peso che può spingere, trascinare o sollevare",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Retaggio Fatato",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Arti-Lunghi",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Corporatura Possente",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Subdolo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Attacco a Sorpresa",
+    "dettaglio": "2d6"
+   }
+  ]
+ },
+ {
+  "nome": "Vedalken",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Disinteresse Vedalken\nHai vantaggio ai tiri salvezza su Intelligenza, Saggezza e Carisma\n\nPrecisione Instancabile\nHai competenza in una delle seguenti abilità a tua scelta: Arcano, Storia, Indagare, Medicina, Intrattenere, o Rapidità di Mano\n\n1 Strumento",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Freddezza Vedalken",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Precisione Incessante",
+    "dettaglio": "d4"
+   },
+   {
+    "livello": 1,
+    "nome": "Parzialmente Anfibio",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Verdan",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra",
+  "altriPrivilegi": "Persuasivo\nHai competenza nell'abilità Persuasione\n\nIntuizione Telepatica\nLa connessione mentale della tua mente con il mondo che ti circonda rafforza la tua volontà. Hai vantaggio ai tiri salvezza su Saggezza e Carisma",
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Guarigione del Sangue Nero",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Telepatia Limitata",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Persuasivo",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Intuizione Telepatica",
+    "dettaglio": null
+   }
+  ]
+ },
+ {
+  "nome": "Yuan-Ti",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Resilienza al Veleno\nDispone di vantaggio sui tiri salvezza eseguiti per evitare o terminare la condizione avvelenato su te stesso. Inoltre, possiede la resistenza ai danni da Poison",
+  "linguaggi": "Comune, 2 extra",
+  "trucchetti": 1,
+  "incantesimiPreparati": 1,
+  "privilegi": [
+   {
+    "livello": 1,
+    "nome": "Scurovisione",
+    "dettaglio": "18 m."
+   },
+   {
+    "livello": 1,
+    "nome": "Resistenza Magica",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Resilienza ai Veleni",
+    "dettaglio": null
+   },
+   {
+    "livello": 1,
+    "nome": "Incantesimi Serpentini",
+    "dettaglio": "Spruzzo Velenoso; Amicizia con gli Animali"
+   },
+   {
+    "livello": 3,
+    "nome": "Incantesimi Serpentini",
+    "dettaglio": "Suggestione"
+   }
+  ]
+ },
+ {
+  "nome": "Asceso Darkin",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra"
+ },
+ {
+  "nome": "Floken (Ramari)",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "resistenze": "Caduta Morbida: hai resistenza ai danni da caduta.",
+  "linguaggi": "Comune, 2 extra"
+ },
+ {
+  "nome": "Ombra Oscura",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra"
+ },
+ {
+  "nome": "Ombra Pallida",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra"
+ },
+ {
+  "nome": "Cervan",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 10.5,
+  "linguaggi": "Comune, 2 extra"
+ },
+ {
+  "nome": "Vulpin",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra"
+ },
+ {
+  "nome": "Jerbeen",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra"
+ },
+ {
+  "nome": "Raptor",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra"
+ },
+ {
+  "nome": "Hedge",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra"
+ },
+ {
+  "nome": "Luma",
+  "aumentoCaratteristiche": "scegli 3: for +1, des +1, cos +1, int +1, sag +1, car +1",
+  "velocita": 9,
+  "linguaggi": "Comune, 2 extra"
+ }
+]
