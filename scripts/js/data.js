@@ -34,7 +34,7 @@ var pages = [
   {k:'regole-del-server',l:'Regole del Server',i:'📋',id:'pag-regole-del-server',sec:'regole'},
   {k:'materiale-approvato',l:'Materiale Approvato',i:'📖',id:'pag-materiale-approvato',sec:'personaggio'},
   {k:'pantheon',l:'Pantheon',i:'🛐',id:'pag-pantheon',sec:'lore'},
-  {k:'lavori',l:'Lavoro',i:'💼',id:'pag-lavori',sec:'personaggio'},
+  {k:'lavori',l:'Lavoro',i:'💼',id:'pag-lavori',sec:'lavori'},
   {k:'come-si-inizia',l:'Come si inizia',i:'🌟',id:'pag-come-si-inizia'},
   {k:'andando-avanti',l:'Andando avanti',i:'📈',id:'pag-andando-avanti'},
   {k:'maestria-titoli',l:'Maestria / Titoli',i:'🏅',id:'pag-maestria-titoli'},
