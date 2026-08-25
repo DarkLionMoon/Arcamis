@@ -83,17 +83,6 @@
       "path": "personaggio/andando-avanti"
     },
     {
-      "k": "corporazione-costruttori",
-      "l": "Corporazione dei Costruttori",
-      "i": "🔨",
-      "id": "pag-corporazione-costruttori",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lavori/corporazione-costruttori",
-      "sec": "lavori"
-    },
-    {
       "k": "ospedale",
       "l": "Ospedale",
       "i": "⚕️",
