@@ -83,17 +83,6 @@
       "path": "personaggio/andando-avanti"
     },
     {
-      "k": "sartoria",
-      "l": "Sartoria",
-      "i": "🧵",
-      "id": "pag-sartoria",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lavori/sartoria",
-      "sec": "lavori"
-    },
-    {
       "k": "maestria-titoli",
       "l": "Maestria / Titoli",
       "i": "🏅",
