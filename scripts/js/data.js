@@ -63,8 +63,7 @@ var pages = [
   {k:'fumofosco',l:'Fumofosco',i:'🌫️',id:'pag-fumofosco'},
   {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'},
   {k:'rivorosso',l:'Rivorosso',i:'🌊',id:'pag-rivorosso'},
-  {k:'circolo-dello-smarrimento',l:'Circolo dello Smarrimento',i:'🪨',id:'pag-circolo-dello-smarrimento'},
-  {k:'dimora-degli-ursidi',l:'Dimora degli Ursidi',i:'🐻',id:'pag-dimora-degli-ursidi'}
+  {k:'circolo-dello-smarrimento',l:'Circolo dello Smarrimento',i:'🪨',id:'pag-circolo-dello-smarrimento'}
 ];
 
 function getPage(idOrK){

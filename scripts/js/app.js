@@ -71,8 +71,7 @@ var _pathMap = {
   'lore/fumofosco': 'pag-fumofosco',
   'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur',
   'lore/rivorosso': 'pag-rivorosso',
-  'lore/circolo-dello-smarrimento': 'pag-circolo-dello-smarrimento',
-  'lore/dimora-degli-ursidi': 'pag-dimora-degli-ursidi'
+  'lore/circolo-dello-smarrimento': 'pag-circolo-dello-smarrimento'
 };
 
 /* ════ DEEP LINK ════ */
