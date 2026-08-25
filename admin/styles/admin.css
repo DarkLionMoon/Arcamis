@@ -642,4 +642,19 @@ button{font-family:inherit}
 /* ═══════════════ DRAG GHOST ═══════════════ */
 .st-ghost{background:var(--panel);border:2px solid var(--acc);opacity:.9;pointer-events:none}
 .st-ghost .st-card-head{border-bottom:1px solid var(--line)}
+
+/* ═══════════════ CMS EDITOR ═══════════════ */
+.st-cms-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.st-cms-fields .st-ta-l{grid-column:span 1}
+.st-cms-fields .st-ta-l:has(textarea){grid-column:span 2}
+.cms-input,.cms-select{width:100%;padding:6px 10px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--rad-s);color:var(--txt);font-size:13px;transition:border-color var(--transition-fast)}
+.cms-input:focus,.cms-select:focus{border-color:var(--acc);outline:none;box-shadow:0 0 0 2px var(--accbg)}
+.cms-select{cursor:pointer;appearance:auto}
+.cms-wysiwyg{min-height:120px;resize:vertical;font-family:var(--mono);font-size:13px;line-height:1.6}
+.cms-wysiwyg-tb{display:flex;gap:2px;padding:4px 0;border-bottom:1px solid var(--line);margin-bottom:4px}
+.cms-wysiwyg-tb .tb-fmt{background:none;border:1px solid transparent;color:var(--mut);padding:2px 6px;border-radius:4px;cursor:pointer;font-size:12px;line-height:1.4;transition:all var(--transition-fast)}
+.cms-wysiwyg-tb .tb-fmt:hover{background:var(--panel2);color:var(--txt);border-color:var(--line)}
+.st-page-form{padding:4px 0}
+.st-page-form .st-ta-l{margin-bottom:8px}
+.st-page-form .st-hint{margin-bottom:12px;padding:8px 10px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--rad-s);font-size:12px;color:var(--dim)}
 .st-ghost .st-fields,.st-ghost .st-blocks{display:none}

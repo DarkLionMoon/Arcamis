@@ -423,13 +423,13 @@ async function _gpRender(id,label,icon){
           var _localHtml;
           var _layout = _localJson.layout || '';
           if(_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
-          else if(_layout === 'regole') _localHtml = _renderRegole(_localJson.content);
+          else if(_layout === 'regole' || _layout === 'contenuto') _localHtml = _renderRegole(_localJson.content);
           else if(_layout === 'lavoro') _localHtml = _renderLavoro(_localJson.content);
           else if(_layout === 'personaggio') _localHtml = _renderPersonaggio(_localJson.content);
-          else if(_layout === 'lore') _localHtml = _renderLore(_localJson.content, _localJson.title, _localJson.icon);
+          else if(_layout === 'lore' || _layout === 'luoghi') _localHtml = _renderLore(_localJson.content, _localJson.title, _localJson.icon);
           else if(_layout === 'pantheon') _localHtml = _renderPantheon(_localJson.content, (_localPage && _localPage.k) || 'pantheon');
           else if(_layout === 'bestiario') _localHtml = _renderBestiario(_localJson.content);
-          else if(_layout === 'timeline') _localHtml = _renderTimeline(_localJson.content);
+          else if(_layout === 'timeline' || _layout === 'cronache') _localHtml = _renderTimeline(_localJson.content);
           else if(_layout === 'fazioni') _localHtml = _renderFazioni(_localJson.content);
           else if(_layout === 'oggetti') _localHtml = _renderOggetti(_localJson.content);
           else if(_layout === 'glossario') _localHtml = _renderGlossario(_localJson.content);

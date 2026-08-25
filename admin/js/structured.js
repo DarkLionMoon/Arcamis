@@ -1,29 +1,31 @@
 /* ════════════════════════════════════════════════════════════════
    ARCAMIS ADMIN — structured.js
-   Editor a blocchi per i layout strutturati.
+   Editor CMS strutturato per i layout.
 
-   Due modalità:
-   - 'pantheon': divinità/sezioni con immagine, citazione, identità,
-     personalità, culto. Markdown compatibile con _parsePantheon del
-     sito (blocchi separati da "---", "# Nome", "## Identità", …).
-   - 'schede': schede a card per i layout sessione/quest/npc/spell/
-     specie/citta/evento/bestiario/fazioni/oggetti. Markdown nel
-     formato "## Titolo" + "- **Chiave:** valore" + "### Sezione"
-     letto dai renderer _renderSchede/_renderBestiario/_renderFazioni/
-     _renderOggetti del sito.
+   Tre modalità:
+   - 'pantheon': griglia divinità (invariata).
+   - 'schede': card multipla con campi tipizzati (personaggio,
+     bestiario, oggetti, luoghi, cronache, fazioni).
+   - 'page': pagina singola con form CMS (contenuto, materiale).
    ════════════════════════════════════════════════════════════════ */
 
 var _stMode=false;
 var _stKind='pantheon';
 var _stPreBlockContent='';
-/* Layout supportati dall'editor schede — derivato da LAYOUT_REGISTRY */
-var _ST_SCHE_LAYOUTS=Object.keys(LAYOUT_REGISTRY).filter(function(k){return k!=='pantheon'});
+/* Layout per ogni modalità editor */
+var _ST_PANTHEON_LAYOUTS=['pantheon'];
+var _ST_PAGE_LAYOUTS=['contenuto','materiale'];
+var _ST_SCHE_LAYOUTS=Object.keys(LAYOUT_REGISTRY).filter(function(k){
+  var em=LAYOUT_REGISTRY[k]&&LAYOUT_REGISTRY[k].editorMode;
+  return em==='schede';
+});
 
 function _stTemplateFields(){
   var r=LAYOUT_REGISTRY[_current.layout];
-  var t=r?r.blockFields:null;
-  if(!t)return [['','']];
-  return t.map(function(k){return [k,'']});
+  var fields=(r&&r.fields)||[];
+  var result={};
+  fields.forEach(function(f){result[f.key]='';});
+  return result;
 }
 
 /* ── UNDO / REDO ── */
@@ -70,33 +72,42 @@ function _stUpdateUndoButtons(){
 function _stCanUndo(){return _stHistoryIdx>0}
 function _stCanRedo(){return _stHistoryIdx<_stHistory.length-1}
 
-/* Layout supportati dall'editor a blocchi.
-   'pantheon' → griglia divinità (solo layout pantheon)
-   'schede'   → card generiche (tutti gli altri layout) */
+/* Layout supportati dall'editor strutturato.
+   'pantheon' → griglia divinità
+   'schede'   → card multipla con campi tipizzati
+   'page'     → pagina singola con form CMS */
 function _stLayoutFor(layout){
-  if(layout==='pantheon')return 'pantheon';
-  if(_ST_SCHE_LAYOUTS.indexOf(layout)!==-1)return 'schede';
+  if(!layout)return null;
+  var reg=LAYOUT_REGISTRY[layout];
+  if(!reg)return null;
+  var em=reg.editorMode;
+  if(em==='pantheon')return 'pantheon';
+  if(em==='schede')return 'schede';
+  if(em==='contenuto'||em==='materiale')return 'page';
   return null;
 }
-/* Kind da usare quando l'editor a blocchi è attivo per il layout dato.
-   L'editor a blocchi è disponibile su OGNI pagina: pantheon usa la sua
-   griglia, qualsiasi altro layout usa l'editor a schede generico. */
 function _stEditorKind(layout){
-  if(layout==='pantheon')return 'pantheon';
-  return 'schede';
+  var mode=_stLayoutFor(layout);
+  return mode||'schede';
 }
 function _stSetKind(layout){
   _stKind=_stEditorKind(layout);
 }
 
-/* Etichetta dell'entità in base alla pagina corrente
-   (Pantheon → "divinità", Lavori → "lavoro") per nomi,
-   pulsanti e avvisi dell'editor a blocchi. */
+/* Etichetta dell'entità in base al layout corrente */
 function _stEntName(){
-  return (_current && _current.k === 'lavori') ? 'Nuovo lavoro' : 'Nuova divinità';
+  if(_stKind==='schede'){
+    var reg=LAYOUT_REGISTRY[_current.layout];
+    return 'Nuova '+(reg?reg.l.split('—')[0].trim().toLowerCase():'scheda');
+  }
+  return 'Nuova scheda';
 }
 function _stEntLabel(){
-  return (_current && _current.k === 'lavori') ? 'lavoro' : 'divinità';
+  if(_stKind==='schede'){
+    var reg=LAYOUT_REGISTRY[_current.layout];
+    return reg?reg.l.split('—')[0].trim().toLowerCase():'scheda';
+  }
+  return 'scheda';
 }
 
 /* ── PARSE markdown → blocchi ── */
@@ -110,6 +121,7 @@ function _stImgPosAttr(pos){
 }
 function _stParse(md){
   if(_stKind==='schede')return _stParseSchede(md);
+  if(_stKind==='page')return _stParsePage(md);
   return _stParsePantheon(md);
 }
 function _stParsePantheon(md){
@@ -173,6 +185,10 @@ function _stParseIdent(t){
 
 /* ── PARSE schede (sessione/quest/npc/spell/specie/citta/evento/bestiario/fazioni/oggetti + generico) ── */
 function _stParseSchede(md){
+  var reg=LAYOUT_REGISTRY[_current.layout];
+  var fieldDefs=(reg&&reg.fields)||[];
+  var shortFieldDefs=fieldDefs.filter(function(f){return f.type!=='wysiwyg'});
+  var wysiwygFieldDefs=fieldDefs.filter(function(f){return f.type==='wysiwyg'});
   var cards=[];
   if(!md)return {heading:'',intro:'',cards:[]};
   var parts=md.split(/^## /m);
@@ -180,34 +196,121 @@ function _stParseSchede(md){
   parts.filter(Boolean).forEach(function(sec){
     var lines=sec.split('\n');
     var name=(lines.shift()||'').trim().replace(/^#\s+/,'');
-    var intro2=[],fields=[],blocks=[],cur=null,buf=[];
+    var intro2=[],fields={},legacyFields=[],blocks=[],cur=null,buf=[];
+    /* Build label→key map for this layout */
+    var labelToKey={};
+    shortFieldDefs.forEach(function(f){labelToKey[f.label.toLowerCase()]=f.key;});
+    /* Init all fields empty */
+    shortFieldDefs.forEach(function(f){fields[f.key]='';});
     function flushBlock(){
       if(cur!==null)blocks.push({name:cur,md:buf.join('\n').trim()});
       buf=[];cur=null;
     }
     lines.forEach(function(line){
       var fm=line.match(/^\s*-\s*\*\*(.+?):?\*\*\s*:?\s*(.*)$/);
-      if(fm){flushBlock();fields.push([fm[1].trim().replace(/:$/,''),fm[2].trim()]);return;}
+      if(fm){
+        flushBlock();
+        var key=fm[1].trim().replace(/:$/,'').toLowerCase();
+        var mappedKey=labelToKey[key];
+        if(mappedKey){
+          fields[mappedKey]=fm[2].trim();
+        }else{
+          legacyFields.push([fm[1].trim().replace(/:$/,''),fm[2].trim()]);
+        }
+        return;
+      }
       var bm=line.match(/^###\s+(.+)/);
-      if(bm){flushBlock();cur=bm[1].trim();return;}
+      if(bm){
+        flushBlock();
+        var secName=bm[1].trim();
+        var secKey=null;
+        wysiwygFieldDefs.forEach(function(f){
+          if(f.label.toLowerCase()===secName.toLowerCase())secKey=f.key;
+        });
+        if(secKey){cur='__wysiwyg__'+secKey;}
+        else{cur=secName;}
+        return;
+      }
       if(cur!==null){buf.push(line);return;}
       if(line.trim())intro2.push(line);
     });
     flushBlock();
-    cards.push({name:name,intro:intro2.join('\n').trim(),fields:fields,blocks:blocks});
+    /* Split blocks into wysiwyg fields and extra blocks */
+    var finalBlocks=[];
+    blocks.forEach(function(b){
+      if(b.name.indexOf('__wysiwyg__')===0){
+        fields[b.name.replace('__wysiwyg__','')]=b.md;
+      }else{
+        finalBlocks.push(b);
+      }
+    });
+    cards.push({name:name,intro:intro2.join('\n').trim(),fields:fields,legacyFields:legacyFields,blocks:finalBlocks});
   });
   return {heading:'',intro:intro,cards:cards};
 }
 
+/* ── PARSE page (contenuto/materiale — pagina singola) ── */
+function _stParsePage(md){
+  if(!md)return {fields:{},body:''};
+  var reg=LAYOUT_REGISTRY[_current.layout];
+  var fields={};
+  var body=md;
+  /* Estrai campi short: - **Chiave:** valore */
+  var fieldDefs=(reg&&reg.fields)||[];
+  var shortFields=fieldDefs.filter(function(f){return f.type!=='wysiwyg'});
+  shortFields.forEach(function(f){
+    var re=new RegExp('^\\s*-\\s*\\*\\*'+f.label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+':\\*\\*\\s*(.*)$','im');
+    var m=body.match(re);
+    if(m){fields[f.key]=m[1].trim();body=body.replace(m[0],'');}
+    else{fields[f.key]='';}
+  });
+  /* Estrai sections wysiwyg: ## Nome → contenuto fino al prossimo ## */
+  var wysiwygFields=fieldDefs.filter(function(f){return f.type==='wysiwyg'});
+  if(wysiwygFields.length&&wysiwygFields[0].key==='body'){
+    /* Single body field: tutto il resto è body */
+    fields.body=body.replace(/^\n+/,'').trim();
+  }else{
+    wysiwygFields.forEach(function(f){
+      var re=new RegExp('^##\\s+'+f.label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*$','im');
+      var m=body.match(re);
+      if(m){
+        var start=m.index+m[0].length;
+        var nextSec=body.indexOf('\n## ',start);
+        var content=nextSec===-1?body.substring(start):body.substring(start,nextSec);
+        fields[f.key]=content.replace(/^\n+/,'').trim();
+        body=body.substring(0,m.index)+body.substring(nextSec===-1?body.length:nextSec);
+      }else{
+        fields[f.key]='';
+      }
+    });
+  }
+  return {fields:fields,body:body.replace(/^\n+/,'').trim()};
+}
+
 /* ── BUILD schede → markdown ── */
 function _stBuildSchede(data){
+  var reg=LAYOUT_REGISTRY[_current.layout];
+  var fieldDefs=(reg&&reg.fields)||[];
+  var shortFieldDefs=fieldDefs.filter(function(f){return f.type!=='wysiwyg'});
+  var wysiwygFieldDefs=fieldDefs.filter(function(f){return f.type==='wysiwyg'});
   var out='';
   if(data.intro&&data.intro.trim())out+=data.intro.trim();
   (data.cards||[]).forEach(function(c){
     if(out)out+='\n\n';
     out+='## '+(c.name||'Scheda');
     if(c.intro)out+='\n\n'+c.intro;
-    if(c.fields&&c.fields.length){
+    /* Campi strutturati tipizzati */
+    if(c.fields&&typeof c.fields==='object'&&!Array.isArray(c.fields)){
+      shortFieldDefs.forEach(function(f){
+        var val=c.fields[f.key]||'';
+        if(val)out+='\n\n- **'+f.label+':** '+val;
+      });
+      wysiwygFieldDefs.forEach(function(f){
+        var val=c.fields[f.key]||'';
+        if(val)out+='\n\n### '+f.label+'\n\n'+val;
+      });
+    }else if(c.fields&&c.fields.length){
+      /* Legacy key-value pairs */
       out+='\n\n'+c.fields.map(function(f){return '- **'+f[0]+':** '+f[1]}).join('\n');
     }
     (c.blocks||[]).forEach(function(b){
@@ -221,11 +324,34 @@ function _stBuildSchede(data){
 /* ── BUILD blocchi → markdown (formato compatibile con il sito) ── */
 function _stBuildMd(data){
   if(_stKind==='schede')return _stBuildSchede(data);
+  if(_stKind==='page')return _stBuildPage(data);
   var out='# '+(data.heading||'Divinità')+'\n\n'+(data.intro||'');
   data.cards.forEach(function(c){
     out+='\n\n---\n\n'+_stBuildCard(c);
   });
   return out;
+}
+function _stBuildPage(data){
+  var reg=LAYOUT_REGISTRY[_current.layout];
+  var fieldDefs=(reg&&reg.fields)||[];
+  var out='';
+  /* Campi short */
+  var shortFields=fieldDefs.filter(function(f){return f.type!=='wysiwyg'});
+  shortFields.forEach(function(f){
+    var val=(data.fields&&data.fields[f.key])||'';
+    if(val)out+='\n- **'+f.label+':** '+val;
+  });
+  /* Sezioni wysiwyg */
+  var wysiwygFields=fieldDefs.filter(function(f){return f.type==='wysiwyg'});
+  if(wysiwygFields.length&&wysiwygFields[0].key==='body'){
+    out+='\n\n'+(data.fields.body||'');
+  }else{
+    wysiwygFields.forEach(function(f){
+      var val=(data.fields&&data.fields[f.key])||'';
+      if(val)out+='\n\n## '+f.label+'\n\n'+val;
+    });
+  }
+  return out.replace(/^\n/,'');
 }
 function _stBuildCard(c){
   var b='# '+(c.name||'');
@@ -254,6 +380,7 @@ function _stMd(md){
 }
 function _stPreviewHTML(data){
   if(_stKind==='schede')return _stPreviewSchede(data);
+  if(_stKind==='page')return _stPreviewPage(data);
   var h='<div class="pan-page">';
   if(data.intro)h+='<div class="pan-intro">'+_stMd(data.intro)+'</div>';
   h+='<div class="pan-grid">';
@@ -277,20 +404,37 @@ function _stPreviewHTML(data){
 
 /* ── ANTEPRIMA schede (stessa resa del sito: card _renderSchede/_renderBestiario) ── */
 function _stPreviewSchede(data){
+  var reg=LAYOUT_REGISTRY[_current.layout];
+  var fieldDefs=(reg&&reg.fields)||[];
+  var shortFieldDefs=fieldDefs.filter(function(f){return f.type!=='wysiwyg'});
   var h='<div class="sch-page">';
   if(data.intro)h+='<div class="sch-intro">'+_stMd(data.intro)+'</div>';
   (data.cards||[]).forEach(function(c){
     h+='<div class="sch-card" style="margin-bottom:16px;border:1px solid var(--line);border-radius:var(--rad);padding:14px">';
     h+='<div class="sch-title" style="font-family:var(--brand);color:var(--acc2);font-size:17px;font-weight:700">'+esc(c.name)+'</div>';
     if(c.intro)h+='<div class="sch-intro" style="margin:8px 0">'+_stMd(c.intro)+'</div>';
-    if(c.fields&&c.fields.length){
+    /* Structured fields */
+    if(c.fields&&typeof c.fields==='object'&&!Array.isArray(c.fields)){
+      var hasFields=shortFieldDefs.some(function(f){return c.fields[f.key]});
+      if(hasFields){
+        h+='<div class="sch-fields" style="display:flex;flex-direction:column;gap:4px;margin:8px 0">';
+        shortFieldDefs.forEach(function(f){
+          var val=c.fields[f.key]||'';
+          if(val)h+='<div class="sch-field"><span class="sch-key" style="color:var(--acc2);font-weight:700">'+esc(f.label)+'</span> '
+            +'<span class="sch-val">'+esc(val)+'</span></div>';
+        });
+        h+='</div>';
+      }
+    }else if(c.fields&&c.fields.length){
+      /* Legacy */
       h+='<div class="sch-fields" style="display:flex;flex-direction:column;gap:4px;margin:8px 0">';
       c.fields.forEach(function(f){
-        h+='<div class="sch-field"><span class="sch-key" style="color:var(--acc2);font-weight:700">'+esc(f[0])+'</span>'
+        h+='<div class="sch-field"><span class="sch-key" style="color:var(--acc2);font-weight:700">'+esc(f[0])+'</span> '
           +'<span class="sch-val">'+esc(f[1])+'</span></div>';
       });
       h+='</div>';
     }
+    /* Legacy blocks */
     (c.blocks||[]).forEach(function(b){
       h+='<div class="sch-block-title" style="font-weight:700;color:var(--acc);margin-top:10px">'+esc(b.name)+'</div>';
       h+='<div class="sch-block-body">'+_stMd(b.md)+'</div>';
@@ -299,6 +443,12 @@ function _stPreviewSchede(data){
   });
   h+='</div>';
   return h;
+}
+
+/* ── ANTEPRIMA page (contenuto/materiale) ── */
+function _stPreviewPage(data){
+  var md=_stBuildPage(data);
+  return '<div class="sch-page">'+_stMd(md)+'</div>';
 }
 
 /* ── CARD blocco ── */
@@ -374,10 +524,66 @@ function _stCardHTML(c,i){
 
 /* ── CARD blocco — schede (titolo + intro + campi + sezioni ###) ── */
 function _stSchedeCardHTML(c,i){
-  var fields=(c.fields&&c.fields.length?c.fields:[['','']])
-    .map(function(p){return '<div class="st-kv"><input class="in k" value="'+escAttr(p[0])+'" placeholder="Chiave" oninput="_stSync()">'
-      +'<input class="in v" value="'+escAttr(p[1])+'" placeholder="Valore" oninput="_stSync()">'
-      +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Rimuovi campo" onclick="_stDelRow(this)">✕</button></div>';}).join('');
+  var reg=LAYOUT_REGISTRY[_current.layout];
+  var fieldDefs=(reg&&reg.fields)||[];
+  var shortFieldDefs=fieldDefs.filter(function(f){return f.type!=='wysiwyg'});
+  var wysiwygFieldDefs=fieldDefs.filter(function(f){return f.type==='wysiwyg'});
+  var cFields=(c.fields&&typeof c.fields==='object'&&!Array.isArray(c.fields))?c.fields:{};
+
+  var fieldsHtml='';
+  shortFieldDefs.forEach(function(f){
+    var val=cFields[f.key]||'';
+    if(f.type==='select'){
+      var opts=(f.options||[]).map(function(o){
+        return '<option value="'+escAttr(o)+'"'+(val===o?' selected':'')+'>'+esc(o)+'</option>';
+      }).join('');
+      fieldsHtml+='<label class="st-ta-l st-field-'+f.key+'">'+esc(f.label)
+        +'<select class="in cms-select" data-field-key="'+escAttr(f.key)+'" onchange="_stSync()">'
+        +'<option value="">— seleziona —</option>'+opts+'</select></label>';
+    }else if(f.type==='number'){
+      fieldsHtml+='<label class="st-ta-l st-field-'+f.key+'">'+esc(f.label)
+        +'<input class="in cms-input" type="number" data-field-key="'+escAttr(f.key)+'" value="'+escAttr(val)+'" oninput="_stSync()" placeholder="'+escAttr(f.placeholder||'0')+'"></label>';
+    }else if(f.type==='image'){
+      fieldsHtml+='<label class="st-ta-l st-field-'+f.key+'">'+esc(f.label)
+        +'<div style="display:flex;gap:6px"><input class="in cms-input" data-field-key="'+escAttr(f.key)+'" value="'+escAttr(val)+'" oninput="_stSync()" placeholder="/images/…">'
+        +'<button type="button" class="btn btn-soft btn-sm" onclick="_stPagePickImage(\''+escAttr(f.key)+'\')">🖼</button></div></label>';
+    }else{
+      fieldsHtml+='<label class="st-ta-l st-field-'+f.key+'">'+esc(f.label)
+        +'<input class="in cms-input" data-field-key="'+escAttr(f.key)+'" value="'+escAttr(val)+'" oninput="_stSync()" placeholder="'+escAttr(f.placeholder||'')+'"></label>';
+    }
+  });
+
+  var sectionsHtml='';
+  wysiwygFieldDefs.forEach(function(f){
+    var val=cFields[f.key]||'';
+    sectionsHtml+='<label class="st-ta-l st-field-'+f.key+'">'+esc(f.label)
+      +'<textarea class="in st-ta cms-wysiwyg" data-field-key="'+escAttr(f.key)+'" oninput="_stSync()" placeholder="'+escAttr(f.placeholder||'Scrivi '+f.label.toLowerCase()+'…')+'">'+esc(val)+'</textarea>'
+      +'<div class="cms-wysiwyg-tb">'
+      +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'**\',\'testo\')" title="Grassetto"><b>B</b></button>'
+      +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'*_\',\'testo\')" title="Corsivo"><i>I</i></button>'
+      +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'~~\',\'testo\')" title="Barrato"><s>S</s></button>'
+      +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'## \',\'\' )" title="Titolo">H2</button>'
+      +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'### \',\'\' )" title="Sottotitolo">H3</button>'
+      +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'- \',\'\' )" title="Lista">☰</button>'
+      +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'> \',\'\' )" title="Citazione">❝</button>'
+      +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmdLink(this)" title="Link">🔗</button>'
+      +'</div>'
+      +'</label>';
+  });
+
+  /* Legacy extra fields (not in layout definition) */
+  var legacyHtml='';
+  if(c.legacyFields&&c.legacyFields.length){
+    legacyHtml='<div class="st-sub">Campi aggiuntivi</div>'
+      +'<div class="st-kvrows" id="st-ident-'+i+'">'
+      +c.legacyFields.map(function(p){
+        return '<div class="st-kv"><input class="in k" value="'+escAttr(p[0])+'" placeholder="Campo" oninput="_stSync()">'
+          +'<input class="in v" value="'+escAttr(p[1])+'" placeholder="Valore" oninput="_stSync()">'
+          +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Rimuovi campo" onclick="_stDelRow(this)">✕</button></div>';
+      }).join('')+'</div>'
+      +'<button type="button" class="btn btn-soft btn-sm" onclick="_stAddIdent('+i+')">＋ campo aggiuntivo</button>';
+  }
+
   var blocks=(c.blocks||[]).map(function(b,j){
     return '<div class="st-block">'
       +'<div class="st-block-head"><input class="in st-bname" value="'+escAttr(b.name)+'" placeholder="Titolo sezione" oninput="_stSync()">'
@@ -385,6 +591,7 @@ function _stSchedeCardHTML(c,i){
       +'<textarea class="in st-ta st-bmd" oninput="_stSync()" placeholder="Contenuto (markdown)">'+esc(b.md)+'</textarea>'
       +'</div>';
   }).join('');
+
   return '<div class="st-card" data-i="'+i+'" draggable="true"'
     +'ondragstart="_stDragStart(event,'+i+')" ondragend="_stDragEnd(event)"'
     +'ondragover="_stDragOver(event,'+i+')" ondragleave="_stDragLeave(event,'+i+')"'
@@ -401,18 +608,17 @@ function _stSchedeCardHTML(c,i){
     +'</span></div>'
     +'<div class="st-card-body">'
     +'<label class="st-ta-l">Descrizione / intro<textarea class="in st-ta st-intro" oninput="_stSync()" placeholder="Breve descrizione della scheda…">'+esc(c.intro)+'</textarea></label>'
-    +'<div class="st-sub">Campi</div>'
-    +'<div class="st-kvrows" id="st-ident-'+i+'">'+fields+'</div>'
-    +'<button type="button" class="btn btn-soft btn-sm" onclick="_stAddIdent('+i+')">＋ campo</button>'
-    +'<div class="st-sub">Sezioni (###)</div>'
-    +'<div class="st-blockrows" id="st-blocks-'+i+'">'+blocks+'</div>'
-    +'<button type="button" class="btn btn-soft btn-sm" onclick="_stAddBlock('+i+')">＋ sezione</button>'
+    +(fieldsHtml?'<div class="st-sub">Campi</div><div class="st-cms-fields">'+fieldsHtml+'</div>':'')
+    +legacyHtml
+    +(sectionsHtml?'<div class="st-sub">Sezioni</div><div class="st-cms-sections">'+sectionsHtml+'</div>':'')
+    +blocks
     +'</div></div>';
 }
 
 /* ── RENDERING dell'editor ── */
 function _stRead(){
   if(_stKind==='schede')return _stReadSchede();
+  if(_stKind==='page')return _stReadPage();
   var heading='Divinità';
   var hd=document.getElementById('st-heading');
   if(hd&&hd.value.trim())heading=hd.value.trim();
@@ -452,12 +658,17 @@ function _stReadSchede(){
     var nv=c.querySelector('.st-name');
     var name=nv?nv.value.trim():'';
     if(!name)name='Scheda '+(idx+1);
-    var fields=[];
+    var fields={};
+    c.querySelectorAll('[data-field-key]').forEach(function(el){
+      fields[el.getAttribute('data-field-key')]=el.value;
+    });
+    /* Legacy fallback: read generic key-value pairs */
+    var legacyFields=[];
     c.querySelectorAll('.st-kv').forEach(function(kv){
       var ke=kv.querySelector('.k');
       var ve=kv.querySelector('.v');
       var k=ke?ke.value.trim():'';
-      if(k)fields.push([k,ve?ve.value.trim():'']);
+      if(k)legacyFields.push([k,ve?ve.value.trim():'']);
     });
     var blocks=[];
     c.querySelectorAll('.st-block').forEach(function(b){
@@ -466,19 +677,27 @@ function _stReadSchede(){
       if(bn||bm)blocks.push({name:bn||'Sezione',md:bm});
     });
     var introEl=c.querySelector('.st-intro');
-    cards.push({name:name,intro:introEl?introEl.value:'',fields:fields,blocks:blocks});
+    cards.push({name:name,intro:introEl?introEl.value:'',fields:fields,legacyFields:legacyFields,blocks:blocks});
   });
   var pageIntro=document.getElementById('st-schede-intro');
   return {heading:'',intro:pageIntro?(pageIntro.value||''):'',cards:cards};
 }
+function _stReadPage(){
+  var fields={};
+  document.querySelectorAll('#st-page-fields [data-field-key]').forEach(function(el){
+    fields[el.getAttribute('data-field-key')]=el.value;
+  });
+  return {fields:fields};
+}
 function _stRender(data){
+  if(_stKind==='page')return;
   var collapsed=[];
   document.querySelectorAll('#st-list .st-card.closed').forEach(function(c){
     collapsed.push(+(c.getAttribute('data-i')||0));
   });
   var grid=document.getElementById('st-grid');
   if(!grid)return;
-  grid.innerHTML=data.cards.map(function(c,i){return _stCardHTML(c,i)}).join('');
+  grid.innerHTML=(data.cards||[]).map(function(c,i){return _stCardHTML(c,i)}).join('');
   if(collapsed.length){
     var cards=grid.querySelectorAll('.st-card');
     for(var j=0;j<cards.length;j++){
@@ -493,8 +712,6 @@ function _stCommit(data){
   if(e){e.value=md;_lastSavedContent=md;}
   _modified=true;setBadge('dirty','modificato');
   try{_autosaveStore(md)}catch(e2){}
-  var st=document.getElementById('e-stats');
-  if(st)st.textContent=data.cards.length+' blocchi';
   _stShowWarnings(data);
 }
 function _stCommitSilent(data){
@@ -553,28 +770,37 @@ function initStructuredEditor(content){
   var sl=document.getElementById('st-list');if(sl)sl.style.display='';
   var head=document.getElementById('struct-head');
   if(head){
-    head.innerHTML=_stKind==='schede'
-      ?_stSchedeIntroHTML(data)
-      :'<div class="st-intro-box">'
+    if(_stKind==='page'){
+      head.innerHTML=_stPageFormHTML(data);
+    }else if(_stKind==='schede'){
+      head.innerHTML=_stSchedeIntroHTML(data);
+    }else{
+      head.innerHTML='<div class="st-intro-box">'
         +'<label class="st-ta-l">Titolo introduzione<input class="in" id="st-heading" value="'+escAttr(data.heading)+'" style="max-width:220px" oninput="_stSync()"></label>'
         +'<label class="st-ta-l">Testo introduttivo (prima della griglia)<textarea class="in st-ta" id="st-intro" oninput="_stSync()" placeholder="Introduzione al pantheon…">'+esc(data.intro)+'</textarea></label>'
         +'</div>';
+    }
   }
-  _stRender(data);
-  if(data.cards.length>5){
-    _stCollapseAll(true);
-    var first=document.querySelector('#st-list .st-card');
-    if(first)first.classList.remove('closed');
+  if(_stKind==='page'){
+    if(sl)sl.style.display='none';
+  }else{
+    _stRender(data);
+    if(data.cards&&data.cards.length>5){
+      _stCollapseAll(true);
+      var first=document.querySelector('#st-list .st-card');
+      if(first)first.classList.remove('closed');
+    }
   }
   _stHistory=[];
   _stHistoryIdx=-1;
   _stPushUndo();
   document.addEventListener('keydown',_stKeyHandler);
   var ph=document.querySelector('#md-pane .pane-head');
-  if(ph)ph.innerHTML='Blocchi <span class="ph-info" id="e-stats"></span>'
-    +'<input id="st-filter" class="in" placeholder="Filtra blocchi…" oninput="stFilter(this.value)" style="max-width:150px;margin-right:8px">'
-    +'<button type="button" class="btn btn-soft btn-sm" title="Comprimi tutte le card" onclick="_stCollapseAll(true)">⤴ Comprimi</button>'
-    +'<button type="button" class="btn btn-soft btn-sm" title="Espandi tutte le card" onclick="_stCollapseAll(false)">⤵ Espandi</button>';
+  var kindLabel=_stKind==='page'?'form CMS':(_stKind==='schede'?'schede a card':'griglia divinità');
+  if(ph)ph.innerHTML='Editor <span class="ph-info" id="e-stats"></span>'
+    +(_stKind!=='page'?'<input id="st-filter" class="in" placeholder="Filtra schede…" oninput="stFilter(this.value)" style="max-width:150px;margin-right:8px">'
+      +'<button type="button" class="btn btn-soft btn-sm" title="Comprimi tutte le card" onclick="_stCollapseAll(true)">⤴ Comprimi</button>'
+      +'<button type="button" class="btn btn-soft btn-sm" title="Espandi tutte le card" onclick="_stCollapseAll(false)">⤵ Espandi</button>':'');
   var wb=document.getElementById('md-pane');
   var wtb=document.getElementById('e-toolbar');
   if(wb&&wtb&&wtb.parentNode===wb&&!document.getElementById('st-warn')){
@@ -599,9 +825,9 @@ function initStructuredEditor(content){
       +'<span class="tb-sep2"></span>'
       +'<button class="btn btn-soft btn-sm" onclick="_stToggle()" title="Passa al markdown grezzo">✍ Markdown</button>'
       +(_stKind==='schede'
-        ?'<button class="btn btn-p btn-sm" onclick="_stAdd(\'card\')">➕ Scheda</button>'
-        :'<button class="btn btn-p btn-sm" onclick="_stAdd(\'deity\')">➕ '+_stEntLabel().charAt(0).toUpperCase()+_stEntLabel().slice(1)+'</button>'
-         +'<button class="btn btn-soft btn-sm" onclick="_stAdd(\'section\')">➕ Sezione</button>')
+        ?'<button class="btn btn-p btn-sm" onclick="_stAdd(\'card\')">➕ '+_stEntLabel()+'</button>'
+        :(_stKind==='page'?'':'<button class="btn btn-p btn-sm" onclick="_stAdd(\'deity\')">➕ Divinità</button>'
+         +'<button class="btn btn-soft btn-sm" onclick="_stAdd(\'section\')">➕ Sezione</button>'))
       +'<span class="tb-spacer"></span>'
       +'<div class="undo-redo-group">'
       +'<button class="btn btn-soft btn-icon btn-sm" id="st-undo-btn" onclick="_stUndo()" title="Annulla (Ctrl+Z)" disabled>↶</button>'
@@ -610,27 +836,132 @@ function initStructuredEditor(content){
       +'</div>'
       +'<span class="tb-sep2"></span>'
       +'<span class="view-switch">'
-      +'<button class="tb-btn2" data-view="md" title="Solo blocchi">SCRIVI</button>'
+      +'<button class="tb-btn2" data-view="md" title="Solo editor">SCRIVI</button>'
       +'<button class="tb-btn2" data-view="pv" title="Solo anteprima">VEDI</button>'
       +'<button class="tb-btn2" data-view="site" title="Come appare sul sito">SITO</button>'
       +'</span></div>';
   }
   var sb=document.getElementById('e-sb');
-  if(sb)sb.textContent=_layoutLabel(_current.layout)+' · editor a blocchi · '+
-    (_stKind==='schede'?'schede a card':'griglia divinità');
+  if(sb)sb.textContent=_layoutLabel(_current.layout)+' · editor CMS · '+kindLabel;
   _stSync();
 }
 /* Header schede: il campo "testo introduttivo" è mostrato solo per i layout
    che sul sito renderizzano markdown pieno (non-schede nativi), dove il testo
    prima di ## viene effettivamente renderizzato. */
 function _stSchedeIntroHTML(data){
+  var reg=LAYOUT_REGISTRY[_current.layout];
   var native=_ST_SCHE_LAYOUTS.indexOf(_current.layout)!==-1;
   if(native){
-    return '<div class="st-intro-box"><p class="st-hint" style="margin:0">Schede a card: ogni scheda ha titolo, descrizione, campi e sezioni. L\'anteprima e il salvataggio usano il formato del sito (<code>## Titolo</code> + <code>- **Chiave:** valore</code> + <code>### Sezione</code>).</p></div>';
+    return '<div class="st-intro-box"><p class="st-hint" style="margin:0">Editor CMS schede: ogni scheda ha campi strutturati + sezioni testo. Formato compatibile con il sito.</p></div>';
   }
   return '<div class="st-intro-box">'
     +'<label class="st-ta-l">Testo introduttivo (prima delle schede)<textarea class="in st-ta" id="st-schede-intro" oninput="_stSync()" placeholder="Testo prima della prima scheda…">'+esc(data.intro)+'</textarea></label>'
-    +'<p class="st-hint" style="margin:0">L\'editor a blocchi di questa pagina usa card generiche: <code>## Titolo</code> + <code>- **Chiave:** valore</code> + <code>### Sezione</code>, formattazione markdown pienamente compatibile col sito. Il testo sopra compare prima delle card.</p></div>';
+    +'<p class="st-hint" style="margin:0">Il testo sopra compare prima delle schede. Ogni scheda ha campi strutturati + sezioni testo lungo.</p></div>';
+}
+
+/* ── FORM HTML per pagina singola (contenuto/materiale) ── */
+function _stPageFormHTML(data){
+  var reg=LAYOUT_REGISTRY[_current.layout];
+  var fieldDefs=(reg&&reg.fields)||[];
+  var h='<div class="st-page-form" id="st-page-fields">';
+  h+='<p class="st-hint" style="margin:0 0 12px">Modifica i campi strutturati. Il contenuto viene salvato come Markdown compatibile con il sito.</p>';
+  fieldDefs.forEach(function(f){
+    var val=(data.fields&&data.fields[f.key])||'';
+    if(f.type==='wysiwyg'){
+      h+='<label class="st-ta-l">'+esc(f.label)
+        +'<textarea class="in st-ta cms-wysiwyg" data-field-key="'+escAttr(f.key)+'" oninput="_stSync()" placeholder="'+escAttr(f.placeholder||'Scrivi '+f.label.toLowerCase()+'…')+'">'+esc(val)+'</textarea>'
+        +'<div class="cms-wysiwyg-tb">'
+        +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'**\',\'testo\')" title="Grassetto"><b>B</b></button>'
+        +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'*_\',\'testo\')" title="Corsivo"><i>I</i></button>'
+        +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'~~\',\'testo\')" title="Barrato"><s>S</s></button>'
+        +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'## \',\'\' )" title="Titolo">H2</button>'
+        +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'### \',\'\' )" title="Sottotitolo">H3</button>'
+        +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'- \',\'\' )" title="Lista">☰</button>'
+        +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmd(this,\'> \',\'\' )" title="Citazione">❝</button>'
+        +'<button type="button" class="tb-fmt" onclick="_stWysiwygCmdLink(this)" title="Link">🔗</button>'
+        +'</div>'
+        +'</label>';
+    }else if(f.type==='select'){
+      var opts=(f.options||[]).map(function(o){
+        return '<option value="'+escAttr(o)+'"'+(val===o?' selected':'')+'>'+esc(o)+'</option>';
+      }).join('');
+      h+='<label class="st-ta-l">'+esc(f.label)
+        +'<select class="in cms-select" data-field-key="'+escAttr(f.key)+'" onchange="_stSync()">'
+        +'<option value="">— seleziona —</option>'+opts+'</select></label>';
+    }else if(f.type==='number'){
+      h+='<label class="st-ta-l">'+esc(f.label)
+        +'<input class="in cms-input" type="number" data-field-key="'+escAttr(f.key)+'" value="'+escAttr(val)+'" oninput="_stSync()" placeholder="'+escAttr(f.placeholder||'0')+'"></label>';
+    }else if(f.type==='image'){
+      h+='<label class="st-ta-l">'+esc(f.label)
+        +'<div style="display:flex;gap:6px"><input class="in cms-input" data-field-key="'+escAttr(f.key)+'" value="'+escAttr(val)+'" oninput="_stSync()" placeholder="/images/…">'
+        +'<button type="button" class="btn btn-soft btn-sm" onclick="_stPagePickImage(\''+escAttr(f.key)+'\')">🖼</button></div></label>';
+    }else{
+      h+='<label class="st-ta-l">'+esc(f.label)
+        +'<input class="in cms-input" data-field-key="'+escAttr(f.key)+'" value="'+escAttr(val)+'" oninput="_stSync()" placeholder="'+escAttr(f.placeholder||'')+'"></label>';
+    }
+  });
+  h+='</div>';
+  return h;
+}
+
+/* WYSIWYG command helper for page form */
+function _stWysiwygCmd(btn,wrap,placeholder){
+  var ta=btn.closest('.st-ta-l').querySelector('textarea');
+  if(!ta)return;
+  var start=ta.selectionStart,end=ta.selectionEnd,sel=ta.value.substring(start,end);
+  var insert=sel?(wrap+sel+wrap):wrap+placeholder+wrap;
+  ta.value=ta.value.substring(0,start)+insert+ta.value.substring(end);
+  ta.setSelectionRange(start+wrap.length,sel?start+wrap.length+sel.length:start+wrap.length+placeholder.length);
+  ta.focus();_stSync();
+}
+function _stWysiwygCmdLink(btn){
+  var ta=btn.closest('.st-ta-l').querySelector('textarea');
+  if(!ta)return;
+  var start=ta.selectionStart,end=ta.selectionEnd,sel=ta.value.substring(start,end);
+  var url=prompt('URL del link:','https://');
+  if(!url)return;
+  var insert='['+(sel||'testo')+']('+url+')';
+  ta.value=ta.value.substring(0,start)+insert+ta.value.substring(end);
+  ta.setSelectionRange(start+insert.length,start+insert.length);
+  ta.focus();_stSync();
+}
+function _stPagePickImage(fieldKey){
+  /* Reuse the same image picker as pantheon */
+  var input=document.querySelector('[data-field-key="'+fieldKey+'"]');
+  if(!input)return;
+  if(document.getElementById('st-pick-modal'))return;
+  modalHtml('st-pick-modal','🖼 Scegli immagine',
+    '<div class="fld"><label>URL diretto</label><div style="display:flex;gap:6px"><input id="st-pick-url" class="in" placeholder="/images/… oppure https://…" onkeydown="if(event.key===\'Enter\')stPagePickUrl(\''+escJsAttr(fieldKey)+'\')">'
+    +'<button class="btn btn-p btn-sm" onclick="stPagePickUrl(\''+escJsAttr(fieldKey)+'\')">Usa</button></div></div>'
+    +'<div class="or">oppure scegli dall\'archivio</div>'
+    +'<div class="pick-grid" id="st-pick-grid"><div class="list-empty">Caricamento…</div></div>',
+    '<button class="btn btn-soft" onclick="closeModal(\'st-pick-modal\')">Annulla</button>');
+  ghGet('images').then(function(list){
+    var items=Array.isArray(list)?list:[];
+    var grid=document.getElementById('st-pick-grid');
+    if(!grid)return;
+    if(!items.length){grid.innerHTML='<div class="list-empty">Nessuna immagine in /images/</div>';return}
+    grid.innerHTML=items.map(function(it){
+      return '<div class="pick-item" onclick="stPagePickChoose(\''+escJsAttr(fieldKey)+'\',\''+escJsAttr(it.name)+'\')">'
+        +'<img class="pick-thumb" src="'+escAttr(it.download_url||'')+'" alt="'+escAttr(it.name)+'" loading="lazy">'
+        +'<div class="pick-name">'+esc(it.name)+'</div></div>';
+    }).join('');
+  }).catch(function(e){
+    var grid=document.getElementById('st-pick-grid');
+    if(grid)grid.innerHTML='<div class="list-empty">Errore: '+esc(e.message)+'</div>';
+  });
+}
+function stPagePickChoose(fieldKey,name){
+  var input=document.querySelector('[data-field-key="'+fieldKey+'"]');
+  if(input){input.value='/images/'+name;_stSync();}
+  closeModal('st-pick-modal');
+}
+function stPagePickUrl(fieldKey){
+  var url=(document.getElementById('st-pick-url').value||'').trim();
+  if(!url){toast('Inserisci un URL','error');return}
+  var input=document.querySelector('[data-field-key="'+fieldKey+'"]');
+  if(input){input.value=url;_stSync();}
+  closeModal('st-pick-modal');
 }
 
 function _stToggle(){
@@ -657,12 +988,16 @@ function _stFocusedIdx(){
   return card?+(card.getAttribute('data-i')||0):-1;
 }
 function _stKeyAdd(){
+  if(_stKind==='page')return;
   _stPushUndo();
   var idx=_stFocusedIdx();
   var data=_stRead();
   if(_stKind==='schede'){
-    var tmpl=_stTemplateFields();
-    data.cards.splice(idx>=0?idx+1:data.cards.length,0,{name:'Nuova scheda',intro:'',fields:tmpl,blocks:[]});
+    var reg=LAYOUT_REGISTRY[_current.layout];
+    var fields=(reg&&reg.fields)||[];
+    var newFields={};
+    fields.forEach(function(f){newFields[f.key]='';});
+    data.cards.splice(idx>=0?idx+1:data.cards.length,0,{name:'Nuova '+_stEntLabel(),intro:'',fields:newFields,blocks:[]});
   }else{
     var type='deity';
     if(idx>=0&&data.cards[idx]&&!data.cards[idx].deity)type='section';
@@ -708,6 +1043,7 @@ function _stExit(){
 /* ── VALIDAZIONE E AVVISI ── */
 function _stValidate(data){
   var warn=[];
+  if(_stKind==='page')return warn;
   var seen={};
   (data.cards||[]).forEach(function(c){
     var n=(c.name||'').trim();
@@ -719,11 +1055,21 @@ function _stValidate(data){
     var n=(c.name||'').trim()||'blocco '+(i+1);
     if(!(c.name||'').trim())warn.push('Il blocco '+(i+1)+' non ha un nome');
     else if(seen[(c.name||'').trim()]>1)warn.push('«'+c.name.trim()+'» è ripetuto '+seen[(c.name||'').trim()]+' volte');
-    if(_stKind!=='schede'&&c.type==='deity'&&!c.img)warn.push('«'+(c.name||'').trim()+'» è un '+_stEntLabel()+' ma non ha immagine');
+    if(_stKind!=='schede'&&c.type==='deity'&&!c.img)warn.push('«'+(c.name||'').trim()+'» è una divinità ma non ha immagine');
     if(_stKind==='schede'&&!_stCardHasContent(c))warn.push('La scheda «'+n+'» è vuota');
     if(_stKind==='schede'&&c.fields&&reqFields.length){
       reqFields.forEach(function(rf){
-        var found=c.fields.some(function(f){return(f[0]||'').toLowerCase()===rf.toLowerCase()&&(f[1]||'').trim()});
+        var found=false;
+        if(typeof c.fields==='object'&&!Array.isArray(c.fields)){
+          /* New format: find field by key matching label */
+          var fieldDefs=(reg&&reg.fields)||[];
+          fieldDefs.forEach(function(f){
+            if(f.label.toLowerCase()===rf.toLowerCase()&&(c.fields[f.key]||'').trim())found=true;
+          });
+        }else if(c.fields&&c.fields.length){
+          /* Legacy format */
+          found=c.fields.some(function(f){return(f[0]||'').toLowerCase()===rf.toLowerCase()&&(f[1]||'').trim()});
+        }
         if(!found)warn.push('«'+n+'» manca il campo obbligatorio «'+rf+'»');
       });
     }
@@ -734,7 +1080,8 @@ function _stShowWarnings(data){
   var w=document.getElementById('st-warn');
   var st=document.getElementById('e-stats');
   var warn=_stValidate(data);
-  if(st)st.textContent=data.cards.length+' blocchi'+(warn.length?' · '+warn.length+' avvisi':'');
+  var countLabel=_stKind==='page'?'form':data.cards.length+' schede';
+  if(st)st.textContent=countLabel+(warn.length?' · '+warn.length+' avvisi':'');
   if(w){
     if(!warn.length){w.style.display='none';return}
     w.style.display='block';
@@ -746,7 +1093,14 @@ function _stCardHasContent(c){
   if((c.name||'').trim()||(c.intro||'').trim()||(c.extra||'').trim()||(c.quote||'').trim()||(c.personality||'').trim()||(c.cult||'').trim())return true;
   if(c.img)return true;
   if(c.ident&&c.ident.some(function(p){return p[0]||p[1]}))return true;
-  if(c.fields&&c.fields.some(function(p){return p[0]||p[1]}))return true;
+  if(c.fields){
+    if(Array.isArray(c.fields)){
+      if(c.fields.some(function(p){return p[0]||p[1]}))return true;
+    }else if(typeof c.fields==='object'){
+      if(Object.keys(c.fields).some(function(k){return c.fields[k]}))return true;
+    }
+  }
+  if(c.legacyFields&&c.legacyFields.some(function(p){return p[0]||p[1]}))return true;
   if(c.blocks&&c.blocks.some(function(b){return (b.name||'').trim()||(b.md||'').trim()}))return true;
   return false;
 }
@@ -796,10 +1150,15 @@ function _stCollapseAll(closed){
   });
 }
 function _stAdd(type){
+  if(_stKind==='page')return;
   _stPushUndo();
   var data=_stRead();
   if(_stKind==='schede'){
-    data.cards.push({name:'Nuova scheda',intro:'',fields:_stTemplateFields(),blocks:[]});
+    var reg=LAYOUT_REGISTRY[_current.layout];
+    var fields=(reg&&reg.fields)||[];
+    var newFields={};
+    fields.forEach(function(f){newFields[f.key]='';});
+    data.cards.push({name:'Nuova '+_stEntLabel(),intro:'',fields:newFields,blocks:[]});
   }else{
     data.cards.push({type:type,deity:type==='deity'||undefined,name:type==='section'?'Nuova sezione':_stEntName(),
       img:type==='deity'?'':'',quote:'',

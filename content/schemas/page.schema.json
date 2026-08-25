@@ -10,7 +10,7 @@
     "title": { "type": "string", "minLength": 1 },
     "icon": { "type": "string" },
     "content": { "type": "string" },
-    "layout": { "type": "string", "enum": ["", "generico", "lore", "regole", "lavoro", "personaggio", "materiale", "wide", "pantheon", "bestiario", "timeline", "fazioni", "oggetti", "glossario", "galleria", "tabelle", "sessione", "quest", "npc", "spell", "specie", "citta", "evento"] },
+    "layout": { "type": "string", "enum": ["", "contenuto", "luoghi", "cronache", "personaggio", "bestiario", "oggetti", "fazioni", "materiale", "pantheon", "generico", "lore", "regole", "lavoro", "wide", "timeline", "glossario", "galleria", "tabelle", "sessione", "quest", "npc", "spell", "specie", "citta", "evento"] },
     "lastModified": { "type": "string", "format": "date-time" }
   },
   "additionalProperties": true

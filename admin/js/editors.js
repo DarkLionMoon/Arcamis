@@ -1,79 +1,167 @@
 /* ════════════════════════════════════════════════════════════════
    ARCAMIS ADMIN — editors.js
-   Editor pagine (Markdown/anteprima/JSON), immagine/emoji/tabella,
-   nuova pagina, rinomina, elimina, storia, link checker, URL pulito,
-   gestione immagini e editor Mestieri. (v2)
+   Editor CMS con campi strutturati + WYSIWYG per i campi
+   testo lungo. 9 layout (pantheon invariato). (v3)
    ════════════════════════════════════════════════════════════════ */
 
-/* ── LAYOUT E TEMPLATE (unificati) ── */
-var LAYOUT_REGISTRY={
-  generico:{v:'generico',l:'Generico — Markdown semplice',i:'📄',
-    template:'## Introduzione\n\nTesto introduttivo della pagina.\n\n## Sezione 1\n\nContenuto della prima sezione.\n\n## Sezione 2\n\n- Elemento 1\n- Elemento 2\n- Elemento 3\n\n> Questa è una citazione importante.\n\n---\n\n## Sezione 3\n\nAltro contenuto qui.',
-    blockFields:['Titolo','Sottotitolo'],requiredFields:[]},
-  lore:{v:'lore',l:'Lore / Luoghi — Card sezioni',i:'🏰',
-    template:'## Introduzione\n\n> Breve descrizione del luogo, atmosfera e cosa lo rende speciale.\n\n## Geografia\n\nDescrizione del territorio, clima, paesaggio.\n\n## Abitanti\n\n- Chi vive qui, culture, usanze.\n\n## Storia\n\nEventi importanti che hanno plasmato il luogo.\n\n## Segreti\n\nDettagli nascosti, leggende, misteri.\n\n## Collegamenti\n\nCome si collega alle altre zone del mondo.',
-    blockFields:['Nome','Tipo','Popolazione'],requiredFields:['Nome']},
-  regole:{v:'regole',l:'Regole / Gameplay — Intro + card',i:'📜',
-    template:'> Riepilogo generale delle regole in una frase.\n\n1) Prima regola breve\n2) Seconda regola breve\n3) Terza regola breve\n\n[📄 Regole in-game]\n[📄 Regole off-game]\n[📄 PVP]\n\n---\n\n### Regola 1\n\nDescrizione dettagliata della prima regola.\n\n### Regola 2\n\nDescrizione dettagliata della seconda regola.\n\n### Eccezioni\n\n- Eccezione 1\n- Eccezione 2\n\n### Esempio\n\n> Esempio pratico di come funziona la regola in gioco.',
-    blockFields:['Titolo','Categoria','Priorità'],requiredFields:['Titolo']},
-  lavoro:{v:'lavoro',l:'Lavoro — Titolo + sezioni griglia',i:'🗡️',
-    template:'# Nome del Lavoro\n\nDescrizione generale del lavoro, atmosfera e regole base.\n\n---\n\n## Stipendio\n\nLo stipendio dipende da:\n\nA) Livello del PG\n\n> • Apprendista (Livelli 1-5) = 15 mo base\n> • Professionista (Livelli 6-12) = 25 mo base\n> • Mastro (Livelli 13-20) = 35 mo base\n\nB) Giorni di lavoro\n\n> • I primi 5 giorni: stipendio base\n> • Dopo 5 giorni: bonus stock extra\n\nC) Modificatore caratteristica\n\n> • **INT** o **CHA** a seconda del lavoro\n\n## Requisiti\n\n- Requisito 1\n- Requisito 2\n- Requisito 3\n\n## Regole\n\n- Regola 1\n- Regola 2',
-    blockFields:['Nome','Stipendio base','Requisiti'],requiredFields:['Nome']},
-  personaggio:{v:'personaggio',l:'Personaggio — Step numerati',i:'🌟',
-    template:'> Introduzione al processo di creazione del personaggio.\n\n---\n\n### Scegli la specie\n\n- Opzione 1\n- Opzione 2\n- Opzione 3\n\n### Scegli la classe\n\n- Opzione 1\n- Opzione 2\n- Opzione 3\n\n### Definisci il background\n\nDescrizione del background del personaggio.\n\n### Scegli i tratti\n\n- Tratto 1\n- Tratto 2\n- Tratto 3',
-    blockFields:['Titolo','Passo','Descrizione'],requiredFields:['Titolo']},
-  materiale:{v:'materiale',l:'Materiale — Grid classi',i:'📋',
-    template:'## Specie\n\n- Umano (PHB)\n- Elfo (PHB)\n- Mezzorco (PHB)\n\n## Classi\n\n- Barbarian (PHB)\n- Berserker (PHB)\n- Totem Warrior (PHB)\n\n- Fighter (PHB)\n- Champion (PHB)\n- Battle Master (PHB)\n\n## Talenti\n\n- Talento 1 (PHB)\n- Talento 2 (XGE)\n- Talento 3 (TCE)\n\n## Spell\n\n- Spell 1 (PHB)\n- Spell 2 (XGE)\n- Spell 3 (TCE)\n\n> 💡 Nota su eventuali restrizioni o materiale non approvato.',
-    blockFields:['Nome','Fonte','Categoria'],requiredFields:['Nome']},
-  wide:{v:'wide',l:'Wide — Larghezza piena',i:'↔️',
-    template:'## Sezione 1\n\nContenuto che beneficia della larghezza piena (tabelle, mappe, colonne).\n\n> Usa il pulsante 🖼 della toolbar per inserire una mappa o un\'immagine a larghezza piena.\n\n## Tabella\n\n| Colonna 1 | Colonna 2 | Colonna 3 |\n|---|---|---|\n| Dato 1 | Dato 2 | Dato 3 |\n| Dato 4 | Dato 5 | Dato 6 |\n\n## Sezione 2\n\nAltro contenuto qui.',
-    blockFields:['Titolo','Descrizione'],requiredFields:[]},
-  pantheon:{v:'pantheon',l:'Pantheon — Griglia divinità',i:'🛐',
-    template:'Divinità\n\nBreve introduzione al pantheon del tuo mondo: come sono visti gli dei, cosa fanno e cosa si aspettano dai mortali.\n\n---\n\n# Nome della Divinità\n\n![](/images/nome-divinita.jpg)\n\n> Citazione rappresentativa - Nome\n\n## Identità\n\n- **Nome:** Vero nome\n- **Epiteto:** Titolo onorifico\n- **Allineamento:** Legale Buono\n- **Sfere:** Guerra, Onore\n- **Simbolo:** Descrizione del simbolo\n\n## Personalità\n\nTratti caratteriali, modi di fare.\n\n## Culto\n\n- **Tempio:** Tipo di tempio\n- **Rituali:** Cerimonie principali\n- **Seguaci:** Chi lo/la adora\n\n---\n\n# Seconda Divinità\n\n![](/images/seconda-divinita.jpg)\n\n> Citazione - Seconda\n\n## Identità\n\n- **Nome:** Vero nome\n- **Epiteto:** Titolo onorifico\n- **Allineamento:** Caotico Buono\n- **Sfere:** Conoscenza, Tempesta\n- **Simbolo:** Descrizione del simbolo\n\n## Personalità\n\nDa scrivere\n\n## Culto\n\n- **Tempio:** Tipo di tempio\n- **Rituali:** Cerimonie principali\n- **Seguaci:** Chi lo/la adora\n\n---\n\n# Altre Figure\n\nI blocchi che iniziano con # ma NON hanno immagine diventano sezioni a tutta larghezza (es. gli Aspetti).',
-    blockFields:['Nome','Razza','Classe / Livello','Allineamento'],requiredFields:['Nome']},
-  bestiario:{v:'bestiario',l:'Bestiario — Schede mostri',i:'🐉',
-    template:'## Nome del Mostro\n\nBreve descrizione, habitat, pericolosita.\n\n- **Tipo:** Aberrazione\n- **Taglia:** Media\n- **Allineamento:** Qualsiasi\n- **CA:** 15\n- **PF:** 45 (10d10+10)\n- **Velocita:** 30 ft\n\n### Statistiche\n\n- **For:** 16 (+3)\n- **Des:** 14 (+2)\n- **Cos:** 15 (+2)\n- **Int:** 10 (+0)\n- **Sag:** 12 (+1)\n- **Car:** 8 (-1)\n\n### Abilita\n\n- **Percezione passiva:** 12\n- **Linguaggi:** Comune\n\n### Azioni\n\n- **Attacco:** +5, 1d8+3 taglio\n\n### Leggenda\n\n- Leggenda o folklore legato al mostro.',
-    blockFields:['Nome','Tipo','CR','Allineamento'],requiredFields:['Nome','CR']},
-  timeline:{v:'timeline',l:'Timeline — Eventi cronologici',i:'📅',
-    template:'## Cronologia\n\n> Introduzione al periodo storico.\n\n### Anno 0\n\n- **Evento 1:** Descrizione dell\'evento\n- **Evento 2:** Descrizione dell\'evento\n\n### Anno 100\n\n- **Evento 3:** Descrizione dell\'evento\n- **Evento 4:** Descrizione dell\'evento\n\n### Anno 200\n\n- **Evento 5:** Descrizione dell\'evento\n\n## Conseguenze\n\nImpatto degli eventi sul mondo.',
-    blockFields:['Epoca','Anno','Evento'],requiredFields:['Evento']},
-  fazioni:{v:'fazioni',l:'Fazioni — Organizzazioni',i:'🏴',
-    template:'## Nome della Fazione\n\nDescrizione introduttiva e obiettivi generali.\n\n- **Simbolo:** Descrizione del simbolo\n- **Sede:** Luogo principale\n- **Motto:** Frase rappresentativa\n- **Membri:** Numero e reclutamento\n\n### Struttura\n\n- **Leader:** Nome e ruolo\n- **Ranghi:** Come sono organizzati\n\n### Obiettivi\n\n- Obiettivo 1\n- Obiettivo 2\n- Obiettivo 3\n\n### Alleati e Nemici\n\n- **Alleati:** Chi supporta la fazione\n- **Nemici:** Chi si oppone\n\n### Storia\n\nCome e nata la fazione, eventi chiave.',
-    blockFields:['Nome','Ideologia','Membri','Base'],requiredFields:['Nome']},
-  oggetti:{v:'oggetti',l:'Oggetti — Equipaggiamento',i:'⚔️',
-    template:'## Nome dell\'Oggetto\n\nDescrizione generale dell\'oggetto.\n\n- **Tipo:** Arma\n- **Rarita:** Raro\n- **Attunamento:** Si\n- **Manuale:** Nome del manuale\n\n### Effetto\n\nDescrizione dell\'effetto magico.\n\n### Limitazioni\n\n- Limite 1\n- Limite 2\n\n### Storia\n\nOrigine e leggenda dell\'oggetto.',
-    blockFields:['Nome','Tipo','Proprietà','Note'],requiredFields:['Nome']},
-  glossario:{v:'glossario',l:'Glossario — Termini e definizioni',i:'📖',
-    template:'## A\n\n### Aberrazione\n\nCreatura non naturale, spesso aliena o magica.\n\n### Allineamento\n\nLa posizione morale e filosofica di un personaggio.\n\n## B\n\n### Bestia\n\nCreatura animale, priva di magia.\n\n### Background\n\nIl passato del personaggio prima dell\'avventura.',
-    blockFields:['Termine','Definizione','Categoria'],requiredFields:['Termine']},
-  galleria:{v:'galleria',l:'Galleria — Griglia immagini',i:'🖼️',
-    template:'## Raccolta\n\nIntroduzione alla galleria.\n\n### Personaggi\n\n- Nome del personaggio — Descrizione breve\n- Nome del personaggio — Descrizione breve\n\n### Luoghi\n\n- Nome del luogo — Descrizione breve\n\n### Oggetti\n\n- Nome dell\'oggetto — Descrizione breve',
-    blockFields:['Titolo','Descrizione','Immagine'],requiredFields:[]},
-  tabelle:{v:'tabelle',l:'Tabelle — Dati strutturati',i:'📊',
-    template:'## Tabella 1\n\nDescrizione della tabella.\n\n| Colonna 1 | Colonna 2 | Colonna 3 |\n|---|---|---|\n| Dato 1 | Dato 2 | Dato 3 |\n| Dato 4 | Dato 5 | Dato 6 |\n\n## Tabella 2\n\n| Colonna A | Colonna B |\n|---|---|\n| Valore 1 | Valore 2 |\n| Valore 3 | Valore 4 |',
-    blockFields:['Titolo','Colonne','Righe'],requiredFields:['Titolo']},
-  sessione:{v:'sessione',l:'Sessione / Diario — Cronache di gioco',i:'📜',
-    template:'## Sessione 1 — Nome dell\'evento\n\nRiassunto della sessione in una o due frasi.\n\n- **Data:** [data]\n- **Luogo:** [luogo]\n- **Party:** Nome, Nome, Nome\n- **XP guadagnati:** [totale]\n\n### Riassunto\n\nResoconto dettagliato degli eventi della sessione.\n\n### Eventi chiave\n\n- Evento 1\n- Evento 2\n- Evento 3\n\n### Hook per la prossima volta\n\n- Filo narrativo lasciato aperto\n- Possibili sviluppi futuri',
-    blockFields:['Titolo','Data','Partecipanti','Luogo'],requiredFields:['Titolo']},
-  quest:{v:'quest',l:'Quest / Missioni — Schede incarichi',i:'🎯',
-    template:'## Nome della Quest\n\nDescrizione della missione.\n\n- **Stato:** In corso / Completata / Fallita\n- **Fornitore:** Nome del PNG\n- **Ricompensa:** Oro, oggetti, favori\n- **Localita:** Dove si svolge\n- **Difficolta:** Bassa / Media / Alta\n\n### Obiettivo\n\nDescrizione dell\'obiettivo principale.\n\n### Passi\n\n- Passo 1\n- Passo 2\n- Passo 3\n\n### Risvolti\n\n- Conseguenze o sviluppi inattesi',
-    blockFields:['Titolo','Tipo','Premio','Stato'],requiredFields:['Titolo']},
-  npc:{v:'npc',l:'NPC / PNG — Schede personaggi',i:'🧙',
-    template:'## Nome del PNG\n\nBreve descrizione del personaggio.\n\n- **Specie:** Elfo, Umano...\n- **Ruolo:** Mercante, Guardia...\n- **Allineamento:** Neutrale Buono\n- **Luogo:** Dove si trova\n- **Occupazione:** Cosa fa\n\n### Aspetto\n\nDescrizione fisica.\n\n### Personalita\n\nTratti caratteriali, modi di fare, vizi.\n\n### Obiettivi\n\n- Obiettivo 1\n- Obiettivo 2\n\n### Segreti\n\nDettagli nascosti, verita scomode.\n\n### Relazioni\n\n- **Alleati:** ...\n- **Nemici:** ...\n- **Contatti:** ...',
-    blockFields:['Nome','Razza','Classe / Livello','Allineamento'],requiredFields:['Nome']},
-  spell:{v:'spell',l:'Incantesimi — Schede magie',i:'✨',
-    template:'## Nome dell\'Incantesimo\n\nDescrizione dell\'effetto.\n\n- **Livello:** 1°\n- **Scuola:** Evocazione\n- **Tempo di lancio:** 1 azione\n- **Gittata:** 18 m\n- **Componenti:** V, S, M\n- **Durata:** Istantanea\n- **Classi:** Mago, Stregone, Bardo\n\n### Effetto\n\nDescrizione dettagliata dell\'effetto e dei danni.\n\n### A livelli superiori\n\nEffetto del lancio con slot di livello superiore.',
-    blockFields:['Nome','Scuola','Livello','Tempo di lancio','Componenti'],requiredFields:['Nome','Scuola']},
-  specie:{v:'specie',l:'Specie / Razze — Schede razziali',i:'🧬',
-    template:'## Nome della Specie\n\nDescrizione generale della specie.\n\n- **Taglia:** Media\n- **Velocita:** 9 m\n- **Bonus caratteristiche:** +2 a una caratteristica\n\n### Tratti razziali\n\n- Tratto 1\n- Tratto 2\n\n### Sottorazze\n\n- **Sottorazza 1:** Descrizione e tratti\n- **Sottorazza 2:** Descrizione e tratti\n\n### Lingue\n\n- Lingue parlate',
-    blockFields:['Nome','Tratti','Altezza','Aspettativa di vita'],requiredFields:['Nome']},
-  citta:{v:'citta',l:'Città — Schede centri abitati',i:'🏙',
-    template:'## Nome della Citta\n\nDescrizione della citta, atmosfera e popolazione.\n\n- **Popolazione:** [numero]\n- **Governo:** Consiglio / Signore / Sindaco\n- **Economia:** Commercio, artigianato\n- **Guardia:** Come e organizzata\n- **Pericolosita:** Bassa / Media / Alta\n\n### Quartieri\n\n- Quartiere 1: descrizione\n- Quartiere 2: descrizione\n\n### Punti di interesse\n\n- **Locanda:** Nome e descrizione\n- **Mercato:** Cosa si trova\n- **Tempio:** A chi e dedicato\n- **Luogo di potere:** Sede del governo\n\n### PNG chiave\n\n- Nome e ruolo\n- Nome e ruolo\n\n### Voci e segreti\n\n- Voce 1\n- Voce 2',
-    blockFields:['Nome','Popolazione','Governo','Distretti'],requiredFields:['Nome']},
-  evento:{v:'evento',l:'Eventi — Cronache e avvenimenti',i:'🎭',
-    template:'## Nome dell\'Evento\n\nBreve descrizione dell\'evento.\n\n- **Data:** [data]\n- **Luogo:** [luogo]\n- **Organizzatori:** Chi lo promuove\n\n### Antefatti\n\nCosa e successo prima dell\'evento.\n\n### Svolgimento\n\nCome si e svolto l\'evento.\n\n### Partecipanti\n\n- Persona 1: ruolo\n- Persona 2: ruolo\n\n### Conseguenze\n\nEffetti dell\'evento sul mondo o nella storia.',
-    blockFields:['Nome','Data','Luogo'],requiredFields:['Nome']}
+/* ── TIPO CAMPI ── */
+var FIELD_TYPES={
+  text:{icon:'Aa',placeholder:''},
+  number:{icon:'#',placeholder:'0'},
+  select:{icon:'▾',placeholder:'Seleziona…'},
+  wysiwyg:{icon:'W',placeholder:'Scrivi il contenuto…'},
+  image:{icon:'🖼',placeholder:'/images/…'}
 };
+
+/* ── LAYOUT REGISTRY (9 layout — pantheon invariato) ── */
+var LAYOUT_REGISTRY={
+/* ═══ PANTEON — NON CAMBIA ═══ */
+  pantheon:{v:'pantheon',l:'Pantheon — Griglia divinità',i:'🛐',
+    template:'Divinità\n\nBreve introduzione al pantheon del tuo mondo.\n\n---\n\n# Nome della Divinità\n\n![](/images/nome-divinita.jpg)\n\n> Citazione - Nome\n\n## Identità\n\n- **Nome:** Vero nome\n- **Epiteto:** Titolo\n- **Allineamento:** Legale Buono\n- **Sfere:** Guerra, Onore\n- **Simbolo:** Descrizione\n\n## Personalità\n\nTratti caratteriali.\n\n## Culto\n\n- **Tempio:** Tipo\n- **Rituali:** Cerimonie\n- **Seguaci:** Chi lo adora',
+    blockFields:['Nome','Razza','Classe / Livello','Allineamento'],requiredFields:['Nome'],
+    editorMode:'pantheon'},
+
+/* ═══ PERSONAGGIO (unisce npc + personaggio) ═══ */
+  personaggio:{v:'personaggio',l:'Personaggio / NPC',i:'🌟',
+    template:'## Nome del Personaggio\n\nBreve descrizione.\n\n- **Razza:** Elfo\n- **Classe:** Ladro\n- **Livello:** 5\n- **Allineamento:** Caotico Neutrale\n- **CA:** 16\n- **PF:** 32\n- **Velocità:** 9 m\n\n### Aspetto\n\nDescrizione fisica.\n\n### Personalità\n\nTratti caratteriali, vizi.\n\n### Abilità\n\nCapacità e talenti speciali.\n\n### Backstory\n\nLa storia del personaggio.',
+    blockFields:['Nome','Razza','Classe','Livello','Allineamento','CA','PF','Velocità'],requiredFields:['Nome'],
+    fields:[
+      {key:'nome',label:'Nome',type:'text',required:true},
+      {key:'razza',label:'Razza',type:'text'},
+      {key:'classe',label:'Classe',type:'text'},
+      {key:'livello',label:'Livello',type:'number'},
+      {key:'allineamento',label:'Allineamento',type:'select',options:['Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale','Neutrale','Caotico Neutrale','Legale Malvagio','Neutrale Malvagio','Caotico Malvagio']},
+      {key:'ca',label:'CA',type:'number'},
+      {key:'pf',label:'PF',type:'text'},
+      {key:'velocita',label:'Velocità',type:'text'},
+      {key:'aspetto',label:'Aspetto',type:'wysiwyg'},
+      {key:'personalita',label:'Personalità',type:'wysiwyg'},
+      {key:'abilita',label:'Abilità',type:'wysiwyg'},
+      {key:'backstory',label:'Backstory',type:'wysiwyg'}
+    ],
+    sections:['Aspetto','Personalità','Abilità','Backstory'],
+    editorMode:'schede'},
+
+/* ═══ BESTIARIO ═══ */
+  bestiario:{v:'bestiario',l:'Bestiario — Mostri',i:'🐉',
+    template:'## Nome del Mostro\n\nBreve descrizione.\n\n- **Tipo:** Aberrazione\n- **Taglia:** Media\n- **Allineamento:** Qualsiasi\n- **CA:** 15\n- **PF:** 45 (10d10+10)\n- **Velocità:** 9 m\n- **CR:** 2\n\n### Statistiche\n\n- **For:** 16 (+3)\n- **Des:** 14 (+2)\n- **Cos:** 15 (+2)\n- **Int:** 10 (+0)\n- **Sag:** 12 (+1)\n- **Car:** 8 (-1)\n\n### Abilità\n\n- **Percezione passiva:** 12\n- **Linguaggi:** Comune\n\n### Azioni\n\n- **Attacco:** +5, 1d8+3 taglio\n\n### Leggenda\n\nFolklore legato al mostro.',
+    blockFields:['Nome','Tipo','CR','Taglia','Allineamento'],requiredFields:['Nome','CR'],
+    fields:[
+      {key:'nome',label:'Nome',type:'text',required:true},
+      {key:'tipo',label:'Tipo',type:'select',options:['Aberrazione','Bestia','Celestiale','Costrutto','Dragonide','Elementale','Fey','Fiend','Gigante','Immortale','Monstruoso','Orrori','Pianta','Tritone','Non-morto','Umanoide']},
+      {key:'taglia',label:'Taglia',type:'select',options:['Piccolissimo','Piccolo','Media','Grande','Enorme','Colossale']},
+      {key:'allineamento',label:'Allineamento',type:'select',options:['Qualsiasi','Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale','Neutrale','Caotico Neutrale','Legale Malvagio','Neutrale Malvagio','Caotico Malvagio','Non allineato']},
+      {key:'ca',label:'CA',type:'number'},
+      {key:'pf',label:'PF',type:'text'},
+      {key:'velocita',label:'Velocità',type:'text'},
+      {key:'cr',label:'CR',type:'text'},
+      {key:'statistiche',label:'Statistiche (For/Des/Cos/Int/Sag/Car)',type:'wysiwyg'},
+      {key:'abilita',label:'Abilità',type:'wysiwyg'},
+      {key:'azioni',label:'Azioni',type:'wysiwyg'},
+      {key:'leggenda',label:'Leggenda',type:'wysiwyg'}
+    ],
+    sections:['Statistiche','Abilità','Azioni','Leggenda'],
+    editorMode:'schede'},
+
+/* ═══ OGGETTI & INCANTESIMI ═══ */
+  oggetti:{v:'oggetti',l:'Oggetti & Incantesimi',i:'⚔️',
+    template:'## Nome dell\'Oggetto\n\nDescrizione generale.\n\n- **Tipo:** Arma\n- **Rarità:** Raro\n- **Attunamento:** Sì\n- **Fonte:** PHB\n\n### Effetto\n\nDescrizione dell\'effetto magico.\n\n### Limitazioni\n\n- Limite 1\n\n### Storia\n\nOrigine e leggenda.',
+    blockFields:['Nome','Tipo','Rarità/Livello','Fonte'],requiredFields:['Nome'],
+    fields:[
+      {key:'nome',label:'Nome',type:'text',required:true},
+      {key:'tipo',label:'Tipo',type:'select',options:['Arma','Armatura','Scudo','Strumento','Pozione','Pergamena','Bacchetta','Bastone','Orologio','Altro']},
+      {key:'rarita',label:'Rarità',type:'select',options:['Comune','Non comune','Raro','Molto raro','Leggendario','Arcaico']},
+      {key:'attunamento',label:'Attunamento',type:'select',options:['No','Sì','Sì (con restrizione)']},
+      {key:'fonte',label:'Fonte',type:'text'},
+      {key:'descrizione',label:'Descrizione',type:'wysiwyg'},
+      {key:'effetto',label:'Effetto',type:'wysiwyg'},
+      {key:'limitazioni',label:'Limitazioni',type:'wysiwyg'},
+      {key:'storia',label:'Storia',type:'wysiwyg'}
+    ],
+    sections:['Descrizione','Effetto','Limitazioni','Storia'],
+    editorMode:'schede'},
+
+/* ═══ LUOGHI (unisce lore + città) ═══ */
+  luoghi:{v:'luoghi',l:'Luoghi — Lore & Città',i:'🏰',
+    template:'## Nome del Luogo\n\n> Breve descrizione, atmosfera e cosa lo rende speciale.\n\n- **Tipo:** Città\n- **Popolazione:** 5000\n- **Governo:** Consiglio\n\n### Geografia\n\nTerritorio, clima, paesaggio.\n\n### Abitanti\n\nChi vive qui, culture, usanze.\n\n### Storia\n\nEventi importanti.\n\n### Segreti\n\nDettagli nascosti, leggende.\n\n### Punti di interesse\n\nLuoghi principali da visitare.',
+    blockFields:['Nome','Tipo','Popolazione','Governo'],requiredFields:['Nome'],
+    fields:[
+      {key:'nome',label:'Nome',type:'text',required:true},
+      {key:'tipo',label:'Tipo',type:'select',options:['Città','Villaggio','Fortezza','Cittadina','Rovine','Dungeon','Regione','Isola','Foresta','Montagna']},
+      {key:'popolazione',label:'Popolazione',type:'text'},
+      {key:'governo',label:'Governo',type:'text'},
+      {key:'geografia',label:'Geografia',type:'wysiwyg'},
+      {key:'abitanti',label:'Abitanti',type:'wysiwyg'},
+      {key:'storia',label:'Storia',type:'wysiwyg'},
+      {key:'segreti',label:'Segreti',type:'wysiwyg'},
+      {key:'punti_interesse',label:'Punti di interesse',type:'wysiwyg'}
+    ],
+    sections:['Geografia','Abitanti','Storia','Segreti','Punti di interesse'],
+    editorMode:'schede'},
+
+/* ═══ CRONACHE (sessione + quest + evento + timeline) ═══ */
+  cronache:{v:'cronache',l:'Cronache — Sessioni, Quest, Eventi',i:'📅',
+    template:'## Titolo della Cronaca\n\nRiassunto in una o due frasi.\n\n- **Tipo:** Sessione\n- **Data:** 2025-01-15\n- **Luogo:** Gandora\n- **Stato:** Completata\n- **Difficoltà:** Media\n\n### Riassunto\n\nResoconto dettagliato degli eventi.\n\n### Eventi chiave\n\n- Evento 1\n- Evento 2\n\n### Risvolti\n\nConseguenze e sviluppi futuri.',
+    blockFields:['Titolo','Tipo','Data','Luogo','Stato'],requiredFields:['Titolo'],
+    fields:[
+      {key:'titolo',label:'Titolo',type:'text',required:true},
+      {key:'tipo',label:'Tipo',type:'select',options:['Sessione','Quest','Evento','Timeline']},
+      {key:'data',label:'Data',type:'text'},
+      {key:'luogo',label:'Luogo',type:'text'},
+      {key:'stato',label:'Stato',type:'select',options:['In corso','Completata','Fallita','Annullata','Programmata']},
+      {key:'difficolta',label:'Difficoltà',type:'select',options:['Facile','Media','Difficile','Mortale','Leggendaria']},
+      {key:'riassunto',label:'Riassunto',type:'wysiwyg'},
+      {key:'eventi',label:'Eventi chiave',type:'wysiwyg'},
+      {key:'risvolti',label:'Risvolti',type:'wysiwyg'}
+    ],
+    sections:['Riassunto','Eventi chiave','Risvolti'],
+    editorMode:'schede'},
+
+/* ═══ CONTENUTO (generico + regole + lavoro) ═══ */
+  contenuto:{v:'contenuto',l:'Contenuto — Testo e regole',i:'📄',
+    template:'## Introduzione\n\nTesto introduttivo.\n\n## Sezione 1\n\nContenuto della sezione.\n\n## Sezione 2\n\n- Elemento 1\n- Elemento 2\n\n> Citazione importante.\n\n---\n\n## Sezione 3\n\nAltro contenuto.',
+    blockFields:['Titolo','Sottotitolo'],requiredFields:[],
+    fields:[
+      {key:'titolo',label:'Titolo',type:'text'},
+      {key:'sottotitolo',label:'Sottotitolo',type:'text'},
+      {key:'body',label:'Contenuto',type:'wysiwyg'}
+    ],
+    sections:[],
+    editorMode:'contenuto'},
+
+/* ═══ FAZIONI ═══ */
+  fazioni:{v:'fazioni',l:'Fazioni & Organizzazioni',i:'🏴',
+    template:'## Nome della Fazione\n\nDescrizione introduttiva.\n\n- **Simbolo:** Descrizione\n- **Sede:** Luogo principale\n- **Leader:** Nome\n- **Membri:** Numero\n\n### Struttura\n\nCome sono organizzati.\n\n### Obiettivi\n\n- Obiettivo 1\n- Obiettivo 2\n\n### Alleati e Nemici\n\n- **Alleati:** ...\n- **Nemici:** ...\n\n### Storia\n\nCome è nata la fazione.',
+    blockFields:['Nome','Simbolo','Sede','Leader','Membri'],requiredFields:['Nome'],
+    fields:[
+      {key:'nome',label:'Nome',type:'text',required:true},
+      {key:'simbolo',label:'Simbolo',type:'image'},
+      {key:'sede',label:'Sede',type:'text'},
+      {key:'leader',label:'Leader',type:'text'},
+      {key:'membri',label:'Membri',type:'text'},
+      {key:'struttura',label:'Struttura',type:'wysiwyg'},
+      {key:'obiettivi',label:'Obiettivi',type:'wysiwyg'},
+      {key:'alleati_nemici',label:'Alleati e Nemici',type:'wysiwyg'},
+      {key:'storia',label:'Storia',type:'wysiwyg'}
+    ],
+    sections:['Struttura','Obiettivi','Alleati e Nemici','Storia'],
+    editorMode:'schede'},
+
+/* ═══ MATERIALE (grid speciale) ═══ */
+  materiale:{v:'materiale',l:'Materiale — Classi, Specie, Talenti',i:'📋',
+    template:'## Specie\n\n- Umano (PHB)\n- Elfo (PHB)\n- Mezzorco (PHB)\n\n## Classi\n\n- Barbarian (PHB)\n- Berserker (PHB)\n- Totem Warrior (PHB)\n\n- Fighter (PHB)\n- Champion (PHB)\n- Battle Master (PHB)\n\n## Talenti\n\n- Talento 1 (PHB)\n- Talento 2 (XGE)\n- Talento 3 (TCE)\n\n## Spell\n\n- Spell 1 (PHB)\n- Spell 2 (XGE)\n- Spell 3 (TCE)\n\n> 💡 Nota su eventuali restrizioni.',
+    blockFields:['Nome','Fonte','Categoria'],requiredFields:[],
+    fields:[
+      {key:'nome',label:'Nome',type:'text'},
+      {key:'specie',label:'Specie (sezioni)',type:'wysiwyg'},
+      {key:'classi',label:'Classi (sezioni)',type:'wysiwyg'},
+      {key:'talenti',label:'Talenti (sezioni)',type:'wysiwyg'},
+      {key:'spell',label:'Spell (sezioni)',type:'wysiwyg'}
+    ],
+    sections:['Specie','Classi','Talenti','Spell'],
+    editorMode:'materiale'}
+};
+
 /* Array derivato per compatibilità con select/lookup */
 var LAYOUTS=[
   {v:'',l:'(Auto — rileva da chiave)',i:'🔍'}
@@ -172,7 +260,7 @@ async function openPage(k){
   h+=buildToolbar();
   h+='<div class="ed-body" id="editor-body">';
   h+='<div class="pane" id="md-pane">';
-  h+='<div class="pane-head" id="mp-head">'+(st?'Blocchi':'Markdown')+' <span class="ph-info" id="e-stats"></span></div>';
+  h+='<div class="pane-head" id="mp-head">'+(st?'Editor':'Markdown')+' <span class="ph-info" id="e-stats"></span></div>';
   h+='<div class="ed-meta">';
   h+='<label>Titolo<input id="e-title" class="in mm-t" value="'+escAttr(json.title||'')+'" oninput="onMetaInput()" placeholder="Titolo pagina"></label>';
   h+='<label>Icona<input id="e-icon" class="in mm-icon" value="'+escAttr(json.icon||'')+'" oninput="onMetaInput()" maxlength="6" placeholder="📄"></label>';
