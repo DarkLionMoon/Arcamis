@@ -81,9 +81,7 @@ var pages = [
   {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'},
   {k:'rivorosso',l:'Rivorosso',i:'🌊',id:'pag-rivorosso'},
   {k:'circolo-dello-smarrimento',l:'Circolo dello Smarrimento',i:'🪨',id:'pag-circolo-dello-smarrimento'},
-  {k:'dimora-degli-ursidi',l:'Dimora degli Ursidi',i:'🐻',id:'pag-dimora-degli-ursidi'},
-  {k:'caverna-delle-talpe',l:'La Caverna delle Talpe',i:'🕳️',id:'pag-caverna-delle-talpe'},
-  {k:'miniera-bruciascoria',l:'Miniera Bruciascoria',i:'⚒️',id:'pag-miniera-bruciascoria'}
+  {k:'dimora-degli-ursidi',l:'Dimora degli Ursidi',i:'🐻',id:'pag-dimora-degli-ursidi'}
 ];
 
 function getPage(idOrK){

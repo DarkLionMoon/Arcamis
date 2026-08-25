@@ -84,9 +84,7 @@ var _pathMap = {
   'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur',
   'lore/rivorosso': 'pag-rivorosso',
   'lore/circolo-dello-smarrimento': 'pag-circolo-dello-smarrimento',
-  'lore/dimora-degli-ursidi': 'pag-dimora-degli-ursidi',
-  'lore/caverna-delle-talpe': 'pag-caverna-delle-talpe',
-  'lore/miniera-bruciascoria': 'pag-miniera-bruciascoria'
+  'lore/dimora-degli-ursidi': 'pag-dimora-degli-ursidi'
 };
 
 /* ════ DEEP LINK ════ */
