@@ -159,7 +159,8 @@ window.onAfterPageRender(function(){
 
   function _bindPinEvents() {
     var tip = document.getElementById('map-tip');
-    document.querySelectorAll('#dynamic-pins .mpin').forEach(function(pin){
+    document.querySelectorAll('.mpin').forEach(function(pin){
+      if(pin._bound) return; pin._bound = true;
       pin.addEventListener('mouseenter', function(){
         if(!tip) return;
         document.getElementById('mt-name').textContent = pin.getAttribute('data-name')||'';
@@ -186,6 +187,7 @@ window.onAfterPageRender(function(){
   }
 
   /* Carica puntine + mappa da API */
+  _bindPinEvents();
   var container = document.getElementById('dynamic-pins');
   var mapImg = document.querySelector('#arcamis-map img');
   if(container){
