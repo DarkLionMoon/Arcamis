@@ -203,7 +203,7 @@
       "menu": true,
       "admin": true,
       "path": "lore/specie-homebrew",
-      "sec": "",
+      "sec": "homebrew",
       "sub": ""
     },
     {
