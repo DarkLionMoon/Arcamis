@@ -84,12 +84,6 @@
   "text": "Contenuto in arrivo."
  },
  {
-  "id": "pag-materiale-extra",
-  "title": "Materiale extra",
-  "icon": "📄",
-  "text": "["
- },
- {
   "id": "pag-mappe",
   "title": "Mappe",
   "icon": "🗺️",

@@ -52,7 +52,6 @@ var _pathMap = {
   'lore/piani-di-esistenza': 'pag-piani-di-esistenza',
   'lore/bibliografia-scoperta': 'pag-bibliografia-scoperta',
   'lore/esplora-dal-vivo': 'pag-esplora-dal-vivo',
-  'lore/materiale-extra': 'pag-materiale-extra',
   'lore/mappe': 'pag-mappe',
   'lore/mappa-arcamis': 'pag-mappa-arcamis',
   'lore/specie-homebrew': 'pag-specie-homebrew',
