@@ -24,11 +24,6 @@ var UI_CONFIG = {
    "label": "Lavori",
    "action": "page",
    "target": "pag-lavori"
-  },
-  {
-   "icon": "⚙️",
-   "label": "Opzioni",
-   "action": "options"
   }
  ],
  "drawerSearch": true
