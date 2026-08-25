@@ -1,6 +1,12 @@
 {
  "pages": [
   {
+   "id": "pag-pantheon",
+   "title": "Pantheon",
+   "icon": "🛐",
+   "lastEdited": "2026-08-25T15:49:47.935Z"
+  },
+  {
    "id": "pag-changelog",
    "title": "Changelog",
    "icon": "📝",
@@ -41,12 +47,6 @@
    "title": "Arcamis",
    "icon": "📄",
    "lastEdited": "2026-08-25T14:49:08.576856Z"
-  },
-  {
-   "id": "pag-materiale-extra",
-   "title": "Materiale extra",
-   "icon": "📄",
-   "lastEdited": "2026-08-25T14:49:07.884870Z"
   }
  ]
 }
