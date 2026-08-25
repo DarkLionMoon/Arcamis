@@ -143,16 +143,6 @@
       "path": "lore/bibliografia-scoperta"
     },
     {
-      "k": "esplora-dal-vivo",
-      "l": "Esplora dal vivo",
-      "i": "🗺️",
-      "id": "pag-esplora-dal-vivo",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/esplora-dal-vivo"
-    },
-    {
       "k": "mappe",
       "l": "Mappe",
       "i": "🗺️",
