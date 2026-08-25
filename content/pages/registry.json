@@ -215,7 +215,7 @@
       "menu": true,
       "admin": true,
       "path": "lore/sottoclassi-homebrew",
-      "sec": "",
+      "sec": "homebrew",
       "sub": ""
     },
     {
