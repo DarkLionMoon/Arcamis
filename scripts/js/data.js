@@ -35,7 +35,7 @@ var pages = [
   {k:'materiale-approvato',l:'Materiale Approvato',i:'📖',id:'pag-materiale-approvato',sec:'personaggio'},
   {k:'pantheon',l:'Pantheon',i:'🛐',id:'pag-pantheon',sec:'lore'},
   {k:'lavori',l:'Lavoro',i:'💼',id:'pag-lavori',sec:'lavori'},
-  {k:'come-si-inizia',l:'Come si inizia',i:'🌟',id:'pag-come-si-inizia'},
+  {k:'come-si-inizia',l:'Come si inizia',i:'🌟',id:'pag-come-si-inizia',sec:'personaggio'},
   {k:'andando-avanti',l:'Andando avanti',i:'📈',id:'pag-andando-avanti'},
   {k:'maestria-titoli',l:'Maestria / Titoli',i:'🏅',id:'pag-maestria-titoli'},
   {k:'casate-e-compagnie',l:'Casate e Compagnie',i:'🏰',id:'pag-casate-e-compagnie'},
