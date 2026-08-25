@@ -46,7 +46,6 @@ var _pathMap = {
   'personaggio/come-si-inizia': 'pag-come-si-inizia',
   'personaggio/andando-avanti': 'pag-andando-avanti',
   'lavori/gilda-avventurieri': 'pag-gilda-avventurieri',
-  'lavori/locanda': 'pag-locanda',
   'lavori/forgia': 'pag-forgia',
   'lavori/biblioteca': 'pag-biblioteca',
   'lavori/bottega-farmaceutica': 'pag-bottega-farmaceutica',
