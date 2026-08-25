@@ -129,7 +129,8 @@
       "k": "specie-homebrew",
       "l": "Specie Homebrew",
       "i": "🧬",
-      "id": "pag-specie-homebrew"
+      "id": "pag-specie-homebrew",
+      "sec": "homebrew"
     },
     {
       "k": "sottoclassi-homebrew",

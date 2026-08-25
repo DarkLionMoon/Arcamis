@@ -46,7 +46,7 @@ var pages = [
   {k:'mappe',l:'Mappe',i:'🗺️',id:'pag-mappe'},
   {k:'mappa-arcamis',l:'Arcamis',i:'🏙️',id:'pag-mappa-arcamis'},
   {k:'regole-homebrew',l:'Regole Homebrew',i:'📐',id:'pag-regole-homebrew',sec:'homebrew'},
-  {k:'specie-homebrew',l:'Specie Homebrew',i:'🧬',id:'pag-specie-homebrew'},
+  {k:'specie-homebrew',l:'Specie Homebrew',i:'🧬',id:'pag-specie-homebrew',sec:'homebrew'},
   {k:'sottoclassi-homebrew',l:'Sottoclassi Homebrew',i:'⚔️',id:'pag-sottoclassi-homebrew'},
   {k:'changelog',l:'Changelog',i:'📝',id:'pag-changelog'},
   {k:'arcamis',l:'Arcamis',i:'📍',id:'pag-arcamis'},
