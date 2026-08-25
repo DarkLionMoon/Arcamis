@@ -500,16 +500,6 @@
       "menu": true,
       "admin": true,
       "path": "lore/caverna-delle-talpe"
-    },
-    {
-      "k": "miniera-bruciascoria",
-      "l": "Miniera Bruciascoria",
-      "i": "⚒️",
-      "id": "pag-miniera-bruciascoria",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/miniera-bruciascoria"
     }
   ],
   "sections": [
