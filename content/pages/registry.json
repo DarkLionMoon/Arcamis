@@ -153,16 +153,6 @@
       "path": "lore/esplora-dal-vivo"
     },
     {
-      "k": "materiale-extra",
-      "l": "Materiale extra",
-      "i": "📦",
-      "id": "pag-materiale-extra",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/materiale-extra"
-    },
-    {
       "k": "mappe",
       "l": "Mappe",
       "i": "🗺️",
