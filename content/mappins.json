@@ -15,8 +15,8 @@
     {
       "id": "pin-selvafoglia",
       "type": "forest",
-      "left": "78.58%",
-      "top": "24.05%",
+      "left": "82.22%",
+      "top": "25.19%",
       "explored": true,
       "sub": "foglia",
       "pageId": "pag-selva-fogliabruna",
@@ -26,8 +26,8 @@
     {
       "id": "pin-forestasmari",
       "type": "fog",
-      "left": "86.74%",
-      "top": "41.99%",
+      "left": "91.2%",
+      "top": "42.28%",
       "explored": false,
       "sub": "smari",
       "pageId": "pag-foresta-dello-smarrimento",
@@ -48,8 +48,8 @@
     {
       "id": "pin-vigilius",
       "type": "city",
-      "left": "78.74%",
-      "top": "51.15%",
+      "left": "77.19%",
+      "top": "53.15%",
       "explored": true,
       "sub": "",
       "pageId": "pag-vigilius",
@@ -59,8 +59,8 @@
     {
       "id": "pin-galeton",
       "type": "village",
-      "left": "86.21%",
-      "top": "69.47%",
+      "left": "83.37%",
+      "top": "72.89%",
       "explored": true,
       "sub": "",
       "pageId": "pag-galeton",
@@ -70,8 +70,8 @@
     {
       "id": "pin-lagogromot",
       "type": "water",
-      "left": "92.65%",
-      "top": "51.72%",
+      "left": "90.63%",
+      "top": "51.58%",
       "explored": true,
       "sub": "",
       "pageId": "pag-lago-di-gromot",
@@ -81,8 +81,8 @@
     {
       "id": "pin-fortevigilius",
       "type": "fort",
-      "left": "20.99%",
-      "top": "33.02%",
+      "left": "18.17%",
+      "top": "35.34%",
       "explored": true,
       "sub": "",
       "pageId": "pag-forte-vigilus",
@@ -92,8 +92,8 @@
     {
       "id": "pin-rivadifero",
       "type": "village",
-      "left": "20.45%",
-      "top": "66.99%",
+      "left": "22.15%",
+      "top": "72.69%",
       "explored": true,
       "sub": "",
       "pageId": "pag-riva-di-ferro",
@@ -103,8 +103,8 @@
     {
       "id": "pin-fumofosco",
       "type": "village",
-      "left": "43.48%",
-      "top": "52.48%",
+      "left": "39.28%",
+      "top": "47.53%",
       "explored": true,
       "sub": "",
       "pageId": "pag-fumofosco",
@@ -114,13 +114,24 @@
     {
       "id": "pin-kaldur",
       "type": "ruin",
-      "left": "48.09%",
-      "top": "69.85%",
-      "explored": true,
+      "left": "50.73%",
+      "top": "70.33%",
+      "explored": false,
       "sub": "",
       "pageId": "pag-rovine-di-kaldur",
       "name": "Rovine di Kaldur",
       "desc": "Una civiltà è finita qui. Le pietre bruciano ancora."
+    },
+    {
+      "id": "pin-mt949t39-92i3a",
+      "left": "14.4%",
+      "top": "22.69%",
+      "type": "forest",
+      "name": "Foresta Infinita",
+      "desc": "",
+      "explored": false,
+      "sub": "",
+      "pageId": ""
     }
   ]
 }
