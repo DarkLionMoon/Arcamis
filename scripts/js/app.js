@@ -55,7 +55,6 @@ var _pathMap = {
   'lore/materiale-extra': 'pag-materiale-extra',
   'lore/mappe': 'pag-mappe',
   'lore/mappa-arcamis': 'pag-mappa-arcamis',
-  'lore/homebrew': 'pag-homebrew',
   'lore/specie-homebrew': 'pag-specie-homebrew',
   'lore/regole-homebrew': 'pag-regole-homebrew',
   'lore/sottoclassi-homebrew': 'pag-sottoclassi-homebrew',

@@ -102,12 +102,6 @@
   "text": "Contenuto in arrivo."
  },
  {
-  "id": "pag-homebrew",
-  "title": "Homebrew",
-  "icon": "⚗️",
-  "text": "Sezione in allestimento. Contenuti disponibili: Specie Homebrew Regole Homebrew per specie, classi ed oggetti già esistenti Sottoclassi Homebrew"
- },
- {
   "id": "pag-specie-homebrew",
   "title": "Specie Homebrew",
   "icon": "📄",

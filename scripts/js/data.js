@@ -52,7 +52,6 @@ var pages = [
   {k:'materiale-extra',l:'Materiale extra',i:'📦',id:'pag-materiale-extra'},
   {k:'mappe',l:'Mappe',i:'🗺️',id:'pag-mappe'},
   {k:'mappa-arcamis',l:'Arcamis',i:'🏙️',id:'pag-mappa-arcamis'},
-  {k:'homebrew',l:'Homebrew',i:'⚗️',id:'pag-homebrew'},
   {k:'specie-homebrew',l:'Specie Homebrew',i:'🧬',id:'pag-specie-homebrew'},
   {k:'regole-homebrew',l:'Regole Homebrew',i:'📐',id:'pag-regole-homebrew'},
   {k:'sottoclassi-homebrew',l:'Sottoclassi Homebrew',i:'⚔️',id:'pag-sottoclassi-homebrew'},
