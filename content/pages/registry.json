@@ -490,16 +490,6 @@
       "menu": true,
       "admin": true,
       "path": "lore/dimora-degli-ursidi"
-    },
-    {
-      "k": "caverna-delle-talpe",
-      "l": "La Caverna delle Talpe",
-      "i": "🕳️",
-      "id": "pag-caverna-delle-talpe",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/caverna-delle-talpe"
     }
   ],
   "sections": [
