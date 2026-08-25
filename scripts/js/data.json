@@ -1,6 +1,32 @@
 {
   "root": "2f00274fdc1c801a9b39d8d69800f7a8",
   "guild": "1348723468157456425",
+  "ui": {
+    "bottomNav": [
+      {
+        "icon": "🏰",
+        "label": "Home",
+        "action": "home"
+      },
+      {
+        "icon": "🧭",
+        "label": "Esplora",
+        "action": "drawer"
+      },
+      {
+        "icon": "💼",
+        "label": "Lavori",
+        "action": "page",
+        "target": "pag-lavori"
+      },
+      {
+        "icon": "⚙️",
+        "label": "Opzioni",
+        "action": "options"
+      }
+    ],
+    "drawerSearch": true
+  },
   "pages": [
     {
       "k": "la-storia-di-gandora",
@@ -53,55 +79,64 @@
       "k": "gilda-avventurieri",
       "l": "Gilda degli Avventurieri",
       "i": "🗡️",
-      "id": "pag-gilda-avventurieri"
+      "id": "pag-gilda-avventurieri",
+      "sec": "lavori"
     },
     {
       "k": "locanda",
       "l": "Locanda",
       "i": "🍺",
-      "id": "pag-locanda"
+      "id": "pag-locanda",
+      "sec": "lavori"
     },
     {
       "k": "forgia",
       "l": "Forgia",
       "i": "🔥",
-      "id": "pag-forgia"
+      "id": "pag-forgia",
+      "sec": "lavori"
     },
     {
       "k": "biblioteca",
       "l": "Biblioteca",
       "i": "📚",
-      "id": "pag-biblioteca"
+      "id": "pag-biblioteca",
+      "sec": "lavori"
     },
     {
       "k": "bottega-farmaceutica",
       "l": "Bottega farmaceutica",
       "i": "💊",
-      "id": "pag-bottega-farmaceutica"
+      "id": "pag-bottega-farmaceutica",
+      "sec": "lavori"
     },
     {
       "k": "caserma",
       "l": "Caserma",
       "i": "🛡️",
-      "id": "pag-caserma"
+      "id": "pag-caserma",
+      "sec": "lavori"
     },
     {
       "k": "corporazione-costruttori",
       "l": "Corporazione dei Costruttori",
       "i": "🔨",
-      "id": "pag-corporazione-costruttori"
+      "id": "pag-corporazione-costruttori",
+      "sec": "lavori"
     },
     {
       "k": "ospedale",
       "l": "Ospedale",
       "i": "⚕️",
-      "id": "pag-ospedale"
+      "id": "pag-ospedale",
+      "sec": "lavori"
     },
     {
       "k": "sartoria",
       "l": "Sartoria",
       "i": "🧵",
-      "id": "pag-sartoria"
+      "id": "pag-sartoria",
+      "sec": "lavori"
     },
     {
       "k": "maestria-titoli",
@@ -310,6 +345,10 @@
     {
       "v": "personaggio",
       "l": "Personaggio"
+    },
+    {
+      "v": "lavori",
+      "l": "Lavori"
     },
     {
       "v": "lore",

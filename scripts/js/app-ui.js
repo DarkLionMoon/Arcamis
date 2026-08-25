@@ -200,6 +200,10 @@ function toggleMobileNav(){
 function closeMobileNav(){
   document.getElementById('mobile-nav').classList.remove('open');
   document.body.classList.remove('nav-open');
+  var msr = document.getElementById('m-sr');
+  if(msr){ msr.innerHTML = ''; msr.classList.remove('open'); }
+  var mts = document.getElementById('m-ts');
+  if(mts) mts.value = '';
 }
 
 /* ════ SEARCH (client-side su indice statico) ════ */
@@ -270,6 +274,49 @@ function csearch(){
   if(sr){ sr.innerHTML = ''; sr.classList.remove('open'); }
   if(ts) ts.value = '';
   clearTimeout(_searchDebounce);
+}
+
+/* ════ SEARCH MOBILE (drawer) ════ */
+function msearch(val){
+  var sr = document.getElementById('m-sr');
+  if(!sr) return;
+  if(!val || val.length < 2){ sr.innerHTML = ''; sr.classList.remove('open'); return; }
+  clearTimeout(_searchDebounce);
+  _searchDebounce = setTimeout(function(){
+    _loadSearchIndex(function(idx){
+      if(!sr) return;
+      var q = val.toLowerCase();
+      var res = [];
+      (idx || []).forEach(function(p){
+        var ti = (p.title||'').toLowerCase();
+        var tx = p.text || '';
+        var score = -1, snippet = '';
+        var tpos = ti.indexOf(q);
+        if(tpos > -1) score = 100 - tpos;
+        else {
+          var pos = tx.indexOf(q);
+          if(pos > -1){
+            score = 10;
+            var st = Math.max(0, pos - 45), en = Math.min(tx.length, pos + q.length + 55);
+            snippet = (st>0?'…':'') + _escHtml(tx.slice(st,en)) + (en<tx.length?'…':'');
+          }
+        }
+        if(score > -1) res.push({p:p, score:score, snippet:snippet});
+      });
+      res.sort(function(a,b){ return b.score - a.score; });
+      res = res.slice(0, 10);
+      if(!res.length){ sr.innerHTML = '<div class="sri" style="color:var(--text3);font-style:italic;padding:12px 14px">Nessun risultato</div>'; sr.classList.add('open'); return; }
+      sr.innerHTML = res.map(function(r){
+        var et=_escHtml(r.p.title), ei=_escHtml(r.p.icon||'📄'), eid=_escHtml(r.p.id);
+        var snippet = r.snippet ? '<div class="sri-snippet">'+r.snippet+'</div>' : '';
+        return '<div class="sri" onclick="closeMobileNav();gp(\''+eid+'\',\''+et+'\',\''+ei+'\')">'
+          +'<span class="si2">'+ei+'</span>'
+          +'<div class="sri-body"><span class="sl">'+et+'</span>'+snippet+'</div>'
+          +'</div>';
+      }).join('');
+      sr.classList.add('open');
+    });
+  }, 280);
 }
 
 /* ════ SCROLL TOP ════ */

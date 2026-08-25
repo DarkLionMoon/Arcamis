@@ -122,46 +122,6 @@ function toggleTnAcc(header) {
   header.classList.toggle('open', !isOpen);
   header.nextElementSibling.style.display = isOpen ? 'none' : 'block';
 }
-/* ════ BUILD LAVORI NAV DINAMICO ════ */
-function buildLavoriNav() {
-  var empty = !window.LAVORI || !LAVORI.length;
-
-  // Desktop: hide entire dropdown if empty
-  var ddWrap = document.getElementById('dd-lavori');
-  if (empty) {
-    if (ddWrap) ddWrap.style.display = 'none';
-    return;
-  }
-
-  var ddMenu = ddWrap && ddWrap.querySelector('.tn-menu--acc');
-  if (ddMenu) {
-    var bodies = ddMenu.querySelectorAll('.tn-acc-body');
-    var lavoriBody = bodies[0];
-
-    if (lavoriBody) {
-      lavoriBody.innerHTML = '';
-      LAVORI.forEach(function(v, i) {
-        if (i === 2) lavoriBody.appendChild(_tnDiv()); // separatore dopo Forgia
-        var el = _tnItem(v.i, v.l, function() { closeDd(); gp(v.id, v.l, v.i); });
-        lavoriBody.appendChild(el);
-      });
-    }
-  }
-
-  // Mobile drawer
-  var mnLavori = document.querySelector('#mobile-nav .mn-section--lavori');
-  if (mnLavori) {
-    mnLavori.innerHTML = '<div class="mn-label">Lavori</div>';
-    LAVORI.forEach(function(v) {
-      var el = _mnItem(v.i, v.l, function(id,l,i){ return function(){ closeMobileNav(); gp(id,l,i); }; }(v.id,v.l,v.i));
-      mnLavori.appendChild(el);
-    });
-  }
-
-  // Bottom nav
-  var bnavLavori = document.querySelector('#bottom-nav .bnav-item[data-k="lavori"]');
-  if (bnavLavori) bnavLavori.style.display = 'none';
-}
 
 function _tnItem(icon, label, fn) {
   var d = document.createElement('div');
@@ -183,4 +143,3 @@ function _mnItem(icon, label, fn) {
   return window._kbdActivate ? window._kbdActivate(d) : d;
 }
 
-document.addEventListener('DOMContentLoaded', buildLavoriNav);

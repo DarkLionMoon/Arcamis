@@ -76,25 +76,8 @@
     <!-- ── Lavori ▾ ── -->
 <div class="tn-drop" id="dd-lavori" role="menu" aria-haspopup="true">
   <div class="tn" onclick="toggleDd('dd-lavori',event)" role="menuitem" aria-expanded="false" tabindex="0">Lavori</div>
-  <div class="tn-menu tn-menu--acc">
-
-    <!-- ACCORDION: Lavori -->
-    <div class="tn-acc-header open" onclick="toggleTnAcc(this)">
-      <span class="tn-menu-label" style="margin:0">Lavori</span>
-      <span class="tn-acc-arrow">▾</span>
-    </div>
-    <div class="tn-acc-body">
-      <div class="tn-item" onclick="closeDd();gp('pag-gilda-avventurieri','Gilda avventurieri','🗡️')"><span class="tn-ii">🗡️</span>Gilda avventurieri</div>
-      <div class="tn-item" onclick="closeDd();gp('pag-locanda','Locanda','🍺')"><span class="tn-ii">🍺</span>Locanda</div>
-      <div class="tn-item" onclick="closeDd();gp('pag-forgia','Forgia','🔥')"><span class="tn-ii">🔥</span>Forgia</div>
-      <div class="tn-div"></div>
-      <div class="tn-item" onclick="closeDd();gp('pag-biblioteca','Biblioteca','📚')"><span class="tn-ii">📚</span>Biblioteca</div>
-      <div class="tn-item" onclick="closeDd();gp('pag-bottega-farmaceutica','Bottega farmaceutica','💊')"><span class="tn-ii">💊</span>Bottega farmaceutica</div>
-      <div class="tn-item" onclick="closeDd();gp('pag-caserma','Caserma','🛡️')"><span class="tn-ii">🛡️</span>Caserma</div>
-      <div class="tn-item" onclick="closeDd();gp('pag-corporazione-costruttori','Corporazione costruttori','🔨')"><span class="tn-ii">🔨</span>Corporazione dei costruttori</div>
-      <div class="tn-item" onclick="closeDd();gp('pag-ospedale','Ospedale','⚕️')"><span class="tn-ii">⚕️</span>Ospedale</div>
-      <div class="tn-item" onclick="closeDd();gp('pag-sartoria','Sartoria','🧵')"><span class="tn-ii">🧵</span>Sartoria</div>
-    </div>
+  <div class="tn-menu">
+    <div class="tn-menu-label">Lavori</div>
   </div>
 </div>
 
@@ -146,6 +129,11 @@
 
 <!-- ═══ MOBILE NAV DRAWER ═══ -->
 <div id="mobile-nav">
+  <div class="mn-search">
+    <span class="mn-search-icon">⌕</span>
+    <input id="m-ts" type="text" placeholder="Cerca nella wiki…" autocomplete="off" aria-label="Cerca nella wiki" oninput="msearch(this.value)"/>
+    <div id="m-sr"></div>
+  </div>
   <div class="mn-section">
     <div class="mn-item" onclick="closeMobileNav();showHome()"><span class="mn-ii">🏠</span>Home</div>
   </div>
@@ -488,10 +476,9 @@
 <!-- ═══ BOTTOM NAV mobile ═══ -->
 <nav id="bottom-nav">
   <div class="bnav-item active" data-k="home" onclick="showHome();setBnavActive('home')" tabindex="0" role="button"><span>🏰</span><span class="bnav-label">Home</span></div>
-  
-  <div class="bnav-item" data-k="lore" onclick="gp('pag-storia-del-mondo','Lore','📖');setBnavActive('lore')" tabindex="0" role="button"><span>📖</span><span class="bnav-label">Lore</span></div>
-  <div class="bnav-item" data-k="lavori" onclick="toggleMobileNav()" tabindex="0" role="button"><span>🗡️</span><span class="bnav-label">Lavori</span></div>
-  <div class="bnav-item" data-k="menu" onclick="ovo()" tabindex="0" role="button"><span>☰</span><span class="bnav-label">Menu</span><div class="bnav-badge changelog-badge"></div></div>
+  <div class="bnav-item" data-k="esplora" onclick="toggleMobileNav();setBnavActive('esplora')" tabindex="0" role="button" aria-expanded="false" aria-controls="mobile-nav"><span>🧭</span><span class="bnav-label">Esplora</span></div>
+  <div class="bnav-item" data-k="lavori" onclick="gp('pag-lavori','Lavoro','💼');setBnavActive('lavori')" tabindex="0" role="button"><span>💼</span><span class="bnav-label">Lavori</span></div>
+  <div class="bnav-item" data-k="opzioni" onclick="_openOptionsPanel();setBnavActive('opzioni')" tabindex="0" role="button"><span>⚙️</span><span class="bnav-label">Opzioni</span><div class="bnav-badge changelog-badge"></div></div>
 </nav>
 
 <!-- ═══ ELEMENTI FISSI ═══ -->

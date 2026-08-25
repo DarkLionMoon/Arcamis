@@ -90,7 +90,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lavori/gilda-avventurieri"
+      "path": "lavori/gilda-avventurieri",
+      "sec": "lavori"
     },
     {
       "k": "locanda",
@@ -100,7 +101,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lavori/locanda"
+      "path": "lavori/locanda",
+      "sec": "lavori"
     },
     {
       "k": "forgia",
@@ -110,7 +112,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lavori/forgia"
+      "path": "lavori/forgia",
+      "sec": "lavori"
     },
     {
       "k": "biblioteca",
@@ -120,7 +123,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lavori/biblioteca"
+      "path": "lavori/biblioteca",
+      "sec": "lavori"
     },
     {
       "k": "bottega-farmaceutica",
@@ -130,7 +134,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lavori/bottega-farmaceutica"
+      "path": "lavori/bottega-farmaceutica",
+      "sec": "lavori"
     },
     {
       "k": "caserma",
@@ -140,7 +145,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lavori/caserma"
+      "path": "lavori/caserma",
+      "sec": "lavori"
     },
     {
       "k": "corporazione-costruttori",
@@ -150,7 +156,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lavori/corporazione-costruttori"
+      "path": "lavori/corporazione-costruttori",
+      "sec": "lavori"
     },
     {
       "k": "ospedale",
@@ -160,7 +167,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lavori/ospedale"
+      "path": "lavori/ospedale",
+      "sec": "lavori"
     },
     {
       "k": "sartoria",
@@ -170,7 +178,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lavori/sartoria"
+      "path": "lavori/sartoria",
+      "sec": "lavori"
     },
     {
       "k": "maestria-titoli",
@@ -515,6 +524,10 @@
       "pages": []
     },
     {
+      "v": "lavori",
+      "l": "Lavori"
+    },
+    {
       "v": "lore",
       "l": "Lore",
       "pages": []
@@ -767,5 +780,31 @@
       "changefreq": "monthly",
       "priority": "0.6"
     }
-  ]
+  ],
+  "ui": {
+    "bottomNav": [
+      {
+        "icon": "🏰",
+        "label": "Home",
+        "action": "home"
+      },
+      {
+        "icon": "🧭",
+        "label": "Esplora",
+        "action": "drawer"
+      },
+      {
+        "icon": "💼",
+        "label": "Lavori",
+        "action": "page",
+        "target": "pag-lavori"
+      },
+      {
+        "icon": "⚙️",
+        "label": "Opzioni",
+        "action": "options"
+      }
+    ],
+    "drawerSearch": true
+  }
 }

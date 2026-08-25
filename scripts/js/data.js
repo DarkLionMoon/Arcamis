@@ -6,6 +6,34 @@
 var ROOT = '2f00274fdc1c801a9b39d8d69800f7a8';
 var GUILD = '1348723468157456425';
 
+/* ════ CONFIG INTERFACCIA (admin → Interfaccia) ════ */
+var UI_CONFIG = {
+ "bottomNav": [
+  {
+   "icon": "🏰",
+   "label": "Home",
+   "action": "home"
+  },
+  {
+   "icon": "🧭",
+   "label": "Esplora",
+   "action": "drawer"
+  },
+  {
+   "icon": "💼",
+   "label": "Lavori",
+   "action": "page",
+   "target": "pag-lavori"
+  },
+  {
+   "icon": "⚙️",
+   "label": "Opzioni",
+   "action": "options"
+  }
+ ],
+ "drawerSearch": true
+};
+
 var pages = [
   {k:'la-storia-di-gandora',l:'La Storia di Gandora',i:'🐉',id:'pag-la-storia-di-gandora',sec:'lore'},
   {k:'regole-del-server',l:'Regole del Server',i:'📋',id:'pag-regole-del-server',sec:'regole'},
@@ -14,15 +42,15 @@ var pages = [
   {k:'lavori',l:'Lavoro',i:'💼',id:'pag-lavori',sec:'personaggio'},
   {k:'come-si-inizia',l:'Come si inizia',i:'🌟',id:'pag-come-si-inizia'},
   {k:'andando-avanti',l:'Andando avanti',i:'📈',id:'pag-andando-avanti'},
-  {k:'gilda-avventurieri',l:'Gilda degli Avventurieri',i:'🗡️',id:'pag-gilda-avventurieri'},
-  {k:'locanda',l:'Locanda',i:'🍺',id:'pag-locanda'},
-  {k:'forgia',l:'Forgia',i:'🔥',id:'pag-forgia'},
-  {k:'biblioteca',l:'Biblioteca',i:'📚',id:'pag-biblioteca'},
-  {k:'bottega-farmaceutica',l:'Bottega farmaceutica',i:'💊',id:'pag-bottega-farmaceutica'},
-  {k:'caserma',l:'Caserma',i:'🛡️',id:'pag-caserma'},
-  {k:'corporazione-costruttori',l:'Corporazione dei Costruttori',i:'🔨',id:'pag-corporazione-costruttori'},
-  {k:'ospedale',l:'Ospedale',i:'⚕️',id:'pag-ospedale'},
-  {k:'sartoria',l:'Sartoria',i:'🧵',id:'pag-sartoria'},
+  {k:'gilda-avventurieri',l:'Gilda degli Avventurieri',i:'🗡️',id:'pag-gilda-avventurieri',sec:'lavori'},
+  {k:'locanda',l:'Locanda',i:'🍺',id:'pag-locanda',sec:'lavori'},
+  {k:'forgia',l:'Forgia',i:'🔥',id:'pag-forgia',sec:'lavori'},
+  {k:'biblioteca',l:'Biblioteca',i:'📚',id:'pag-biblioteca',sec:'lavori'},
+  {k:'bottega-farmaceutica',l:'Bottega farmaceutica',i:'💊',id:'pag-bottega-farmaceutica',sec:'lavori'},
+  {k:'caserma',l:'Caserma',i:'🛡️',id:'pag-caserma',sec:'lavori'},
+  {k:'corporazione-costruttori',l:'Corporazione dei Costruttori',i:'🔨',id:'pag-corporazione-costruttori',sec:'lavori'},
+  {k:'ospedale',l:'Ospedale',i:'⚕️',id:'pag-ospedale',sec:'lavori'},
+  {k:'sartoria',l:'Sartoria',i:'🧵',id:'pag-sartoria',sec:'lavori'},
   {k:'maestria-titoli',l:'Maestria / Titoli',i:'🏅',id:'pag-maestria-titoli'},
   {k:'casate-e-compagnie',l:'Casate e Compagnie',i:'🏰',id:'pag-casate-e-compagnie'},
   {k:'storia-del-mondo',l:'Storia del Mondo',i:'📖',id:'pag-storia-del-mondo'},
@@ -66,6 +94,7 @@ function getPage(idOrK){
 var SECTIONS = [
   {v:"regole",l:"Regole"},
   {v:"personaggio",l:"Personaggio"},
+  {v:"lavori",l:"Lavori"},
   {v:"lore",l:"Lore"}
 ];
 

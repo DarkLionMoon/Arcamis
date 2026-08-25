@@ -78,7 +78,8 @@
 
     document.querySelectorAll('#bottom-nav .bnav-item').forEach(function(b){
       var k = b.getAttribute('data-k');
-      if(k && k !== 'home' && k !== 'menu' && !active[k]) b.remove();
+      if(k && k.indexOf('slot-') === 0) return; /* renderizzate da UI_CONFIG */
+      if(k && k !== 'home' && k !== 'esplora' && k !== 'opzioni' && !active[k]) b.remove();
     });
   }
 
@@ -254,9 +255,63 @@
     _reorder();
   }
 
+  /* ════ BOTTOM NAV da UI_CONFIG ════ */
+  function _bnavAction(item, el){
+    var a = item.action || 'home';
+    if(a === 'home'){ el.addEventListener('click', function(){ showHome(); setBnavActive('slot-'+item.slot); }); }
+    else if(a === 'drawer'){ el.setAttribute('aria-controls','mobile-nav'); el.addEventListener('click', function(){ toggleMobileNav(); setBnavActive('slot-'+item.slot); }); }
+    else if(a === 'options'){ el.addEventListener('click', function(){ if(typeof _openOptionsPanel==='function') _openOptionsPanel(); setBnavActive('slot-'+item.slot); }); }
+    else if(a === 'page' && item.target){
+      var pg = (typeof getPage === 'function') ? getPage(item.target) : null;
+      el.addEventListener('click', function(){
+        gp(pg ? pg.id : item.target, pg ? pg.l : (item.label||''), pg ? pg.i : '📄');
+        setBnavActive('slot-'+item.slot);
+      });
+    } else if(a === 'url' && item.target){
+      el.addEventListener('click', function(){ window.open(item.target, '_blank', 'noopener'); });
+    } else {
+      el.addEventListener('click', function(){ showHome(); setBnavActive('slot-'+item.slot); });
+    }
+  }
+  function renderBottomNav(){
+    var nav = document.getElementById('bottom-nav');
+    if(!nav) return;
+    var cfg = (typeof UI_CONFIG !== 'undefined' && UI_CONFIG && Array.isArray(UI_CONFIG.bottomNav))
+      ? UI_CONFIG.bottomNav : null;
+    if(!cfg || !cfg.length) return; /* fallback: markup esistente */
+    nav.innerHTML = '';
+    nav.style.gridTemplateColumns = 'repeat(' + cfg.length + ',1fr)';
+    cfg.forEach(function(item, i){
+      item.slot = i;
+      var el = document.createElement('div');
+      el.className = 'bnav-item' + (i === 0 ? ' active' : '');
+      el.setAttribute('data-k', 'slot-' + i);
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'button');
+      el.innerHTML = '<span>' + (item.icon || '📄') + '</span>'
+        + '<span class="bnav-label">' + _escH2(item.label || '') + '</span>';
+      if(item.action === 'options'){
+        var badge = document.createElement('div');
+        badge.className = 'bnav-badge changelog-badge';
+        el.appendChild(badge);
+      }
+      _bnavAction(item, el);
+      nav.appendChild(el);
+    });
+  }
+  function _escH2(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
   function init(){
     if(!document.getElementById('tnav') && !document.getElementById('mobile-nav')) return;
+    renderBottomNav();
     inject();
+    /* Ricerca drawer: on/off da config */
+    if(typeof UI_CONFIG !== 'undefined' && UI_CONFIG && UI_CONFIG.drawerSearch === false){
+      var ms = document.querySelector('.mn-search');
+      if(ms) ms.style.display = 'none';
+    }
     if(document.getElementById('mobile-nav')){
       var t = setInterval(function(){
         if(document.querySelector('#mobile-nav .mn-item')){

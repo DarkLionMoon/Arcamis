@@ -387,6 +387,7 @@ function buildSidebar(){
   h+='<div class="sb-group"><div class="sb-label">Sito</div>';
   h+='<div class="sb-item" data-type="mappins" onclick="openMapEditor()"><span class="ico">🗺️</span><span class="lbl">Mappa (puntine)</span></div>';
   h+='<div class="sb-item" data-type="nav" onclick="openNav()"><span class="ico">🧭</span><span class="lbl">Navigazione</span></div>';
+  h+='<div class="sb-item" data-type="interface" onclick="openInterfaceUI()"><span class="ico">📱</span><span class="lbl">Interfaccia</span></div>';
   h+='<div class="sb-item" data-type="settings" onclick="openSettings()"><span class="ico">⚙️</span><span class="lbl">Impostazioni</span></div>';
   h+='</div>';
   if(admin){

@@ -81,15 +81,15 @@ window.ArcAdmin.pages = [
 {k:'lavori',l:'Lavoro',i:'💼',sec:'personaggio',c:1},
 {k:'come-si-inizia',l:'Come si inizia',i:'🌟',c:1},
 {k:'andando-avanti',l:'Andando avanti',i:'📈',c:1},
-{k:'gilda-avventurieri',l:'Gilda degli Avventurieri',i:'🗡️',c:1},
-{k:'locanda',l:'Locanda',i:'🍺',c:1},
-{k:'forgia',l:'Forgia',i:'🔥',c:1},
-{k:'biblioteca',l:'Biblioteca',i:'📚',c:1},
-{k:'bottega-farmaceutica',l:'Bottega farmaceutica',i:'💊',c:1},
-{k:'caserma',l:'Caserma',i:'🛡️',c:1},
-{k:'corporazione-costruttori',l:'Corporazione dei Costruttori',i:'🔨',c:1},
-{k:'ospedale',l:'Ospedale',i:'⚕️',c:1},
-{k:'sartoria',l:'Sartoria',i:'🧵',c:1},
+{k:'gilda-avventurieri',l:'Gilda degli Avventurieri',i:'🗡️',sec:'lavori',c:1},
+{k:'locanda',l:'Locanda',i:'🍺',sec:'lavori',c:1},
+{k:'forgia',l:'Forgia',i:'🔥',sec:'lavori',c:1},
+{k:'biblioteca',l:'Biblioteca',i:'📚',sec:'lavori',c:1},
+{k:'bottega-farmaceutica',l:'Bottega farmaceutica',i:'💊',sec:'lavori',c:1},
+{k:'caserma',l:'Caserma',i:'🛡️',sec:'lavori',c:1},
+{k:'corporazione-costruttori',l:'Corporazione dei Costruttori',i:'🔨',sec:'lavori',c:1},
+{k:'ospedale',l:'Ospedale',i:'⚕️',sec:'lavori',c:1},
+{k:'sartoria',l:'Sartoria',i:'🧵',sec:'lavori',c:1},
 {k:'maestria-titoli',l:'Maestria / Titoli',i:'🏅',c:1},
 {k:'casate-e-compagnie',l:'Casate e Compagnie',i:'🏰',c:1},
 {k:'storia-del-mondo',l:'Storia del Mondo',i:'📖',c:1},
@@ -127,6 +127,7 @@ window.ArcAdmin.pages = [
 window.ArcAdmin.sections = [
 {v:"regole",l:"Regole"},
 {v:"personaggio",l:"Personaggio"},
+{v:"lavori",l:"Lavori"},
 {v:"lore",l:"Lore"}
 ];
 /* Alias retrocompatibili (gestori onclick e codice legacy). */
@@ -138,6 +139,7 @@ var SECTIONS = window.ArcAdmin.sections;
 <script src="js/structured.js"></script>
 <script src="js/site.js"></script>
 <script src="js/mappins.js"></script>
+<script src="js/ui-editor.js"></script>
 <script src="js/system.js"></script>
 </body>
 </html>

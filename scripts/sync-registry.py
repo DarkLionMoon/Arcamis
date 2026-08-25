@@ -253,6 +253,7 @@ def generate_data_js(reg):
 
     sections = [f"{{v:\"{s['v']}\",l:\"{escape_js(s['l'])}\"}}" for s in reg['sections'] if not s.get('adminOnly')]
     lavori = [f"{{ l:'{escape_js(w['l'])}', i:'{w['i']}', id:'{w['id']}' }}" for w in reg['lavori']]
+    ui = json.dumps(reg.get('ui', {}), ensure_ascii=False, indent=1)
 
     return f"""/* ════════════════════════════════════
    ARCAMIS — data.js
@@ -261,6 +262,9 @@ def generate_data_js(reg):
 ════════════════════════════════════ */
 var ROOT = '{reg['root']}';
 var GUILD = '{reg['guild']}';
+
+/* ════ CONFIG INTERFACCIA (admin → Interfaccia) ════ */
+var UI_CONFIG = {ui};
 
 var pages = [
   {',\n  '.join(pages)}
@@ -299,6 +303,7 @@ def generate_data_json(reg):
     data = {
         'root': reg['root'],
         'guild': reg['guild'],
+        'ui': reg.get('ui', {}),
         'pages': pages,
         'sections': sections,
         'lavori': lavori
