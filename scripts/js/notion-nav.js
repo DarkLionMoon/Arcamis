@@ -604,8 +604,16 @@ async function _gpRender(id,label,icon){
     if(typeof afterPageRender==='function')afterPageRender();
 
   }catch(e){
-    document.getElementById('pbody').innerHTML='';
-    showToast('Errore caricamento pagina: '+e.message,'⚠️',4000);
+    var _pb=document.getElementById('pbody');
+    if(_pb){
+      var _lbl=label||'Pagina';
+      phTitle.textContent=_lbl;
+      document.title=_lbl+' — Arcamis';
+      _pb.innerHTML='<div class="nc"><div class="n-empty"><div class="n-empty-icon">🗺️</div>'
+        +'<div class="n-empty-title">Pagina non trovata</div>'
+        +'<div class="n-empty-msg">Il contenuto richiesto non esiste o è stato spostato. Usa la ricerca o il menu per continuare l\'esplorazione.</div></div></div>';
+    }
+    showToast('Contenuto non disponibile','⚠️',3000);
     if(typeof afterPageRender==='function')afterPageRender();
   }
 }

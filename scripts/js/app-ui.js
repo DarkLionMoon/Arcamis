@@ -347,18 +347,35 @@ function setNav(k){
 
 /* ════ RECENTI ════ */
 var _recenti = [];
+try { _recenti = JSON.parse(localStorage.getItem('arc_recenti') || '[]'); } catch(e) { _recenti = []; }
 function addRecente(id, title, icon){
   _recenti = _recenti.filter(function(r){ return r.id !== id; });
   _recenti.unshift({id:id, title:title, icon:icon});
   if(_recenti.length > 5) _recenti.pop();
-  var el = document.getElementById('ov-recenti');
-  if(!el || !_recenti.length) return;
-  el.innerHTML = '<div class="portal-sh">Visitati di recente</div>'
-    + _recenti.map(function(r){
-      return '<div class="ov-rec-item" onclick="cv();gp(\''+r.id+'\',\''+r.title+'\',\''+r.icon+'\')">'
-        +'<span>'+r.icon+'</span> '+r.title+'</div>';
-    }).join('');
+  try { localStorage.setItem('arc_recenti', JSON.stringify(_recenti)); } catch(e) {}
+  _renderRecenti();
 }
+function _renderRecenti(){
+  var el = document.getElementById('ov-recenti');
+  if(el && _recenti.length){
+    el.innerHTML = '<div class="portal-sh">Visitati di recente</div>'
+      + _recenti.map(function(r){
+        return '<div class="ov-rec-item" onclick="cv();gp(\''+r.id+'\',\''+r.title+'\',\''+r.icon+'\')">'
+          +'<span>'+r.icon+'</span> '+r.title+'</div>';
+      }).join('');
+  }
+  var mn = document.getElementById('mn-recenti');
+  if(mn){
+    if(!_recenti.length){ mn.style.display = 'none'; return; }
+    mn.style.display = '';
+    mn.innerHTML = '<div class="mn-label">Visitati di recente</div>'
+      + _recenti.map(function(r){
+        return '<div class="mn-item" onclick="closeMobileNav();gp(\''+r.id+'\',\''+r.title+'\',\''+r.icon+'\')">'
+          +'<span class="mn-ii">'+r.icon+'</span>'+r.title+'</div>';
+      }).join('');
+  }
+}
+_renderRecenti();
 
 /* ════ BOTTOM NAV ════ */
 function setBnavActive(k){
@@ -466,6 +483,15 @@ document.addEventListener('click', function(e){
     var txt = document.getElementById('disclaimer-text');
     if(txt && s.disclaimer_text) txt.textContent = s.disclaimer_text;
     overlay.style.display = 'flex';
+    var btn = document.getElementById('disclaimer-btn');
+    if(btn && !btn._bound){
+      btn._bound = true;
+      btn.addEventListener('click', function(){
+        localStorage.setItem(DISCLAIMER_KEY, '1');
+        overlay.style.display = 'none';
+      });
+      overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.style.display = 'none'; });
+    }
   }
 
   fetch('/api/admin?action=get_site_settings')

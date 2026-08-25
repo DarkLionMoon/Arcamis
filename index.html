@@ -134,6 +134,7 @@
     <input id="m-ts" type="text" placeholder="Cerca nella wiki…" autocomplete="off" aria-label="Cerca nella wiki" oninput="msearch(this.value)"/>
     <div id="m-sr"></div>
   </div>
+  <div class="mn-section" id="mn-recenti" style="display:none"></div>
   <div class="mn-section">
     <div class="mn-item" onclick="closeMobileNav();showHome()"><span class="mn-ii">🏠</span>Home</div>
   </div>
@@ -487,6 +488,16 @@
 
 <div id="arc-lightbox" onclick="this.classList.remove('open')">
   <img id="arc-lightbox-img" src="" alt="">
+</div>
+
+<!-- ═══ DISCLAIMER ═══ -->
+<div id="disclaimer-overlay" style="display:none">
+  <div class="disclaimer-card">
+    <div class="disclaimer-logo">⚔️</div>
+    <h2 class="disclaimer-title">Arcamis</h2>
+    <div class="disclaimer-body" id="disclaimer-text">Questo sito fa parte di una community di gioco di ruolo. Continuando dichiari di accedere ai contenuti della campagna.</div>
+    <button class="disclaimer-btn" id="disclaimer-btn">HO CAPITO</button>
+  </div>
 </div>
 
 <!-- ════ HELP WIDGET ════ -->
