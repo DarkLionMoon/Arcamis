@@ -219,18 +219,6 @@
       "sub": ""
     },
     {
-      "k": "changelog",
-      "l": "Changelog",
-      "i": "📝",
-      "id": "pag-changelog",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "changelog",
-      "sec": "",
-      "sub": ""
-    },
-    {
       "k": "arcamis",
       "l": "Arcamis",
       "i": "📍",
