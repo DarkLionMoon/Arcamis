@@ -136,7 +136,8 @@
       "k": "sottoclassi-homebrew",
       "l": "Sottoclassi Homebrew",
       "i": "⚔️",
-      "id": "pag-sottoclassi-homebrew"
+      "id": "pag-sottoclassi-homebrew",
+      "sec": "homebrew"
     },
     {
       "k": "changelog",
