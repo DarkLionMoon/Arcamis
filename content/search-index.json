@@ -90,16 +90,16 @@
   "text": "Contenuto in arrivo."
  },
  {
-  "id": "pag-specie-homebrew",
-  "title": "Specie Homebrew",
-  "icon": "📄",
-  "text": ""
- },
- {
   "id": "pag-regole-homebrew",
   "title": "Regole Homebrew per specie, classi ed oggetti già esistenti",
   "icon": "📄",
   "text": "Contenuto in arrivo."
+ },
+ {
+  "id": "pag-specie-homebrew",
+  "title": "Specie Homebrew",
+  "icon": "📄",
+  "text": ""
  },
  {
   "id": "pag-sottoclassi-homebrew",

@@ -119,16 +119,16 @@
       "id": "pag-mappa-arcamis"
     },
     {
-      "k": "specie-homebrew",
-      "l": "Specie Homebrew",
-      "i": "🧬",
-      "id": "pag-specie-homebrew"
-    },
-    {
       "k": "regole-homebrew",
       "l": "Regole Homebrew",
       "i": "📐",
       "id": "pag-regole-homebrew"
+    },
+    {
+      "k": "specie-homebrew",
+      "l": "Specie Homebrew",
+      "i": "🧬",
+      "id": "pag-specie-homebrew"
     },
     {
       "k": "sottoclassi-homebrew",
