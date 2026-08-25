@@ -25,12 +25,6 @@
    "lastEdited": "2026-08-25T14:49:32.831917Z"
   },
   {
-   "id": "pag-esplora-dal-vivo",
-   "title": "Esplora dal “vivo”",
-   "icon": "📄",
-   "lastEdited": "2026-08-25T14:49:32.827106Z"
-  },
-  {
    "id": "pag-sottoclassi-homebrew",
    "title": "Sottoclassi Homebrew",
    "icon": "📄",
@@ -47,6 +41,12 @@
    "title": "Specie Homebrew",
    "icon": "📄",
    "lastEdited": "2026-08-25T14:49:09.002940Z"
+  },
+  {
+   "id": "pag-mappa-arcamis",
+   "title": "Arcamis",
+   "icon": "📄",
+   "lastEdited": "2026-08-25T14:49:08.576856Z"
   }
  ]
 }

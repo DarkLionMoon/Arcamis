@@ -43,7 +43,6 @@ var pages = [
   {k:'introduzione',l:'Introduzione',i:'📜',id:'pag-introduzione'},
   {k:'piani-di-esistenza',l:'Piani di esistenza',i:'🌌',id:'pag-piani-di-esistenza'},
   {k:'bibliografia-scoperta',l:'Bibliografia scoperta',i:'📚',id:'pag-bibliografia-scoperta'},
-  {k:'esplora-dal-vivo',l:'Esplora dal vivo',i:'🗺️',id:'pag-esplora-dal-vivo'},
   {k:'mappe',l:'Mappe',i:'🗺️',id:'pag-mappe'},
   {k:'mappa-arcamis',l:'Arcamis',i:'🏙️',id:'pag-mappa-arcamis'},
   {k:'specie-homebrew',l:'Specie Homebrew',i:'🧬',id:'pag-specie-homebrew'},
