@@ -122,7 +122,8 @@
       "k": "regole-homebrew",
       "l": "Regole Homebrew",
       "i": "📐",
-      "id": "pag-regole-homebrew"
+      "id": "pag-regole-homebrew",
+      "sec": "homebrew"
     },
     {
       "k": "specie-homebrew",
