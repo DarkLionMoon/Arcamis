@@ -1,0 +1,126 @@
+{
+  "mapImage": "/mappa.webp",
+  "pins": [
+    {
+      "id": "pin-arcamis",
+      "type": "city",
+      "left": "87.76%",
+      "top": "28.53%",
+      "explored": true,
+      "sub": "",
+      "pageId": "pag-arcamis",
+      "name": "Arcamis",
+      "desc": "Città portuale delle Marche. Porto, commercio, avventura."
+    },
+    {
+      "id": "pin-selvafoglia",
+      "type": "forest",
+      "left": "78.58%",
+      "top": "24.05%",
+      "explored": true,
+      "sub": "foglia",
+      "pageId": "pag-selva-fogliabruna",
+      "name": "Selva Fogliabruna",
+      "desc": "Alberi troppo vecchi. Chi entra non sempre torna."
+    },
+    {
+      "id": "pin-forestasmari",
+      "type": "fog",
+      "left": "86.74%",
+      "top": "41.99%",
+      "explored": false,
+      "sub": "smari",
+      "pageId": "pag-foresta-dello-smarrimento",
+      "name": "Foresta dello Smarrimento",
+      "desc": "Non ci sono mappe. I sentieri cambiano. Rune violacee compaiono di notte."
+    },
+    {
+      "id": "pin-volonx",
+      "type": "village",
+      "left": "93.13%",
+      "top": "35.69%",
+      "explored": true,
+      "sub": "",
+      "pageId": "pag-volonx",
+      "name": "Volonx",
+      "desc": "Insediamento ai margini. Chi ci abita, raramente se ne va."
+    },
+    {
+      "id": "pin-vigilius",
+      "type": "city",
+      "left": "78.74%",
+      "top": "51.15%",
+      "explored": true,
+      "sub": "",
+      "pageId": "pag-vigilius",
+      "name": "Vigilius",
+      "desc": "Città interna delle Marche. Centro politico e militare."
+    },
+    {
+      "id": "pin-galeton",
+      "type": "village",
+      "left": "86.21%",
+      "top": "69.47%",
+      "explored": true,
+      "sub": "",
+      "pageId": "pag-galeton",
+      "name": "Galeton",
+      "desc": "Crocevia commerciale. Molte strade si incontrano qui."
+    },
+    {
+      "id": "pin-lagogromot",
+      "type": "water",
+      "left": "92.65%",
+      "top": "51.72%",
+      "explored": true,
+      "sub": "",
+      "pageId": "pag-lago-di-gromot",
+      "name": "Lago di Gromot",
+      "desc": "Acque scure e profonde. Nessuno sa quanto è fondo."
+    },
+    {
+      "id": "pin-fortevigilius",
+      "type": "fort",
+      "left": "20.99%",
+      "top": "33.02%",
+      "explored": true,
+      "sub": "",
+      "pageId": "pag-forte-vigilus",
+      "name": "Forte Vigilus",
+      "desc": "Avamposto militare sulle alture. Controlla i passi verso est."
+    },
+    {
+      "id": "pin-rivadifero",
+      "type": "village",
+      "left": "20.45%",
+      "top": "66.99%",
+      "explored": true,
+      "sub": "",
+      "pageId": "pag-riva-di-ferro",
+      "name": "Riva di Ferro",
+      "desc": "Porto minore. Pescatori, contrabbandieri, qualche avventuriero di passaggio."
+    },
+    {
+      "id": "pin-fumofosco",
+      "type": "village",
+      "left": "43.48%",
+      "top": "52.48%",
+      "explored": true,
+      "sub": "",
+      "pageId": "pag-fumofosco",
+      "name": "Fumofosco",
+      "desc": "Un villaggio avvolto da strane nebbie. I locali non parlano molto."
+    },
+    {
+      "id": "pin-kaldur",
+      "type": "ruin",
+      "left": "48.09%",
+      "top": "69.85%",
+      "explored": true,
+      "sub": "",
+      "pageId": "pag-rovine-di-kaldur",
+      "name": "Rovine di Kaldur",
+      "desc": "Una civiltà è finita qui. Le pietre bruciano ancora."
+    }
+  ]
+}

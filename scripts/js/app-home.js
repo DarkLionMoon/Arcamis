@@ -186,12 +186,12 @@ window.onAfterPageRender(function(){
     });
   }
 
-  /* Carica puntine + mappa da API */
+  /* Carica puntine + mappa da file repo */
   _bindPinEvents();
   var container = document.getElementById('dynamic-pins');
   var mapImg = document.querySelector('#arcamis-map img');
   if(container){
-    fetch('/api/mappins')
+    fetch('/content/mappins.json')
       .then(function(r){ return r.json(); })
       .then(function(d){
         var pins = d.pins || [];

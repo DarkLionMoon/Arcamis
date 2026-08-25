@@ -7,6 +7,7 @@
 
 var MAP_PINS = [];
 var MAP_IMAGE_URL = '/mappa.webp';
+var _mapFileSha = null;
 var _mapDirty = false;
 var _mapDragPin = null;
 var _mapDragOffset = { x: 0, y: 0 };
@@ -40,49 +41,42 @@ function _mapTypeOptions(selected) {
   }).join('');
 }
 
-/* ════ CARICA DA API ════ */
+/* ════ CARICA DA REPO ════ */
 async function _loadMapPins() {
   try {
-    var r = await fetch('/api/mappins', { credentials: 'include' });
-    var j = await r.json();
+    var d = await ghGet('content/mappins.json');
+    var j = JSON.parse(b64decode(d.content));
     MAP_PINS = j.pins || [];
     MAP_IMAGE_URL = j.mapImage || '/mappa.webp';
+    _mapFileSha = d.sha;
     return MAP_PINS;
   } catch (e) {
     MAP_PINS = [];
     MAP_IMAGE_URL = '/mappa.webp';
+    _mapFileSha = null;
     return MAP_PINS;
   }
 }
 
-/* ════ SALVA SU API ════ */
+/* ════ SALVA SU REPO ════ */
 async function _saveMapPins() {
-  var payload = { pins: MAP_PINS };
-
-  /* Salva immagine mappa se cambiata */
   var imgInput = document.getElementById('me-map-image');
-  if (imgInput) {
-    payload.mapImage = imgInput.value.trim() || '/mappa.webp';
-  }
+  if (imgInput) MAP_IMAGE_URL = imgInput.value.trim() || '/mappa.webp';
+  var payload = { mapImage: MAP_IMAGE_URL, pins: MAP_PINS };
 
   try {
-    var r = await fetch('/api/mappins', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    var j = await r.json();
-    if (j.ok) {
-      _mapDirty = false;
-      if (imgInput) MAP_IMAGE_URL = imgInput.value.trim() || '/mappa.webp';
-      ArcAdmin.module('core').ui.toast('Salvato in KV', 'success');
-      ArcAdmin.module('core').audit('save_mappins', 'map', { count: MAP_PINS.length });
-    } else {
-      ArcAdmin.module('core').ui.toast('Errore: ' + (j.error || 'sconosciuto'), 'error');
-    }
+    setStatus('saving', 'salvataggio...');
+    await ghPut('content/mappins.json', 'admin: update mappins',
+      JSON.stringify(payload, null, 2) + '\n', _mapFileSha);
+    _mapDirty = false;
+    ArcAdmin.module('core').ui.toast('Salvato nel repo — deploy in corso (~30s)', 'success');
+    ArcAdmin.module('core').audit('save_mappins', 'map', { count: MAP_PINS.length });
+    startDeployTimer();
+    setStatus('ok', 'deploying');
+    setTimeout(function() { setStatus('idle', 'pronto'); }, 2000);
   } catch (e) {
     ArcAdmin.module('core').ui.toast('Errore di rete: ' + e.message, 'error');
+    setStatus('err', 'errore');
   }
 }
 
@@ -366,7 +360,7 @@ function _mapEditPin(idx) {
     + '</div>'
     + '<div class="grid-2">'
     + '<div class="fld"><label>Sub-mappa</label><input id="mef-sub" class="in" placeholder="foglia, smari…" value="' + escAttr(pin.sub || '') + '"></div>'
-    + '<div class="fld"><label>Page ID Notion</label><input id="mef-pageid" class="in" placeholder="ID pagina wiki" value="' + escAttr(pin.pageId || '') + '"></div>'
+    + '<div class="fld"><label>ID pagina wiki</label><input id="mef-pageid" class="in" placeholder="es. pag-arcamis" value="' + escAttr(pin.pageId || '') + '"></div>'
     + '</div>'
     + '<div class="fld"><label><input type="checkbox" id="mef-explored"' + (pin.explored ? ' checked' : '') + '> Esplorata</label></div>'
     + '</div>';
