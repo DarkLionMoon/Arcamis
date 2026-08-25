@@ -123,16 +123,6 @@
       "path": "lore/introduzione"
     },
     {
-      "k": "npc-storia",
-      "l": "Npc",
-      "i": "🧝",
-      "id": "pag-npc-storia",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/npc"
-    },
-    {
       "k": "piani-di-esistenza",
       "l": "Piani di esistenza",
       "i": "🌌",
