@@ -183,16 +183,6 @@
       "path": "lore/mappa-arcamis"
     },
     {
-      "k": "homebrew",
-      "l": "Homebrew",
-      "i": "⚗️",
-      "id": "pag-homebrew",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/homebrew"
-    },
-    {
       "k": "specie-homebrew",
       "l": "Specie Homebrew",
       "i": "🧬",
