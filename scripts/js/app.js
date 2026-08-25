@@ -70,7 +70,6 @@ var _pathMap = {
   'lore/riva-di-ferro': 'pag-riva-di-ferro',
   'lore/fumofosco': 'pag-fumofosco',
   'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur',
-  'lore/rivorosso': 'pag-rivorosso',
   'lore/circolo-dello-smarrimento': 'pag-circolo-dello-smarrimento'
 };
 

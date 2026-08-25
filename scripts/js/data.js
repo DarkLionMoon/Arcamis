@@ -62,7 +62,6 @@ var pages = [
   {k:'riva-di-ferro',l:'Riva di Ferro',i:'⚓',id:'pag-riva-di-ferro'},
   {k:'fumofosco',l:'Fumofosco',i:'🌫️',id:'pag-fumofosco'},
   {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'},
-  {k:'rivorosso',l:'Rivorosso',i:'🌊',id:'pag-rivorosso'},
   {k:'circolo-dello-smarrimento',l:'Circolo dello Smarrimento',i:'🪨',id:'pag-circolo-dello-smarrimento'}
 ];
 
