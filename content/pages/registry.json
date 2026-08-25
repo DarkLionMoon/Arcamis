@@ -191,7 +191,7 @@
       "menu": true,
       "admin": true,
       "path": "lore/regole-homebrew",
-      "sec": "",
+      "sec": "homebrew",
       "sub": ""
     },
     {
