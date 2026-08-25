@@ -83,27 +83,6 @@
       "sec": "lavori"
     },
     {
-      "k": "biblioteca",
-      "l": "Biblioteca",
-      "i": "📚",
-      "id": "pag-biblioteca",
-      "sec": "lavori"
-    },
-    {
-      "k": "bottega-farmaceutica",
-      "l": "Bottega farmaceutica",
-      "i": "💊",
-      "id": "pag-bottega-farmaceutica",
-      "sec": "lavori"
-    },
-    {
-      "k": "caserma",
-      "l": "Caserma",
-      "i": "🛡️",
-      "id": "pag-caserma",
-      "sec": "lavori"
-    },
-    {
       "k": "corporazione-costruttori",
       "l": "Corporazione dei Costruttori",
       "i": "🔨",

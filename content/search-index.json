@@ -48,24 +48,6 @@
   "text": "La forgia, dove echi di martelli a lavoro ed il calore del fuoco, avvolgono l'atmosfera. Come fabbro, puoi forgiare e riparare armi ed armature, lavorare minerali ed anche oggetti mondani (Ovviamente quelli che possono essere creati da un fabbro). Stipendio Lo stipendio dipende da: A) Livello del PG • Apprendista (Livelli 1 5) = 15 mo base • Professionista (Livelli 6 12) = 25 mo base • Mastro (Livelli 13 20) = 35 mo base B) Giorni di lavoro • I primi 5 giorni, avrete lo stipendio base descritto nella variabile A (Chi fa meno di 5 giorni, non viene pagato); • Successivamente, avrete stipendio extra, in base dagli stock bonus completati (5 giorni per stock, per un massimo di 4 stock bonus) C) Modificatore caratteristica del lavoro • Ogni lavoro ha due modificatori caratteristica tra cui scegliere, che aumenteranno il vostro stipendio. • Per questo lavoro, sono Costituzione (COS) o Forza (STR)."
  },
  {
-  "id": "pag-biblioteca",
-  "title": "Biblioteca",
-  "icon": "📚",
-  "text": "Un silenzio rispettoso avvolge un luogo sacro, carico di storia e memoria. Fai attenzione a ogni passo: il capo dello staff non tollera chi disturba la quiete. Stipendio Lo stipendio dipende da: A) Livello del PG • Apprendista (Livelli 1 5) = 15 mo base • Professionista (Livelli 6 12) = 25 mo base • Mastro (Livelli 13 20) = 35 mo base B) Giorni di lavoro • I primi 5 giorni, avrete lo stipendio base descritto nella variabile A (Chi fa meno di 5 giorni, non viene pagato); • Successivamente, avrete stipendio extra, in base dagli stock bonus completati (5 giorni per stock, per un massimo di 4 stock bonus) C) Modificatore caratteristica del lavoro • Ogni lavoro ha due modificatori caratteristica tra cui scegliere, che aumenteranno il vostro stipendio. • Per questo lavoro, sono Intelligenza (INT) o Carisma (CHA)."
- },
- {
-  "id": "pag-bottega-farmaceutica",
-  "title": "Bottega farmaceutica",
-  "icon": "💊",
-  "text": "\"Mai pensato di aver bisogno di pozioni, tonici, prodotti di bellezza? Da noi puoi trovare ogni cosa di cui potresti avere bisogno!\" Come alchimista puoi vendere, come citato sopra, tonici, pozioni, prodotti di bellezza e molti altri prodotti inclusi in questa categoria. Stipendio Lo stipendio dipende da: A) Livello del PG • Apprendista (Livelli 1 5) = 15 mo base • Professionista (Livelli 6 12) = 25 mo base • Mastro (Livelli 13 20) = 35 mo base B) Giorni di lavoro • I primi 5 giorni, avrete lo stipendio base descritto nella variabile A (Chi fa meno di 5 giorni, non viene pagato); • Successivamente, avrete stipendio extra, in base dagli stock bonus completati (5 giorni per stock, per un massimo di 4 stock bonus) C) Modificatore caratteristica del lavoro • Ogni lavoro ha due modificatori caratteristica tra cui scegliere, che aumenteranno il vostro stipendio. • Per questo lavoro, sono Intelligenza (INT) o Saggezza (WIS)."
- },
- {
-  "id": "pag-caserma",
-  "title": "Caserma",
-  "icon": "🛡️",
-  "text": "L’interno della caserma è vasto e ordinato, un grande salone di pietra e legno rinforzato dove l’eco dei passi rimbalza tra pareti colme di armi e rastrelliere. Tavoli ingombri di mappe e registri occupano il centro, mentre lampade a olio e congegni a vapore illuminano l’ambiente con una luce calda e severa. Guardie indaffarate si muovono ovunque, e l’aria sa di metallo, disciplina e autorità. Stipendio Per accedere ufficialmente alle Guardie, richiediamo che il PG abbia una reputazione minima di +15 con Arcadia. Lo stipendio dipende da: A) Livello del PG • Apprendista (Livelli 1 5) = 15 mo base • Professionista (Livelli 6 12) = 25 mo base • Mastro (Livelli 13 20) = 35 mo base B) Giorni di lavoro • I primi 5 giorni, avrete lo stipendio base descritto nella variabile A (Chi fa meno di 5 giorni, non viene pagato); • Successivamente, avrete stipendio extra, in base dagli stock bonus completati (5 giorni per stock, per un massimo di 4 stock bonus) C) Modificatore caratteristica del lavoro • Ogni lavoro ha due modificatori caratteristica tra cui scegliere, che aumenteranno il vostro stipendio. • Per questo lavoro, il mod. caratteristica da scegliere, dipende dal master."
- },
- {
   "id": "pag-corporazione-costruttori",
   "title": "Corporazione dei Costruttori",
   "icon": "🔨",
