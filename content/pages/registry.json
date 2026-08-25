@@ -331,16 +331,6 @@
       "menu": true,
       "admin": true,
       "path": "lore/rovine-di-kaldur"
-    },
-    {
-      "k": "circolo-dello-smarrimento",
-      "l": "Circolo dello Smarrimento",
-      "i": "🪨",
-      "id": "pag-circolo-dello-smarrimento",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/circolo-dello-smarrimento"
     }
   ],
   "sections": [
