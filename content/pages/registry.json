@@ -83,17 +83,6 @@
       "path": "personaggio/andando-avanti"
     },
     {
-      "k": "gilda-avventurieri",
-      "l": "Gilda degli Avventurieri",
-      "i": "🗡️",
-      "id": "pag-gilda-avventurieri",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lavori/gilda-avventurieri",
-      "sec": "lavori"
-    },
-    {
       "k": "forgia",
       "l": "Forgia",
       "i": "🔥",
