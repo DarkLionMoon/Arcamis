@@ -87,18 +87,6 @@
       "sub": ""
     },
     {
-      "k": "maestria-titoli",
-      "l": "Maestria / Titoli",
-      "i": "🏅",
-      "id": "pag-maestria-titoli",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "in-game/maestria-titoli",
-      "sec": "",
-      "sub": ""
-    },
-    {
       "k": "casate-e-compagnie",
       "l": "Casate e Compagnie",
       "i": "🏰",
