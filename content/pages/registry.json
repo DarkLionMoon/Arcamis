@@ -83,17 +83,6 @@
       "path": "personaggio/andando-avanti"
     },
     {
-      "k": "ospedale",
-      "l": "Ospedale",
-      "i": "⚕️",
-      "id": "pag-ospedale",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lavori/ospedale",
-      "sec": "lavori"
-    },
-    {
       "k": "sartoria",
       "l": "Sartoria",
       "i": "🧵",
