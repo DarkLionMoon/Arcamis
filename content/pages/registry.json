@@ -83,7 +83,7 @@
       "menu": true,
       "admin": true,
       "path": "personaggio/andando-avanti",
-      "sec": "",
+      "sec": "personaggio",
       "sub": ""
     },
     {
