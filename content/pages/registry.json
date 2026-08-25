@@ -70,7 +70,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "personaggio/come-si-inizia"
+      "path": "personaggio/come-si-inizia",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "andando-avanti",
@@ -80,7 +82,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "personaggio/andando-avanti"
+      "path": "personaggio/andando-avanti",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "maestria-titoli",
@@ -90,7 +94,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "in-game/maestria-titoli"
+      "path": "in-game/maestria-titoli",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "casate-e-compagnie",
@@ -100,7 +106,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "in-game/casate-e-compagnie"
+      "path": "in-game/casate-e-compagnie",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "storia-del-mondo",
@@ -110,7 +118,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/storia-del-mondo"
+      "path": "lore/storia-del-mondo",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "introduzione",
@@ -120,7 +130,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/introduzione"
+      "path": "lore/introduzione",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "piani-di-esistenza",
@@ -130,7 +142,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/piani-di-esistenza"
+      "path": "lore/piani-di-esistenza",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "bibliografia-scoperta",
@@ -140,7 +154,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/bibliografia-scoperta"
+      "path": "lore/bibliografia-scoperta",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "mappe",
@@ -150,7 +166,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/mappe"
+      "path": "lore/mappe",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "mappa-arcamis",
@@ -160,17 +178,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/mappa-arcamis"
-    },
-    {
-      "k": "specie-homebrew",
-      "l": "Specie Homebrew",
-      "i": "🧬",
-      "id": "pag-specie-homebrew",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/specie-homebrew"
+      "path": "lore/mappa-arcamis",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "regole-homebrew",
@@ -180,7 +190,21 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/regole-homebrew"
+      "path": "lore/regole-homebrew",
+      "sec": "",
+      "sub": ""
+    },
+    {
+      "k": "specie-homebrew",
+      "l": "Specie Homebrew",
+      "i": "🧬",
+      "id": "pag-specie-homebrew",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/specie-homebrew",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "sottoclassi-homebrew",
@@ -190,7 +214,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/sottoclassi-homebrew"
+      "path": "lore/sottoclassi-homebrew",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "changelog",
@@ -200,7 +226,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "changelog"
+      "path": "changelog",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "arcamis",
@@ -210,7 +238,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/arcamis"
+      "path": "lore/arcamis",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "selva-fogliabruna",
@@ -220,7 +250,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/selva-fogliabruna"
+      "path": "lore/selva-fogliabruna",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "foresta-dello-smarrimento",
@@ -230,7 +262,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/foresta-dello-smarrimento"
+      "path": "lore/foresta-dello-smarrimento",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "volonx",
@@ -240,7 +274,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/volonx"
+      "path": "lore/volonx",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "vigilius",
@@ -250,7 +286,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/vigilius"
+      "path": "lore/vigilius",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "galeton",
@@ -260,7 +298,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/galeton"
+      "path": "lore/galeton",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "lago-di-gromot",
@@ -270,7 +310,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/lago-di-gromot"
+      "path": "lore/lago-di-gromot",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "forte-vigilus",
@@ -280,7 +322,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/forte-vigilus"
+      "path": "lore/forte-vigilus",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "riva-di-ferro",
@@ -290,7 +334,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/riva-di-ferro"
+      "path": "lore/riva-di-ferro",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "fumofosco",
@@ -300,7 +346,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/fumofosco"
+      "path": "lore/fumofosco",
+      "sec": "",
+      "sub": ""
     },
     {
       "k": "rovine-di-kaldur",
@@ -310,7 +358,9 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "lore/rovine-di-kaldur"
+      "path": "lore/rovine-di-kaldur",
+      "sec": "",
+      "sub": ""
     }
   ],
   "sections": [
