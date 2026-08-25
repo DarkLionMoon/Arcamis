@@ -333,16 +333,6 @@
       "path": "lore/rovine-di-kaldur"
     },
     {
-      "k": "rivorosso",
-      "l": "Rivorosso",
-      "i": "🌊",
-      "id": "pag-rivorosso",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/rivorosso"
-    },
-    {
       "k": "circolo-dello-smarrimento",
       "l": "Circolo dello Smarrimento",
       "i": "🪨",
