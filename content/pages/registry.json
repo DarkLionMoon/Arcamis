@@ -94,17 +94,6 @@
       "sec": "lavori"
     },
     {
-      "k": "bottega-farmaceutica",
-      "l": "Bottega farmaceutica",
-      "i": "💊",
-      "id": "pag-bottega-farmaceutica",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lavori/bottega-farmaceutica",
-      "sec": "lavori"
-    },
-    {
       "k": "corporazione-costruttori",
       "l": "Corporazione dei Costruttori",
       "i": "🔨",
