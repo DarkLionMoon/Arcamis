@@ -160,6 +160,22 @@ export async function onRequest(context) {
       return new Response(JSON.stringify({ ok: true, data: { sha: newCommit.sha } }), { headers: cors });
     }
 
+    /* Stato ultimo workflow GitHub Actions su main (badge deploy admin). */
+    if (action === 'ci_status') {
+      const runs = await ghFetch(api + '/actions/runs?per_page=1', { headers });
+      const run = (runs.workflow_runs || [])[0] || null;
+      return new Response(JSON.stringify({
+        ok: true,
+        data: run ? {
+          status: run.status,
+          conclusion: run.conclusion,
+          name: run.name,
+          sha: (run.head_commit && run.head_commit.id) ? run.head_commit.id.slice(0, 7) : '',
+          message: (run.head_commit && run.head_commit.message) ? String(run.head_commit.message).split('\n')[0].slice(0, 60) : ''
+        } : null
+      }), { headers: cors });
+    }
+
     return new Response(JSON.stringify({ error: 'Azione non valida' }), { status: 400, headers: cors });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });

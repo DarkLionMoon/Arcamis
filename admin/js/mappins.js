@@ -343,6 +343,21 @@ function _renderPinList() {
   }).join('');
 }
 
+/* Selettore pagine del sito (registry admin) per collegare la puntina */
+function _mapPageSelect(current){
+  var opts='<option value="">— nessun collegamento —</option>';
+  var found=false;
+  (window.ArcAdmin.pages||[]).forEach(function(pg){
+    var sel=(pg.id===current);
+    if(sel)found=true;
+    opts+='<option value="'+escAttr(pg.id)+'"'+(sel?' selected':'')+'>'+esc((pg.i||'📄')+' '+pg.l)+'</option>';
+  });
+  if(current&&!found){
+    opts+='<option value="'+escAttr(current)+'" selected>⚠ '+esc(current)+' (pagina eliminata)</option>';
+  }
+  return '<select id="mef-pageid" class="in">'+opts+'</select>';
+}
+
 /* ════ EDITA PUNTINA ════ */
 function _mapEditPin(idx) {
   var pin = MAP_PINS[idx];
@@ -360,7 +375,9 @@ function _mapEditPin(idx) {
     + '</div>'
     + '<div class="grid-2">'
     + '<div class="fld"><label>Sub-mappa</label><input id="mef-sub" class="in" placeholder="foglia, smari…" value="' + escAttr(pin.sub || '') + '"></div>'
-    + '<div class="fld"><label>ID pagina wiki</label><input id="mef-pageid" class="in" placeholder="es. pag-arcamis" value="' + escAttr(pin.pageId || '') + '"></div>'
+    + '<div class="fld"><label>ID pagina wiki</label>'
+    + _mapPageSelect(pin.pageId || '')
+    + '</div>'
     + '</div>'
     + '<div class="fld"><label><input type="checkbox" id="mef-explored"' + (pin.explored ? ' checked' : '') + '> Esplorata</label></div>'
     + '</div>';
@@ -418,8 +435,8 @@ function _mapSavePin(idx) {
   ArcAdmin.module('core').ui.toast('Puntina aggiornata — ricorda di salvare', 'success');
 }
 
-function _mapDeletePin(idx) {
-  if (!confirm('Eliminare questa puntina?')) return;
+async function _mapDeletePin(idx) {
+  if (!(await uiConfirm('Eliminare questa puntina?',{ok:'Elimina'}))) return;
   MAP_PINS.splice(idx, 1);
   _mapDirty = true;
   _renderMapPins();

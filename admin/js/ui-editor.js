@@ -72,9 +72,23 @@ async function openInterfaceUI(){
   h += '<div class="panel-sub">Le sezioni e le voci del menu si gestiscono da <b>Navigazione</b> (sezioni e assegnazione pagine).</div>';
   h += '</div>';
 
+  /* ── Anteprima sito con toggle dispositivo ── */
+  h += '<div class="panel" style="margin-bottom:16px">';
+  h += '<div class="panel-head"><h3>Anteprima sito</h3>'
+    + '<span style="display:flex;gap:6px;align-items:center">'
+    + '<button class="btn btn-soft btn-sm" id="ui-prev-m" onclick="_uiPrevDevice(390)">📱 Mobile</button>'
+    + '<button class="btn btn-soft btn-sm" id="ui-prev-t" onclick="_uiPrevDevice(820)">📲 Tablet</button>'
+    + '<button class="btn btn-soft btn-sm" id="ui-prev-d" onclick="_uiPrevDevice(0)">🖥️ Desktop</button>'
+    + '<button class="btn btn-soft btn-sm" onclick="_uiPrevReload()">⟳</button></span></div>';
+  h += '<div class="panel-sub">Caricata dopo il deploy (~30s dal salvataggio). Le modifiche alla barra si vedono a fine deploy.</div>';
+  h += '<div style="background:#0b0d16;border:1px solid var(--line);border-radius:10px;padding:10px;overflow:auto;text-align:center">'
+    + '<iframe id="ui-preview-frame" src="https://arcamis.pages.dev" style="width:100%;height:560px;border:1px solid var(--line);border-radius:8px;background:#fff" title="Anteprima sito"></iframe>'
+    + '</div></div>';
+
   document.getElementById('main').innerHTML = h;
   _uiRenderRows();
   _uiRenderPreview();
+  _uiPrevDevice(390);
   setStatus('ok', 'caricato');
   setTimeout(function(){ setStatus('idle', 'pronto'); }, 1200);
 }
@@ -153,8 +167,8 @@ function _uiMove(i, dir){
   _uiRenderPreview();
 }
 
-function _uiDel(i){
-  if(!confirm('Eliminare la voce "' + (_uiCfg.bottomNav[i].label || '') + '"?')) return;
+async function _uiDel(i){
+  if(!(await uiConfirm('Eliminare la voce "' + (_uiCfg.bottomNav[i].label || '') + '"?', {ok:'Elimina'}))) return;
   _uiCfg.bottomNav.splice(i, 1);
   _uiDirty = true;
   _uiRenderRows();
@@ -237,4 +251,26 @@ async function _uiSave(){
     setStatus('err', 'errore');
     toast('Errore salvataggio: ' + e.message, 'error');
   }
+}
+
+
+/* ════ ANTEPRIMA DISPOSITIVO ════ */
+function _uiPrevDevice(w){
+  var f=document.getElementById('ui-preview-frame');
+  if(!f) return;
+  f.style.width = w ? w+'px' : '100%';
+  f.style.maxWidth = '100%';
+  var map={m:390,t:820,d:0};
+  Object.keys(map).forEach(function(k){
+    var b=document.getElementById('ui-prev-'+k);
+    if(b) b.classList.toggle('btn-p', map[k]===w);
+  });
+}
+function _uiPrevReload(){
+  var f=document.getElementById('ui-preview-frame');
+  if(f){ var src=f.src; f.src='about:blank'; setTimeout(function(){ f.src=src; },80); }
+}
+function _uiPrevReload(){
+  var f=document.getElementById('ui-preview-frame');
+  if(f){ var src=f.src; f.src='about:blank'; setTimeout(function(){ f.src=src; },80); }
 }

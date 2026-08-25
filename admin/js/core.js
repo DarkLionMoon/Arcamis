@@ -151,8 +151,37 @@ async function ghDelete(path,msg,sha){
 async function ghCommitMulti(files,msg){
   return ghProxy('commit_multi',{files:files,message:msg});
 }
+async function ghCIStatus(){
+  try{ var r=await ghProxy('ci_status',{}); return r||null; }catch(e){ return null; }
+}
 async function ghCommits(path){
   return ghProxy('commits',{path:path,per_page:25});
+}
+/* ═══════════════ CONFERMA MODALE ═══════════════
+   Sostituisce confirm() nativo: restituisce una Promise<boolean>. */
+function uiConfirm(msg, opts){
+  opts = opts || {};
+  return new Promise(function(resolve){
+    var id='uic-'+Date.now();
+    var danger=opts.danger!==false;
+    modalHtml(id, opts.title||'Conferma',
+      '<div style="padding:6px 2px 2px;color:var(--text);line-height:1.55;white-space:pre-line">'+esc(msg)+'</div>',
+      '<button class="btn btn-soft" data-uic="0">Annulla</button>'
+      +'<button class="btn '+(danger?'btn-d':'btn-p')+'" data-uic="1">'+(opts.ok||'Conferma')+'</button>');
+    var m=document.getElementById(id);
+    m.querySelectorAll('[data-uic]').forEach(function(b){
+      b.addEventListener('click',function(){
+        closeModal(id);
+        resolve(b.getAttribute('data-uic')==='1');
+      });
+    });
+    /* click sull'overlay = annulla */
+    var obs=new MutationObserver(function(){
+      if(!document.getElementById(id)){ obs.disconnect(); resolve(false); }
+    });
+    obs.observe(document.body,{childList:true,subtree:true});
+    setTimeout(function(){obs.disconnect();},60000);
+  });
 }
 function b64decode(s){return decodeURIComponent(escape(atob(s)))}
 function b64encode(s){return btoa(unescape(encodeURIComponent(s)))}
@@ -391,6 +420,7 @@ function buildSidebar(){
   h+='<div class="sb-item" data-type="mappins" onclick="openMapEditor()"><span class="ico">🗺️</span><span class="lbl">Mappa (puntine)</span></div>';
   h+='<div class="sb-item" data-type="nav" onclick="openNav()"><span class="ico">🧭</span><span class="lbl">Navigazione</span></div>';
   h+='<div class="sb-item" data-type="interface" onclick="openInterfaceUI()"><span class="ico">📱</span><span class="lbl">Interfaccia</span></div>';
+  h+='<div class="sb-item" data-type="changelog" onclick="openChangelog()"><span class="ico">📝</span><span class="lbl">Changelog</span></div>';
   h+='<div class="sb-item" data-type="settings" onclick="openSettings()"><span class="ico">⚙️</span><span class="lbl">Impostazioni</span></div>';
   h+='</div>';
   if(admin){
@@ -402,13 +432,98 @@ function buildSidebar(){
   document.getElementById('sb-nav').innerHTML=h;
 }
 function _sbItems(label,type,items){
-  var h='<div class="sb-label">'+label+'</div>';
-  items.forEach(function(it){
-    h+='<div class="sb-item" data-type="'+type+'" data-key="'+escAttr(it.k||it.file)+'" onclick="openItem(this)">';
-    h+='<span class="ico">'+esc(it.i)+'</span><span class="lbl">'+esc(it.l)+'</span></div>';
+  var h='<div class="sb-label">'+label+(type==='page'?' <span class="hint" style="text-transform:none;letter-spacing:0">· trascina o usa ↑↓</span>':'')+'</div>';
+  items.forEach(function(it,idx){
+    var k=escAttr(it.k||it.file);
+    var reorder='';
+    if(type==='page'){
+      reorder='<span class="sb-reorder" onclick="event.stopPropagation()">'
+        +'<button class="sb-mv" title="Su" onclick="sbMovePage(\''+k.replace(/'/g,"\\'")+'\',-1)">↑</button>'
+        +'<button class="sb-mv" title="Giù" onclick="sbMovePage(\''+k.replace(/'/g,"\\'")+'\',1)">↓</button>'
+        +'</span>';
+    }
+    h+='<div class="sb-item'+(type==='page'?' sb-draggable':'')+'" data-type="'+type+'" data-key="'+k+'" onclick="openItem(this)"'
+      +(type==='page'?' draggable="true" title="Trascina per riordinare (salva su deploy)"':'')+'>';
+    h+='<span class="ico">'+esc(it.i)+'</span><span class="lbl">'+esc(it.l)+'</span>'+reorder+'</div>';
   });
   return h;
 }
+/* ═══════════════ RIORDINO PAGINE SIDEBAR ═══════════════
+   L'ordine delle pagine nel registry guida sia questa lista sia
+   il menu del sito. Salvataggio atomico su GitHub + deploy. */
+var _sbDragK=null;
+function _sbPageList(){ return window.ArcAdmin.pages; }
+function sbMovePage(k,dir){
+  var arr=_sbPageList();
+  var i=arr.findIndex(function(p){return p.k===k});
+  var t=i+dir;
+  if(i<0||t<0||t>=arr.length)return;
+  var tmp=arr[i];arr[i]=arr[t];arr[t]=tmp;
+  buildSidebar();
+  var q=document.getElementById('sb-q');
+  if(q&&q.value)sbFilter(q.value);
+  _persistPageOrder();
+}
+async function _persistPageOrder(){
+  try{
+    setStatus('saving','riordino pagine…');
+    var d=await ghGet('content/pages/registry.json');
+    var reg=JSON.parse(b64decode(d.content));
+    var byK={};
+    (reg.pages||[]).forEach(function(p){byK[p.k]=p});
+    var known={},head=[];
+    _sbPageList().forEach(function(p){
+      if(byK[p.k]&&!known[p.k]){head.push(byK[p.k]);known[p.k]=1;}
+    });
+    var tail=(reg.pages||[]).filter(function(p){return !known[p.k]});
+    reg.pages=head.concat(tail);
+    await ghCommitMulti([
+      { path:'content/pages/registry.json', content:b64encode(JSON.stringify(reg,null,2)+'\n') }
+    ],'admin: reorder pages');
+    toast('Ordine pagine salvato! Deploy in corso (~30s)…','success');
+    startDeployTimer();
+    setStatus('ok','deploying…');
+    setTimeout(function(){setStatus('idle','pronto');},2000);
+  }catch(e){
+    toast('Errore riordino: '+e.message,'error');
+    setStatus('err','errore');
+  }
+}
+document.addEventListener('dragstart',function(e){
+  var it=e.target.closest('.sb-item.sb-draggable');
+  if(!it)return;
+  _sbDragK=it.getAttribute('data-key');
+  e.dataTransfer.effectAllowed='move';
+  try{e.dataTransfer.setData('text/plain',_sbDragK);}catch(ex){}
+});
+document.addEventListener('dragover',function(e){
+  var it=e.target.closest('.sb-item.sb-draggable');
+  if(it&&_sbDragK&&it.getAttribute('data-key')!==_sbDragK){e.preventDefault();e.dataTransfer.dropEffect='move';it.classList.add('sb-drop-target');}
+});
+document.addEventListener('dragleave',function(e){
+  var it=e.target.closest('.sb-item.sb-draggable');
+  if(it)it.classList.remove('sb-drop-target');
+});
+document.addEventListener('drop',function(e){
+  var it=e.target.closest('.sb-item.sb-draggable');
+  if(!it||!_sbDragK)return;
+  e.preventDefault();
+  it.classList.remove('sb-drop-target');
+  var targetK=it.getAttribute('data-key');
+  if(targetK===_sbDragK){_sbDragK=null;return;}
+  var arr=_sbPageList();
+  var from=arr.findIndex(function(p){return p.k===_sbDragK});
+  var to=arr.findIndex(function(p){return p.k===targetK});
+  _sbDragK=null;
+  if(from<0||to<0)return;
+  var moved=arr.splice(from,1)[0];
+  arr.splice(to,0,moved);
+  buildSidebar();
+  var q=document.getElementById('sb-q');
+  if(q&&q.value)sbFilter(q.value);
+  _persistPageOrder();
+});
+
 function sbFilter(q){
   q=q.toLowerCase();
   document.querySelectorAll('.sb-item').forEach(function(el){
@@ -477,6 +592,33 @@ function _dashGrid(label,type,items){
   }
   return h+'</div>';
 }
+
+async function _loadTopPages(){
+  var box=document.getElementById('dash-top-pages');
+  if(!box)return;
+  try{
+    var r=await fetch('/api/admin?action=get_analytics',{credentials:'include'});
+    var j=await r.json();
+    var pages=(j.pages||[]).slice(0,10);
+    if(!pages.length){ box.innerHTML='Nessuna statistica disponibile ancora.'; return; }
+    var max=Math.max.apply(null,pages.map(function(p){return p.views||1;}));
+    var labelById={};
+    (window.ArcAdmin.pages||[]).forEach(function(p){labelById[p.id]=p;});
+    box.innerHTML=pages.map(function(pg){
+      var meta=labelById[pg.pageKey]||{i:'📄',l:pg.pageKey};
+      var w=Math.max(4,Math.round((pg.views/max)*100));
+      return '<div style="display:flex;align-items:center;gap:10px;margin:7px 0">'
+        +'<span style="width:22px;text-align:center">'+esc(meta.i||'📄')+'</span>'
+        +'<span style="flex:0 0 200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--text)">'+esc(meta.l||pg.pageKey)+'</span>'
+        +'<span style="flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><span style="display:block;height:100%;width:'+w+'%;background:linear-gradient(90deg,#b47832,#c49a48);border-radius:4px"></span></span>'
+        +'<span style="flex:0 0 52px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--dim)">'+(pg.views||0)+'</span>'
+        +'</div>';
+    }).join('');
+  }catch(e){
+    box.innerHTML='Statistiche non disponibili.';
+  }
+}
+
 async function renderDashboard(){
   _current=null;
   _mapActive=false;
@@ -494,6 +636,7 @@ async function renderDashboard(){
   h+='<div class="stat" onclick="dashOpenByType(\'page\')"><div class="si">📄</div><div><div class="sn">'+PAGES.length+'</div><div class="sl">Pagine wiki</div></div></div>';
   h+='<div class="stat" id="dash-total-views"><div class="si">👁️</div><div><div class="sn">…</div><div class="sl">Visualizzazioni totali</div></div></div>';
   h+='</div>';
+  h+='<div class="panel"><div class="panel-head"><h3>Pagine più lette</h3><span class="hint">top 10 per visualizzazioni</span></div><div id="dash-top-pages" style="padding:6px 16px 14px;color:var(--dim);font-size:12px">⏳ Caricamento statistiche…</div></div>';
   h+='<div class="panel"><div class="panel-head"><h3>Azioni rapide</h3><span class="hint">scorciatoie</span></div><div class="quick-grid">';
   h+='<div class="quick" onclick="openNewPageModal()"><div class="qi">➕</div><div class="qt">Nuova pagina</div><div class="qd">Crea una sezione wiki con URL pulito</div></div>';
   h+='<div class="quick" onclick="openContentSearch()"><div class="qi">🔎</div><div class="qt">Cerca contenuto</div><div class="qd">Trova testi in tutte le pagine</div></div>';
@@ -634,6 +777,7 @@ async function _loadTotalViews(){
     var total=j.total||0;
     var el=document.getElementById('dash-total-views');
     if(el)el.querySelector('.sn').textContent=total.toLocaleString('it-IT');
+    await _loadTopPages();
   }catch(e){}
 }
 
@@ -692,6 +836,24 @@ function startDeployTimer(){
         el.textContent='deploy: '+j.status;
       }
     }catch(e){}
+    /* Fallback: stato workflow GitHub Actions */
+    try{
+      var ci=await ghCIStatus();
+      if(ci){
+        if(ci.status==='completed'&&ci.conclusion==='success'){
+          clearInterval(_deployInterval);_deployInterval=null;
+          el.className='ok';el.textContent='pubblicato ✓';
+          return true;
+        }
+        if(ci.status==='completed'&&ci.conclusion==='failure'){
+          clearInterval(_deployInterval);_deployInterval=null;
+          el.className='err';el.textContent='workflow fallito ✗';
+          toast('Workflow GitHub fallito: '+(ci.name||'')+' — controlla le Actions','error');
+          return true;
+        }
+        el.textContent='building…';
+      }
+    }catch(e2){}
     return false;
   }
   _deployInterval=setInterval(function(){

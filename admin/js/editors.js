@@ -1108,7 +1108,7 @@ async function deletePage(){
   var msg=isCustom
     ?'Eliminare definitivamente la pagina "'+label+'"?\n\nVerranno rimossi contenuto, voce del menu e URL dedicato. Questa operazione non è reversibile.'
     :'Eliminare la sezione "'+label+'"?\n\nAttenzione: è una sezione predefinita del sito. Verranno rimossi il contenuto locale, la voce dal menu (desktop e mobile), la card dalla home e l\'URL dedicato. Questa operazione non è reversibile.';
-  if(!confirm(msg))return;
+  if(!(await uiConfirm(msg,{title:'Elimina pagina',ok:'ELIMINA'})))return;
   var btn=document.getElementById('del-btn');
   if(btn)btn.disabled=true;
   setStatus('saving','eliminazione...');
@@ -1439,7 +1439,12 @@ async function openImages(){
     h+='<option value="size"'+(_imgSortBy==='size'?' selected':'')+'>Dimensione</option>';
     h+='</select>';
     h+='<button class="btn btn-soft btn-sm" onclick="_imgViewMode=_imgViewMode===\'grid\'?\'list\':\'grid\';openImages()">'+(_imgViewMode==='grid'?'☰ Lista':'▦ Griglia')+'</button>';
+    h+='<button class="btn btn-soft btn-sm" onclick="_imgAnalyzeUsage(this)" title="Scansiona pagine, mappa e home">🧭 Analizza utilizzi</button>';
     h+='</div>';
+    if(_imgUsage){
+      var unused=items.filter(function(it){ return !_imgUsage[it.name]; }).length;
+      h+='<div style="padding:6px 16px 0;color:var(--dim);font-size:11.5px">Analisi: <b style="color:var(--acc)">'+(items.length-unused)+'</b> usate · <b style="color:'+(unused?'var(--red)':'inherit')+'">'+unused+'</b> non utilizzate</div>';
+    }
     if(_imgFilter)items=_imgFilterItems(items,_imgFilter);
     if(_imgSortBy!=='name')items=_imgSortItems(items,_imgSortBy);
     if(_imgViewMode==='list'){
@@ -1451,7 +1456,7 @@ async function openImages(){
         h+='<div class="row">'
           +'<div class="rico" style="overflow:hidden;width:40px;height:40px;border-radius:4px"><img src="'+esc(it.download_url||'')+'" alt="" style="width:100%;height:100%;object-fit:cover"></div>'
           +'<div class="rmain"><div class="rt img-rename" contenteditable="true" spellcheck="false" data-original="'+escAttr(name)+'" data-sha="'+escAttr(it.sha||'')+'" onblur="renameImage(this)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur()}">'+esc(name)+'</div>'
-          +'<div class="rs">'+size+' · '+esc(it.type||'file')+'</div></div>'
+          +'<div class="rs">'+size+' · '+esc(it.type||'file')+(_imgUsage?(_imgUsage[name]?' · <span style="color:var(--green,#7dc87d)">usata ×'+_imgUsage[name]+'</span>':' · <span style="color:var(--red)">mai usata</span>'):'')+'</div></div>'
           +'<div class="ract">'
           +'<button class="btn btn-soft btn-sm" onclick="copyImageUrl(\''+escJsAttr(name)+'\')">🔗 URL</button>'
           +'<button class="btn btn-d btn-sm" onclick="deleteImage(\''+escJsAttr(name)+'\',\''+esc(it.sha)+'\')">🗑</button>'
@@ -1475,6 +1480,34 @@ async function openImages(){
     setStatus('ok','caricato');
     setTimeout(function(){setStatus('idle','pronto')},1500);
   }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+var _imgUsage=null;
+async function _imgAnalyzeUsage(btn){
+  if(btn){btn.disabled=true;btn.textContent='⏳ Scansione…';}
+  try{
+    var counts={};
+    function bump(txt){
+      if(!txt)return;
+      String(txt).replace(/\r/g,'').split('/images/').slice(1).forEach(function(part){
+        var m=part.match(/^([A-Za-z0-9._-]+)/);
+        if(m)counts[m[1]]=(counts[m[1]]||0)+1;
+      });
+    }
+    var idx=await _loadContentIndex();
+    (idx||[]).forEach(function(pg){ bump(pg.content); });
+    try{ bump(b64decode((await ghGet('content/mappins.json')).content)); }catch(e){}
+    try{ bump(b64decode((await ghGet('index.html')).content)); }catch(e){}
+    try{
+      var cl=JSON.parse(b64decode((await ghGet('content/changelog.json')).content));
+      (cl||[]).forEach(function(e){ bump(e.content); });
+    }catch(e){}
+    _imgUsage=counts;
+    toast('Analisi completata','success');
+    openImages();
+  }catch(e){
+    toast('Errore analisi: '+e.message,'error');
+    if(btn){btn.disabled=false;btn.textContent='🧭 Analizza utilizzi';}
+  }
 }
 async function renameImage(el){
   var oldName=el.getAttribute('data-original');
@@ -1500,6 +1533,7 @@ function _imgCard(it){
     +'<img src="'+esc(it.download_url||'')+'" alt="'+esc(name)+'" loading="lazy">'
     +'<div class="ic-body"><div class="ic-name">'+esc(name)+'</div>'
     +'<div class="ic-meta">'+size+' · '+esc(it.type||'file')+'</div>'
+    +(_imgUsage?'<div class="ic-meta" style="'+(_imgUsage[name]?'color:#7dc87d':'color:var(--red)')+'">'+(_imgUsage[name]?'usata ×'+_imgUsage[name]:'mai usata')+'</div>':'')
     +'<div class="ic-actions">'
     +'<button class="btn btn-soft btn-sm" onclick="copyImageUrl(\''+escJsAttr(name)+'\')">🔗 URL</button>'
     +'<button class="btn btn-d btn-sm" onclick="deleteImage(\''+escJsAttr(name)+'\',\''+esc(it.sha)+'\')">🗑</button>'
@@ -1512,7 +1546,7 @@ async function copyImageUrl(name){
   }catch(e){toast('Errore copia: '+e.message,'error')}
 }
 async function deleteImage(name,sha){
-  if(!confirm('Eliminare definitivamente l\'immagine /images/'+name+'?'))return;
+  if(!(await uiConfirm("Eliminare definitivamente l'immagine /images/"+name+'?',{ok:'Elimina'})))return;
   setStatus('saving','eliminazione…');
   try{
     await ghDelete('images/'+name,'admin: delete image '+name,sha);
