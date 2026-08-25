@@ -42,12 +42,6 @@
   "text": "Checkpoint – Livello 5 Raggiunto il livello 5, ottieni accesso ad 1 modifica del personaggio, con la quale potrete modificare: Sottoclasse Talenti Punteggi di caratteristica Allineamento L’utilizzo della modifica verrà indicato sulla Tessera Avventuriero con un simbolo dedicato, che sarà barrato (X) una volta utilizzato. 👉 Ripetiamo che q uesta modifica può essere usata una sola volta per personaggio , a partire dal livello 5."
  },
  {
-  "id": "pag-maestria-titoli",
-  "title": "Maestria / Titoli",
-  "icon": "🏅",
-  "text": "Sezione in allestimento. Contenuti disponibili: Casate e Compagnie"
- },
- {
   "id": "pag-casate-e-compagnie",
   "title": "Casate e Compagnie",
   "icon": "📄",

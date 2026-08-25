@@ -37,7 +37,6 @@ var pages = [
   {k:'lavori',l:'Lavoro',i:'💼',id:'pag-lavori',sec:'lavori'},
   {k:'come-si-inizia',l:'Come si inizia',i:'🌟',id:'pag-come-si-inizia',sec:'personaggio'},
   {k:'andando-avanti',l:'Andando avanti',i:'📈',id:'pag-andando-avanti',sec:'personaggio'},
-  {k:'maestria-titoli',l:'Maestria / Titoli',i:'🏅',id:'pag-maestria-titoli'},
   {k:'casate-e-compagnie',l:'Casate e Compagnie',i:'🏰',id:'pag-casate-e-compagnie'},
   {k:'storia-del-mondo',l:'Storia del Mondo',i:'📖',id:'pag-storia-del-mondo'},
   {k:'introduzione',l:'Introduzione',i:'📜',id:'pag-introduzione'},
