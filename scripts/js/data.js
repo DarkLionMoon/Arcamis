@@ -42,7 +42,6 @@ var pages = [
   {k:'lavori',l:'Lavoro',i:'💼',id:'pag-lavori',sec:'personaggio'},
   {k:'come-si-inizia',l:'Come si inizia',i:'🌟',id:'pag-come-si-inizia'},
   {k:'andando-avanti',l:'Andando avanti',i:'📈',id:'pag-andando-avanti'},
-  {k:'corporazione-costruttori',l:'Corporazione dei Costruttori',i:'🔨',id:'pag-corporazione-costruttori',sec:'lavori'},
   {k:'ospedale',l:'Ospedale',i:'⚕️',id:'pag-ospedale',sec:'lavori'},
   {k:'sartoria',l:'Sartoria',i:'🧵',id:'pag-sartoria',sec:'lavori'},
   {k:'maestria-titoli',l:'Maestria / Titoli',i:'🏅',id:'pag-maestria-titoli'},
