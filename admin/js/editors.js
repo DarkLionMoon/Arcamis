@@ -1003,8 +1003,19 @@ async function createNewPage(){
   setStatus('saving','creazione...');
   try{
     var json={k:slug,title:label,icon:icon,content:buildNewPageContent(layout,label),layout:layout,lastModified:new Date().toISOString()};
-    await ghPut(CONTENT+'/pages/'+slug+'.json','admin: create page '+slug,JSON.stringify(json,null,2),null);
-    await addToRegistry(slug,label,icon,'pag-'+slug,sec,sub);
+    /* Commit atomico: file pagina + registro insieme */
+    var d0=await ghGet('content/pages/registry.json');
+    var reg=JSON.parse(b64decode(d0.content));
+    if(!Array.isArray(reg.pages))reg.pages=[];
+    var entry={k:slug,l:label,i:icon,id:id,c:1,menu:true,admin:true};
+    if(sec)entry.sec=sec;
+    if(sub)entry.sub=sub;
+    entry.path=sec?sec+'/'+slug:slug;
+    reg.pages.push(entry);
+    await ghCommitMulti([
+      { path:'content/pages/'+slug+'.json', content:b64encode(JSON.stringify(json,null,2)) },
+      { path:'content/pages/registry.json', content:b64encode(JSON.stringify(reg,null,2)+'\n') }
+    ],'admin: create page '+slug);
     PAGES.push({k:slug,l:label,i:icon,sec:sec,sub:sub,c:1});
     _contentIndex=null;
     buildSidebar();
@@ -1104,8 +1115,26 @@ async function deletePage(){
   var slug=_current.k;
   try{
     var id=await _getPageId(slug);
-    if(_current.sha)await ghDelete(CONTENT+'/pages/'+slug+'.json','admin: delete page '+slug,_current.sha);
-    await removeFromRegistry(slug);
+    /* Commit atomico: file pagina + registry in un solo commit,
+       così il repo non passa mai da uno stato invalido (workflow validate). */
+    var d=await ghGet('content/pages/registry.json');
+    var reg=JSON.parse(b64decode(d.content));
+    reg.pages=(reg.pages||[]).filter(function(p){return p.k!==slug});
+    if(id){
+      (reg.sections||[]).forEach(function(s){
+        if(Array.isArray(s.pages))s.pages=s.pages.filter(function(x){return x!==id});
+      });
+      if(Array.isArray(reg.lavori))reg.lavori=reg.lavori.filter(function(w){return w.id!==id});
+      if(Array.isArray(reg.legacySlugs))reg.legacySlugs=reg.legacySlugs.filter(function(x){return x.id!==id});
+      if(Array.isArray(reg.layoutDatabases))reg.layoutDatabases=reg.layoutDatabases.filter(function(x){return x.id!==id});
+      if(Array.isArray(reg.pathOverrides))reg.pathOverrides=reg.pathOverrides.filter(function(x){return x.id!==id});
+      (reg.indexDatabases||[]).forEach(function(db){
+        if(Array.isArray(db.ids))db.ids=db.ids.filter(function(x){return x!==id});
+      });
+    }
+    var files=[{ path:'content/pages/registry.json', content:b64encode(JSON.stringify(reg,null,2)+'\n') }];
+    files.push({ path:'content/pages/'+slug+'.json', content:null });
+    await ghCommitMulti(files,'admin: delete page '+slug);
     if(id&&id.indexOf('pag-')!==0)await removeFromIndex(slug,id);
     for(var i=0;i<PAGES.length;i++){if(PAGES[i].k===slug){PAGES.splice(i,1);break}}
     _modified=false;
@@ -1655,6 +1684,10 @@ async function doImport(){
   var imported=0,skipped=0;
   try{
     var pages=_importData.pages||_importData.data&&_importData.data.pages||[];
+    var d0=await ghGet('content/pages/registry.json');
+    var reg=JSON.parse(b64decode(d0.content));
+    if(!Array.isArray(reg.pages))reg.pages=[];
+    var files=[];
     for(var i=0;i<pages.length;i++){
       var pg=pages[i];
       var k=pg.k||pg.slug||'';
@@ -1665,10 +1698,17 @@ async function doImport(){
       var content=pg.content||'';
       var layout=pg.layout||'';
       var json={k:k,title:label,icon:icon,content:content,layout:layout,lastModified:new Date().toISOString()};
-      await ghPut(CONTENT+'/pages/'+k+'.json','admin: import page '+k,JSON.stringify(json,null,2),null);
-      await addToRegistry(k,label,icon,'pag-'+k,pg.sec||'',pg.sub||'');
+      files.push({ path:'content/pages/'+k+'.json', content:b64encode(JSON.stringify(json,null,2)) });
+      var entry={k:k,l:label,i:icon,id:'pag-'+k,c:1,menu:true,admin:true};
+      if(pg.sec)entry.sec=pg.sec;
+      if(pg.sub)entry.sub=pg.sub;
+      entry.path=pg.sec?pg.sec+'/'+k:k;
+      reg.pages.push(entry);
       PAGES.push({k:k,l:label,i:icon,sec:pg.sec||'',sub:pg.sub||'',c:1});
       imported++;
+    }
+    if(files.length){
+      await ghCommitMulti(files,'admin: import '+files.length+' pages');
     }
     _contentIndex=null;
     buildSidebar();

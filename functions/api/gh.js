@@ -126,6 +126,40 @@ export async function onRequest(context) {
       return new Response(JSON.stringify({ ok: true, data }), { headers: cors });
     }
 
+    /* Commit atomico multi-file (Git Data API).
+       p.files: [{ path, content(base64) | null }] — content null = elimina il file. */
+    if (action === 'commit_multi') {
+      const refData = await ghFetch(api + '/git/ref/heads/' + GH_BRANCH, { headers });
+      const baseSha = refData.object.sha;
+      const commitData = await ghFetch(api + '/git/commits/' + baseSha, { headers });
+      const baseTree = commitData.tree.sha;
+      const treeItems = [];
+      for (const f of (p.files || [])) {
+        if (f.content == null) {
+          treeItems.push({ path: f.path, mode: '100644', type: 'blob', sha: null });
+        } else {
+          const blob = await ghFetch(api + '/git/blobs', {
+            method: 'POST', headers,
+            body: JSON.stringify({ content: f.content, encoding: 'base64' })
+          });
+          treeItems.push({ path: f.path, mode: '100644', type: 'blob', sha: blob.sha });
+        }
+      }
+      const treeData = await ghFetch(api + '/git/trees', {
+        method: 'POST', headers,
+        body: JSON.stringify({ base_tree: baseTree, tree: treeItems })
+      });
+      const newCommit = await ghFetch(api + '/git/commits', {
+        method: 'POST', headers,
+        body: JSON.stringify({ message: p.message, tree: treeData.sha, parents: [baseSha] })
+      });
+      await ghFetch(api + '/git/refs/heads/' + GH_BRANCH, {
+        method: 'PATCH', headers,
+        body: JSON.stringify({ sha: newCommit.sha, force: false })
+      });
+      return new Response(JSON.stringify({ ok: true, data: { sha: newCommit.sha } }), { headers: cors });
+    }
+
     return new Response(JSON.stringify({ error: 'Azione non valida' }), { status: 400, headers: cors });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });

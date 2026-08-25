@@ -148,6 +148,9 @@ async function ghPutBinary(path,msg,dataUri){
 async function ghDelete(path,msg,sha){
   return ghProxy('delete',{path:path,message:msg,sha:sha});
 }
+async function ghCommitMulti(files,msg){
+  return ghProxy('commit_multi',{files:files,message:msg});
+}
 async function ghCommits(path){
   return ghProxy('commits',{path:path,per_page:25});
 }
