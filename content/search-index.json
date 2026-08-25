@@ -42,12 +42,6 @@
   "text": "Checkpoint – Livello 5 Raggiunto il livello 5, ottieni accesso ad 1 modifica del personaggio, con la quale potrete modificare: Sottoclasse Talenti Punteggi di caratteristica Allineamento L’utilizzo della modifica verrà indicato sulla Tessera Avventuriero con un simbolo dedicato, che sarà barrato (X) una volta utilizzato. 👉 Ripetiamo che q uesta modifica può essere usata una sola volta per personaggio , a partire dal livello 5."
  },
  {
-  "id": "pag-gilda-avventurieri",
-  "title": "Gilda degli Avventurieri",
-  "icon": "🗡️",
-  "text": "Tutti i prodi avventurieri devono passare da questo posto per ottenere le loro missioni. Un messaggio affisso, dal capo del Corpo degli Avventurieri, sul banco principale: \"Al fine di garantire un'esperienza equa per tutti, chiunque lavori come Avventuriero non può lavorare come membro del nostro staff e viceversa. Vi ringraziamo per la pazienza. Kerios\" Essendo la Locanda parte dello stesso edificio, in caso i posti a sedere fossero pieni, i tavoli della Gilda degli Avventurieri possono essere sfruttati per sedersi a mangiare."
- },
- {
   "id": "pag-forgia",
   "title": "Forgia",
   "icon": "🔥",

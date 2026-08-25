@@ -40,8 +40,17 @@ jobs:
           git add -A
           if ! git diff --cached --quiet; then
             git commit -m "chore: rigenera artifact da registry.json"
-            git pull --rebase
-            git push
+            for i in 1 2 3; do
+              if git pull --rebase --autostash -X theirs origin main; then
+                git push
+                exit 0
+              fi
+              echo "⏳ Conflitto/razza (tentativo $i), riprovo tra 10s…"
+              sleep 10
+              git rebase --abort 2>/dev/null || true
+            done
+            echo "✗ Push fallito dopo 3 tentativi"
+            exit 1
           else
             echo "✓ Generated artifacts are up to date."
           fi

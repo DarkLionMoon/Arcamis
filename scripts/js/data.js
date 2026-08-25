@@ -42,7 +42,6 @@ var pages = [
   {k:'lavori',l:'Lavoro',i:'💼',id:'pag-lavori',sec:'personaggio'},
   {k:'come-si-inizia',l:'Come si inizia',i:'🌟',id:'pag-come-si-inizia'},
   {k:'andando-avanti',l:'Andando avanti',i:'📈',id:'pag-andando-avanti'},
-  {k:'gilda-avventurieri',l:'Gilda degli Avventurieri',i:'🗡️',id:'pag-gilda-avventurieri',sec:'lavori'},
   {k:'forgia',l:'Forgia',i:'🔥',id:'pag-forgia',sec:'lavori'},
   {k:'biblioteca',l:'Biblioteca',i:'📚',id:'pag-biblioteca',sec:'lavori'},
   {k:'bottega-farmaceutica',l:'Bottega farmaceutica',i:'💊',id:'pag-bottega-farmaceutica',sec:'lavori'},
