@@ -71,7 +71,8 @@ var SECTIONS = [
   {v:"regole",l:"Regole"},
   {v:"personaggio",l:"Personaggio"},
   {v:"lavori",l:"Lavori"},
-  {v:"lore",l:"Lore"}
+  {v:"lore",l:"Lore"},
+  {v:"homebrew",l:"Homebrew"}
 ];
 
 /* ════ LAVORI ════ */
