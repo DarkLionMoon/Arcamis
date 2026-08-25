@@ -45,7 +45,6 @@ var _pathMap = {
   'personaggio/lavori': 'pag-lavori',
   'personaggio/come-si-inizia': 'pag-come-si-inizia',
   'personaggio/andando-avanti': 'pag-andando-avanti',
-  'lavori/sartoria': 'pag-sartoria',
   'in-game/maestria-titoli': 'pag-maestria-titoli',
   'in-game/casate-e-compagnie': 'pag-casate-e-compagnie',
   'lore/storia-del-mondo': 'pag-storia-del-mondo',
