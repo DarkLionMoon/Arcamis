@@ -5,8 +5,8 @@ window.loadChangelog = async function(container) {
 
   let entries;
   try {
-    const res = await fetch('/api/changelog');
-    if (!res.ok) throw new Error('Fetch error ' + res.status);
+    const res = await fetch('/content/changelog.json');
+    if (!res.ok) throw new Error('Fetch error: ' + res.status);
     entries = await res.json();
   } catch (e) {
     container.innerHTML = `<p class="cl-error">Errore nel caricamento del changelog: ${e.message}</p>`;
@@ -203,17 +203,15 @@ window.loadChangelog = async function(container) {
           const inline = document.createElement('div');
           inline.className = 'cl-inline-content';
           inline.dataset.id = entry.id;
-          inline.innerHTML = '<div class="hbsc-loading"><div class="gs-loading-spin"></div></div>';
           card.appendChild(inline);
-          fetch('/api/notion?pageId=' + entry.id)
-            .then(r => r.json())
-            .then(data => {
-              if (!data.blocks) throw new Error('no blocks');
-              inline.innerHTML = '<div class="n-body">' + renderBlocks(data.blocks, true) + '</div>';
-            })
-            .catch(() => {
-              inline.innerHTML = '<div class="cl-error">Errore caricamento</div>';
-            });
+          try {
+            const html = (entry.content && window.mdRender)
+              ? window.mdRender(entry.content)
+              : '<p class="cl-error">Contenuto non disponibile</p>';
+            inline.innerHTML = '<div class="n-body">' + html + '</div>';
+          } catch (e) {
+            inline.innerHTML = '<div class="cl-error">Errore caricamento</div>';
+          }
         });
 
         cardHeader.appendChild(titleEl);

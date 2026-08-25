@@ -137,9 +137,10 @@
   if (_store[key] && _times[key] && Date.now() - _times[key] < MC_TTL) return;
   if (typeof _memCache !== 'undefined' && _memCache[key]) return;
       _evict();
-      fetch('/api/notion?pageId=' + id)
-        .then(function(r) { return r.json(); })
+      fetch('/content/pages/' + id.replace(/^pag-/, '') + '.json')
+        .then(function(r) { return r.ok ? r.json() : null; })
         .then(function(data) {
+          if (!data) return;
           _store[key] = data;
           _times[key] = Date.now();
           var idx = _order.indexOf(key);
@@ -252,14 +253,14 @@
     setTimeout(function() {
       /* Pagine lavori — le più cliccate */
       var hotPages = [
-        '2f00274fdc1c8089bfe6c24434d53b67', // Biblioteca
-        '2f00274fdc1c801c9697e75caa8d5f13', // Bottega farmaceutica
-        '2ff0274fdc1c80688dd6c2b293a1f626', // Caserma
-        '2f00274fdc1c805ca01ec57f18d2ffee', // Forgia
-        '2f00274fdc1c801b8c13cefd9e15694e', // Gilda avventurieri
-        '2f00274fdc1c80faa99eda064ef0fabc', // Locanda
-        '2f00274fdc1c807aa03cc6cbeb3687cc', // Ospedale
-        '2ff0274fdc1c8035bad4f0b6ab705192', // Sartoria
+        'pag-biblioteca',
+        'pag-bottega-farmaceutica',
+        'pag-caserma',
+        'pag-forgia',
+        'pag-gilda-avventurieri',
+        'pag-locanda',
+        'pag-ospedale',
+        'pag-sartoria',
       ];
       hotPages.forEach(function(id) {
         if (window.prefetchPage) window.prefetchPage(id);

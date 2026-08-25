@@ -169,8 +169,13 @@ def validate_integrity(reg, errors, warnings):
         if k not in keys:
             errors.append(f"file orfano: content/pages/{f.name} non presente nel registry")
 
-def validate_content_links(errors, warnings):
-    """Verifica che immagini e link markdown nei contenuti puntino a file esistenti."""
+def validate_content_links(reg, errors, warnings):
+    """Verifica che immagini e link markdown nei contenuti puntino a file esistenti
+    o a route interne del sito (path del registry)."""
+    known_routes = {'/'}
+    for p in reg.get('pages', []):
+        if p.get('path'):
+            known_routes.add('/' + p['path'])
     img_rx = re.compile(r'!\[[^\]]*\]\(([^)]+)\)')
     link_rx = re.compile(r'(?<!!)\[[^\]]*\]\(([^)]+)\)')
     refs = {}
@@ -195,6 +200,8 @@ def validate_content_links(errors, warnings):
         if not path.startswith('/'):
             warnings.append(f"contenuto: riferimento relativo senza '/' iniziale: '{url[:60]}…' (usato in {uses[0][0]})")
             continue
+        if path in known_routes:
+            continue
         rel = Path(path[1:])
         if not (ROOT_DIR / rel).exists():
             warnings.append(f"contenuto: riferimento mancante '{url}' (usato in {uses[0][0]})")
@@ -204,7 +211,7 @@ def validate_all(reg):
     errors, warnings = [], []
     validate_schema(reg, errors)
     validate_integrity(reg, errors, warnings)
-    validate_content_links(errors, warnings)
+    validate_content_links(reg, errors, warnings)
     return errors, warnings
 
 def run_validation(reg):
@@ -330,25 +337,6 @@ def generate_path_map(reg):
         entries.append(f"  '{po['path']}': '{po['id']}'")
     return entries
 
-def generate_index_build(reg):
-    entries = []
-    for p in reg['pages']:
-        if p.get('index'):
-            entries.append(f"  {{ id:'{p['id']}', title:'{escape_js(p['l'])}', icon:'{p['i']}' }}")
-
-    db_entries = []
-    for d in reg.get('indexDatabases', []):
-        db_entries.append(f"  {{ id:'{d['id']}', label:'{escape_js(d['label'])}' }}")
-
-    return entries, db_entries
-
-def generate_build_index(reg):
-    entries = []
-    for p in reg['pages']:
-        if p.get('root'):
-            entries.append(f"    {{ id: '{p['id']}', title: '{escape_js(p['l'])}', icon: '{p['i']}' }}")
-    return entries
-
 def generate_export_index(reg):
     pages = []
     for p in reg['pages']:
@@ -407,6 +395,32 @@ def replace_between(content, pattern, replacement):
     regex = re.compile(pattern, re.DOTALL)
     return regex.sub(replacement, content)
 
+def generate_search_and_recent(reg):
+    """Indice di ricerca client-side + pagine aggiornate di recente."""
+    import re as _re
+    idx = []
+    recents = []
+    for p in reg['pages']:
+        f = PAGES_DIR / (p['k'] + '.json')
+        if not f.exists():
+            continue
+        try:
+            doc = load_json(f, f.name)
+        except Exception:
+            continue
+        text = _re.sub(r'!\[[^\]]*\]\([^)]*\)', ' ', doc.get('content') or '')
+        text = _re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', text)
+        text = _re.sub(r'[#>*`~_|\-]{1,3}', ' ', text)
+        text = _re.sub(r'\s+', ' ', text).strip()
+        idx.append({'id': 'pag-' + p['k'], 'title': doc.get('title') or p['l'], 'icon': doc.get('icon') or p['i'], 'text': text[:4000]})
+        lm = doc.get('lastModified')
+        if lm:
+            recents.append({'id': 'pag-' + p['k'], 'title': doc.get('title') or p['l'], 'icon': doc.get('icon') or p['i'], 'lastEdited': lm})
+    recents.sort(key=lambda x: x.get('lastEdited') or '', reverse=True)
+    search = json.dumps(idx, ensure_ascii=False, indent=1) + '\n'
+    recent = json.dumps({'pages': recents[:8]}, ensure_ascii=False, indent=1) + '\n'
+    return search, recent
+
 def main():
     check_mode = '--check' in sys.argv
     reg = load_registry()
@@ -461,31 +475,10 @@ def main():
     )
     write_file('scripts/js/app.js', app_js)
 
-    # 4. functions/api/index-build.js
-    index_build_path = ROOT_DIR / 'functions' / 'api' / 'index-build.js'
-    index_build = index_build_path.read_text(encoding='utf-8')
-    pages_entries, db_entries = generate_index_build(reg)
-    index_build = replace_between(
-        index_build,
-        r'const PAGES_TO_INDEX = \[[\s\S]*?\n\];',
-        f"const PAGES_TO_INDEX = [\n{',\n'.join(pages_entries)}\n];"
-    )
-    index_build = replace_between(
-        index_build,
-        r'const DATABASES_TO_INDEX = \[[\s\S]*?\n\];',
-        f"const DATABASES_TO_INDEX = [\n{',\n'.join(db_entries)}\n];"
-    )
-    write_file('functions/api/index-build.js', index_build)
-
-    # 5. functions/api/build-index.js
-    build_index_path = ROOT_DIR / 'functions' / 'api' / 'build-index.js'
-    build_index = build_index_path.read_text(encoding='utf-8')
-    build_index = replace_between(
-        build_index,
-        r'const ROOT_PAGES = \[[\s\S]*?\n\s*\];',
-        f"const ROOT_PAGES = [\n{',\n'.join(generate_build_index(reg))}\n  ];"
-    )
-    write_file('functions/api/build-index.js', build_index)
+    # 4-5. Indice ricerca client-side + novità recenti (da file locali)
+    search_json, recent_json = generate_search_and_recent(reg)
+    write_file('content/search-index.json', search_json)
+    write_file('content/recent.json', recent_json)
 
     # 6. export/index.html
     export_path = ROOT_DIR / 'export' / 'index.html'

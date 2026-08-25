@@ -198,8 +198,8 @@ var _scrollPositions = {};
 window.prefetchPage = function(id){
   var cacheKey = 'pg_' + id;
   if(!id || _memCache[cacheKey]) return;
-  fetch('/api/notion?pageId=' + id)
-    .then(function(r){ return r.json(); })
+  fetch('/content/pages/' + String(id).replace(/^pag-/,'') + '.json')
+    .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data){ _memCache[cacheKey] = data; })
     .catch(function(){});
 };
@@ -453,6 +453,14 @@ async function _gpRender(id,label,icon){
           var _footer = '<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
             + '<div class="n-page-footer-text">Archivi di Arcamis — ' + ptitle + '</div></div>';
           pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + (_scrubHtmlString(_localHtml || '') || _emptyHtml) + _footer + '</div>';
+          if(_localPage.k === 'changelog' && window.loadChangelog){
+            var _clWrap = document.createElement('div');
+            _clWrap.className = 'hb-changelog-container';
+            var _nc = pbody.querySelector('.nc');
+            var _ft = pbody.querySelector('.n-page-footer');
+            if(_ft) _nc.insertBefore(_clWrap, _ft); else _nc.appendChild(_clWrap);
+            window.loadChangelog(_clWrap);
+          }
           applyGlossary(pbody);
           _maybeBuildToc(pbody, !!_localJson.toc);
           if(typeof afterPageRender === 'function') afterPageRender();

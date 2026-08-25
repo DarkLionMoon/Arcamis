@@ -71,7 +71,7 @@
   _style.textContent = `
 #arc-d20-btn {
   position: fixed;
-  bottom: 72px;
+  bottom: calc(72px + env(safe-area-inset-bottom));
   right: 16px;
   width: 48px;
   height: 48px;
@@ -198,7 +198,7 @@
   100% { transform: translate(var(--x),var(--y)); opacity: 0; }
 }
 @media(max-width:700px){
-  #arc-d20-btn { bottom: 80px; right: 12px; }
+  #arc-d20-btn { bottom: calc(80px + env(safe-area-inset-bottom)); right: 12px; }
   #arc-d20-canvas { width: 260px; height: 260px; }
   #arc-d20-bignum { font-size: 56px; }
 }

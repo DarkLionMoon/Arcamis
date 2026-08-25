@@ -643,6 +643,19 @@ async function savePage(){
     try{
       var r=await ghPut(path,'admin: update '+_current.k,JSON.stringify(json,null,2),_current.sha);
       if(r&&r.content&&r.content.sha)_current.sha=r.content.sha;
+      /* Sync registry: titolo/icona del menu sito devono seguire la pagina */
+      try{
+        var rd=await ghGet('content/pages/registry.json');
+        var reg=JSON.parse(b64decode(rd.content));
+        var rp=reg.pages.find(function(x){return x.k===_current.k});
+        if(rp&&(rp.l!==_current.title||rp.i!==_current.icon)){
+          rp.l=_current.title;rp.i=_current.icon;
+          await ghPut('content/pages/registry.json','admin: sync '+_current.k+' metadata to registry',JSON.stringify(reg,null,2)+'\n',rd.sha);
+          var mi=PAGES.find(function(p){return p.k===_current.k});
+          if(mi){mi.l=_current.title;mi.i=_current.icon}
+          buildSidebar();
+        }
+      }catch(_re){/* best-effort */}
       _modified=false;_autosaveClear();_lastSavedContent=md;
       setBadge('ok','salvato');setStatus('ok','deploying...');
       await _logAudit('save_page',_current.k,{layout:_current.layout});

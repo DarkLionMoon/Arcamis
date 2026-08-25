@@ -52,8 +52,8 @@
     },
     {
       "k": "lavori",
-      "l": "Lavori",
-      "i": "📄",
+      "l": "Lavoro",
+      "i": "💼",
       "id": "pag-lavori",
       "c": 1,
       "menu": true,
@@ -61,6 +61,446 @@
       "sec": "personaggio",
       "path": "personaggio/lavori",
       "sub": ""
+    },
+    {
+      "k": "come-si-inizia",
+      "l": "Come si inizia",
+      "i": "🌟",
+      "id": "pag-come-si-inizia",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "personaggio/come-si-inizia"
+    },
+    {
+      "k": "andando-avanti",
+      "l": "Andando avanti",
+      "i": "📈",
+      "id": "pag-andando-avanti",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "personaggio/andando-avanti"
+    },
+    {
+      "k": "gilda-avventurieri",
+      "l": "Gilda degli Avventurieri",
+      "i": "🗡️",
+      "id": "pag-gilda-avventurieri",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lavori/gilda-avventurieri"
+    },
+    {
+      "k": "locanda",
+      "l": "Locanda",
+      "i": "🍺",
+      "id": "pag-locanda",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lavori/locanda"
+    },
+    {
+      "k": "forgia",
+      "l": "Forgia",
+      "i": "🔥",
+      "id": "pag-forgia",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lavori/forgia"
+    },
+    {
+      "k": "biblioteca",
+      "l": "Biblioteca",
+      "i": "📚",
+      "id": "pag-biblioteca",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lavori/biblioteca"
+    },
+    {
+      "k": "bottega-farmaceutica",
+      "l": "Bottega farmaceutica",
+      "i": "💊",
+      "id": "pag-bottega-farmaceutica",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lavori/bottega-farmaceutica"
+    },
+    {
+      "k": "caserma",
+      "l": "Caserma",
+      "i": "🛡️",
+      "id": "pag-caserma",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lavori/caserma"
+    },
+    {
+      "k": "corporazione-costruttori",
+      "l": "Corporazione dei Costruttori",
+      "i": "🔨",
+      "id": "pag-corporazione-costruttori",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lavori/corporazione-costruttori"
+    },
+    {
+      "k": "ospedale",
+      "l": "Ospedale",
+      "i": "⚕️",
+      "id": "pag-ospedale",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lavori/ospedale"
+    },
+    {
+      "k": "sartoria",
+      "l": "Sartoria",
+      "i": "🧵",
+      "id": "pag-sartoria",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lavori/sartoria"
+    },
+    {
+      "k": "maestria-titoli",
+      "l": "Maestria / Titoli",
+      "i": "🏅",
+      "id": "pag-maestria-titoli",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "in-game/maestria-titoli"
+    },
+    {
+      "k": "casate-e-compagnie",
+      "l": "Casate e Compagnie",
+      "i": "🏰",
+      "id": "pag-casate-e-compagnie",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "in-game/casate-e-compagnie"
+    },
+    {
+      "k": "storia-del-mondo",
+      "l": "Storia del Mondo",
+      "i": "📖",
+      "id": "pag-storia-del-mondo",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/storia-del-mondo"
+    },
+    {
+      "k": "introduzione",
+      "l": "Introduzione",
+      "i": "📜",
+      "id": "pag-introduzione",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/introduzione"
+    },
+    {
+      "k": "npc-storia",
+      "l": "Npc",
+      "i": "🧝",
+      "id": "pag-npc-storia",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/npc"
+    },
+    {
+      "k": "piani-di-esistenza",
+      "l": "Piani di esistenza",
+      "i": "🌌",
+      "id": "pag-piani-di-esistenza",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/piani-di-esistenza"
+    },
+    {
+      "k": "linguaggi",
+      "l": "Linguaggi",
+      "i": "🗣️",
+      "id": "pag-linguaggi",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/linguaggi"
+    },
+    {
+      "k": "bibliografia-scoperta",
+      "l": "Bibliografia scoperta",
+      "i": "📚",
+      "id": "pag-bibliografia-scoperta",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/bibliografia-scoperta"
+    },
+    {
+      "k": "esplora-dal-vivo",
+      "l": "Esplora dal vivo",
+      "i": "🗺️",
+      "id": "pag-esplora-dal-vivo",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/esplora-dal-vivo"
+    },
+    {
+      "k": "materiale-extra",
+      "l": "Materiale extra",
+      "i": "📦",
+      "id": "pag-materiale-extra",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/materiale-extra"
+    },
+    {
+      "k": "mappe",
+      "l": "Mappe",
+      "i": "🗺️",
+      "id": "pag-mappe",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/mappe"
+    },
+    {
+      "k": "mappa-arcamis",
+      "l": "Arcamis",
+      "i": "🏙️",
+      "id": "pag-mappa-arcamis",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/mappa-arcamis"
+    },
+    {
+      "k": "homebrew",
+      "l": "Homebrew",
+      "i": "⚗️",
+      "id": "pag-homebrew",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/homebrew"
+    },
+    {
+      "k": "specie-homebrew",
+      "l": "Specie Homebrew",
+      "i": "🧬",
+      "id": "pag-specie-homebrew",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/specie-homebrew"
+    },
+    {
+      "k": "regole-homebrew",
+      "l": "Regole Homebrew",
+      "i": "📐",
+      "id": "pag-regole-homebrew",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/regole-homebrew"
+    },
+    {
+      "k": "sottoclassi-homebrew",
+      "l": "Sottoclassi Homebrew",
+      "i": "⚔️",
+      "id": "pag-sottoclassi-homebrew",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/sottoclassi-homebrew"
+    },
+    {
+      "k": "changelog",
+      "l": "Changelog",
+      "i": "📝",
+      "id": "pag-changelog",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "changelog"
+    },
+    {
+      "k": "arcamis",
+      "l": "Arcamis",
+      "i": "📍",
+      "id": "pag-arcamis",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/arcamis"
+    },
+    {
+      "k": "selva-fogliabruna",
+      "l": "Selva Fogliabruna",
+      "i": "🌲",
+      "id": "pag-selva-fogliabruna",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/selva-fogliabruna"
+    },
+    {
+      "k": "foresta-dello-smarrimento",
+      "l": "Foresta dello Smarrimento",
+      "i": "🌑",
+      "id": "pag-foresta-dello-smarrimento",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/foresta-dello-smarrimento"
+    },
+    {
+      "k": "volonx",
+      "l": "Volonx",
+      "i": "🏘️",
+      "id": "pag-volonx",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/volonx"
+    },
+    {
+      "k": "vigilius",
+      "l": "Vigilius",
+      "i": "🏛️",
+      "id": "pag-vigilius",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/vigilius"
+    },
+    {
+      "k": "galeton",
+      "l": "Galeton",
+      "i": "🏘️",
+      "id": "pag-galeton",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/galeton"
+    },
+    {
+      "k": "lago-di-gromot",
+      "l": "Lago di Gromot",
+      "i": "🌊",
+      "id": "pag-lago-di-gromot",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/lago-di-gromot"
+    },
+    {
+      "k": "forte-vigilus",
+      "l": "Forte Vigilus",
+      "i": "🏰",
+      "id": "pag-forte-vigilus",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/forte-vigilus"
+    },
+    {
+      "k": "riva-di-ferro",
+      "l": "Riva di Ferro",
+      "i": "⚓",
+      "id": "pag-riva-di-ferro",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/riva-di-ferro"
+    },
+    {
+      "k": "fumofosco",
+      "l": "Fumofosco",
+      "i": "🌫️",
+      "id": "pag-fumofosco",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/fumofosco"
+    },
+    {
+      "k": "rovine-di-kaldur",
+      "l": "Rovine di Kaldur",
+      "i": "🗿",
+      "id": "pag-rovine-di-kaldur",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/rovine-di-kaldur"
+    },
+    {
+      "k": "rivorosso",
+      "l": "Rivorosso",
+      "i": "🌊",
+      "id": "pag-rivorosso",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/rivorosso"
+    },
+    {
+      "k": "circolo-dello-smarrimento",
+      "l": "Circolo dello Smarrimento",
+      "i": "🪨",
+      "id": "pag-circolo-dello-smarrimento",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/circolo-dello-smarrimento"
+    },
+    {
+      "k": "dimora-degli-ursidi",
+      "l": "Dimora degli Ursidi",
+      "i": "🐻",
+      "id": "pag-dimora-degli-ursidi",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/dimora-degli-ursidi"
+    },
+    {
+      "k": "caverna-delle-talpe",
+      "l": "La Caverna delle Talpe",
+      "i": "🕳️",
+      "id": "pag-caverna-delle-talpe",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/caverna-delle-talpe"
+    },
+    {
+      "k": "miniera-bruciascoria",
+      "l": "Miniera Bruciascoria",
+      "i": "⚒️",
+      "id": "pag-miniera-bruciascoria",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "lore/miniera-bruciascoria"
     }
   ],
   "sections": [
@@ -106,6 +546,226 @@
       "path": "personaggio/lavori",
       "changefreq": "monthly",
       "priority": "0.7"
+    },
+    {
+      "path": "personaggio/come-si-inizia",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "personaggio/andando-avanti",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lavori/gilda-avventurieri",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lavori/locanda",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lavori/forgia",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lavori/biblioteca",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lavori/bottega-farmaceutica",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lavori/caserma",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lavori/corporazione-costruttori",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lavori/ospedale",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lavori/sartoria",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "in-game/maestria-titoli",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "in-game/casate-e-compagnie",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/storia-del-mondo",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/introduzione",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/npc",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/piani-di-esistenza",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/linguaggi",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/bibliografia-scoperta",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/esplora-dal-vivo",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/materiale-extra",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/mappe",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/mappa-arcamis",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/homebrew",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/specie-homebrew",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/regole-homebrew",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/sottoclassi-homebrew",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "changelog",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/arcamis",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/selva-fogliabruna",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/foresta-dello-smarrimento",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/volonx",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/vigilius",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/galeton",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/lago-di-gromot",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/forte-vigilus",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/riva-di-ferro",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/fumofosco",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/rovine-di-kaldur",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/rivorosso",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/circolo-dello-smarrimento",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/dimora-degli-ursidi",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/caverna-delle-talpe",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "lore/miniera-bruciascoria",
+      "changefreq": "monthly",
+      "priority": "0.6"
     }
   ]
 }

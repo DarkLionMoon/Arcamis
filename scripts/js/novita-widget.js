@@ -18,7 +18,7 @@ window.loadNovitaWidget = function(container) {
   container.innerHTML =
     '<div class="arc-news-loading">⏳ Caricamento novità...</div>';
 
-  fetch('/api/recent')
+  fetch('/content/recent.json')
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var pages = data.pages || [];
@@ -161,7 +161,7 @@ window._injectTagCloud = function(container, pages, onFilter) {
    BADGE "ULTIMO AGGIORNAMENTO" sulle card
 ════════════════════════════════════ */
 window.applyRecentBadges = function() {
-  fetch('/api/recent')
+  fetch('/content/recent.json')
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var pages = data.pages || [];

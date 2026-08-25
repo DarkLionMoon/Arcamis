@@ -112,7 +112,7 @@
   background:rgba(4,5,12,.98);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-bottom:2px solid var(--gold);
   z-index:190;display:none;
-  max-height:calc(100vh - var(--topbar-h));overflow-y:auto;
+  max-height:calc(100vh - var(--topbar-h));max-height:calc(100dvh - var(--topbar-h));padding-bottom:env(safe-area-inset-bottom);overflow-y:auto;
 }
 #mobile-nav.open{display:block;animation:mnopen .22s ease forwards}
 @keyframes mnopen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
@@ -182,7 +182,7 @@
 /* ════════════════════════════════════
    BOTTOM NAV (mobile)
 ════════════════════════════════════ */
-#bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:180;height:54px;background:rgba(4,5,14,.97);border-top:1px solid rgba(200,155,60,.1);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);grid-template-columns:repeat(5,1fr);}
+#bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:180;height:calc(54px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:rgba(4,5,14,.97);border-top:1px solid rgba(200,155,60,.1);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);grid-template-columns:repeat(4,1fr);}
 .bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:100%;cursor:pointer;color:rgba(200,155,60,.32);font-size:19px;transition:color .15s;position:relative;}
 .bnav-item.active,.bnav-item:active{color:var(--gold2)}
 .bnav-label{font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.07em;text-transform:uppercase;opacity:.7}
@@ -466,8 +466,9 @@ body.light .gold-sep::after{color:var(--gold)!important}
   .mn-ii{font-size:18px;width:24px}
   .mn-label{padding:12px 20px 4px;font-size:8px}
   #bottom-nav{display:grid}
-  #main{padding-bottom:54px}
-  #scroll-top-btn{bottom:70px}
+  #main{padding-bottom:calc(54px + env(safe-area-inset-bottom))}
+  #scroll-top-btn{bottom:calc(70px + env(safe-area-inset-bottom))}
+  body.nav-open #main{overflow:hidden}
 }
 @media(max-width:390px){
   #tlt{font-size:10px;letter-spacing:.06em}
@@ -1216,7 +1217,7 @@ body.theme-alchemy #arc-options-panel{background:rgba(10,6,22,.97)!important;bor
 
 /* Mobile */
 @media(max-width:768px){
-  #arc-help-btn{bottom:70px;left:14px;width:42px;height:42px;font-size:20px}
+  #arc-help-btn{bottom:calc(70px + env(safe-area-inset-bottom));left:14px;width:42px;height:42px;font-size:20px}
   #arc-help-panel{bottom:122px;left:10px;width:calc(100vw - 20px);max-width:340px}
 }
 

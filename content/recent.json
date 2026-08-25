@@ -1,0 +1,52 @@
+{
+ "pages": [
+  {
+   "id": "pag-changelog",
+   "title": "Changelog",
+   "icon": "📝",
+   "lastEdited": "2026-08-25T14:59:03.113399Z"
+  },
+  {
+   "id": "pag-foresta-dello-smarrimento",
+   "title": "Foresta dello Smarrimento",
+   "icon": "🌑",
+   "lastEdited": "2026-08-25T14:49:32.831917Z"
+  },
+  {
+   "id": "pag-esplora-dal-vivo",
+   "title": "Esplora dal “vivo”",
+   "icon": "📄",
+   "lastEdited": "2026-08-25T14:49:32.827106Z"
+  },
+  {
+   "id": "pag-sottoclassi-homebrew",
+   "title": "Sottoclassi Homebrew",
+   "icon": "📄",
+   "lastEdited": "2026-08-25T14:49:09.687390Z"
+  },
+  {
+   "id": "pag-regole-homebrew",
+   "title": "Regole Homebrew per specie, classi ed oggetti già esistenti",
+   "icon": "📄",
+   "lastEdited": "2026-08-25T14:49:09.344400Z"
+  },
+  {
+   "id": "pag-specie-homebrew",
+   "title": "Specie Homebrew",
+   "icon": "📄",
+   "lastEdited": "2026-08-25T14:49:09.002940Z"
+  },
+  {
+   "id": "pag-mappa-arcamis",
+   "title": "Arcamis",
+   "icon": "📄",
+   "lastEdited": "2026-08-25T14:49:08.576856Z"
+  },
+  {
+   "id": "pag-materiale-extra",
+   "title": "Materiale extra",
+   "icon": "📄",
+   "lastEdited": "2026-08-25T14:49:07.884870Z"
+  }
+ ]
+}
