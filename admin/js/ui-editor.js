@@ -82,7 +82,7 @@ async function openInterfaceUI(){
     + '<button class="btn btn-soft btn-sm" onclick="_uiPrevReload()">⟳</button></span></div>';
   h += '<div class="panel-sub">Caricata dopo il deploy (~30s dal salvataggio). Le modifiche alla barra si vedono a fine deploy.</div>';
   h += '<div style="background:#0b0d16;border:1px solid var(--line);border-radius:10px;padding:10px;overflow:auto;text-align:center">'
-    + '<iframe id="ui-preview-frame" src="https://arcamis.pages.dev" style="width:100%;height:560px;border:1px solid var(--line);border-radius:8px;background:#fff" title="Anteprima sito"></iframe>'
+    + '<iframe id="ui-preview-frame" src="/" style="width:100%;height:560px;border:1px solid var(--line);border-radius:8px;background:#fff" title="Anteprima sito"></iframe>'
     + '</div></div>';
 
   document.getElementById('main').innerHTML = h;
