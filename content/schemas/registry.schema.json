@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://arcamis.pages.dev/schemas/registry.schema.json",
+  "title": "Arcamis registry",
+  "description": "Registry unico delle pagine e della navigazione. È la fonte di verità da cui sync-registry.py genera data.js, notion-nav.js, app.js, index-build.js, build-index.js, export/, admin/ e sitemap.xml.",
+  "type": "object",
+  "required": ["root", "guild", "pages", "sections", "lavori"],
+  "properties": {
+    "root": { "type": "string" },
+    "guild": { "type": "string" },
+
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["k", "l", "i", "id"],
+        "properties": {
+          "k": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "l": { "type": "string" },
+          "i": { "type": "string" },
+          "id": { "type": "string" },
+          "adminId": { "type": "string" },
+          "path": { "type": "string" },
+          "slug": { "type": "string" },
+          "sec": { "type": "string" },
+          "sub": { "type": "string" },
+          "layout": { "type": "string" },
+          "layoutDb": { "type": "string" },
+          "menu": { "type": "boolean" },
+          "admin": { "type": "boolean" },
+          "export": { "type": "boolean" },
+          "index": { "type": "boolean" },
+          "root": { "type": "boolean" },
+          "c": { "type": "integer" }
+        },
+        "additionalProperties": true
+      }
+    },
+
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["v", "l"],
+        "properties": {
+          "v": { "type": "string" },
+          "l": { "type": "string" },
+          "adminOnly": { "type": "boolean" },
+          "pages": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+
+    "lavori": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["l", "i", "id"],
+        "properties": {
+          "l": { "type": "string" },
+          "i": { "type": "string" },
+          "id": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+
+    "legacySlugs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slug", "id"],
+        "properties": { "slug": { "type": "string" }, "id": { "type": "string" } }
+      }
+    },
+
+    "layoutDatabases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "layout"],
+        "properties": { "id": { "type": "string" }, "layout": { "type": "string" } }
+      }
+    },
+
+    "pathOverrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "id"],
+        "properties": { "path": { "type": "string" }, "id": { "type": "string" } }
+      }
+    },
+
+    "databases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "label", "dbId"],
+        "properties": { "name": { "type": "string" }, "label": { "type": "string" }, "dbId": { "type": "string" } }
+      }
+    },
+
+    "indexDatabases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": { "id": { "type": "string" }, "label": { "type": "string" } }
+      }
+    },
+
+    "sitemap": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": { "type": "string" },
+          "changefreq": { "type": "string" },
+          "priority": { "type": ["string", "number"] }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

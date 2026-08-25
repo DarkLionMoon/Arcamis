@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcamis — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="/scripts/js/md-render.js"></script>
+  <link rel="stylesheet" href="styles/admin.css">
+<script src="js/arc.js"></script>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="lg-card">
+    <div class="lg-brand">
+      <div class="lg-logo">A</div>
+      <h1>ARCAMIS</h1>
+      <div class="sub">PANNELLO DI GESTIONE</div>
+    </div>
+    <div class="lg-f">
+      <div class="fld"><label>Utente</label><input id="login-user" class="in" placeholder="username" autocomplete="username"></div>
+      <div class="fld"><label>Password</label><input id="login-pw" class="in" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="lg-row"><label><input type="checkbox" id="login-remember" checked> Ricordami</label><span style="color:var(--dim)">sessione sicura</span></div>
+      <div class="lg-err" id="login-err"></div>
+      <button class="btn btn-p btn-block" id="login-btn" onclick="doLogin()">ACCEDI</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header id="topbar">
+    <button id="tb-menu" onclick="toggleSidebar()" title="Menu">☰</button>
+    <div class="tb-brand">
+      <div class="tb-logo">A</div>
+      <div style="display:flex;flex-direction:column;line-height:1">
+        <span class="t1">ARCAMIS</span>
+        <span class="t2">ADMIN</span>
+      </div>
+    </div>
+    <div class="tb-sep"></div>
+    <div id="tb-crumb"><span class="cr">Admin</span></div>
+    <div class="tb-right">
+      <span id="tb-status" class="idle">pronto</span>
+      <a class="tb-btn" href="https://arcamis.pages.dev" target="_blank" rel="noopener" title="Apri il sito in una nuova scheda">🌐 Apri sito</a>
+      <div class="tb-user" id="tb-user"></div>
+    </div>
+  </header>
+  <div style="display:flex;flex:1;min-height:0">
+    <aside id="sidebar">
+      <div class="sb-search"><input id="sb-q" class="in" placeholder="Filtra menu…" oninput="sbFilter(this.value)"></div>
+      <div class="sb-scroll" id="sb-nav"></div>
+      <div class="sb-foot">
+        <div class="tb-ava" id="sb-ava">?</div>
+        <div class="grow"><div class="un" id="sb-name"></div><div class="ur" id="sb-role"></div></div>
+        <button class="sb-logout" onclick="doLogout()" title="Esci">⎋</button>
+      </div>
+    </aside>
+    <div id="sb-overlay" onclick="closeSidebar()"></div>
+    <main id="main"></main>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   CONFIG INLINE — registro pagine e sezioni del menu.
+   Questi due array vengono riscritti dinamicamente dall'admin
+   (nuova pagina / rinomina / navigazione), devono restare qui.
+   ════════════════════════════════════════════════════════════════ */
+window.ArcAdmin.pages = [
+{k:'la-storia-di-gandora',l:'La Storia di Gandora',i:'🐉',sec:'lore',c:1},
+{k:'regole-del-server',l:'Regole del Server',i:'📋',sec:'regole',c:1},
+{k:'materiale-approvato',l:'Materiale Approvato',i:'📖',sec:'personaggio',c:1},
+{k:'pantheon',l:'Pantheon',i:'🛐',sec:'lore',c:1},
+{k:'lavori',l:'Lavori',i:'📄',sec:'personaggio',c:1}
+];
+window.ArcAdmin.sections = [
+{v:"regole",l:"Regole"},
+{v:"personaggio",l:"Personaggio"},
+{v:"lore",l:"Lore"}
+];
+/* Alias retrocompatibili (gestori onclick e codice legacy). */
+var PAGES = window.ArcAdmin.pages;
+var SECTIONS = window.ArcAdmin.sections;
+</script>
+<script src="js/core.js"></script>
+<script src="js/editors.js"></script>
+<script src="js/structured.js"></script>
+<script src="js/site.js"></script>
+<script src="js/mappins.js"></script>
+<script src="js/system.js"></script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcamis — Export Contenuti</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Pro:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#080a0e; --bg2:#0c0f15; --bg3:#10141c; --bdr:#1e1808; --bdr2:#2c2210; --gold:#c89b3c; --gold2:#d4aa4a; --text:#a08848; --text2:#786438; --text3:#483c1c; --white:#f0e6d2; --green:#4a9a58; --red:#c04040; }
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:'Crimson Pro',serif; padding:40px; }
+h1 { font-family:'Cinzel',serif; color:var(--gold2); font-size:22px; margin-bottom:8px; }
+.subtitle { color:var(--text3); font-size:14px; margin-bottom:32px; }
+.section { background:var(--bg2); border:1px solid var(--bdr2); border-radius:8px; padding:20px 24px; margin-bottom:20px; }
+.section h2 { font-family:'Cinzel',serif; color:var(--gold); font-size:13px; letter-spacing:.1em; margin-bottom:12px; }
+.btn { background:var(--gold); color:var(--bg); border:none; border-radius:4px; font-family:'Cinzel',serif; font-size:11px; font-weight:700; letter-spacing:.1em; padding:10px 20px; cursor:pointer; transition:all .2s; }
+.btn:hover { background:var(--gold2); }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+.btn-outline { background:none; border:1px solid var(--bdr2); color:var(--text2); }
+.btn-outline:hover { border-color:var(--gold); color:var(--gold2); }
+.btn-danger { background:rgba(192,64,64,.15); border:1px solid rgba(192,64,64,.3); color:var(--red); }
+.log { background:var(--bg3); border:1px solid var(--bdr); border-radius:4px; padding:12px 16px; margin-top:12px; max-height:300px; overflow-y:auto; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; color:var(--text2); }
+.log .ok { color:var(--green); }
+.log .err { color:var(--red); }
+.log .info { color:var(--gold); }
+.progress { height:4px; background:var(--bg3); border-radius:2px; margin-top:8px; overflow:hidden; }
+.progress-bar { height:100%; background:var(--gold); width:0%; transition:width .3s; }
+.stats { display:flex; gap:16px; margin-top:12px; font-size:13px; }
+.stat { color:var(--text2); }
+.stat strong { color:var(--gold2); }
+</style>
+</head>
+<body>
+<h1>⚔ Export Contenuti Arcamis</h1>
+<p class="subtitle">Fetcha tutti i contenuti da Notion/Google e li salva come JSON locale</p>
+
+<div class="section">
+<h2>📦 Export Completo</h2>
+<p style="color:var(--text2);font-size:14px;margin-bottom:12px">
+  Fetcha pagine wiki, database, mestieri e documenti. I file JSON vengono scaricati come ZIP.
+</p>
+<button class="btn" id="btn-export-all" onclick="exportAll()">AVVIA EXPORT</button>
+<div class="progress" id="progress" style="display:none"><div class="progress-bar" id="progress-bar"></div></div>
+<div class="stats" id="stats"></div>
+<div class="log" id="log" style="display:none"></div>
+</div>
+
+<div class="section">
+<h2>📄 Export Singolo</h2>
+<p style="color:var(--text2);font-size:14px;margin-bottom:12px">
+  Exporta una singola pagina wiki. Incolla l'ID Notion o il route key.
+</p>
+<div style="display:flex;gap:8px;margin-bottom:12px">
+  <input type="text" id="single-id" placeholder="Route key (es. gameplay) o Notion ID" style="flex:1;background:var(--bg3);border:1px solid var(--bdr);border-radius:4px;color:var(--white);font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 12px;outline:none">
+  <button class="btn btn-outline" onclick="exportSingle()">EXPORT</button>
+</div>
+<div class="log" id="single-log" style="display:none"></div>
+</div>
+
+<div class="section">
+<h2>ℹ️ Note</h2>
+<ul style="color:var(--text2);font-size:14px;line-height:1.8;padding-left:20px">
+  <li>L'export usa le API endpoints del sito (<code>/api/notion</code>)</li>
+  <li>Le immagini S3 vengono convertite in riferimenti lazy</li>
+  <li>I file JSON sono pronti per essere caricati nell'admin panel</li>
+  <li>Dopo l'export, incolla i JSON nell'admin panel e salva su GitHub</li>
+</ul>
+</div>
+
+<script>
+// Page registry
+var PAGES = [
+
+];
+
+var DBS = [
+
+];
+
+function log(el, msg, cls) {
+  var d = document.getElementById(el);
+  d.style.display = 'block';
+  d.innerHTML += '<div class="' + (cls||'') + '">' + msg + '</div>';
+  d.scrollTop = d.scrollHeight;
+}
+
+function updateProgress(pct) {
+  document.getElementById('progress').style.display = 'block';
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+async function fetchPage(pageId) {
+  var res = await fetch('/api/notion?pageId=' + pageId);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+async function fetchDb(dbId) {
+  var res = await fetch('/api/notion?dbId=' + dbId);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+function blocksToMarkdown(blocks) {
+  if (!blocks || !blocks.length) return '';
+  var md = '';
+  for (var i = 0; i < blocks.length; i++) {
+    var b = blocks[i];
+    var type = b.type;
+    var content = '';
+    
+    if (b.rich_text && b.rich_text.length) {
+      content = b.rich_text.map(function(rt) {
+        var t = rt.plain_text || '';
+        if (rt.annotations) {
+          if (rt.annotations.bold) t = '**' + t + '**';
+          if (rt.annotations.italic) t = '*' + t + '*';
+          if (rt.annotations.code) t = '`' + t + '`';
+        }
+        if (rt.href) t = '[' + t + '](' + rt.href + ')';
+        return t;
+      }).join('');
+    }
+    
+    switch(type) {
+      case 'paragraph': md += content + '\n\n'; break;
+      case 'heading_1': md += '# ' + content + '\n\n'; break;
+      case 'heading_2': md += '## ' + content + '\n\n'; break;
+      case 'heading_3': md += '### ' + content + '\n\n'; break;
+      case 'bulleted_list_item': md += '- ' + content + '\n'; break;
+      case 'numbered_list_item': md += '1. ' + content + '\n'; break;
+      case 'quote': md += '> ' + content + '\n\n'; break;
+      case 'divider': md += '---\n\n'; break;
+      case 'code': md += '```\n' + content + '\n```\n\n'; break;
+      case 'toggle': md += '<details><summary>' + content + '</summary>\n\n'; break;
+      case 'callout': md += '> ' + (b.icon ? b.icon.emoji + ' ' : '') + content + '\n\n'; break;
+      case 'image':
+        var url = b.image && b.image.file ? b.image.file.url : (b.image && b.image.external ? b.image.external.url : '');
+        if (url) md += '![' + (b.image.caption ? b.image.caption.map(function(c){return c.plain_text}).join('') : '') + '](' + url + ')\n\n';
+        break;
+      case 'bookmark':
+        if (b.bookmark && b.bookmark.url) md += '[Bookmark](' + b.bookmark.url + ')\n\n';
+        break;
+      case 'embed':
+        if (b.embed && b.embed.url) md += '[Embed](' + b.embed.url + ')\n\n';
+        break;
+      case 'table':
+        if (b.table && b.table.children) {
+          b.table.children.forEach(function(row) {
+            if (row.table && row.table.cells) {
+              md += '| ' + row.table.cells.map(function(c) {
+                return c.map(function(rt){return rt.plain_text}).join('');
+              }).join(' | ') + ' |\n';
+            }
+          });
+          md += '\n';
+        }
+        break;
+      case 'child_page':
+        md += '[📄 ' + (b.child_page.title || 'Page') + '](/' + (b.child_page.id || '') + ')\n\n';
+        break;
+      default:
+        if (content) md += content + '\n\n';
+    }
+    
+    // Recurse children
+    if (b.children && b.children.length) {
+      md += blocksToMarkdown(b.children);
+    }
+  }
+  return md;
+}
+
+async function exportAll() {
+  var btn = document.getElementById('btn-export-all');
+  btn.disabled = true;
+  var total = PAGES.length + DBS.length;
+  var done = 0;
+  var results = { pages: {}, dbs: {} };
+  var errors = [];
+  
+  log('log', '🚀 Avvio export...', 'info');
+  
+  // Export pages
+  for (var i = 0; i < PAGES.length; i++) {
+    var p = PAGES[i];
+    try {
+      log('log', '📄 [' + (done+1) + '/' + total + '] ' + p.l + '...');
+      var data = await fetchPage(p.id);
+      var md = blocksToMarkdown(data.blocks);
+      results.pages[p.k] = { k: p.k, title: p.l, icon: p.i, content: md, lastModified: new Date().toISOString() };
+      log('log', '  ✅ ' + p.l + ' (' + md.length + ' chars)', 'ok');
+    } catch(e) {
+      log('log', '  ❌ ' + p.l + ': ' + e.message, 'err');
+      errors.push(p.l);
+    }
+    done++;
+    updateProgress(Math.round(done / total * 100));
+    await new Promise(function(r){ setTimeout(r, 200) });
+  }
+  
+  // Export databases
+  for (var i = 0; i < DBS.length; i++) {
+    var d = DBS[i];
+    try {
+      log('log', '🗄️ [' + (done+1) + '/' + total + '] ' + d.label + '...');
+      var data = await fetchDb(d.dbId);
+      results.dbs[d.name] = data.pages || [];
+      log('log', '  ✅ ' + d.label + ' (' + (data.pages||[]).length + ' items)', 'ok');
+    } catch(e) {
+      log('log', '  ❌ ' + d.label + ': ' + e.message, 'err');
+      errors.push(d.label);
+    }
+    done++;
+    updateProgress(Math.round(done / total * 100));
+    await new Promise(function(r){ setTimeout(r, 200) });
+  }
+  
+  // Download as individual JSON files
+  log('log', '\n📦 Generazione file JSON...', 'info');
+  
+  // Download pages
+  for (var k in results.pages) {
+    downloadJson('pages/' + k + '.json', results.pages[k]);
+  }
+  
+  // Download databases
+  for (var name in results.dbs) {
+    downloadJson('db/' + name + '.json', results.dbs[name]);
+  }
+  
+  var statsHtml = '<div class="stat">Pagine: <strong>' + Object.keys(results.pages).length + '</strong></div>';
+  statsHtml += '<div class="stat">Database: <strong>' + Object.keys(results.dbs).length + '</strong></div>';
+  statsHtml += '<div class="stat">Errori: <strong style="color:' + (errors.length ? 'var(--red)' : 'var(--green)') + '">' + errors.length + '</strong></div>';
+  document.getElementById('stats').innerHTML = statsHtml;
+  
+  log('log', '\n✅ Export completato! File scaricati nella cartella downloads.', 'ok');
+  if (errors.length) log('log', '⚠️ Errori: ' + errors.join(', '), 'err');
+  
+  btn.disabled = false;
+}
+
+async function exportSingle() {
+  var input = document.getElementById('single-id').value.trim();
+  if (!input) return;
+  
+  var logEl = document.getElementById('single-log');
+  logEl.style.display = 'block';
+  logEl.innerHTML = '';
+  
+  // Try to find by key
+  var page = PAGES.find(function(p) { return p.k === input || p.id === input; });
+  if (!page) {
+    log('single-log', '❌ Pagina non trovata: ' + input, 'err');
+    return;
+  }
+  
+  try {
+    log('single-log', '📄 Fetch ' + page.l + '...', 'info');
+    var data = await fetchPage(page.id);
+    var md = blocksToMarkdown(data.blocks);
+    var json = { k: page.k, title: page.l, icon: page.i, content: md, lastModified: new Date().toISOString() };
+    downloadJson('pages/' + page.k + '.json', json);
+    log('single-log', '✅ ' + page.l + ' scaricato (' + md.length + ' chars)', 'ok');
+  } catch(e) {
+    log('single-log', '❌ Errore: ' + e.message, 'err');
+  }
+}
+
+function downloadJson(path, data) {
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = path.split('/').pop();
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>

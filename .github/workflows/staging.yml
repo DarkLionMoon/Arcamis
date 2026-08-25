@@ -1,0 +1,72 @@
+name: Staging Deploy
+
+on:
+  push:
+    branches: [preview, staging]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Pages (Preview)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check secrets
+        id: check
+        run: |
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "⚠️  Secrets mancanti (CF_API_TOKEN, CF_ACCOUNT_ID): deploy GitHub saltato. Il sito si aggiorna tramite l'integrazione Git di Cloudflare Pages."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+
+      - name: Setup Node
+        if: steps.check.outputs.configured == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Wrangler
+        if: steps.check.outputs.configured == 'true'
+        run: npm install -g wrangler@latest
+
+      - name: Build (noop for static)
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          echo "Static site - no build step required"
+          ls -la
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.check.outputs.configured == 'true'
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: ${{ secrets.CF_PAGES_PROJECT || 'arcamis' }}
+          directory: .
+          branch: ${{ github.ref_name }}
+          # preview deployments get unique URLs like: https://<branch>.<project>.pages.dev
+        env:
+          # Pass any needed env vars to the deploy
+          NODE_ENV: production
+
+      - name: Post preview URL
+        if: github.event_name == 'pull_request'
+        run: |
+          PREVIEW_URL="https://${{ github.head_ref }}.${{ secrets.CF_PAGES_PROJECT || 'arcamis' }}.pages.dev"
+          echo "Preview deploy ready at: $PREVIEW_URL"
+          gh pr comment ${{ github.event.pull_request.number }} --body "🚀 **Preview deploy ready!**\n\n🔗 **URL:** $PREVIEW_URL\n\n*Questo deploy viene aggiornato automaticamente ad ogni push su questo branch.*"
+        env:
+          GH_TOKEN: ${{ github.token }}
