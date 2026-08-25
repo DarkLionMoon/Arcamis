@@ -571,6 +571,17 @@
     <div id="ahp-dm-status" class="ahp-dm-status"></div>
   </div>
 </div>
+<!-- ═══ PURGE VECCHIO SERVICE WORKER ═══ -->
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    regs.forEach(function(r){ r.unregister(); });
+  });
+  caches.keys().then(function(ks){
+    ks.forEach(function(k){ caches.delete(k); });
+  });
+}
+</script>
 <!-- ═══ SCRIPT ═══ -->
 <script src="/scripts/js/data.js" defer></script>
 <script src="/scripts/js/md-render.js" defer></script>
