@@ -58,7 +58,7 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "sec": "personaggio",
+      "sec": "lavori",
       "path": "personaggio/lavori",
       "sub": ""
     },
