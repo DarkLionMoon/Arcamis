@@ -83,17 +83,6 @@
       "path": "personaggio/andando-avanti"
     },
     {
-      "k": "forgia",
-      "l": "Forgia",
-      "i": "🔥",
-      "id": "pag-forgia",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lavori/forgia",
-      "sec": "lavori"
-    },
-    {
       "k": "corporazione-costruttori",
       "l": "Corporazione dei Costruttori",
       "i": "🔨",
