@@ -71,7 +71,7 @@
       "menu": true,
       "admin": true,
       "path": "personaggio/come-si-inizia",
-      "sec": "",
+      "sec": "personaggio",
       "sub": ""
     },
     {
