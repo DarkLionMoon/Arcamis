@@ -69,8 +69,7 @@ var _pathMap = {
   'lore/forte-vigilus': 'pag-forte-vigilus',
   'lore/riva-di-ferro': 'pag-riva-di-ferro',
   'lore/fumofosco': 'pag-fumofosco',
-  'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur',
-  'lore/circolo-dello-smarrimento': 'pag-circolo-dello-smarrimento'
+  'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur'
 };
 
 /* ════ DEEP LINK ════ */

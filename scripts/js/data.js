@@ -61,8 +61,7 @@ var pages = [
   {k:'forte-vigilus',l:'Forte Vigilus',i:'🏰',id:'pag-forte-vigilus'},
   {k:'riva-di-ferro',l:'Riva di Ferro',i:'⚓',id:'pag-riva-di-ferro'},
   {k:'fumofosco',l:'Fumofosco',i:'🌫️',id:'pag-fumofosco'},
-  {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'},
-  {k:'circolo-dello-smarrimento',l:'Circolo dello Smarrimento',i:'🪨',id:'pag-circolo-dello-smarrimento'}
+  {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'}
 ];
 
 function getPage(idOrK){
