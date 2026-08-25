@@ -133,16 +133,6 @@
       "path": "lore/piani-di-esistenza"
     },
     {
-      "k": "linguaggi",
-      "l": "Linguaggi",
-      "i": "🗣️",
-      "id": "pag-linguaggi",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/linguaggi"
-    },
-    {
       "k": "bibliografia-scoperta",
       "l": "Bibliografia scoperta",
       "i": "📚",
