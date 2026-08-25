@@ -351,16 +351,6 @@
       "menu": true,
       "admin": true,
       "path": "lore/circolo-dello-smarrimento"
-    },
-    {
-      "k": "dimora-degli-ursidi",
-      "l": "Dimora degli Ursidi",
-      "i": "🐻",
-      "id": "pag-dimora-degli-ursidi",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "lore/dimora-degli-ursidi"
     }
   ],
   "sections": [
