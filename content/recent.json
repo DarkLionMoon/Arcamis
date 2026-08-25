@@ -13,12 +13,6 @@
    "lastEdited": "2026-08-25T15:49:47.935Z"
   },
   {
-   "id": "pag-changelog",
-   "title": "Changelog",
-   "icon": "📝",
-   "lastEdited": "2026-08-25T14:59:03.113399Z"
-  },
-  {
    "id": "pag-foresta-dello-smarrimento",
    "title": "Foresta dello Smarrimento",
    "icon": "🌑",
@@ -47,6 +41,12 @@
    "title": "Arcamis",
    "icon": "📄",
    "lastEdited": "2026-08-25T14:49:08.576856Z"
+  },
+  {
+   "id": "pag-bibliografia-scoperta",
+   "title": "Bibliografia scoperta",
+   "icon": "📄",
+   "lastEdited": "2026-08-25T14:49:07.539746Z"
   }
  ]
 }

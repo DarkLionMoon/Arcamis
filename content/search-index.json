@@ -108,12 +108,6 @@
   "text": "Contenuto in arrivo."
  },
  {
-  "id": "pag-changelog",
-  "title": "Changelog",
-  "icon": "📝",
-  "text": "Cronologia aggiornamenti di Arcamis"
- },
- {
   "id": "pag-arcamis",
   "title": "Arcamis",
   "icon": "📍",

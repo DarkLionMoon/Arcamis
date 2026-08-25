@@ -56,7 +56,6 @@ var _pathMap = {
   'lore/regole-homebrew': 'pag-regole-homebrew',
   'lore/specie-homebrew': 'pag-specie-homebrew',
   'lore/sottoclassi-homebrew': 'pag-sottoclassi-homebrew',
-  'changelog': 'pag-changelog',
   'lore/arcamis': 'pag-arcamis',
   'lore/selva-fogliabruna': 'pag-selva-fogliabruna',
   'lore/foresta-dello-smarrimento': 'pag-foresta-dello-smarrimento',

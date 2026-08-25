@@ -48,7 +48,6 @@ var pages = [
   {k:'regole-homebrew',l:'Regole Homebrew',i:'📐',id:'pag-regole-homebrew',sec:'homebrew'},
   {k:'specie-homebrew',l:'Specie Homebrew',i:'🧬',id:'pag-specie-homebrew',sec:'homebrew'},
   {k:'sottoclassi-homebrew',l:'Sottoclassi Homebrew',i:'⚔️',id:'pag-sottoclassi-homebrew',sec:'homebrew'},
-  {k:'changelog',l:'Changelog',i:'📝',id:'pag-changelog'},
   {k:'arcamis',l:'Arcamis',i:'📍',id:'pag-arcamis'},
   {k:'selva-fogliabruna',l:'Selva Fogliabruna',i:'🌲',id:'pag-selva-fogliabruna'},
   {k:'foresta-dello-smarrimento',l:'Foresta dello Smarrimento',i:'🌑',id:'pag-foresta-dello-smarrimento'},
