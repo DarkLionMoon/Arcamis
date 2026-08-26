@@ -439,7 +439,8 @@ function _renderNav(){
     return 0;
   });
   var h=viewHead('🧭','Navigazione','Ordine, sezioni e voci del menu del sito',
-    '<button class="btn btn-p" onclick="openNewPageModal()">+ Nuova pagina</button>'
+    '<button class="btn btn-soft" onclick="openNavAudit()" title="Voci morte, doppioni, incoerenze">🩺 Diagnostica</button>'
+    +'<button class="btn btn-p" onclick="openNewPageModal()">+ Nuova pagina</button>'
     +'<button class="btn btn-soft" onclick="openNav()">⟳ AGGIORNA</button>');
   h+='<div class="panel-sub">Le frecce riordinano le card della home e il menu. Cambiare sezione aggiorna l\'URL pulito delle pagine personalizzate; la sottosezione serve solo a raggruppare le voci nel menu.</div>';
   secKeys.forEach(function(v){
@@ -659,6 +660,337 @@ async function navDelete(slug){
     await _logAudit('delete_page',slug,{});
     _renderNav();
   }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+
+/* ════════════════════════════════════
+   DIAGNOSTICA NAVIGAZIONE
+   Rileva voci morte, doppiioni e
+   incoerenze tra le voci gp() di index.html
+   ════════════════════════════════════ */
+var _navAudit=null;
+var _NAV_CTX=[
+  ['tn-item','Barra superiore'],
+  ['mn-item','Menu mobile'],
+  ['lcard','Card home'],
+  ['bnav-item','Barra inferiore'],
+  ['sbtn','Pulsante home'],
+  ['fpill','Pill fazione'],
+  ['guild-card','Card gilda']
+];
+function _navCtxOf(line){
+  for(var i=0;i<_NAV_CTX.length;i++){if(line.indexOf(_NAV_CTX[i][0])!==-1)return _NAV_CTX[i]}
+  return ['altro','Altro'];
+}
+function _parseGpOccurrences(html){
+  var out=[];
+  var re=/gp\('([^']+)','([^']*)','([^']*)'\)/g;
+  html.split('\n').forEach(function(line,i){
+    if(line.indexOf("gp('")===-1)return;
+    re.lastIndex=0;
+    var m;
+    while((m=re.exec(line))){
+      var ctx=_navCtxOf(line);
+      out.push({ln:i,id:m[1],label:m[2],icon:m[3],ctx:ctx[0],ctxLabel:ctx[1],raw:line});
+    }
+  });
+  return out;
+}
+async function _fetchDataJsPages(){
+  var d=await ghGet('scripts/js/data.js');
+  var s=b64decode(d.content);
+  var start=s.indexOf('var pages = [');
+  var end=s.indexOf('];',start);
+  if(start===-1||end===-1)throw new Error('data.js: registro pages non trovato');
+  var map={};
+  s.slice(start,end).split('\n').forEach(function(line){
+    var m=line.match(/^\s*\{\s*k:\s*(?:"([^"]+)"|'([^']+)')/);
+    if(!m)return;
+    var obj={k:m[1]||m[2],sec:'',sub:''};
+    var sm=line.match(/sec:\s*(?:"([^"]*)"|'([^']*)')/);obj.sec=sm?(sm[1]||sm[2]):'';
+    var um=line.match(/sub:\s*(?:"([^"]*)"|'([^']*)')/);obj.sub=um?(um[1]||um[2]):'';
+    var im=line.match(/i:\s*(?:"([^"]*)"|'([^']*)')/);obj.i=im?(im[1]||im[2]):'📄';
+    var lm=line.match(/l:\s*(?:"([^"]*)"|'([^']*)')/);obj.l=lm?(lm[1]||lm[2]):obj.k;
+    var idm=line.match(/id:\s*(?:"([^"]*)"|'([^']*)')/);obj.id=idm?(idm[1]||idm[2]):'pag-'+obj.k;
+    if(obj.id)map[obj.id]=obj;
+  });
+  return map;
+}
+async function openNavAudit(){
+  if(_modified&&!confirm('Hai modifiche non salvate. Continuare?'))return;
+  _modified=false;
+  _current=null;
+  setActive('nav');
+  closeSidebar();
+  setCrumb('Sito','Diagnostica navigazione');
+  setTitle('🩺 Diagnostica navigazione');
+  setStatus('saving','analisi navigazione…');
+  try{
+    var results=await Promise.all([ghGet('index.html'),_fetchDataJsPages()]);
+    var dHtml=results[0];
+    var html=b64decode(dHtml.content);
+    var linesArr=html.split('\n');
+    var known=results[1];
+    var occs=_parseGpOccurrences(html);
+    /* raggruppa per id */
+    var byId={};
+    occs.forEach(function(o){(byId[o.id]=byId[o.id]||[]).push(o)});
+    var dead=[],redun=[],dup=[],mismatch=[],unknownLegacy=0,okCount=0;
+    Object.keys(byId).forEach(function(id){
+      var list=byId[id];
+      var k=known[id];
+      if(!k){
+        if(id.indexOf('pag-')===0){dead.push({id:id,list:list});return}
+        unknownLegacy+=list.length;okCount+=list.length;return;
+      }
+      okCount+=list.length;
+      /* voce statica in barra/mobile per pagina già iniettata dal menu dinamico */
+      list.forEach(function(o){
+        if(k.sec&&(o.ctx==='tn-item'||o.ctx==='mn-item'))redun.push({id:id,occ:o,k:k});
+      });
+      /* duplicati nello stesso contesto (solo superfici a voce unica:
+         i pulsanti/pill della home possono ripetere la stessa pagina) */
+      var MENU_CTX={ 'tn-item':1,'mn-item':1,'lcard':1,'bnav-item':1 };
+      var ctxMap={};
+      list.forEach(function(o){if(MENU_CTX[o.ctx])(ctxMap[o.ctx]=ctxMap[o.ctx]||[]).push(o)});
+      Object.keys(ctxMap).forEach(function(c){
+        ctxMap[c].slice(1).forEach(function(o){dup.push({id:id,occ:o})});
+      });
+      /* etichette/iconcine incoerenti */
+      var variants={};
+      list.forEach(function(o){variants[o.label+'||'+o.icon]=(variants[o.label+'||'+o.icon]||0)+1});
+      var vk=Object.keys(variants);
+      if(vk.length>1)mismatch.push({id:id,list:list,variants:vk,counts:variants});
+    });
+    var orphanPages=[];
+    Object.keys(known).forEach(function(id){
+      if(!byId[id])orphanPages.push(known[id]);
+    });
+    /* contenitori che resterebbero vuoti dopo le correzioni selezionate */
+    var delPreview={};
+    dead.forEach(function(d){if(d.list.length)d.list.forEach(function(o){delPreview[o.ln]=1})});
+    redun.concat(dup).forEach(function(x){delPreview[x.occ.ln]=1});
+    var containers=[];
+    /* azione = voce navigabile: gp(), showHome() o link; un contenitore è
+       orfano se tutte le sue voci sono state eliminate e non resta nulla di attivo */
+    _findContainerBlocks(linesArr).forEach(function(blk){
+      var hasAction=false;
+      for(var li=blk.start;li<=blk.end;li++){
+        if(delPreview[li])continue;
+        if(/gp\(|showHome\(|href=/.test(linesArr[li])){hasAction=true;break}
+      }
+      if(!hasAction)containers.push({start:blk.start,end:blk.end,kind:blk.kind,label:_blockLabel(linesArr,blk)});
+    });
+    _navAudit={html:html,sha:dHtml.sha,known:known,
+      issues:{dead:dead,redun:redun,dup:dup,mismatch:mismatch,containers:containers},
+      stats:{total:occs.length,ok:okCount,legacy:unknownLegacy,orphans:orphanPages}};
+    _renderNavAudit(orphanPages);
+    setStatus('ok','analizzato');
+    setTimeout(function(){setStatus('idle','pronto')},1500);
+  }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+function _naCtxChip(ctxLabel){
+  return '<span class="na-chip">'+esc(ctxLabel)+'</span>';
+}
+/* ── blocchi contenitore: trova l'intervallo di righe di un <div> bilanciato ── */
+var _NA_DIV_OPEN=/<div\b/g,_NA_DIV_CLOSE=/<\/div>/g;
+function _divBlockEnd(lines,start){
+  var depth=0,i,j,line,m;
+  for(i=start;i<lines.length;i++){
+    line=lines[i];
+    var opens=0,closes=0;
+    _NA_DIV_OPEN.lastIndex=0;while((m=_NA_DIV_OPEN.exec(line)))opens++;
+    _NA_DIV_CLOSE.lastIndex=0;while((m=_NA_DIV_CLOSE.exec(line)))closes++;
+    depth+=opens-closes;
+    if(depth<=0)return i;
+    if(i-start>400)return i; /* guardia: blocco anomalo */
+  }
+  return lines.length-1;
+}
+function _findContainerBlocks(lines){
+  var out=[],i;
+  for(i=0;i<lines.length;i++){
+    if(/class="(?:tn-drop|mn-section)\b/.test(lines[i])){
+      var end=_divBlockEnd(lines,i);
+      if(end>i)out.push({start:i,end:end,kind:/tn-drop/.test(lines[i])?'dropdown':'sezione mobile'});
+      i=end;
+    }else if(/class="shead"/.test(lines[i])){
+      /* gruppo wiki: shead + cgrid successivo */
+      var j,end2=-1;
+      for(j=i+1;j<Math.min(i+4,lines.length);j++){
+        if(/class="cgrid"/.test(lines[j])){end2=_divBlockEnd(lines,j);break}
+        if(/\S/.test(lines[j])&&!/<\/div>/.test(lines[j]))break;
+      }
+      if(end2>i){out.push({start:i,end:end2,kind:'gruppo wiki'});i=end2}
+    }
+  }
+  return out;
+}
+function _blockLabel(lines,blk){
+  var i,m;
+  for(i=blk.start;i<=Math.min(blk.end,blk.start+3);i++){
+    if(blk.kind==='dropdown'){
+      m=lines[i].match(/id="dd-([^"]+)"/);
+      if(m)return m[1];
+    }
+    m=lines[i].match(/id="mn-sec-([^"]+)"/);
+    if(m)return m[1];
+  }
+  var src=(blk.kind==='gruppo wiki')?lines[blk.start]:(lines[blk.start]+'\n'+(lines[blk.start+1]||''));
+  var txt=src.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+  return txt||'(senza titolo)';
+}
+function _renderNavAudit(orphanPages){
+  var iss=_navAudit.issues,st=_navAudit.stats;
+  var h=viewHead('🩺','Diagnostica navigazione','Voci morte, doppioni, incoerenze e contenitori vuoti delle voci di menu statiche',
+    '<button class="btn btn-soft" onclick="openNav()">◀ Navigazione</button>'
+    +'<button class="btn btn-p" onclick="openNavAudit()">⟳ RIANALIZZA</button>');
+  h+='<div class="panel-sub">La diagnostica confronta le voci statiche di <code>index.html</code> con le pagine registrate in <code>data.js</code>. '
+    +'Le sezioni dei menu sono popolate dinamicamente dal registry: una voce statica che punta a una pagina già iniettata nel menu è un doppione.</div>';
+  h+='<div class="audit-summary">'
+    +'<span class="badge '+(iss.dead.length?'badge-draft':'badge-idle')+'">'+iss.dead.length+' pagine morte</span>'
+    +'<span class="badge '+(iss.redun.length?'badge-draft':'badge-idle')+'">'+iss.redun.length+' doppioni</span>'
+    +'<span class="badge '+(iss.mismatch.length?'badge-draft':'badge-idle')+'">'+iss.mismatch.length+' incoerenze</span>'
+    +'<span class="badge '+(iss.dup.length?'badge-draft':'badge-idle')+'">'+iss.dup.length+' duplicati</span>'
+    +'<span class="badge '+(iss.containers.length?'badge-draft':'badge-idle')+'">'+iss.containers.length+' contenitori orfani</span>'
+    +'<span class="badge badge-idle">'+st.total+' voci totali</span>'
+    +'</div>';
+  var anyFix=iss.dead.length||iss.redun.length||iss.dup.length||iss.mismatch.length||iss.containers.length;
+  if(anyFix){
+    h+='<div style="padding:10px 16px"><button class="btn btn-p" id="na-apply" onclick="applyNavAuditFixes()">APPLICA CORREZIONI SELEZIONATE</button>'
+      +'<span style="margin-left:10px;font-size:11px;color:var(--dim)">un unico commit su index.html</span></div>';
+  }
+  /* ── Morte ── */
+  if(iss.dead.length){
+    h+='<div class="panel"><div class="panel-head"><h3>🔴 Pagine inesistenti</h3><span class="hint">'+iss.dead.length+' id senza pagina</span></div>';
+    h+='<div class="panel-sub">Queste voci di menu portano a nessuna pagina (click senza effetto o errore). Rimuovile, oppure ricrea la pagina con lo stesso indirizzo.</div>';
+    iss.dead.forEach(function(d){
+      var first=d.list[0];
+      var ctxs=d.list.map(function(o){return _naCtxChip(o.ctxLabel)}).join(' ');
+      var slug=d.id.replace(/^pag-/,'');
+      h+='<div class="row navm">'
+        +'<div class="rico"><input type="checkbox" data-na-dead="'+escAttr(d.id)+'" checked title="Rimuovi tutte le voci"></div>'
+        +'<div class="rmain"><div class="rt" style="color:var(--red)">'+esc(first.icon)+' '+esc(first.label)+'</div>'
+        +'<div class="rs">id <code>'+esc(d.id)+'</code> · '+d.list.length+' voc'+(d.list.length>1?'e':'i')+' '+ctxs+'</div></div>'
+        +'<div class="ract"><button class="btn btn-soft btn-sm" onclick="openNewPageModal(\''+escJsAttr(first.label)+'\',\''+escJsAttr(slug)+'\')">➕ Crea pagina</button></div>'
+        +'</div>';
+    });
+    h+='</div>';
+  }
+  /* ── Doppie dinamiche ── */
+  if(iss.redun.length){
+    h+='<div class="panel"><div class="panel-head"><h3>🟠 Voci duplicate dal menu dinamico</h3><span class="hint">'+iss.redun.length+' voci</span></div>';
+    h+='<div class="panel-sub">Le sezioni dei menu sono popolate automaticamente dal registry: queste voci statiche generano un doppione visibile. Rimuovile (la pagina resta nel menu).</div>';
+    iss.redun.forEach(function(r){
+      h+='<div class="row navm">'
+        +'<div class="rico"><input type="checkbox" data-na-line="'+r.occ.ln+'" checked></div>'
+        +'<div class="rmain"><div class="rt">'+esc(r.k.i)+' '+esc(r.k.l)+'</div>'
+        +'<div class="rs">voce statica '+_naCtxChip(r.occ.ctxLabel)+' · già presente nella sezione «'+esc(_sectionLabel(r.k.sec))+'» del menu dinamico</div></div>'
+        +'</div>';
+    });
+    h+='</div>';
+  }
+  /* ── Incoerenti ── */
+  if(iss.mismatch.length){
+    h+='<div class="panel"><div class="panel-head"><h3>🟠 Etichette / icone incoerenti</h3><span class="hint">'+iss.mismatch.length+' pagine</span></div>';
+    h+='<div class="panel-sub">Lo stesso id appare con testi o icone diverse. Scegli la versione corretta: verrà applicata a tutte le occorrenze.</div>';
+    iss.mismatch.forEach(function(m){
+      var variants=m.variants.map(function(v,i){
+        var parts=v.split('||');
+        return '<label class="na-var"><input type="radio" name="na-mm-'+escAttr(m.id)+'" data-mm-label="'+escAttr(parts[0])+'" data-mm-icon="'+escAttr(parts[1])+'"'+(i===0?' checked':'')+'>'
+          +parts[1]+' '+esc(parts[0])+' <span class="hint">×'+m.counts[v]+'</span></label>';
+      }).join('');
+      h+='<div class="row navm"><div class="rico">'+esc(m.list[0].icon)+'</div>'
+        +'<div class="rmain"><div class="rt">'+esc(m.id)+'</div><div class="rs na-variants">'+variants+'</div></div></div>';
+    });
+    h+='</div>';
+  }
+  /* ── Dup stesso contesto ── */
+  if(iss.dup.length){
+    h+='<div class="panel"><div class="panel-head"><h3>🟡 Duplicati nello stesso contesto</h3><span class="hint">'+iss.dup.length+'</span></div>';
+    iss.dup.forEach(function(d){
+      h+='<div class="row navm">'
+        +'<div class="rico"><input type="checkbox" data-na-line="'+d.occ.ln+'" checked></div>'
+        +'<div class="rmain"><div class="rt">'+esc(d.occ.icon)+' '+esc(d.occ.label)+'</div>'
+        +'<div class="rs">ripetuto in '+_naCtxChip(d.occ.ctxLabel)+'</div></div></div>';
+    });
+    h+='</div>';
+  }
+  /* ── Contenitori orfani ── */
+  if(iss.containers.length){
+    h+='<div class="panel"><div class="panel-head"><h3>⚪ Contenitori orfani</h3><span class="hint">'+iss.containers.length+' blocchi</span></div>';
+    h+='<div class="panel-sub">Dopo le correzioni selezionate questi blocchi resterebbero vuoti (dropdown senza voci, gruppi di card senza card). '
+      +'I menu e le sezioni vengono ricostruiti automaticamente dal registry quando serviranno: rimuoverli è sicuro.</div>';
+    iss.containers.forEach(function(c){
+      h+='<div class="row navm">'
+        +'<div class="rico na-check"><input type="checkbox" data-na-block="'+c.start+':'+c.end+'" checked></div>'
+        +'<div class="rmain"><div class="rt">'+esc(c.label)+'</div>'
+        +'<div class="rs">'+esc(c.kind)+' · righe '+(c.start+1)+'–'+(c.end+1)+' · nessuna voce valida all\'interno</div></div>'
+        +'</div>';
+    });
+    h+='</div>';
+  }
+  if(!anyFix){
+    h+='<div class="empty"><span class="ei">✅</span>Nessun problema trovato nella navigazione</div>';
+  }
+  h+='<div class="panel"><div class="panel-head"><h3>ℹ️ Informativa</h3></div><div class="panel-sub" style="padding:0 14px 12px">'
+    +st.ok+' voci valide · '+st.legacy+' id legacy non verificabili · '+st.orphans.length+' pagine registrate senza voce statica'
+    +(st.orphans.length?' (raggiungibili dai menu dinamici e dalla ricerca: '+esc(st.orphans.slice(0,6).map(function(p){return p.k}).join(', '))+(st.orphans.length>6?'…':'')+')':'')
+    +'</div></div>';
+  document.getElementById('main').innerHTML=h;
+}
+async function applyNavAuditFixes(){
+  if(!_navAudit)return;
+  var iss=_navAudit.issues;
+  var deadSel={},lineDel={},blockDel=[],mmSel={};
+  document.querySelectorAll('[data-na-dead]').forEach(function(cb){
+    if(cb.checked)deadSel[cb.getAttribute('data-na-dead')]=1;
+  });
+  document.querySelectorAll('[data-na-line]').forEach(function(cb){
+    if(cb.checked)lineDel[cb.getAttribute('data-na-line')]=1;
+  });
+  document.querySelectorAll('[data-na-block]').forEach(function(cb){
+    if(cb.checked){
+      var p=cb.getAttribute('data-na-block').split(':');
+      blockDel.push({s:parseInt(p[0],10),e:parseInt(p[1],10)});
+    }
+  });
+  document.querySelectorAll('input[type="radio"][data-mm-label]').forEach(function(r){
+    if(r.checked){
+      var id=r.name.replace('na-mm-','');
+      mmSel[id]={label:r.getAttribute('data-mm-label'),icon:r.getAttribute('data-mm-icon')};
+    }
+  });
+  var nDead=Object.keys(deadSel).length,nLines=Object.keys(lineDel).length,
+      nBlocks=blockDel.length,nMm=Object.keys(mmSel).length;
+  if(!nDead&&!nLines&&!nBlocks&&!nMm){toast('Seleziona almeno una correzione','error');return}
+  var btn=document.getElementById('na-apply');
+  if(btn)btn.disabled=true;
+  setStatus('saving','applicazione correzioni…');
+  try{
+    var lines=_navAudit.html.split('\n');
+    /* spazio indice unificato: righe singole + intervalli di blocco */
+    var delSet={};
+    iss.dead.forEach(function(d){if(deadSel[d.id])d.list.forEach(function(o){delSet[o.ln]=1})});
+    iss.redun.concat(iss.dup).forEach(function(x){if(lineDel[x.occ.ln])delSet[x.occ.ln]=1});
+    blockDel.forEach(function(b){for(var i=b.s;i<=b.e;i++)delSet[i]=1});
+    var kept=[];
+    lines.forEach(function(l,i){if(!delSet[i])kept.push(l)});
+    var html=kept.join('\n');
+    var nRemoved=Object.keys(delSet).length;
+    Object.keys(mmSel).forEach(function(id){
+      html=_rewriteIndexForPage(html,id,mmSel[id].label,mmSel[id].icon);
+    });
+    await ghPut('index.html','admin: pulizia navigazione ('+nRemoved+' righe, '+nBlocks+' contenitori, '+nMm+' etichette unificate)',html,_navAudit.sha);
+    _navAudit=null;
+    toast('Navigazione ripulita! Deploy in corso (~30s)...','success');
+    setStatus('ok','deploying...');
+    startDeployTimer();
+    await _logAudit('nav_audit_fix',{dead:nDead,lines:nRemoved,blocks:nBlocks,mismatch:nMm});
+    openNavAudit();
+  }catch(e){
+    setStatus('err','errore');toast(e.message,'error');
+    if(btn)btn.disabled=false;
+  }
 }
 
 /* ════════════════════════════════════

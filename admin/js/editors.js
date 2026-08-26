@@ -1041,7 +1041,7 @@ function _subOptionsForSec(sec,cur){
   h+='<option value="__new__">➕ nuova…</option>';
   return h;
 }
-function openNewPageModal(){
+function openNewPageModal(prefLabel,prefSlug){
   if(document.getElementById('np-modal'))return;
   _slugTouched=false;
   var layoutOpts='';
@@ -1050,9 +1050,9 @@ function openNewPageModal(){
   SECTIONS.forEach(function(s){secOpts+='<option value="'+s.v+'">'+s.l+'</option>'});
   var subOpts=_subOptionsForSec('','');
   modalHtml('np-modal','➕ Nuova pagina / sezione',
-    '<div class="fld"><label>Nome della sezione</label><input id="np-label" class="in" placeholder="es. La Gilda dei Mercanti" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
+    '<div class="fld"><label>Nome della sezione</label><input id="np-label" class="in" placeholder="es. La Gilda dei Mercanti" value="'+escAttr(prefLabel||'')+'" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
     +'<div class="fld"><label>Icona (emoji)</label><input id="np-icon" class="in" placeholder="es. 🏛️" value="📄" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
-    +'<div class="fld"><label>Slug / URL</label><input id="np-slug" class="in" placeholder="auto (es. la-gilda-dei-mercanti)" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
+    +'<div class="fld"><label>Slug / URL</label><input id="np-slug" class="in" placeholder="auto (es. la-gilda-dei-mercanti)" value="'+escAttr(prefSlug||'')+'" onkeydown="if(event.key===\'Enter\')createNewPage()"></div>'
     +'<div class="fld"><label>Sezione del menu</label><select id="np-sec" class="in">'+secOpts+'</select></div>'
     +'<div class="fld"><label>Sottosezione (opzionale)</label><select id="np-sub" class="in">'+subOpts+'</select></div>'
     +'<div class="fld"><label>Layout</label><select id="np-layout" class="in">'+layoutOpts+'</select></div>',
@@ -1066,7 +1066,8 @@ function openNewPageModal(){
   document.getElementById('np-sec').addEventListener('change',function(){
     document.getElementById('np-sub').innerHTML=_subOptionsForSec(this.value,'');
   });
-  label.focus();
+  if(prefSlug)_slugTouched=true;
+  if(!prefLabel)label.focus();
 }
 function closeNewPageModal(){closeModal('np-modal')}
 function buildNewPageContent(layout,label){
@@ -1272,7 +1273,7 @@ function _rewriteIndexForPage(html,id,label,icon){
     "$1<span>"+IH+"</span>");
   html=html.replace(new RegExp("(<div class=\"lcard\"[^>]*gp\\('"+id+"','[^']*','[^']*'\\)[^>]*>[^\\n]*?<div class=\"ctit\">)[^<]*(</div>)"),
     "$1"+LH+"$2");
-  html=html.replace(new RegExp("gp\\('"+id+"','[^']*','[^']*'\\)"),"gp('"+id+"','"+L+"','"+I+"')");
+  html=html.replace(new RegExp("gp\\('"+id+"','[^']*','[^']*'\\)","g"),"gp('"+id+"','"+L+"','"+I+"')");
   return html;
 }
 function _removeIndexForPage(html,id){
