@@ -1,6 +1,12 @@
 {
  "pages": [
   {
+   "id": "pag-come-si-inizia",
+   "title": "Come si inizia",
+   "icon": "🌟",
+   "lastEdited": "2026-08-26T09:10:27.729Z"
+  },
+  {
    "id": "pag-regole-del-server",
    "title": "Regole del Server",
    "icon": "📋",
@@ -41,12 +47,6 @@
    "title": "Arcamis",
    "icon": "📄",
    "lastEdited": "2026-08-25T14:49:08.576856Z"
-  },
-  {
-   "id": "pag-bibliografia-scoperta",
-   "title": "Bibliografia scoperta",
-   "icon": "📄",
-   "lastEdited": "2026-08-25T14:49:07.539746Z"
   }
  ]
 }
