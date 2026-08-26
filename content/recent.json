@@ -1,16 +1,16 @@
 {
  "pages": [
   {
+   "id": "pag-come-si-inizia",
+   "title": "Come si inizia",
+   "icon": "🌟",
+   "lastEdited": "2026-08-26T11:59:55.547Z"
+  },
+  {
    "id": "pag-lavori",
    "title": "Lavori",
    "icon": "💼",
    "lastEdited": "2026-08-26T09:52:29.371Z"
-  },
-  {
-   "id": "pag-come-si-inizia",
-   "title": "Come si inizia",
-   "icon": "🌟",
-   "lastEdited": "2026-08-26T09:10:27.729Z"
   },
   {
    "id": "pag-regole-del-server",
