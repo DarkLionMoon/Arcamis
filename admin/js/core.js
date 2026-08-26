@@ -183,6 +183,31 @@ function uiConfirm(msg, opts){
     setTimeout(function(){obs.disconnect();},60000);
   });
 }
+function uiConfirmChoice(msg,opts){
+  opts=opts||{};
+  return new Promise(function(resolve){
+    var id='uicc-'+Date.now();
+    var btnsHtml='';
+    (opts.choices||[]).forEach(function(c,i){
+      btnsHtml+='<button class="'+(c.className||'btn btn-soft')+'" data-uicc="'+escAttr(c.value||String(i))+'">'+esc(c.label)+'</button> ';
+    });
+    modalHtml(id,opts.title||'Conferma',
+      '<div style="padding:6px 2px 2px;color:var(--text);line-height:1.55;white-space:pre-line">'+esc(msg)+'</div>',
+      btnsHtml);
+    var m=document.getElementById(id);
+    m.querySelectorAll('[data-uicc]').forEach(function(b){
+      b.addEventListener('click',function(){
+        closeModal(id);
+        resolve(b.getAttribute('data-uicc'));
+      });
+    });
+    var obs=new MutationObserver(function(){
+      if(!document.getElementById(id)){obs.disconnect();resolve(null)}
+    });
+    obs.observe(document.body,{childList:true,subtree:true});
+    setTimeout(function(){obs.disconnect()},60000);
+  });
+}
 function b64decode(s){return decodeURIComponent(escape(atob(s)))}
 function b64encode(s){return btoa(unescape(encodeURIComponent(s)))}
 
@@ -279,8 +304,9 @@ async function _saveUsers(users){
 async function _addUser(username,password,role){
   var users=await _loadUsers();
   for(var i=0;i<users.length;i++)if(users[i].username===username)return false;
+  var salt=crypto.getRandomValues?Array.from(crypto.getRandomValues(new Uint8Array(16))).map(function(b){return b.toString(16).padStart(2,'0')}).join(''):Date.now().toString(36)+Math.random().toString(36).slice(2);
   var hash=await sha256(password);
-  users.push({username:username,role:role,passwordHash:hash,created:new Date().toISOString()});
+  users.push({username:username,role:role,passwordHash:hash,salt:salt,created:new Date().toISOString()});
   return _saveUsers(users);
 }
 async function _updateUser(username,password,role){
@@ -288,7 +314,11 @@ async function _updateUser(username,password,role){
   var idx=-1;
   for(var i=0;i<users.length;i++)if(users[i].username===username){idx=i;break}
   if(idx===-1)return false;
-  if(password)users[idx].passwordHash=await sha256(password);
+  if(password){
+    var salt=crypto.getRandomValues?Array.from(crypto.getRandomValues(new Uint8Array(16))).map(function(b){return b.toString(16).padStart(2,'0')}).join(''):Date.now().toString(36)+Math.random().toString(36).slice(2);
+    users[idx].passwordHash=await sha256(password);
+    users[idx].salt=salt;
+  }
   users[idx].role=role;
   users[idx].updated=new Date().toISOString();
   return _saveUsers(users);
@@ -426,7 +456,13 @@ function buildSidebar(){
   if(admin){
     h+='<div class="sb-group"><div class="sb-label">Sistema</div>';
     h+='<div class="sb-item" data-type="users" onclick="openUserManagement()"><span class="ico">👥</span><span class="lbl">Gestione utenti</span></div>';
+    h+='<div class="sb-item" data-type="sessions" onclick="openActiveSessions()"><span class="ico">🔐</span><span class="lbl">Sessioni attive</span></div>';
     h+='<div class="sb-item" data-type="audit" onclick="openAudit()"><span class="ico">📋</span><span class="lbl">Registro attività</span></div>';
+    h+='<div class="sb-item" data-type="orphan-media" onclick="openOrphanMedia()"><span class="ico">🗑️</span><span class="lbl">Media orfani</span></div>';
+    h+='<div class="sb-item" data-type="trash" onclick="openTrash()"><span class="ico">🗑️</span><span class="lbl">Cestino</span></div>';
+    h+='<div class="sb-item" data-type="link-scanner" onclick="openLinkScanner()"><span class="ico">🔗</span><span class="lbl">Link rotti</span></div>';
+    h+='<div class="sb-item" data-type="link-graph" onclick="openLinkGraph()"><span class="ico">🕸️</span><span class="lbl">Grafo link</span></div>';
+    h+='<div class="sb-item" data-type="find-replace" onclick="openGlobalFindReplace()"><span class="ico">🔍</span><span class="lbl">Trova & Sostituisci</span></div>';
     h+='</div>';
   }
   document.getElementById('sb-nav').innerHTML=h;
@@ -635,7 +671,10 @@ async function renderDashboard(){
   h+='<div class="stat-row">';
   h+='<div class="stat" onclick="dashOpenByType(\'page\')"><div class="si">📄</div><div><div class="sn">'+PAGES.length+'</div><div class="sl">Pagine wiki</div></div></div>';
   h+='<div class="stat" id="dash-total-views"><div class="si">👁️</div><div><div class="sn">…</div><div class="sl">Visualizzazioni totali</div></div></div>';
+  h+='<div class="stat" id="dash-storage"><div class="si blue">💾</div><div><div class="sn">…</div><div class="sl">Immagini /images/</div></div></div>';
+  h+='<div class="stat" id="dash-sessions"><div class="si green">🔐</div><div><div class="sn">…</div><div class="sl">Sessioni attive</div></div></div>';
   h+='</div>';
+  h+='<div class="panel"><div class="panel-head"><h3>Andamento 30 giorni</h3><span class="hint">visualizzazioni totali</span></div><div id="dash-chart" style="padding:8px 16px"><div style="color:var(--dim);font-size:12px">⏳ Caricamento…</div></div></div>';
   h+='<div class="panel"><div class="panel-head"><h3>Pagine più lette</h3><span class="hint">top 10 per visualizzazioni</span></div><div id="dash-top-pages" style="padding:6px 16px 14px;color:var(--dim);font-size:12px">⏳ Caricamento statistiche…</div></div>';
   h+='<div class="panel"><div class="panel-head"><h3>Azioni rapide</h3><span class="hint">scorciatoie</span></div><div class="quick-grid">';
   h+='<div class="quick" onclick="openNewPageModal()"><div class="qi">➕</div><div class="qt">Nuova pagina</div><div class="qd">Crea una sezione wiki con URL pulito</div></div>';
@@ -646,6 +685,7 @@ async function renderDashboard(){
   h+='<div class="quick" onclick="openBackupModal()"><div class="qi">💾</div><div class="qt">Backup</div><div class="qd">Esporta tutto il contenuto come JSON</div></div>';
   if(admin){
     h+='<div class="quick" onclick="openCovers()"><div class="qi">🖌️</div><div class="qt">Cover pagine</div><div class="qd">Sfondi delle card sulla home</div></div>';
+    h+='<div class="quick" onclick="openAudit()"><div class="qi">📋</div><div class="qt">Registro attività</div><div class="qd">Log delle modifiche admin</div></div>';
   }
   h+='</div></div>';
   h+=_dashGrid('Pagine wiki','page',PAGES);
@@ -653,6 +693,7 @@ async function renderDashboard(){
   document.getElementById('main').innerHTML=h;
   _dashActivity();
   _loadTotalViews();
+  _loadStorageStats();
 }
 function dashOpen(el){
   if(_modified&&!confirm('Hai modifiche non salvate. Continuare?'))return;
@@ -778,7 +819,43 @@ async function _loadTotalViews(){
     var el=document.getElementById('dash-total-views');
     if(el)el.querySelector('.sn').textContent=total.toLocaleString('it-IT');
     await _loadTopPages();
+    await _loadTimeSeries();
   }catch(e){}
+}
+async function _loadTimeSeries(){
+  try{
+    var r=await fetch('/api/admin?action=get_analytics_timeseries&days=30',{credentials:'include'});
+    var j=await r.json();
+    if(!j.series||!j.series.length)return;
+    var el=document.getElementById('dash-chart');
+    if(!el)return;
+    var max=Math.max.apply(null,j.series.map(function(s){return s.views}))||1;
+    var barW=Math.floor(90/j.series.length);
+    if(barW<3)barW=3;
+    if(barW>12)barW=12;
+    var h='<div style="display:flex;align-items:flex-end;gap:1px;height:80px;padding:4px 0">';
+    j.series.forEach(function(s){
+      var pct=Math.round((s.views/max)*100);
+      h+='<div title="'+s.date+': '+s.views+' views" style="flex:1;min-width:'+barW+'px;height:'+Math.max(pct,2)+'%;background:var(--gold);border-radius:2px 2px 0 0;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"></div>';
+    });
+    h+='</div>';
+    h+='<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim)"><span>'+j.series[0].date+'</span><span>'+j.series[j.series.length-1].date+'</span></div>';
+    el.innerHTML=h;
+  }catch(e){}
+}
+
+/* ═══════════════ STORAGE STATS ═══════════════ */
+async function _loadStorageStats(){
+  try{
+    var list=await ghGet('images');
+    var count=0;
+    if(Array.isArray(list))count=list.filter(function(f){return f.type==='file'}).length;
+    var el=document.getElementById('dash-storage');
+    if(el)el.querySelector('.sn').textContent=count;
+  }catch(e){
+    var el=document.getElementById('dash-storage');
+    if(el)el.querySelector('.sn').textContent='—';
+  }
 }
 
 /* ═══════════════ BACKUP / EXPORT ═══════════════ */

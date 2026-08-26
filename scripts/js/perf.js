@@ -173,6 +173,7 @@
 
   /* Attacca hover su tutti i tn-item esistenti */
   function _attachNavbarPrefetch() {
+    if (window._arcDev && window._arcDev.coarse) return; /* hover inesistente su touch */
     document.querySelectorAll('.tn-item, .tn-drop > .tn').forEach(function(el) {
       if (el.dataset.pfAttached) return;
       el.dataset.pfAttached = '1';
@@ -191,6 +192,7 @@
   ════════════════════════════════ */
   function _attachCardPrefetch(root) {
     root = root || document;
+    if (window._arcDev && window._arcDev.coarse) return; /* hover inesistente su touch */
     var selectors = [
       '.loc-card', '.loc-banner', '.cp-icard',
       '.gs-card', '.n-db-card', '.lcard'
@@ -245,27 +247,35 @@
 
   /* ════════════════════════════════
      8. PREFETCH ANTICIPATO PAGINE
-     Dopo 2s dal load, prefetch
-     silenzioso delle pagine più
-     visitate non ancora in cache.
+     Dopo il load, prefetch silenzioso
+     delle pagine più visitate non
+     ancora in cache.
+     - SKIP su saveData / rete lenta (2g, 3g)
+     - ritardo più lungo su dispositivi deboli
   ════════════════════════════════ */
-  if(!window._reducedMotion) window.addEventListener('load', function() {
-    setTimeout(function() {
-      /* Pagine lavori — le più cliccate */
-      var hotPages = [
-        'pag-biblioteca',
-        'pag-bottega-farmaceutica',
-        'pag-caserma',
-        'pag-forgia',
-        'pag-gilda-avventurieri',
-        'pag-locanda',
-        'pag-ospedale',
-        'pag-sartoria',
-      ];
-      hotPages.forEach(function(id) {
-        if (window.prefetchPage) window.prefetchPage(id);
+  if(!window._reducedMotion){
+    var _dev = window._arcDev || {};
+    /* saveData: rispetta sempre la preferenza utente — niente prefetch */
+    if(!_dev.saveData){
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          /* Pagine lavori — le più cliccate */
+          var hotPages = [
+            'pag-biblioteca',
+            'pag-bottega-farmaceutica',
+            'pag-caserma',
+            'pag-forgia',
+            'pag-gilda-avventurieri',
+            'pag-locanda',
+            'pag-ospedale',
+            'pag-sartoria',
+          ];
+          hotPages.forEach(function(id) {
+            if (window.prefetchPage) window.prefetchPage(id);
+          });
+        }, (_dev.low || _dev.slowNet) ? 10000 : 5000);
       });
-    }, 5000);
-  });
+    }
+  }
 
 })();

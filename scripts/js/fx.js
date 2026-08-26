@@ -6,10 +6,31 @@
 
 /* ── Reduced motion detection ── */
 window._reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-var _pMul = window._reducedMotion ? 0.3 : 1;
+
+/* ── Profilo dispositivo: capacità hardware/rete per ottimizzazioni adattive ──
+   Usato da fx.js, perf.js ed easter-eggs.js per scalare particelle,
+   prefetch e qualità grafica. Esposto come window._arcDev. */
+window._arcDev = (function(){
+  var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
+  var saveData = !!c.saveData;
+  var slowNet = /\b(?:slow-)?2g\b/.test(String(c.effectiveType || '')) || saveData;
+  var mem = navigator.deviceMemory || 0;          /* GB, ~Chrome/Android */
+  var cores = navigator.hardwareConcurrency || 0;
+  var coarse = !!(window.matchMedia && matchMedia('(pointer:coarse)').matches); /* touch-first */
+  return {
+    saveData: saveData,
+    slowNet: slowNet,
+    coarse: coarse,
+    low: saveData || slowNet || (mem > 0 && mem <= 4) || (cores > 0 && cores <= 4)
+  };
+})();
+
+/* Moltiplicatore densità effetti: ridotto motion < dispositivo debole < touch < pieno */
+var _pMul = window._reducedMotion ? 0.3 : (window._arcDev.low ? 0.45 : (window._arcDev.coarse ? 0.7 : 1));
 
 /* ── Glossy shine sulle lcard ── */
 function attachShine(root){
+  if(window._arcDev && window._arcDev.coarse) return; /* niente mouse su touch */
   (root||document).querySelectorAll('.lcard').forEach(function(card){
     var shine=card.querySelector('.shine');if(!shine)return;
     card.addEventListener('mousemove',function(e){

@@ -74,7 +74,7 @@ function _mdToHtml(md){
     var safeAlt = (alt || '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     if(!/^(https?:|#|\/|data:image\/)/i.test(u)) return '';
     var jsUrl = u.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    return '<img src="'+u.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')+'" alt="'+safeAlt+'" loading="lazy" class="n-image n-zoomable" onclick="arcZoom(\''+jsUrl+'\')">';
+    return '<img src="'+u.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')+'" alt="'+safeAlt+'" loading="lazy" decoding="async" class="n-image n-zoomable" onclick="arcZoom(\''+jsUrl+'\')">';
   });
   /* Paragraphs */
   md = md.replace(/\n\n/g, '</p><p class="n-p">');
@@ -1012,7 +1012,7 @@ function _renderLavoro(md) {
     sections.forEach(function(sec, i) {
       html += '<a class="lv-tile" href="#lv-sec-' + i + '">';
       if (sec.image) {
-        html += '<img class="lv-tile-img" src="' + esc(sec.image) + '" alt="' + esc(sec.title) + '" loading="lazy"/>';
+        html += '<img class="lv-tile-img" src="' + esc(sec.image) + '" alt="' + esc(sec.title) + '" loading="lazy" decoding="async"/>';
       } else {
         html += '<div class="lv-tile-none"></div>';
       }
@@ -1163,7 +1163,7 @@ function _renderDeityPage(d, coll){
   var ic = _panIcon(d, coll);
   var hero = '<div class="pan-deity-hero">'
     + (d.img
-        ? '<img src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy"'
+        ? '<img src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy" decoding="async"'
           + (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '')
           + ' onerror="this.onerror=null;this.style.display=\'none\';this.parentNode.classList.add(\'hero-broken\');">'
         : '<div class="pan-deity-hero-none">' + ic + '</div>')
@@ -1192,7 +1192,7 @@ function _renderPantheon(md, pageKey) {
     var _cfb = "this.onerror=null;this.style.display='none';this.parentNode.classList.add('pan-tile-none');";
     var go = "gp('" + _pre + d.slug + "','" + _jsStr(d.n) + "','" + ic + "')";
     html += '<div class="pan-tile" data-ic="' + ic + '" role="button" tabindex="0" onclick="' + go + '" onkeydown="if(event.key===\'Enter\')' + go + '">'
-      + '<img class="pan-tile-img" src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy"'
+      + '<img class="pan-tile-img" src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy" decoding="async"'
       + (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '')
       + ' onerror="' + _cfb + '">'
       + '<div class="pan-tile-caption"><span class="pan-tile-name">' + _siteEsc(d.n) + '</span>'
@@ -1466,7 +1466,7 @@ function _renderGalleria(md) {
       html += '<div class="gal-grid">';
       categories[cat].forEach(function(img) {
         if (img.src) {
-          html += '<div class="gal-item"><img src="' + img.src + '" alt="' + img.alt + '" loading="lazy">' + (img.alt ? '<div class="gal-caption">' + img.alt + '</div>' : '') + '</div>';
+          html += '<div class="gal-item"><img src="' + img.src + '" alt="' + img.alt + '" loading="lazy" decoding="async">' + (img.alt ? '<div class="gal-caption">' + img.alt + '</div>' : '') + '</div>';
         } else if (img.caption) {
           html += '<div class="gal-item gal-text"><div class="gal-caption">' + img.caption + '</div></div>';
         }

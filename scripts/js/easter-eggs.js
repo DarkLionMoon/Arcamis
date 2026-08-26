@@ -321,9 +321,9 @@
     var THREE = window.THREE;
     var canvas = document.getElementById('arc-d20-canvas');
 
-    var renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true, alpha: true});
+    var renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: !(window._arcDev && window._arcDev.low), alpha: true});
     renderer.setSize(300, 300, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, (window._arcDev && window._arcDev.low) ? 1.25 : 2));
     renderer.setClearColor(0x000000, 0);
 
     var scene = new THREE.Scene();

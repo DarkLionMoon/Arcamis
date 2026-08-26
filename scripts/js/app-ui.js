@@ -194,11 +194,17 @@ document.addEventListener('keydown', function(e){
 
 /* ════ MOBILE NAV ════ */
 function toggleMobileNav(){
-  document.getElementById('mobile-nav').classList.toggle('open');
+  var el = document.getElementById('mobile-nav');
+  var isOpen = el.classList.toggle('open');
   document.body.classList.toggle('nav-open');
+  if(el) el.setAttribute('aria-hidden', String(!isOpen));
 }
 function closeMobileNav(){
-  document.getElementById('mobile-nav').classList.remove('open');
+  var el = document.getElementById('mobile-nav');
+  if(el) {
+    el.classList.remove('open');
+    el.setAttribute('aria-hidden', 'true');
+  }
   document.body.classList.remove('nav-open');
   var msr = document.getElementById('m-sr');
   if(msr){ msr.innerHTML = ''; msr.classList.remove('open'); }

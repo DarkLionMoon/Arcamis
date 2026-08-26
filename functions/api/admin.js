@@ -13,6 +13,30 @@ export async function onRequest(context) {
     return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
+  /* Password hashing con salt casuale (PBKDF2-SHA256) */
+  async function hashPassword(password, existingSalt) {
+    const salt = existingSalt || (() => {
+      const arr = new Uint8Array(16);
+      crypto.getRandomValues(arr);
+      return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+    })();
+    const data = new TextEncoder().encode(password + salt);
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw', data, { name: 'PBKDF2' }, false, ['deriveBits']
+    );
+    const derivedBits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt: new TextEncoder().encode(salt), iterations: 100000, hash: 'SHA-256' },
+      keyMaterial, 256
+    );
+    const hash = Array.from(new Uint8Array(derivedBits)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return { hash, salt };
+  }
+
+  async function verifyPassword(password, storedHash, salt) {
+    const { hash } = await hashPassword(password, salt);
+    return hash === storedHash;
+  }
+
   const cors = {
     'Access-Control-Allow-Origin': url.origin,
     'Content-Type': 'application/json',
@@ -209,16 +233,39 @@ export async function onRequest(context) {
     if (body.password === ADMIN_SECRET) {
       ok = true; role = 'admin';
     } else {
-      /* Multi-user: verifica utenti in KV */
+      /* Multi-user: verifica utenti in KV con PBKDF2 salted */
       try {
         const usersRaw = await KV.get('admin_users');
         if (usersRaw) {
           const users = JSON.parse(usersRaw);
           const u = users.find(x => x.username === body.username);
           if (u) {
-            const hash = await sha256hex(body.password);
-            if (hash === u.passwordHash) {
-              ok = true; role = u.role || 'editor';
+            /* Supporta sia il vecchio hash SHA-256 (legacy) che il nuovo PBKDF2 salted */
+            if (u.salt && u.passwordHash) {
+              const valid = await verifyPassword(body.password, u.passwordHash, u.salt);
+              if (valid) { ok = true; role = u.role || 'editor'; }
+            } else if (u.passwordHash) {
+              /* Legacy: SHA-256 senza salt (backward compat) */
+              const hash = await sha256hex(body.password);
+              if (hash === u.passwordHash) {
+                ok = true; role = u.role || 'editor';
+                /* Migra automaticamente al nuovo formato PBKDF2 salted */
+                const { hash: newHash, salt } = await hashPassword(body.password);
+                u.passwordHash = newHash;
+                u.salt = salt;
+                try {
+                  const updatedUsersRaw = await KV.get('admin_users');
+                  if (updatedUsersRaw) {
+                    const updatedUsers = JSON.parse(updatedUsersRaw);
+                    const idx = updatedUsers.findIndex(x => x.username === body.username);
+                    if (idx !== -1) {
+                      updatedUsers[idx].passwordHash = newHash;
+                      updatedUsers[idx].salt = salt;
+                      await KV.put('admin_users', JSON.stringify(updatedUsers));
+                    }
+                  }
+                } catch (_) {}
+              }
             }
           }
         }
@@ -381,6 +428,17 @@ export async function onRequest(context) {
       const rawTotal = await KV.get('views_total');
       const totalCount = rawTotal ? parseInt(rawTotal, 10) + 1 : 1;
       await KV.put('views_total', String(totalCount));
+      // Time series: store daily count
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const dailyKey = 'views_' + pageKey + '_' + today;
+      const rawDaily = await KV.get(dailyKey);
+      const dailyCount = rawDaily ? parseInt(rawDaily, 10) + 1 : 1;
+      await KV.put(dailyKey, String(dailyCount));
+      // Also store daily total
+      const dailyTotalKey = 'views_total_' + today;
+      const rawDailyTotal = await KV.get(dailyTotalKey);
+      const dailyTotal = rawDailyTotal ? parseInt(rawDailyTotal, 10) + 1 : 1;
+      await KV.put(dailyTotalKey, String(dailyTotal));
       return new Response(JSON.stringify({ ok: true, views: count, total: totalCount }), { headers: cors });
     } catch (e) {
       return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
@@ -781,6 +839,488 @@ if (action === 'set_posa' && request.method === 'POST') {
     return new Response(JSON.stringify({ total: rawTotal ? parseInt(rawTotal, 10) : 0, pages }), { headers: cors });
   }
 
+  /* ════ TIME SERIES ANALYTICS ════ */
+  if (action === 'get_analytics_timeseries') {
+    const days = parseInt(url.searchParams.get('days') || '30', 10);
+    const limit = Math.min(Math.max(days, 1), 90);
+    const series = [];
+    const now = new Date();
+    for (let i = limit - 1; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const raw = await KV.get('views_total_' + dateStr);
+      series.push({ date: dateStr, views: raw ? parseInt(raw, 10) : 0 });
+    }
+    return new Response(JSON.stringify({ series, days: limit }), { headers: cors });
+  }
+
+  /* ════ FIND ORPHAN MEDIA ════ */
+  if (action === 'find_orphan_media') {
+    const sessRole = await sessionRole();
+    if (sessRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
+    }
+    const ghToken = await getGhToken();
+    if (!ghToken) {
+      return new Response(JSON.stringify({ error: 'GH_TOKEN non configurato' }), { status: 501, headers: cors });
+    }
+    const GH_REPO = env.GH_REPO || 'DarkLionMoon/Arcamis';
+    const GH_BRANCH = env.GH_BRANCH || 'main';
+    const apiBase = 'https://api.github.com/repos/' + GH_REPO;
+    const ghHeaders = {
+      'Authorization': 'token ' + ghToken,
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'ArcamisAdmin'
+    };
+    try {
+      /* 1. Get all images */
+      const imgRes = await fetch(apiBase + '/contents/images?ref=' + GH_BRANCH, { headers: ghHeaders });
+      if (!imgRes.ok) return new Response(JSON.stringify({ error: 'Impossibile elencare immagini' }), { status: 502, headers: cors });
+      const imgFiles = (await imgRes.json()).filter(f => f.type === 'file').map(f => f.name);
+
+      /* 2. Get all page content to search for references */
+      const pagesRes = await fetch(apiBase + '/contents/content/pages?ref=' + GH_BRANCH, { headers: ghHeaders });
+      const pageFiles = pagesRes.ok ? (await pagesRes.json()).filter(f => f.type === 'file' && f.name.endsWith('.json')) : [];
+
+      let allContent = '';
+      for (const pf of pageFiles) {
+        try {
+          const cr = await fetch(apiBase + '/contents/content/pages/' + pf.name + '?ref=' + GH_BRANCH, { headers: ghHeaders });
+          if (cr.ok) {
+            const cd = await cr.json();
+            allContent += decodeURIComponent(escape(atob(cd.content))) + ' ';
+          }
+        } catch (_) {}
+      }
+
+      /* Also check index.html and other files */
+      const otherFiles = ['index.html', 'admin/index.html', 'scripts/js/data.js'];
+      for (const of2 of otherFiles) {
+        try {
+          const cr = await fetch(apiBase + '/contents/' + of2 + '?ref=' + GH_BRANCH, { headers: ghHeaders });
+          if (cr.ok) {
+            const cd = await cr.json();
+            allContent += decodeURIComponent(escape(atob(cd.content))) + ' ';
+          }
+        } catch (_) {}
+      }
+
+      /* 3. Find orphans */
+      const orphans = imgFiles.filter(name => !allContent.includes(name));
+
+      return new Response(JSON.stringify({ 
+        total: imgFiles.length, 
+        orphans, 
+        referenced: imgFiles.length - orphans.length 
+      }), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    }
+  }
+
+  /* ════ DELETE ORPHAN MEDIA ════ */
+  if (action === 'delete_orphan_media' && request.method === 'POST') {
+    const sessRole = await sessionRole();
+    if (sessRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
+    }
+    const csrfOk = await verifyCsrf(request);
+    if (!csrfOk) return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
+    if (await genericRateLimit('delete_orphan_media', 3, 300)) {
+      return new Response(JSON.stringify({ error: 'Troppe richieste' }), { status: 429, headers: cors });
+    }
+    let body;
+    try { body = await request.json(); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    const { filenames } = body;
+    if (!Array.isArray(filenames) || filenames.length === 0) {
+      return new Response(JSON.stringify({ error: 'filenames array richiesto' }), { status: 400, headers: cors });
+    }
+    const ghToken = await getGhToken();
+    if (!ghToken) {
+      return new Response(JSON.stringify({ error: 'GH_TOKEN non configurato' }), { status: 501, headers: cors });
+    }
+    const GH_REPO = env.GH_REPO || 'DarkLionMoon/Arcamis';
+    const GH_BRANCH = env.GH_BRANCH || 'main';
+    const apiBase = 'https://api.github.com/repos/' + GH_REPO;
+    const ghHeaders = {
+      'Authorization': 'token ' + ghToken,
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'ArcamisAdmin'
+    };
+    const deleted = [];
+    for (const name of filenames.slice(0, 10)) {
+      try {
+        const getFile = await fetch(apiBase + '/contents/images/' + name + '?ref=' + GH_BRANCH, { headers: ghHeaders });
+        if (getFile.ok) {
+          const fileData = await getFile.json();
+          const delRes = await fetch(apiBase + '/contents/images/' + name, {
+            method: 'DELETE',
+            headers: ghHeaders,
+            body: JSON.stringify({ message: 'admin: delete orphan media ' + name, sha: fileData.sha, branch: GH_BRANCH })
+          });
+          if (delRes.ok) deleted.push(name);
+        }
+      } catch (_) {}
+    }
+    await writeAdminLog('delete_orphan_media', deleted.join(', '), 'eliminati ' + deleted.length + ' file orfani', await sessionUser());
+    notifyWebhook('🗑️ ' + deleted.length + ' file orfani eliminati da ' + (await sessionUser()));
+    return new Response(JSON.stringify({ ok: true, deleted }), { headers: cors });
+  }
+
+  /* ════ GLOBAL LINK SCANNER ════ */
+  if (action === 'scan_links') {
+    const sessRole = await sessionRole();
+    if (!sessRole) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
+    const ghToken = await getGhToken();
+    if (!ghToken) {
+      return new Response(JSON.stringify({ error: 'GH_TOKEN non configurato' }), { status: 501, headers: cors });
+    }
+    const GH_REPO = env.GH_REPO || 'DarkLionMoon/Arcamis';
+    const GH_BRANCH = env.GH_BRANCH || 'main';
+    const apiBase = 'https://api.github.com/repos/' + GH_REPO;
+    const ghHeaders = {
+      'Authorization': 'token ' + ghToken,
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'ArcamisAdmin'
+    };
+    try {
+      /* 1. Get registry for valid page keys */
+      const regRes = await fetch(apiBase + '/contents/content/pages/registry.json?ref=' + GH_BRANCH, { headers: ghHeaders });
+      let validKeys = [];
+      let validSlugs = [];
+      if (regRes.ok) {
+        const regData = await regRes.json();
+        const reg = JSON.parse(decodeURIComponent(escape(atob(regData.content))));
+        if (reg.pages) {
+          validKeys = reg.pages.map(p => p.k);
+          validSlugs = reg.pages.map(p => p.k);
+        }
+      }
+
+      /* 2. Get all page files */
+      const pagesRes = await fetch(apiBase + '/contents/content/pages?ref=' + GH_BRANCH, { headers: ghHeaders });
+      if (!pagesRes.ok) return new Response(JSON.stringify({ error: 'Impossibile elencare pagine' }), { status: 502, headers: cors });
+      const pageFiles = (await pagesRes.json()).filter(f => f.type === 'file' && f.name.endsWith('.json') && f.name !== 'registry.json');
+
+      /* 3. Get image list */
+      const imgRes = await fetch(apiBase + '/contents/images?ref=' + GH_BRANCH, { headers: ghHeaders });
+      const validImages = imgRes.ok ? (await imgRes.json()).filter(f => f.type === 'file').map(f => f.name) : [];
+
+      const broken = [];
+      const warnings = [];
+      const checked = [];
+
+      for (const pf of pageFiles) {
+        try {
+          const cr = await fetch(apiBase + '/contents/content/pages/' + pf.name + '?ref=' + GH_BRANCH, { headers: ghHeaders });
+          if (!cr.ok) continue;
+          const cd = await cr.json();
+          const content = decodeURIComponent(escape(atob(cd.content)));
+          const pageKey = pf.name.replace('.json', '');
+
+          /* Check internal page links: [text](/section/slug) or [text](slug) */
+          const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
+          let match;
+          while ((match = linkRegex.exec(content)) !== null) {
+            const href = match[2];
+            if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) continue;
+            const cleanHref = href.replace(/^\//, '').split('#')[0].split('?')[0];
+            /* Check if it's a valid page slug */
+            if (cleanHref && !validSlugs.some(s => cleanHref === s || cleanHref.endsWith('/' + s))) {
+              /* Check if it's a valid image */
+              const imgName = cleanHref.replace('images/', '');
+              if (!validImages.includes(imgName)) {
+                broken.push({ page: pageKey, type: 'link', target: href, line: content.substring(0, match.index).split('\n').length });
+              }
+            }
+          }
+
+          /* Check image references: ![alt](/images/filename) */
+          const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+          while ((match = imgRegex.exec(content)) !== null) {
+            const src = match[2];
+            if (src.startsWith('http') || src.startsWith('data:')) continue;
+            const imgName = src.replace(/^\/?images\//, '').split('?')[0];
+            if (imgName && !validImages.includes(imgName)) {
+              broken.push({ page: pageKey, type: 'image', target: src, alt: match[1], line: content.substring(0, match.index).split('\n').length });
+            }
+          }
+
+          /* Check HTML img tags */
+          const htmlImgRegex = /<img[^>]+src=["']([^"']+)["']/g;
+          while ((match = htmlImgRegex.exec(content)) !== null) {
+            const src = match[1];
+            if (src.startsWith('http') || src.startsWith('data:')) continue;
+            const imgName = src.replace(/^\/?images\//, '').split('?')[0];
+            if (imgName && !validImages.includes(imgName)) {
+              broken.push({ page: pageKey, type: 'image', target: src, line: content.substring(0, match.index).split('\n').length });
+            }
+          }
+
+          /* Check for images without alt text */
+          const noAltRegex = /!\[\]\([^)]+\)/g;
+          while ((match = noAltRegex.exec(content)) !== null) {
+            warnings.push({ page: pageKey, type: 'missing_alt', target: match[0].substring(0, 60), line: content.substring(0, match.index).split('\n').length });
+          }
+
+          checked.push(pageKey);
+        } catch (e) {}
+      }
+
+      return new Response(JSON.stringify({
+        checked: checked.length,
+        broken,
+        warnings,
+        summary: {
+          totalBroken: broken.length,
+          brokenLinks: broken.filter(b => b.type === 'link').length,
+          brokenImages: broken.filter(b => b.type === 'image').length,
+          missingAlt: warnings.length
+        }
+      }), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    }
+  }
+
+  /* ════ TRASH: MOVE TO TRASH ════ */
+  if (action === 'trash_page' && request.method === 'POST') {
+    const sessRole = await sessionRole();
+    if (sessRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
+    }
+    const csrfOk = await verifyCsrf(request);
+    if (!csrfOk) return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
+    let body;
+    try { body = await request.json(); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    const { pageKey, pageData, registryData } = body;
+    if (!pageKey) {
+      return new Response(JSON.stringify({ error: 'pageKey richiesto' }), { status: 400, headers: cors });
+    }
+    // Save to KV trash with 30-day expiry
+    const trashKey = 'trash_' + pageKey;
+    const trashEntry = {
+      pageKey,
+      pageData: pageData || null,
+      registryData: registryData || null,
+      deletedAt: new Date().toISOString(),
+      deletedBy: await sessionUser() || 'admin'
+    };
+    // KV doesn't support native TTL, but we store timestamp and filter client-side
+    await KV.put(trashKey, JSON.stringify(trashEntry));
+    
+    // Update trash index
+    const trashIndexRaw = await KV.get('trash_index');
+    let trashIndex = [];
+    if (trashIndexRaw) {
+      try { trashIndex = JSON.parse(trashIndexRaw); } catch (e) { trashIndex = []; }
+    }
+    if (!trashIndex.find(t => t.pageKey === pageKey)) {
+      trashIndex.unshift({ pageKey, deletedAt: trashEntry.deletedAt, deletedBy: trashEntry.deletedBy });
+      // Keep max 50 items in trash index
+      if (trashIndex.length > 50) trashIndex = trashIndex.slice(0, 50);
+    }
+    await KV.put('trash_index', JSON.stringify(trashIndex));
+    
+    await writeAdminLog('trash_page', pageKey, {}, await sessionUser());
+    return new Response(JSON.stringify({ ok: true }), { headers: cors });
+  }
+
+  /* ════ TRASH: LIST ════ */
+  if (action === 'list_trash') {
+    const sessRole = await sessionRole();
+    if (sessRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
+    }
+    const trashIndexRaw = await KV.get('trash_index');
+    let trashIndex = [];
+    if (trashIndexRaw) {
+      try { trashIndex = JSON.parse(trashIndexRaw); } catch (e) { trashIndex = []; }
+    }
+    // Filter out expired (>30 days)
+    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+    const valid = trashIndex.filter(t => new Date(t.deletedAt).getTime() > thirtyDaysAgo);
+    
+    // Fetch details for each
+    const items = [];
+    for (const entry of valid) {
+      const raw = await KV.get('trash_' + entry.pageKey);
+      if (raw) {
+        try {
+          const data = JSON.parse(raw);
+          items.push({
+            pageKey: data.pageKey,
+            deletedAt: data.deletedAt,
+            deletedBy: data.deletedBy,
+            pageTitle: data.pageData ? JSON.parse(data.pageData).title : entry.pageKey,
+            pageIcon: data.pageData ? JSON.parse(data.pageData).icon : '📄'
+          });
+        } catch (e) {}
+      }
+    }
+    return new Response(JSON.stringify({ items, maxAge: '30 giorni' }), { headers: cors });
+  }
+
+  /* ════ TRASH: RESTORE ════ */
+  if (action === 'restore_trash' && request.method === 'POST') {
+    const sessRole = await sessionRole();
+    if (sessRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
+    }
+    const csrfOk = await verifyCsrf(request);
+    if (!csrfOk) return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
+    const ghToken = await getGhToken();
+    if (!ghToken) {
+      return new Response(JSON.stringify({ error: 'GH_TOKEN non configurato' }), { status: 501, headers: cors });
+    }
+    let body;
+    try { body = await request.json(); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    const { pageKey } = body;
+    if (!pageKey) {
+      return new Response(JSON.stringify({ error: 'pageKey richiesto' }), { status: 400, headers: cors });
+    }
+    const trashKey = 'trash_' + pageKey;
+    const raw = await KV.get(trashKey);
+    if (!raw) {
+      return new Response(JSON.stringify({ error: 'Pagina non trovata nel cestino' }), { status: 404, headers: cors });
+    }
+    const trashData = JSON.parse(raw);
+    const GH_REPO = env.GH_REPO || 'DarkLionMoon/Arcamis';
+    const GH_BRANCH = env.GH_BRANCH || 'main';
+    const apiBase = 'https://api.github.com/repos/' + GH_REPO;
+    const ghHeaders = {
+      'Authorization': 'token ' + ghToken,
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'ArcamisAdmin'
+    };
+    try {
+      const files = [];
+      if (trashData.pageData) {
+        files.push({ path: 'content/pages/' + pageKey + '.json', content: btoa(unescape(encodeURIComponent(trashData.pageData))) });
+      }
+      if (trashData.registryData) {
+        // Get current registry and merge the page back
+        const regRes = await fetch(apiBase + '/contents/content/pages/registry.json?ref=' + GH_BRANCH, { headers: ghHeaders });
+        if (regRes.ok) {
+          const regFile = await regRes.json();
+          const currentReg = JSON.parse(decodeURIComponent(escape(atob(regFile.content))));
+          const trashedReg = JSON.parse(trashData.registryData);
+          // Add the page back to registry
+          const pageEntry = (trashedReg.pages || []).find(p => p.k === pageKey);
+          if (pageEntry && !currentReg.pages.find(p => p.k === pageKey)) {
+            currentReg.pages.push(pageEntry);
+          }
+          files.push({ path: 'content/pages/registry.json', content: btoa(unescape(encodeURIComponent(JSON.stringify(currentReg, null, 2) + '\n'))), sha: regFile.sha });
+        }
+      }
+      if (files.length === 0) {
+        return new Response(JSON.stringify({ error: 'Nessun dato da ripristinare' }), { status: 400, headers: cors });
+      }
+      // Commit restored files
+      if (files.length === 1) {
+        const f = files[0];
+        const getRes = await fetch(apiBase + '/contents/' + f.path + '?ref=' + GH_BRANCH, { headers: ghHeaders });
+        if (getRes.ok) {
+          const fileData = await getRes.json();
+          f.sha = fileData.sha;
+        }
+      }
+      const commitRes = await fetch(apiBase + '/contents/' + files[0].path, {
+        method: 'PUT',
+        headers: ghHeaders,
+        body: JSON.stringify({
+          message: 'admin: restore from trash ' + pageKey,
+          content: files[0].content,
+          sha: files[0].sha || undefined,
+          branch: GH_BRANCH
+        })
+      });
+      // If multiple files, commit them one by one
+      if (files.length > 1) {
+        for (const f of files) {
+          let sha = f.sha;
+          if (!sha) {
+            const getRes = await fetch(apiBase + '/contents/' + f.path + '?ref=' + GH_BRANCH, { headers: ghHeaders });
+            if (getRes.ok) {
+              const fileData = await getRes.json();
+              sha = fileData.sha;
+            }
+          }
+          await fetch(apiBase + '/contents/' + f.path, {
+            method: 'PUT',
+            headers: ghHeaders,
+            body: JSON.stringify({
+              message: 'admin: restore from trash ' + pageKey,
+              content: f.content,
+              sha: sha || undefined,
+              branch: GH_BRANCH
+            })
+          });
+        }
+      }
+      // Remove from trash
+      await KV.delete(trashKey);
+      const trashIndexRaw = await KV.get('trash_index');
+      if (trashIndexRaw) {
+        let idx = JSON.parse(trashIndexRaw);
+        idx = idx.filter(t => t.pageKey !== pageKey);
+        await KV.put('trash_index', JSON.stringify(idx));
+      }
+      notifyWebhook('♻️ Ripristinata dal cestino: ' + pageKey);
+      await writeAdminLog('restore_trash', pageKey, {}, await sessionUser());
+      return new Response(JSON.stringify({ ok: true }), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    }
+  }
+
+  /* ════ TRASH: PERMANENT DELETE ════ */
+  if (action === 'empty_trash' && request.method === 'POST') {
+    const sessRole = await sessionRole();
+    if (sessRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
+    }
+    const csrfOk = await verifyCsrf(request);
+    if (!csrfOk) return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
+    let body;
+    try { body = await request.json(); } catch (e) {}
+    const pageKey = body && body.pageKey;
+    if (pageKey) {
+      // Delete single item
+      await KV.delete('trash_' + pageKey);
+      const trashIndexRaw = await KV.get('trash_index');
+      if (trashIndexRaw) {
+        let idx = JSON.parse(trashIndexRaw);
+        idx = idx.filter(t => t.pageKey !== pageKey);
+        await KV.put('trash_index', JSON.stringify(idx));
+      }
+      await writeAdminLog('empty_trash', pageKey, {}, await sessionUser());
+      return new Response(JSON.stringify({ ok: true }), { headers: cors });
+    }
+    // Empty all expired (>30 days)
+    const trashIndexRaw = await KV.get('trash_index');
+    if (!trashIndexRaw) return new Response(JSON.stringify({ ok: true, deleted: 0 }), { headers: cors });
+    let idx = JSON.parse(trashIndexRaw);
+    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+    const expired = idx.filter(t => new Date(t.deletedAt).getTime() <= thirtyDaysAgo);
+    for (const entry of expired) {
+      await KV.delete('trash_' + entry.pageKey);
+    }
+    idx = idx.filter(t => new Date(t.deletedAt).getTime() > thirtyDaysAgo);
+    await KV.put('trash_index', JSON.stringify(idx));
+    await writeAdminLog('empty_trash', 'auto', { deleted: expired.length }, await sessionUser());
+    return new Response(JSON.stringify({ ok: true, deleted: expired.length }), { headers: cors });
+  }
+
   /* ════ BACKUP CONTENT ════ */
   if (action === 'backup_content') {
     const sessRole = await sessionRole();
@@ -863,6 +1403,152 @@ if (action === 'set_posa' && request.method === 'POST') {
         new: JSON.parse(newContent),
         diff: simpleDiff(oldContent, newContent)
       }), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    }
+  }
+
+  /* ════ SAVE PAGE VERSION (backup to KV) ════ */
+  if (action === 'save_version' && request.method === 'POST') {
+    const sessRole = await sessionRole();
+    if (sessRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
+    }
+    const csrfOk = await verifyCsrf(request);
+    if (!csrfOk) return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
+    let body;
+    try { body = await request.json(); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    const { pageKey, content } = body;
+    if (!pageKey || !content) {
+      return new Response(JSON.stringify({ error: 'pageKey e content richiesti' }), { status: 400, headers: cors });
+    }
+    // Get existing versions
+    const versionKey = 'versions_' + pageKey;
+    const existing = await KV.get(versionKey);
+    let versions = [];
+    if (existing) {
+      try { versions = JSON.parse(existing); } catch (e) { versions = []; }
+    }
+    // Add new version (max 20 per page)
+    versions.unshift({
+      timestamp: new Date().toISOString(),
+      user: await sessionUser() || 'admin',
+      content: typeof content === 'string' ? content : JSON.stringify(content)
+    });
+    if (versions.length > 20) versions = versions.slice(0, 20);
+    await KV.put(versionKey, JSON.stringify(versions));
+    return new Response(JSON.stringify({ ok: true, count: versions.length }), { headers: cors });
+  }
+
+  /* ════ GET PAGE VERSIONS ════ */
+  if (action === 'get_versions') {
+    const sessRole = await sessionRole();
+    if (!sessRole) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
+    const pageKey = url.searchParams.get('pageKey');
+    if (!pageKey) {
+      return new Response(JSON.stringify({ error: 'pageKey richiesto' }), { status: 400, headers: cors });
+    }
+    const versionKey = 'versions_' + pageKey;
+    const existing = await KV.get(versionKey);
+    let versions = [];
+    if (existing) {
+      try {
+        versions = JSON.parse(existing).map(v => ({
+          timestamp: v.timestamp,
+          user: v.user,
+          preview: (v.content || '').substring(0, 200)
+        }));
+      } catch (e) { versions = []; }
+    }
+    return new Response(JSON.stringify({ versions }), { headers: cors });
+  }
+
+  /* ════ RESTORE PAGE VERSION ════ */
+  if (action === 'restore_version' && request.method === 'POST') {
+    const sessRole = await sessionRole();
+    if (sessRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
+    }
+    const csrfOk = await verifyCsrf(request);
+    if (!csrfOk) return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
+    const ghToken = await getGhToken();
+    if (!ghToken) {
+      return new Response(JSON.stringify({ error: 'GH_TOKEN non configurato' }), { status: 501, headers: cors });
+    }
+    let body;
+    try { body = await request.json(); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    const { pageKey, versionIndex } = body;
+    if (!pageKey || versionIndex === undefined) {
+      return new Response(JSON.stringify({ error: 'pageKey e versionIndex richiesti' }), { status: 400, headers: cors });
+    }
+    const versionKey = 'versions_' + pageKey;
+    const existing = await KV.get(versionKey);
+    if (!existing) {
+      return new Response(JSON.stringify({ error: 'Nessuna versione trovata' }), { status: 404, headers: cors });
+    }
+    let versions;
+    try { versions = JSON.parse(existing); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Dati versioni corrotti' }), { status: 500, headers: cors });
+    }
+    if (!versions[versionIndex]) {
+      return new Response(JSON.stringify({ error: 'Versione non trovata' }), { status: 404, headers: cors });
+    }
+    const restoredContent = versions[versionIndex].content;
+    // Save current as a version before restoring
+    const GH_REPO = env.GH_REPO || 'DarkLionMoon/Arcamis';
+    const GH_BRANCH = env.GH_BRANCH || 'main';
+    const apiBase = 'https://api.github.com/repos/' + GH_REPO;
+    const ghHeaders = {
+      'Authorization': 'token ' + ghToken,
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'ArcamisAdmin'
+    };
+    try {
+      const path = 'content/pages/' + pageKey + '.json';
+      const getFile = await fetch(apiBase + '/contents/' + path + '?ref=' + GH_BRANCH, { headers: ghHeaders });
+      if (!getFile.ok) {
+        return new Response(JSON.stringify({ error: 'Pagina non trovata su GitHub' }), { status: 404, headers: cors });
+      }
+      const fileData = await getFile.json();
+      // Auto-backup current version
+      const currentContent = decodeURIComponent(escape(atob(fileData.content)));
+      versions.unshift({
+        timestamp: new Date().toISOString(),
+        user: (await sessionUser()) || 'admin',
+        content: currentContent,
+        note: 'auto-backup before restore'
+      });
+      if (versions.length > 20) versions = versions.slice(0, 20);
+      await KV.put(versionKey, JSON.stringify(versions));
+      // Commit restored content
+      const commitMsg = 'admin: restore ' + pageKey + ' to version ' + versionIndex;
+      const putRes = await fetch(apiBase + '/contents/' + path, {
+        method: 'PUT',
+        headers: ghHeaders,
+        body: JSON.stringify({
+          message: commitMsg,
+          content: btoa(unescape(encodeURIComponent(restoredContent))),
+          sha: fileData.sha,
+          branch: GH_BRANCH
+        })
+      });
+      if (!putRes.ok) {
+        const errBody = await putRes.json().catch(() => ({}));
+        return new Response(JSON.stringify({ error: 'GitHub push fallito: ' + putRes.status, detail: errBody.message }), { status: 502, headers: cors });
+      }
+      // Invalidate KV cache
+      if (typeof pageKV !== 'undefined' && pageKV) {
+        try { pageKV.delete('content/pages/' + pageKey + '.json'); } catch (e) {}
+      }
+      notifyWebhook('♻️ Restore versione: ' + pageKey + ' (v' + versionIndex + ')');
+      await writeAdminLog('restore_version', pageKey, { versionIndex }, await sessionUser());
+      return new Response(JSON.stringify({ ok: true, versions: versions.length }), { headers: cors });
     } catch (e) {
       return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
     }

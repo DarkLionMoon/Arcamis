@@ -6,6 +6,9 @@ Thumbs.db
 node_modules/
 package-lock.json
 
+# Build
+dist/
+
 # Ambiente / segreti
 .env
 .env.*

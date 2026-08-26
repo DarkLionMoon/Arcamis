@@ -192,6 +192,10 @@ button{font-family:inherit}
 .tb-btn2.active{background:var(--accbg);color:var(--acc2);border-color:rgba(212,170,74,.3)}
 .tb-sep2{width:1px;height:18px;background:var(--line);margin:0 5px}
 .tb-spacer{flex:1}
+.tb-dropdown{position:relative}
+.tb-dropdown-menu{position:absolute;top:100%;left:0;background:var(--bg2);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:100;min-width:200px;padding:4px 0}
+.tb-dd-item{padding:7px 14px;font-size:12px;color:var(--txt);cursor:pointer;white-space:nowrap}
+.tb-dd-item:hover{background:var(--accbg);color:var(--acc2)}
 .view-switch{display:flex;align-items:center;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:2px}
 .view-switch .tb-btn2{height:24px;font-size:10.5px;border-radius:6px;padding:0 9px;width:auto;letter-spacing:.04em}
 .ed-body{flex:1;display:flex;min-height:0;position:relative;overflow:hidden}

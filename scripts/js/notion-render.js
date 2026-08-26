@@ -232,7 +232,7 @@ function renderBlocks(blocks,isRoot){
         var cap=d.caption&&d.caption.length?rt(d.caption):'';
         if(src){
           h+='<figure class="n-image">'
-            +'<img src="'+src+'" loading="lazy" class="n-zoomable" onclick="arcZoom(\''+src+'\')" onerror="this.parentElement.style.display=\'none\'"/>'
+            +'<img src="'+src+'" loading="lazy" decoding="async" class="n-zoomable" onclick="arcZoom(\''+src+'\')" onerror="this.parentElement.style.display=\'none\'"/>'
             +(cap?'<figcaption class="n-figcap">'+cap+'</figcaption>':'')
             +'</figure>';
         }else if(d.type==='file'&&d.file&&d.file._blockId){
@@ -248,7 +248,7 @@ function renderBlocks(blocks,isRoot){
                 var freshUrl=data.url;
                 var fig=document.getElementById('nimg-'+blockId);
                 if(!fig)return;
-                fig.innerHTML=_scrubHtmlString('<img src="'+freshUrl+'" loading="lazy" class="n-zoomable" onclick="arcZoom(\''+freshUrl+'\')" onerror="this.parentElement.style.display=\'none\'"/>')
+                fig.innerHTML=_scrubHtmlString('<img src="'+freshUrl+'" loading="lazy" decoding="async" class="n-zoomable" onclick="arcZoom(\''+freshUrl+'\')" onerror="this.parentElement.style.display=\'none\'"/>')
                   +(caption?'<figcaption class="n-figcap">'+caption+'</figcaption>':'');
               })
               .catch(function(){

@@ -254,16 +254,20 @@ async function openPage(k){
   h+='<div class="ed-title"><span class="eti" id="ed-icon">'+esc(json.icon||'📄')+'</span><span id="ed-title">'+esc(json.title||k)+'</span><span class="etp">pages/'+esc(k)+'</span></div>';
   h+='<span class="badge badge-idle" id="e-badge">salvato</span>';
   h+='<span class="badge badge-draft" id="e-draft-badge" style="display:none">BOZZA</span>';
+  h+='<span class="ed-sep"></span>';
+  h+='<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--dim)">📅 <input type="datetime-local" id="e-publish-at" class="in" style="width:auto;padding:2px 6px;font-size:11px" title="Pubblica automaticamente alla data"></label>';
   h+='<div class="grow"></div>';
   h+='<div class="ed-actions">';
   h+='<button class="btn btn-soft btn-sm" onclick="saveDraft()" title="Salva come bozza (non pubblicata)">💾 <span class="lbl">SALVA BOZZA</span></button>';
   h+='<button class="btn btn-p btn-sm" id="publish-btn" onclick="publishDraft()" style="display:none" title="Pubblica bozza come versione live">🚀 <span class="lbl">PUBBLICA</span></button>';
   h+='<span class="ed-sep"></span>';
   h+='<button class="btn btn-soft btn-sm" onclick="toggleJson()" title="Modifica il JSON grezzo della pagina">JSON</button>';
-  h+='<button class="btn btn-soft btn-sm" onclick="openHistory()" title="Cronologia commit e ripristino versione">📜 <span class="lbl">Storia</span></button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="openHistory()" title="Cronologia commit e ripristino versione">📜 <span class="lbl">Git Storia</span></button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="openKVVersions()" title="Versioni salvate in backup (KV)">💾 <span class="lbl">Backup</span></button>';
   h+='<button class="btn btn-soft btn-sm" onclick="checkLinks()" title="Verifica i link interni del contenuto">🔗 <span class="lbl">Link</span></button>';
   h+='<button class="btn btn-soft btn-sm" onclick="copyPageUrl()" title="Copia URL pulito della pagina">URL</button>';
   h+='<button class="btn btn-soft btn-sm" onclick="openPageOnSite()" title="Apri la pagina sul sito in una nuova scheda">🌐 <span class="lbl">Apri</span></button>';
+  h+='<button class="btn btn-soft btn-sm" onclick="clonePageModal()" title="Clona questa pagina come template per una nuova">📋 <span class="lbl">Clona</span></button>';
   h+='<button class="btn btn-soft btn-sm" onclick="openRenameModal()" title="Rinomina sezione / pagina">✏️ <span class="lbl">Rinomina</span></button>';
   h+='<span class="ed-sep"></span>';
   h+='<button class="btn btn-d btn-sm" id="del-btn" onclick="deletePage()" title="Elimina questa pagina (azione irreversibile)">ELIMINA</button>';
@@ -279,6 +283,7 @@ async function openPage(k){
   h+='<label>Icona<input id="e-icon" class="in mm-icon" value="'+escAttr(json.icon||'')+'" oninput="onMetaInput()" maxlength="6" placeholder="📄"></label>';
   h+='<label>Layout<select id="e-layout" class="in mm-layout" onchange="onLayoutChange(this.value)">'+layoutOpts+'</select></label>';
   h+='<label class="ed-toc-toggle">Sommario<input type="checkbox" id="e-toc" '+(json.toc?'checked':'')+' onchange="_current.toc=this.checked"></label>';
+  h+='<label style="grid-column:1/-1">Descrizione SEO (meta description)<input id="e-description" class="in" value="'+escAttr(json.description||'')+'" oninput="onMetaInput()" placeholder="Descrizione breve per i motori di ricerca (max 160 caratteri)" maxlength="160"></label>';
   h+='</div>';
   if(st){
     h+='<textarea id="e-md" style="display:none" placeholder="Contenuto Markdown (sincronizzato dai blocchi)...">'+esc(json.content||'')+'</textarea>';
@@ -298,7 +303,7 @@ async function openPage(k){
   h+='</div>';
   h+='<iframe id="site-frame"></iframe><div id="site-hint"><span>🔎 Anteprima del sito</span><span class="sh-k">· clicca SITO per tornare all\'editor</span></div>';
   h+='<div class="json-pane" id="json-pane"><div class="pane-head">JSON</div><textarea id="e-json"></textarea></div>';
-  h+='<div class="ed-statusbar"><span id="e-sb">'+esc(_layoutLabel(json.layout||''))+' · Autosave ogni 5s · SALVA / Ctrl+S salva subito</span><span class="st-r">Ctrl+B grassetto · Ctrl+I corsivo · Ctrl+K link · Ctrl+H cerca · Ctrl+G riga · Ctrl+Shift+F schermo intero</span></div>';
+  h+='<div class="ed-statusbar"><span id="e-sb">'+esc(_layoutLabel(json.layout||''))+' · Autosave ogni 5s · SALVA / Ctrl+S salva · Ctrl+Shift+S backup versione · Ctrl+Shift+C commit custom</span><span class="st-r">Ctrl+B grassetto · Ctrl+I corsivo · Ctrl+K link · Ctrl+H cerca · Ctrl+G riga · Ctrl+Shift+F schermo intero</span></div>';
   h+='</div>';
   document.getElementById('main').innerHTML=h;
   if(st){
@@ -338,6 +343,7 @@ function buildToolbar(){
   var h='<div class="ed-toolbar" id="e-toolbar">';
   if(_current){
     h+='<button class="btn btn-soft btn-sm" onclick="_stToggle()" title="Passa all\'editor a blocchi (disponibile su ogni pagina)">🧱 Blocchi</button>';
+    h+='<button class="btn btn-soft btn-sm" onclick="saveKVVersion()" title="Salva una snapshot di backup in KV (max 20 per pagina)">📦 Salva Versione</button>';
   }
   EDITOR_TB.forEach(function(g){
     g.forEach(function(cmd){
@@ -346,6 +352,19 @@ function buildToolbar(){
     h+='<span class="tb-sep2"></span>';
   });
   h+='<span class="tb-spacer"></span>';
+  h+='<div class="tb-dropdown" id="snippets-dd">';
+  h+='<button class="tb-btn2" onclick="toggleSnippetsDD()" title="Template D&D predefiniti">🧙 Snippets</button>';
+  h+='<div class="tb-dropdown-menu" id="snippets-menu" style="display:none">';
+  h+='<div class="tb-dd-item" onclick="insertSnippet(\'statblock\')">📊 Stat Block Mostro</div>';
+  h+='<div class="tb-dd-item" onclick="insertSnippet(\'spell\')">✨ Incantesimo</div>';
+  h+='<div class="tb-dd-item" onclick="insertSnippet(\'item\')">⚔️ Oggetto Magico</div>';
+  h+='<div class="tb-dd-item" onclick="insertSnippet(\'npc\')">👤 Scheda NPC</div>';
+  h+='<div class="tb-dd-item" onclick="insertSnippet(\'location\')">🏰 Scheda Luogo</div>';
+  h+='<div class="tb-dd-item" onclick="insertSnippet(\'encounter\')">🎲 Tabella Incontri</div>';
+  h+='<div class="tb-dd-item" onclick="insertSnippet(\'dialogue\')">💬 Dialogo NPC</div>';
+  h+='<div class="tb-dd-item" onclick="insertSnippet(\'notebook\')">📓 Diario di Sessione</div>';
+  h+='</div></div>';
+  h+='<span class="tb-sep2"></span>';
   h+='<button class="tb-btn2" id="tb-outline" title="Sommario sezioni" onclick="toggleOutline()">☰</button>';
   h+='<span class="view-switch">';
   h+='<button class="tb-btn2" data-view="md" title="Solo markdown">SCRIVI</button>';
@@ -373,6 +392,8 @@ function onMdBlur(){
 function onMdKey(e){
   var ta=document.getElementById('e-md');if(!ta)return;
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();savePage();return}
+  if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='s'){e.preventDefault();saveKVVersion();return}
+  if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='c'){e.preventDefault();window._useCustomCommitMsg=true;savePage();return}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='b'){e.preventDefault();runCmd('bold');return}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='i'){e.preventDefault();runCmd('italic');return}
   if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='k'){e.preventDefault();runCmd('link');return}
@@ -471,6 +492,56 @@ function buildOutline(){
   body.innerHTML=h||'<div style="padding:10px;color:var(--dim);font-size:11px">Nessuna sezione</div>';
 }
 function jumpToLine(off){var pv=document.getElementById('e-preview');if(pv){pv.scrollTop=off-90;pv.focus()}}
+/* ── SNIPPETS D&D ── */
+var DND_SNIPPETS={
+  statblock:'### Nome Mostro\n\n*Gigante, caotico neutrale*\n\n**CA** 15 **For** 19 (+4) **Des** 14 (+2) **Cost** 18 (+4) **Int** 10 (+0) **Sag** 12 (+1) **Car** 9 (-1)\n\n**Salute** 138 (12d10+72)\n**Tempo** 40 ft.\n**TT** 19 (squamato)\n\n**Resistenze** danni contundenti, perforanti e taglienti da armi non magiche\n**Status** Immune al veleno\n**Percezione** Passiva 12\n**Linguaggi** Gigante\n**Sfida** 8 (3.900 XP)\n\n---\n\n**Azioni**\n\n**Fendente**. Attacco misura: +4 a tiro per colpire, portata 5 ft., un bersaglio. *Colpo:* 12 (2d8+4) danni taglienti.\n\n**Lancio Runico** (A Giorno). Il mostro lancia uno dei seguenti incantesimi (Sag 12, +3 a tiro salvezza):\n- *Frecce Accecanti* (ceppo)\n- *Frecce Infuocate* (ceppo)\n- *Paralizzante* (ceppo)',
+  
+  spell:'### Nome Incantesimo\n\n*Evocazione (arcana)*\n\n**Livello** 3°\n**Lanciatori** Strega, mago\n**Tempo di lancio** 1 azione\n**Portata** 90 metri\n**Componenti** V, S, M (un filo di ragnicola)\n**Durata** Concentrazione, fino a 1 minuto\n\n---\n\nUna sagoma di energy takes shape…\n\n**A livelli superiori.** Se lanciato come incantesimo di livello superiore, il danno aumenta di 1d6 per ogni livello superiore.',
+  
+  item:'### Nome Oggetto\n\n*Armatura, rara (richiede sintonizzazione)*\n\nMentre indossi questa armatura, il tuo **CA** diventa 14 + il tuo modificatore di Destrezza. L\'armatura non ti penalizza la Destrezza e ti dà **vantaggio ai tiri salvezza contro la magia**.\n\n**Bonus magico.** L\'armatura conferisce +1 alla CA (non cumulativo con altre armature).\n\n**Aura di protezione.** Una volta al giorno, puoi usare la tua reazione per ridurre di metà il danno subito da un alleato entro 10 metri.\n\n---\n\n*Indossare questa armatura richiede un tiro salvezza di Saggezza CD 13. In caso di fallimento, l\'armatura ti respinge per 1d4 ore.*',
+  
+  npc:'### Nome NPC\n\n*Altezza* 1,75m · *Età* 34 · *Allineamento* Legale Buono\n\n---\n\n**Aspetto fisico:** Capelli neri corti, occhi verdi, cicatrice sulla guancia sinistra.\n**Personalità:** Calmo, metodico, parla poco ma quando lo fa dice cose importanti.\n**Voce:** Bassa e rassicurante.\n**Motto:** *"Ogni problema ha una soluzione, basta guardarlo da giusto angolo."*\n\n---\n\n**Ruolo nella storia**\nDescrizione del ruolo dell\'NPC nella narrativa…\n\n**Relazioni**\n- **Personaggio X**: Alleato fidato\n- **Personaggio Y**: Rivalità professionale\n\n**Segreti**\n- Conosce la verità su…\n- Ha un debito con…',
+  
+  location:'### Nome Luogo\n\n*Tipo* Città · *Regione* Continente\n**Popolazione** 12.000 abitanti · **Signore** Barone\n\n---\n\n**Aspetto generale**\nDescrizione visiva del luogo…\n\n**Punti di interesse**\n1. 🏛️ **Piazza del Mercato** — Cuore economico della città\n2. ⚔️ **Guardia Civica** — Sorvegliano le strade\n3. 🏰 **Castello** — Residenza del barone\n4. 🍺 **La Tavola d\'Oro** — Locanda principale\n5. ⛪ **Tempio della Luce** — Centro religioso\n\n**NBT** (Nota Bene Territorio)\n- Cosa si trova qui: *commercio, politica, giustizia*\n- Atmosfera: *bustante di giorno, tranquilla di notte*\n- Pericoli: *furti notturni nella zona portuale*',
+  
+  encounter:'### Tabella Incontro\n\n| d20 | Risultato |\n|-----|-----------|\n| 1-2 | Nothing happens |\n| 3-5 | Light rain begins to fall |\n| 6-8 | A distant sound of war drums |\n| 9-12 | A traveler approaches on the road |\n| 13-15 | Strange birdsong fills the air |\n| 16-18 | The ground trembles slightly |\n| 19-20 | Something catches your eye in the undergrowth |\n\n---\n\n*Nota: questa tabella è pensata per l\'esplorazione della foresta. Aggiungi modificatori basati sul livello del gruppo.*',
+  
+  dialogue:'### Dialogo NPC\n\n> **Mercante:** "Ben arrivati, viaggiatori! Cosa posso offrirvi oggi?"\n\n> **PG:** "Cerchiamo informazioni sulla torre abbandonata a nord."\n\n> **Mercante:** *si guarda intorno nervosamente*\n> "La torre... non parlate di quella qui dentro. L\'ultimo che ha fatto domande è sparito tre notti fa. Ma... se insistete, parlate con **Marta la guardia**. Sa più di quanto dica."\n\n---\n\n*Le opzioni di dialogo dipendono dalla performance del PG (CD 12 per ottenere informazioni utili).*',
+  
+  notebook:'### Sessione del [DATA]\n\n**Livello party:** 5\n**Luogo:** Città di [NOME]\n**Obiettivo sessione:** [BREVE DESCRIZIONE]\n\n---\n\n**Eventi chiave**\n1. [Evento 1]\n2. [Evento 2]\n3. [Evento 3]\n\n**NPC incontrati**\n| Nome | Luogo | Nota |\n|------|-------|------|\n| | | |\n\n**Ricompense ottenute**\n- [Ricompensa 1]\n- [Ricompensa 2]\n\n**Note per la prossima sessione**\n- [ ] [TODO 1]\n- [ ] [TODO 2]'
+};
+function toggleSnippetsDD(){
+  var el=document.getElementById('snippets-menu');
+  if(!el)return;
+  var isOpen=el.style.display!=='none';
+  el.style.display=isOpen?'none':'block';
+  if(!isOpen){
+    var close=function(e){
+      if(!el.contains(e.target)&&!el.parentElement.contains(e.target)){
+        el.style.display='none';
+        document.removeEventListener('click',close);
+      }
+    };
+    setTimeout(function(){document.addEventListener('click',close)},10);
+  }
+}
+function insertSnippet(type){
+  var md=document.getElementById('e-md');
+  if(!md)return;
+  var tpl=DND_SNIPPETS[type];
+  if(!tpl)return;
+  var start=md.selectionStart;
+  var before=md.value.substring(0,start);
+  var after=md.value.substring(md.selectionEnd);
+  var insert=tpl+'\n\n';
+  md.value=before+insert+after;
+  md.selectionStart=md.selectionEnd=start+insert.length;
+  md.focus();
+  onMdInput();
+  toggleSnippetsDD();
+  toast('Snippet inserito','success');
+}
+
 function toggleOutline(){
   var ol=document.getElementById('e-outline');if(!ol)return;
   ol.classList.toggle('open');
@@ -661,7 +732,9 @@ async function savePage(){
   var md=document.getElementById('e-md').value;
   _current.title=getTitle()||_current.title;
   _current.icon=getIcon()||_current.icon;
-  var json={k:_current.k,title:_current.title,icon:_current.icon,content:md,layout:_current.layout||'',toc:!!_current.toc,lastModified:new Date().toISOString()};
+  var descEl=document.getElementById('e-description');
+  var description=descEl?descEl.value.trim():'';
+  var json={k:_current.k,title:_current.title,icon:_current.icon,content:md,layout:_current.layout||'',toc:!!_current.toc,description:description,lastModified:new Date().toISOString()};
   var path=CONTENT+'/pages/'+_current.k+'.json';
   setStatus('saving','verifica conflitti...');
   var remote=await _checkRemoteSha();
@@ -670,6 +743,14 @@ async function savePage(){
     if(!resolved){setStatus('idle','annullato');return}
     if(resolved==='remote'){_current.sha=remote.remoteSha}
   }
+  /* Custom commit message: prompt only if Shift+S */
+  var commitMsg='admin: update '+_current.k;
+  var useCustom=window._useCustomCommitMsg;
+  window._useCustomCommitMsg=false;
+  if(useCustom){
+    var custom=prompt('Messaggio di commit (opzionale):','');
+    if(custom!==null&&custom.trim())commitMsg='admin: '+custom.trim()+' ('+_current.k+')';
+  }
   setStatus('saving','salvataggio...');
   var btn=document.getElementById('save-btn');
   if(btn)btn.disabled=true;
@@ -677,7 +758,7 @@ async function savePage(){
   var maxRetries=3,lastErr=null;
   for(var attempt=0;attempt<maxRetries;attempt++){
     try{
-      var r=await ghPut(path,'admin: update '+_current.k,JSON.stringify(json,null,2),_current.sha);
+      var r=await ghPut(path,commitMsg,JSON.stringify(json,null,2),_current.sha);
       if(r&&r.content&&r.content.sha)_current.sha=r.content.sha;
       /* Sync registry: titolo/icona del menu sito devono seguire la pagina */
       try{
@@ -779,9 +860,13 @@ async function saveDraft(){
   var title=getTitle()||_current.title;
   var icon=getIcon()||_current.icon;
   var layout=_current.layout||'';
+  var pubAtEl=document.getElementById('e-publish-at');
+  var publishAt=pubAtEl?pubAtEl.value:'';
   setStatus('saving','salvataggio bozza...');
   try{
-    var r=await _authPost('/api/admin?action=save_draft',{pageKey:_current.k,content:content,title:title,icon:icon,layout:layout});
+    var payload={pageKey:_current.k,content:content,title:title,icon:icon,layout:layout};
+    if(publishAt)payload.publishAt=publishAt;
+    var r=await _authPost('/api/admin?action=save_draft',payload);
     var j=await r.json();
     if(!j.ok)throw new Error(j.error||'Errore bozza');
     var badge=document.getElementById('e-draft-badge');
@@ -791,8 +876,8 @@ async function saveDraft(){
     setBadge('ok','bozza salvata');
     setStatus('ok','bozza salvata');
     setTimeout(function(){setStatus('idle','pronto')},1500);
-    toast('Bozza salvata! Non è ancora visibile sul sito.','success');
-    await _logAudit('save_draft',_current.k,{});
+    toast(publishAt?'Bozza salvata! Pubblicazione schedulata per '+publishAt+'.':'Bozza salvata! Non è ancora visibile sul sito.','success');
+    await _logAudit('save_draft',_current.k,{publishAt:publishAt});
   }catch(e){setStatus('err','errore');toast('Errore bozza: '+e.message,'error')}
 }
 async function publishDraft(){
@@ -1127,6 +1212,80 @@ async function createNewPage(){
     if(btn)btn.disabled=false;
   }
 }
+/* ── CLONA PAGINA ── */
+function clonePageModal(){
+  if(!_current||_current.type!=='page')return;
+  if(document.getElementById('cl-modal'))return;
+  var meta=PAGES.find(function(p){return p.k===_current.k});
+  var layoutOpts='';
+  LAYOUTS.forEach(function(l){if(l.v)layoutOpts+='<option value="'+l.v+'"'+(l.v===(_current.layout||'')?' selected':'')+'>'+l.i+' '+l.l+'</option>'});
+  var secOpts='';
+  SECTIONS.forEach(function(s){secOpts+='<option value="'+s.v+'"'+((meta&&meta.sec===s.v)?' selected':'')+'>'+s.l+'</option>'});
+  var subOpts=_subOptionsForSec(meta?meta.sec:'',meta?meta.sub:'');
+  var cloneLabel=(_current.title||_current.k)+' (copia)';
+  var cloneSlug=slugify(cloneLabel);
+  modalHtml('cl-modal','📋 Clona pagina',
+    '<div class="fld"><label>Nome della nuova pagina</label><input id="cl-label" class="in" value="'+escAttr(cloneLabel)+'" onkeydown="if(event.key===\'Enter\')clonePage()"></div>'
+    +'<div class="fld"><label>Icona (emoji)</label><input id="cl-icon" class="in" value="'+escAttr(_current.icon||'📄')+'" onkeydown="if(event.key===\'Enter\')clonePage()"></div>'
+    +'<div class="fld"><label>Slug / URL</label><input id="cl-slug" class="in" value="'+escAttr(cloneSlug)+'"></div>'
+    +'<div class="fld"><label>Sezione del menu</label><select id="cl-sec" class="in">'+secOpts+'</select></div>'
+    +'<div class="fld"><label>Sottosezione</label><select id="cl-sub" class="in">'+subOpts+'</select></div>'
+    +'<div class="fld"><label>Layout</label><select id="cl-layout" class="in">'+layoutOpts+'</select></div>'
+    +'<div class="fld"><label><input type="checkbox" id="cl-content" checked> Copia il contenuto</label></div>'
+    +'<div style="font-size:12px;color:var(--dim);margin-top:4px">La nuova pagina sarà una copia indipendente. Le modifiche successive non si propagano.</div>',
+    '<button class="btn btn-soft" onclick="closeModal(\'cl-modal\')">Annulla</button>'
+    +'<button class="btn btn-p" onclick="clonePage()">CLONA</button>');
+  document.getElementById('cl-label').addEventListener('input',function(){
+    document.getElementById('cl-slug').value=slugify(this.value);
+  });
+  document.getElementById('cl-sec').addEventListener('change',function(){
+    document.getElementById('cl-sub').innerHTML=_subOptionsForSec(this.value,'');
+  });
+}
+async function clonePage(){
+  var label=(document.getElementById('cl-label').value||'').trim();
+  var icon=(document.getElementById('cl-icon').value||'').trim()||'📄';
+  var slug=(document.getElementById('cl-slug').value||'').trim();
+  var sec=document.getElementById('cl-sec').value||'';
+  var sub=document.getElementById('cl-sub').value||'';
+  var copyContent=document.getElementById('cl-content').checked;
+  var layout=document.getElementById('cl-layout').value||'';
+  if(!label){toast('Inserisci un nome','error');return}
+  if(!slug){toast('Inserisci uno slug','error');return}
+  if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)){toast('Slug non valido','error');return}
+  if(PAGES.some(function(p){return p.k===slug})){toast('Slug già esistente','error');return}
+  setStatus('saving','clonazione...');
+  try{
+    var srcContent='';
+    if(copyContent){
+      var d=await ghGet(CONTENT+'/pages/'+_current.k+'.json');
+      var src=JSON.parse(b64decode(d.content));
+      srcContent=src.content||'';
+    }
+    var json={k:slug,title:label,icon:icon,content:srcContent||buildNewPageContent(layout,label),layout:layout,lastModified:new Date().toISOString()};
+    var d0=await ghGet('content/pages/registry.json');
+    var reg=JSON.parse(b64decode(d0.content));
+    if(!Array.isArray(reg.pages))reg.pages=[];
+    var entry={k:slug,l:label,i:icon,id:'pag-'+slug,c:1,menu:true,admin:true};
+    if(sec)entry.sec=sec;
+    if(sub)entry.sub=sub;
+    entry.path=sec?sec+'/'+slug:slug;
+    reg.pages.push(entry);
+    await ghCommitMulti([
+      {path:'content/pages/'+slug+'.json',content:b64encode(JSON.stringify(json,null,2))},
+      {path:'content/pages/registry.json',content:b64encode(JSON.stringify(reg,null,2)+'\n')}
+    ],'admin: clone page '+slug+' from '+_current.k);
+    PAGES.push({k:slug,l:label,i:icon,sec:sec,sub:sub,c:1});
+    _contentIndex=null;
+    buildSidebar();
+    closeModal('cl-modal');
+    toast('Pagina "'+label+'" clonata! Deploy in corso…','success');
+    startDeployTimer();
+    _modified=false;
+    await openPage(slug);
+    setActive('page',slug);
+  }catch(e){setStatus('err','errore');toast('Errore clonazione: '+e.message,'error')}
+}
 function _arrayInsert(s,marker,close,entry){
   var start=s.indexOf(marker);
   if(start===-1)throw new Error('Marker non trovato: '+marker);
@@ -1201,17 +1360,22 @@ async function deletePage(){
   var isCustom=!!(meta&&meta.c);
   var label=_current.title||_current.k;
   var msg=isCustom
-    ?'Eliminare definitivamente la pagina "'+label+'"?\n\nVerranno rimossi contenuto, voce del menu e URL dedicato. Questa operazione non è reversibile.'
-    :'Eliminare la sezione "'+label+'"?\n\nAttenzione: è una sezione predefinita del sito. Verranno rimossi il contenuto locale, la voce dal menu (desktop e mobile), la card dalla home e l\'URL dedicato. Questa operazione non è reversibile.';
-  if(!(await uiConfirm(msg,{title:'Elimina pagina',ok:'ELIMINA'})))return;
+    ?'Cosa fare con "'+label+'"?\n\n• CESTINO: sposta nel cestino (ripristinabile per 30gg)\n• ELIMINA: cancella definitivamente (irreversibile)'
+    :'Cosa fare con "'+label+'"?\n\n• CESTINO: sposta nel cestino (ripristinabile per 30gg)\n• ELIMINA: cancella definitivamente (irreversibile)\n\nAttenzione: è una sezione predefinita del sito.';
+  var choice=await uiConfirmChoice(msg,{title:'Elimina pagina',choices:[
+    {label:'🗑️ Cestino',value:'trash',className:'btn btn-soft'},
+    {label:'❌ Elimina definitivamente',value:'delete',className:'btn btn-d'},
+    {label:'Annulla',value:'cancel',className:'btn btn-soft'}
+  ]});
+  if(!choice||choice==='cancel')return;
+  if(choice==='trash')return trashPage();
+  // Permanent delete
   var btn=document.getElementById('del-btn');
   if(btn)btn.disabled=true;
   setStatus('saving','eliminazione...');
   var slug=_current.k;
   try{
     var id=await _getPageId(slug);
-    /* Commit atomico: file pagina + registry in un solo commit,
-       così il repo non passa mai da uno stato invalido (workflow validate). */
     var d=await ghGet('content/pages/registry.json');
     var reg=JSON.parse(b64decode(d.content));
     reg.pages=(reg.pages||[]).filter(function(p){return p.k!==slug});
@@ -1227,8 +1391,8 @@ async function deletePage(){
         if(Array.isArray(db.ids))db.ids=db.ids.filter(function(x){return x!==id});
       });
     }
-    var files=[{ path:'content/pages/registry.json', content:b64encode(JSON.stringify(reg,null,2)+'\n') }];
-    files.push({ path:'content/pages/'+slug+'.json', content:null });
+    var files=[{path:'content/pages/registry.json',content:b64encode(JSON.stringify(reg,null,2)+'\n')}];
+    files.push({path:'content/pages/'+slug+'.json',content:null});
     await ghCommitMulti(files,'admin: delete page '+slug);
     if(id&&id.indexOf('pag-')!==0)await removeFromIndex(slug,id);
     for(var i=0;i<PAGES.length;i++){if(PAGES[i].k===slug){PAGES.splice(i,1);break}}
@@ -1238,7 +1402,7 @@ async function deletePage(){
     buildSidebar();
     document.getElementById('main').innerHTML='<div class="empty"><span class="ei">🗑</span>'+esc(label)+' eliminata</div>';
     setTitle('');
-    toast('Sezione "'+label+'" eliminata! Deploy in corso (~30s)...','success');
+    toast('Pagina "'+label+'" eliminata definitivamente!','success');
     setStatus('ok','deploying...');
     startDeployTimer();
   }catch(e){
@@ -1246,6 +1410,59 @@ async function deletePage(){
     toast('Errore eliminazione: '+e.message,'error');
     if(btn)btn.disabled=false;
   }
+}
+async function trashPage(){
+  if(!_current||_current.type!=='page')return;
+  var slug=_current.k;
+  var label=_current.title||_current.k;
+  setStatus('saving','spostamento nel cestino…');
+  try{
+    /* Save page data before deleting from GitHub */
+    var pageData=null;
+    try{
+      var d=await ghGet(CONTENT+'/pages/'+slug+'.json');
+      pageData=b64decode(d.content);
+    }catch(e){}
+    var registryData=null;
+    try{
+      var rd=await ghGet('content/pages/registry.json');
+      registryData=b64decode(rd.content);
+    }catch(e){}
+    /* Save to KV trash */
+    var r=await _authPost('/api/admin?action=trash_page',{pageKey:slug,pageData:pageData,registryData:registryData});
+    var j=await r.json();
+    if(j.error)throw new Error(j.error);
+    /* Now delete from GitHub */
+    var id=await _getPageId(slug);
+    var d2=await ghGet('content/pages/registry.json');
+    var reg=JSON.parse(b64decode(d2.content));
+    reg.pages=(reg.pages||[]).filter(function(p){return p.k!==slug});
+    if(id){
+      (reg.sections||[]).forEach(function(s){
+        if(Array.isArray(s.pages))s.pages=s.pages.filter(function(x){return x!==id});
+      });
+      if(Array.isArray(reg.lavori))reg.lavori=reg.lavori.filter(function(w){return w.id!==id});
+      if(Array.isArray(reg.legacySlugs))reg.legacySlugs=reg.legacySlugs.filter(function(x){return x.id!==id});
+      if(Array.isArray(reg.layoutDatabases))reg.layoutDatabases=reg.layoutDatabases.filter(function(x){return x.id!==id});
+      if(Array.isArray(reg.pathOverrides))reg.pathOverrides=reg.pathOverrides.filter(function(x){return x.id!==id});
+      (reg.indexDatabases||[]).forEach(function(db){
+        if(Array.isArray(db.ids))db.ids=db.ids.filter(function(x){return x!==id});
+      });
+    }
+    var files=[{path:'content/pages/registry.json',content:b64encode(JSON.stringify(reg,null,2)+'\n')}];
+    files.push({path:'content/pages/'+slug+'.json',content:null});
+    await ghCommitMulti(files,'admin: trash page '+slug);
+    if(id&&id.indexOf('pag-')!==0)await removeFromIndex(slug,id);
+    for(var i=0;i<PAGES.length;i++){if(PAGES[i].k===slug){PAGES.splice(i,1);break}}
+    _modified=false;
+    _contentIndex=null;
+    _current=null;
+    buildSidebar();
+    document.getElementById('main').innerHTML='<div class="empty"><span class="ei">🗑️</span>'+esc(label)+' spostata nel cestino <button class="btn btn-soft btn-sm" onclick="openTrash()" style="margin-left:8px">Apri cestino</button></div>';
+    setTitle('');
+    toast('"'+label+'" spostata nel cestino (ripristinabile per 30gg)','success');
+    startDeployTimer();
+  }catch(e){setStatus('err','errore');toast('Errore: '+e.message,'error')}
 }
 
 /* ── RINOMINA SEZIONE / PAGINA ── */
@@ -1438,6 +1655,82 @@ async function restoreVersion(sha){
   }catch(e){toast('Errore ripristino: '+e.message,'error')}
 }
 
+/* ── KV VERSION BACKUP ── */
+async function saveKVVersion(){
+  if(!_current||_current.type!=='page')return;
+  var md=document.getElementById('e-md');
+  var content=md?md.value:'';
+  if(!content){toast('Nessun contenuto da salvare','error');return}
+  setStatus('saving','salvataggio versione…');
+  try{
+    var r=await _authPost('/api/admin?action=save_version',{pageKey:_current.k,content:content});
+    var j=await r.json();
+    if(j.error)throw new Error(j.error);
+    toast('Versione salvata! ('+j.count+' versioni totali)','success');
+    await _logAudit('save_kv_version',_current.k,{count:j.count});
+    setBadge('ok','versione salvata');
+  }catch(e){setStatus('err','errore');toast('Errore: '+e.message,'error')}
+  setStatus('idle','pronto');
+}
+async function openKVVersions(){
+  if(!_current||_current.type!=='page')return;
+  if(document.getElementById('kvver-modal'))return;
+  setStatus('saving','caricamento versioni backup…');
+  try{
+    var r=await fetch('/api/admin?action=get_versions&pageKey='+encodeURIComponent(_current.k),{credentials:'include'});
+    var j=await r.json();
+    if(j.error)throw new Error(j.error);
+    var versions=j.versions||[];
+    if(!versions.length){
+      modalHtml('kvver-modal','💾 Backup versioni — '+esc(_current.title||_current.k),
+        '<div class="list-empty" style="padding:24px"><span class="ei">📦</span><div>Nessuna versione salvata per questa pagina.</div><div style="margin-top:8px;font-size:12px">Salva una versione dalla barra degli strumenti dell\'editor.</div></div>',
+        '<button class="btn btn-soft" onclick="closeModal(\'kvver-modal\')">Chiudi</button>');
+      setStatus('idle','pronto');
+      return;
+    }
+    var rows=versions.map(function(v,i){
+      var date=new Date(v.timestamp).toLocaleString('it-IT');
+      var preview=esc((v.preview||'').replace(/[#*_`]/g,'').substring(0,120));
+      return '<div class="row" style="cursor:default;background:var(--panel);border:1px solid var(--line)">'
+        +'<div class="rmain"><div class="rt">'+esc(v.user||'admin')+' — '+esc(date)+'</div>'
+        +'<div class="rs" style="font-family:var(--mono);font-size:11px;opacity:.7">'+preview+'…</div></div>'
+        +'<div class="ract">'
+        +'<button class="btn btn-soft btn-sm" onclick="previewKVVersion('+i+')">ANTEPRIMA</button>'
+        +'<button class="btn btn-p btn-sm" onclick="restoreKVVersion('+i+')">RIPRISTINA</button>'
+        +'</div></div>';
+    }).join('');
+    modalHtml('kvver-modal','💾 Backup versioni — '+esc(_current.title||_current.k),
+      '<div class="list-body">'+rows+'</div>',
+      '<button class="btn btn-soft" onclick="closeModal(\'kvver-modal\')">Chiudi</button>');
+    setStatus('idle','pronto');
+  }catch(e){setStatus('err','errore');toast(e.message,'error')}
+}
+async function previewKVVersion(index){
+  try{
+    var r=await fetch('/api/admin?action=get_versions&pageKey='+encodeURIComponent(_current.k),{credentials:'include'});
+    var j=await r.json();
+    var v=(j.versions||[])[index];
+    if(!v||!v.preview){toast('Versione non trovata','error');return}
+    modalHtml('kvver-preview','Anteprima versione',
+      '<div style="font-family:var(--mono);font-size:12px;white-space:pre-wrap;max-height:60vh;overflow-y:auto;padding:16px">'+esc(v.preview)+'</div>',
+      '<button class="btn btn-soft" onclick="closeModal(\'kvver-preview\')">Chiudi</button>','md-wide');
+  }catch(e){toast('Errore: '+e.message,'error')}
+}
+async function restoreKVVersion(index){
+  var ok=await uiConfirm('Ripristinare questa versione dalla backup?\n\nLa versione corrente verrà salvata come backup automatico prima del ripristino. Il contenuto verrà caricato nell\'editor — ricordati di premere SALVA.',{ok:'RIPRISTINA'});
+  if(!ok)return;
+  setStatus('saving','ripristino…');
+  try{
+    var r=await _authPost('/api/admin?action=restore_version',{pageKey:_current.k,versionIndex:index});
+    var j=await r.json();
+    if(j.error)throw new Error(j.error);
+    toast('Versione ripristinata! Ricaricamento…','success');
+    await _logAudit('restore_kv_version',_current.k,{versionIndex:index});
+    openPage(_current.k);
+    startDeployTimer();
+  }catch(e){setStatus('err','errore');toast('Errore: '+e.message,'error')}
+}
+
 /* ── LINK CHECKER INTERNO ── */
 var _pathMapCached=null;
 async function _getPathMap(){
@@ -1535,6 +1828,7 @@ async function openImages(){
     h+='</select>';
     h+='<button class="btn btn-soft btn-sm" onclick="_imgViewMode=_imgViewMode===\'grid\'?\'list\':\'grid\';openImages()">'+(_imgViewMode==='grid'?'☰ Lista':'▦ Griglia')+'</button>';
     h+='<button class="btn btn-soft btn-sm" onclick="_imgAnalyzeUsage(this)" title="Scansiona pagine, mappa e home">🧭 Analizza utilizzi</button>';
+    h+='<button class="btn btn-soft btn-sm" onclick="openAltTextAudit()" title="Audit testo alternativo immagini">♿ Alt-text</button>';
     h+='</div>';
     if(_imgUsage){
       var unused=items.filter(function(it){ return !_imgUsage[it.name]; }).length;
@@ -1603,6 +1897,54 @@ async function _imgAnalyzeUsage(btn){
     toast('Errore analisi: '+e.message,'error');
     if(btn){btn.disabled=false;btn.textContent='🧭 Analizza utilizzi';}
   }
+}
+async function openAltTextAudit(){
+  setStatus('saving','analisi alt-text…');
+  try{
+    var idx=await _loadContentIndex();
+    var results=[];
+    (idx||[]).forEach(function(pg){
+      var content=pg.content||'';
+      var lines=content.split('\n');
+      lines.forEach(function(line,num){
+        /* Find images with empty alt: ![](...) */
+        var emptyAlt=line.match(/!\[\]\(([^)]+)\)/g);
+        if(emptyAlt){
+          emptyAlt.forEach(function(m){
+            var src=m.match(/!\[\]\(([^)]+)\)/);
+            if(src)results.push({page:pg.k||pg.slug,line:num+1,src:src[1],alt:'',type:'empty'});
+          });
+        }
+        /* Find images with alt: ![alt](...) */
+        var withAlt=line.match(/!\[([^\]]+)\]\(([^)]+)\)/g);
+        if(withAlt){
+          withAlt.forEach(function(m){
+            var parts=m.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+            if(parts&&parts[1]&&parts[1].length<5)results.push({page:pg.k||pg.slug,line:num+1,src:parts[2],alt:parts[1],type:'short'});
+          });
+        }
+      });
+    });
+    if(!results.length){
+      toast('Nessun problema di alt-text trovato!','success');
+      setStatus('idle','pronto');
+      return;
+    }
+    var h='<div style="padding:8px 0 12px;font-size:13px"><b>'+results.length+'</b> immagini con alt-text potenzialmente problematico</div>';
+    h+='<div style="font-size:12px;color:var(--dim);margin-bottom:12px">🟢 Alt-text presente e valido · 🟡 Alt-text vuoto (aggiungi descrizione) · 🔴 Alt-text troppo corto</div>';
+    results.slice(0,50).forEach(function(r){
+      var cls=r.type==='empty'?'border-color:rgba(200,150,60,.3)':'border-color:rgba(200,200,60,.2)';
+      var icon=r.type==='empty'?'🟡':'🔴';
+      h+='<div class="cover-row" style="cursor:default;'+cls+'">'
+        +'<div class="si" style="font-size:18px">'+icon+'</div>'
+        +'<div class="cmain"><div class="ct" style="font-size:13px">'+esc(r.page)+'</div>'
+        +'<div class="cs" style="font-family:var(--mono);font-size:11px">'+esc(r.src)+'</div>'
+        +'<div class="cs">riga '+r.line+(r.alt?' · alt: "'+esc(r.alt)+'"':' · alt vuoto')+'</div></div></div>';
+    });
+    if(results.length>50)h+='<div style="padding:8px;font-size:12px;color:var(--dim)">… e altre '+(results.length-50)+' occorrenze</div>';
+    modalHtml('alt-audit','♿ Audit Alt-Text',h,'<button class="btn btn-soft" onclick="closeModal(\'alt-audit\')">Chiudi</button>','md-wide');
+    setStatus('idle','pronto');
+  }catch(e){setStatus('err','errore');toast('Errore: '+e.message,'error')}
 }
 async function renameImage(el){
   var oldName=el.getAttribute('data-original');
@@ -2205,5 +2547,10 @@ ArcAdmin.register('editors', {
   bulkExportSelected: bulkExportSelected,
   openImportModal: openImportModal,
   exportAllPages: exportAllPages,
-  renameImage: renameImage
+  renameImage: renameImage,
+  clonePageModal: clonePageModal,
+  insertSnippet: insertSnippet,
+  openKVVersions: openKVVersions,
+  saveKVVersion: saveKVVersion,
+  openAltTextAudit: openAltTextAudit
 });

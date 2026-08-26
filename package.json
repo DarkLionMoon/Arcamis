@@ -1,0 +1,29 @@
+{
+  "name": "arcamis-wiki",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Wiki ufficiale del server D&D Arcamis",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint scripts/js/ admin/js/",
+    "lint:fix": "eslint scripts/js/ admin/js/ --fix",
+    "format": "prettier --write 'scripts/js/**/*.js' 'admin/js/**/*.js' 'scripts/css/**/*.css' 'admin/styles/**/*.css'",
+    "format:check": "prettier --check 'scripts/js/**/*.js' 'admin/js/**/*.js' 'scripts/css/**/*.css' 'admin/styles/**/*.css'",
+    "typecheck": "echo 'No TypeScript configured yet'",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0",
+    "eslint": "^9.0.0",
+    "@eslint/js": "^9.0.0",
+    "prettier": "^3.4.0",
+    "vitest": "^2.0.0"
+  }
+}

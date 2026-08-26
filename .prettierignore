@@ -1,0 +1,15 @@
+node_modules/
+dist/
+content/
+images/
+audio/
+*.md
+*.json
+*.xml
+*.html
+*.py
+*.png
+*.jpg
+*.webp
+*.mp3
+*.zip

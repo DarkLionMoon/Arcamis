@@ -40,6 +40,27 @@ body::before{
 ::-webkit-scrollbar-thumb:hover{background:var(--gold)}
 
 /* ════════════════════════════════════
+   ACCESSIBILITÀ — Skip link + Focus
+════════════════════════════════════ */
+.skip-link{
+  position:absolute;top:-100%;left:50%;transform:translateX(-50%);
+  background:var(--gold2);color:#14100a;padding:10px 24px;
+  font-family:'Cinzel',serif;font-size:13px;font-weight:700;
+  border-radius:0 0 8px 8px;z-index:9999;
+  text-decoration:none;transition:top .2s ease;
+}
+.skip-link:focus{top:0}
+*:focus-visible{
+  outline:2px solid var(--gold2);outline-offset:2px;
+}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid var(--gold2);outline-offset:2px;
+}
+@media(prefers-reduced-motion:reduce){
+  .skip-link{transition:none}
+}
+
+/* ════════════════════════════════════
    SCROLL REVEAL — fade-in + rise
 ════════════════════════════════════ */
 .fade-in{

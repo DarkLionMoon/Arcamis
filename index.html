@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" dir="ltr">
 <head>
 <link rel="icon" type="image/png" href="/Artboard_1.png">
 <link rel="apple-touch-icon" href="/Artboard_1.png">
@@ -7,13 +7,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Arcamis</title>
 <meta name="cf-pages-sha" content="$CF_PAGES_COMMIT_SHA">
-<meta name="description" content="Wiki ufficiale del server D&D Arcamis — regole, lore, personaggi e mestieri.">
-<meta property="og:title" content="Arcamis Wiki">
-<meta property="og:description" content="Wiki ufficiale del server D&D Arcamis — regole, lore, personaggi e mestieri.">
+<meta name="description" content="Wiki ufficiale del server D&D Arcamis — regole, lore, personaggi e mestieri del mondo di Gandora.">
+<meta name="author" content="DarkLionMoon">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#080a0e">
+<!-- Open Graph -->
+<meta property="og:title" content="Arcamis Wiki — Il Mondo di Gandora">
+<meta property="og:description" content="Wiki ufficiale del server D&D Arcamis. Scopri la lore, le regole e i segreti del mondo di Gandora.">
 <meta property="og:image" content="https://arcamis.pages.dev/Artboard_1.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://arcamis.pages.dev">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Arcamis Wiki","url":"https://arcamis.pages.dev","description":"Wiki ufficiale del server D&D Arcamis"}</script>
+<meta property="og:site_name" content="Arcamis Wiki">
+<meta property="og:locale" content="it_IT">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Arcamis Wiki — Il Mondo di Gandora">
+<meta name="twitter:description" content="Wiki ufficiale del server D&D Arcamis.">
+<meta name="twitter:image" content="https://arcamis.pages.dev/Artboard_1.png">
+<link rel="canonical" href="https://arcamis.pages.dev">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Arcamis Wiki","url":"https://arcamis.pages.dev","description":"Wiki ufficiale del server D&D Arcamis","inLanguage":"it","publisher":{"@type":"Organization","name":"Arcamis"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/></noscript>
@@ -28,6 +40,9 @@
 <link rel="stylesheet" href="/scripts/css/style-compendio.css">
 </head>
 <body>
+<!-- ═══ SKIP LINK (accessibilità) ═══ -->
+<a href="#main" class="skip-link" id="skip-link">Vai al contenuto principale</a>
+
 <!-- ═══ LOADER ═══ -->
 <div id="site-loader">
   <img src="/Artboard_1.png" alt="Arcamis" style="width:280px;height:280px;object-fit:contain;opacity:.85">
@@ -105,7 +120,7 @@
 </div>
 
 <!-- ═══ MOBILE NAV DRAWER ═══ -->
-<div id="mobile-nav">
+<div id="mobile-nav" role="dialog" aria-label="Menu di navigazione mobile" aria-hidden="true">
   <div class="mn-search">
     <span class="mn-search-icon">⌕</span>
     <input id="m-ts" type="text" placeholder="Cerca nella wiki…" autocomplete="off" aria-label="Cerca nella wiki" oninput="msearch(this.value)"/>
@@ -129,7 +144,7 @@
 </div>
 
 <!-- ═══ MAIN ═══ -->
-<div id="main">
+<div id="main" role="main" aria-label="Contenuto principale">
 
   <!-- HOME VIEW -->
   <div id="hv" class="vp" style="display:block">
@@ -492,16 +507,7 @@
   </div>
 </div>
 <!-- ═══ PURGE VECCHIO SERVICE WORKER ═══ -->
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(function(regs){
-    regs.forEach(function(r){ r.unregister(); });
-  });
-  caches.keys().then(function(ks){
-    ks.forEach(function(k){ caches.delete(k); });
-  });
-}
-</script>
+<script src="/scripts/js/sw-purge.js"></script>
 <!-- ═══ SCRIPT ═══ -->
 <script src="/scripts/js/data.js" defer></script>
 <script src="/scripts/js/md-render.js" defer></script>

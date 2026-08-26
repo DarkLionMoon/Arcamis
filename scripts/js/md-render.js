@@ -57,7 +57,7 @@ function inline(t){
     if(!safeImg(u))return '';
     var a=attr(dec(alt||cap||''));
     var js=u.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-    var img='<img src="'+attr(u)+'" alt="'+a+'" loading="lazy" class="n-image n-zoomable"'+(window.arcZoom?' onclick="arcZoom(\''+js+'\')"':'')+'>';
+    var img='<img src="'+attr(u)+'" alt="'+a+'" loading="lazy" decoding="async" class="n-image n-zoomable"'+(window.arcZoom?' onclick="arcZoom(\''+js+'\')"':'')+'>';
     if(cap||alt)return '<figure class="n-image">'+img+'<figcaption>'+inline(dec(cap||alt))+'</figcaption></figure>';
     return '<figure class="n-image">'+img+'</figure>';
   });
