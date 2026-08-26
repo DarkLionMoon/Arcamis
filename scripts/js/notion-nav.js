@@ -362,16 +362,24 @@ async function _gpRender(id,label,icon){
   var phCrumb=document.getElementById('ph-crumb');
 
   /* ═══ LOCAL JSON CHECK ═══ */
-  /* Pagine locali a collezione: divinità del Pantheon (pantheon-<slug>)
-     e Lavori (lavori-<slug>) — stesso meccanismo, sorgenti diverse. */
-  var _collMatch = id.match(/^(pantheon|lavori)-(.+)$/);
-  if(_collMatch){
-    var _collKey = _collMatch[1], _slug = _collMatch[2];
+  /* Pagine locali a collezione: sotto-pagine <chiave>-<slug> (es. pantheon-anivia,
+     lavori-xxx). Valido per Pantheon, Lavori e per qualsiasi pagina con layout
+     griglia stile-Pantheon (es. 'collezione'): si risale alla pagina padre dal
+     prefisso dell'id (match più lungo tra le chiavi del registro). */
+  var _collKey = '', _slug = '', _collBest = 0;
+  if(typeof pages !== 'undefined' && pages && pages.length){
+    for(var _ci = 0; _ci < pages.length; _ci++){
+      var _ck = pages[_ci].k;
+      if(!_ck || id.length <= _ck.length + 1 || id.indexOf(_ck + '-') !== 0) continue;
+      if(_ck.length > _collBest){ _collKey = _ck; _slug = id.slice(_ck.length + 1); _collBest = _ck.length; }
+    }
+  }
+  if(_collKey){
     try{
       var _pd = await _loadPantheonData(_collKey);
       var _deity = _pd.deities.find(function(x){ return x.slug === _slug; });
       if(_deity){
-        var _dic = _panIcon(_deity);
+        var _dic = _panIcon(_deity, _collKey);
         var _collLabel = _collKey === 'lavori' ? 'Lavori ad Arcamis' : 'Archivi di Arcamis';
         phTitle.textContent = _deity.n;
         phIcon.textContent = _dic;
@@ -390,7 +398,7 @@ async function _gpRender(id,label,icon){
         _pbody.style.width = '';
         var _deityFooter = '<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>'
           + '<div class="n-page-footer-text">' + _collLabel + ' — ' + _siteEsc(_deity.n) + '</div></div>';
-        _pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + _scrubHtmlString(_renderDeityPage(_deity)) + _deityFooter + '</div>';
+        _pbody.innerHTML = '<div class="nc" style="animation:fi .22s ease forwards">' + _scrubHtmlString(_renderDeityPage(_deity, _collKey)) + _deityFooter + '</div>';
         applyGlossary(_pbody);
         _maybeBuildToc(_pbody, false);
         if(typeof afterPageRender === 'function') afterPageRender();
@@ -428,6 +436,7 @@ async function _gpRender(id,label,icon){
           else if(_layout === 'personaggio') _localHtml = _renderPersonaggio(_localJson.content);
           else if(_layout === 'lore' || _layout === 'luoghi') _localHtml = _renderLore(_localJson.content, _localJson.title, _localJson.icon);
           else if(_layout === 'pantheon') _localHtml = _renderPantheon(_localJson.content, (_localPage && _localPage.k) || 'pantheon');
+          else if(_layout === 'collezione') _localHtml = _renderPantheon(_localJson.content, (_localPage && _localPage.k) || 'pantheon');
           else if(_layout === 'bestiario') _localHtml = _renderBestiario(_localJson.content);
           else if(_layout === 'timeline' || _layout === 'cronache') _localHtml = _renderTimeline(_localJson.content);
           else if(_layout === 'fazioni') _localHtml = _renderFazioni(_localJson.content);
@@ -1091,7 +1100,7 @@ var _PAN_ICONS = {
   kindred:'🐺', ornn:'🔨', volibear:'⚡', nagakabouros:'🐙',
   diana:'🌙', kayle:'⚔️', leona:'☀️', pantheon:'🛡️', taric:'💎', zoe:'✨'
 };
-function _panIcon(d){ return _PAN_ICONS[d.slug] || '🛐'; }
+function _panIcon(d, coll){ return _PAN_ICONS[d.slug] || (coll && coll !== 'pantheon' && coll !== 'lavori' ? '🗂️' : '🛐'); }
 function _jsStr(s){ return (s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 function _parsePantheon(md){
   if(!md) return { intro:'', deities:[] };
@@ -1113,7 +1122,7 @@ function _parsePantheon(md){
     var posm = img.match(/#(\d{1,3})[.,](\d{1,3})$/);
     if(posm) pos = [parseInt(posm[1],10), parseInt(posm[2],10)];
     var epi = '';
-    var epiRe = rest.join('\n').match(/-\s*\*\*Epiteto:?\*\*\s*:?\s*(.+)/);
+    var epiRe = rest.join('\n').match(/-\s*\*\*(?:Epiteto|Sottotitolo):?\*\*\s*:?\s*(.+)/);
     if(epiRe) epi = epiRe[1].trim();
     deities.push({
       slug: _slugify(name),
@@ -1139,8 +1148,8 @@ function _loadPantheonData(key){
       return _panCollCache[key];
     });
 }
-function _renderDeityPage(d){
-  var ic = _panIcon(d);
+function _renderDeityPage(d, coll){
+  var ic = _panIcon(d, coll);
   var hero = '<div class="pan-deity-hero">'
     + (d.img
         ? '<img src="' + _siteAttr(d.img) + '" alt="' + _siteAttr(d.n) + '" loading="lazy"'
@@ -1163,7 +1172,7 @@ function _renderPantheon(md, pageKey) {
   if(data.intro) html += '<div class="pan-intro">' + _mdToHtml(data.intro) + '</div>';
   html += '<div class="pan-grid">';
   data.deities.forEach(function(d){
-    var ic = _panIcon(d);
+    var ic = _panIcon(d, pageKey);
     if(!d.img){
       html += '<div class="pan-section"><div class="pan-section-title">' + _siteEsc(d.n) + '</div>'
         + '<div class="pan-section-body">' + _mdToHtml(d.md) + '</div></div>';

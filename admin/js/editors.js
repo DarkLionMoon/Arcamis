@@ -1,7 +1,7 @@
 /* ════════════════════════════════════════════════════════════════
    ARCAMIS ADMIN — editors.js
    Editor CMS con campi strutturati + WYSIWYG per i campi
-   testo lungo. 9 layout (pantheon invariato). (v3)
+   testo lungo. 10 layout (pantheon invariato). (v3)
    ════════════════════════════════════════════════════════════════ */
 
 /* ── TIPO CAMPI ── */
@@ -13,12 +13,18 @@ var FIELD_TYPES={
   image:{icon:'🖼',placeholder:'/images/…'}
 };
 
-/* ── LAYOUT REGISTRY (9 layout — pantheon invariato) ── */
+/* ── LAYOUT REGISTRY (10 layout — pantheon invariato) ── */
 var LAYOUT_REGISTRY={
 /* ═══ PANTEON — NON CAMBIA ═══ */
   pantheon:{v:'pantheon',l:'Pantheon — Griglia divinità',i:'🛐',
     template:'Divinità\n\nBreve introduzione al pantheon del tuo mondo.\n\n---\n\n# Nome della Divinità\n\n![](/images/nome-divinita.jpg)\n\n> Citazione - Nome\n\n## Identità\n\n- **Nome:** Vero nome\n- **Epiteto:** Titolo\n- **Allineamento:** Legale Buono\n- **Sfere:** Guerra, Onore\n- **Simbolo:** Descrizione\n\n## Personalità\n\nTratti caratteriali.\n\n## Culto\n\n- **Tempio:** Tipo\n- **Rituali:** Cerimonie\n- **Seguaci:** Chi lo adora',
     blockFields:['Nome','Razza','Classe / Livello','Allineamento'],requiredFields:['Nome'],
+    editorMode:'pantheon'},
+
+/* ═══ COLLEZIONE — griglia generica stile Pantheon ═══ */
+  collezione:{v:'collezione',l:'Collezione — Griglia generica',i:'🗂️',
+    template:'Titolo della collezione\n\nBreve introduzione: di cosa parla questa raccolta.\n\n---\n\n# Nome dell\'elemento\n\n![](/images/elemento.jpg)\n\n> Citazione o motto rappresentativo - Nome\n\n## Dettagli\n\n- **Sottotitolo:** Compare sotto il nome nella tile\n- **Categoria:** Tipo / categoria\n\n## Descrizione\n\nTesto libero in markdown.\n\n## Note\n\nPuoi aggiungere sezioni con qualsiasi titolo.',
+    blockFields:['Nome','Sottotitolo','Categoria'],requiredFields:['Nome'],
     editorMode:'pantheon'},
 
 /* ═══ PERSONAGGIO (unisce npc + personaggio) ═══ */

@@ -60,11 +60,15 @@ Ogni pagina `content/pages/<slug>.json` può dichiarare un `layout` che
 determina come viene renderizzata. Se manca, viene rilevato in automatico
 dalla chiave (es. `pantheon`, `regole`, …).
 
-La lista completa dei layout è in `admin/index.html` (`LAYOUTS` e
-`LAYOUT_TEMPLATES`): `generico`, `lore`, `regole`, `lavoro`,
-`personaggio`, `materiale`, `wide`, `pantheon`, `bestiario`, `timeline`,
-`fazioni`, `oggetti`, `glossario`, `galleria`, `tabelle` e i layout a card
-`sessione`, `quest`, `npc`, `spell`, `specie`, `citta`, `evento`.
+La lista completa dei layout è in `admin/js/editors.js` (`LAYOUT_REGISTRY`):
+`contenuto`, `luoghi`, `cronache`, `personaggio`, `materiale`, `wide`,
+`pantheon`, `collezione`, `bestiario`, `timeline`, `fazioni`, `oggetti`,
+`glossario`, `galleria`, `tabelle` e i layout a card `sessione`, `quest`,
+`npc`, `spell`, `specie`, `citta`, `evento`.
+
+Il layout `collezione` è la versione generica del Pantheon: stessa griglia
+di tile con immagini e schede dedicate (`<chiave-pagina>-<slug>`), ma con
+nomenclatura neutra, riutilizzabile per qualsiasi argomento.
 
 I layout a card sono renderizzati da `_renderSchede` in `notion-nav.js`
 (markdown → card con campi `- **Chiave:** valore`); gli altri da
@@ -72,7 +76,9 @@ renderer dedicati (`_renderPantheon`, `_renderBestiario`, …).
 
 L'editor a blocchi (`admin/js/structured.js`) copre **due modalità**:
 - `pantheon`: blocchi divinità/sezioni con immagine, citazione, identità,
-  personalità e culto (separati da `---` nel markdown);
+  personalità e culto (separati da `---` nel markdown). Il layout
+  `collezione` usa lo stesso editor con etichette generiche ("elementi",
+  sezione "Dettagli" al posto di "Identità", senza Personalità/Culto);
 - schede a card: `bestiario`, `fazioni`, `oggetti` e i layout a card
   `sessione`, `quest`, `npc`, `spell`, `specie`, `citta`, `evento` — ogni
   blocco produce `## Titolo` + campi `- **Chiave:** valore` + sezioni `###`.

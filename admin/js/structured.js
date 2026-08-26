@@ -94,12 +94,29 @@ function _stSetKind(layout){
   _stKind=_stEditorKind(layout);
 }
 
+/* Griglia generica: layout ≠ 'pantheon' con editorMode 'pantheon'
+   usano nomenclatura neutra (elementi) invece delle divinità. */
+function _stPanGeneric(){
+  return _stKind==='pantheon'&&_current&&_current.layout&&_current.layout!=='pantheon';
+}
+function _stPanWord(){return _stPanGeneric()?'elemento':'divinità'}
+function _stPanWordCap(){var w=_stPanWord();return w.charAt(0).toUpperCase()+w.slice(1)}
+function _stPanHeadDefault(){return _stPanGeneric()?'Collezione':'Divinità'}
+function _stPanKvTitle(){return _stPanGeneric()?'Dettagli':'Identità'}
+function _stPanEmptyIcon(){return _stPanGeneric()?'🗂️':'🛐'}
+function _stPanNewRows(){
+  return _stPanGeneric()
+    ?[['Sottotitolo',''],['Categoria','']]
+    :[['Nome',''],['Epiteto',''],['Allineamento',''],['Sfere',''],['Simbolo','']];
+}
+
 /* Etichetta dell'entità in base al layout corrente */
 function _stEntName(){
   if(_stKind==='schede'){
     var reg=LAYOUT_REGISTRY[_current.layout];
     return 'Nuova '+(reg?reg.l.split('—')[0].trim().toLowerCase():'scheda');
   }
+  if(_stKind==='pantheon')return 'Nuova '+_stPanWord();
   return 'Nuova scheda';
 }
 function _stEntLabel(){
@@ -107,6 +124,7 @@ function _stEntLabel(){
     var reg=LAYOUT_REGISTRY[_current.layout];
     return reg?reg.l.split('—')[0].trim().toLowerCase():'scheda';
   }
+  if(_stKind==='pantheon')return _stPanWord();
   return 'scheda';
 }
 
@@ -125,11 +143,11 @@ function _stParse(md){
   return _stParsePantheon(md);
 }
 function _stParsePantheon(md){
-  if(!md)return {heading:'Divinità',intro:'',cards:[]};
+  if(!md)return {heading:_stPanHeadDefault(),intro:'',cards:[]};
   md=md.replace(/^\s*---\s*\n/,'');
   var blocks=md.split(/\n---\n/);
   var first=blocks.shift()||'';
-  var heading='Divinità';
+  var heading=_stPanHeadDefault();
   var hm=first.match(/^#\s+(.+)/);
   if(hm)heading=hm[1].trim();
   var intro=first.replace(/^#\s+.+\n?/,'').trim();
@@ -157,9 +175,9 @@ function _stParsePantheon(md){
     function flush(){
       var t=buf.join('\n').trim();
       var f=_stFold(sec);
-      if(f==='identita'){ident=_stParseIdent(t);}
-      else if(f==='personalita'){personality=t;}
-      else if(f==='culto'){cult=t;}
+      if(f==='identita'||f==='dettagli'){ident=_stParseIdent(t);}
+      else if(!_stPanGeneric()&&f==='personalita'){personality=t;}
+      else if(!_stPanGeneric()&&f==='culto'){cult=t;}
       else if(t)extra.push((sec?('## '+sec+'\n\n'):'')+t);
       buf=[];sec=null;
     }
@@ -325,7 +343,7 @@ function _stBuildSchede(data){
 function _stBuildMd(data){
   if(_stKind==='schede')return _stBuildSchede(data);
   if(_stKind==='page')return _stBuildPage(data);
-  var out='# '+(data.heading||'Divinità')+'\n\n'+(data.intro||'');
+  var out='# '+(data.heading||_stPanHeadDefault())+'\n\n'+(data.intro||'');
   data.cards.forEach(function(c){
     out+='\n\n---\n\n'+_stBuildCard(c);
   });
@@ -358,17 +376,17 @@ function _stBuildCard(c){
   if(c.img)b+='\n\n!['+(c.name||'')+']('+c.img+_stImgPosAttr(c.pos)+')';
   if(c.quote)b+='\n\n> '+c.quote;
   if(c.ident&&c.ident.length){
-    b+='\n\n## Identità\n\n'+c.ident.map(function(p){return '- **'+p[0]+':** '+p[1]}).join('\n');
+    b+='\n\n## '+_stPanKvTitle()+'\n\n'+c.ident.map(function(p){return '- **'+p[0]+':** '+p[1]}).join('\n');
   }
-  if(c.personality)b+='\n\n## Personalità\n\n'+c.personality;
-  if(c.cult)b+='\n\n## Culto\n\n'+c.cult;
+  if(!_stPanGeneric()&&c.personality)b+='\n\n## Personalità\n\n'+c.personality;
+  if(!_stPanGeneric()&&c.cult)b+='\n\n## Culto\n\n'+c.cult;
   if(c.extra)b+='\n\n'+c.extra;
   return b;
 }
 
 /* ── ANTEPRIMA griglia (stessa resa del sito) ── */
 function _stEpi(c){
-  for(var i=0;i<(c.ident||[]).length;i++)if(/^epiteto$/i.test(c.ident[i][0]))return c.ident[i][1];
+  for(var i=0;i<(c.ident||[]).length;i++)if(/^(epiteto|sottotitolo)$/i.test(c.ident[i][0]))return c.ident[i][1];
   return '';
 }
 function _stMd(md){
@@ -474,7 +492,7 @@ function _stCardHTML(c,i){
       +'<label class="st-ta-l">Contenuto della sezione (markdown)<textarea class="in st-ta st-extra" oninput="_stSync()" placeholder="Scrivi qui la sezione…">'+esc(c.extra)+'</textarea></label>'
       +'</div></div>';
   }
-  var rows=(c.ident&&c.ident.length?c.ident:[['Nome',''],['Epiteto',''],['Allineamento',''],['Sfere',''],['Simbolo','']])
+  var rows=(c.ident&&c.ident.length?c.ident:_stPanNewRows())
     .map(function(p){return '<div class="st-kv"><input class="in k" value="'+escAttr(p[0])+'" placeholder="Campo" oninput="_stSync()">'
       +'<input class="in v" value="'+escAttr(p[1])+'" placeholder="Valore" oninput="_stSync()">'
       +'<button type="button" class="btn btn-d btn-icon btn-sm" title="Rimuovi campo" onclick="_stDelRow(this)">✕</button></div>';}).join('');
@@ -484,7 +502,7 @@ function _stCardHTML(c,i){
     +'ondrop="_stDrop(event,'+i+')">'
     +'<div class="st-card-head"><span class="st-drag-handle" title="Trascina per riordinare" ontouchstart="_stTouchDragStart(event,'+i+')">⠿</span>'
     +'<span class="st-idx">'+(i+1)+'</span>'
-    +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Nome della divinità / sezione" oninput="_stSync()">'
+    +'<input class="in st-name" value="'+escAttr(c.name)+'" placeholder="Nome della '+_stPanWord()+' / sezione" oninput="_stSync()">'
     +'<span class="st-head-actions">'
     +'<button type="button" class="btn btn-soft btn-icon btn-sm" title="Trasforma in sezione (rimuovi immagine)" onclick="_stConvertToSection('+i+')">➖</button>'
     +'<button type="button" class="btn btn-soft btn-icon btn-sm st-collapse" title="Comprimi/espandi" onclick="_stCollapse('+i+')">▾</button>'
@@ -501,7 +519,7 @@ function _stCardHTML(c,i){
         ?'<img class="st-img" id="st-img-'+i+'" src="'+escAttr(c.img)+'" alt="'+escAttr(c.name)+'"'
           +' onerror="this.onerror=null;this.style.display=\'none\';this.parentNode.classList.add(\'img-broken\')"'
           +(c.pos?' style="object-position:'+c.pos[0]+'% '+c.pos[1]+'%"':'')+'>'
-        :'<div class="st-img st-img-empty" id="st-img-'+i+'">🛐</div>')
+        :'<div class="st-img st-img-empty" id="st-img-'+i+'">'+_stPanEmptyIcon()+'</div>')
     +'<div class="st-pos-mark" id="st-posmark-'+i+'" style="left:'+(c.pos?c.pos[0]:50)+'%;top:'+(c.pos?c.pos[1]:50)+'%;display:'+(c.pos?'block':'none')+'"></div>'
     +'</div>'
     +'<input type="hidden" class="st-imgval" id="st-imgval-'+i+'" value="'+escAttr(c.img||'')+'">'
@@ -512,12 +530,13 @@ function _stCardHTML(c,i){
     +'<span class="st-pos-hint">Trascina sull\'immagine per il ritaglio</span>'
     +'</div>'
     +'<label class="st-ta-l">Citazione<input class="in st-quote" value="'+escAttr(c.quote)+'" placeholder="Frase rappresentativa…" oninput="_stSync()"></label>'
-    +'<p class="st-hint">Senza immagine il blocco diventa una sezione a tutta larghezza (es. gli Aspetti).</p>'
-    +'<div class="st-sub">Identità</div>'
+    +'<p class="st-hint">Senza immagine il blocco diventa una sezione a tutta larghezza'+(_stPanGeneric()?'.':' (es. gli Aspetti).')+'</p>'
+    +'<div class="st-sub">'+_stPanKvTitle()+'</div>'
     +'<div class="st-kvrows" id="st-ident-'+i+'">'+rows+'</div>'
-    +'<button type="button" class="btn btn-soft btn-sm" onclick="_stAddIdent('+i+')">＋ campo identità</button>'
-    +'<label class="st-ta-l">Personalità<textarea class="in st-ta st-personality" oninput="_stSync()">'+esc(c.personality)+'</textarea></label>'
-    +'<label class="st-ta-l">Culto<textarea class="in st-ta st-cult" oninput="_stSync()">'+esc(c.cult)+'</textarea></label>'
+    +'<button type="button" class="btn btn-soft btn-sm" onclick="_stAddIdent('+i+')">＋ campo '+_stPanKvTitle().toLowerCase()+'</button>'
+    +(_stPanGeneric()?''
+      :'<label class="st-ta-l">Personalità<textarea class="in st-ta st-personality" oninput="_stSync()">'+esc(c.personality)+'</textarea></label>'
+      +'<label class="st-ta-l">Culto<textarea class="in st-ta st-cult" oninput="_stSync()">'+esc(c.cult)+'</textarea></label>')
     +'<label class="st-ta-l">Contenuto aggiuntivo (markdown)<textarea class="in st-ta st-extra" oninput="_stSync()">'+esc(c.extra)+'</textarea></label>'
     +'</div></div>';
 }
@@ -632,7 +651,7 @@ function _stRead(){
     var isDeity=!!iv;
     var nv=c.querySelector('.st-name');
     var name=nv?nv.value.trim():'';
-    if(!name)name=img?'Divinità '+(idx+1):'Sezione '+(idx+1);
+    if(!name)name=img?(_stPanWordCap()+' '+(idx+1)):'Sezione '+(idx+1);
     var pos=null;
     var pv=c.querySelector('.st-posval');
     if(pv&&pv.value){var pp=pv.value.split(',');pos=[+pp[0],+pp[1]];}
@@ -777,7 +796,7 @@ function initStructuredEditor(content){
     }else{
       head.innerHTML='<div class="st-intro-box">'
         +'<label class="st-ta-l">Titolo introduzione<input class="in" id="st-heading" value="'+escAttr(data.heading)+'" style="max-width:220px" oninput="_stSync()"></label>'
-        +'<label class="st-ta-l">Testo introduttivo (prima della griglia)<textarea class="in st-ta" id="st-intro" oninput="_stSync()" placeholder="Introduzione al pantheon…">'+esc(data.intro)+'</textarea></label>'
+        +'<label class="st-ta-l">Testo introduttivo (prima della griglia)<textarea class="in st-ta" id="st-intro" oninput="_stSync()" placeholder="'+(_stPanGeneric()?'Introduzione alla collezione…':'Introduzione al pantheon…')+'">'+esc(data.intro)+'</textarea></label>'
         +'</div>';
     }
   }
@@ -796,7 +815,7 @@ function initStructuredEditor(content){
   _stPushUndo();
   document.addEventListener('keydown',_stKeyHandler);
   var ph=document.querySelector('#md-pane .pane-head');
-  var kindLabel=_stKind==='page'?'form CMS':(_stKind==='schede'?'schede a card':'griglia divinità');
+  var kindLabel=_stKind==='page'?'form CMS':(_stKind==='schede'?'schede a card':(_stPanGeneric()?'griglia collezione':'griglia divinità'));
   if(ph)ph.innerHTML='Editor <span class="ph-info" id="e-stats"></span>'
     +(_stKind!=='page'?'<input id="st-filter" class="in" placeholder="Filtra schede…" oninput="stFilter(this.value)" style="max-width:150px;margin-right:8px">'
       +'<button type="button" class="btn btn-soft btn-sm" title="Comprimi tutte le card" onclick="_stCollapseAll(true)">⤴ Comprimi</button>'
@@ -826,7 +845,7 @@ function initStructuredEditor(content){
       +'<button class="btn btn-soft btn-sm" onclick="_stToggle()" title="Passa al markdown grezzo">✍ Markdown</button>'
       +(_stKind==='schede'
         ?'<button class="btn btn-p btn-sm" onclick="_stAdd(\'card\')">➕ '+_stEntLabel()+'</button>'
-        :(_stKind==='page'?'':'<button class="btn btn-p btn-sm" onclick="_stAdd(\'deity\')">➕ Divinità</button>'
+        :(_stKind==='page'?'':'<button class="btn btn-p btn-sm" onclick="_stAdd(\'deity\')">➕ '+_stPanWordCap()+'</button>'
          +'<button class="btn btn-soft btn-sm" onclick="_stAdd(\'section\')">➕ Sezione</button>'))
       +'<span class="tb-spacer"></span>'
       +'<div class="undo-redo-group">'
@@ -1003,7 +1022,7 @@ function _stKeyAdd(){
     if(idx>=0&&data.cards[idx]&&!data.cards[idx].deity)type='section';
     data.cards.splice(idx>=0?idx+1:data.cards.length,0,{type:type,deity:type==='deity'||undefined,name:type==='section'?'Nuova sezione':_stEntName(),
       img:type==='deity'?'':'',quote:'',
-      ident:[['Nome',''],['Epiteto',''],['Allineamento',''],['Sfere',''],['Simbolo','']],
+      ident:_stPanNewRows(),
       personality:'',cult:'',extra:''});
   }
   _stRender(data);_stSync();
@@ -1055,7 +1074,7 @@ function _stValidate(data){
     var n=(c.name||'').trim()||'blocco '+(i+1);
     if(!(c.name||'').trim())warn.push('Il blocco '+(i+1)+' non ha un nome');
     else if(seen[(c.name||'').trim()]>1)warn.push('«'+c.name.trim()+'» è ripetuto '+seen[(c.name||'').trim()]+' volte');
-    if(_stKind!=='schede'&&c.type==='deity'&&!c.img)warn.push('«'+(c.name||'').trim()+'» è una divinità ma non ha immagine');
+    if(_stKind!=='schede'&&c.type==='deity'&&!c.img)warn.push('«'+(c.name||'').trim()+'» è un'+(_stPanGeneric()?' elemento ma non ha immagine':'a divinità ma non ha immagine'));
     if(_stKind==='schede'&&!_stCardHasContent(c))warn.push('La scheda «'+n+'» è vuota');
     if(_stKind==='schede'&&c.fields&&reqFields.length){
       reqFields.forEach(function(rf){
@@ -1162,7 +1181,7 @@ function _stAdd(type){
   }else{
     data.cards.push({type:type,deity:type==='deity'||undefined,name:type==='section'?'Nuova sezione':_stEntName(),
       img:type==='deity'?'':'',quote:'',
-      ident:[['Nome',''],['Epiteto',''],['Allineamento',''],['Sfere',''],['Simbolo','']],
+      ident:_stPanNewRows(),
       personality:'',cult:'',extra:''});
   }
   _stRender(data);_stSync();
@@ -1586,7 +1605,7 @@ function _stClearImg(i){
   var im=document.getElementById('st-img-'+i);
   if(im&&im.tagName==='IMG'){
     var d=document.createElement('div');
-    d.className='st-img st-img-empty';d.id='st-img-'+i;d.textContent='🛐';
+    d.className='st-img st-img-empty';d.id='st-img-'+i;d.textContent=_stPanEmptyIcon();
     im.parentNode.insertBefore(d,im);im.remove();
   }
   var wrap=document.getElementById('st-imgwrap-'+i);
