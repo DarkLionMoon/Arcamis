@@ -75,18 +75,6 @@
       "sub": ""
     },
     {
-      "k": "andando-avanti",
-      "l": "Andando avanti",
-      "i": "📈",
-      "id": "pag-andando-avanti",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "personaggio/andando-avanti",
-      "sec": "personaggio",
-      "sub": ""
-    },
-    {
       "k": "casate-e-compagnie",
       "l": "Casate e Compagnie",
       "i": "🏰",
