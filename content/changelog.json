@@ -110,16 +110,6 @@
     "_i": 10
   },
   {
-    "id": "3400274fdc1c80c1862fceacf27896ae",
-    "title": "Ingegno e Scampoli",
-    "versione": "0",
-    "sottoversione": "0.4",
-    "patch": "0.4.0",
-    "date": "2026-03-20",
-    "content": "",
-    "_i": 11
-  },
-  {
     "id": "3590274fdc1c8066956cde80b13a4d3e",
     "title": "Evento di primavera + Rework Sotto-classi",
     "versione": "0",
@@ -127,7 +117,7 @@
     "patch": "0.5.0",
     "date": "2026-05-06",
     "content": "",
-    "_i": 13
+    "_i": 12
   },
   {
     "id": "3780274fdc1c808ba719daba442e400d",
@@ -137,6 +127,6 @@
     "patch": "0.6.0",
     "date": null,
     "content": "",
-    "_i": 14
+    "_i": 13
   }
 ]
