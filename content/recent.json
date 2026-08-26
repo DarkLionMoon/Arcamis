@@ -1,6 +1,12 @@
 {
  "pages": [
   {
+   "id": "pag-specie-homebrew",
+   "title": "Specie Homebrew",
+   "icon": "📄",
+   "lastEdited": "2026-08-26T14:15:21.580Z"
+  },
+  {
    "id": "pag-come-si-inizia",
    "title": "Creazione",
    "icon": "🌟",
@@ -41,12 +47,6 @@
    "title": "Regole Homebrew per specie, classi ed oggetti già esistenti",
    "icon": "📄",
    "lastEdited": "2026-08-25T14:49:09.344400Z"
-  },
-  {
-   "id": "pag-specie-homebrew",
-   "title": "Specie Homebrew",
-   "icon": "📄",
-   "lastEdited": "2026-08-25T14:49:09.002940Z"
   }
  ]
 }
