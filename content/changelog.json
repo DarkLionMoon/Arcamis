@@ -30,16 +30,6 @@
     "_i": 2
   },
   {
-    "id": "3400274fdc1c80558a0ce909f37def4a",
-    "title": "Update Vari",
-    "versione": "0",
-    "sottoversione": "0.3",
-    "patch": "0.3.0.1",
-    "date": "2026-02-13",
-    "content": "Siamo arrivati già alla nuova Patch, la 0.3, chi se lo aspettava che avremmo avuto anche oggi tante succose novità per il bilanciamento! \n\n**Orari strutture***Abbiamo deciso di rendere coerente la vita nel server, ora anche gli npc avranno il meritato riposo*\n\nTutti i negozi e strutture di servizi non essenziali apriranno alle 06:00 e chiuderanno alle 20:00\n\n **Modifiche minori alle sottoclassi***Per allineare le vecchie sottoclassi del chierico alle nuove abbiamo deciso di togliere la competenza in armi o armature alle varie sottoclassi del chierico. Il monaco anima solare è notoriamente una delle sottoclassi più scarse del monaco, abbiamo deciso di dargli quella spinta in più. Lo stregone Piromante è spoglio di incantesimi tematici, abbiamo deciso di dargli una lista di sottoclasse, BURN 'EM ALL!*\n\n- **Chierico** tutte le sottoclassi non avranno più competenze in armature e/o armi.\n\n- **Monaco** - **Anima solare** Ora i suoi colpi della feature Radiant Sun Bolt sono considerati colpi senza armi\n\n- **Stregone** - **Piromante** Aggiunta lista delle spell di sottoclasse\n\n **Rework***Abbiamo notato che lo spirito di Ionia era meno appetibile rispetto ad altre razze. Inoltre la prima versione del chierico dominio dei geli non ha fatto impazzire la nostra community, abbiamo deciso di seguire la vostra voce e ne abbiamo fatto una nuova versione.*",
-    "_i": 3
-  },
-  {
     "id": "3400274fdc1c8067958bc1982919eaee",
     "title": "Update Vari",
     "versione": "0",
@@ -117,7 +107,7 @@
     "patch": "0.5.0",
     "date": "2026-05-06",
     "content": "",
-    "_i": 12
+    "_i": 11
   },
   {
     "id": "3780274fdc1c808ba719daba442e400d",
@@ -127,6 +117,6 @@
     "patch": "0.6.0",
     "date": null,
     "content": "",
-    "_i": 13
+    "_i": 12
   }
 ]
