@@ -98,15 +98,5 @@
     "date": "2026-03-18",
     "content": "Abbiamo cambiato il comando !meteo con il comando !bollettino (Piu aggiornato, piu randomico). Adesso da Temp. Massima / Minima\n\nAbbiamo cambiato il comando !viaggio con !itinerario (Ora sincronizzato col meteo di !bollettino). Adesso, in base al meteo nella zona di partenza e quella di arrivo, i tempi di viaggio potrebbero aumentare in caso di cattivo tempo. Vi invitiamo a controllare prima di muovervi in viaggio.",
     "_i": 9
-  },
-  {
-    "id": "3780274fdc1c808ba719daba442e400d",
-    "title": "Rework razze + nuove razze",
-    "versione": "0",
-    "sottoversione": "0.6",
-    "patch": "0.6.0",
-    "date": null,
-    "content": "",
-    "_i": 11
   }
 ]
