@@ -1,6 +1,12 @@
 {
  "pages": [
   {
+   "id": "pag-lavori",
+   "title": "Lavori",
+   "icon": "💼",
+   "lastEdited": "2026-08-26T09:36:39.715Z"
+  },
+  {
    "id": "pag-come-si-inizia",
    "title": "Come si inizia",
    "icon": "🌟",
@@ -41,12 +47,6 @@
    "title": "Specie Homebrew",
    "icon": "📄",
    "lastEdited": "2026-08-25T14:49:09.002940Z"
-  },
-  {
-   "id": "pag-mappa-arcamis",
-   "title": "Arcamis",
-   "icon": "📄",
-   "lastEdited": "2026-08-25T14:49:08.576856Z"
   }
  ]
 }
