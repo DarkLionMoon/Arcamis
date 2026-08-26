@@ -44,7 +44,6 @@ var _pathMap = {
   'lore/pantheon': 'pag-pantheon',
   'personaggio/lavori': 'pag-lavori',
   'personaggio/come-si-inizia': 'pag-come-si-inizia',
-  'personaggio/andando-avanti': 'pag-andando-avanti',
   'in-game/casate-e-compagnie': 'pag-casate-e-compagnie',
   'lore/storia-del-mondo': 'pag-storia-del-mondo',
   'lore/introduzione': 'pag-introduzione',
