@@ -37,7 +37,7 @@
     "patch": "0.3.0.2",
     "date": "2026-02-14",
     "content": "Per nostro errore abbiamo ignorato un problema finché non si è presentato alle nostre porte\n\n\n**Rework**\n\n*Per esigenze narrative abbiamo dovuto modificare la sottorazza Darkin dell'Asceso.*\n\n- **Asceso (Darkin)** - Modificate le condizioni per cui l'abilità Arma Sigillata avrebbe portato a commettere svariate Player Kill\n\n\n**Spoiler Patch Future**\n\n- Stiamo lavorando al sistema di crafting del server, nelle prossime patch avrete notizie!\n\n- Tante nuove chicche arriveranno nei prossimi aggiornamenti\n\nLe modifiche fatte le trovate online già da ora nel server e potete consultarle sulla Wiki che trovate in **⁠⛲benvenuti.**\n\nBuon game e continuate a supportarci **@Leggenda**e vi ricordiamo che domani alle 15 verranno pubblicate le sessioni.",
-    "_i": 4
+    "_i": 3
   },
   {
     "id": "3400274fdc1c803ab919e52da6e8d887",
@@ -47,7 +47,7 @@
     "patch": "0.3.1",
     "date": "2026-02-28",
     "content": "Salve **@Leggenda** piccoli update molto veloci.\n\n## **NEW**\n\n- Sostituiti i forum Downtime con un unico canale **⁠⏰downtime**\n\n- Abbiamo una nuova mappa di Arcamis, aggiornata e migliorata. Questa la vedrete aggiornare con una frequenza maggiore e con maggiore dettaglio (Ringraziamo **@Sarkhan [Lv1] - Gandora** per ~~farsi schiavizz...~~l'aiuto!)\n\n## **SCOPERTE**\n\n- Scoperte un'entrata delle **⁠Fogne** al **⁠⛵porto** ;\n\n- Scoperte nuove aree alla **⁠🌳foresta-dello-smarrimento**\n\n- Sono stati scoperti nuovi npc;\n\n- Scoperto un nuovo mercante (Non ancora disponibile).\n\n## **BUG-FIX**\n\n- Abbiamo pensato che, permettere a chi lavora in **⁠📔biblioteca** di leggere durante l'orario di lavoro, poteva essere un po' un bug-abuse. Abbiamo deciso di rimuovere questa feature per bilanciare la situazione dei Downtime con quelli degli altri player!\n\n### **COSA ASPETTARSI PER I PROSSIMI UPDATE?**\n\n- Stiamo... HEY! NIENTE SPOILER! Lo scoprirete con le prossime patch!",
-    "_i": 5
+    "_i": 4
   },
   {
     "id": "3400274fdc1c80bb8628ea596a2c9094",
@@ -57,7 +57,7 @@
     "patch": "0.3.3",
     "date": "2026-03-01",
     "content": "Grazie a **@Sarkhan [Lv1] - Gandora** abbiamo una nuova mappa ufficiale di Arcamis! (Con altre mappe a venire in futuro c.c)!\n\n### **Patch 0.3.3 B**\n\n### Patch 0.3.3 C",
-    "_i": 6
+    "_i": 5
   },
   {
     "id": "3400274fdc1c809e80a7edafa21a8b27",
@@ -67,7 +67,7 @@
     "patch": "0.3.2",
     "date": "2026-03-01",
     "content": "NEW\nCon una decisione tempestiva ed efficiente (Grazie a **@Zoe** per la proposta ottima), abbiamo finalmente dato un bilanciamento ai lavori ed allo stipendio.\nCosa troviamo di nuovo?\nDa oggi, partendo con un minimo di 5 giorni, avrete uno stipendio che dipenderà da molte variabili. Quelle che vi interessano sono:\n\nA) Livello del PG\nApprendista (Livelli 1-5) = 15 mo base\nProfessionista (Livelli 6-12) = 25 mo base\nMastro (Livelli 13-20) = 35 mo base\n\nB) Giorni di lavoro\nI primi 5 giorni, avrete lo stipendio base descritto nella variabile A (Chi fa meno di 5 giorni, non viene pagato);\nSuccessivamente, avrete stipendio extra, in base dagli stock bonus completati (5 giorni per stock, per un massimo di 4 stock bonus)\n\nC) Modificatore caratteristica del lavoro\nCome potrete vedere nella WIKI, ogni lavoro ha due modificatori caratteristica tra cui scegliere, che aumenteranno il vostro stipendio.\nQuesto serve a rendere il tutto molto più bilanciato, dando a tutti le stesse possibilità e lasciandovi maggiore scelta su quanto decidiate di lavorare.\n\nNOTA IMPORTANTE\n\nCome detto nella patch 0.3.1, non potrete effettuare più di 1 downtime per volta (Quindi, chi lavora in biblioteca, non può anche leggere libri nello stesso periodo. Stessa cosa vale, ad esempio, per il fabbro, il quale non può costruire delle armi per vendita/uso personale mentre lavora allo stesso tempo).\nCi vediamo alle prossime patch! \n\n**@Leggenda**\nP.S.",
-    "_i": 7
+    "_i": 6
   },
   {
     "id": "3400274fdc1c800ba9cee99752dedb89",
@@ -77,7 +77,7 @@
     "patch": "0.3.4",
     "date": "2026-03-05",
     "content": "*Abbiamo modificato la succube/incubo a causa di fraintendimenti sulla meccanica Lingua d'Argento e abbiamo deciso di effettuare un Rework*\n\nModificata Lingua d'Argento con Presenza magnetica. Chiunque stia giocando una succube ha diritto a un cambio personaggio senza relativa perdita di punti esperienza e valore bag qualora l'aggiornamento non possa essere gradito.\n\nCi scusiamo per il disagio e buon game!\n\n**@Leggenda**",
-    "_i": 8
+    "_i": 7
   },
   {
     "id": "3400274fdc1c806e9fd5d9bff94da64e",
@@ -87,7 +87,7 @@
     "patch": "0.3.5",
     "date": "2026-03-18",
     "content": "### CANCELLATO FINO A DATA DA DESTINARSI \n\nNonostante gli imprevisti, non ci siamo fatti demordere e siamo tornati piu forti di prima con un nuovo sub-aggiornamento che va a precedere la 0.4 (Siamo pronti, manca poco).\n\nQuale novita possiamo proporvi in questa sub-patch?\n\n- Abbiamo finalmente aggiornato il comando !meteo che prima sembrava rendere Arcamis un posto perennemente soleggiato (Si, era buggato... ora dovrebbe funzionare)\n\n- Abbiamo FINALMENTE le schede Automatizzate! Con un grandissimo lavoro di... **@Dungeon Non Master** (Grazie, grazie, lo so, vi voglio bene anche io)... da oggi chi vuole puo crearsi una scheda dove le zone \"Privilegi di Classe\" \"Privilegi di Sottoclasse\" e \"Privilegi di Specie\" saranno automatizzate in base al livello (E, ovviamente, a classe/sottoclasse/specie scelte)\n\n> Ovviamente, per chi volesse aggiornare la propria scheda, questo significa proprio quello che pensate...aprire ticket, spostare tutte le info dalla scheda vecchia a quella nuova, fare !import, rifare la !bag e la !coinpurse.",
-    "_i": 9
+    "_i": 8
   },
   {
     "id": "3400274fdc1c801ba23fe5b8033b48b7",
@@ -97,17 +97,7 @@
     "patch": "0.3.6",
     "date": "2026-03-18",
     "content": "Abbiamo cambiato il comando !meteo con il comando !bollettino (Piu aggiornato, piu randomico). Adesso da Temp. Massima / Minima\n\nAbbiamo cambiato il comando !viaggio con !itinerario (Ora sincronizzato col meteo di !bollettino). Adesso, in base al meteo nella zona di partenza e quella di arrivo, i tempi di viaggio potrebbero aumentare in caso di cattivo tempo. Vi invitiamo a controllare prima di muovervi in viaggio.",
-    "_i": 10
-  },
-  {
-    "id": "3590274fdc1c8066956cde80b13a4d3e",
-    "title": "Evento di primavera + Rework Sotto-classi",
-    "versione": "0",
-    "sottoversione": "0.5",
-    "patch": "0.5.0",
-    "date": "2026-05-06",
-    "content": "",
-    "_i": 11
+    "_i": 9
   },
   {
     "id": "3780274fdc1c808ba719daba442e400d",
@@ -117,6 +107,6 @@
     "patch": "0.6.0",
     "date": null,
     "content": "",
-    "_i": 12
+    "_i": 11
   }
 ]
