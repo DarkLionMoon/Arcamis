@@ -352,6 +352,17 @@ async function _gpRender(id,label,icon){
     return;
   }
 
+  /* ═══ TRACKING VISTA PAGINA (fire & forget, mai bloccante) ═══ */
+  try{
+    var _tvKey=String(id).replace(/^pag-/,'');
+    if(_tvKey) fetch('/api/admin?action=track_view',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({pageKey:_tvKey}),
+      keepalive:true
+    }).catch(function(){});
+  }catch(_tve){}
+
   var phTitle=document.getElementById('ph-title');
   var phIcon=document.getElementById('ph-icon');
   var phCovbg=document.getElementById('ph-covbg');

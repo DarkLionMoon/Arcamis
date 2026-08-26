@@ -1123,11 +1123,11 @@ async function saveBanner(){
   if(!bOn||!bTxt)return;
   if(st)st.textContent='Salvataggio…';
   try{
-    var r=await fetch('/api/admin?action=set_site_settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({settings:{banner_enabled:bOn.checked,banner_text:bTxt.value.trim()}})});
+    var r=await _authPost('/api/admin?action=set_site_settings',{settings:{banner_enabled:bOn.checked,banner_text:bTxt.value.trim()}});
     var j=await r.json();
-    if(j.ok){if(st){st.textContent='✓';setTimeout(function(){st.textContent='';},2000);}}
-    else{if(st)st.textContent='Errore';}
-  }catch(e){if(st)st.textContent='Errore di rete';}
+    if(!r.ok)throw new Error(j.error||'Errore '+r.status);
+    if(st){st.textContent='✓';setTimeout(function(){st.textContent='';},2000);}
+  }catch(e){if(st){st.textContent='✕ '+e.message;st.className='md-status err'}}
 }
 async function saveDisclaimer(){
   var dOn=document.getElementById('set-disclaimer-on');
@@ -1136,11 +1136,11 @@ async function saveDisclaimer(){
   if(!dOn||!dTxt)return;
   if(st)st.textContent='Salvataggio…';
   try{
-    var r=await fetch('/api/admin?action=set_site_settings',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({settings:{disclaimer_enabled:dOn.checked,disclaimer_text:dTxt.value.trim()}})});
+    var r=await _authPost('/api/admin?action=set_site_settings',{settings:{disclaimer_enabled:dOn.checked,disclaimer_text:dTxt.value.trim()}});
     var j=await r.json();
-    if(j.ok){if(st){st.textContent='✓';setTimeout(function(){st.textContent='';},2000);}}
-    else{if(st)st.textContent='Errore';}
-  }catch(e){if(st)st.textContent='Errore di rete';}
+    if(!r.ok)throw new Error(j.error||'Errore '+r.status);
+    if(st){st.textContent='✓';setTimeout(function(){st.textContent='';},2000);}
+  }catch(e){if(st){st.textContent='✕ '+e.message;st.className='md-status err'}}
 }
 function openGHTokenModal(){
   var id='gh-token-modal';
@@ -1158,7 +1158,7 @@ async function saveGhToken(){
   var token=inp?(inp.value||'').trim():'';
   if(!token){if(st){st.textContent='Inserisci il token';st.className='md-status err'};return}
   try{
-    var r=await fetch('/api/admin?action=set_gh_token',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:token})});
+    var r=await _authPost('/api/admin?action=set_gh_token',{token:token});
     var j=await r.json();
     if(!r.ok)throw new Error(j.error||('Errore '+r.status));
     closeModal('gh-token-modal');
@@ -1257,11 +1257,10 @@ async function loadWebhookStatus(){
   try{
     var r=await fetch('/api/admin?action=get_webhook',{credentials:'include'});
     var j=await r.json();
-    var w=j.webhook||{};
     var on=document.getElementById('set-webhook-on');
     var url=document.getElementById('set-webhook-url');
-    if(on)on.checked=!!w.enabled;
-    if(url)url.value=w.url||'';
+    if(on)on.checked=j.enabled!==false;
+    if(url)url.value=j.url||'';
   }catch(e){}
 }
 async function saveWebhook(){
@@ -1271,7 +1270,7 @@ async function saveWebhook(){
   if(!on||!url)return;
   if(st){st.textContent='Salvataggio…';st.className='md-status'}
   try{
-    var r=await _authPost('/api/admin?action=set_webhook',{enabled:on.checked,url:url.value.trim()});
+    var r=await _authPost('/api/admin?action=set_webhook',{webhookUrl:url.value.trim(),enabled:on.checked});
     var j=await r.json();
     if(!j.ok)throw new Error(j.error||'Errore');
     if(st){st.textContent='✓ Salvato';st.className='md-status ok'}
@@ -1304,15 +1303,18 @@ async function loadAnalytics(){
     var total=j.total||0;
     if(!box)return;
     if(!pages.length){box.innerHTML='<div class="empty" style="padding:22px"><span class="ei">📊</span>Nessun dato disponibile</div>';return}
+    var labelById={};
+    ((window.ArcAdmin&&window.ArcAdmin.pages)||[]).forEach(function(p){if(p.id)labelById[p.id]=p;if(p.k)labelById[p.k]=p;});
     var h='<div class="kv-rows">'
       +'<div class="kv-row"><div class="kv-main"><div class="kt">Visualizzazioni totali</div><div class="ks">'+total.toLocaleString('it-IT')+'</div></div></div>'
       +'</div>';
     h+='<div class="panel-head" style="margin-top:12px"><h3 style="font-size:12px">Pagine più visitate</h3></div>';
     var top=pages.sort(function(a,b){return (b.views||0)-(a.views||0)}).slice(0,10);
     top.forEach(function(p,i){
+      var meta=labelById[p.pageKey]||{i:'📄',l:p.pageKey};
       h+='<div class="act-item"><div class="act-dot" style="background:var(--acc)"></div>'
-        +'<div class="act-main"><div class="act-t"><b>#'+(i+1)+'</b> '+esc(p.pageKey||'')+'</div>'
-        +'<div class="act-s">'+(p.views||0)+' visualizzazioni</div></div></div>';
+        +'<div class="act-main"><div class="act-t"><b>#'+(i+1)+'</b> '+esc(meta.i||'📄')+' '+esc(meta.l||p.pageKey)+'</div>'
+        +'<div class="act-s">'+esc(p.pageKey||'')+' · '+(p.views||0)+' visualizzazioni</div></div></div>';
     });
     box.innerHTML=h;
   }catch(e){if(box)box.innerHTML='<div class="empty" style="padding:22px"><span class="ei">⚠️</span>Statistiche non disponibili</div>'}

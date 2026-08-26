@@ -154,6 +154,8 @@ export async function onRequest(context) {
     try {
       const webhookUrl = await KV.get('webhook_url');
       if (!webhookUrl) return;
+      const whEnabled = await KV.get('webhook_enabled');
+      if (whEnabled === '0') return;
       await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -359,6 +361,32 @@ export async function onRequest(context) {
     }
   }
 
+  /* ════ TRACK VIEW — pubblico: registra le visualizzazioni dei visitatori ════ */
+  if (action === 'track_view' && request.method === 'POST') {
+    let body;
+    try { body = await request.json(); } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    const pageKey = String(body.pageKey || '').slice(0, 120);
+    if (!pageKey || !/^[a-z0-9-]+$/i.test(pageKey)) {
+      return new Response(JSON.stringify({ error: 'pageKey mancante o non valida' }), { status: 400, headers: cors });
+    }
+    if (await genericRateLimit('track_view', 60, 60)) {
+      return new Response(JSON.stringify({ error: 'Troppe richieste' }), { status: 429, headers: cors });
+    }
+    try {
+      const raw = await KV.get('views_' + pageKey);
+      const count = raw ? parseInt(raw, 10) + 1 : 1;
+      await KV.put('views_' + pageKey, String(count));
+      const rawTotal = await KV.get('views_total');
+      const totalCount = rawTotal ? parseInt(rawTotal, 10) + 1 : 1;
+      await KV.put('views_total', String(totalCount));
+      return new Response(JSON.stringify({ ok: true, views: count, total: totalCount }), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    }
+  }
+
   /* ── Da qui in poi richiede sessione valida ── */
   const authed = await checkSession();
   if (!authed) {
@@ -381,6 +409,8 @@ export async function onRequest(context) {
     if ((await sessionRole()) !== 'admin') {
       return new Response(JSON.stringify({ error: 'Richiede ruolo admin' }), { status: 403, headers: cors });
     }
+    const csrfOk = await verifyCsrf(request);
+    if (!csrfOk) return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
     let body;
     try { body = await request.json(); } catch (e) {
       return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
@@ -396,8 +426,15 @@ export async function onRequest(context) {
 
   /* ════ GET LOG ════ */
   if (action === 'get_log') {
-    const raw = await KV.get('admin_log', 'text');
-    const entries = raw ? JSON.parse(raw) : [];
+    let entries = [];
+    try {
+      const raw = await KV.get('admin_log', 'text');
+      entries = raw ? JSON.parse(raw) : [];
+    } catch (e) {}
+    /* gli editor vedono il registro senza i nomi utente */
+    if ((await sessionRole()) !== 'admin') {
+      entries = entries.map(function(e2) { const c = Object.assign({}, e2); delete c.user; return c; });
+    }
     return new Response(JSON.stringify({ entries }), { headers: cors });
   }
 
@@ -660,11 +697,12 @@ if (action === 'set_posa' && request.method === 'POST') {
     try { body = await request.json(); } catch (e) {
       return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
     }
-    const { webhookUrl } = body;
+    const { webhookUrl, enabled } = body;
     if (!webhookUrl) {
       return new Response(JSON.stringify({ error: 'webhookUrl mancante' }), { status: 400, headers: cors });
     }
     await KV.put('webhook_url', webhookUrl);
+    await KV.put('webhook_enabled', enabled === false ? '0' : '1');
     await writeAdminLog('set_webhook', 'webhook_url', 'webhook configurato', await sessionUser());
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
@@ -676,7 +714,8 @@ if (action === 'set_posa' && request.method === 'POST') {
       return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
     }
     const url2 = await KV.get('webhook_url');
-    return new Response(JSON.stringify({ configured: !!url2 }), { headers: cors });
+    const whEnabled = await KV.get('webhook_enabled');
+    return new Response(JSON.stringify({ configured: !!url2, enabled: whEnabled !== '0', url: url2 || '' }), { headers: cors });
   }
 
   /* ════ TEST WEBHOOK ════ */
@@ -691,6 +730,10 @@ if (action === 'set_posa' && request.method === 'POST') {
     if (!webhookUrl) {
       return new Response(JSON.stringify({ error: 'Webhook non configurato' }), { status: 400, headers: cors });
     }
+    const whEnabled = await KV.get('webhook_enabled');
+    if (whEnabled === '0') {
+      return new Response(JSON.stringify({ error: 'Webhook disabilitato' }), { status: 400, headers: cors });
+    }
     try {
       const res = await fetch(webhookUrl, {
         method: 'POST',
@@ -703,29 +746,6 @@ if (action === 'set_posa' && request.method === 'POST') {
         return new Response(JSON.stringify({ error: 'Webhook fallito: ' + res.status }), { status: 502, headers: cors });
       }
       return new Response(JSON.stringify({ ok: true }), { headers: cors });
-    } catch (e) {
-      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
-    }
-  }
-
-  /* ════ TRACK VIEW ════ */
-  if (action === 'track_view' && request.method === 'POST') {
-    let body;
-    try { body = await request.json(); } catch (e) {
-      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
-    }
-    const { pageKey } = body;
-    if (!pageKey) {
-      return new Response(JSON.stringify({ error: 'pageKey mancante' }), { status: 400, headers: cors });
-    }
-    try {
-      const raw = await KV.get('views_' + pageKey);
-      const count = raw ? parseInt(raw, 10) + 1 : 1;
-      await KV.put('views_' + pageKey, String(count));
-      const rawTotal = await KV.get('views_total');
-      const totalCount = rawTotal ? parseInt(rawTotal, 10) + 1 : 1;
-      await KV.put('views_total', String(totalCount));
-      return new Response(JSON.stringify({ ok: true, views: count, total: totalCount }), { headers: cors });
     } catch (e) {
       return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
     }

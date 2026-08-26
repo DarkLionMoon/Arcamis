@@ -603,7 +603,7 @@ async function _loadTopPages(){
     if(!pages.length){ box.innerHTML='Nessuna statistica disponibile ancora.'; return; }
     var max=Math.max.apply(null,pages.map(function(p){return p.views||1;}));
     var labelById={};
-    (window.ArcAdmin.pages||[]).forEach(function(p){labelById[p.id]=p;});
+    (window.ArcAdmin.pages||[]).forEach(function(p){if(p.id)labelById[p.id]=p;if(p.k)labelById[p.k]=p;});
     box.innerHTML=pages.map(function(pg){
       var meta=labelById[pg.pageKey]||{i:'📄',l:pg.pageKey};
       var w=Math.max(4,Math.round((pg.views/max)*100));
