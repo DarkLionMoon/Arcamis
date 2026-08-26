@@ -816,6 +816,8 @@ function initStructuredEditor(content){
   document.addEventListener('keydown',_stKeyHandler);
   var ph=document.querySelector('#md-pane .pane-head');
   var kindLabel=_stKind==='page'?'form CMS':(_stKind==='schede'?'schede a card':(_stPanGeneric()?'griglia collezione':'griglia divinità'));
+  var _mpPane=document.getElementById('md-pane');
+  if(_mpPane)_mpPane.classList.remove('with-lineno');
   if(ph)ph.innerHTML='Editor <span class="ph-info" id="e-stats"></span>'
     +(_stKind!=='page'?'<input id="st-filter" class="in" placeholder="Filtra schede…" oninput="stFilter(this.value)" style="max-width:150px;margin-right:8px">'
       +'<button type="button" class="btn btn-soft btn-sm" title="Comprimi tutte le card" onclick="_stCollapseAll(true)">⤴ Comprimi</button>'
@@ -1050,7 +1052,8 @@ function _stExit(){
   var sh=document.getElementById('struct-head');if(sh)sh.style.display='none';
   var sl=document.getElementById('st-list');if(sl)sl.style.display='none';
   var ph=document.querySelector('#md-pane .pane-head');
-  if(ph)ph.innerHTML='Markdown <span class="ph-info" id="e-stats"></span>';
+  if(ph)ph.innerHTML='Markdown '+_paneHeadTools()+' <span class="ph-info" id="e-stats"></span>';
+  _applyEdPrefs();
   var wd=document.getElementById('st-warn');
   if(wd)wd.remove();
   _stFilterQ='';

@@ -7,9 +7,12 @@
    stilizzate da scripts/css/style-notion.css.
 
    Supporta: paragrafi, h1-h6, liste annidate, checklist, tabelle
-   (con allineamento), blockquote, callout (> [!NOTE] ecc.),
-   code block con linguaggio, codice inline, grassetto/corsivo/
-   barrato, link (URL sicuri), immagini con didascalia, hr.
+   (con allineamento), blockquote, callout (> [!NOTE] ecc., anche
+   richiudibili con > [!NOTE]- / > [!NOTE]+ titolo), code block
+   con linguaggio, codice inline, grassetto/corsivo/barrato,
+   evidenziazione ==testo==, apici ^testo^ e pedici ~testo~,
+   note a piè di pagina [^id], link (URL sicuri), immagini con
+   didascalia, hr.
 
    Espone: window.mdRender(md) -> html,  window.mdToc(md) -> []
    ════════════════════════════════════════════════════════════ */
@@ -23,6 +26,13 @@ function safeLink(u){return /^(https?:|mailto:|#|\/)/i.test(u)}
 function safeImg(u){return /^(https?:|#|\/|data:image\/)/i.test(u)}
 
 /* ── INLINE ──────────────────────────────────────────────── */
+var _fnDefs={};   /* id -> {num,text} */
+var _fnOrder=0;
+function fnRef(id){
+  var def=_fnDefs[id];
+  if(!def)return '[^'+id+']';
+  return '<sup class="n-fnref" id="fnref-'+attr(id)+'"><a href="#fn-'+attr(id)+'" class="n-anchor">'+def.num+'</a></sup>';
+}
 function inline(t){
   t=esc(t);
   /* codice inline */
@@ -30,10 +40,17 @@ function inline(t){
   /* grassetto + corsivo */
   t=t.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>');
   t=t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-  /* barrato */
+  /* barrato (prima del pedice, che usa ~ singola) */
   t=t.replace(/~~(.+?)~~/g,'<s class="rs">$1</s>');
   /* corsivo (singolo *) */
   t=t.replace(/(^|[^*])\*([^*\s][^*]*?)\*([^*]|$)/g,'$1<em>$2</em>$3');
+  /* evidenziazione ==testo== */
+  t=t.replace(/==([^\s=][^=]*?)==/g,'<mark class="n-mark">$1</mark>');
+  /* apice ^testo^ e pedice ~testo~ */
+  t=t.replace(/\^([^\s^]+)\^/g,'<sup class="n-sup">$1</sup>');
+  t=t.replace(/~([^~\s]+)~/g,'<sub class="n-sub">$1</sub>');
+  /* note a piè di pagina [^id] */
+  t=t.replace(/\[\^([a-zA-Z0-9_-]+)\]/g,function(m,id){return fnRef(id)});
   /* immagini prima dei link */
   t=t.replace(/!\[([^\]]*)\]\(([^)]+?)(?:\s+"([^"]*)")?\)/g,function(m,alt,u,cap){
     u=dec(u).trim();
@@ -127,15 +144,35 @@ var CALLOUT_TYPES={
   CAUTION:{icon:'⚠️',c:'#c04040',bg:'rgba(192,64,64,.07)'},
   DANGER:{icon:'⚠️',c:'#c04040',bg:'rgba(192,64,64,.07)'},
   IMPORTANT:{icon:'⭐',c:'#d4aa4a',bg:'rgba(212,170,74,.07)'},
-  SUGGERIMENTO:{icon:'✨',c:'#d4aa4a',bg:'rgba(212,170,74,.06)'}
+  SUGGERIMENTO:{icon:'✨',c:'#d4aa4a',bg:'rgba(212,170,74,.06)'},
+  LORE:{label:'Lore',icon:'📖',c:'#8a6db8',bg:'rgba(138,109,184,.07)'},
+  QUEST:{label:'Quest',icon:'🗺️',c:'#5a9ab8',bg:'rgba(90,154,184,.07)'},
+  SECRET:{label:'Segreto',icon:'🕳️',c:'#9a5ab8',bg:'rgba(154,90,184,.08)'},
+  MAGIC:{label:'Magia',icon:'🔮',c:'#b85a9a',bg:'rgba(184,90,154,.07)'},
+  REGOLA:{label:'Regola',icon:'⚖️',c:'#d4aa4a',bg:'rgba(212,170,74,.07)'},
+  TESORO:{label:'Tesoro',icon:'💰',c:'#c89b3c',bg:'rgba(200,155,60,.08)'},
+  MOSTRO:{label:'Mostro',icon:'🐉',c:'#c05a40',bg:'rgba(192,90,64,.07)'},
+  NPC:{label:'PNG',icon:'👤',c:'#5a9a58',bg:'rgba(90,154,88,.07)'},
+  DM:{label:'Solo Master',icon:'🎲',c:'#c04040',bg:'rgba(192,64,64,.09)'}
 };
 function blockquoteLines(lines){
   var inner=lines.map(function(l){return l.replace(/^>\s?/,'')}).join('\n');
   var first=inner.split('\n')[0];
-  var cm=first.match(/^\[!([a-zA-Z]+)\]\s*(.*)$/i);
+  /* accetta [!TIPO]- titolo e la variante [!TIPO-] titolo */
+  var cm=first.match(/^\[!([a-zA-Z]+)\]\s*([-+]?)\s*(.*)$/i);
+  if(!cm)cm=first.match(/^\[!([a-zA-Z]+)([-+]?)\]\s*(.*)$/i);
   if(cm){
-    var key=cm[1].toUpperCase(),cfg=CALLOUT_TYPES[key]||{icon:'✨',c:'#c89b3c',bg:'rgba(200,155,60,.05)'};
-    var body=(cm[2]?cm[2]+'\n':'')+inner.split('\n').slice(1).join('\n');
+    var key=cm[1].toUpperCase(),fold=cm[2],title=cm[3];
+    var cfg=CALLOUT_TYPES[key]||{label:key.charAt(0)+key.slice(1).toLowerCase(),icon:'✨',c:'#c89b3c',bg:'rgba(200,155,60,.05)'};
+    if(fold==='-'||fold==='+'){
+      var body=inner.split('\n').slice(1).join('\n');
+      return '<details class="n-callout n-fold" style="--callout-c:'+cfg.c+';--callout-bg:'+cfg.bg+'"'+(fold==='+'?' open':'')+'>'
+        +'<summary class="n-fold-head"><span class="n-callout-icon">'+cfg.icon+'</span>'
+        +'<span class="n-fold-title">'+inline(dec(title||cfg.label||key))+'</span>'
+        +'<span class="n-fold-arrow">▸</span></summary>'
+        +'<div class="n-callout-body">'+renderBlocks(body)+'</div></details>';
+    }
+    var body=(title?title+'\n':'')+inner.split('\n').slice(1).join('\n');
     return '<div class="n-callout" style="--callout-c:'+cfg.c+';--callout-bg:'+cfg.bg+'">'
       +'<span class="n-callout-icon">'+cfg.icon+'</span>'
       +'<div class="n-callout-body">'+renderBlocks(body)+'</div></div>';
@@ -219,10 +256,43 @@ function renderBlocks(src){
   return html;
 }
 
+/* ── NOTE A PIÈ DI PAGINA ────────────────────────────────── */
+function extractFootnotes(lines){
+  _fnDefs={};_fnOrder=0;
+  var out=[],i=0,n=lines.length,inFence=false;
+  while(i<n){
+    if(/^```/.test(lines[i])){inFence=!inFence;out.push(lines[i]);i++;continue}
+    var m=(!inFence)?lines[i].match(/^\[\^([a-zA-Z0-9_-]+)\]:\s*(.*)$/):null;
+    if(m){
+      var id=m[1],text=[m[2]];
+      i++;
+      while(i<n&&/^\s+\S/.test(lines[i])){text.push(lines[i].replace(/^\s+/,''));i++}
+      _fnOrder++;
+      _fnDefs[id]={num:_fnOrder,text:text.join(' ')};
+      continue;
+    }
+    out.push(lines[i]);i++;
+  }
+  return out;
+}
+function renderFootnotes(){
+  var ids=Object.keys(_fnDefs);
+  if(!ids.length)return'';
+  var items=ids.map(function(id){
+    var d=_fnDefs[id];
+    return '<li class="n-fn-item" id="fn-'+attr(id)+'">'+inline(dec(d.text))
+      +' <a href="#fnref-'+attr(id)+'" class="n-anchor n-fn-back" title="Torna al testo">↩</a></li>';
+  });
+  return '<section class="n-footnotes"><div class="n-fn-title">Note</div><ol class="n-fn-list">'+items.join('')+'</ol></section>';
+}
+
 /* ── API ─────────────────────────────────────────────────── */
 function mdRender(md){
   if(!md||!md.trim())return'';
-  return renderBlocks(md);
+  var lines=extractFootnotes(md.replace(/\r\n/g,'\n').split('\n'));
+  var html=renderBlocks(lines.join('\n'))+renderFootnotes();
+  _fnDefs={};_fnOrder=0;
+  return html;
 }
 function mdToc(md){
   var toc=[];

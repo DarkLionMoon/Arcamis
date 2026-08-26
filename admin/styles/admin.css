@@ -203,7 +203,23 @@ button{font-family:inherit}
 .ed-meta .mm-t{min-width:200px;flex:1 1 220px}
 .ed-meta .mm-icon{width:58px;text-align:center}
 .ed-meta .mm-layout{max-width:260px;flex:0 1 220px}
-#e-md{flex:1;min-width:0;resize:none;border:none;outline:none;background:transparent;color:var(--txt);font-family:var(--mono);font-size:13px;line-height:1.65;padding:14px 16px;tab-size:2}
+#e-md{flex:1;min-width:0;resize:none;border:none;outline:none;background:transparent;color:var(--txt);font-family:var(--mono);font-size:var(--ed-fs,13px);line-height:calc(var(--ed-fs,13px)*1.65);padding:14px 16px;tab-size:2}
+/* strumenti editor: numeri riga, word-wrap, dimensione font */
+#md-pane{position:relative}
+.ln-gutter{
+  display:none;position:absolute;top:0;left:0;width:42px;height:100%;
+  padding:14px 6px 14px 0;margin:0;text-align:right;
+  font-family:var(--mono);font-size:var(--ed-fs,13px);line-height:calc(var(--ed-fs,13px)*1.65);
+  color:var(--dim);background:var(--bg2);
+  border-right:1px solid var(--line);
+  overflow:hidden;white-space:pre;user-select:none;pointer-events:none;z-index:2;
+}
+#md-pane.with-lineno .ln-gutter{display:block}
+#md-pane.with-lineno #e-md{padding-left:54px}
+.ed-tools{display:inline-flex;align-items:center;gap:1px}
+.ed-tool{width:24px;height:20px;font-size:10px;padding:0}
+.ed-tool.active{background:var(--accbg);color:var(--acc2);border-color:rgba(212,170,74,.3)}
+.ed-tools .ed-sep{width:1px;height:14px;background:var(--line);margin:0 3px}
 #e-preview{flex:1;min-width:0;overflow:auto;padding:22px 26px;background:var(--bg)}
 #e-preview.zoomed{overflow:auto}
 .divider-v{width:5px;cursor:col-resize;background:var(--bg2);border-left:1px solid var(--line);flex-shrink:0;transition:background .15s}
@@ -610,7 +626,7 @@ button{font-family:inherit}
 #app.full-screen .ed-toolbar{padding:4px 16px}
 #app.full-screen .ed-statusbar{padding:4px 16px}
 #app.full-screen .ed-body{flex:1}
-#app.full-screen #e-md{font-size:14px;line-height:1.7;padding:16px 20px}
+#app.full-screen #e-md{font-size:calc(var(--ed-fs,13px) + 1px);line-height:calc((var(--ed-fs,13px) + 1px)*1.7);padding:16px 20px}
 #app.full-screen .md-outline{display:none!important}
 .fs-hint{color:var(--acc2);font-size:11px;letter-spacing:.04em}
 

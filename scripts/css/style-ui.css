@@ -397,6 +397,12 @@ body.light .n-h1,body.light .n-h2,body.light .n-h3{color:var(--text)!important}
 body.light .n-p,body.light .n-li{color:var(--text2)!important}
 body.light .n-quote{border-color:var(--gold2)!important;color:var(--text3)!important;background:rgba(120,88,36,.04)!important}
 body.light .n-callout{background:rgba(120,88,36,.06)!important;border-color:rgba(120,88,36,.15)!important}
+body.light mark.n-mark{background:rgba(120,88,36,.22)!important;color:var(--text)!important;box-shadow:none}
+body.light sup.n-sup{color:var(--gold2)}
+body.light sub.n-sub{color:var(--text2,var(--text))}
+body.light .n-fnref a{color:var(--gold2);border-bottom-color:rgba(120,88,36,.4)}
+body.light .n-footnotes{border-top-color:rgba(120,88,36,.25)}
+body.light .n-fn-title{color:var(--text2,var(--text))}
 body.light .n-divider{border-color:rgba(120,88,36,.18)!important}
 body.light .n-table th{background:rgba(120,88,36,.08)!important;color:var(--text)!important}
 body.light .n-table td{color:var(--text2)!important;border-color:rgba(120,88,36,.12)!important}

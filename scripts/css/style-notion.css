@@ -87,6 +87,47 @@
 .n-callout-icon{flex-shrink:0;font-size:19px;margin-top:2px}
 .n-callout-body{flex:1;font-size:16px;line-height:1.75}
 
+/* Callout richiudibile (toggle): > [!TIPO]- chiuso · > [!TIPO]+ aperto */
+details.n-fold{display:block!important;padding:0!important;overflow:hidden}
+details.n-fold>.n-fold-head{
+  list-style:none;display:flex;align-items:center;gap:10px;
+  padding:13px 18px;margin:0;cursor:pointer;user-select:none;
+  font-family:'Cinzel',serif;font-size:11px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--callout-c,#d4aa4a);
+}
+details.n-fold>.n-fold-head::-webkit-details-marker{display:none}
+details.n-fold[open]>.n-fold-head .n-fold-arrow{transform:rotate(90deg)}
+.n-fold-arrow{margin-left:auto;transition:transform .18s ease;font-size:11px;opacity:.7;flex-shrink:0}
+.n-fold-title{flex:1;text-align:left}
+details.n-fold>.n-callout-body{padding:2px 18px 14px 47px!important}
+
+/* Evidenziazione ==testo== */
+mark.n-mark{
+  background:linear-gradient(120deg,rgba(200,155,60,.06) 0%,rgba(200,155,60,.35) 6%,rgba(200,155,60,.28) 94%,rgba(200,155,60,.06) 100%);
+  color:#f5e6bd;padding:.05em .28em;border-radius:3px;
+  box-shadow:0 0 14px rgba(200,155,60,.1);
+}
+
+/* Apice ^…^ e pedice ~…~ */
+sup.n-sup{font-size:.72em;color:var(--gold2);vertical-align:super;line-height:0}
+sub.n-sub{font-size:.72em;color:var(--parch);vertical-align:sub;line-height:0}
+
+/* Note a piè di pagina [^id] */
+.n-fnref{line-height:0}
+.n-fnref a{
+  color:var(--gold2);text-decoration:none;font-weight:700;font-size:.82em;
+  padding:0 2px;border-bottom:1px dotted rgba(200,155,60,.55);
+}
+.n-fnref a:hover{color:var(--gold)}
+.n-footnotes{margin-top:34px;padding-top:16px;border-top:1px solid rgba(200,155,60,.22)}
+.n-fn-title{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold2);margin-bottom:10px}
+.n-fn-list{padding-left:22px;margin:0}
+.n-fn-item{font-size:14px;line-height:1.7;color:var(--text);margin-bottom:6px}
+.n-fn-item .n-p{font-size:inherit;display:inline}
+.n-fn-back{color:var(--gold);text-decoration:none;font-size:12px;opacity:.65;padding-left:4px}
+.n-fn-back:hover{opacity:1}
+
 /* Intro block */
 .n-intro{
   display:flex;gap:18px;align-items:flex-start;
