@@ -34,7 +34,13 @@ export async function onRequest(context) {
 
   async function verifyPassword(password, storedHash, salt) {
     const { hash } = await hashPassword(password, salt);
-    return hash === storedHash;
+    // Constant-time comparison to prevent timing attacks
+    if (hash.length !== storedHash.length) return false;
+    let result = 0;
+    for (let i = 0; i < hash.length; i++) {
+      result |= hash.charCodeAt(i) ^ storedHash.charCodeAt(i);
+    }
+    return result === 0;
   }
 
   const cors = {
@@ -247,7 +253,16 @@ export async function onRequest(context) {
             } else if (u.passwordHash) {
               /* Legacy: SHA-256 senza salt (backward compat) */
               const hash = await sha256hex(body.password);
-              if (hash === u.passwordHash) {
+              /* Constant-time comparison to prevent timing attacks */
+              let legacyMatch = false;
+              if (hash.length === u.passwordHash.length) {
+                let result = 0;
+                for (let i = 0; i < hash.length; i++) {
+                  result |= hash.charCodeAt(i) ^ u.passwordHash.charCodeAt(i);
+                }
+                legacyMatch = result === 0;
+              }
+              if (legacyMatch) {
                 ok = true; role = u.role || 'editor';
                 /* Migra automaticamente al nuovo formato PBKDF2 salted */
                 const { hash: newHash, salt } = await hashPassword(body.password);
