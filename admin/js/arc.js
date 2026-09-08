@@ -20,7 +20,7 @@
     CONFIG: {
       repo: 'DarkLionMoon/Arcamis',
       branch: 'main',
-      content: 'content'
+      content: 'content',
     },
     pages: [],
     sections: [],
@@ -43,7 +43,7 @@
     cfg: function (key, fallback) {
       var v = this.CONFIG[key];
       return v === undefined ? fallback : v;
-    }
+    },
   };
 
   global.ArcAdmin = arc;

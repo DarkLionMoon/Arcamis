@@ -7,17 +7,14 @@
    - DNS prefetch dinamico
 ════════════════════════════════════ */
 
-(function() {
-
+(function () {
   /* ════════════════════════════════
      1. DNS PREFETCH DINAMICO
      Inietta i tag dns-prefetch per
      i domini esterni usati dal sito
   ════════════════════════════════ */
-  var dnsDomains = [
-    'docs.google.com',
-  ];
-  dnsDomains.forEach(function(domain) {
+  var dnsDomains = ['docs.google.com'];
+  dnsDomains.forEach(function (domain) {
     if (document.querySelector('link[rel="dns-prefetch"][href*="' + domain + '"]')) return;
     var l = document.createElement('link');
     l.rel = 'dns-prefetch';
@@ -50,7 +47,7 @@
   var _origGetItem = sessionStorage.getItem.bind(sessionStorage);
   var _origSetItem = sessionStorage.setItem.bind(sessionStorage);
 
-  sessionStorage.getItem = function(key) {
+  sessionStorage.getItem = function (key) {
     var raw = _origGetItem(key);
     if (!raw) return null;
     /* Prova a leggere wrapper con timestamp */
@@ -63,19 +60,19 @@
         }
         return wrapper._arc_data;
       }
-    } catch(e) {}
+    } catch (e) {}
     /* Dato vecchio senza wrapper — restituisci com'è */
     return raw;
   };
 
-  sessionStorage.setItem = function(key, value) {
+  sessionStorage.setItem = function (key, value) {
     /* Wrappa solo le chiavi pg_ di Arcamis */
     if (key.indexOf('pg_') === 0) {
       try {
         var wrapper = JSON.stringify({ _arc_ts: Date.now(), _arc_data: value });
         _origSetItem(key, wrapper);
         return;
-      } catch(e) {}
+      } catch (e) {}
     }
     _origSetItem(key, value);
   };
@@ -90,7 +87,7 @@
   var MC_TTL = 20 * 60 * 1000;
 
   /* Aspetta che _memCache sia definito */
-  var _mcPatchInterval = setInterval(function() {
+  var _mcPatchInterval = setInterval(function () {
     if (typeof _memCache === 'undefined') return;
     clearInterval(_mcPatchInterval);
 
@@ -102,7 +99,7 @@
     function _evict() {
       /* Rimuovi entrate scadute */
       var now = Date.now();
-      Object.keys(_times).forEach(function(k) {
+      Object.keys(_times).forEach(function (k) {
         if (now - _times[k] > MC_TTL) {
           delete _store[k];
           delete _times[k];
@@ -119,7 +116,7 @@
     }
 
     /* Copia dati esistenti */
-    Object.keys(_memCache).forEach(function(k) {
+    Object.keys(_memCache).forEach(function (k) {
       _store[k] = _memCache[k];
       _times[k] = Date.now();
       _order.push(k);
@@ -130,16 +127,18 @@
        quindi patchiamo prefetchPage e _gpRender invece */
 
     var _origPrefetch = window.prefetchPage;
-    window.prefetchPage = function(id) {
-  if (!id) return;
-  var key = 'pg_' + id;
-  /* Controlla sia _store locale che _memCache globale */
-  if (_store[key] && _times[key] && Date.now() - _times[key] < MC_TTL) return;
-  if (typeof _memCache !== 'undefined' && _memCache[key]) return;
+    window.prefetchPage = function (id) {
+      if (!id) return;
+      var key = 'pg_' + id;
+      /* Controlla sia _store locale che _memCache globale */
+      if (_store[key] && _times[key] && Date.now() - _times[key] < MC_TTL) return;
+      if (typeof _memCache !== 'undefined' && _memCache[key]) return;
       _evict();
       fetch('/content/pages/' + id.replace(/^pag-/, '') + '.json')
-        .then(function(r) { return r.ok ? r.json() : null; })
-        .then(function(data) {
+        .then(function (r) {
+          return r.ok ? r.json() : null;
+        })
+        .then(function (data) {
           if (!data) return;
           _store[key] = data;
           _times[key] = Date.now();
@@ -149,12 +148,11 @@
           /* Sincronizza con _memCache originale */
           _memCache[key] = data;
         })
-        .catch(function() {});
+        .catch(function () {});
     };
 
     /* Pulizia periodica ogni 5 minuti */
     setInterval(_evict, 5 * 60 * 1000);
-
   }, 100);
 
   /* ════════════════════════════════
@@ -174,12 +172,16 @@
   /* Attacca hover su tutti i tn-item esistenti */
   function _attachNavbarPrefetch() {
     if (window._arcDev && window._arcDev.coarse) return; /* hover inesistente su touch */
-    document.querySelectorAll('.tn-item, .tn-drop > .tn').forEach(function(el) {
+    document.querySelectorAll('.tn-item, .tn-drop > .tn').forEach(function (el) {
       if (el.dataset.pfAttached) return;
       el.dataset.pfAttached = '1';
-      el.addEventListener('mouseenter', function() {
-        _prefetchFromOnclick(el);
-      }, { passive: true });
+      el.addEventListener(
+        'mouseenter',
+        function () {
+          _prefetchFromOnclick(el);
+        },
+        { passive: true }
+      );
     });
   }
 
@@ -193,18 +195,19 @@
   function _attachCardPrefetch(root) {
     root = root || document;
     if (window._arcDev && window._arcDev.coarse) return; /* hover inesistente su touch */
-    var selectors = [
-      '.loc-card', '.loc-banner', '.cp-icard',
-      '.gs-card', '.n-db-card', '.lcard'
-    ];
-    root.querySelectorAll(selectors.join(',')).forEach(function(el) {
+    var selectors = ['.loc-card', '.loc-banner', '.cp-icard', '.gs-card', '.n-db-card', '.lcard'];
+    root.querySelectorAll(selectors.join(',')).forEach(function (el) {
       if (el.dataset.pfAttached) return;
       el.dataset.pfAttached = '1';
-      el.addEventListener('mouseenter', function() {
-        _prefetchFromOnclick(el);
-        /* Anche i figli con onclick */
-        el.querySelectorAll('[onclick]').forEach(_prefetchFromOnclick);
-      }, { passive: true });
+      el.addEventListener(
+        'mouseenter',
+        function () {
+          _prefetchFromOnclick(el);
+          /* Anche i figli con onclick */
+          el.querySelectorAll('[onclick]').forEach(_prefetchFromOnclick);
+        },
+        { passive: true }
+      );
     });
   }
 
@@ -213,12 +216,16 @@
      Stesso per il drawer mobile
   ════════════════════════════════ */
   function _attachMobileNavPrefetch() {
-    document.querySelectorAll('.mn-item').forEach(function(el) {
+    document.querySelectorAll('.mn-item').forEach(function (el) {
       if (el.dataset.pfAttached) return;
       el.dataset.pfAttached = '1';
-      el.addEventListener('touchstart', function() {
-        _prefetchFromOnclick(el);
-      }, { passive: true });
+      el.addEventListener(
+        'touchstart',
+        function () {
+          _prefetchFromOnclick(el);
+        },
+        { passive: true }
+      );
     });
   }
 
@@ -239,8 +246,8 @@
   }
 
   /* Hook afterPageRender per riattaccare sulle nuove card */
-  window.onAfterPageRender(function() {
-    setTimeout(function() {
+  window.onAfterPageRender(function () {
+    setTimeout(function () {
       _attachCardPrefetch(document.getElementById('pbody'));
     }, 400);
   });
@@ -253,29 +260,31 @@
      - SKIP su saveData / rete lenta (2g, 3g)
      - ritardo più lungo su dispositivi deboli
   ════════════════════════════════ */
-  if(!window._reducedMotion){
+  if (!window._reducedMotion) {
     var _dev = window._arcDev || {};
     /* saveData: rispetta sempre la preferenza utente — niente prefetch */
-    if(!_dev.saveData){
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          /* Pagine lavori — le più cliccate */
-          var hotPages = [
-            'pag-biblioteca',
-            'pag-bottega-farmaceutica',
-            'pag-caserma',
-            'pag-forgia',
-            'pag-gilda-avventurieri',
-            'pag-locanda',
-            'pag-ospedale',
-            'pag-sartoria',
-          ];
-          hotPages.forEach(function(id) {
-            if (window.prefetchPage) window.prefetchPage(id);
-          });
-        }, (_dev.low || _dev.slowNet) ? 10000 : 5000);
+    if (!_dev.saveData) {
+      window.addEventListener('load', function () {
+        setTimeout(
+          function () {
+            /* Pagine lavori — le più cliccate */
+            var hotPages = [
+              'pag-biblioteca',
+              'pag-bottega-farmaceutica',
+              'pag-caserma',
+              'pag-forgia',
+              'pag-gilda-avventurieri',
+              'pag-locanda',
+              'pag-ospedale',
+              'pag-sartoria',
+            ];
+            hotPages.forEach(function (id) {
+              if (window.prefetchPage) window.prefetchPage(id);
+            });
+          },
+          _dev.low || _dev.slowNet ? 10000 : 5000
+        );
       });
     }
   }
-
 })();

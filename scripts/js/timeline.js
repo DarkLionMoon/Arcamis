@@ -3,7 +3,7 @@
    Widget timeline orizzontale
 ════════════════════════════════════ */
 
-window.renderTimeline = function(container, pages) {
+window.renderTimeline = function (container, pages) {
   _injectTimelineCSS();
 
   var wrap = document.createElement('div');
@@ -19,7 +19,7 @@ window.renderTimeline = function(container, pages) {
   var events = document.createElement('div');
   events.className = 'tl-events';
 
-  pages.forEach(function(ev, i) {
+  pages.forEach(function (ev, i) {
     var isTop = i % 2 === 0;
     var slot = document.createElement('div');
     slot.className = 'tl-slot';
@@ -27,7 +27,9 @@ window.renderTimeline = function(container, pages) {
     var box = document.createElement('div');
     box.className = 'tl-box ' + (isTop ? 'top' : 'bottom');
     box.innerHTML = '<div class="tl-year">' + ev.title + '</div>';
-    box.onclick = function() { _tlOpenModal(ev); };
+    box.onclick = function () {
+      _tlOpenModal(ev);
+    };
 
     var stemTop = document.createElement('div');
     stemTop.className = 'tl-stem top';
@@ -63,32 +65,45 @@ window.renderTimeline = function(container, pages) {
     var modalBg = document.createElement('div');
     modalBg.className = 'tl-modal-bg';
     modalBg.id = 'tl-modal-bg';
-   modalBg.innerHTML =
-  '<div class="tl-modal">' +
-    '<div class="tl-modal-close" onclick="tlCloseModal()">✕ CHIUDI</div>' +
-    '<div class="tl-modal-year" id="tl-m-year"></div>' +
-    '<div class="tl-modal-title" id="tl-m-title"></div>' +
-    '<div class="tl-modal-content" id="tl-m-content"></div>' +
-  '</div>';
-    modalBg.addEventListener('click', function(e) { if (e.target === modalBg) tlCloseModal(); });
+    modalBg.innerHTML =
+      '<div class="tl-modal">' +
+      '<div class="tl-modal-close" onclick="tlCloseModal()">✕ CHIUDI</div>' +
+      '<div class="tl-modal-year" id="tl-m-year"></div>' +
+      '<div class="tl-modal-title" id="tl-m-title"></div>' +
+      '<div class="tl-modal-content" id="tl-m-content"></div>' +
+      '</div>';
+    modalBg.addEventListener('click', function (e) {
+      if (e.target === modalBg) tlCloseModal();
+    });
     document.body.appendChild(modalBg);
   }
 
   /* ── Drag scroll ── */
-  var isDown = false, startX, scrollLeft;
-  wrap.addEventListener('mousedown', function(e) {
-    isDown = true; wrap.classList.add('grabbing');
-    startX = e.pageX - wrap.offsetLeft; scrollLeft = wrap.scrollLeft;
+  var isDown = false,
+    startX,
+    scrollLeft;
+  wrap.addEventListener('mousedown', function (e) {
+    isDown = true;
+    wrap.classList.add('grabbing');
+    startX = e.pageX - wrap.offsetLeft;
+    scrollLeft = wrap.scrollLeft;
   });
-  wrap.addEventListener('mouseleave', function() { isDown = false; wrap.classList.remove('grabbing'); });
-  wrap.addEventListener('mouseup', function() { isDown = false; wrap.classList.remove('grabbing'); });
-  wrap.addEventListener('mousemove', function(e) {
-    if (!isDown) return; e.preventDefault();
+  wrap.addEventListener('mouseleave', function () {
+    isDown = false;
+    wrap.classList.remove('grabbing');
+  });
+  wrap.addEventListener('mouseup', function () {
+    isDown = false;
+    wrap.classList.remove('grabbing');
+  });
+  wrap.addEventListener('mousemove', function (e) {
+    if (!isDown) return;
+    e.preventDefault();
     wrap.scrollLeft = scrollLeft - (e.pageX - wrap.offsetLeft - startX);
   });
 };
 
-window.tlCloseModal = function() {
+window.tlCloseModal = function () {
   var bg = document.getElementById('tl-modal-bg');
   if (bg) bg.classList.remove('open');
 };
@@ -98,17 +113,16 @@ function _tlOpenModal(ev) {
   if (!bg) return;
   document.getElementById('tl-m-year').textContent = ev.title;
   document.getElementById('tl-m-title').textContent = '';
-  document.getElementById('tl-m-content').innerHTML = '<div class="tl-modal-loading"><div class="gs-loading-spin"></div></div>';
+  document.getElementById('tl-m-content').innerHTML =
+    '<div class="tl-modal-loading"><div class="gs-loading-spin"></div></div>';
   bg.classList.add('open');
 
-  fetch('/api/notion?pageId=' + ev.id)
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(!data.blocks) throw new Error('no blocks');
-      var html = renderBlocks(data.blocks, true);
+  _loadLocalPage(ev.id)
+    .then(function (html) {
+      if (!html) throw new Error('no content');
       document.getElementById('tl-m-content').innerHTML = '<div class="n-body">' + html + '</div>';
     })
-    .catch(function(){
+    .catch(function () {
       document.getElementById('tl-m-content').innerHTML = '<div class="tl-modal-error">Errore caricamento</div>';
     });
 }

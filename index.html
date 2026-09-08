@@ -38,6 +38,7 @@
 <link rel="stylesheet" href="/scripts/css/style-ui.css">
 <link rel="stylesheet" href="/scripts/css/style-rep.css">
 <link rel="stylesheet" href="/scripts/css/style-compendio.css">
+<link rel="stylesheet" href="/scripts/css/style-imprese.css">
 </head>
 <body>
 <!-- ═══ SKIP LINK (accessibilità) ═══ -->
@@ -76,6 +77,12 @@
     <!-- ── Lavori ▾ ── -->
 
     <!-- ── Lore ▾ ── -->
+    <div class="tn-drop" id="dd-imprese" role="menu" aria-haspopup="true">
+      <div class="tn" onclick="toggleDd('dd-imprese',event)" role="menuitem" aria-expanded="false" tabindex="0">Imprese</div>
+      <div class="tn-menu">
+        <div class="tn-item" onclick="closeDd();gp('pag-imprese','Imprese e Licenze','⚖️')"><span class="tn-ii">⚖️</span>Imprese e Licenze</div>
+      </div>
+    </div>
     <div class="tn-drop" id="dd-lore" role="menu" aria-haspopup="true">
       <div class="tn" onclick="toggleDd('dd-lore',event)" role="menuitem" aria-expanded="false" tabindex="0">Lore</div>
       <div class="tn-menu">
@@ -131,6 +138,10 @@
     <div class="mn-item" onclick="closeMobileNav();showHome()"><span class="mn-ii">🏠</span>Home</div>
   </div>
   <div class="mn-section mn-section--lavori"></div>
+  <div class="mn-section" id="mn-sec-imprese">
+    <div class="mn-label">Imprese</div>
+    <div class="mn-item" onclick="closeMobileNav();gp('pag-imprese','Imprese e Licenze','⚖️')"><span class="mn-ii">⚖️</span>Imprese e Licenze</div>
+  </div>
   <div class="mn-section" id="mn-sec-lore">
     <div class="mn-label">Lore &amp; Mondo</div>
     <div class="mn-item" onclick="closeMobileNav();gp('pag-storia-del-mondo','Lore','📖')"><span class="mn-ii">📖</span>Lore</div>

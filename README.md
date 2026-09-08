@@ -1,7 +1,7 @@
 # Arcamis Wiki — Static Version
 
 Wiki statica per la campagna D&D Arcamis, deployata su Cloudflare Pages.
-Contenuto servito da JSON locali; API Functions come fallback Notion.
+Contenuto 100% local-first: tutto servito da JSON statici (nessun ping alla Notion API).
 
 ---
 
@@ -36,9 +36,12 @@ Contenuto servito da JSON locali; API Functions come fallback Notion.
 
 - **Pagine**: `content/pages/<slug>.json` con campo `content` in markdown.
   Il client le legge localmente (`notion-nav.js` → `_gpRender`); se mancano,
-  ricade su `/api/notion?pageId=…`.
-- **Database/gallerie**: serviti via API `/api/notion?dbId=…` (Notion live).
-- **Ricerca**: `/api/search`, indici costruiti con `/api/build-index`.
+  mostra un placeholder "non disponibile" (nessuna chiamata a Notion).
+- **Database/gallerie**: serviti da JSON locali in `content/databases/*.json`
+  (struttura `{ "pages": [...] }`) tramite `_loadLocalDb`/`_loadLocalPage`
+  in `notion-render.js`. Se il file è assente, i loader mostrano l'empty state
+  (nessuna API, nessun ping a Notion).
+- **Ricerca**: locale, dall'indice statico `content/search-index.json`.
 - I mestieri e le professioni sono renderizzati dal compendio locale
   (`mestieri-compendio.js`).
 

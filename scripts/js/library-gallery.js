@@ -9,35 +9,35 @@ var BOOKS_PER_SHELF = 8;
 
 /* Mappa colori Notion → CSS */
 var _notionColors = {
-  green:   '#4a7c59',
-  blue:    '#3a6b9e',
-  yellow:  '#9e7a1a',
-  orange:  '#9e5a1a',
-  red:     '#9e2a2a',
-  purple:  '#6a3a9e',
-  brown:   '#7a4a2a',
-  gray:    '#555566',
-  pink:    '#9e3a6a',
-  default: '#555566'
+  green: '#4a7c59',
+  blue: '#3a6b9e',
+  yellow: '#9e7a1a',
+  orange: '#9e5a1a',
+  red: '#9e2a2a',
+  purple: '#6a3a9e',
+  brown: '#7a4a2a',
+  gray: '#555566',
+  pink: '#9e3a6a',
+  default: '#555566',
 };
 
 /* Colori dorso libro per argomento */
 var _spineColors = {
-  'Arcamis':    { bg: '#1a3a2a', accent: '#4a7c59', text: '#a0d0b0' },
-  'Botanica':   { bg: '#1a2a1a', accent: '#5a8a3a', text: '#90c080' },
-  'Storia':     { bg: '#2a1a0a', accent: '#8a5a2a', text: '#d0a060' },
-  'Geografia':  { bg: '#0a1a2a', accent: '#2a5a8a', text: '#70a0d0' },
-  'Arcadia':    { bg: '#2a2a0a', accent: '#8a8a2a', text: '#d0d060' },
-  'Shurima':    { bg: '#2a1500', accent: '#9a6010', text: '#e0a040' },
-  'Ixtal':      { bg: '#1a0a2a', accent: '#6a2a8a', text: '#b060d0' },
-  'Magia':      { bg: '#200a2a', accent: '#7a1a9a', text: '#c050e0' },
-  'Void':       { bg: '#0a0a14', accent: '#3a2a6a', text: '#7060b0' },
-  'PERICOLOSO': { bg: '#1e0404', accent: '#8a0a0a', text: '#d04040' },
-  'Medicina':   { bg: '#0a1e1a', accent: '#2a7a6a', text: '#60c0a0' },
-  'Alchimia':   { bg: '#1a0a18', accent: '#7a2a78', text: '#c060b0' },
-  'Targon':     { bg: '#0a0e20', accent: '#2a3a8a', text: '#6080d0' },
-  'Mitologia':  { bg: '#1a0808', accent: '#7a1a2a', text: '#c04060' },
-  'default':    { bg: '#1a1408', accent: '#7a6030', text: '#c0a060' }
+  Arcamis: { bg: '#1a3a2a', accent: '#4a7c59', text: '#a0d0b0' },
+  Botanica: { bg: '#1a2a1a', accent: '#5a8a3a', text: '#90c080' },
+  Storia: { bg: '#2a1a0a', accent: '#8a5a2a', text: '#d0a060' },
+  Geografia: { bg: '#0a1a2a', accent: '#2a5a8a', text: '#70a0d0' },
+  Arcadia: { bg: '#2a2a0a', accent: '#8a8a2a', text: '#d0d060' },
+  Shurima: { bg: '#2a1500', accent: '#9a6010', text: '#e0a040' },
+  Ixtal: { bg: '#1a0a2a', accent: '#6a2a8a', text: '#b060d0' },
+  Magia: { bg: '#200a2a', accent: '#7a1a9a', text: '#c050e0' },
+  Void: { bg: '#0a0a14', accent: '#3a2a6a', text: '#7060b0' },
+  PERICOLOSO: { bg: '#1e0404', accent: '#8a0a0a', text: '#d04040' },
+  Medicina: { bg: '#0a1e1a', accent: '#2a7a6a', text: '#60c0a0' },
+  Alchimia: { bg: '#1a0a18', accent: '#7a2a78', text: '#c060b0' },
+  Targon: { bg: '#0a0e20', accent: '#2a3a8a', text: '#6080d0' },
+  Mitologia: { bg: '#1a0808', accent: '#7a1a2a', text: '#c04060' },
+  default: { bg: '#1a1408', accent: '#7a6030', text: '#c0a060' },
 };
 
 function _getSpineColor(argomenti) {
@@ -45,46 +45,70 @@ function _getSpineColor(argomenti) {
   return _spineColors[argomenti[0].name] || _spineColors['default'];
 }
 
-window.loadLibraryGallery = function(container) {
-  container.innerHTML = '<div class="lib-loader"><div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div></div>';
-  fetch('/api/notion?dbId=' + BIBLIO_DB_ID)
-    .then(function(r) { return r.json(); })
-    .then(function(data) { _renderLibrary(container, data.pages || []); })
-    .catch(function(err) {
-      container.innerHTML = '<p style="color:rgba(200,155,60,.5);font-family:Cinzel,serif;text-align:center;padding:40px">Errore nel risveglio delle pergamene.</p>';
+window.loadLibraryGallery = function (container, pages) {
+  container.innerHTML =
+    '<div class="lib-loader"><div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div></div>';
+  if (Array.isArray(pages)) {
+    _renderLibrary(container, pages);
+    return;
+  }
+  _loadLocalDb(BIBLIO_DB_ID)
+    .then(function (data) {
+      if (!data.pages || !data.pages.length) {
+        container.innerHTML =
+          '<p style="color:rgba(200,155,60,.5);font-family:Cinzel,serif;text-align:center;padding:40px">La biblioteca non è ancora disponibile.</p>';
+        return;
+      }
+      _renderLibrary(container, data.pages);
+    })
+    .catch(function (err) {
+      container.innerHTML =
+        '<p style="color:rgba(200,155,60,.5);font-family:Cinzel,serif;text-align:center;padding:40px">La biblioteca non è ancora disponibile.</p>';
       console.error(err);
     });
 };
 
 function _renderLibrary(container, pages) {
   var allArgs = {};
-  pages.forEach(function(p) {
+  pages.forEach(function (p) {
     if (p && p.argomenti) {
-        p.argomenti.forEach(function(a) { 
-            if (a && a.name) allArgs[a.name] = a.color; 
-        });
+      p.argomenti.forEach(function (a) {
+        if (a && a.name) allArgs[a.name] = a.color;
+      });
     }
-});
+  });
   container._libAllArgs = allArgs;
   var argKeys = Object.keys(allArgs).sort();
 
   container.innerHTML =
-    '<div class="lib-wrap">'+
-      '<div class="lib-filters">'+
-        '<button class="lib-filter active" data-filter="all" onclick="libFilter(this,\'all\')">Tutti</button>'+
-        argKeys.map(function(k) {
-          var col = _notionColors[allArgs[k]] || '#888';
-          return '<button class="lib-filter" data-filter="'+k+'" onclick="libFilter(this,\''+k+'\')" style="--fc:'+col+'">'+k+'</button>';
-        }).join('')+
-      '</div>'+
-      '<div class="lib-body">'+
-        '<div class="lib-shelves" id="lib-shelves">'+
-          _renderShelves(pages)+
-        '</div>'+
-        '<div class="lib-info" id="lib-info">'+
-          '<div class="lib-info-placeholder">📖 Seleziona un libro</div>'+
-        '</div>'+
-      '</div>'+
+    '<div class="lib-wrap">' +
+    '<div class="lib-filters">' +
+    '<button class="lib-filter active" data-filter="all" onclick="libFilter(this,\'all\')">Tutti</button>' +
+    argKeys
+      .map(function (k) {
+        var col = _notionColors[allArgs[k]] || '#888';
+        return (
+          '<button class="lib-filter" data-filter="' +
+          k +
+          '" onclick="libFilter(this,\'' +
+          k +
+          '\')" style="--fc:' +
+          col +
+          '">' +
+          k +
+          '</button>'
+        );
+      })
+      .join('') +
+    '</div>' +
+    '<div class="lib-body">' +
+    '<div class="lib-shelves" id="lib-shelves">' +
+    _renderShelves(pages) +
+    '</div>' +
+    '<div class="lib-info" id="lib-info">' +
+    '<div class="lib-info-placeholder">📖 Seleziona un libro</div>' +
+    '</div>' +
+    '</div>' +
     '</div>';
 
   container._libPages = pages;
@@ -96,34 +120,68 @@ function _renderShelves(pages) {
   for (var i = 0; i < pages.length; i += BOOKS_PER_SHELF) {
     rows.push(pages.slice(i, i + BOOKS_PER_SHELF));
   }
-  return rows.map(function(row) {
-    return '<div class="lib-shelf-row">'+
-      '<div class="lib-shelf-books">'+
-        row.map(function(p) { return _renderBook(p); }).join('')+
-      '</div>'+
-      '<div class="lib-shelf-base"></div>'+
-    '</div>';
-  }).join('');
+  return rows
+    .map(function (row) {
+      return (
+        '<div class="lib-shelf-row">' +
+        '<div class="lib-shelf-books">' +
+        row
+          .map(function (p) {
+            return _renderBook(p);
+          })
+          .join('') +
+        '</div>' +
+        '<div class="lib-shelf-base"></div>' +
+        '</div>'
+      );
+    })
+    .join('');
 }
 
 function _renderBook(p) {
   var sc = _getSpineColor(p.argomenti);
   var titleSafe = p.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-  var argStr = (p.argomenti||[]).map(function(a){return a.name;}).join(',');
-  var h = 140 + Math.abs((_hash(p.id) % 40));
-  var w = 28 + Math.abs((_hash(p.id + '1') % 18));
+  var argStr = (p.argomenti || [])
+    .map(function (a) {
+      return a.name;
+    })
+    .join(',');
+  var h = 140 + Math.abs(_hash(p.id) % 40);
+  var w = 28 + Math.abs(_hash(p.id + '1') % 18);
   var tilt = (_hash(p.id + '2') % 5) - 2;
 
-  return '<div class="lib-book" data-id="'+p.id+'" data-title="'+titleSafe+'" data-args="'+argStr+'" '+
-    'style="--sc-bg:'+sc.bg+';--sc-acc:'+sc.accent+';--sc-txt:'+sc.text+';--bh:'+h+'px;--bw:'+w+'px;--btilt:'+tilt+'deg" '+
-    'onclick="libOpenBook(this)" onmouseenter="libHoverBook(this)" onmouseleave="libLeaveBook(this)">'+
-    '<div class="lib-spine">'+
-      '<div class="lib-spine-title">'+p.title+'</div>'+
-      '<div class="lib-spine-deco"></div>'+
-    '</div>'+
-    '<div class="lib-book-top"></div>'+
-    '<div class="lib-book-side"></div>'+
-  '</div>';
+  return (
+    '<div class="lib-book" data-id="' +
+    p.id +
+    '" data-title="' +
+    titleSafe +
+    '" data-args="' +
+    argStr +
+    '" ' +
+    'style="--sc-bg:' +
+    sc.bg +
+    ';--sc-acc:' +
+    sc.accent +
+    ';--sc-txt:' +
+    sc.text +
+    ';--bh:' +
+    h +
+    'px;--bw:' +
+    w +
+    'px;--btilt:' +
+    tilt +
+    'deg" ' +
+    'onclick="libOpenBook(this)" onmouseenter="libHoverBook(this)" onmouseleave="libLeaveBook(this)">' +
+    '<div class="lib-spine">' +
+    '<div class="lib-spine-title">' +
+    p.title +
+    '</div>' +
+    '<div class="lib-spine-deco"></div>' +
+    '</div>' +
+    '<div class="lib-book-top"></div>' +
+    '<div class="lib-book-side"></div>' +
+    '</div>'
+  );
 }
 
 function _hash(str) {
@@ -132,10 +190,12 @@ function _hash(str) {
   return Math.abs(h);
 }
 
-window.libFilter = function(btn, filter) {
-  document.querySelectorAll('.lib-filter').forEach(function(b){ b.classList.remove('active'); });
+window.libFilter = function (btn, filter) {
+  document.querySelectorAll('.lib-filter').forEach(function (b) {
+    b.classList.remove('active');
+  });
   btn.classList.add('active');
-  document.querySelectorAll('.lib-book').forEach(function(book) {
+  document.querySelectorAll('.lib-book').forEach(function (book) {
     var args = book.getAttribute('data-args') || '';
     var show = filter === 'all' || args.split(',').indexOf(filter) > -1;
     book.style.opacity = show ? '1' : '0.12';
@@ -144,64 +204,94 @@ window.libFilter = function(btn, filter) {
   });
 };
 
-window.libHoverBook = function(el) {
+window.libHoverBook = function (el) {
   if (el.classList.contains('selected')) return;
   el.style.transform = 'translateY(-12px) rotate(var(--btilt)) scale(1.04)';
 };
 
-window.libLeaveBook = function(el) {
+window.libLeaveBook = function (el) {
   if (el.classList.contains('selected')) return;
   el.style.transform = '';
 };
 
-window.libOpenBook = function(el) {
+window.libOpenBook = function (el) {
   var id = el.getAttribute('data-id');
   var title = el.getAttribute('data-title');
 
-  document.querySelectorAll('.lib-book').forEach(function(b){ b.classList.remove('selected'); b.style.transform = ''; });
+  document.querySelectorAll('.lib-book').forEach(function (b) {
+    b.classList.remove('selected');
+    b.style.transform = '';
+  });
   el.classList.add('selected');
   el.style.transform = 'translateY(-18px) rotate(var(--btilt)) scale(1.08)';
 
   var info = document.getElementById('lib-info');
   if (!info) return;
-  info.innerHTML = '<div class="lib-info-loading"><div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div></div>';
+  info.innerHTML =
+    '<div class="lib-info-loading"><div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div></div>';
   info.classList.add('open');
 
-  fetch('/api/notion?pageId=' + id)
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (!data.blocks) throw new Error('no blocks');
+  _loadLocalPage(id)
+    .then(function (html) {
+      if (!html) throw new Error('no content');
 
       var argStr = el.getAttribute('data-args') || '';
       var argomenti = argStr ? argStr.split(',').filter(Boolean) : [];
-      var sc = _getSpineColor(argomenti.map(function(a){ return {name:a}; }));
+      var sc = _getSpineColor(
+        argomenti.map(function (a) {
+          return { name: a };
+        })
+      );
 
       var libContainer = el.closest('.hb-library-container');
       var allArgsSaved = (libContainer && libContainer._libAllArgs) || {};
-      var tagsHtml = argomenti.map(function(a) {
-        var col = _notionColors[allArgsSaved[a]] || '#888';
-        return '<span class="lib-tag" style="background:'+col+'22;border-color:'+col+'44;color:'+col+'">'+a+'</span>';
-      }).join('');
+      var tagsHtml = argomenti
+        .map(function (a) {
+          var col = _notionColors[allArgsSaved[a]] || '#888';
+          return (
+            '<span class="lib-tag" style="background:' +
+            col +
+            '22;border-color:' +
+            col +
+            '44;color:' +
+            col +
+            '">' +
+            a +
+            '</span>'
+          );
+        })
+        .join('');
 
-      var html = renderBlocks(data.blocks, true);
       info.innerHTML =
-        '<div class="lib-info-inner">'+
-          '<div class="lib-info-header" style="--sc-acc:'+sc.accent+';--sc-bg:'+sc.bg+'">'+
-            '<div class="lib-info-icon">📖</div>'+
-            '<div>'+
-              '<div class="lib-info-title">'+title+'</div>'+
-              (tagsHtml ? '<div class="lib-info-tags">'+tagsHtml+'</div>' : '')+
-            '</div>'+
-          '</div>'+
-          '<div class="lib-info-body n-body">'+html+'</div>'+
-          '<div class="lib-info-footer">'+
-            '<button class="lib-open-btn" onclick="gp(\''+id+'\',\''+title.replace(/'/g,"\'")+'\',\'📖\')">Apri pagina completa →</button>'+
-          '</div>'+
+        '<div class="lib-info-inner">' +
+        '<div class="lib-info-header" style="--sc-acc:' +
+        sc.accent +
+        ';--sc-bg:' +
+        sc.bg +
+        '">' +
+        '<div class="lib-info-icon">📖</div>' +
+        '<div>' +
+        '<div class="lib-info-title">' +
+        title +
+        '</div>' +
+        (tagsHtml ? '<div class="lib-info-tags">' + tagsHtml + '</div>' : '') +
+        '</div>' +
+        '</div>' +
+        '<div class="lib-info-body n-body">' +
+        html +
+        '</div>' +
+        '<div class="lib-info-footer">' +
+        '<button class="lib-open-btn" onclick="gp(\'' +
+        id +
+        "','" +
+        title.replace(/'/g, "\'") +
+        "','📖')\">Apri pagina completa →</button>" +
+        '</div>' +
         '</div>';
     })
-    .catch(function() {
+    .catch(function () {
       info.innerHTML = '<div class="lib-info-err">Errore caricamento</div>';
-});
+    });
 };
 
 function _injectLibCSS() {

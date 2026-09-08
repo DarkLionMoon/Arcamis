@@ -4,8 +4,7 @@
    e la applica al DOM: sfondo, tag, titolo, descrizione, bottoni.
    Se non ci sono override in KV, le slide restano invariate.
 ════════════════════════════════════════════════════════ */
-(function() {
-
+(function () {
   function applyBtnHref(el, href) {
     if (href && href.startsWith('http')) {
       if (el.tagName === 'A') {
@@ -29,14 +28,14 @@
 
   function applyCarouselConfig(slides) {
     var slideEls = document.querySelectorAll('.slide');
-    slides.forEach(function(data, idx) {
+    slides.forEach(function (data, idx) {
       var slideEl = slideEls[idx];
       if (!slideEl) return;
 
       /* ── Sfondo ── */
       if (data.img) {
-        slideEl.style.backgroundImage    = 'url(\'' + data.img + '\')';
-        slideEl.style.backgroundSize     = 'cover';
+        slideEl.style.backgroundImage = "url('" + data.img + "')";
+        slideEl.style.backgroundSize = 'cover';
         slideEl.style.backgroundPosition = 'center 40%';
       }
 
@@ -46,7 +45,7 @@
           var tagEl = slideEl.querySelector('.stag');
           if (tagEl) {
             var lastText = null;
-            tagEl.childNodes.forEach(function(n) {
+            tagEl.childNodes.forEach(function (n) {
               if (n.nodeType === Node.TEXT_NODE) lastText = n;
             });
             if (lastText) lastText.textContent = data.meta.tag;
@@ -67,7 +66,7 @@
       if (data.btns && data.btns.length) {
         var btnsEl = slideEl.querySelectorAll('.sbtn');
         if (data.btns.length > btnsEl.length) {
-          var host = btnsEl.length ? btnsEl[0].parentNode : (slideEl.querySelector('.scnt') || slideEl);
+          var host = btnsEl.length ? btnsEl[0].parentNode : slideEl.querySelector('.scnt') || slideEl;
           for (var k = btnsEl.length; k < data.btns.length; k++) {
             var n = document.createElement('div');
             n.className = 'sbtn';
@@ -76,7 +75,7 @@
           }
           btnsEl = slideEl.querySelectorAll('.sbtn');
         }
-        data.btns.forEach(function(btn, bi) {
+        data.btns.forEach(function (btn, bi) {
           var el = btnsEl[bi];
           if (!el) return;
           if (btn.label) {
@@ -94,13 +93,15 @@
 
   function loadCarousel() {
     fetch('/api/carousel')
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (data) {
         if (data.slides && data.slides.length) {
           applyCarouselConfig(data.slides);
         }
       })
-      .catch(function(e) {
+      .catch(function (e) {
         /* Silenzioso — se fallisce rimane il carousel hardcoded */
         console.warn('[carousel-loader] fetch failed:', e);
       });
@@ -111,5 +112,4 @@
   } else {
     loadCarousel();
   }
-
 })();

@@ -1,0 +1,352 @@
+/* ════════════════════════════════════
+   ARCAMIS — Imprese & Licenze
+   Layout integrato, stile Bronze Age
+   Namespace: .imprese-app
+════════════════════════════════════ */
+.imprese-app {
+  --imp-bg: var(--bg); --imp-bg2: var(--bg2); --imp-bg3: var(--bg3);
+  --imp-panel: var(--panel); --imp-bdr: var(--bdr); --imp-bdr2: var(--bdr2); --imp-bdr3: var(--bdr3);
+  --imp-gold: var(--gold); --imp-gold2: var(--gold2); --imp-gold3: var(--gold3);
+  --imp-text: var(--text); --imp-text2: var(--text2); --imp-text3: var(--text3); --imp-white: var(--white);
+  --imp-red: #c04040; --imp-green: #4a9a58; --imp-amber: #d4954a;
+  --imp-blue: #5a8ad8; --imp-purple: #8a50b0; --imp-purple2: #a070c8;
+  --imp-common: #60b840; --imp-uncommon: #50a0d8;
+  --imp-rare: #a060d8; --imp-very-rare: #d88040; --imp-legendary: #d8b020;
+  --imp-glow: 0 0 22px rgba(200,155,60,.18);
+  --imp-radius: 8px;
+  font-family: 'Crimson Pro', Georgia, serif;
+}
+.imprese-app *, .imprese-app *::before, .imprese-app *::after { box-sizing: border-box; margin: 0; padding: 0; }
+.imprese-app { color: var(--imp-text); line-height: 1.6; min-height: 100%; }
+
+/* ── HEADER ── */
+.imprese-app .imp-header {
+  background: linear-gradient(180deg, var(--imp-bg2) 0%, var(--imp-bg) 100%);
+  border-bottom: 1px solid var(--imp-bdr2);
+  padding: 24px 28px; text-align: center; position: sticky; top: 0; z-index: 10;
+  height: 108px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.imprese-app .imp-header h1 {
+  font-family: 'Cinzel', serif; font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+  font-weight: 900; color: var(--imp-gold2); letter-spacing: .06em;
+  text-shadow: 0 0 30px rgba(200,155,60,.3); margin-bottom: 4px;
+}
+.imprese-app .imp-header p { font-size: .8rem; color: var(--imp-text3); letter-spacing: .1em; text-transform: uppercase; }
+.imprese-app .imp-theme-toggle {
+  position: absolute; top: 50%; right: 20px; transform: translateY(-50%);
+  background: var(--imp-panel); border: 1px solid var(--imp-bdr2); color: var(--imp-gold2);
+  border-radius: 4px; width: 36px; height: 36px; cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+}
+.imprese-app .imp-theme-toggle:hover { border-color: var(--imp-gold); box-shadow: var(--imp-glow); }
+
+/* ── TABS ── */
+.imprese-app .imp-tabs {
+  display: flex; gap: 4px; padding: 12px 20px 0;
+  border-bottom: 1px solid var(--imp-bdr); background: var(--imp-bg2);
+}
+.imprese-app .imp-tab {
+  background: var(--imp-panel); border: 1px solid var(--imp-bdr); color: var(--imp-text2);
+  font-family: 'Cinzel', serif; font-size: .72rem; letter-spacing: .06em;
+  padding: 7px 14px; border-radius: 4px 4px 0 0; cursor: pointer; transition: all .2s;
+  white-space: nowrap;
+}
+.imprese-app .imp-tab:hover { background: var(--imp-bg3); color: var(--imp-gold2); border-color: var(--imp-bdr2); }
+.imprese-app .imp-tab.active {
+  background: var(--imp-bg); color: var(--imp-gold2); border-color: var(--imp-gold);
+  border-bottom-color: var(--imp-bg); position: relative; bottom: -1px;
+}
+
+/* ── LAYOUT ── */
+.imprese-app .imp-main { display: flex; min-height: calc(100vh - 164px); }
+
+/* ── SIDENAV ── */
+.imprese-app .imp-sidenav {
+  width: 200px; flex-shrink: 0; background: var(--imp-bg2); border-right: 1px solid var(--imp-bdr);
+  padding: 16px 0; position: sticky; top: 108px; align-self: flex-start;
+  max-height: calc(100vh - 108px); overflow-y: auto;
+}
+.imprese-app .imp-sidenav-title {
+  font-family: 'Cinzel', serif; font-size: .6rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--imp-text3); padding: 0 16px 6px;
+}
+.imprese-app .imp-sidenav-btn {
+  display: block; width: 100%; background: none; border: none;
+  color: var(--imp-text2); font-family: 'Crimson Pro', Georgia, serif;
+  font-size: .88rem; text-align: left; padding: 6px 18px; cursor: pointer;
+  transition: all .15s; border-left: 3px solid transparent;
+}
+.imprese-app .imp-sidenav-btn:hover { color: var(--imp-gold); background: rgba(200,155,60,.05); }
+.imprese-app .imp-sidenav-btn.active { color: var(--imp-gold2); border-left-color: var(--imp-gold); background: rgba(200,155,60,.08); font-weight: 600; }
+
+/* ── CONTENT ── */
+.imprese-app .imp-content { flex: 1; padding: 24px 24px; overflow-x: auto; max-width: 960px; }
+
+/* ── HERO ── */
+.imprese-app .imp-hero {
+  background: linear-gradient(135deg, var(--imp-panel) 0%, var(--imp-bg3) 100%);
+  border: 1px solid var(--imp-bdr2); border-radius: var(--imp-radius);
+  padding: 28px 32px; margin-bottom: 24px; position: relative; overflow: hidden;
+}
+.imprese-app .imp-hero::before {
+  position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+  font-size: 5rem; opacity: .05; pointer-events: none;
+}
+.imprese-app .imp-hero.gilde::before { content: '🏛️'; }
+.imprese-app .imp-hero.licenze::before { content: '⚖️'; }
+.imprese-app .imp-hero h2 {
+  font-family: 'Cinzel', serif; font-size: 1.4rem; color: var(--imp-gold2);
+  margin-bottom: 8px; text-shadow: 0 0 24px rgba(200,155,60,.25);
+}
+.imprese-app .imp-hero p { color: var(--imp-text2); font-size: .92rem; line-height: 1.6; }
+.imprese-app .imp-hero-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.imprese-app .imp-hero-link {
+  background: var(--imp-panel); border: 1px solid var(--imp-bdr2); color: var(--imp-gold2);
+  border-radius: 4px; padding: 5px 10px; font-size: .74rem; font-weight: 600;
+  cursor: pointer; transition: all .2s; font-family: 'Cinzel', serif; letter-spacing: .03em;
+}
+.imprese-app .imp-hero-link:hover { border-color: var(--imp-gold); box-shadow: var(--imp-glow); }
+
+/* ── SECTION ── */
+.imprese-app .imp-section { margin-bottom: 28px; }
+.imprese-app .imp-section-title {
+  font-family: 'Cinzel', serif; font-size: .75rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--imp-gold); margin-bottom: 12px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--imp-bdr);
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ── CARD ── */
+.imprese-app .imp-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.imprese-app .imp-card {
+  background: var(--imp-panel); border: 1px solid var(--imp-bdr); border-radius: var(--imp-radius);
+  padding: 14px 16px; transition: border-color .2s, box-shadow .2s;
+}
+.imprese-app .imp-card:hover { border-color: var(--imp-bdr2); box-shadow: var(--imp-glow); }
+.imprese-app .imp-card h4 { font-family: 'Cinzel', serif; font-size: .82rem; color: var(--imp-gold2); margin-bottom: 6px; }
+.imprese-app .imp-card p, .imprese-app .imp-card li { font-size: .84rem; color: var(--imp-text2); line-height: 1.5; }
+.imprese-app .imp-card ul { padding-left: 12px; }
+.imprese-app .imp-card li { margin-bottom: 2px; }
+
+/* ── IMPRESA TYPE CARD ── */
+.imprese-app .imp-type-card {
+  background: var(--imp-panel); border-radius: var(--imp-radius);
+  border: 1px solid var(--imp-bdr2); margin-bottom: 18px; overflow: hidden;
+}
+.imprese-app .imp-type-header {
+  padding: 12px 18px; display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--imp-bdr);
+}
+.imprese-app .imp-type-header h3 { font-family: 'Cinzel', serif; font-size: .92rem; color: var(--imp-gold2); }
+.imprese-app .imp-type-body { padding: 14px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.imprese-app .imp-type-body h5 {
+  font-family: 'Cinzel', serif; font-size: .65rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--imp-text3); margin-bottom: 5px;
+}
+.imprese-app .imp-type-body p { font-size: .82rem; color: var(--imp-text2); margin-bottom: 3px; }
+.imprese-app .imp-type-body strong { color: var(--imp-gold); }
+.imprese-app .imp-benefit-list, .imprese-app .imp-limit-list { list-style: none; padding: 0; margin-top: 6px; }
+.imprese-app .imp-benefit-list li { font-size: .82rem; color: var(--imp-green); padding: 2px 0; display: flex; gap: 5px; }
+.imprese-app .imp-benefit-list li::before { content: '✦'; color: var(--imp-gold); flex-shrink: 0; }
+.imprese-app .imp-limit-list li { font-size: .82rem; color: var(--imp-amber); padding: 2px 0; display: flex; gap: 5px; }
+.imprese-app .imp-limit-list li::before { content: '⚠'; flex-shrink: 0; }
+
+/* ── TABLE ── */
+.imprese-app .imp-table-wrap { overflow-x: auto; margin-bottom: 20px; }
+.imprese-app table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+.imprese-app thead tr { background: var(--imp-bg3); border-bottom: 2px solid var(--imp-bdr2); }
+.imprese-app thead th {
+  font-family: 'Cinzel', serif; font-size: .65rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--imp-gold); padding: 8px 10px; text-align: left;
+}
+.imprese-app tbody tr { border-bottom: 1px solid var(--imp-bdr); transition: background .15s; }
+.imprese-app tbody tr:nth-child(even) { background: rgba(200,155,60,.03); }
+.imprese-app tbody tr:hover { background: rgba(200,155,60,.07); }
+.imprese-app tbody td { padding: 8px 10px; color: var(--imp-text2); vertical-align: top; }
+.imprese-app tbody td:first-child { color: var(--imp-text); font-weight: 600; }
+.imprese-app tbody td strong { color: var(--imp-gold); }
+
+/* ── PATENTE BADGES ── */
+.imprese-app .imp-pat-badge {
+  font-family: 'Cinzel', serif; font-size: .65rem; letter-spacing: .08em;
+  padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+}
+.imprese-app .imp-pat-pmc  { background: rgba(96,184,64,.12); color: var(--imp-common); border: 1px solid rgba(96,184,64,.25); }
+.imprese-app .imp-pat-pmt  { background: rgba(90,138,216,.12); color: var(--imp-uncommon); border: 1px solid rgba(90,138,216,.25); }
+.imprese-app .imp-pat-pasv { background: rgba(212,149,74,.12); color: var(--imp-amber); border: 1px solid rgba(212,149,74,.25); }
+.imprese-app .imp-pat-poe  { background: rgba(216,176,32,.12); color: var(--imp-legendary); border: 1px solid rgba(216,176,32,.25); }
+.imprese-app button.imp-pat-badge { cursor: pointer; }
+.imprese-app button.imp-pat-badge:hover { filter: brightness(1.25); }
+
+/* ── RULE / NOTE BOX ── */
+.imprese-app .imp-rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 12px; }
+.imprese-app .imp-rule-box { background: var(--imp-bg3); border: 1px solid var(--imp-bdr); border-radius: 4px; padding: 10px 12px; }
+.imprese-app .imp-rule-box h4 {
+  font-family: 'Cinzel', serif; font-size: .68rem; letter-spacing: .08em;
+  color: var(--imp-gold); margin-bottom: 5px; text-transform: uppercase;
+}
+.imprese-app .imp-rule-box p, .imprese-app .imp-rule-box li { font-size: .84rem; color: var(--imp-text2); line-height: 1.45; }
+.imprese-app .imp-rule-box ul { padding-left: 12px; }
+.imprese-app .imp-note-box {
+  background: rgba(212,149,74,.06); border: 1px solid rgba(212,149,74,.18);
+  border-radius: 4px; padding: 10px 14px; font-size: .82rem; color: var(--imp-amber);
+  margin-top: 10px; line-height: 1.5;
+}
+.imprese-app .imp-note-box strong { color: var(--imp-gold2); }
+
+/* ── MODAL ── */
+.imprese-app .imp-modal-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.65); }
+.imprese-app .imp-modal-overlay.open { display: flex; align-items: center; justify-content: center; padding: 20px; }
+.imprese-app .imp-modal {
+  background: var(--imp-bg2); border: 1px solid var(--imp-bdr2); border-radius: var(--imp-radius);
+  width: 100%; max-width: 700px; max-height: 88vh; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.imprese-app .imp-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--imp-bdr); background: var(--imp-panel); }
+.imprese-app .imp-modal-header h3 { font-family: 'Cinzel', serif; font-size: .92rem; color: var(--imp-gold2); }
+.imprese-app .imp-modal-close { background: none; border: none; color: var(--imp-text3); font-size: 1.3rem; cursor: pointer; padding: 0 6px; }
+.imprese-app .imp-modal-close:hover { color: var(--imp-red); }
+.imprese-app .imp-modal-body { padding: 18px; overflow-y: auto; }
+.imprese-app .imp-modal-footer { padding: 10px 18px; border-top: 1px solid var(--imp-bdr); background: var(--imp-panel); display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+
+/* ── FORM / CALC ── */
+.imprese-app .imp-calc-section { margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--imp-bdr); }
+.imprese-app .imp-calc-section:last-child { border-bottom: none; }
+.imprese-app .imp-calc-section h4 {
+  font-family: 'Cinzel', serif; font-size: .72rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--imp-gold); margin-bottom: 10px;
+}
+.imprese-app .imp-calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.imprese-app .imp-calc-field { display: flex; flex-direction: column; gap: 3px; }
+.imprese-app .imp-calc-field label { font-size: .7rem; color: var(--imp-text3); text-transform: uppercase; letter-spacing: .04em; }
+.imprese-app .imp-calc-field input, .imprese-app .imp-calc-field select {
+  background: var(--imp-panel); border: 1px solid var(--imp-bdr); color: var(--imp-text);
+  padding: 7px 9px; border-radius: 4px; font-family: 'Crimson Pro', Georgia, serif; font-size: .82rem;
+}
+.imprese-app .imp-calc-field input:focus, .imprese-app .imp-calc-field select:focus { outline: none; border-color: var(--imp-gold); }
+.imprese-app .imp-calc-field input[readonly] { background: var(--imp-bg3); color: var(--imp-gold2); font-weight: 600; }
+.imprese-app .imp-calc-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px dashed var(--imp-bdr); font-size: .82rem; }
+.imprese-app .imp-calc-row:last-child { border-bottom: none; }
+.imprese-app .imp-calc-row.total { font-weight: 700; color: var(--imp-gold2); font-size: .9rem; border-top: 2px solid var(--imp-bdr2); border-bottom: none; margin-top: 6px; padding-top: 10px; }
+.imprese-app .imp-calc-row .label { color: var(--imp-text2); }
+.imprese-app .imp-calc-row .value { font-family: 'SF Mono', 'Cascadia Code', monospace; }
+
+/* ── BUTTONS ── */
+.imprese-app .imp-btn {
+  background: linear-gradient(135deg, var(--imp-gold) 0%, var(--imp-gold2) 100%);
+  color: var(--imp-bg); border: none; padding: 8px 16px; border-radius: 4px;
+  font-family: 'Cinzel', serif; font-size: .75rem; font-weight: 600;
+  cursor: pointer; transition: all .2s; letter-spacing: .03em;
+}
+.imprese-app .imp-btn:hover { box-shadow: 0 0 16px rgba(200,155,60,.3); transform: translateY(-1px); }
+.imprese-app .imp-btn:active { transform: translateY(0); }
+.imprese-app .imp-btn.secondary { background: var(--imp-panel); color: var(--imp-text); border: 1px solid var(--imp-bdr); }
+.imprese-app .imp-btn.secondary:hover { background: var(--imp-bg3); border-color: var(--imp-bdr2); }
+.imprese-app .imp-btn.danger { background: rgba(192,64,64,.8); color: var(--imp-white); }
+.imprese-app .imp-btn.danger:hover { background: rgba(192,64,64,1); }
+.imprese-app .imp-btn.small { padding: 4px 8px; font-size: .7rem; }
+
+/* ── STATO BADGE ── */
+.imprese-app .imp-stato-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .64rem; font-weight: 700; }
+.imprese-app .imp-stato-attiva   { background: rgba(74,154,88,.12); color: var(--imp-green); border: 1px solid rgba(74,154,88,.25); }
+.imprese-app .imp-stato-sospesa  { background: rgba(212,149,74,.12); color: var(--imp-amber); border: 1px solid rgba(212,149,74,.25); }
+.imprese-app .imp-stato-sanzione { background: rgba(192,64,64,.12); color: var(--imp-red); border: 1px solid rgba(192,64,64,.25); }
+.imprese-app .imp-stato-sciolta  { background: rgba(128,104,72,.12); color: var(--imp-text3); border: 1px solid rgba(128,104,72,.25); }
+
+/* ── SANZIONI ROW ── */
+.imprese-app .row-pmc td:first-child { color: var(--imp-common) !important; }
+.imprese-app .row-pmt td:first-child { color: var(--imp-uncommon) !important; }
+.imprese-app .row-pasv td:first-child { color: var(--imp-amber) !important; }
+.imprese-app .row-poe td:first-child { color: var(--imp-legendary) !important; }
+.imprese-app .row-app td { color: var(--imp-text3) !important; }
+.imprese-app .row-art td:first-child { color: var(--imp-common) !important; }
+.imprese-app .row-mst td:first-child { color: var(--imp-uncommon) !important; }
+.imprese-app .row-gran td:first-child { color: var(--imp-legendary) !important; }
+.imprese-app .row-on td:first-child { color: var(--imp-purple2) !important; }
+.imprese-app .sanz-lieve td:first-child { color: var(--imp-common) !important; }
+.imprese-app .sanz-grave td:first-child { color: var(--imp-amber) !important; }
+.imprese-app .sanz-graviss td:first-child { color: var(--imp-red) !important; }
+
+/* ── STRUTTURE ── */
+.imprese-app .imp-strutt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.imprese-app .imp-strutt-card {
+  background: var(--imp-panel); border: 1px solid var(--imp-bdr); border-radius: 4px;
+  padding: 12px 14px; transition: border-color .2s;
+}
+.imprese-app .imp-strutt-card:hover { border-color: var(--imp-bdr2); }
+.imprese-app .imp-strutt-card h5 { font-family: 'Cinzel', serif; font-size: .78rem; color: var(--imp-gold2); margin-bottom: 3px; }
+.imprese-app .imp-strutt-card .cost { font-size: .74rem; color: var(--imp-amber); font-weight: 700; margin-bottom: 5px; }
+.imprese-app .imp-strutt-card p { font-size: .78rem; color: var(--imp-text2); line-height: 1.4; }
+.imprese-app .imp-strutt-card.lv2 { border-left: 3px solid var(--imp-purple); }
+.imprese-app .imp-strutt-card.lv2 h5 { color: var(--imp-purple2); }
+
+/* ── LICENZA CARD ── */
+.imprese-app .imp-lic-card {
+  background: var(--imp-panel); border: 1px solid var(--imp-bdr2); border-radius: var(--imp-radius);
+  margin-bottom: 20px; overflow: hidden;
+}
+.imprese-app .imp-lic-header { padding: 16px 22px; border-bottom: 1px solid var(--imp-bdr); }
+.imprese-app .imp-lic-header h3 { font-family: 'Cinzel', serif; font-size: 1.05rem; margin-bottom: 3px; }
+.imprese-app .imp-lic-header .meta { font-size: .78rem; color: var(--imp-text3); font-style: italic; }
+.imprese-app .imp-lic-body { padding: 14px 22px 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.imprese-app .imp-lic-block h5 {
+  font-family: 'Cinzel', serif; font-size: .65rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--imp-text3); margin-bottom: 5px;
+}
+.imprese-app .imp-lic-block ul { list-style: none; padding: 0; }
+.imprese-app .imp-lic-block li { font-size: .82rem; color: var(--imp-text2); padding: 2px 0; display: flex; gap: 5px; }
+.imprese-app .imp-lic-block li::before { content: '·'; color: var(--imp-gold); flex-shrink: 0; }
+
+/* ── ADD ROW / FORM CONTROLS ── */
+.imprese-app .imp-add-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+.imprese-app .imp-add-row input, .imprese-app .imp-add-row select {
+  background: var(--imp-panel); border: 1px solid var(--imp-bdr); color: var(--imp-text);
+  padding: 6px 8px; border-radius: 4px; font-family: 'Crimson Pro', Georgia, serif; font-size: .8rem;
+}
+.imprese-app .imp-add-row input:focus, .imprese-app .imp-add-row select:focus { outline: none; border-color: var(--imp-gold); }
+.imprese-app .imp-add-row input::placeholder { color: var(--imp-text3); }
+.imprese-app .imp-cell {
+  background: var(--imp-panel) !important; border: 1px solid var(--imp-bdr) !important;
+  color: var(--imp-text) !important; padding: 3px 5px !important; border-radius: 3px !important;
+  font-family: 'Crimson Pro', Georgia, serif; font-size: .8rem; width: 100%;
+}
+.imprese-app .imp-cell:focus { outline: none; border-color: var(--imp-gold) !important; }
+.imprese-app .imp-lv2-tag {
+  display: inline-block; font-size: .55rem; font-weight: 700; letter-spacing: .06em;
+  background: rgba(138,80,176,.12); color: var(--imp-purple2); border: 1px solid rgba(138,80,176,.25);
+  border-radius: 5px; padding: 1px 5px; vertical-align: middle;
+}
+.imprese-app .imp-chk { display: inline-flex; align-items: center; gap: 4px; font-size: .8rem; color: var(--imp-text2); cursor: pointer; }
+.imprese-app .imp-chk input { accent-color: var(--imp-gold); }
+
+/* ── TOOLTIP ── */
+.imprese-app .imp-tip { cursor: help; border-bottom: 1px dotted var(--imp-text3); }
+.imprese-app .imp-pat-link {
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--imp-gold2); font: inherit; font-weight: 700; text-decoration: underline dotted;
+}
+.imprese-app .imp-pat-link:hover { color: var(--imp-gold3); }
+
+/* ── COMPARE ── */
+.imprese-app .imp-compare-table { width: 100%; border-collapse: collapse; font-size: .78rem; margin-top: 8px; }
+.imprese-app .imp-compare-table th, .imprese-app .imp-compare-table td { border: 1px solid var(--imp-bdr); padding: 6px 8px; text-align: center; }
+.imprese-app .imp-compare-table th { background: var(--imp-bg3); text-transform: uppercase; font-size: .62rem; letter-spacing: .08em; color: var(--imp-gold); }
+.imprese-app .imp-compare-table td:first-child { text-align: left; color: var(--imp-text2); font-weight: 600; white-space: nowrap; }
+
+/* ── SCROLL ── */
+.imprese-app ::-webkit-scrollbar { width: 5px; height: 5px; }
+.imprese-app ::-webkit-scrollbar-track { background: var(--imp-bg2); }
+.imprese-app ::-webkit-scrollbar-thumb { background: var(--imp-bdr2); border-radius: 3px; }
+.imprese-app ::-webkit-scrollbar-thumb:hover { background: var(--imp-gold); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .imprese-app .imp-sidenav { display: none; }
+  .imprese-app .imp-content { padding: 14px 10px; }
+  .imprese-app .imp-type-body { grid-template-columns: 1fr; }
+  .imprese-app .imp-card-grid { grid-template-columns: 1fr; }
+  .imprese-app .imp-strutt-grid { grid-template-columns: 1fr; }
+  .imprese-app .imp-lic-body { grid-template-columns: 1fr; }
+  .imprese-app .imp-rules-grid { grid-template-columns: 1fr; }
+  .imprese-app .imp-add-row { flex-direction: column; align-items: stretch; }
+}

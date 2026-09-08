@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcamis — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="/scripts/js/md-render.js"></script>
+<script src="js/arc.js"></script>
+  <link rel="stylesheet" crossorigin href="/admin/assets/admin-BYryRH8-.css">
+<link rel="manifest" href="/admin/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/admin/registerSW.js"></script></head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="lg-card">
+    <div class="lg-brand">
+      <div class="lg-logo">A</div>
+      <h1>ARCAMIS</h1>
+      <div class="sub">PANNELLO DI GESTIONE</div>
+    </div>
+    <div class="lg-f">
+      <div class="fld"><label>Utente</label><input id="login-user" class="in" placeholder="username" autocomplete="username"></div>
+      <div class="fld"><label>Password</label><input id="login-pw" class="in" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="lg-row"><label><input type="checkbox" id="login-remember" checked> Ricordami</label><span style="color:var(--dim)">sessione sicura</span></div>
+      <div class="lg-err" id="login-err"></div>
+      <button class="btn btn-p btn-block" id="login-btn" onclick="doLogin()">ACCEDI</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header id="topbar">
+    <button id="tb-menu" onclick="toggleSidebar()" title="Menu">☰</button>
+    <div class="tb-brand">
+      <div class="tb-logo">A</div>
+      <div style="display:flex;flex-direction:column;line-height:1">
+        <span class="t1">ARCAMIS</span>
+        <span class="t2">ADMIN</span>
+      </div>
+    </div>
+    <div class="tb-sep"></div>
+    <div id="tb-crumb"><span class="cr">Admin</span></div>
+    <div class="tb-right">
+      <span id="tb-status" class="idle">pronto</span>
+      <a class="tb-btn" href="https://arcamis.pages.dev" target="_blank" rel="noopener" title="Apri il sito in una nuova scheda">🌐 Apri sito</a>
+      <div class="tb-user" id="tb-user"></div>
+    </div>
+  </header>
+  <div style="display:flex;flex:1;min-height:0">
+    <aside id="sidebar">
+      <div class="sb-search"><input id="sb-q" class="in" placeholder="Filtra menu…" oninput="sbFilter(this.value)"></div>
+      <div class="sb-scroll" id="sb-nav"></div>
+      <div class="sb-foot">
+        <div class="tb-ava" id="sb-ava">?</div>
+        <div class="grow"><div class="un" id="sb-name"></div><div class="ur" id="sb-role"></div></div>
+        <button class="sb-logout" onclick="doLogout()" title="Esci">⎋</button>
+      </div>
+    </aside>
+    <div id="sb-overlay" onclick="closeSidebar()"></div>
+    <main id="main"></main>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- GLOBAL SEARCH MODAL (Cmd+K) -->
+<div id="gs-modal" class="md-backdrop" style="display:none">
+  <div class="md md-lg">
+    <div class="md-head">
+      <h3>🔎 Ricerca Globale <span class="hint" style="font-weight:400;font-size:11px">⌘K / Ctrl+K</span></h3>
+      <button class="md-x" onclick="closeGlobalSearch()" title="Chiudi (Esc)">✕</button>
+    </div>
+    <div class="md-body" style="padding:0;max-height:70vh">
+      <div class="gs-input-wrap" style="padding:16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:10">
+        <label style="position:relative;width:100%;display:block">
+          <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:14px;pointer-events:none">⌘K</span>
+          <input id="gs-input" class="in" placeholder="Cerca pagine, azioni, impostazioni…" style="padding-left:40px;font-size:15px;height:44px;border-radius:var(--rad);background:var(--bg2);border:1px solid var(--line2);width:100%" autocomplete="off" spellcheck="false" aria-label="Ricerca globale">
+        </label>
+        <div id="gs-hints" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:var(--dim)"></div>
+      </div>
+      <div id="gs-results" class="list-body" style="max-height:calc(70vh - 120px);overflow-y:auto"></div>
+      <div id="gs-empty" class="list-empty" style="display:none;padding:40px 20px">Nessun risultato</div>
+      <div id="gs-loading" class="list-empty" style="display:none;padding:40px 20px">⏳ Caricamento indice…</div>
+    </div>
+    <div class="md-actions" style="border-top:1px solid var(--line);padding:12px 16px;justify-content:space-between">
+      <div id="gs-shortcuts" style="font-size:10px;color:var(--dim);display:flex;gap:12px;flex-wrap:wrap"></div>
+      <button class="btn btn-soft btn-sm" onclick="closeGlobalSearch()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   CONFIG INLINE — registro pagine e sezioni del menu.
+   Questi due array vengono riscritti dinamicamente dall'admin
+   (nuova pagina / rinomina / navigazione), devono restare qui.
+   ════════════════════════════════════════════════════════════════ */
+window.ArcAdmin.pages = [
+{k:'la-storia-di-gandora',l:'La Storia di Gandora',i:'🐉',sec:'lore',c:1},
+{k:'regole-del-server',l:'Regole del Server',i:'📋',sec:'regole',c:1},
+{k:'materiale-approvato',l:'Materiale Approvato',i:'📖',sec:'regole',c:1},
+{k:'pantheon',l:'Pantheon',i:'🛐',sec:'lore',c:1},
+{k:'lavori',l:'Lavori',i:'💼',sec:'lavori',c:1},
+{k:'come-si-inizia',l:'Creazione',i:'🌟',sec:'personaggio',c:1},
+{k:'casate-e-compagnie',l:'Casate e Compagnie',i:'🏰',c:1},
+{k:'storia-del-mondo',l:'Storia del Mondo',i:'📖',c:1},
+{k:'introduzione',l:'Introduzione',i:'📜',c:1},
+{k:'piani-di-esistenza',l:'Piani di esistenza',i:'🌌',c:1},
+{k:'bibliografia-scoperta',l:'Bibliografia scoperta',i:'📚',c:1},
+{k:'mappe',l:'Mappe',i:'🗺️',c:1},
+{k:'mappa-arcamis',l:'Arcamis',i:'🏙️',c:1},
+{k:'regole-homebrew',l:'Regole Homebrew',i:'📐',sec:'homebrew',c:1},
+{k:'specie-homebrew',l:'Specie Homebrew',i:'🧬',sec:'homebrew',c:1},
+{k:'sottoclassi-homebrew',l:'Sottoclassi Homebrew',i:'⚔️',sec:'homebrew',c:1},
+{k:'arcamis',l:'Arcamis',i:'📍',c:1},
+{k:'selva-fogliabruna',l:'Selva Fogliabruna',i:'🌲',c:1},
+{k:'foresta-dello-smarrimento',l:'Foresta dello Smarrimento',i:'🌑',c:1},
+{k:'volonx',l:'Volonx',i:'🏘️',c:1},
+{k:'vigilius',l:'Vigilius',i:'🏛️',c:1},
+{k:'galeton',l:'Galeton',i:'🏘️',c:1},
+{k:'lago-di-gromot',l:'Lago di Gromot',i:'🌊',c:1},
+{k:'forte-vigilus',l:'Forte Vigilus',i:'🏰',c:1},
+{k:'riva-di-ferro',l:'Riva di Ferro',i:'⚓',c:1},
+{k:'fumofosco',l:'Fumofosco',i:'🌫️',c:1},
+{k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',c:1}
+];
+window.ArcAdmin.sections = [
+{v:"regole",l:"Regole"},
+{v:"personaggio",l:"Personaggio"},
+{v:"lavori",l:"Lavori"},
+{v:"lore",l:"Lore"},
+{v:"homebrew",l:"Homebrew"}
+];
+/* Alias retrocompatibili (gestori onclick e codice legacy). */
+var PAGES = window.ArcAdmin.pages;
+var SECTIONS = window.ArcAdmin.sections;
+</script>
+<script src="js/core.js"></script>
+<script src="js/editors.js"></script>
+<script src="js/structured.js"></script>
+<script src="js/site.js"></script>
+<script src="js/mappins.js"></script>
+<script src="js/ui-editor.js"></script>
+<script src="js/changelog-ui.js"></script>
+<script src="js/system.js"></script>
+</body>
+</html>

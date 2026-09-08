@@ -32,12 +32,12 @@ h1 { font-family:'Cinzel',serif; color:var(--gold2); font-size:22px; margin-bott
 </head>
 <body>
 <h1>⚔ Export Contenuti Arcamis</h1>
-<p class="subtitle">Fetcha tutti i contenuti da Notion/Google e li salva come JSON locale</p>
+<p class="subtitle">Raccoglie tutti i contenuti locali (JSON statici) e li scarica / ispeziona</p>
 
 <div class="section">
 <h2>📦 Export Completo</h2>
 <p style="color:var(--text2);font-size:14px;margin-bottom:12px">
-  Fetcha pagine wiki, database, mestieri e documenti. I file JSON vengono scaricati come ZIP.
+  Raccoglie pagine wiki e database locali. I file JSON vengono scaricati come ZIP.
 </p>
 <button class="btn" id="btn-export-all" onclick="exportAll()">AVVIA EXPORT</button>
 <div class="progress" id="progress" style="display:none"><div class="progress-bar" id="progress-bar"></div></div>
@@ -48,10 +48,10 @@ h1 { font-family:'Cinzel',serif; color:var(--gold2); font-size:22px; margin-bott
 <div class="section">
 <h2>📄 Export Singolo</h2>
 <p style="color:var(--text2);font-size:14px;margin-bottom:12px">
-  Exporta una singola pagina wiki. Incolla l'ID Notion o il route key.
+  Exporta una singola pagina wiki. Inserisci la route key (es. gameplay).
 </p>
 <div style="display:flex;gap:8px;margin-bottom:12px">
-  <input type="text" id="single-id" placeholder="Route key (es. gameplay) o Notion ID" style="flex:1;background:var(--bg3);border:1px solid var(--bdr);border-radius:4px;color:var(--white);font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 12px;outline:none">
+  <input type="text" id="single-id" placeholder="Route key (es. gameplay)" style="flex:1;background:var(--bg3);border:1px solid var(--bdr);border-radius:4px;color:var(--white);font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 12px;outline:none">
   <button class="btn btn-outline" onclick="exportSingle()">EXPORT</button>
 </div>
 <div class="log" id="single-log" style="display:none"></div>
@@ -60,22 +60,17 @@ h1 { font-family:'Cinzel',serif; color:var(--gold2); font-size:22px; margin-bott
 <div class="section">
 <h2>ℹ️ Note</h2>
 <ul style="color:var(--text2);font-size:14px;line-height:1.8;padding-left:20px">
-  <li>L'export usa le API endpoints del sito (<code>/api/notion</code>)</li>
-  <li>Le immagini S3 vengono convertite in riferimenti lazy</li>
-  <li>I file JSON sono pronti per essere caricati nell'admin panel</li>
-  <li>Dopo l'export, incolla i JSON nell'admin panel e salva su GitHub</li>
+  <li>L'export legge i contenuti dai JSON locali (<code>/content/pages/*.json</code> e <code>/content/databases/*.json</code>)</li>
+  <li>Nessuna chiamata a Notion: il sito è 100% local-first</li>
+  <li>I file JSON scaricati sono pronti per essere riutilizzati nel pannello admin</li>
 </ul>
 </div>
 
 <script>
-// Page registry
-var PAGES = [
-
-];
-
-var DBS = [
-
-];
+// I contenuti sono letti dai JSON locali (nessuna API Notion).
+// PAGES/DBS vengono popolati dinamicamente da /content.
+var PAGES = [];
+var DBS = [];
 
 function log(el, msg, cls) {
   var d = document.getElementById(el);
@@ -89,179 +84,109 @@ function updateProgress(pct) {
   document.getElementById('progress-bar').style.width = pct + '%';
 }
 
-async function fetchPage(pageId) {
-  var res = await fetch('/api/notion?pageId=' + pageId);
-  if (!res.ok) throw new Error('HTTP ' + res.status);
+/* ── Caricamento contenuti locali ── */
+async function fetchLocalJson(path) {
+  var res = await fetch(path);
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' (' + path + ')');
   return res.json();
 }
 
 async function fetchDb(dbId) {
-  var res = await fetch('/api/notion?dbId=' + dbId);
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
+  var key = String(dbId || '').replace(/^db-/, '');
+  return await fetchLocalJson('/content/databases/' + key + '.json');
 }
 
-function blocksToMarkdown(blocks) {
-  if (!blocks || !blocks.length) return '';
-  var md = '';
-  for (var i = 0; i < blocks.length; i++) {
-    var b = blocks[i];
-    var type = b.type;
-    var content = '';
-    
-    if (b.rich_text && b.rich_text.length) {
-      content = b.rich_text.map(function(rt) {
-        var t = rt.plain_text || '';
-        if (rt.annotations) {
-          if (rt.annotations.bold) t = '**' + t + '**';
-          if (rt.annotations.italic) t = '*' + t + '*';
-          if (rt.annotations.code) t = '`' + t + '`';
-        }
-        if (rt.href) t = '[' + t + '](' + rt.href + ')';
-        return t;
-      }).join('');
-    }
-    
-    switch(type) {
-      case 'paragraph': md += content + '\n\n'; break;
-      case 'heading_1': md += '# ' + content + '\n\n'; break;
-      case 'heading_2': md += '## ' + content + '\n\n'; break;
-      case 'heading_3': md += '### ' + content + '\n\n'; break;
-      case 'bulleted_list_item': md += '- ' + content + '\n'; break;
-      case 'numbered_list_item': md += '1. ' + content + '\n'; break;
-      case 'quote': md += '> ' + content + '\n\n'; break;
-      case 'divider': md += '---\n\n'; break;
-      case 'code': md += '```\n' + content + '\n```\n\n'; break;
-      case 'toggle': md += '<details><summary>' + content + '</summary>\n\n'; break;
-      case 'callout': md += '> ' + (b.icon ? b.icon.emoji + ' ' : '') + content + '\n\n'; break;
-      case 'image':
-        var url = b.image && b.image.file ? b.image.file.url : (b.image && b.image.external ? b.image.external.url : '');
-        if (url) md += '![' + (b.image.caption ? b.image.caption.map(function(c){return c.plain_text}).join('') : '') + '](' + url + ')\n\n';
-        break;
-      case 'bookmark':
-        if (b.bookmark && b.bookmark.url) md += '[Bookmark](' + b.bookmark.url + ')\n\n';
-        break;
-      case 'embed':
-        if (b.embed && b.embed.url) md += '[Embed](' + b.embed.url + ')\n\n';
-        break;
-      case 'table':
-        if (b.table && b.table.children) {
-          b.table.children.forEach(function(row) {
-            if (row.table && row.table.cells) {
-              md += '| ' + row.table.cells.map(function(c) {
-                return c.map(function(rt){return rt.plain_text}).join('');
-              }).join(' | ') + ' |\n';
-            }
-          });
-          md += '\n';
-        }
-        break;
-      case 'child_page':
-        md += '[📄 ' + (b.child_page.title || 'Page') + '](/' + (b.child_page.id || '') + ')\n\n';
-        break;
-      default:
-        if (content) md += content + '\n\n';
-    }
-    
-    // Recurse children
-    if (b.children && b.children.length) {
-      md += blocksToMarkdown(b.children);
-    }
-  }
-  return md;
+var LOCAL_PAGE_KEYS = null;
+async function localPageKeys() {
+  if (LOCAL_PAGE_KEYS) return LOCAL_PAGE_KEYS;
+  LOCAL_PAGE_KEYS = [];
+  try {
+    var reg = await fetchLocalJson('/content/pages/registry.json');
+    (reg.pages || []).forEach(function(p){ if (p && p.k) LOCAL_PAGE_KEYS.push(p.k); });
+  } catch(e) {}
+  return LOCAL_PAGE_KEYS;
 }
+
+var LOCAL_DB_KEYS = ['galleria','npc','specie','timeline','sottoclassi','biblioteca','changelog'];
 
 async function exportAll() {
   var btn = document.getElementById('btn-export-all');
   btn.disabled = true;
-  var total = PAGES.length + DBS.length;
+  var keys = await localPageKeys();
+  var total = keys.length + LOCAL_DB_KEYS.length;
   var done = 0;
   var results = { pages: {}, dbs: {} };
   var errors = [];
-  
-  log('log', '🚀 Avvio export...', 'info');
-  
+
+  log('log', '🚀 Avvio export locale...', 'info');
+
   // Export pages
-  for (var i = 0; i < PAGES.length; i++) {
-    var p = PAGES[i];
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i];
     try {
-      log('log', '📄 [' + (done+1) + '/' + total + '] ' + p.l + '...');
-      var data = await fetchPage(p.id);
-      var md = blocksToMarkdown(data.blocks);
-      results.pages[p.k] = { k: p.k, title: p.l, icon: p.i, content: md, lastModified: new Date().toISOString() };
-      log('log', '  ✅ ' + p.l + ' (' + md.length + ' chars)', 'ok');
+      log('log', '📄 [' + (done+1) + '/' + total + '] ' + k + '...');
+      var j = await fetchLocalJson('/content/pages/' + k + '.json');
+      results.pages[k] = j;
+      log('log', '  ✅ ' + k + ' (' + (j.content||'').length + ' chars)', 'ok');
     } catch(e) {
-      log('log', '  ❌ ' + p.l + ': ' + e.message, 'err');
-      errors.push(p.l);
+      log('log', '  ❌ ' + k + ': ' + e.message, 'err');
+      errors.push(k);
     }
     done++;
     updateProgress(Math.round(done / total * 100));
-    await new Promise(function(r){ setTimeout(r, 200) });
   }
-  
+
   // Export databases
-  for (var i = 0; i < DBS.length; i++) {
-    var d = DBS[i];
+  for (var i = 0; i < LOCAL_DB_KEYS.length; i++) {
+    var db = LOCAL_DB_KEYS[i];
     try {
-      log('log', '🗄️ [' + (done+1) + '/' + total + '] ' + d.label + '...');
-      var data = await fetchDb(d.dbId);
-      results.dbs[d.name] = data.pages || [];
-      log('log', '  ✅ ' + d.label + ' (' + (data.pages||[]).length + ' items)', 'ok');
+      log('log', '🗄️ [' + (done+1) + '/' + total + '] ' + db + '...');
+      var data = await fetchDb(db);
+      results.dbs[db] = data.pages || [];
+      log('log', '  ✅ ' + db + ' (' + (data.pages||[]).length + ' items)', 'ok');
     } catch(e) {
-      log('log', '  ❌ ' + d.label + ': ' + e.message, 'err');
-      errors.push(d.label);
+      log('log', '  ❌ ' + db + ': ' + e.message, 'err');
+      errors.push(db);
     }
     done++;
     updateProgress(Math.round(done / total * 100));
-    await new Promise(function(r){ setTimeout(r, 200) });
   }
-  
+
   // Download as individual JSON files
   log('log', '\n📦 Generazione file JSON...', 'info');
-  
-  // Download pages
+
   for (var k in results.pages) {
     downloadJson('pages/' + k + '.json', results.pages[k]);
   }
-  
-  // Download databases
   for (var name in results.dbs) {
     downloadJson('db/' + name + '.json', results.dbs[name]);
   }
-  
+
   var statsHtml = '<div class="stat">Pagine: <strong>' + Object.keys(results.pages).length + '</strong></div>';
   statsHtml += '<div class="stat">Database: <strong>' + Object.keys(results.dbs).length + '</strong></div>';
   statsHtml += '<div class="stat">Errori: <strong style="color:' + (errors.length ? 'var(--red)' : 'var(--green)') + '">' + errors.length + '</strong></div>';
   document.getElementById('stats').innerHTML = statsHtml;
-  
+
   log('log', '\n✅ Export completato! File scaricati nella cartella downloads.', 'ok');
   if (errors.length) log('log', '⚠️ Errori: ' + errors.join(', '), 'err');
-  
+
   btn.disabled = false;
 }
 
 async function exportSingle() {
   var input = document.getElementById('single-id').value.trim();
   if (!input) return;
-  
+
   var logEl = document.getElementById('single-log');
   logEl.style.display = 'block';
   logEl.innerHTML = '';
-  
-  // Try to find by key
-  var page = PAGES.find(function(p) { return p.k === input || p.id === input; });
-  if (!page) {
-    log('single-log', '❌ Pagina non trovata: ' + input, 'err');
-    return;
-  }
-  
+
+  var key = String(input).replace(/^pag-/, '');
   try {
-    log('single-log', '📄 Fetch ' + page.l + '...', 'info');
-    var data = await fetchPage(page.id);
-    var md = blocksToMarkdown(data.blocks);
-    var json = { k: page.k, title: page.l, icon: page.i, content: md, lastModified: new Date().toISOString() };
-    downloadJson('pages/' + page.k + '.json', json);
-    log('single-log', '✅ ' + page.l + ' scaricato (' + md.length + ' chars)', 'ok');
+    log('single-log', '📄 Fetch ' + key + '...', 'info');
+    var j = await fetchLocalJson('/content/pages/' + key + '.json');
+    downloadJson('pages/' + key + '.json', j);
+    log('single-log', '✅ ' + key + ' scaricato (' + (j.content||'').length + ' chars)', 'ok');
   } catch(e) {
     log('single-log', '❌ Errore: ' + e.message, 'err');
   }

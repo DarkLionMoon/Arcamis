@@ -640,6 +640,33 @@ button{font-family:inherit}
 #app.full-screen .md-outline{display:none!important}
 .fs-hint{color:var(--acc2);font-size:11px;letter-spacing:.04em}
 
+/* ZEN MODE - hide toolbar, statusbar, only editor */
+#app.full-screen.zen-mode .ed-head{display:none!important}
+#app.full-screen.zen-mode .ed-toolbar{display:none!important}
+#app.full-screen.zen-mode .ed-statusbar{display:none!important}
+#app.full-screen.zen-mode .ed-body{height:100%}
+#app.full-screen.zen-mode #md-pane{height:100%;display:flex;flex-direction:column}
+#app.full-screen.zen-mode #e-md{flex:1;padding:40px 60px;font-size:16px;line-height:1.8;max-width:800px;margin:0 auto;width:100%;box-sizing:border-box}
+#app.full-screen.zen-mode #e-divider{display:none!important}
+#app.full-screen.zen-mode #pv-pane{display:none!important}
+#app.full-screen.zen-mode .ln-gutter{display:none!important}
+#app.full-screen.zen-mode #e-md::placeholder{color:var(--dim);opacity:.5}
+
+/* TYPEWRITER MODE - highlight current line, center it */
+#app.full-screen.typewriter-mode #e-md{background:
+  linear-gradient(180deg,transparent 50%,rgba(212,170,74,.03) 50%,rgba(212,170,74,.03) calc(50% + 2px),transparent calc(50% + 2px))!important;
+  background-size:100% 2.2em!important;
+  animation:typewriter-pulse 2s ease-in-out infinite}
+@keyframes typewriter-pulse{
+  0%,100%{background-position:0 50%}
+  50%{background-position:0 52%}
+}
+#app.full-screen.typewriter-mode.zen-mode #e-md{padding-top:calc(50vh - 1.1em);padding-bottom:calc(50vh - 1.1em)}
+
+#app.full-screen .tb-btn2#tb-fullscreen.active{background:var(--accbg);color:var(--acc2);border-color:rgba(212,170,74,.3)}
+#app.full-screen .tb-btn2#tb-fullscreen.zen{background:rgba(163,113,247,.15);color:var(--vio);border-color:rgba(163,113,247,.3)}
+#app.full-screen .tb-btn2#tb-fullscreen.typewriter{background:rgba(63,185,80,.15);color:var(--grn);border-color:rgba(63,185,80,.3)}
+
 /* ═══════════════ GO TO LINE ═══════════════ */
 .gtl-row{display:flex;gap:8px;align-items:center}
 
@@ -730,3 +757,24 @@ button{font-family:inherit}
   .sb-reorder{display:flex}
   .sb-mv{padding:5px 6px;font-size:11px}
 }
+
+/* ═══════════════ BULK OPERATIONS ═══════════════ */
+.row.bulk-selected{background:var(--accbg);border-color:rgba(212,170,74,.3)}
+.row.bulk-selected .rico{color:var(--acc2)}
+.bulk-bar{background:var(--accbg);border:1px solid rgba(212,170,74,.3);border-radius:9px;margin-top:10px;padding:10px 14px}
+.bulk-bar .bulk-count{font-size:12px;font-weight:600;color:var(--acc2);min-width:80px}
+.bulk-divider{width:1px;height:24px;background:var(--line);margin:0 4px;flex-shrink:0}
+@media(max-width:700px){
+  .bulk-bar{flex-wrap:wrap}
+  .bulk-bar .grow{display:none}
+  .bulk-divider{display:none}
+}
+
+/* ═══════════════ GLOBAL SEARCH (Cmd+K) ═══════════════ */
+.gs-result{transition:background .1s}
+.gs-result.selected{background:var(--accbg);border-color:rgba(212,170,74,.25)}
+.gs-result .rico{flex-shrink:0}
+#gs-modal .md{animation:mdIn .12s ease}
+#gs-modal .md-head h3{display:flex;align-items:center;gap:8px}
+#gs-input:focus{outline:none;box-shadow:0 0 0 3px var(--accbg);border-color:var(--acc)}
+.gs-input-wrap{transition:box-shadow .15s}

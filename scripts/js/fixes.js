@@ -4,8 +4,7 @@
    - Breadcrumb reset su navigazione navbar
 ═════════════════════════════════════ */
 
-(function() {
-
+(function () {
   /* ════════════════════════════════
      1. BREADCRUMB FIX
      Resetta navStack quando si clicca
@@ -23,48 +22,60 @@
   /* Patch showHome — già resetta la vista,
      ma navStack non viene svuotato */
   var _origShowHome = window.showHome;
-  window.showHome = function() {
+  window.showHome = function () {
     if (typeof navStack !== 'undefined') navStack = [];
     if (_origShowHome) _origShowHome();
   };
 
   /* Attacca reset su tutti i tn-item del navbar desktop */
   function _attachNavReset() {
-    document.querySelectorAll('.tn-item').forEach(function(el) {
+    document.querySelectorAll('.tn-item').forEach(function (el) {
       if (el.dataset.navResetAttached) return;
       el.dataset.navResetAttached = '1';
-      el.addEventListener('click', function() {
-        /* Resetta navStack prima della navigazione */
-        if (typeof navStack !== 'undefined') navStack = [];
-      }, true); /* capture: true per eseguire prima di gp() */
+      el.addEventListener(
+        'click',
+        function () {
+          /* Resetta navStack prima della navigazione */
+          if (typeof navStack !== 'undefined') navStack = [];
+        },
+        true
+      ); /* capture: true per eseguire prima di gp() */
     });
 
     /* Mobile nav items */
-    document.querySelectorAll('.mn-item').forEach(function(el) {
+    document.querySelectorAll('.mn-item').forEach(function (el) {
       if (el.dataset.navResetAttached) return;
       el.dataset.navResetAttached = '1';
-      el.addEventListener('click', function() {
-        if (typeof navStack !== 'undefined') navStack = [];
-      }, true);
+      el.addEventListener(
+        'click',
+        function () {
+          if (typeof navStack !== 'undefined') navStack = [];
+        },
+        true
+      );
     });
 
     /* Bottom nav items */
-    document.querySelectorAll('.bnav-item').forEach(function(el) {
+    document.querySelectorAll('.bnav-item').forEach(function (el) {
       if (el.dataset.navResetAttached) return;
       el.dataset.navResetAttached = '1';
-      el.addEventListener('click', function() {
-        if (typeof navStack !== 'undefined') navStack = [];
-      }, true);
+      el.addEventListener(
+        'click',
+        function () {
+          if (typeof navStack !== 'undefined') navStack = [];
+        },
+        true
+      );
     });
   }
 
-   /* ════════════════════════════════
+  /* ════════════════════════════════
      2. KEYBOARD ACCESS
      Attiva con Enter/Space gli elementi
      non-native con onclick (div role=button,
      dot del carousel, pill, ecc.)
   ════════════════════════════════ */
-  document.addEventListener('keydown', function(e) {
+  document.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     if (e.defaultPrevented) return; /* già gestito da altri handler (es. dropdown) */
     var t = e.target;
@@ -77,18 +88,21 @@
   });
 
   /* Helper: rende focusable/attivabile da tastiera un elemento creato via JS */
-  window._kbdActivate = function(el) {
+  window._kbdActivate = function (el) {
     if (!el || el.dataset.kbdAttached) return el;
     el.dataset.kbdAttached = '1';
     el.setAttribute('tabindex', '0');
     el.setAttribute('role', 'button');
-    el.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        el.click();
+      }
     });
     return el;
   };
 
-   /* ════════════════════════════════
+  /* ════════════════════════════════
      3. INIT
   ════════════════════════════════ */
   function _init() {
@@ -103,15 +117,14 @@
 
   /* Riattacca dopo ogni navigazione (il mobile nav
      viene ricreato dinamicamente in alcuni casi) */
-  window.onAfterPageRender(function() {
+  window.onAfterPageRender(function () {
     setTimeout(_attachNavReset, 100);
   });
-
 })();
 function toggleTnAcc(header) {
   var menu = header.closest('.tn-menu--acc');
   // chiudi tutti gli altri header della stessa menu
-  menu.querySelectorAll('.tn-acc-header').forEach(function(h) {
+  menu.querySelectorAll('.tn-acc-header').forEach(function (h) {
     if (h !== header) {
       h.classList.remove('open');
       h.nextElementSibling.style.display = 'none';
@@ -142,4 +155,3 @@ function _mnItem(icon, label, fn) {
   d.addEventListener('click', fn);
   return window._kbdActivate ? window._kbdActivate(d) : d;
 }
-

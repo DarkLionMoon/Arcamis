@@ -12,6 +12,8 @@
     binary  {path, message, content, sha?}  → scrive file binario (content = base64)
     delete  {path, message, sha}            → elimina file
 */
+import { parseCookie } from './_lib/auth.js';
+
 export async function onRequest(context) {
   const { request, env } = context;
   const KV = env.ARCAMIS_CACHE;
@@ -19,7 +21,7 @@ export async function onRequest(context) {
      altrimenti il token salvato dall'admin in KV (azione set_gh_token). */
   let GH_TOKEN = env.GH_TOKEN || '';
   if (!GH_TOKEN && KV) {
-    try { GH_TOKEN = (await KV.get('gh_token')) || ''; } catch (_) {}
+    try { GH_TOKEN = (await KV.get('gh_token')) || ''; } catch (_) { GH_TOKEN = ''; }
   }
   const GH_REPO = env.GH_REPO || 'DarkLionMoon/Arcamis';
   const GH_BRANCH = env.GH_BRANCH || 'main';
@@ -41,26 +43,29 @@ export async function onRequest(context) {
   }
 
   /* ── Verifica sessione admin ── */
-  function getCookie(name) {
-    const header = request.headers.get('Cookie') || '';
-    const match = header.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]+)'));
-    return match ? decodeURIComponent(match[1]) : null;
-  }
-  const token = getCookie('arc_admin');
+  const token = parseCookie(request.headers.get('Cookie') || '', 'arc_admin');
   let authed = false;
+  let sessionUserRole = null;
   if (token) {
     try {
       const stored = await KV.get('admin_session_' + token);
       if (stored === 'valid') {
         authed = true; // compatibilità con vecchie sessioni
+        sessionUserRole = 'admin';
       } else {
         const session = JSON.parse(stored);
         authed = !!(session && (session === true || session.role));
+        sessionUserRole = authed ? (session.role || 'admin') : null;
       }
-    } catch (_) {}
+    } catch (_) { authed = false; }
   }
   if (!authed) {
     return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+  }
+  /* ── Check di ruolo: le operazioni di scrittura richiedono editor o admin ── */
+  const WRITE_ACTIONS = ['put', 'binary', 'delete', 'commit_multi'];
+  if (WRITE_ACTIONS.includes(String(body.action)) && sessionUserRole !== 'admin' && sessionUserRole !== 'editor') {
+    return new Response(JSON.stringify({ error: 'Permessi insufficienti: serve un ruolo editor o admin' }), { status: 403, headers: cors });
   }
   if (!GH_TOKEN) {
     return new Response(JSON.stringify({ error: 'GH_TOKEN non configurato: imposta la variabile d\'ambiente GH_TOKEN in Cloudflare Pages oppure configuralo da Admin → Impostazioni → Repository → GitHub token' }), { status: 501, headers: cors });
@@ -89,7 +94,7 @@ export async function onRequest(context) {
       try {
         const j = await r.json();
         if (j && (j.message || j.error)) msg = (j.message || j.error) + ' (' + r.status + ')';
-      } catch (_) {}
+      } catch (_) { /* body non JSON */ }
       throw new Error(msg);
     }
     return r.json();

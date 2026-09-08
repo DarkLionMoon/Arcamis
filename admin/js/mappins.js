@@ -14,13 +14,13 @@ var _mapDragOffset = { x: 0, y: 0 };
 var _mapActive = false;
 
 var MAP_PIN_TYPES = [
-  { v: 'city',    l: 'Città',       c: 'rgba(220,175,60,.95)',  g: 'rgba(220,175,60,.8)' },
-  { v: 'village', l: 'Villaggio',   c: 'rgba(200,155,60,.85)',  g: 'rgba(200,155,60,.65)' },
-  { v: 'fort',    l: 'Forte',       c: 'rgba(190,130,50,.85)',  g: 'rgba(190,130,50,.65)' },
-  { v: 'forest',  l: 'Foresta',     c: 'rgba(60,200,80,.85)',   g: 'rgba(60,200,80,.65)' },
-  { v: 'water',   l: 'Acqua',       c: 'rgba(80,160,240,.85)',  g: 'rgba(80,160,240,.65)' },
-  { v: 'ruin',    l: 'Rovine',      c: 'rgba(150,80,240,.85)',  g: 'rgba(150,80,240,.7)' },
-  { v: 'fog',     l: 'Nebbia',      c: 'rgba(140,100,240,.85)', g: 'rgba(140,100,240,.7)' }
+  { v: 'city', l: 'Città', c: 'rgba(220,175,60,.95)', g: 'rgba(220,175,60,.8)' },
+  { v: 'village', l: 'Villaggio', c: 'rgba(200,155,60,.85)', g: 'rgba(200,155,60,.65)' },
+  { v: 'fort', l: 'Forte', c: 'rgba(190,130,50,.85)', g: 'rgba(190,130,50,.65)' },
+  { v: 'forest', l: 'Foresta', c: 'rgba(60,200,80,.85)', g: 'rgba(60,200,80,.65)' },
+  { v: 'water', l: 'Acqua', c: 'rgba(80,160,240,.85)', g: 'rgba(80,160,240,.65)' },
+  { v: 'ruin', l: 'Rovine', c: 'rgba(150,80,240,.85)', g: 'rgba(150,80,240,.7)' },
+  { v: 'fog', l: 'Nebbia', c: 'rgba(140,100,240,.85)', g: 'rgba(140,100,240,.7)' },
 ];
 
 function _mapTypeColor(type) {
@@ -36,7 +36,7 @@ function _mapTypeLabel(type) {
   return type;
 }
 function _mapTypeOptions(selected) {
-  return MAP_PIN_TYPES.map(function(t) {
+  return MAP_PIN_TYPES.map(function (t) {
     return '<option value="' + t.v + '"' + (t.v === selected ? ' selected' : '') + '>' + t.l + '</option>';
   }).join('');
 }
@@ -66,14 +66,15 @@ async function _saveMapPins() {
 
   try {
     setStatus('saving', 'salvataggio...');
-    await ghPut('content/mappins.json', 'admin: update mappins',
-      JSON.stringify(payload, null, 2) + '\n', _mapFileSha);
+    await ghPut('content/mappins.json', 'admin: update mappins', JSON.stringify(payload, null, 2) + '\n', _mapFileSha);
     _mapDirty = false;
     ArcAdmin.module('core').ui.toast('Salvato nel repo — deploy in corso (~30s)', 'success');
     ArcAdmin.module('core').audit('save_mappins', 'map', { count: MAP_PINS.length });
     startDeployTimer();
     setStatus('ok', 'deploying');
-    setTimeout(function() { setStatus('idle', 'pronto'); }, 2000);
+    setTimeout(function () {
+      setStatus('idle', 'pronto');
+    }, 2000);
   } catch (e) {
     ArcAdmin.module('core').ui.toast('Errore di rete: ' + e.message, 'error');
     setStatus('err', 'errore');
@@ -97,25 +98,33 @@ function openMapEditor() {
   setTitle('Mappa');
   setStatus('saving', 'caricamento mappa…');
 
-  _loadMapPins().then(function() {
-    var h = ArcAdmin.module('core').ui.viewHead('🗺️', 'Editor Mappa',
+  _loadMapPins().then(function () {
+    var h = ArcAdmin.module('core').ui.viewHead(
+      '🗺️',
+      'Editor Mappa',
       'Puntine della mappa interattiva sulla homepage',
-      '<button class="btn btn-p" onclick="_saveMapPins()" id="map-save-btn">💾 Salva</button>'
-      + '<button class="btn btn-soft" onclick="openMapEditor()">⟳ Aggiorna</button>'
-      + '<button class="btn btn-soft" onclick="_mapAddPin()">+ Nuova puntina</button>'
+      '<button class="btn btn-p" onclick="_saveMapPins()" id="map-save-btn">💾 Salva</button>' +
+        '<button class="btn btn-soft" onclick="openMapEditor()">⟳ Aggiorna</button>' +
+        '<button class="btn btn-soft" onclick="_mapAddPin()">+ Nuova puntina</button>'
     );
-    h += '<div class="panel-sub">Clicca sulla mappa per aggiungere una puntina. Trascina per spostare. Click su una puntina per editarla.</div>';
+    h +=
+      '<div class="panel-sub">Clicca sulla mappa per aggiungere una puntina. Trascina per spostare. Click su una puntina per editarla.</div>';
 
     /* Pannello immagine mappa */
     h += '<div class="panel" style="margin-bottom:16px">';
     h += '<div class="panel-head"><h3>Immagine mappa</h3><span class="hint">URL dell\'immagine di sfondo</span></div>';
     h += '<div style="display:flex;gap:10px;align-items:center">';
-    h += '<input id="me-map-image" class="in" style="flex:1" value="' + escAttr(MAP_IMAGE_URL) + '" placeholder="/mappa.webp">';
+    h +=
+      '<input id="me-map-image" class="in" style="flex:1" value="' +
+      escAttr(MAP_IMAGE_URL) +
+      '" placeholder="/mappa.webp">';
     h += '<button class="btn btn-soft btn-sm" onclick="_previewMapImage()">Anteprima</button>';
     h += '<button class="btn btn-soft btn-sm" onclick="_uploadMapImage()">Carica file</button>';
-    h += '<input type="file" id="me-map-file" accept="image/*" aria-label="Carica nuova immagine mappa" style="display:none" onchange="_handleMapFileUpload(this)">';
+    h +=
+      '<input type="file" id="me-map-file" accept="image/*" aria-label="Carica nuova immagine mappa" style="display:none" onchange="_handleMapFileUpload(this)">';
     h += '</div>';
-    h += '<div id="me-map-preview" style="margin-top:10px;display:none"><img src="" style="max-width:100%;max-height:200px;border-radius:6px;border:1px solid var(--line)"></div>';
+    h +=
+      '<div id="me-map-preview" style="margin-top:10px;display:none"><img src="" style="max-width:100%;max-height:200px;border-radius:6px;border:1px solid var(--line)"></div>';
     h += '</div>';
 
     /* Mappa + sidebar puntine */
@@ -137,14 +146,19 @@ function openMapEditor() {
     _mapBindClick();
 
     setStatus('ok', 'mappa caricata');
-    setTimeout(function() { setStatus('idle', 'pronto'); }, 1500);
+    setTimeout(function () {
+      setStatus('idle', 'pronto');
+    }, 1500);
   });
 }
 
 /* ════ CAMBIA IMMAGINE MAPPA ════ */
 function _previewMapImage() {
   var url = document.getElementById('me-map-image').value.trim();
-  if (!url) { ArcAdmin.module('core').ui.toast('Inserisci un URL', 'error'); return; }
+  if (!url) {
+    ArcAdmin.module('core').ui.toast('Inserisci un URL', 'error');
+    return;
+  }
   var box = document.getElementById('me-map-preview');
   var img = box.querySelector('img');
   img.src = url;
@@ -163,10 +177,14 @@ async function _handleMapFileUpload(input) {
   if (!file) return;
   setStatus('saving', 'caricamento immagine…');
   try {
-    var dataUri = await new Promise(function(resolve, reject) {
+    var dataUri = await new Promise(function (resolve, reject) {
       var reader = new FileReader();
-      reader.onload = function() { resolve(reader.result); };
-      reader.onerror = function() { reject(new Error('Lettura file fallita')); };
+      reader.onload = function () {
+        resolve(reader.result);
+      };
+      reader.onerror = function () {
+        reject(new Error('Lettura file fallita'));
+      };
       reader.readAsDataURL(file);
     });
     var name = 'map-' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -180,7 +198,9 @@ async function _handleMapFileUpload(input) {
     ArcAdmin.module('core').ui.toast('Errore caricamento: ' + e.message, 'error');
   }
   setStatus('ok', 'caricato');
-  setTimeout(function() { setStatus('idle', 'pronto'); }, 1500);
+  setTimeout(function () {
+    setStatus('idle', 'pronto');
+  }, 1500);
   input.value = '';
 }
 
@@ -190,7 +210,7 @@ function _renderMapPins() {
   if (!container) return;
   container.innerHTML = '';
 
-  MAP_PINS.forEach(function(pin, idx) {
+  MAP_PINS.forEach(function (pin, idx) {
     var el = document.createElement('div');
     el.className = 'me-pin';
     el.style.left = pin.left;
@@ -200,7 +220,7 @@ function _renderMapPins() {
     el.innerHTML = '<div class="me-pin-dot"></div><div class="me-pin-label">' + esc(pin.name) + '</div>';
 
     /* Drag */
-    el.addEventListener('mousedown', function(e) {
+    el.addEventListener('mousedown', function (e) {
       if (e.button !== 0) return;
       e.stopPropagation();
       _mapDragPin = el;
@@ -209,19 +229,23 @@ function _renderMapPins() {
       _mapDragOffset.y = e.clientY - rect.top - rect.height / 2;
       el.classList.add('dragging');
     });
-    el.addEventListener('touchstart', function(e) {
-      if (e.touches.length !== 1) return;
-      e.preventDefault();
-      _mapDragPin = el;
-      var t = e.touches[0];
-      var rect = el.getBoundingClientRect();
-      _mapDragOffset.x = t.clientX - rect.left - rect.width / 2;
-      _mapDragOffset.y = t.clientY - rect.top - rect.height / 2;
-      el.classList.add('dragging');
-    }, {passive: false});
+    el.addEventListener(
+      'touchstart',
+      function (e) {
+        if (e.touches.length !== 1) return;
+        e.preventDefault();
+        _mapDragPin = el;
+        var t = e.touches[0];
+        var rect = el.getBoundingClientRect();
+        _mapDragOffset.x = t.clientX - rect.left - rect.width / 2;
+        _mapDragOffset.y = t.clientY - rect.top - rect.height / 2;
+        el.classList.add('dragging');
+      },
+      { passive: false }
+    );
 
     /* Click per editare */
-    el.addEventListener('click', function(e) {
+    el.addEventListener('click', function (e) {
       if (el.classList.contains('was-dragged')) {
         el.classList.remove('was-dragged');
         return;
@@ -235,37 +259,41 @@ function _renderMapPins() {
 }
 
 /* ════ DRAG & DROP ════ */
-document.addEventListener('mousemove', function(e) {
+document.addEventListener('mousemove', function (e) {
   if (!_mapActive || !_mapDragPin) return;
   var container = document.getElementById('map-editor-container');
   if (!container) return;
   var imgRect = container.getBoundingClientRect();
-  var x = ((e.clientX - imgRect.left - _mapDragOffset.x) / imgRect.width * 100);
-  var y = ((e.clientY - imgRect.top - _mapDragOffset.y) / imgRect.height * 100);
+  var x = ((e.clientX - imgRect.left - _mapDragOffset.x) / imgRect.width) * 100;
+  var y = ((e.clientY - imgRect.top - _mapDragOffset.y) / imgRect.height) * 100;
   x = Math.max(0, Math.min(100, x));
   y = Math.max(0, Math.min(100, y));
   _mapDragPin.style.left = x.toFixed(2) + '%';
   _mapDragPin.style.top = y.toFixed(2) + '%';
 });
-document.addEventListener('touchmove', function(e) {
-  if (!_mapActive || !_mapDragPin || e.touches.length !== 1) return;
-  e.preventDefault();
-  var container = document.getElementById('map-editor-container');
-  if (!container) return;
-  var t = e.touches[0];
-  var imgRect = container.getBoundingClientRect();
-  var x = ((t.clientX - imgRect.left - _mapDragOffset.x) / imgRect.width * 100);
-  var y = ((t.clientY - imgRect.top - _mapDragOffset.y) / imgRect.height * 100);
-  x = Math.max(0, Math.min(100, x));
-  y = Math.max(0, Math.min(100, y));
-  _mapDragPin.style.left = x.toFixed(2) + '%';
-  _mapDragPin.style.top = y.toFixed(2) + '%';
-}, {passive: false});
+document.addEventListener(
+  'touchmove',
+  function (e) {
+    if (!_mapActive || !_mapDragPin || e.touches.length !== 1) return;
+    e.preventDefault();
+    var container = document.getElementById('map-editor-container');
+    if (!container) return;
+    var t = e.touches[0];
+    var imgRect = container.getBoundingClientRect();
+    var x = ((t.clientX - imgRect.left - _mapDragOffset.x) / imgRect.width) * 100;
+    var y = ((t.clientY - imgRect.top - _mapDragOffset.y) / imgRect.height) * 100;
+    x = Math.max(0, Math.min(100, x));
+    y = Math.max(0, Math.min(100, y));
+    _mapDragPin.style.left = x.toFixed(2) + '%';
+    _mapDragPin.style.top = y.toFixed(2) + '%';
+  },
+  { passive: false }
+);
 
-document.addEventListener('mouseup', function() {
+document.addEventListener('mouseup', function () {
   if (_mapActive) _mapEndDrag();
 });
-document.addEventListener('touchend', function() {
+document.addEventListener('touchend', function () {
   if (_mapActive) _mapEndDrag();
 });
 function _mapEndDrag() {
@@ -279,7 +307,9 @@ function _mapEndDrag() {
     _mapDragPin.classList.add('was-dragged');
     var ref = _mapDragPin;
     _mapDragPin = null;
-    setTimeout(function() { ref.classList.remove('was-dragged'); }, 50);
+    setTimeout(function () {
+      ref.classList.remove('was-dragged');
+    }, 50);
     _renderPinList();
   } else {
     _mapDragPin = null;
@@ -290,11 +320,11 @@ function _mapEndDrag() {
 function _mapBindClick() {
   var container = document.getElementById('map-editor-container');
   if (!container) return;
-  container.addEventListener('click', function(e) {
+  container.addEventListener('click', function (e) {
     if (e.target.closest('.me-pin')) return;
     var rect = container.getBoundingClientRect();
-    var x = ((e.clientX - rect.left) / rect.width * 100);
-    var y = ((e.clientY - rect.top) / rect.height * 100);
+    var x = ((e.clientX - rect.left) / rect.width) * 100;
+    var y = ((e.clientY - rect.top) / rect.height) * 100;
     x = Math.max(0, Math.min(100, x));
     y = Math.max(0, Math.min(100, y));
     _mapAddPinAt(x, y);
@@ -316,7 +346,7 @@ function _mapAddPinAt(x, y) {
     desc: '',
     explored: false,
     sub: '',
-    pageId: ''
+    pageId: '',
   };
   MAP_PINS.push(pin);
   _mapDirty = true;
@@ -334,28 +364,51 @@ function _renderPinList() {
     list.innerHTML = '<div class="empty" style="padding:20px"><span class="ei">📍</span>Nessuna puntina</div>';
     return;
   }
-  list.innerHTML = MAP_PINS.map(function(pin, idx) {
-    return '<div class="mes-item' + (_mapDirty ? ' dirty' : '') + '" onclick="_mapEditPin(' + idx + ')">'
-      + '<div class="mes-dot" style="background:' + esc(_mapTypeColor(pin.type)) + '"></div>'
-      + '<div class="mes-info"><div class="mes-name">' + esc(pin.name) + '</div>'
-      + '<div class="mes-meta">' + _mapTypeLabel(pin.type) + ' · ' + esc(pin.left) + ', ' + esc(pin.top) + '</div></div>'
-      + '</div>';
+  list.innerHTML = MAP_PINS.map(function (pin, idx) {
+    return (
+      '<div class="mes-item' +
+      (_mapDirty ? ' dirty' : '') +
+      '" onclick="_mapEditPin(' +
+      idx +
+      ')">' +
+      '<div class="mes-dot" style="background:' +
+      esc(_mapTypeColor(pin.type)) +
+      '"></div>' +
+      '<div class="mes-info"><div class="mes-name">' +
+      esc(pin.name) +
+      '</div>' +
+      '<div class="mes-meta">' +
+      _mapTypeLabel(pin.type) +
+      ' · ' +
+      esc(pin.left) +
+      ', ' +
+      esc(pin.top) +
+      '</div></div>' +
+      '</div>'
+    );
   }).join('');
 }
 
 /* Selettore pagine del sito (registry admin) per collegare la puntina */
-function _mapPageSelect(current){
-  var opts='<option value="">— nessun collegamento —</option>';
-  var found=false;
-  (window.ArcAdmin.pages||[]).forEach(function(pg){
-    var sel=(pg.id===current);
-    if(sel)found=true;
-    opts+='<option value="'+escAttr(pg.id)+'"'+(sel?' selected':'')+'>'+esc((pg.i||'📄')+' '+pg.l)+'</option>';
+function _mapPageSelect(current) {
+  var opts = '<option value="">— nessun collegamento —</option>';
+  var found = false;
+  (window.ArcAdmin.pages || []).forEach(function (pg) {
+    var sel = pg.id === current;
+    if (sel) found = true;
+    opts +=
+      '<option value="' +
+      escAttr(pg.id) +
+      '"' +
+      (sel ? ' selected' : '') +
+      '>' +
+      esc((pg.i || '📄') + ' ' + pg.l) +
+      '</option>';
   });
-  if(current&&!found){
-    opts+='<option value="'+escAttr(current)+'" selected>⚠ '+esc(current)+' (pagina eliminata)</option>';
+  if (current && !found) {
+    opts += '<option value="' + escAttr(current) + '" selected>⚠ ' + esc(current) + ' (pagina eliminata)</option>';
   }
-  return '<select id="mef-pageid" class="in">'+opts+'</select>';
+  return '<select id="mef-pageid" class="in">' + opts + '</select>';
 }
 
 /* ════ EDITA PUNTINA ════ */
@@ -363,38 +416,60 @@ function _mapEditPin(idx) {
   var pin = MAP_PINS[idx];
   if (!pin) return;
 
-  var body = '<div class="map-edit-form">'
-    + '<div class="grid-2">'
-    + '<div class="fld"><label>Nome</label><input id="mef-name" class="in" value="' + escAttr(pin.name) + '"></div>'
-    + '<div class="fld"><label>Tipo</label><select id="mef-type" class="in">' + _mapTypeOptions(pin.type) + '</select></div>'
-    + '</div>'
-    + '<div class="fld"><label>Descrizione</label><textarea id="mef-desc" class="in" rows="2" style="resize:vertical">' + esc(pin.desc) + '</textarea></div>'
-    + '<div class="grid-2">'
-    + '<div class="fld"><label>Posizione X</label><input id="mef-left" class="in" value="' + escAttr(pin.left) + '"></div>'
-    + '<div class="fld"><label>Posizione Y</label><input id="mef-top" class="in" value="' + escAttr(pin.top) + '"></div>'
-    + '</div>'
-    + '<div class="grid-2">'
-    + '<div class="fld"><label>Sub-mappa</label><input id="mef-sub" class="in" placeholder="foglia, smari…" value="' + escAttr(pin.sub || '') + '"></div>'
-    + '<div class="fld"><label>ID pagina wiki</label>'
-    + _mapPageSelect(pin.pageId || '')
-    + '</div>'
-    + '</div>'
-    + '<div class="fld"><label><input type="checkbox" id="mef-explored"' + (pin.explored ? ' checked' : '') + '> Esplorata</label></div>'
-    + '</div>';
+  var body =
+    '<div class="map-edit-form">' +
+    '<div class="grid-2">' +
+    '<div class="fld"><label>Nome</label><input id="mef-name" class="in" value="' +
+    escAttr(pin.name) +
+    '"></div>' +
+    '<div class="fld"><label>Tipo</label><select id="mef-type" class="in">' +
+    _mapTypeOptions(pin.type) +
+    '</select></div>' +
+    '</div>' +
+    '<div class="fld"><label>Descrizione</label><textarea id="mef-desc" class="in" rows="2" style="resize:vertical">' +
+    esc(pin.desc) +
+    '</textarea></div>' +
+    '<div class="grid-2">' +
+    '<div class="fld"><label>Posizione X</label><input id="mef-left" class="in" value="' +
+    escAttr(pin.left) +
+    '"></div>' +
+    '<div class="fld"><label>Posizione Y</label><input id="mef-top" class="in" value="' +
+    escAttr(pin.top) +
+    '"></div>' +
+    '</div>' +
+    '<div class="grid-2">' +
+    '<div class="fld"><label>Sub-mappa</label><input id="mef-sub" class="in" placeholder="foglia, smari…" value="' +
+    escAttr(pin.sub || '') +
+    '"></div>' +
+    '<div class="fld"><label>ID pagina wiki</label>' +
+    _mapPageSelect(pin.pageId || '') +
+    '</div>' +
+    '</div>' +
+    '<div class="fld"><label><input type="checkbox" id="mef-explored"' +
+    (pin.explored ? ' checked' : '') +
+    '> Esplorata</label></div>' +
+    '</div>';
 
   var id = 'mef-modal';
   if (document.getElementById(id)) document.getElementById(id).remove();
 
-  var actions = '<button class="btn btn-d" onclick="_mapDeletePin(' + idx + ')">🗑 Elimina</button>'
-    + '<div style="flex:1"></div>'
-    + '<button class="btn btn-soft" onclick="closeModal(\'' + id + '\')">Annulla</button>'
-    + '<button class="btn btn-p" onclick="_mapSavePin(' + idx + ')">Salva</button>';
+  var actions =
+    '<button class="btn btn-d" onclick="_mapDeletePin(' +
+    idx +
+    ')">🗑 Elimina</button>' +
+    '<div style="flex:1"></div>' +
+    '<button class="btn btn-soft" onclick="closeModal(\'' +
+    id +
+    '\')">Annulla</button>' +
+    '<button class="btn btn-p" onclick="_mapSavePin(' +
+    idx +
+    ')">Salva</button>';
 
   var modal = ArcAdmin.module('core').ui.modal(id, '📍 ' + pin.name, body, actions);
 
   var typeSelect = document.getElementById('mef-type');
   if (typeSelect) {
-    typeSelect.addEventListener('change', function() {
+    typeSelect.addEventListener('change', function () {
       var dot = modal.querySelector('.md-head');
       if (dot) dot.style.borderBottomColor = _mapTypeColor(typeSelect.value);
     });
@@ -436,7 +511,7 @@ function _mapSavePin(idx) {
 }
 
 async function _mapDeletePin(idx) {
-  if (!(await uiConfirm('Eliminare questa puntina?',{ok:'Elimina'}))) return;
+  if (!(await uiConfirm('Eliminare questa puntina?', { ok: 'Elimina' }))) return;
   MAP_PINS.splice(idx, 1);
   _mapDirty = true;
   _renderMapPins();

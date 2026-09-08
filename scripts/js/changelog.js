@@ -1,6 +1,5 @@
 /* scripts/js/changelog.js */
-window.loadChangelog = async function(container) {
-
+window.loadChangelog = async function (container) {
   container.innerHTML = '<p class="cl-loading">Caricamento changelog…</p>';
 
   let entries;
@@ -22,13 +21,13 @@ window.loadChangelog = async function(container) {
   const tree = {};
 
   for (const e of entries) {
-    const v    = String(e.versione      ?? '?');
-    const sv   = String(e.sottoversione ?? (v + '.0'));
-    const p    = e.patch != null ? String(e.patch) : null;
+    const v = String(e.versione ?? '?');
+    const sv = String(e.sottoversione ?? v + '.0');
+    const p = e.patch != null ? String(e.patch) : null;
     const pKey = p ?? '__none__';
 
-    if (!tree[v])        tree[v]         = {};
-    if (!tree[v][sv])    tree[v][sv]     = {};
+    if (!tree[v]) tree[v] = {};
+    if (!tree[v][sv]) tree[v][sv] = {};
     if (!Array.isArray(tree[v][sv][pKey])) tree[v][sv][pKey] = [];
     tree[v][sv][pKey].push(e);
   }
@@ -36,9 +35,9 @@ window.loadChangelog = async function(container) {
   const versions = Object.keys(tree).sort((a, b) => parseFloat(a) - parseFloat(b));
 
   // ── State ─────────────────────────────────────────────────────────────────
-  let activeV  = versions[versions.length - 1];
+  let activeV = versions[versions.length - 1];
   let activeSV = null;
-  let activeP  = null;
+  let activeP = null;
 
   function getSubversions(v) {
     return Object.keys(tree[v] ?? {}).sort((a, b) => {
@@ -53,24 +52,23 @@ window.loadChangelog = async function(container) {
   }
 
   function getPatches(v, sv) {
-  return Object.keys(tree[v]?.[sv] ?? {})
-    .filter(p => p !== '__none__')
-    .sort((a, b) => {
-      const partsA = a.split(' ');
-      const partsB = b.split(' ');
-      const numCmp = partsA[0].localeCompare(partsB[0], undefined, { numeric: true });
-      if (numCmp !== 0) return numCmp;
-      return (partsA[1] ?? '').localeCompare(partsB[1] ?? '');
-    });
-}
+    return Object.keys(tree[v]?.[sv] ?? {})
+      .filter((p) => p !== '__none__')
+      .sort((a, b) => {
+        const partsA = a.split(' ');
+        const partsB = b.split(' ');
+        const numCmp = partsA[0].localeCompare(partsB[0], undefined, { numeric: true });
+        if (numCmp !== 0) return numCmp;
+        return (partsA[1] ?? '').localeCompare(partsB[1] ?? '');
+      });
+  }
 
   // ── Render ────────────────────────────────────────────────────────────────
   function render() {
     const svList = getSubversions(activeV);
     if (!activeSV || !svList.includes(activeSV)) activeSV = svList[svList.length - 1];
 
-    const patches  = getPatches(activeV, activeSV);
-    
+    const patches = getPatches(activeV, activeSV);
 
     const hasPatch = patches.length > 0;
 
@@ -83,19 +81,21 @@ window.loadChangelog = async function(container) {
     // Entries to show
     let visibleEntries;
     if (hasPatch && activeP) {
-  const bucket = tree[activeV]?.[activeSV]?.[activeP];
-  if (Array.isArray(bucket) && bucket.length) {
-    visibleEntries = bucket;
-  } else {
-    visibleEntries = [];
-    for (const sv of Object.values(tree[activeV] ?? {})) {
-      const b = sv[activeP];
-      if (Array.isArray(b)) visibleEntries.push(...b);
-    }
-  }
-} else {
+      const bucket = tree[activeV]?.[activeSV]?.[activeP];
+      if (Array.isArray(bucket) && bucket.length) {
+        visibleEntries = bucket;
+      } else {
+        visibleEntries = [];
+        for (const sv of Object.values(tree[activeV] ?? {})) {
+          const b = sv[activeP];
+          if (Array.isArray(b)) visibleEntries.push(...b);
+        }
+      }
+    } else {
       const svBucket = tree[activeV]?.[activeSV] ?? {};
-      visibleEntries = Object.values(svBucket).flat().filter(e => e && e.id);
+      visibleEntries = Object.values(svBucket)
+        .flat()
+        .filter((e) => e && e.id);
     }
 
     container.innerHTML = '';
@@ -118,9 +118,9 @@ window.loadChangelog = async function(container) {
       btn.className = 'cl-ver-btn' + (v === activeV ? ' active' : '');
       btn.textContent = 'Versione ' + v;
       btn.addEventListener('click', () => {
-        activeV  = v;
+        activeV = v;
         activeSV = null;
-        activeP  = null;
+        activeP = null;
         render();
       });
       sidebar.appendChild(btn);
@@ -142,7 +142,7 @@ window.loadChangelog = async function(container) {
       btn.textContent = sv;
       btn.addEventListener('click', () => {
         activeSV = sv;
-        activeP  = null;
+        activeP = null;
         render();
       });
       svTabs.appendChild(btn);
@@ -159,10 +159,10 @@ window.loadChangelog = async function(container) {
         btn.className = 'cl-tab-btn cl-patch-btn' + (p === activeP ? ' active' : '');
         btn.textContent = p;
         btn.addEventListener('click', (ev) => {
-  ev.stopPropagation();
-  activeP = p;
-  render();
-});
+          ev.stopPropagation();
+          activeP = p;
+          render();
+        });
         pTabs.appendChild(btn);
       }
       main.appendChild(pTabs);
@@ -198,16 +198,17 @@ window.loadChangelog = async function(container) {
             return;
           }
           if (existing) existing.remove();
-          container.querySelectorAll('.cl-entry-card--open').forEach(c => c.classList.remove('cl-entry-card--open'));
+          container.querySelectorAll('.cl-entry-card--open').forEach((c) => c.classList.remove('cl-entry-card--open'));
           card.classList.add('cl-entry-card--open');
           const inline = document.createElement('div');
           inline.className = 'cl-inline-content';
           inline.dataset.id = entry.id;
           card.appendChild(inline);
           try {
-            const html = (entry.content && window.mdRender)
-              ? window.mdRender(entry.content)
-              : '<p class="cl-error">Contenuto non disponibile</p>';
+            const html =
+              entry.content && window.mdRender
+                ? window.mdRender(entry.content)
+                : '<p class="cl-error">Contenuto non disponibile</p>';
             inline.innerHTML = '<div class="n-body">' + html + '</div>';
           } catch (e) {
             inline.innerHTML = '<div class="cl-error">Errore caricamento</div>';
@@ -229,9 +230,9 @@ window.loadChangelog = async function(container) {
         const badges = document.createElement('div');
         badges.className = 'cl-entry-badges';
 
-        if (entry.versione)      badges.appendChild(makeBadge(entry.versione,      'badge-v'));
+        if (entry.versione) badges.appendChild(makeBadge(entry.versione, 'badge-v'));
         if (entry.sottoversione) badges.appendChild(makeBadge(entry.sottoversione, 'badge-sv'));
-        if (entry.patch)         badges.appendChild(makeBadge(entry.patch,         'badge-p'));
+        if (entry.patch) badges.appendChild(makeBadge(entry.patch, 'badge-p'));
 
         card.appendChild(badges);
         entriesWrap.appendChild(card);

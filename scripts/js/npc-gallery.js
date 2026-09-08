@@ -5,106 +5,133 @@
 var NPC_PARENT_DB = '3320274fdc1c805090becb2a5a0414e1';
 
 var NPC_LORE_COLORS = {
-  'Locanda':                  { c: '#c8a44a', bg: 'rgba(200,164,74,.12)' },
-  'Porto':                    { c: '#4a8fc8', bg: 'rgba(74,143,200,.12)' },
-  'Forgia':                   { c: '#c86a4a', bg: 'rgba(200,106,74,.12)' },
-  'Bazaar':                   { c: '#a44ac8', bg: 'rgba(164,74,200,.12)' },
-  'Biblioteca':               { c: '#4ac8a4', bg: 'rgba(74,200,164,.12)' },
-  'Caserma':                  { c: '#c84a4a', bg: 'rgba(200,74,74,.12)' },
+  Locanda: { c: '#c8a44a', bg: 'rgba(200,164,74,.12)' },
+  Porto: { c: '#4a8fc8', bg: 'rgba(74,143,200,.12)' },
+  Forgia: { c: '#c86a4a', bg: 'rgba(200,106,74,.12)' },
+  Bazaar: { c: '#a44ac8', bg: 'rgba(164,74,200,.12)' },
+  Biblioteca: { c: '#4ac8a4', bg: 'rgba(74,200,164,.12)' },
+  Caserma: { c: '#c84a4a', bg: 'rgba(200,74,74,.12)' },
   'Gilda degli avventurieri': { c: '#c8b44a', bg: 'rgba(200,180,74,.12)' },
-  'Sartoria':                 { c: '#c84a8f', bg: 'rgba(200,74,143,.12)' },
-  'Bottega Farmaceutica':     { c: '#4ac84a', bg: 'rgba(74,200,74,.12)' },
-  'Fuori dalle mura':         { c: '#8fc84a', bg: 'rgba(143,200,74,.12)' },
-  'Foresta dello Smarrimento':{ c: '#4a6ec8', bg: 'rgba(74,110,200,.12)' },
-  'NPC Evento':               { c: '#c8c84a', bg: 'rgba(200,200,74,.12)' },
-  'Marchese':                 { c: '#c89b3c', bg: 'rgba(200,155,60,.12)' },
-  'Duca':                     { c: '#c89b3c', bg: 'rgba(200,155,60,.12)' },
+  Sartoria: { c: '#c84a8f', bg: 'rgba(200,74,143,.12)' },
+  'Bottega Farmaceutica': { c: '#4ac84a', bg: 'rgba(74,200,74,.12)' },
+  'Fuori dalle mura': { c: '#8fc84a', bg: 'rgba(143,200,74,.12)' },
+  'Foresta dello Smarrimento': { c: '#4a6ec8', bg: 'rgba(74,110,200,.12)' },
+  'NPC Evento': { c: '#c8c84a', bg: 'rgba(200,200,74,.12)' },
+  Marchese: { c: '#c89b3c', bg: 'rgba(200,155,60,.12)' },
+  Duca: { c: '#c89b3c', bg: 'rgba(200,155,60,.12)' },
 };
-function _npcLoreColor(lore){ return NPC_LORE_COLORS[lore]||{c:'rgba(200,155,60,.7)',bg:'rgba(200,155,60,.08)'}; }
+function _npcLoreColor(lore) {
+  return NPC_LORE_COLORS[lore] || { c: 'rgba(200,155,60,.7)', bg: 'rgba(200,155,60,.08)' };
+}
 
 var NPC_LORE_ICONS = {
-  'Locanda':'🍺','Porto':'⚓','Forgia':'🔨','Bazaar':'🛒',
-  'Biblioteca':'📚','Caserma':'⚔️','Gilda degli avventurieri':'🗡️',
-  'Sartoria':'🧵','Bottega Farmaceutica':'⚕️','Fuori dalle mura':'🌿',
-  'Foresta dello Smarrimento':'🌲','NPC Evento':'✨','Marchese':'👑','Duca':'👑',
+  Locanda: '🍺',
+  Porto: '⚓',
+  Forgia: '🔨',
+  Bazaar: '🛒',
+  Biblioteca: '📚',
+  Caserma: '⚔️',
+  'Gilda degli avventurieri': '🗡️',
+  Sartoria: '🧵',
+  'Bottega Farmaceutica': '⚕️',
+  'Fuori dalle mura': '🌿',
+  'Foresta dello Smarrimento': '🌲',
+  'NPC Evento': '✨',
+  Marchese: '👑',
+  Duca: '👑',
 };
-function _npcLoreIcon(lore){ return NPC_LORE_ICONS[lore]||'📍'; }
+function _npcLoreIcon(lore) {
+  return NPC_LORE_ICONS[lore] || '📍';
+}
 
 var NPC_IMP = {
-  'NPC Chiave':     { c:'#f0d060', border:'#c8a44a', label:'⭐ CHIAVE' },
-  'NPC Secondario': { c:'#a0b0c8', border:'#6080a0', label:'· SECONDARIO' },
-  'Nobile':         { c:'#e080c0', border:'#c040a0', label:'♦ NOBILE' },
+  'NPC Chiave': { c: '#f0d060', border: '#c8a44a', label: '⭐ CHIAVE' },
+  'NPC Secondario': { c: '#a0b0c8', border: '#6080a0', label: '· SECONDARIO' },
+  Nobile: { c: '#e080c0', border: '#c040a0', label: '♦ NOBILE' },
 };
-function _npcImpStyle(imp){ return NPC_IMP[imp]||null; }
+function _npcImpStyle(imp) {
+  return NPC_IMP[imp] || null;
+}
 
 /* ── Filtro attivo ── */
 var _npcActiveFilter = 'tutti';
 
 /* ════ ENTRY POINT ════ */
-window.loadNpcGallery = async function(container, cities) {
+window.loadNpcGallery = async function (container, cities) {
   container.innerHTML = '<div class="npc-loading"><div class="gs-loading-spin"></div></div>';
   _injectNpcCSS();
   _npcActiveFilter = 'tutti';
 
   if (!cities) {
     try {
-      var r = await fetch('/api/notion?dbId=' + NPC_PARENT_DB);
-      cities = (await r.json()).pages || [];
-    } catch(e) {
-      container.innerHTML = '<div class="npc-err">⚠️ Errore caricamento città.</div>'; return;
+      var data = await _loadLocalDb(NPC_PARENT_DB);
+      cities = data.pages || [];
+    } catch (e) {
+      container.innerHTML = '<div class="npc-err">⚠️ Errore caricamento città.</div>';
+      return;
     }
   }
 
-  if (!cities.length) { container.innerHTML = '<div class="npc-err">Nessuna città trovata.</div>'; return; }
+  if (!cities.length) {
+    container.innerHTML = '<div class="npc-err">Nessuna città trovata.</div>';
+    return;
+  }
 
   container.innerHTML =
     '<div class="npc-layout">' +
-      '<div class="npc-sidebar">' +
-        '<div class="npc-sidebar-title">Città</div>' +
-        '<ul class="npc-city-list" id="npc-city-list"></ul>' +
-      '</div>' +
-      '<div class="npc-main">' +
-        /* Filtro importanza */
-        '<div class="npc-filter-bar" id="npc-filter-bar">' +
-          '<button class="npc-filter-btn active" data-filter="tutti">Tutti</button>' +
-          '<button class="npc-filter-btn" data-filter="NPC Chiave">⭐ Chiave</button>' +
-          '<button class="npc-filter-btn" data-filter="NPC Secondario">· Secondario</button>' +
-          '<button class="npc-filter-btn" data-filter="Nobile">♦ Nobile</button>' +
-        '</div>' +
-        '<div class="npc-board" id="npc-board">' +
-          '<div class="npc-board-placeholder">← Seleziona una città</div>' +
-        '</div>' +
-      '</div>' +
+    '<div class="npc-sidebar">' +
+    '<div class="npc-sidebar-title">Città</div>' +
+    '<ul class="npc-city-list" id="npc-city-list"></ul>' +
+    '</div>' +
+    '<div class="npc-main">' +
+    /* Filtro importanza */
+    '<div class="npc-filter-bar" id="npc-filter-bar">' +
+    '<button class="npc-filter-btn active" data-filter="tutti">Tutti</button>' +
+    '<button class="npc-filter-btn" data-filter="NPC Chiave">⭐ Chiave</button>' +
+    '<button class="npc-filter-btn" data-filter="NPC Secondario">· Secondario</button>' +
+    '<button class="npc-filter-btn" data-filter="Nobile">♦ Nobile</button>' +
+    '</div>' +
+    '<div class="npc-board" id="npc-board">' +
+    '<div class="npc-board-placeholder">← Seleziona una città</div>' +
+    '</div>' +
+    '</div>' +
     '</div>';
 
   /* Filtro click */
-  container.querySelector('#npc-filter-bar').addEventListener('click', function(e) {
+  container.querySelector('#npc-filter-bar').addEventListener('click', function (e) {
     var btn = e.target.closest('.npc-filter-btn');
     if (!btn) return;
-    container.querySelectorAll('.npc-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+    container.querySelectorAll('.npc-filter-btn').forEach(function (b) {
+      b.classList.remove('active');
+    });
     btn.classList.add('active');
     _npcActiveFilter = btn.dataset.filter;
     _applyNpcFilter(container);
   });
 
   var list = container.querySelector('#npc-city-list');
-  cities.forEach(function(city, idx) {
+  cities.forEach(function (city, idx) {
     var li = document.createElement('li');
     li.className = 'npc-city-item';
     li.innerHTML = (city.icon && city.icon !== '📄' ? '<span>' + city.icon + '</span>' : '') + city.title;
-    li.addEventListener('click', function() {
-      container.querySelectorAll('.npc-city-item').forEach(function(i){ i.classList.remove('active'); });
+    li.addEventListener('click', function () {
+      container.querySelectorAll('.npc-city-item').forEach(function (i) {
+        i.classList.remove('active');
+      });
       li.classList.add('active');
       _loadCityBoard(container.querySelector('#npc-board'), city);
     });
     list.appendChild(li);
-    if (idx === 0) setTimeout(function(){ li.click(); }, 0);
+    if (idx === 0)
+      setTimeout(function () {
+        li.click();
+      }, 0);
   });
 };
 
 function _applyNpcFilter(container) {
   var f = _npcActiveFilter;
-  container.querySelectorAll('.npc-poster').forEach(function(p) {
+  container.querySelectorAll('.npc-poster').forEach(function (p) {
     if (f === 'tutti' || p.dataset.imp === f) {
       p.style.display = '';
     } else {
@@ -112,7 +139,7 @@ function _applyNpcFilter(container) {
     }
   });
   /* Nascondi sezioni vuote */
-  container.querySelectorAll('.npc-section').forEach(function(sec) {
+  container.querySelectorAll('.npc-section').forEach(function (sec) {
     var visible = sec.querySelectorAll('.npc-poster:not([style*="display: none"]):not([style*="display:none"])');
     sec.style.display = visible.length ? '' : 'none';
   });
@@ -122,79 +149,21 @@ function _applyNpcFilter(container) {
 async function _loadCityBoard(board, city) {
   board.innerHTML = '<div class="npc-loading"><div class="gs-loading-spin"></div></div>';
 
-  var subDbId = null;
-  try {
-    var pr = await fetch('/api/notion?pageId=' + city.id);
-    var pd = await pr.json();
-    var dbBlock = (pd.blocks || []).find(function(b){ return b.type === 'child_database'; });
-    if (dbBlock) subDbId = dbBlock.id.replace(/-/g, '');
-  } catch(e) {}
-
-  if (!subDbId) { board.innerHTML = '<div class="npc-err">Nessun database trovato.</div>'; return; }
-
-  var npcs = [];
-  try {
-    var nr = await fetch('/api/notion?dbId=' + subDbId);
-    npcs = (await nr.json()).pages || [];
-  } catch(e) { board.innerHTML = '<div class="npc-err">⚠️ Errore.</div>'; return; }
-
-  if (!npcs.length) { board.innerHTML = '<div class="npc-err">Nessun NPC trovato.</div>'; return; }
-
-  var groups = {}, groupOrder = [];
-  npcs.forEach(function(npc) {
-    var key = npc.lore || 'Altro';
-    if (!groups[key]) { groups[key] = []; groupOrder.push(key); }
-    groups[key].push(npc);
-  });
-
-  var html = '<div class="npc-city-title">' +
-    (city.icon && city.icon !== '📄' ? '<span>' + city.icon + '</span>' : '') +
-    city.title + '</div>';
-
-  groupOrder.forEach(function(lore) {
-    var col = _npcLoreColor(lore);
-    var ico = _npcLoreIcon(lore);
-    html += '<div class="npc-section">' +
-      '<div class="npc-section-header" style="color:' + col.c + ';border-bottom-color:' + col.c + '40">' +
-        '<span>' + ico + '</span>' + lore +
-        '<span class="npc-section-count">' + groups[lore].length + '</span>' +
-      '</div>' +
-      '<div class="npc-posters">';
-
-    groups[lore].forEach(function(npc) {
-      var titleSafe = npc.title.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      var imp = npc.importanza || '';
-      var impStyle = imp ? _npcImpStyle(imp) : null;
-      var col2 = _npcLoreColor(lore);
-
-      var impBadge = impStyle
-        ? '<div class="npc-poster-imp" style="color:' + impStyle.c + ';border-color:' + impStyle.border + '">' + impStyle.label + '</div>'
-        : '<div class="npc-poster-imp" style="opacity:0;pointer-events:none">·</div>';
-
-      html +=
-        '<div class="npc-poster" data-imp="' + imp + '"' +
-          ' onclick="gp(\'' + npc.id + '\',\'' + titleSafe + '\',\'' + (npc.icon !== '📄' ? npc.icon : '👤') + '\')">' +
-          '<div class="npc-poster-texture"></div>' +
-          '<div class="npc-poster-corner npc-corner-tl"></div>' +
-          '<div class="npc-poster-corner npc-corner-tr"></div>' +
-          '<div class="npc-poster-corner npc-corner-bl"></div>' +
-          '<div class="npc-poster-corner npc-corner-br"></div>' +
-          '<div class="npc-poster-inner">' +
-            impBadge +
-            '<div class="npc-poster-avatar">' + (npc.icon !== '📄' ? npc.icon : '👤') + '</div>' +
-            '<div class="npc-poster-divider" style="border-color:' + col2.c + '40"></div>' +
-            '<div class="npc-poster-name">' + npc.title + '</div>' +
-            '<div class="npc-poster-lore-badge" style="background:' + col2.bg + ';color:' + col2.c + ';border-color:' + col2.c + '60">' + ico + ' ' + lore + '</div>' +
-          '</div>' +
-          '<div class="npc-poster-footer">LEGGI LA SCHEDA →</div>' +
+  _loadLocalPage(city.id)
+    .then(function (html) {
+      if (!html) throw new Error('no content');
+      board.innerHTML =
+        '<div class="npc-city-title">' +
+        (city.icon && city.icon !== '📄' ? '<span>' + city.icon + '</span>' : '') +
+        city.title +
+        '</div>' +
+        '<div class="n-body">' +
+        html +
         '</div>';
+    })
+    .catch(function () {
+      board.innerHTML = '<div class="npc-err">Schede città non ancora disponibili (export locale assente).</div>';
     });
-
-    html += '</div></div>';
-  });
-
-  board.innerHTML = html;
-  _applyNpcFilter(board.closest('.npc-layout').parentElement);
 }
 
 /* ════ CSS ════ */

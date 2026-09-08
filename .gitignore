@@ -8,6 +8,8 @@ package-lock.json
 
 # Build
 dist/
+vite.config.ts.timestamp-*.mjs
+vite.config.ts.timestamp-*.js
 
 # Ambiente / segreti
 .env

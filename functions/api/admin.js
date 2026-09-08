@@ -1,47 +1,20 @@
+import {
+  sha256hex,
+  constantTimeEqual,
+  hashPassword,
+  verifyPassword,
+  genToken,
+  rateLimitCheck
+} from './_lib/auth.js';
+
 export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const action = url.searchParams.get('action');
   const KV = env.ARCAMIS_CACHE;
   const ADMIN_SECRET = env.ADMIN_SECRET;
-   const SESSION_TTL        = 86400;          /* 24 ore  (default) */
+  const SESSION_TTL        = 86400;          /* 24 ore  (default) */
   const SESSION_TTL_LONG   = 90 * 86400;     /* 90 giorni (ricordami) */
-
-  async function sha256hex(text) {
-    const data = new TextEncoder().encode(text);
-    const hash = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  /* Password hashing con salt casuale (PBKDF2-SHA256) */
-  async function hashPassword(password, existingSalt) {
-    const salt = existingSalt || (() => {
-      const arr = new Uint8Array(16);
-      crypto.getRandomValues(arr);
-      return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
-    })();
-    const data = new TextEncoder().encode(password + salt);
-    const keyMaterial = await crypto.subtle.importKey(
-      'raw', data, { name: 'PBKDF2' }, false, ['deriveBits']
-    );
-    const derivedBits = await crypto.subtle.deriveBits(
-      { name: 'PBKDF2', salt: new TextEncoder().encode(salt), iterations: 100000, hash: 'SHA-256' },
-      keyMaterial, 256
-    );
-    const hash = Array.from(new Uint8Array(derivedBits)).map(b => b.toString(16).padStart(2, '0')).join('');
-    return { hash, salt };
-  }
-
-  async function verifyPassword(password, storedHash, salt) {
-    const { hash } = await hashPassword(password, salt);
-    // Constant-time comparison to prevent timing attacks
-    if (hash.length !== storedHash.length) return false;
-    let result = 0;
-    for (let i = 0; i < hash.length; i++) {
-      result |= hash.charCodeAt(i) ^ storedHash.charCodeAt(i);
-    }
-    return result === 0;
-  }
 
   const cors = {
     'Access-Control-Allow-Origin': url.origin,
@@ -100,13 +73,6 @@ export async function onRequest(context) {
     } catch (e) { return null; }
   }
 
-  /* ── Helper: genera token casuale ── */
-  function genToken() {
-    const arr = new Uint8Array(32);
-    crypto.getRandomValues(arr);
-    return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
   /* ── Helper: scrivi log entry ── */
   async function writeAdminLog(action, target, extra, user) {
     try {
@@ -133,13 +99,7 @@ export async function onRequest(context) {
   async function rateLimitReached() {
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
     const key = 'rl_admin_login_' + ip;
-    try {
-      const raw = await KV.get(key);
-      const count = raw ? parseInt(raw, 10) : 0;
-      if (count >= 5) return true;
-      await KV.put(key, String(count + 1), { expirationTtl: 15 * 60 });
-    } catch (_) {}
-    return false;
+    return rateLimitCheck(KV, key, 5, 15 * 60);
   }
 
   async function resetRateLimit() {
@@ -170,13 +130,7 @@ export async function onRequest(context) {
   async function genericRateLimit(action, maxRequests, windowSec) {
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
     const key = 'rl_' + action + '_' + ip;
-    try {
-      const raw = await KV.get(key);
-      const count = raw ? parseInt(raw, 10) : 0;
-      if (count >= maxRequests) return true;
-      await KV.put(key, String(count + 1), { expirationTtl: windowSec });
-    } catch (_) {}
-    return false;
+    return rateLimitCheck(KV, key, maxRequests, windowSec);
   }
 
   /* ── Helper: notifica webhook Discord (fire & forget) ── */
@@ -236,7 +190,7 @@ export async function onRequest(context) {
     }
     /* Supporta sia login con ADMIN_SECRET (single-user) che multi-user da KV */
     let ok = false, role = 'editor';
-    if (body.password === ADMIN_SECRET) {
+    if (ADMIN_SECRET && constantTimeEqual(body.password, ADMIN_SECRET)) {
       ok = true; role = 'admin';
     } else {
       /* Multi-user: verifica utenti in KV con PBKDF2 salted */
@@ -315,7 +269,13 @@ export async function onRequest(context) {
     try {
       const raw = await KV.get('admin_users');
       const users = raw ? JSON.parse(raw) : [];
-      /* Non restituire gli hash delle password */
+      const role = await sessionRole();
+      if (role === 'admin') {
+        /* Gli admin ricevono i record completi (hash inclusi): necessario per un
+           round-trip sicuro su set_users senza perdere le password esistenti. */
+        return new Response(JSON.stringify({ users }), { headers: cors });
+      }
+      /* Non esporre gli hash delle password a editor/viewer */
       const safeUsers = users.map(u => ({ username: u.username, role: u.role, created: u.created, updated: u.updated }));
       return new Response(JSON.stringify({ users: safeUsers }), { headers: cors });
     } catch (e) {
@@ -425,6 +385,16 @@ export async function onRequest(context) {
 
   /* ════ TRACK VIEW — pubblico: registra le visualizzazioni dei visitatori ════ */
   if (action === 'track_view' && request.method === 'POST') {
+    /* Anti-spoofing: se presente, Origin deve coincidere con il dominio del sito.
+       Origin è una "forbidden header" per i browser, quindi non è falsificabile lato client. */
+    const origin = request.headers.get('Origin');
+    if (origin && new URL(origin).origin !== url.origin) {
+      return new Response(JSON.stringify({ error: 'Origine non valida' }), { status: 403, headers: cors });
+    }
+    const referer = request.headers.get('Referer');
+    if (referer && !referer.startsWith(url.origin)) {
+      return new Response(JSON.stringify({ error: 'Referer non valido' }), { status: 403, headers: cors });
+    }
     let body;
     try { body = await request.json(); } catch (e) {
       return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
@@ -1128,8 +1098,8 @@ if (action === 'set_posa' && request.method === 'POST') {
       deletedAt: new Date().toISOString(),
       deletedBy: await sessionUser() || 'admin'
     };
-    // KV doesn't support native TTL, but we store timestamp and filter client-side
-    await KV.put(trashKey, JSON.stringify(trashEntry));
+    // Scadenza nativa KV di 30 giorni per pulizia automatica.
+    await KV.put(trashKey, JSON.stringify(trashEntry), { expirationTtl: 30 * 24 * 3600 });
     
     // Update trash index
     const trashIndexRaw = await KV.get('trash_index');
@@ -1142,7 +1112,7 @@ if (action === 'set_posa' && request.method === 'POST') {
       // Keep max 50 items in trash index
       if (trashIndex.length > 50) trashIndex = trashIndex.slice(0, 50);
     }
-    await KV.put('trash_index', JSON.stringify(trashIndex));
+    await KV.put('trash_index', JSON.stringify(trashIndex), { expirationTtl: 30 * 24 * 3600 });
     
     await writeAdminLog('trash_page', pageKey, {}, await sessionUser());
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
@@ -1288,7 +1258,7 @@ if (action === 'set_posa' && request.method === 'POST') {
       if (trashIndexRaw) {
         let idx = JSON.parse(trashIndexRaw);
         idx = idx.filter(t => t.pageKey !== pageKey);
-        await KV.put('trash_index', JSON.stringify(idx));
+        await KV.put('trash_index', JSON.stringify(idx), { expirationTtl: 30 * 24 * 3600 });
       }
       notifyWebhook('♻️ Ripristinata dal cestino: ' + pageKey);
       await writeAdminLog('restore_trash', pageKey, {}, await sessionUser());
@@ -1316,7 +1286,7 @@ if (action === 'set_posa' && request.method === 'POST') {
       if (trashIndexRaw) {
         let idx = JSON.parse(trashIndexRaw);
         idx = idx.filter(t => t.pageKey !== pageKey);
-        await KV.put('trash_index', JSON.stringify(idx));
+        await KV.put('trash_index', JSON.stringify(idx), { expirationTtl: 30 * 24 * 3600 });
       }
       await writeAdminLog('empty_trash', pageKey, {}, await sessionUser());
       return new Response(JSON.stringify({ ok: true }), { headers: cors });
@@ -1331,7 +1301,7 @@ if (action === 'set_posa' && request.method === 'POST') {
       await KV.delete('trash_' + entry.pageKey);
     }
     idx = idx.filter(t => new Date(t.deletedAt).getTime() > thirtyDaysAgo);
-    await KV.put('trash_index', JSON.stringify(idx));
+    await KV.put('trash_index', JSON.stringify(idx), { expirationTtl: 30 * 24 * 3600 });
     await writeAdminLog('empty_trash', 'auto', { deleted: expired.length }, await sessionUser());
     return new Response(JSON.stringify({ ok: true, deleted: expired.length }), { headers: cors });
   }
@@ -1556,10 +1526,6 @@ if (action === 'set_posa' && request.method === 'POST') {
       if (!putRes.ok) {
         const errBody = await putRes.json().catch(() => ({}));
         return new Response(JSON.stringify({ error: 'GitHub push fallito: ' + putRes.status, detail: errBody.message }), { status: 502, headers: cors });
-      }
-      // Invalidate KV cache
-      if (typeof pageKV !== 'undefined' && pageKV) {
-        try { pageKV.delete('content/pages/' + pageKey + '.json'); } catch (e) {}
       }
       notifyWebhook('♻️ Restore versione: ' + pageKey + ' (v' + versionIndex + ')');
       await writeAdminLog('restore_version', pageKey, { versionIndex }, await sessionUser());

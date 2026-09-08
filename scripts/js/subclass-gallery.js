@@ -1,42 +1,43 @@
 var HB_CHANGELOG_DB_ID = '3400274fdc1c80178db3dcf6ba7098aa';
 var HB_SUBCLASS_DB_ID = '2f70274fdc1c80e3bdc7f95f81eb9cc0';
-var HB_SPECIES_DB_ID  = '3350274fdc1c808fba5ed9ad1f3b4bb4'; 
+var HB_SPECIES_DB_ID = '3350274fdc1c808fba5ed9ad1f3b4bb4';
 
 /* ════════════════════════════════════
    SUBCLASS GALLERY
    Layout: sidebar classi | tab bar sottoclassi | contenuto
 ════════════════════════════════════ */
 
-window.loadSubclassGallery = function(container, pages) {
+window.loadSubclassGallery = function (container, pages) {
   if (pages && pages.length) {
     _renderHbLayout(container, pages);
     return;
   }
   container.innerHTML = '<div class="loader-dots">...';
-  fetch('/api/notion?dbId=' + HB_SUBCLASS_DB_ID)
-    .then(function(r){ return r.json(); })
-    .then(function(data){ _renderHbLayout(container, data.pages || []); })
-    .catch(function(err){
+  _loadLocalDb(HB_SUBCLASS_DB_ID)
+    .then(function (data) {
+      _renderHbLayout(container, data.pages || []);
+    })
+    .catch(function (err) {
       container.innerHTML = '<p class="sec-p">Errore nel risveglio delle pergamene.</p>';
       console.error(err);
     });
 };
-window.loadSpeciesGallery = function(container, pages) {  // ← qui
+window.loadSpeciesGallery = function (container, pages) {
+  // ← qui
   if (pages && pages.length) {
     _renderHbLayout(container, pages, { groupKey: 'specie', sideLabel: 'Specie', fallback: 'Altra' });
     return;
   }
   container.innerHTML = '<div class="loader-dots">...';
-  fetch('/api/notion?dbId=' + HB_SPECIES_DB_ID)
-    .then(function(r){ return r.json(); })
-    .then(function(data){
+  _loadLocalDb(HB_SPECIES_DB_ID)
+    .then(function (data) {
       _renderHbLayout(container, data.pages || [], {
-        groupKey:  'specie',
+        groupKey: 'specie',
         sideLabel: 'Specie',
-        fallback:  'Altra'
+        fallback: 'Altra',
       });
     })
-    .catch(function(err){
+    .catch(function (err) {
       container.innerHTML = '<p class="sec-p">Errore nel risveglio delle pergamene.</p>';
       console.error(err);
     });
@@ -44,109 +45,140 @@ window.loadSpeciesGallery = function(container, pages) {  // ← qui
 
 function _renderHbLayout(container, pages, options) {
   var opts = options || {};
-  var groupKey  = opts.groupKey  || 'classe';
+  var groupKey = opts.groupKey || 'classe';
   var sideLabel = opts.sideLabel || 'Classi';
-  var fallback  = opts.fallback  || 'Altra';
+  var fallback = opts.fallback || 'Altra';
 
   var grouped = {};
-  pages.forEach(function(p){
+  pages.forEach(function (p) {
     var cl = p[groupKey] || fallback;
-    if(!grouped[cl]) grouped[cl] = [];
+    if (!grouped[cl]) grouped[cl] = [];
     grouped[cl].push(p);
   });
-  var classi = Object.keys(grouped).sort(function(a,b){ return a.localeCompare(b,'it'); });
-  classi.forEach(function(cl){
-    grouped[cl].sort(function(a,b){ return a.title.localeCompare(b.title,'it'); });
+  var classi = Object.keys(grouped).sort(function (a, b) {
+    return a.localeCompare(b, 'it');
+  });
+  classi.forEach(function (cl) {
+    grouped[cl].sort(function (a, b) {
+      return a.title.localeCompare(b.title, 'it');
+    });
   });
 
-  var sidebarItems = classi.map(function(cl){
-    return '<li class="hbsc-class-item" data-classe="'+cl+'" onclick="hbscSelectClass(this,\''+cl+'\')">'+cl+'</li>';
-  }).join('');
+  var sidebarItems = classi
+    .map(function (cl) {
+      return (
+        '<li class="hbsc-class-item" data-classe="' +
+        cl +
+        '" onclick="hbscSelectClass(this,\'' +
+        cl +
+        '\')">' +
+        cl +
+        '</li>'
+      );
+    })
+    .join('');
 
   container.innerHTML =
-    '<div class="hbsc-layout">'+
-      '<aside class="hbsc-sidebar">'+
-        '<div class="hbsc-sidebar-title">'+sideLabel+'</div>'+
-        '<ul class="hbsc-class-list">'+sidebarItems+'</ul>'+
-      '</aside>'+
-      '<div class="hbsc-main">'+
-        '<div class="hbsc-tabs" id="hbsc-tabs"></div>'+
-        '<div class="hbsc-content" id="hbsc-content">'+
-          '<div class="hbsc-placeholder">← Seleziona una classe</div>'+
-        '</div>'+
-      '</div>'+
+    '<div class="hbsc-layout">' +
+    '<aside class="hbsc-sidebar">' +
+    '<div class="hbsc-sidebar-title">' +
+    sideLabel +
+    '</div>' +
+    '<ul class="hbsc-class-list">' +
+    sidebarItems +
+    '</ul>' +
+    '</aside>' +
+    '<div class="hbsc-main">' +
+    '<div class="hbsc-tabs" id="hbsc-tabs"></div>' +
+    '<div class="hbsc-content" id="hbsc-content">' +
+    '<div class="hbsc-placeholder">← Seleziona una classe</div>' +
+    '</div>' +
+    '</div>' +
     '</div>';
 
   var layout = container.querySelector('.hbsc-layout');
-  if(layout) layout._hbscData = grouped;
+  if (layout) layout._hbscData = grouped;
 
   container._hbscData = grouped;
 
-  if(classi.length){
+  if (classi.length) {
     var firstItem = container.querySelector('.hbsc-class-item');
-    if(firstItem) hbscSelectClass(firstItem, classi[0]);
+    if (firstItem) hbscSelectClass(firstItem, classi[0]);
   }
 
   _injectHbscCSS();
 }
 
-window.hbscSelectClass = function(el, classe) {
+window.hbscSelectClass = function (el, classe) {
   /* Aggiorna sidebar active */
-  document.querySelectorAll('.hbsc-class-item').forEach(function(i){ i.classList.remove('active'); });
+  document.querySelectorAll('.hbsc-class-item').forEach(function (i) {
+    i.classList.remove('active');
+  });
   el.classList.add('active');
 
   /* Trova i dati */
   var container = el.closest('.hbsc-layout').parentElement;
-  if(!container || !container._hbscData) return;
+  if (!container || !container._hbscData) return;
   var sottoclassi = container._hbscData[classe] || [];
 
   /* Renderizza tab bar */
   var tabsEl = document.getElementById('hbsc-tabs');
   var contentEl = document.getElementById('hbsc-content');
-  if(!tabsEl || !contentEl) return;
+  if (!tabsEl || !contentEl) return;
 
-  tabsEl.innerHTML = sottoclassi.map(function(p, i){
-    var titleSafe = p.title.replace(/'/g, "\\'");
-    return '<div class="hbsc-tab" data-id="'+p.id+'" data-title="'+titleSafe+'" onclick="hbscSelectTab(this,\''+p.id+'\',\''+titleSafe+'\')">'+p.title+'</div>';
-  }).join('');
+  tabsEl.innerHTML = sottoclassi
+    .map(function (p, i) {
+      var titleSafe = p.title.replace(/'/g, "\\'");
+      return (
+        '<div class="hbsc-tab" data-id="' +
+        p.id +
+        '" data-title="' +
+        titleSafe +
+        '" onclick="hbscSelectTab(this,\'' +
+        p.id +
+        "','" +
+        titleSafe +
+        '\')">' +
+        p.title +
+        '</div>'
+      );
+    })
+    .join('');
 
   contentEl.innerHTML = '<div class="hbsc-placeholder">↑ Seleziona una sottoclasse</div>';
 
   /* Seleziona automaticamente la prima tab */
-  if(sottoclassi.length){
+  if (sottoclassi.length) {
     var firstTab = tabsEl.querySelector('.hbsc-tab');
-    if(firstTab) hbscSelectTab(firstTab, sottoclassi[0].id, sottoclassi[0].title);
+    if (firstTab) hbscSelectTab(firstTab, sottoclassi[0].id, sottoclassi[0].title);
   }
 };
 
-window.hbscSelectTab = function(el, pageId, title) {
+window.hbscSelectTab = function (el, pageId, title) {
   /* Aggiorna tab active */
-  document.querySelectorAll('.hbsc-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.hbsc-tab').forEach(function (t) {
+    t.classList.remove('active');
+  });
   el.classList.add('active');
 
   var contentEl = document.getElementById('hbsc-content');
-  if(!contentEl) return;
+  if (!contentEl) return;
 
   contentEl.innerHTML = '<div class="hbsc-loading"><div class="gs-loading-spin"></div></div>';
 
-  fetch('/api/notion?pageId=' + pageId)
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(!data.blocks) throw new Error('no blocks');
-      var html = renderBlocks(data.blocks, true);
+  _loadLocalPage(pageId)
+    .then(function (html) {
+      if (!html) throw new Error('no content');
       contentEl.innerHTML =
-        '<div class="n-body">'+
-          '<div class="hbsc-content-title">'+title+'</div>'+
-          html+
-        '</div>';
+        '<div class="n-body">' + '<div class="hbsc-content-title">' + title + '</div>' + html + '</div>';
     })
-    .catch(function(){
+    .catch(function () {
       contentEl.innerHTML = '<div class="hbsc-error">Errore caricamento</div>';
     });
 };
 
-function _injectHbscCSS(){
-  if(document.getElementById('hbsc-css')) return;
+function _injectHbscCSS() {
+  if (document.getElementById('hbsc-css')) return;
   var s = document.createElement('style');
   s.id = 'hbsc-css';
   s.textContent = `

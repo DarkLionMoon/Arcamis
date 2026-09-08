@@ -67,6 +67,32 @@
 
 <div id="toast"></div>
 
+<!-- GLOBAL SEARCH MODAL (Cmd+K) -->
+<div id="gs-modal" class="md-backdrop" style="display:none">
+  <div class="md md-lg">
+    <div class="md-head">
+      <h3>🔎 Ricerca Globale <span class="hint" style="font-weight:400;font-size:11px">⌘K / Ctrl+K</span></h3>
+      <button class="md-x" onclick="closeGlobalSearch()" title="Chiudi (Esc)">✕</button>
+    </div>
+    <div class="md-body" style="padding:0;max-height:70vh">
+      <div class="gs-input-wrap" style="padding:16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:10">
+        <label style="position:relative;width:100%;display:block">
+          <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:14px;pointer-events:none">⌘K</span>
+          <input id="gs-input" class="in" placeholder="Cerca pagine, azioni, impostazioni…" style="padding-left:40px;font-size:15px;height:44px;border-radius:var(--rad);background:var(--bg2);border:1px solid var(--line2);width:100%" autocomplete="off" spellcheck="false" aria-label="Ricerca globale">
+        </label>
+        <div id="gs-hints" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:var(--dim)"></div>
+      </div>
+      <div id="gs-results" class="list-body" style="max-height:calc(70vh - 120px);overflow-y:auto"></div>
+      <div id="gs-empty" class="list-empty" style="display:none;padding:40px 20px">Nessun risultato</div>
+      <div id="gs-loading" class="list-empty" style="display:none;padding:40px 20px">⏳ Caricamento indice…</div>
+    </div>
+    <div class="md-actions" style="border-top:1px solid var(--line);padding:12px 16px;justify-content:space-between">
+      <div id="gs-shortcuts" style="font-size:10px;color:var(--dim);display:flex;gap:12px;flex-wrap:wrap"></div>
+      <button class="btn btn-soft btn-sm" onclick="closeGlobalSearch()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ════════════════════════════════════════════════════════════════
    CONFIG INLINE — registro pagine e sezioni del menu.
