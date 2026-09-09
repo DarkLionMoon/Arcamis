@@ -8,71 +8,73 @@ var GUILD = '1348723468157456425';
 
 /* ════ CONFIG INTERFACCIA (admin → Interfaccia) ════ */
 var UI_CONFIG = {
-  bottomNav: [
-    {
-      icon: '🏰',
-      label: 'Home',
-      action: 'home',
-    },
-    {
-      icon: '🧭',
-      label: 'Esplora',
-      action: 'drawer',
-    },
-    {
-      icon: '💼',
-      label: 'Lavori',
-      action: 'page',
-      target: 'pag-lavori',
-    },
-  ],
-  drawerSearch: true,
+ "bottomNav": [
+  {
+   "icon": "🏰",
+   "label": "Home",
+   "action": "home"
+  },
+  {
+   "icon": "🧭",
+   "label": "Esplora",
+   "action": "drawer"
+  },
+  {
+   "icon": "💼",
+   "label": "Lavori",
+   "action": "page",
+   "target": "pag-lavori"
+  }
+ ],
+ "drawerSearch": true
 };
 
 var pages = [
-  { k: 'imprese', l: 'Imprese e Licenze', i: '⚖️', id: 'pag-imprese', sec: 'imprese' },
-  { k: 'la-storia-di-gandora', l: 'La Storia di Gandora', i: '🐉', id: 'pag-la-storia-di-gandora', sec: 'lore' },
-  { k: 'regole-del-server', l: 'Regole del Server', i: '📋', id: 'pag-regole-del-server', sec: 'regole' },
-  { k: 'materiale-approvato', l: 'Materiale Approvato', i: '📖', id: 'pag-materiale-approvato', sec: 'regole' },
-  { k: 'pantheon', l: 'Pantheon', i: '🛐', id: 'pag-pantheon', sec: 'lore' },
-  { k: 'lavori', l: 'Lavori', i: '💼', id: 'pag-lavori', sec: 'lavori' },
-  { k: 'come-si-inizia', l: 'Creazione', i: '🌟', id: 'pag-come-si-inizia', sec: 'personaggio' },
-  { k: 'casate-e-compagnie', l: 'Casate e Compagnie', i: '🏰', id: 'pag-casate-e-compagnie' },
-  { k: 'storia-del-mondo', l: 'Storia del Mondo', i: '📖', id: 'pag-storia-del-mondo' },
-  { k: 'introduzione', l: 'Introduzione', i: '📜', id: 'pag-introduzione' },
-  { k: 'piani-di-esistenza', l: 'Piani di esistenza', i: '🌌', id: 'pag-piani-di-esistenza' },
-  { k: 'bibliografia-scoperta', l: 'Bibliografia scoperta', i: '📚', id: 'pag-bibliografia-scoperta' },
-  { k: 'mappe', l: 'Mappe', i: '🗺️', id: 'pag-mappe' },
-  { k: 'mappa-arcamis', l: 'Arcamis', i: '🏙️', id: 'pag-mappa-arcamis' },
-  { k: 'regole-homebrew', l: 'Regole Homebrew', i: '📐', id: 'pag-regole-homebrew', sec: 'homebrew' },
-  { k: 'specie-homebrew', l: 'Specie Homebrew', i: '🧬', id: 'pag-specie-homebrew', sec: 'homebrew' },
-  { k: 'sottoclassi-homebrew', l: 'Sottoclassi Homebrew', i: '⚔️', id: 'pag-sottoclassi-homebrew', sec: 'homebrew' },
-  { k: 'arcamis', l: 'Arcamis', i: '📍', id: 'pag-arcamis' },
-  { k: 'selva-fogliabruna', l: 'Selva Fogliabruna', i: '🌲', id: 'pag-selva-fogliabruna' },
-  { k: 'foresta-dello-smarrimento', l: 'Foresta dello Smarrimento', i: '🌑', id: 'pag-foresta-dello-smarrimento' },
-  { k: 'volonx', l: 'Volonx', i: '🏘️', id: 'pag-volonx' },
-  { k: 'vigilius', l: 'Vigilius', i: '🏛️', id: 'pag-vigilius' },
-  { k: 'galeton', l: 'Galeton', i: '🏘️', id: 'pag-galeton' },
-  { k: 'lago-di-gromot', l: 'Lago di Gromot', i: '🌊', id: 'pag-lago-di-gromot' },
-  { k: 'forte-vigilus', l: 'Forte Vigilus', i: '🏰', id: 'pag-forte-vigilus' },
-  { k: 'riva-di-ferro', l: 'Riva di Ferro', i: '⚓', id: 'pag-riva-di-ferro' },
-  { k: 'fumofosco', l: 'Fumofosco', i: '🌫️', id: 'pag-fumofosco' },
-  { k: 'rovine-di-kaldur', l: 'Rovine di Kaldur', i: '🗿', id: 'pag-rovine-di-kaldur' },
+  {k:'imprese',l:'Imprese e Licenze',i:'⚖️',id:'pag-imprese',sec:'imprese'},
+  {k:'la-storia-di-gandora',l:'La Storia di Gandora',i:'🐉',id:'pag-la-storia-di-gandora',sec:'lore'},
+  {k:'regole-del-server',l:'Regole del Server',i:'📋',id:'pag-regole-del-server',sec:'regole'},
+  {k:'materiale-approvato',l:'Materiale Approvato',i:'📖',id:'pag-materiale-approvato',sec:'regole'},
+  {k:'pantheon',l:'Pantheon',i:'🛐',id:'pag-pantheon',sec:'lore'},
+  {k:'lavori',l:'Lavori',i:'💼',id:'pag-lavori',sec:'lavori'},
+  {k:'come-si-inizia',l:'Creazione',i:'🌟',id:'pag-come-si-inizia',sec:'personaggio'},
+  {k:'casate-e-compagnie',l:'Casate e Compagnie',i:'🏰',id:'pag-casate-e-compagnie'},
+  {k:'storia-del-mondo',l:'Storia del Mondo',i:'📖',id:'pag-storia-del-mondo'},
+  {k:'introduzione',l:'Introduzione',i:'📜',id:'pag-introduzione'},
+  {k:'piani-di-esistenza',l:'Piani di esistenza',i:'🌌',id:'pag-piani-di-esistenza'},
+  {k:'bibliografia-scoperta',l:'Bibliografia scoperta',i:'📚',id:'pag-bibliografia-scoperta'},
+  {k:'mappe',l:'Mappe',i:'🗺️',id:'pag-mappe'},
+  {k:'mappa-arcamis',l:'Arcamis',i:'🏙️',id:'pag-mappa-arcamis'},
+  {k:'regole-homebrew',l:'Regole Homebrew',i:'📐',id:'pag-regole-homebrew',sec:'homebrew'},
+  {k:'specie-homebrew',l:'Specie Homebrew',i:'🧬',id:'pag-specie-homebrew',sec:'homebrew'},
+  {k:'sottoclassi-homebrew',l:'Sottoclassi Homebrew',i:'⚔️',id:'pag-sottoclassi-homebrew',sec:'homebrew'},
+  {k:'arcamis',l:'Arcamis',i:'📍',id:'pag-arcamis'},
+  {k:'selva-fogliabruna',l:'Selva Fogliabruna',i:'🌲',id:'pag-selva-fogliabruna'},
+  {k:'foresta-dello-smarrimento',l:'Foresta dello Smarrimento',i:'🌑',id:'pag-foresta-dello-smarrimento'},
+  {k:'volonx',l:'Volonx',i:'🏘️',id:'pag-volonx'},
+  {k:'vigilius',l:'Vigilius',i:'🏛️',id:'pag-vigilius'},
+  {k:'galeton',l:'Galeton',i:'🏘️',id:'pag-galeton'},
+  {k:'lago-di-gromot',l:'Lago di Gromot',i:'🌊',id:'pag-lago-di-gromot'},
+  {k:'forte-vigilus',l:'Forte Vigilus',i:'🏰',id:'pag-forte-vigilus'},
+  {k:'riva-di-ferro',l:'Riva di Ferro',i:'⚓',id:'pag-riva-di-ferro'},
+  {k:'fumofosco',l:'Fumofosco',i:'🌫️',id:'pag-fumofosco'},
+  {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'}
 ];
 
-function getPage(idOrK) {
-  return pages.find((p) => p.id === idOrK || p.k === idOrK);
+function getPage(idOrK){
+  return pages.find(p => p.id === idOrK || p.k === idOrK);
 }
 
 /* ════ SEZIONI MENU (dropdown top bar) ════ */
 var SECTIONS = [
-  { v: 'regole', l: 'Regole' },
-  { v: 'personaggio', l: 'Personaggio' },
-  { v: 'lavori', l: 'Lavori' },
-  { v: 'imprese', l: 'Imprese' },
-  { v: 'lore', l: 'Lore' },
-  { v: 'homebrew', l: 'Homebrew' },
+  {v:"regole",l:"Regole"},
+  {v:"personaggio",l:"Personaggio"},
+  {v:"lavori",l:"Lavori"},
+  {v:"imprese",l:"Imprese"},
+  {v:"lore",l:"Lore"},
+  {v:"homebrew",l:"Homebrew"}
 ];
 
 /* ════ LAVORI ════ */
-var LAVORI = [];
+var LAVORI = [
+  
+];

@@ -24,6 +24,13 @@
   },
   "pages": [
     {
+      "k": "imprese",
+      "l": "Imprese e Licenze",
+      "i": "⚖️",
+      "id": "pag-imprese",
+      "sec": "imprese"
+    },
+    {
       "k": "la-storia-di-gandora",
       "l": "La Storia di Gandora",
       "i": "🐉",
@@ -207,6 +214,10 @@
     {
       "v": "lavori",
       "l": "Lavori"
+    },
+    {
+      "v": "imprese",
+      "l": "Imprese"
     },
     {
       "v": "lore",

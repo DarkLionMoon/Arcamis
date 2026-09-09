@@ -1,5 +1,11 @@
 [
  {
+  "id": "pag-imprese",
+  "title": "Imprese e Licenze",
+  "icon": "⚖️",
+  "text": ""
+ },
+ {
   "id": "pag-la-storia-di-gandora",
   "title": "La Storia di Gandora",
   "icon": "🐉",

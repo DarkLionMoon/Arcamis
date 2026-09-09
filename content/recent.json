@@ -1,6 +1,12 @@
 {
  "pages": [
   {
+   "id": "pag-imprese",
+   "title": "Imprese e Licenze",
+   "icon": "⚖️",
+   "lastEdited": "2026-09-09T00:00:00Z"
+  },
+  {
    "id": "pag-specie-homebrew",
    "title": "Specie Homebrew",
    "icon": "🧬",
@@ -41,12 +47,6 @@
    "title": "Sottoclassi Homebrew",
    "icon": "📄",
    "lastEdited": "2026-08-25T14:49:09.687390Z"
-  },
-  {
-   "id": "pag-regole-homebrew",
-   "title": "Regole Homebrew per specie, classi ed oggetti già esistenti",
-   "icon": "📄",
-   "lastEdited": "2026-08-25T14:49:09.344400Z"
   }
  ]
 }
