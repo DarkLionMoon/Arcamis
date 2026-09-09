@@ -233,8 +233,8 @@
 
   RENDER_GILDE.panoramica = function() {
     return ''
-    + '<div class="imp-page-hero gilde">'
-    + '<h2>\uD83C\uDFDB\uFE0F Le Imprese di Arcadia<br><small style="font-size:.55em;color:var(--imp-text3);letter-spacing:.08em">Camera del Commercio e dei Mestieri \u2014 Regno di Arcadia</small></h2>'
+    + '<div class="imp-section-hero">'
+    + '<h2>Le Imprese di Arcadia<small>Camera del Commercio e dei Mestieri \u2014 Regno di Arcadia</small></h2>'
     + '<p><strong style="color:var(--imp-gold)">Che cos\u00E8 un\u2019Impresa?</strong> \u00C8 un gruppo di <strong>2 o pi\u00F9 personaggi</strong> che si mettono insieme per produrre e vendere i propri mestieri, con una sede fisica e una cassa comune. Tutto qui.</p>'
     + '<p style="margin-top:8px">Un\u2019Impresa nasce come una piccola <strong style="color:var(--imp-gold)">Bottega</strong> e cresce fino a diventare una potente <strong style="color:var(--imp-gold)">Corporazione</strong>. Ogni passaggio \u00E8 semplice: <em>paghi una tassa, allarghi la sede, ottieni un nuovo beneficio</em>.</p>'
     + '<div class="imp-hero-links">'
@@ -289,7 +289,7 @@
   };
 
   RENDER_GILDE.livelli = function() {
-    var html = '<div class="imp-page-hero gilde"><h2>\uD83C\uDFEA I 3 Livelli dell\u2019Impresa</h2><p>Ogni Impresa parte dal Livello 1. Ogni Livello d\u00E0 <strong>1 beneficio</strong> e impone <strong>1 limite</strong>.</p></div>';
+    var html = '<div class="imp-section-hero"><h2>I 3 Livelli dell\u2019Impresa</h2><p>Ogni Impresa parte dal Livello 1. Ogni Livello d\u00E0 <strong>1 beneficio</strong> e impone <strong>1 limite</strong>.</p></div>';
     DATA.livelli.forEach(function(l){
       html += '<div class="imp-card-type">'
       + '<div class="imp-card-type-header"><h3>Livello '+l.id+' \u2014 '+l.name+'</h3>'+patBtn(l.patente)+'</div>'
@@ -304,7 +304,7 @@
   };
 
   RENDER_GILDE.procedura = function() {
-    return '<div class="imp-page-hero gilde"><h2>\uD83D\uDCDC Come si fonda e si gestisce</h2><p>Tutto quello che serve per creare e far funzionare un\u2019Impresa, in pochi passi.</p></div>'
+    return '<div class="imp-section-hero"><h2>Come si fonda e si gestisce</h2><p>Tutto quello che serve per creare e far funzionare un\u2019Impresa, in pochi passi.</p></div>'
 
     + '<div class="imp-doc-section">' + sectionTitle('\uD83D\uDCDC', 'Passo 1 \u2014 Fondazione')
     + tableWrap('<table class="imp-tbl"><thead><tr><th>Cosa serve</th><th>Costo</th></tr></thead><tbody>'
@@ -335,7 +335,7 @@
   };
 
   RENDER_GILDE.entrate = function() {
-    return '<div class="imp-page-hero gilde"><h2>\uD83D\uDCB0 Entrate dell\u2019Impresa</h2><p>Come guadagna un\u2019Impresa, senza regole complicate.</p></div>'
+    return '<div class="imp-section-hero"><h2>Entrate dell\u2019Impresa</h2><p>Come guadagna un\u2019Impresa, senza regole complicate.</p></div>'
 
     + '<div class="imp-doc-section">' + sectionTitle('\uD83D\uDCB5', 'Contratti di Fornitura')
     + '<p style="color:var(--imp-text2);font-size:.9rem;margin-bottom:16px;line-height:1.6">Negozi <strong>una volta</strong> e ottieni una rendita <strong>automatica ogni mese</strong>.</p>'
@@ -368,7 +368,7 @@
   };
 
   RENDER_GILDE.riferimenti = function() {
-    return '<div class="imp-page-hero gilde"><h2>\uD83D\uDCDA Riferimenti Avanzati</h2><p>Tutto il resto, per chi vuole approfondire.</p></div>'
+    return '<div class="imp-section-hero"><h2>Riferimenti Avanzati</h2><p>Tutto il resto, per chi vuole approfondire.</p></div>'
 
     + '<div class="imp-doc-section">' + sectionTitle('\uD83E\uDD1D', 'Alleanze e Joint Venture')
     + '<p style="color:var(--imp-text2);font-size:.9rem;margin-bottom:14px;line-height:1.6"><strong>Alleanza Commerciale</strong> (fino a 3 Imprese): registrazione 20 Mo/impresa, sconto 5% su acquisti congiunti.</p>'
@@ -406,7 +406,7 @@
   var RENDER_LICENZE = {};
 
   RENDER_LICENZE.panoramica = function() {
-    return '<div class="imp-page-hero licenze"><h2>\u2696\uFE0F Codice Patenti di Arcadia<br><small style="font-size:.55em;color:var(--imp-text3);letter-spacing:.08em">Ufficio del Registro e della Vigilanza (U.R.V.) \u2014 Regno di Arcadia</small></h2>'
+    return '<div class="imp-section-hero"><h2>Codice Patenti di Arcadia<small>Ufficio del Registro e della Vigilanza (U.R.V.) \u2014 Regno di Arcadia</small></h2>'
     + '<p>Ogni licenza ha una <strong style="color:var(--imp-gold)">durata triennale</strong> e il possesso del <strong style="color:var(--imp-gold)">Sigillo di Riconoscimento</strong> garantisce lo status legale dell\u2019artigiano.</p></div>';
   };
 
@@ -435,7 +435,7 @@
     + '<p class="imp-lh-meta">Costo: '+p.costo+' Mo \u00B7 Cauzione: '+p.cauzione+' Mo \u00B7 <strong style="color:var(--imp-text2)">Totale: '+p.totale+' Mo</strong> \u00B7 Durata: '+p.durata+'</p>'
     + '<p class="imp-lh-meta" style="margin-top:4px">Ideale per: '+p.destinatari+'.</p></div>'
     + '<div class="imp-licenza-body">' + blocks + '</div>'
-    + '<div class="imp-note-box" style="margin:0 24px 20px">\u26A0 <strong>Nota:</strong> Ci\u00F2 che il licenziatario pu\u00F2 craftare e vendere \u00E8 sempre limitato dal <strong>livello del mestiere</strong> posseduto.</div></div>';
+    + '<div class="imp-note-box" style="margin:0 24px 20px">Nota: Ci\u00F2 che il licenziatario pu\u00F2 craftare e vendere \u00E8 sempre limitato dal <strong>livello del mestiere</strong> posseduto.</div></div>';
   }
 
   RENDER_LICENZE.pmc = function() {
@@ -487,7 +487,7 @@
   };
 
   RENDER_LICENZE.strumenti = function() {
-    return '<div class="imp-page-hero licenze"><h2>\uD83D\uDEE0\uFE0F Strumenti per Patenti</h2><p>Calcolatori e tracker per gestire le Patenti.</p></div>'
+    return '<div class="imp-section-hero"><h2>Strumenti per Patenti</h2><p>Calcolatori e tracker per gestire le Patenti.</p></div>'
     + '<div class="imp-doc-section">' + sectionTitle('\uD83E\uDDEA', 'Confronto & Costi Patenti')
     + tableWrap('<table class="imp-tbl"><thead><tr><th>Patente</th><th>Costo (3 anni)</th><th>Cauzione</th><th>Totale</th><th>Durata</th><th>Destinatari</th></tr></thead><tbody>'
     + DATA.patenti.map(function(p){ return '<tr class="'+p.cls+'"><td><strong>'+p.sigla+'</strong> \u2014 '+p.nome+'</td><td>'+p.costo+' Mo</td><td>'+p.cauzione+' Mo</td><td><strong>'+p.totale+' Mo</strong></td><td>'+p.durata+'</td><td>'+p.destinatari+'</td></tr>'; }).join('')
@@ -805,7 +805,7 @@
   }
 
   function gestoreShell() {
-    return '<div class="imp-page-hero gilde"><h2>\uD83C\uDF9B\uFE0F Gestore di Societ\u00E0</h2><p>Una sola schermata per fondare, gestire e far crescere le societ\u00E0.</p></div>'
+    return '<div class="imp-section-hero"><h2>Gestore di Societ\u00E0</h2><p>Una sola schermata per fondare, gestire e far crescere le societ\u00E0.</p></div>'
     + '<div class="imp-doc-section" id="imp-gTop"></div>'
     + '<div class="imp-doc-section" id="imp-gScheda"></div>'
     + '<div class="imp-doc-section" id="imp-gSoci"></div>'
@@ -1222,20 +1222,15 @@
      SHELL HTML
      ══════════════════════════════════ */
   function shellHTML() {
-    return '<div class="imp-header">'
-      + '<h1>\u2696\uFE0F Societ\u00E0 &amp; Licenze di Arcamis \u2696\uFE0F</h1>'
-      + '<p>Imprese \u00B7 Societ\u00E0 \u00B7 Patenti \u00B7 Camera del Commercio \u2014 Arcadia</p>'
-      + '</div>'
-
-      + '<div class="imp-tabs" id="imp-tabs">'
+    return '<div class="imp-tabs" id="imp-tabs">'
       + '<div class="imp-tabs-row" id="imp-tabsRow"></div>'
-      + '<div class="imp-tabs-row" id="imp-searchRow" style="padding: 8px 20px 12px; border-top: 1px solid var(--imp-border); display: none;">'
-      + '<div class="imp-search-wrap"><input type="search" class="imp-search-input" id="imp-globalSearch" placeholder="\uD83D\uDD0D Cerca..."></div>'
+      + '<div class="imp-tabs-row" id="imp-searchRow" style="display:none;padding:8px 0 12px;border-top:1px solid var(--imp-border);">'
+      + '<div class="imp-search-wrap"><input type="search" class="imp-search-input" id="imp-globalSearch" placeholder="Cerca..."></div>'
       + '<div id="imp-activeFilters"></div></div></div>'
 
       + '<div class="imp-mobile-drawer-overlay" id="imp-drawerOverlay" data-imp-action="closeDrawer"></div>'
       + '<div class="imp-mobile-drawer" id="imp-mobileDrawer">'
-      + '<div class="imp-mobile-drawer-header"><h3>\uD83D\uDCD1 Navigazione</h3>'
+      + '<div class="imp-mobile-drawer-header"><h3>Navigazione</h3>'
       + '<button class="imp-mobile-drawer-close" data-imp-action="closeDrawer">\u2715</button></div>'
       + '<nav id="imp-mobileDrawerNav"></nav></div>'
       + '<button class="imp-mobile-nav-btn" id="imp-mobileNavBtn" data-imp-action="openDrawer" title="Navigazione">\u2630</button>'
