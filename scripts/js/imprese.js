@@ -285,7 +285,8 @@
     + '<tr class="imp-row-pmc"><td>1</td><td>Bottega</td><td>'+patLink('P.M.C.')+'</td><td>Fondazione: un gruppo di artigiani con una sede e una patente.</td></tr>'
     + '<tr class="imp-row-pmt"><td>2</td><td>Officina</td><td>'+patLink('P.M.T.')+'</td><td>Espansione: pi\u00F9 mestieri, struttura avanzata, lavori militari.</td></tr>'
     + '<tr class="imp-row-poe"><td>3</td><td>Corporazione</td><td>'+patLink('P.O.E.')+'</td><td>La vetta: monopolio, seggio al Consiglio, prestigio.</td></tr>'
-    + '</tbody></table></div>';
+    + '</tbody></table>')
+    + '</div>';
   };
 
   RENDER_GILDE.livelli = function() {
@@ -311,7 +312,7 @@
     + '<tr><td>Tassa di registrazione (Livello 1)</td><td><strong>'+DATA.livelli[0].fee+' Mo</strong></td></tr>'
     + '<tr><td>Sede minima: Magazzino</td><td><strong>150 Mo</strong></td></tr>'
     + '<tr><td>Fondo Iniziale (cassa comune)</td><td><strong>'+DATA.fondi.init+' Mo</strong></td></tr>'
-    + '</tbody></table></div>'
+    + '</tbody></table>') + '</div>'
 
     + '<div class="imp-doc-section">' + sectionTitle('\uD83D\uDCB0', 'Passo 2 \u2014 Gestione semplice')
     + tableWrap('<table class="imp-tbl"><thead><tr><th>Voce</th><th>Regola</th></tr></thead><tbody>'
@@ -319,19 +320,19 @@
     + '<tr><td>Fondo di Riserva</td><td>Accantona il <strong>10%</strong> dei profitti mensili.</td></tr>'
     + '<tr><td>Tassa alla Camera</td><td><strong>1% del fatturato complessivo</strong>, trimestrale (esente i primi 3 mesi).</td></tr>'
     + '<tr><td>Apprendisti</td><td>PG LV1 o NPC assunti. Costi: NPC 8 Mo/mese, PG 20 Mo/mese.</td></tr>'
-    + '</tbody></table></div>'
+    + '</tbody></table>') + '</div>'
 
     + '<div class="imp-doc-section">' + sectionTitle('\uD83C\uDFD7\uFE0F', 'Passo 3 \u2014 Sede e Strutture')
     + tableWrap('<table class="imp-tbl"><thead><tr><th>Struttura</th><th>Liv</th><th style="text-align:right">Costo</th><th>Effetto</th></tr></thead><tbody>'
     + DATA.strutture.map(function(s){ return '<tr class="'+(s.lv===2?'imp-row-pmt':'')+'"><td>'+s.nome+'</td><td>'+s.lv+'</td><td style="text-align:right">'+s.cost+' Mo</td><td>'+s.effetto+'</td></tr>'; }).join('')
-    + '</tbody></table></div>'
+    + '</tbody></table>') + '</div>'
 
     + '<div class="imp-doc-section">' + sectionTitle('\u26A0\uFE0F', 'Passo 4 \u2014 Sanzioni (in breve)')
     + tableWrap('<table class="imp-tbl"><thead><tr><th>Gravit\u00E0</th><th>Sanzione</th></tr></thead><tbody>'
     + '<tr class="imp-sanz-lieve"><td>Lieve</td><td>Multa <strong>50 Mo</strong> + regolarizzazione in 15 giorni.</td></tr>'
     + '<tr class="imp-sanz-grave"><td>Grave</td><td>Multa <strong>200 Mo</strong> + sospensione 3 mesi.</td></tr>'
     + '<tr class="imp-sanz-graviss"><td>Gravissima</td><td>Scioglimento coatto + confisca cassa + Sigillo Spezzato ai soci.</td></tr>'
-    + '</tbody></table></div>';
+    + '</tbody></table>') + '</div>';
   };
 
   RENDER_GILDE.entrate = function() {
@@ -344,7 +345,7 @@
       var mesi = Math.ceil(f.cost / f.rent);
       return '<tr class="'+dataCls(f.pat)+'"><td>'+patLink(f.pat)+'</td><td style="text-align:right">'+f.cost+' Mo</td><td style="text-align:right"><strong>'+f.rent+' Mo</strong></td><td style="text-align:right">'+mesi+' mesi</td></tr>';
     }).join('')
-    + '</tbody></table></div>'
+    + '</tbody></table>') + '</div>'
 
     + '<div class="imp-doc-section">' + sectionTitle('\uD83C\uDFE0', 'Affitto di Struttura')
     + '<p style="color:var(--imp-text2);font-size:.9rem;line-height:1.6">Una struttura inutilizzata pu\u00F2 essere affittata: rendita del <strong>5\u201310%</strong> del suo valore, ogni mese.</p></div>'
@@ -355,7 +356,7 @@
     + '<tr><td>In Bottega (sede)</td><td>Senza commissione se l\u2019Impresa ha accesso al mercato comunale.</td></tr>'
     + '<tr><td>Fuori sede</td><td>Al mercato di un\u2019altra citt\u00E0: <strong>10% di commissione</strong>.</td></tr>'
     + '<tr><td>Contratti a termine</td><td>Ordini che richiedono pi\u00F9 Downtime: paga anticipata <strong>50%</strong>, saldo a consegna.</td></tr>'
-    + '</tbody></table></div>'
+    + '</tbody></table>') + '</div>'
 
     + '<div class="imp-doc-section">' + sectionTitle('\uD83D\uDCDD', 'Lavori su Commissione privata')
     + '<p style="color:var(--imp-text2);font-size:.9rem;line-height:1.6">Prezzi orientativi: oggetto comune 1\u201320 Mo, non comune 20\u201380 Mo, raro 80\u2013200 Mo, molto raro 200\u2013500 Mo, leggendario: trattativa. La <strong style="color:var(--imp-gold2)">P.O.E.</strong> pu\u00F2 certificare (+20% valore).</p></div>'
@@ -378,13 +379,13 @@
     + '<p style="color:var(--imp-text2);font-size:.9rem;margin-bottom:14px;line-height:1.6"><strong>Conflitto Commerciale:</strong> dichiarazione '+DATA.conflitti.dichiarazione+' Mo, poi \u221210% prezzi vendita per 3 mesi. Escalation '+DATA.conflitti.escalation+' Mo/mese, mediazione '+DATA.conflitti.mediazione+' Mo.</p>'
     + tableWrap('<table class="imp-tbl"><thead><tr><th>Mezzo</th><th>Costo/Durata</th><th>CD</th><th>Se scoperti</th></tr></thead><tbody>'
     + DATA.sponsaggio.map(function(s){ return '<tr><td>'+s.livello+'</td><td>'+s.dt+'</td><td>'+s.cd+'</td><td>'+s.san+'</td></tr>'; }).join('')
-    + '</tbody></table></div>'
+    + '</tbody></table>') + '</div>'
 
     + '<div class="imp-doc-section">' + sectionTitle('\uD83C\uDFB2', 'Eventi Stagionali')
     + '<p style="color:var(--imp-text2);font-size:.9rem;margin-bottom:14px;line-height:1.6">Tira <strong>1d20</strong> a inizio mese (+2 per ogni Livello dell\u2019Impresa).</p>'
     + tableWrap('<table class="imp-tbl"><thead><tr><th>Evento</th><th>Stagione</th><th>Effetto</th></tr></thead><tbody>'
     + DATA.eventi.map(function(e){ return '<tr><td>'+e.nome+'</td><td>'+e.stagione+' ('+e.mese+')</td><td>'+e.effetto+'</td></tr>'; }).join('')
-    + '</tbody></table></div>'
+    + '</tbody></table>') + '</div>'
 
     + '<div class="imp-doc-section">' + sectionTitle('\uD83D\uDCDA', 'Glossario Essenziale')
     + tableWrap('<table class="imp-tbl"><thead><tr><th>Termine</th><th>Cosa significa</th></tr></thead><tbody>'
@@ -395,7 +396,7 @@
     + '<tr><td><strong>Monopolio</strong></td><td>Privilegio della Corporazione sulle commesse pubbliche del proprio settore.</td></tr>'
     + '<tr><td><strong>Mo</strong></td><td>Monete d\u2019oro: tutta la valuta del Codice.</td></tr>'
     + '<tr><td><strong>DT (Downtime)</strong></td><td>Tempo libero tra le avventure.</td></tr>'
-    + '</tbody></table></div>';
+    + '</tbody></table>') + '</div>';
   };
 
   RENDER_GILDE.gestore = function() { return gestoreShell(); };
@@ -426,7 +427,7 @@
     return '<div class="imp-doc-section">' + sectionTitle('\uD83D\uDCCB', 'Quadro Generale delle Patenti')
     + tableWrap('<table class="imp-tbl"><thead><tr><th>Sigla</th><th>Denominazione</th><th style="text-align:right">Costo (3 anni)</th><th style="text-align:right">Cauzione</th><th style="text-align:right">Totale</th></tr></thead><tbody>'
     + DATA.patenti.map(function(p){ return '<tr class="'+p.cls+'"><td>'+abbr(p.sigla)+'</td><td>'+p.nome+'</td><td style="text-align:right">'+p.costo+' Mo</td><td style="text-align:right">'+p.cauzione+' Mo</td><td style="text-align:right"><strong>'+p.totale+' Mo</strong></td></tr>'; }).join('')
-    + '</tbody></table></div>';
+    + '</tbody></table>') + '</div>';
   };
 
   function renderLicenzaCard(p, headerBg, blocks) {
@@ -482,7 +483,7 @@
     + '<tr class="imp-row-pmt"><td><span class="imp-dot-i" style="background:var(--imp-uncommon)"></span>Grado II</td><td>'+abbr('P.M.T.')+'</td><td>Tracciato nel Libretto degli Acquisti</td><td>Mappe ufficiali, documenti legali sigillati</td></tr>'
     + '<tr class="imp-row-pasv"><td><span class="imp-dot-i" style="background:var(--imp-amber)"></span>Grado III</td><td>'+abbr('P.A.S.V.')+'</td><td>Tracciato con Marchio Spettrale</td><td>Pergamene magiche, Tattoo magici, componenti alchemici</td></tr>'
     + '<tr class="imp-row-poe"><td><span class="imp-dot-i" style="background:var(--imp-legendary)"></span>Grado IV+</td><td>'+abbr('P.O.E.')+' + approvazione U.R.V.</td><td>Approvazione caso per caso</td><td>Manufatti leggendari, opere della Corte</td></tr>'
-    + '</tbody></table></div>'
+    + '</tbody></table>') + '</div>'
     + '<div class="imp-note-box">\u26A0 <strong>Marchio Spettrale:</strong> Ogni fiala di inchiostro di Grado III o superiore viene marchiata spettralmente dall\u2019U.R.V.</div>';
   };
 
@@ -491,7 +492,7 @@
     + '<div class="imp-doc-section">' + sectionTitle('\uD83E\uDDEA', 'Confronto & Costi Patenti')
     + tableWrap('<table class="imp-tbl"><thead><tr><th>Patente</th><th>Costo (3 anni)</th><th>Cauzione</th><th>Totale</th><th>Durata</th><th>Destinatari</th></tr></thead><tbody>'
     + DATA.patenti.map(function(p){ return '<tr class="'+p.cls+'"><td><strong>'+p.sigla+'</strong> \u2014 '+p.nome+'</td><td>'+p.costo+' Mo</td><td>'+p.cauzione+' Mo</td><td><strong>'+p.totale+' Mo</strong></td><td>'+p.durata+'</td><td>'+p.destinatari+'</td></tr>'; }).join('')
-    + '</tbody></table></div>'
+    + '</tbody></table>') + '</div>'
     + '<div class="imp-doc-section">' + sectionTitle('\uD83D\uDCCA', 'Tracker Patenti dei Licenziatari')
     + '<p style="color:var(--imp-text2);font-size:.9rem;margin-bottom:16px">Tieni traccia delle Patenti di ogni personaggio. Dati salvati in locale (localStorage).</p>'
     + '<button class="imp-btn" data-imp-action="openPatentiTracker">Apri Tracker Patenti</button></div>';
