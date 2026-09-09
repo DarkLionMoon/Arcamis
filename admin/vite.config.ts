@@ -38,6 +38,12 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'Artboard_1.png'],
+      workbox: {
+        // The Vue admin has no index.html: its only entry is app.html.
+        // The navigation fallback MUST point to a precached document,
+        // otherwise the SW throws on navigation and the page stays blank.
+        navigateFallback: 'app.html'
+      },
       manifest: {
         name: 'Arcamis Admin',
         short_name: 'Admin',
