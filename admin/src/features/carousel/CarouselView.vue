@@ -66,7 +66,7 @@ onMounted(load)
     <div class="arc-panel" style="margin-bottom: 16px">
       <p class="arc-hint">
         Copertine delle slide del carousel in home. Titolo, descrizione e pulsanti hanno valori di default definiti
-        nello store (slide — vedi pannello legacy per la modifica avanzata).
+        nello store.
       </p>
     </div>
 

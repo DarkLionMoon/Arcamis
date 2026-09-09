@@ -2,6 +2,10 @@ import { test, expect } from 'playwright/test'
 
 test.describe('Vue admin shell', () => {
   test.beforeEach(async ({ page }) => {
+    page.on('pageerror', (error) => console.log('[pageerror]', error.message))
+    page.on('console', (message) => {
+      if (message.type() === 'error') console.log('[console.error]', message.text())
+    })
     await page.route('**/api/admin?action=check', async (route) => {
       await route.fulfill({
         status: 200,

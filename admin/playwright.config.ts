@@ -17,7 +17,7 @@ export default defineConfig({
     ? undefined
     : {
         command:
-          'cd .. && npm run build && npm --prefix admin run build && rm -rf dist/admin && cp -R export/admin dist/admin && npx vite preview --host 0.0.0.0 --port 4173',
+          'cd .. && npm run build && npx vite preview --host 0.0.0.0 --port 4173',
         url: 'http://localhost:4173',
         reuseExistingServer: !process.env.CI,
         timeout: 120_000

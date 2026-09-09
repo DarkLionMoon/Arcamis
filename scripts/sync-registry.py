@@ -354,6 +354,7 @@ def generate_export_index(reg):
     
     return pages, dbs
 
+# Legacy admin inline registry generation kept for historical exports only.
 def generate_admin_inline(reg):
     pages = []
     for p in reg['pages']:
@@ -501,21 +502,9 @@ def main():
     )
     write_file('export/index.html', export_html)
 
-    # 7. admin/index.html inline script (namespace ArcAdmin)
-    admin_path = ROOT_DIR / 'admin' / 'index.html'
-    admin_html = admin_path.read_text(encoding='utf-8')
-    adm_pages, adm_sections = generate_admin_inline(reg)
-    admin_html = replace_between(
-        admin_html,
-        r'window\.ArcAdmin\.pages = \[[\s\S]*?\n\];',
-        f"window.ArcAdmin.pages = [\n{',\n'.join(adm_pages)}\n];"
-    )
-    admin_html = replace_between(
-        admin_html,
-        r'window\.ArcAdmin\.sections = \[[\s\S]*?\n\];',
-        f"window.ArcAdmin.sections = [\n{',\n'.join(adm_sections)}\n];"
-    )
-    write_file('admin/index.html', admin_html)
+    # 7. The legacy admin is no longer part of the generated public build.
+    # Keep the registry generator focused on the public site and Vue admin.
+    # Legacy admin intentionally excluded from generated artifacts.
 
     # 8. sitemap.xml
     write_file('sitemap.xml', generate_sitemap(reg))

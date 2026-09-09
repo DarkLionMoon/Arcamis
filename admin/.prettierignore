@@ -1,4 +1,6 @@
-node_modules/
-dist/
 ../export/
+../dist/
 ../admin/js/
+../admin/styles/
+node_modules/
+test-results/

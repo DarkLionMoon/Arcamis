@@ -9,10 +9,10 @@ export default defineConfig({
   build: {
     outDir: '../export/admin',
     emptyOutDir: true,
+    copyPublicDir: false,
     sourcemap: true,
     rollupOptions: {
       input: {
-        main: 'index.html',
         app: 'app.html'
       },
       output: {

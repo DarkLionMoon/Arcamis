@@ -49,7 +49,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        admin: 'admin/index.html',
       },
       output: {
         // Preserve original file paths for Cloudflare Pages compatibility
@@ -57,7 +56,6 @@ export default defineConfig({
         chunkFileNames: 'scripts/js/[name].js',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name?.endsWith('.css')) {
-            if (assetInfo.name.includes('admin')) return 'admin/styles/[name][extname]';
             return 'scripts/css/[name][extname]';
           }
           return 'assets/[name][extname]';

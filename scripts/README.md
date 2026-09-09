@@ -43,7 +43,7 @@ arcamis-backup/
 │   ├── admin_session_xxx.json
 │   └── ...
 └── repo/
-    ├── admin/index.html
+    ├── admin/app.html
     ├── content/pages/materiale.json
     └── ...
 ```

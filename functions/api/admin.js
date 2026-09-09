@@ -1080,7 +1080,7 @@ export async function onRequest(context) {
       }
 
       /* Also check index.html and other files */
-      const otherFiles = ['index.html', 'admin/index.html', 'scripts/js/data.js'];
+      const otherFiles = ['index.html', 'admin/app.html', 'scripts/js/data.js'];
       for (const of2 of otherFiles) {
         try {
           const cr = await fetch(apiBase + '/contents/' + of2 + '?ref=' + GH_BRANCH, { headers: ghHeaders });

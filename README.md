@@ -26,7 +26,7 @@ Contenuto 100% local-first: tutto servito da JSON statici (nessun ping alla Noti
 │   └── pages/*.json        ← Pagine in markdown (usate dal client)
 │
 ├── functions/api/*.js      ← Cloudflare Pages Functions
-├── admin/index.html        ← Pannello amministrazione (con upload immagini in /images/)
+├── admin/                  ← Pannello amministrazione Vue (accesso da /admin/app.html)
 ├── export/index.html       ← Tool export contenuti
 ├── images/                 ← Immagini caricate dall'editor admin
 └── audio/                  ← Effetti sonori (ambient, footsteps, …)
@@ -63,7 +63,7 @@ Ogni pagina `content/pages/<slug>.json` può dichiarare un `layout` che
 determina come viene renderizzata. Se manca, viene rilevato in automatico
 dalla chiave (es. `pantheon`, `regole`, …).
 
-La lista completa dei layout è in `admin/js/editors.js` (`LAYOUT_REGISTRY`):
+La lista completa dei layout è gestita dal pannello admin Vue e dai tipi condivisi in `admin/src/types/index.ts`.
 `contenuto`, `luoghi`, `cronache`, `personaggio`, `materiale`, `wide`,
 `pantheon`, `collezione`, `bestiario`, `timeline`, `fazioni`, `oggetti`,
 `glossario`, `galleria`, `tabelle` e i layout a card `sessione`, `quest`,
@@ -77,7 +77,7 @@ I layout a card sono renderizzati da `_renderSchede` in `notion-nav.js`
 (markdown → card con campi `- **Chiave:** valore`); gli altri da
 renderer dedicati (`_renderPantheon`, `_renderBestiario`, …).
 
-L'editor a blocchi (`admin/js/structured.js`) copre **due modalità**:
+L'editor a blocchi del pannello Vue copre **due modalità**:
 - `pantheon`: blocchi divinità/sezioni con immagine, citazione, identità,
   personalità e culto (separati da `---` nel markdown). Il layout
   `collezione` usa lo stesso editor con etichette generiche ("elementi",
@@ -108,7 +108,7 @@ o nessuna) e layout. La creazione:
 1. scrive `content/pages/<slug>.json` con il template del layout scelto;
 2. registra la pagina in `scripts/js/data.js` (array `pages`, con campo `sec`);
 3. registra l'URL pulito in `scripts/js/app.js` (`_pathMap`);
-4. aggiunge la voce alla sidebar dell'admin (`admin/index.html`, `PAGES`);
+4. aggiorna il registro usato dal pannello admin Vue;
 5. al deploy, `scripts/js/custom-nav.js` inietta la voce nel menu del sito
    (desktop e mobile) nella sezione scelta.
 
@@ -152,11 +152,11 @@ menu del sito dopo il deploy.
 Con `GH_TOKEN` configurato il pannello non richiede mai il Personal Access Token
 nel browser: tutte le operazioni passano da `functions/api/gh.js` (session-authenticated).
 
-## Pannello admin
+## Pannello admin Vue
 
-Oltre all'editor markdown con anteprima, il pannello offre:
+Il pannello legacy è stato rimosso. Il pannello Vue è disponibile su `/admin/app.html` e offre:
 
-- **Login server-side** con "ricordami", fallback hash locale se non configurato.
+- **Login server-side** con "ricordami".
 - **📜 STORIA** — cronologia commit di una pagina e ripristino di una versione
   precedente nell'editor (poi da salvare).
 - **🔗 LINKS** — verifica che i link interni del contenuto esistano in `_pathMap`.
