@@ -481,7 +481,7 @@ async function _gpRender(id, label, icon) {
           else if (_layout === 'wide') {
             _localHtml = _mdToHtml(_localJson.content);
           }           else if (_layout === 'imprese') {
-            _localHtml = '<div class="imprese-iframe-wrap"><iframe src="/imprese-standalone/index.html" class="imprese-iframe" title="Imprese e Licenze" loading="lazy"></iframe></div>';
+            _localHtml = '<div class="imprese-app" id="imprese-app-root"></div>';
           } else {
             /* Auto-detect by page key (legacy fallback) */
             _localHtml =
@@ -540,8 +540,12 @@ async function _gpRender(id, label, icon) {
           }
           applyGlossary(pbody);
           _maybeBuildToc(pbody, !!_localJson.toc);
+          /* Imprese: init sezione dedicata */
+          if (_layout === 'imprese' && typeof window._impreseInit === 'function') {
+            var _impRoot = document.getElementById('imprese-app-root');
+            if (_impRoot) window._impreseInit(_impRoot);
+          }
           if (typeof afterPageRender === 'function') afterPageRender();
-          /* Imprese: caricata in iframe, nessuna init JS necessaria */
           return;
         }
       }
