@@ -537,7 +537,7 @@ export async function checkSession(): Promise<{ ok: boolean; user?: string; role
     const response = await fetch(`${API_BASE}/admin?action=check`, {
       credentials: 'include'
     })
-    return handleResponse(response)
+    return await handleResponse(response)
   } catch {
     return null
   }
