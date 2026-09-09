@@ -12,7 +12,7 @@
     binary  {path, message, content, sha?}  → scrive file binario (content = base64)
     delete  {path, message, sha}            → elimina file
 */
-import { parseCookie } from './_lib/auth.js';
+import { isSafeRepositoryPath, parseCookie } from './_lib/auth.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -21,7 +21,11 @@ export async function onRequest(context) {
      altrimenti il token salvato dall'admin in KV (azione set_gh_token). */
   let GH_TOKEN = env.GH_TOKEN || '';
   if (!GH_TOKEN && KV) {
-    try { GH_TOKEN = (await KV.get('gh_token')) || ''; } catch (_) { GH_TOKEN = ''; }
+    try {
+      GH_TOKEN = (await KV.get('gh_token')) || '';
+    } catch (_) {
+      GH_TOKEN = '';
+    }
   }
   const GH_REPO = env.GH_REPO || 'DarkLionMoon/Arcamis';
   const GH_BRANCH = env.GH_BRANCH || 'main';
@@ -29,7 +33,7 @@ export async function onRequest(context) {
   const cors = {
     'Access-Control-Allow-Origin': new URL(request.url).origin,
     'Content-Type': 'application/json',
-    'Vary': 'Cookie'
+    Vary: 'Cookie',
   };
 
   if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
@@ -38,7 +42,9 @@ export async function onRequest(context) {
   }
 
   let body;
-  try { body = await request.json(); } catch (e) {
+  try {
+    body = await request.json();
+  } catch (e) {
     return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
   }
 
@@ -55,9 +61,11 @@ export async function onRequest(context) {
       } else {
         const session = JSON.parse(stored);
         authed = !!(session && (session === true || session.role));
-        sessionUserRole = authed ? (session.role || 'admin') : null;
+        sessionUserRole = authed ? session.role || 'admin' : null;
       }
-    } catch (_) { authed = false; }
+    } catch (_) {
+      authed = false;
+    }
   }
   if (!authed) {
     return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
@@ -65,10 +73,19 @@ export async function onRequest(context) {
   /* ── Check di ruolo: le operazioni di scrittura richiedono editor o admin ── */
   const WRITE_ACTIONS = ['put', 'binary', 'delete', 'commit_multi'];
   if (WRITE_ACTIONS.includes(String(body.action)) && sessionUserRole !== 'admin' && sessionUserRole !== 'editor') {
-    return new Response(JSON.stringify({ error: 'Permessi insufficienti: serve un ruolo editor o admin' }), { status: 403, headers: cors });
+    return new Response(JSON.stringify({ error: 'Permessi insufficienti: serve un ruolo editor o admin' }), {
+      status: 403,
+      headers: cors,
+    });
   }
   if (!GH_TOKEN) {
-    return new Response(JSON.stringify({ error: 'GH_TOKEN non configurato: imposta la variabile d\'ambiente GH_TOKEN in Cloudflare Pages oppure configuralo da Admin → Impostazioni → Repository → GitHub token' }), { status: 501, headers: cors });
+    return new Response(
+      JSON.stringify({
+        error:
+          "GH_TOKEN non configurato: imposta la variabile d'ambiente GH_TOKEN in Cloudflare Pages oppure configuralo da Admin → Impostazioni → Repository → GitHub token",
+      }),
+      { status: 501, headers: cors }
+    );
   }
 
   const action = body.action;
@@ -79,12 +96,32 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ error: 'Path non valido' }), { status: 400, headers: cors });
   }
 
+  if (action === 'commit_multi') {
+    if (
+      !Array.isArray(p.files) ||
+      p.files.length === 0 ||
+      p.files.length > 50 ||
+      p.files.some((f) => !f || !isSafeRepositoryPath(f.path))
+    ) {
+      return new Response(JSON.stringify({ error: 'Elenco file non valido' }), { status: 400, headers: cors });
+    }
+  } else if (['get', 'commits', 'put', 'binary', 'delete'].includes(action) && !isSafeRepositoryPath(p.path)) {
+    return new Response(JSON.stringify({ error: 'Path non valido' }), { status: 400, headers: cors });
+  }
+
+  if (
+    typeof p.message !== 'undefined' &&
+    (typeof p.message !== 'string' || p.message.length === 0 || p.message.length > 200)
+  ) {
+    return new Response(JSON.stringify({ error: 'Messaggio non valido' }), { status: 400, headers: cors });
+  }
+
   const api = 'https://api.github.com/repos/' + GH_REPO;
   const headers = {
-    'Authorization': 'token ' + GH_TOKEN,
-    'Accept': 'application/vnd.github.v3+json',
+    Authorization: 'token ' + GH_TOKEN,
+    Accept: 'application/vnd.github.v3+json',
     'Content-Type': 'application/json',
-    'User-Agent': 'ArcamisAdmin'
+    'User-Agent': 'ArcamisAdmin',
   };
 
   async function ghFetch(url, opts) {
@@ -94,7 +131,9 @@ export async function onRequest(context) {
       try {
         const j = await r.json();
         if (j && (j.message || j.error)) msg = (j.message || j.error) + ' (' + r.status + ')';
-      } catch (_) { /* body non JSON */ }
+      } catch (_) {
+        /* body non JSON */
+      }
       throw new Error(msg);
     }
     return r.json();
@@ -109,7 +148,14 @@ export async function onRequest(context) {
 
     if (action === 'commits') {
       const per = Math.min(parseInt(p.per_page, 10) || 25, 100);
-      const url = api + '/commits?path=' + encodeURIComponent(p.path) + '&per_page=' + per + '&sha=' + encodeURIComponent(GH_BRANCH);
+      const url =
+        api +
+        '/commits?path=' +
+        encodeURIComponent(p.path) +
+        '&per_page=' +
+        per +
+        '&sha=' +
+        encodeURIComponent(GH_BRANCH);
       const data = await ghFetch(url, { headers });
       return new Response(JSON.stringify({ ok: true, data }), { headers: cors });
     }
@@ -118,15 +164,18 @@ export async function onRequest(context) {
       const bodyObj = { message: p.message, branch: GH_BRANCH, content: p.content };
       if (p.sha) bodyObj.sha = p.sha;
       const data = await ghFetch(api + '/contents/' + p.path, {
-        method: 'PUT', headers, body: JSON.stringify(bodyObj)
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(bodyObj),
       });
       return new Response(JSON.stringify({ ok: true, data }), { headers: cors });
     }
 
     if (action === 'delete') {
       const data = await ghFetch(api + '/contents/' + p.path, {
-        method: 'DELETE', headers,
-        body: JSON.stringify({ message: p.message, branch: GH_BRANCH, sha: p.sha })
+        method: 'DELETE',
+        headers,
+        body: JSON.stringify({ message: p.message, branch: GH_BRANCH, sha: p.sha }),
       });
       return new Response(JSON.stringify({ ok: true, data }), { headers: cors });
     }
@@ -134,33 +183,37 @@ export async function onRequest(context) {
     /* Commit atomico multi-file (Git Data API).
        p.files: [{ path, content(base64) | null }] — content null = elimina il file. */
     if (action === 'commit_multi') {
-      const refData = await ghFetch(api + '/git/ref/heads/' + GH_BRANCH, { headers });
+      const refData = await ghFetch(api + '/git/ref/heads/' + encodeURIComponent(GH_BRANCH), { headers });
       const baseSha = refData.object.sha;
       const commitData = await ghFetch(api + '/git/commits/' + baseSha, { headers });
       const baseTree = commitData.tree.sha;
       const treeItems = [];
-      for (const f of (p.files || [])) {
+      for (const f of p.files) {
         if (f.content == null) {
           treeItems.push({ path: f.path, mode: '100644', type: 'blob', sha: null });
         } else {
           const blob = await ghFetch(api + '/git/blobs', {
-            method: 'POST', headers,
-            body: JSON.stringify({ content: f.content, encoding: 'base64' })
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ content: f.content, encoding: 'base64' }),
           });
           treeItems.push({ path: f.path, mode: '100644', type: 'blob', sha: blob.sha });
         }
       }
       const treeData = await ghFetch(api + '/git/trees', {
-        method: 'POST', headers,
-        body: JSON.stringify({ base_tree: baseTree, tree: treeItems })
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ base_tree: baseTree, tree: treeItems }),
       });
       const newCommit = await ghFetch(api + '/git/commits', {
-        method: 'POST', headers,
-        body: JSON.stringify({ message: p.message, tree: treeData.sha, parents: [baseSha] })
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ message: p.message, tree: treeData.sha, parents: [baseSha] }),
       });
-      await ghFetch(api + '/git/refs/heads/' + GH_BRANCH, {
-        method: 'PATCH', headers,
-        body: JSON.stringify({ sha: newCommit.sha, force: false })
+      await ghFetch(api + '/git/refs/heads/' + encodeURIComponent(GH_BRANCH), {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ sha: newCommit.sha, force: false }),
       });
       return new Response(JSON.stringify({ ok: true, data: { sha: newCommit.sha } }), { headers: cors });
     }
@@ -169,16 +222,24 @@ export async function onRequest(context) {
     if (action === 'ci_status') {
       const runs = await ghFetch(api + '/actions/runs?per_page=1', { headers });
       const run = (runs.workflow_runs || [])[0] || null;
-      return new Response(JSON.stringify({
-        ok: true,
-        data: run ? {
-          status: run.status,
-          conclusion: run.conclusion,
-          name: run.name,
-          sha: (run.head_commit && run.head_commit.id) ? run.head_commit.id.slice(0, 7) : '',
-          message: (run.head_commit && run.head_commit.message) ? String(run.head_commit.message).split('\n')[0].slice(0, 60) : ''
-        } : null
-      }), { headers: cors });
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          data: run
+            ? {
+                status: run.status,
+                conclusion: run.conclusion,
+                name: run.name,
+                sha: run.head_commit && run.head_commit.id ? run.head_commit.id.slice(0, 7) : '',
+                message:
+                  run.head_commit && run.head_commit.message
+                    ? String(run.head_commit.message).split('\n')[0].slice(0, 60)
+                    : '',
+              }
+            : null,
+        }),
+        { headers: cors }
+      );
     }
 
     return new Response(JSON.stringify({ error: 'Azione non valida' }), { status: 400, headers: cors });

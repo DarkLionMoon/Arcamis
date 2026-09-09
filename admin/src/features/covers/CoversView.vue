@@ -91,8 +91,11 @@ onMounted(load)
       <button class="btn btn-soft" type="button" :disabled="loading" @click="load">⟳ Aggiorna</button>
     </div>
 
-    <div class="arc-panel" style="margin-bottom:16px">
-      <p class="arc-hint">Anteprime delle card delle pagine. Il percorso usato è <code>pages/<em>slug</em>.json</code>; l'immagine viene mostrata in homepage e nelle card.</p>
+    <div class="arc-panel" style="margin-bottom: 16px">
+      <p class="arc-hint">
+        Anteprime delle card delle pagine. Il percorso usato è <code>pages/<em>slug</em>.json</code>; l'immagine viene
+        mostrata in homepage e nelle card.
+      </p>
     </div>
 
     <div v-if="loading" class="arc-empty-side">Caricamento…</div>
@@ -103,17 +106,23 @@ onMounted(load)
           <img v-if="state.covers[p.id]" :src="state.covers[p.id]" :alt="p.l" />
           <span v-else class="arc-carousel-img--empty">{{ p.i || '📄' }} {{ p.l }}</span>
         </div>
-        <div class="arc-card-value" style="font-size:15px">{{ p.l }}</div>
-        <div style="font-size:11px;opacity:.5;margin-bottom:8px">{{ p.k }}</div>
+        <div class="arc-card-value" style="font-size: 15px">{{ p.l }}</div>
+        <div style="font-size: 11px; opacity: 0.5; margin-bottom: 8px">{{ p.k }}</div>
         <label class="arc-fld">
           <span>URL</span>
           <input v-model="state.urls[p.id]" class="in" placeholder="/images/… o https://…" />
         </label>
         <div class="arc-form-actions">
-          <button class="btn btn-soft btn-sm" type="button" :disabled="savingKey === p.id" @click="pickImage(p.id)">🖼 Carica</button>
-          <button class="btn btn-soft btn-sm" type="button" :disabled="savingKey === p.id" @click="resetCover(p.id)">Reset</button>
-          <span style="flex:1"></span>
-          <button class="btn btn-p btn-sm" type="button" :disabled="savingKey === p.id" @click="saveCover(p.id)">💾</button>
+          <button class="btn btn-soft btn-sm" type="button" :disabled="savingKey === p.id" @click="pickImage(p.id)">
+            🖼 Carica
+          </button>
+          <button class="btn btn-soft btn-sm" type="button" :disabled="savingKey === p.id" @click="resetCover(p.id)">
+            Reset
+          </button>
+          <span style="flex: 1"></span>
+          <button class="btn btn-p btn-sm" type="button" :disabled="savingKey === p.id" @click="saveCover(p.id)">
+            💾
+          </button>
         </div>
       </div>
     </div>

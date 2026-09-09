@@ -27,7 +27,7 @@ async function restore(item: TrashItem) {
   saving.value = item.pageKey
   try {
     await trashApi.restore(item.pageKey)
-    items.value = items.value.filter(x => x.pageKey !== item.pageKey)
+    items.value = items.value.filter((x) => x.pageKey !== item.pageKey)
     ui.toast('Pagina ripristinata', 'success')
   } catch (e) {
     ui.toast('Errore ripristino: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -41,7 +41,7 @@ async function emptyOne(item: TrashItem) {
   saving.value = item.pageKey
   try {
     await trashApi.empty(item.pageKey)
-    items.value = items.value.filter(x => x.pageKey !== item.pageKey)
+    items.value = items.value.filter((x) => x.pageKey !== item.pageKey)
     ui.toast('Eliminata definitivamente', 'success')
   } catch (e) {
     ui.toast('Errore: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -76,25 +76,50 @@ onMounted(load)
 
     <AdminOnly>
       <div class="arc-panel">
-      <table class="arc-table">
-        <thead>
-          <tr><th>Pagina</th><th>Eliminata</th><th>Da</th><th style="text-align:right">Azioni</th></tr>
-        </thead>
-        <tbody>
-          <tr v-if="loading"><td colspan="4">Caricamento…</td></tr>
-          <tr v-for="item in items" :key="item.pageKey">
-            <td><code>{{ item.pageKey }}</code></td>
-            <td>{{ item.deletedAt ? new Date(item.deletedAt).toLocaleString('it-IT') : '—' }}</td>
-            <td>{{ item.deletedBy || '—' }}</td>
-            <td style="text-align:right">
-              <button class="btn btn-p btn-sm" type="button" :disabled="saving === item.pageKey" @click="restore(item)">♻️ Ripristina</button>
-              <button class="btn btn-d btn-sm" type="button" :disabled="saving === item.pageKey" @click="emptyOne(item)">🗑</button>
-            </td>
-          </tr>
-          <tr v-if="!loading && !items.length"><td colspan="4" class="arc-empty-side">Cestino vuoto.</td></tr>
-        </tbody>
-      </table>
-    </div>
+        <table class="arc-table">
+          <thead>
+            <tr>
+              <th>Pagina</th>
+              <th>Eliminata</th>
+              <th>Da</th>
+              <th style="text-align: right">Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="loading">
+              <td colspan="4">Caricamento…</td>
+            </tr>
+            <tr v-for="item in items" :key="item.pageKey">
+              <td>
+                <code>{{ item.pageKey }}</code>
+              </td>
+              <td>{{ item.deletedAt ? new Date(item.deletedAt).toLocaleString('it-IT') : '—' }}</td>
+              <td>{{ item.deletedBy || '—' }}</td>
+              <td style="text-align: right">
+                <button
+                  class="btn btn-p btn-sm"
+                  type="button"
+                  :disabled="saving === item.pageKey"
+                  @click="restore(item)"
+                >
+                  ♻️ Ripristina
+                </button>
+                <button
+                  class="btn btn-d btn-sm"
+                  type="button"
+                  :disabled="saving === item.pageKey"
+                  @click="emptyOne(item)"
+                >
+                  🗑
+                </button>
+              </td>
+            </tr>
+            <tr v-if="!loading && !items.length">
+              <td colspan="4" class="arc-empty-side">Cestino vuoto.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </AdminOnly>
   </section>
 </template>

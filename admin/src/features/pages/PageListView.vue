@@ -36,8 +36,11 @@ const bundle = ref<RegistryBundle | null>(null)
 const filteredPages = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
   if (!q) return registry.pages
-  return registry.pages.filter(p =>
-    (p.l || '').toLowerCase().includes(q) || (p.k || '').toLowerCase().includes(q) || (p.id || '').toLowerCase().includes(q)
+  return registry.pages.filter(
+    (p) =>
+      (p.l || '').toLowerCase().includes(q) ||
+      (p.k || '').toLowerCase().includes(q) ||
+      (p.id || '').toLowerCase().includes(q)
   )
 })
 
@@ -56,7 +59,12 @@ const groupedPages = computed(() => {
 })
 
 function slugify(s: string): string {
-  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
 }
 
 async function load() {
@@ -96,7 +104,7 @@ async function createPage() {
     ui.toast('Nome e chiave obbligatori', 'error')
     return
   }
-  if (registry.pages.some(p => p.k === key)) {
+  if (registry.pages.some((p) => p.k === key)) {
     ui.toast('Chiave già esistente', 'error')
     return
   }
@@ -149,34 +157,44 @@ onMounted(load)
       </div>
     </div>
 
-    <div class="arc-panel" style="margin-bottom:16px">
-      <input v-model="searchQuery" class="in" style="width:100%" placeholder="🔎 Cerca pagina…" />
+    <div class="arc-panel" style="margin-bottom: 16px">
+      <input v-model="searchQuery" class="in" style="width: 100%" placeholder="🔎 Cerca pagina…" />
     </div>
 
     <div v-if="loading" class="arc-empty-side">Caricamento…</div>
 
-    <div v-for="[group, pages] in groupedPages" :key="group" class="arc-panel" style="margin-bottom:16px">
-      <h3 class="arc-panel-title">Gruppo: {{ group }} <span style="opacity:.5">({{ pages.length }})</span></h3>
+    <div v-for="[group, pages] in groupedPages" :key="group" class="arc-panel" style="margin-bottom: 16px">
+      <h3 class="arc-panel-title">
+        Gruppo: {{ group }} <span style="opacity: 0.5">({{ pages.length }})</span>
+      </h3>
       <table class="arc-table">
         <tbody>
           <tr v-for="p in pages" :key="p.k">
-            <td style="width:34px;font-size:20px">{{ p.i || '📄' }}</td>
+            <td style="width: 34px; font-size: 20px">{{ p.i || '📄' }}</td>
             <td>
               <strong>{{ p.l || p.k }}</strong>
-              <div style="font-size:12px;opacity:.5">{{ p.k }} · {{ p.id }}{{ p.layout ? ' · layout ' + p.layout : '' }}</div>
+              <div style="font-size: 12px; opacity: 0.5">
+                {{ p.k }} · {{ p.id }}{{ p.layout ? ' · layout ' + p.layout : '' }}
+              </div>
             </td>
-            <td style="width:60px;text-align:right">
+            <td style="width: 60px; text-align: right">
               <img
                 v-if="covers.covers[p.id]"
                 :src="covers.covers[p.id]"
                 alt="cover"
-                style="width:52px;height:32px;object-fit:cover;border-radius:6px;border:1px solid var(--border,#1d2430)"
+                style="
+                  width: 52px;
+                  height: 32px;
+                  object-fit: cover;
+                  border-radius: 6px;
+                  border: 1px solid var(--border, #1d2430);
+                "
               />
             </td>
-            <td style="width:180px">
-              <a :href="'/' + (p.id)" target="_blank" rel="noreferrer" style="font-size:12px;opacity:.7">sito ↗</a>
+            <td style="width: 180px">
+              <a :href="'/' + p.id" target="_blank" rel="noreferrer" style="font-size: 12px; opacity: 0.7">sito ↗</a>
             </td>
-            <td style="width:150px;text-align:right">
+            <td style="width: 150px; text-align: right">
               <button class="btn btn-p btn-sm" type="button" @click="openPage(p.k)">✏️ Modifica</button>
               <button class="btn btn-d btn-sm" type="button" @click="deletePage(p)">🗑</button>
             </td>
@@ -212,7 +230,7 @@ onMounted(load)
           </label>
         </div>
         <div class="arc-form-actions">
-          <span style="flex:1"></span>
+          <span style="flex: 1"></span>
           <button class="btn btn-soft btn-sm" type="button" @click="showNewModal = false">Annulla</button>
           <button class="btn btn-p btn-sm" type="button" :disabled="savingNew" @click="createPage">Crea</button>
         </div>

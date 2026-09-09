@@ -11,8 +11,8 @@ export type UserRole = 'admin' | 'editor' | 'viewer'
 export interface User {
   username: string
   role: UserRole
-  passwordHash: string
-  salt: string
+  passwordHash?: string
+  salt?: string
   created: string
   updated?: string
 }
@@ -28,23 +28,24 @@ export interface AuthState {
 // Pages & Registry
 // ──────────────────────────────────────────────
 export interface PageRegistryEntry {
-  k: string           // slug key
-  l: string           // label
-  i: string           // icon (emoji)
-  id: string          // unique id for URL (pag-xxx or custom)
-  sec?: string        // section (regole, personaggio, lavori, lore, homebrew)
-  sub?: string        // subsection
-  c?: number          // custom flag (1 = custom page)
-  layout?: string     // layout key
+  k: string // slug key
+  l: string // label
+  i: string // icon (emoji)
+  id: string // unique id for URL (pag-xxx or custom)
+  sec?: string // section (regole, personaggio, lavori, lore, homebrew)
+  sub?: string // subsection
+  c?: number // custom flag (1 = custom page)
+  layout?: string // layout key
 }
 
 export interface SectionRegistryEntry {
-  v: string           // value (URL segment)
-  l: string           // label
+  v: string // value (URL segment)
+  l: string // label
 }
 
 export interface RegistryData {
   pages: PageRegistryEntry[]
+  sections?: SectionRegistryEntry[]
   ui?: UIConfig
 }
 
@@ -100,14 +101,14 @@ export type PinType = 'city' | 'village' | 'fort' | 'forest' | 'water' | 'ruin' 
 
 export interface MapPin {
   id: string
-  left: string        // percentage (e.g., "50.25%")
+  left: string // percentage (e.g., "50.25%")
   top: string
   type: PinType
   name: string
   desc: string
   explored: boolean
-  sub?: string        // sub-map key (foglia, smari)
-  pageId?: string     // linked wiki page id
+  sub?: string // sub-map key (foglia, smari)
+  pageId?: string // linked wiki page id
 }
 
 export interface MapData {
@@ -140,7 +141,7 @@ export interface CarouselSlide {
 // ──────────────────────────────────────────────
 // Covers
 // ──────────────────────────────────────────────
-export type CoversMap = Record<string, string>  // pageId -> imageUrl
+export type CoversMap = Record<string, string> // pageId -> imageUrl
 
 // ──────────────────────────────────────────────
 // UI Config (bottom nav, drawer)
@@ -151,7 +152,7 @@ export interface UIBottomNavItem {
   icon: string
   label: string
   action: UIAction
-  target?: string  // page id for 'page', URL for 'url'
+  target?: string // page id for 'page', URL for 'url'
 }
 
 export interface UIConfig {
@@ -211,8 +212,10 @@ export interface GHCommit {
 // ──────────────────────────────────────────────
 export interface DeployStatus {
   configured: boolean
-  status: 'success' | 'failure' | 'pending' | 'building'
+  status?: 'success' | 'failure' | 'pending' | 'building' | 'unknown'
   url?: string
+  created_on?: string | null
+  latest_commit?: string | null
 }
 
 // ──────────────────────────────────────────────
@@ -237,6 +240,7 @@ export interface SiteSettings {
 export interface WebhookConfig {
   webhookUrl?: string
   enabled?: boolean
+  configured?: boolean
 }
 
 export interface GhTokenStatus {

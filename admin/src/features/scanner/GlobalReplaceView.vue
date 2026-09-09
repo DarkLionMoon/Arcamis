@@ -45,7 +45,7 @@ function snippet(content: string) {
 async function doReplace() {
   const q = query.value.trim()
   if (!q) return
-  const keys = results.value.filter(r => selected.value[r.k]).map(r => r.k)
+  const keys = results.value.filter((r) => selected.value[r.k]).map((r) => r.k)
   if (!keys.length) {
     ui.toast('Nessuna pagina selezionata', 'error')
     return
@@ -78,42 +78,56 @@ async function doReplace() {
     </div>
 
     <AdminOnly>
-      <div class="arc-panel" style="margin-bottom:16px">
-        <div class="arc-form-actions" style="flex-wrap:wrap">
-          <input v-model="query" class="in" style="flex:1;min-width:200px" placeholder="Testo da cercare…"
-            @keyup.enter="search" />
-          <span style="align-self:center">→</span>
-          <input v-model="replaceText" class="in" style="flex:1;min-width:200px" placeholder="Testo sostitutivo…"
-            @keyup.enter="doReplace" />
-          <button class="btn btn-p" type="button" :disabled="searching || !query.trim()" @click="search">🔎 Cerca</button>
+      <div class="arc-panel" style="margin-bottom: 16px">
+        <div class="arc-form-actions" style="flex-wrap: wrap">
+          <input
+            v-model="query"
+            class="in"
+            style="flex: 1; min-width: 200px"
+            placeholder="Testo da cercare…"
+            @keyup.enter="search"
+          />
+          <span style="align-self: center">→</span>
+          <input
+            v-model="replaceText"
+            class="in"
+            style="flex: 1; min-width: 200px"
+            placeholder="Testo sostitutivo…"
+            @keyup.enter="doReplace"
+          />
+          <button class="btn btn-p" type="button" :disabled="searching || !query.trim()" @click="search">
+            🔎 Cerca
+          </button>
         </div>
       </div>
 
       <div v-if="searching" class="arc-empty-side">Ricerca in corso…</div>
 
       <template v-if="!searching && results.length">
-        <div class="arc-panel" style="margin-bottom:16px">
-          <div class="arc-form-actions" style="flex-wrap:wrap">
+        <div class="arc-panel" style="margin-bottom: 16px">
+          <div class="arc-form-actions" style="flex-wrap: wrap">
             <strong>{{ results.length }} pagine trovate</strong>
-            <span v-if="replacedCount" style="color:#8fceaa">→ {{ replacedCount }} sostituite</span>
-            <span style="flex:1"></span>
+            <span v-if="replacedCount" style="color: #8fceaa">→ {{ replacedCount }} sostituite</span>
+            <span style="flex: 1"></span>
             <button class="btn btn-soft btn-sm" type="button" @click="toggleAll(true)">Seleziona tutte</button>
             <button class="btn btn-soft btn-sm" type="button" @click="toggleAll(false)">Deseleziona</button>
-            <button class="btn btn-p btn-sm" type="button" :disabled="!replaceText" @click="doReplace">♻️ Sostituisci nelle selezionate</button>
+            <button class="btn btn-p btn-sm" type="button" :disabled="!replaceText" @click="doReplace">
+              ♻️ Sostituisci nelle selezionate
+            </button>
           </div>
         </div>
 
         <div class="arc-panel">
           <div v-for="r in results" :key="r.k" class="arc-changelog-item">
-            <label class="arc-toggle-line" style="margin:0">
+            <label class="arc-toggle-line" style="margin: 0">
               <input v-model="selected[r.k]" type="checkbox" />
             </label>
-            <div style="flex:1">
+            <div style="flex: 1">
               <div class="arc-changelog-head">
                 <strong>{{ r.icon }} {{ r.title }}</strong>
-                <code style="margin-left:8px;font-size:12px;opacity:.5">{{ r.k }}</code>
+                <code style="margin-left: 8px; font-size: 12px; opacity: 0.5">{{ r.k }}</code>
               </div>
-              <p style="font-size:13px;opacity:.8;margin:6px 0 0">{{ snippet(r.content) }}</p>
+              <p style="font-size: 13px; opacity: 0.8; margin: 6px 0 0">{{ snippet(r.content) }}</p>
             </div>
           </div>
         </div>

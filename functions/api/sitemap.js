@@ -5,9 +5,9 @@ export async function onRequestGet(context) {
   const token = env.GH_TOKEN;
   const base = 'https://api.github.com/repos/' + GH_REPO + '/contents/';
   const headers = {
-    'Authorization': 'token ' + token,
-    'Accept': 'application/vnd.github.v3+json',
-    'User-Agent': 'ArcamisSitemap'
+    Authorization: 'token ' + token,
+    Accept: 'application/vnd.github.v3+json',
+    'User-Agent': 'ArcamisSitemap',
   };
 
   let urls = [];
@@ -17,7 +17,7 @@ export async function onRequestGet(context) {
   urls.push({
     loc: siteBase + '/',
     changefreq: 'weekly',
-    priority: '1.0'
+    priority: '1.0',
   });
 
   try {
@@ -54,7 +54,7 @@ export async function onRequestGet(context) {
           urls.push({
             loc: siteBase + '/' + section + '/' + slug,
             changefreq,
-            priority
+            priority,
           });
         }
       }
@@ -67,7 +67,7 @@ export async function onRequestGet(context) {
   urls.push({
     loc: siteBase + '/changelog',
     changefreq: 'weekly',
-    priority: '0.5'
+    priority: '0.5',
   });
 
   // Generate XML
@@ -86,8 +86,8 @@ export async function onRequestGet(context) {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
       'Cache-Control': 'public, max-age=3600',
-      'X-Content-Type-Options': 'nosniff'
-    }
+      'X-Content-Type-Options': 'nosniff',
+    },
   });
 }
 

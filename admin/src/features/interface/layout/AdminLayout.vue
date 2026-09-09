@@ -24,24 +24,36 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
 
 const roleLabel = computed(() => {
   switch (auth.role) {
-    case 'admin': return 'Admin'
-    case 'editor': return 'Editor'
-    default: return 'Visualizzatore'
+    case 'admin':
+      return 'Admin'
+    case 'editor':
+      return 'Editor'
+    default:
+      return 'Visualizzatore'
   }
 })
 
 async function logout() {
-  try { await authApi.logout() } catch { /* best effort */ }
+  try {
+    await authApi.logout()
+  } catch {
+    /* best effort */
+  }
   auth.clearAuth()
   ui.toast('Logout effettuato', 'info')
-  router.push('/login')
+  await router.push('/login')
 }
 
 function closeSidebar() {
   sidebarOpen.value = false
 }
 
-interface NavItem { label: string; to: string; icon: string; minRole?: 'admin' | 'editor' }
+interface NavItem {
+  label: string
+  to: string
+  icon: string
+  minRole?: 'admin' | 'editor'
+}
 const groups: Array<{ title: string; items: NavItem[] }> = [
   {
     title: 'Pannello',
@@ -94,7 +106,7 @@ const groups: Array<{ title: string; items: NavItem[] }> = [
 
 function visible(items: NavItem[]) {
   if (auth.role === 'admin') return items
-  return items.filter(i => !i.minRole || auth.role === i.minRole)
+  return items.filter((i) => !i.minRole || auth.role === i.minRole)
 }
 </script>
 
@@ -113,7 +125,8 @@ function visible(items: NavItem[]) {
             class="arc-nav-link"
             active-class="active"
             @click="closeSidebar"
-          >{{ item.icon }} {{ item.label }}</router-link>
+            >{{ item.icon }} {{ item.label }}</router-link
+          >
         </template>
       </nav>
 
@@ -122,12 +135,12 @@ function visible(items: NavItem[]) {
 
     <div class="arc-main">
       <header class="arc-topbar">
-        <button class="arc-topbar-burger btn btn-soft btn-sm" type="button" @click="sidebarOpen = !sidebarOpen">☰</button>
+        <button class="arc-topbar-burger btn btn-soft btn-sm" type="button" @click="sidebarOpen = !sidebarOpen">
+          ☰
+        </button>
         <span class="arc-topbar-title">Pannello</span>
         <div class="arc-topbar-user">
-          <span class="arc-role" :class="auth.role">
-            {{ auth.user || 'admin' }} · {{ roleLabel }}
-          </span>
+          <span class="arc-role" :class="auth.role"> {{ auth.user || 'admin' }} · {{ roleLabel }} </span>
           <button class="btn btn-soft btn-sm" type="button" @click="logout">Logout</button>
         </div>
       </header>
@@ -141,12 +154,7 @@ function visible(items: NavItem[]) {
 
     <div class="arc-toasts">
       <transition-group name="arc-toast">
-        <div
-          v-for="t in ui.toasts"
-          :key="t.id"
-          class="arc-toast"
-          :class="'arc-toast--' + t.type"
-        >
+        <div v-for="t in ui.toasts" :key="t.id" class="arc-toast" :class="'arc-toast--' + t.type">
           {{ t.message }}
         </div>
       </transition-group>

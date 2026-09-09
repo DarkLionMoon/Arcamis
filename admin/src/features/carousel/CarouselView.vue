@@ -63,10 +63,10 @@ onMounted(load)
       <button class="btn btn-soft" type="button" :disabled="loading" @click="load">⟳ Aggiorna</button>
     </div>
 
-    <div class="arc-panel" style="margin-bottom:16px">
+    <div class="arc-panel" style="margin-bottom: 16px">
       <p class="arc-hint">
-        Copertine delle slide del carousel in home. Titolo, descrizione e pulsanti hanno valori di default
-        definiti nello store (slide — vedi pannello legacy per la modifica avanzata).
+        Copertine delle slide del carousel in home. Titolo, descrizione e pulsanti hanno valori di default definiti
+        nello store (slide — vedi pannello legacy per la modifica avanzata).
       </p>
     </div>
 
@@ -75,11 +75,7 @@ onMounted(load)
     <div v-else class="arc-carousel-grid">
       <div v-for="slide in carousel.slides" :key="slide.key" class="arc-card arc-carousel-card">
         <div class="arc-carousel-img">
-          <img
-            v-if="covers[slide.key]"
-            :src="covers[slide.key]"
-            :alt="slide.label"
-          />
+          <img v-if="covers[slide.key]" :src="covers[slide.key]" :alt="slide.label" />
           <span v-else class="arc-carousel-img--empty">{{ slide.defTit }}</span>
         </div>
         <div class="arc-card-label">{{ slide.label }}</div>
@@ -91,11 +87,21 @@ onMounted(load)
           <input v-model="urls[slide.key]" class="in" placeholder="/images/… o https://…" />
         </label>
         <div class="arc-form-actions">
-          <button class="btn btn-soft btn-sm" type="button" :disabled="savingKey === slide.key" @click="resetCover(slide.key)">
+          <button
+            class="btn btn-soft btn-sm"
+            type="button"
+            :disabled="savingKey === slide.key"
+            @click="resetCover(slide.key)"
+          >
             Reset
           </button>
-          <span style="flex:1"></span>
-          <button class="btn btn-p btn-sm" type="button" :disabled="savingKey === slide.key" @click="setCover(slide.key, (urls[slide.key] || '').trim())">
+          <span style="flex: 1"></span>
+          <button
+            class="btn btn-p btn-sm"
+            type="button"
+            :disabled="savingKey === slide.key"
+            @click="setCover(slide.key, (urls[slide.key] || '').trim())"
+          >
             💾 Salva copertina
           </button>
         </div>

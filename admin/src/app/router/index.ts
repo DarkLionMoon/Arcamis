@@ -1,6 +1,9 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 import AdminLayout from '@/features/interface/layout/AdminLayout.vue'
+import LoginView from '@/features/auth/LoginView.vue'
+import { useAuthStore } from '@/app/store'
+import { checkSession } from '@/shared/api'
 import DashboardView from '@/features/dashboard/DashboardView.vue'
 import MapEditorView from '@/features/map/MapEditorView.vue'
 import CarouselView from '@/features/carousel/CarouselView.vue'
@@ -20,9 +23,12 @@ import GlobalReplaceView from '@/features/scanner/GlobalReplaceView.vue'
 import OrphanMediaView from '@/features/scanner/OrphanMediaView.vue'
 import BackupView from '@/features/system/BackupView.vue'
 
+let sessionVerified = false
+
 export const router = createRouter({
   history: createWebHashHistory('/admin/app.html'),
   routes: [
+    { path: '/login', name: 'login', component: LoginView },
     {
       path: '/',
       component: AdminLayout,
@@ -48,4 +54,32 @@ export const router = createRouter({
       ]
     }
   ]
+})
+
+router.beforeEach(async (to) => {
+  const auth = useAuthStore()
+  if (to.name === 'login') {
+    if (auth.isAuthenticated && !sessionVerified) {
+      const session = await checkSession()
+      if (session?.ok && session.user && session.role) {
+        auth.setAuth(session.user, session.role, session.csrf || '')
+        sessionVerified = true
+        return { name: 'dashboard' }
+      }
+      auth.clearAuth()
+    }
+    return true
+  }
+  if (auth.isAuthenticated && sessionVerified) {
+    return true
+  }
+  const session = await checkSession()
+  if (session?.ok && session.user && session.role) {
+    auth.setAuth(session.user, session.role, session.csrf || '')
+    sessionVerified = true
+    return true
+  }
+  auth.clearAuth()
+  sessionVerified = false
+  return { name: 'login', query: { redirect: to.fullPath } }
 })

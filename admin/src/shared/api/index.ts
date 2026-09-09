@@ -54,7 +54,7 @@ function b64encode(str: string): string {
   return btoa(unescape(encodeURIComponent(str)))
 }
 
-function b64decode(str: string): string {
+export function decodeBase64Utf8(str: string): string {
   return decodeURIComponent(escape(atob(str)))
 }
 
@@ -63,14 +63,15 @@ function b64decode(str: string): string {
 // ──────────────────────────────────────────────
 export const ghApi = {
   // GET file
-  async get(path: string, ref?: string): Promise<{ content: string; sha: string }> {
-    const params = new URLSearchParams({ path })
-    if (ref) params.set('ref', ref)
-    const response = await fetch(`${API_BASE}/gh?${params}`, {
+  async get(path: string, ref?: string): Promise<{ content: string; sha: string; type?: string }> {
+    const response = await fetch(`${API_BASE}/gh`, {
+      method: 'POST',
       credentials: 'include',
-      headers: getAuthHeaders()
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ action: 'get', payload: { path, ref } })
     })
-    return handleResponse(response)
+    const result = await handleResponse<{ data: { content: string; sha: string; type?: string } }>(response)
+    return result.data
   },
 
   // PUT file (create or update)
@@ -89,7 +90,8 @@ export const ghApi = {
         payload: { path, message, content: b64encode(content), sha: sha || null }
       })
     })
-    return handleResponse(response)
+    const result = await handleResponse<{ data: { content: { sha: string } } }>(response)
+    return result.data
   },
 
   // PUT binary file (images)
@@ -104,7 +106,8 @@ export const ghApi = {
         payload: { path, message, content: match ? match[1] : dataUri, sha: null }
       })
     })
-    return handleResponse(response)
+    const result = await handleResponse<{ data: { content: { sha: string } } }>(response)
+    return result.data
   },
 
   // DELETE file
@@ -119,10 +122,7 @@ export const ghApi = {
   },
 
   // Multi-file commit
-  async commitMulti(
-    files: Array<{ path: string; content: string }>,
-    message: string
-  ): Promise<void> {
+  async commitMulti(files: Array<{ path: string; content: string | null }>, message: string): Promise<void> {
     const response = await fetch(`${API_BASE}/gh`, {
       method: 'POST',
       credentials: 'include',
@@ -137,22 +137,31 @@ export const ghApi = {
 
   // Get directory listing
   async list(path: string): Promise<GHFile[]> {
-    const response = await fetch(`${API_BASE}/gh?path=${encodeURIComponent(path)}`, {
+    const response = await fetch(`${API_BASE}/gh`, {
+      method: 'POST',
       credentials: 'include',
-      headers: getAuthHeaders()
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ action: 'get', payload: { path } })
     })
-    return handleResponse(response)
+    const result = await handleResponse<{ data: GHFile | GHFile[] }>(response)
+    return Array.isArray(result.data) ? result.data : [result.data]
   },
 
   // Get commit history
-  async commits(path: string, perPage = 25): Promise<Array<{ sha: string; commit: { author: { date: string }; message: string } }>> {
+  async commits(
+    path: string,
+    perPage = 25
+  ): Promise<Array<{ sha: string; commit: { author: { date: string }; message: string } }>> {
     const response = await fetch(`${API_BASE}/gh`, {
       method: 'POST',
       credentials: 'include',
       headers: getAuthHeaders(),
       body: JSON.stringify({ action: 'commits', payload: { path, per_page: perPage } })
     })
-    return handleResponse(response)
+    const result = await handleResponse<{
+      data: Array<{ sha: string; commit: { author: { date: string }; message: string } }>
+    }>(response)
+    return result.data
   },
 
   // CI Status
@@ -164,7 +173,8 @@ export const ghApi = {
         headers: getAuthHeaders(),
         body: JSON.stringify({ action: 'ci_status', payload: {} })
       })
-      return handleResponse(response)
+      const result = await handleResponse<{ data: DeployStatus | null }>(response)
+      return result.data
     } catch {
       return null
     }
@@ -175,7 +185,7 @@ export const ghApi = {
 // Auth API
 // ──────────────────────────────────────────────
 export const authApi = {
-  async login(username: string, password: string, remember = false): Promise<{ role: UserRole }> {
+  async login(username: string, password: string, remember = false): Promise<{ role: UserRole; csrf: string }> {
     const response = await fetch(`${API_BASE}/admin?action=login`, {
       method: 'POST',
       credentials: 'include',
@@ -186,13 +196,15 @@ export const authApi = {
   },
 
   async logout(): Promise<void> {
-    await fetch(`${API_BASE}/admin?action=logout`, {
+    const response = await fetch(`${API_BASE}/admin?action=logout`, {
       method: 'POST',
-      credentials: 'include'
+      credentials: 'include',
+      headers: getAuthHeaders()
     })
+    await handleResponse(response)
   },
 
-  async getCsrf(): Promise<{ token: string }> {
+  async getCsrf(): Promise<{ csrf: string }> {
     const response = await fetch(`${API_BASE}/admin?action=get_csrf`, {
       credentials: 'include'
     })
@@ -203,7 +215,8 @@ export const authApi = {
     const response = await fetch(`${API_BASE}/admin?action=get_users`, {
       credentials: 'include'
     })
-    return handleResponse(response)
+    const result = await handleResponse<{ users: User[] }>(response)
+    return result.users || []
   },
 
   async saveUsers(users: User[]): Promise<void> {
@@ -223,26 +236,16 @@ export const authApi = {
 export const pagesApi = {
   async get(key: string): Promise<PageContent> {
     const data = await ghApi.get(`${CONTENT_PATH}/${key}.json`)
-    return JSON.parse(b64decode(data.content))
+    return JSON.parse(decodeBase64Utf8(data.content))
   },
 
   async save(page: PageContent, message: string): Promise<{ sha: string }> {
-    const result = await ghApi.put(
-      `${CONTENT_PATH}/${page.k}.json`,
-      message,
-      JSON.stringify(page, null, 2),
-      page.sha
-    )
+    const result = await ghApi.put(`${CONTENT_PATH}/${page.k}.json`, message, JSON.stringify(page, null, 2), page.sha)
     return { sha: result.content.sha }
   },
 
   async create(page: PageContent, message: string): Promise<{ sha: string }> {
-    const result = await ghApi.put(
-      `${CONTENT_PATH}/${page.k}.json`,
-      message,
-      JSON.stringify(page, null, 2),
-      null
-    )
+    const result = await ghApi.put(`${CONTENT_PATH}/${page.k}.json`, message, JSON.stringify(page, null, 2), null)
     return { sha: result.content.sha }
   },
 
@@ -254,13 +257,15 @@ export const pagesApi = {
     return ghApi.list(CONTENT_PATH)
   },
 
-  async getHistory(key: string): Promise<Array<{ sha: string; commit: { author: { date: string }; message: string } }>> {
+  async getHistory(
+    key: string
+  ): Promise<Array<{ sha: string; commit: { author: { date: string }; message: string } }>> {
     return ghApi.commits(`${CONTENT_PATH}/${key}.json`)
   },
 
   async getAt(key: string, ref: string): Promise<PageContent> {
     const data = await ghApi.get(`${CONTENT_PATH}/${key}.json`, ref)
-    return JSON.parse(b64decode(data.content))
+    return JSON.parse(decodeBase64Utf8(data.content))
   }
 }
 
@@ -270,7 +275,12 @@ export const pagesApi = {
 export const registryApi = {
   async get(): Promise<{ pages: any[]; sections?: any[]; ui?: any; sitemap?: any; sha?: string }> {
     const data = await ghApi.get('content/pages/registry.json')
-    const parsed = JSON.parse(b64decode(data.content)) as { pages: any[]; sections?: any[]; ui?: any; sitemap?: any }
+    const parsed = JSON.parse(decodeBase64Utf8(data.content)) as {
+      pages: any[]
+      sections?: any[]
+      ui?: any
+      sitemap?: any
+    }
     return { ...parsed, sha: data.sha }
   },
 
@@ -295,7 +305,7 @@ export const mapApi = {
   async get(): Promise<MapData> {
     try {
       const data = await ghApi.get('content/mappins.json')
-      return JSON.parse(b64decode(data.content))
+      return JSON.parse(decodeBase64Utf8(data.content))
     } catch {
       return { mapImage: '/mappa.webp', pins: [] }
     }
@@ -308,12 +318,7 @@ export const mapApi = {
     } catch {
       /* file non ancora esistente */
     }
-    const result = await ghApi.put(
-      'content/mappins.json',
-      message,
-      JSON.stringify(data, null, 2) + '\n',
-      sha
-    )
+    const result = await ghApi.put('content/mappins.json', message, JSON.stringify(data, null, 2) + '\n', sha)
     return { sha: result.content.sha }
   }
 }
@@ -326,7 +331,8 @@ export const carouselApi = {
     const response = await fetch(`${API_BASE}/admin?action=get_covers`, {
       credentials: 'include'
     })
-    return handleResponse(response)
+    const result = await handleResponse<{ covers: Record<string, string> }>(response)
+    return result.covers || {}
   },
 
   async saveCover(key: string, value: string): Promise<boolean> {
@@ -362,7 +368,8 @@ export const analyticsApi = {
     const response = await fetch(`${API_BASE}/admin?action=get_analytics`, {
       credentials: 'include'
     })
-    return handleResponse(response)
+    const result = await handleResponse<{ total: number; pages: AnalyticsData['pages'] }>(response)
+    return { ...result, series: [] }
   },
 
   async getTimeSeries(days = 30): Promise<{ series: Array<{ date: string; views: number }> }> {
@@ -425,11 +432,12 @@ export const deployApi = {
   },
 
   async trigger(): Promise<void> {
-    await fetch(`${API_BASE}/deploy`, {
+    const response = await fetch(`${API_BASE}/deploy`, {
       method: 'POST',
       credentials: 'include',
       headers: getAuthHeaders()
     })
+    await handleResponse(response)
   }
 }
 
@@ -474,7 +482,7 @@ export const layoutsApi = {
   async get(): Promise<Record<string, any>> {
     try {
       const data = await ghApi.get('content/layouts/registry.json')
-      return JSON.parse(b64decode(data.content))
+      return JSON.parse(decodeBase64Utf8(data.content))
     } catch {
       return {}
     }
@@ -524,7 +532,7 @@ export async function uploadImage(dataUri: string, filename: string): Promise<st
 // ──────────────────────────────────────────────
 // Session Check API
 // ──────────────────────────────────────────────
-export async function checkSession(): Promise<{ user: string; role: UserRole } | null> {
+export async function checkSession(): Promise<{ ok: boolean; user?: string; role?: UserRole; csrf?: string } | null> {
   try {
     const response = await fetch(`${API_BASE}/admin?action=check`, {
       credentials: 'include'
@@ -561,7 +569,8 @@ export const settingsApi = {
     const response = await fetch(`${API_BASE}/admin?action=get_webhook`, {
       credentials: 'include'
     })
-    return handleResponse(response)
+    const result = await handleResponse<{ configured?: boolean; enabled?: boolean; url?: string }>(response)
+    return { webhookUrl: result.url, enabled: result.enabled }
   },
 
   async setWebhook(webhookUrl: string, enabled: boolean): Promise<void> {
@@ -610,8 +619,8 @@ export const trashApi = {
     const response = await fetch(`${API_BASE}/admin?action=list_trash`, {
       credentials: 'include'
     })
-    const json = await handleResponse<{ trash: TrashItem[] }>(response)
-    return json.trash || []
+    const json = await handleResponse<{ items: TrashItem[] }>(response)
+    return json.items || []
   },
 
   async restore(pageKey: string): Promise<void> {
@@ -650,7 +659,7 @@ export const scannerApi = {
     const response = await fetch(`${API_BASE}/admin?action=find_orphan_media`, {
       credentials: 'include'
     })
-    return handleResponse(response)
+    return handleResponse<{ orphans: OrphanMediaItem[] }>(response)
   },
 
   async deleteOrphanMedia(filenames: string[]): Promise<void> {

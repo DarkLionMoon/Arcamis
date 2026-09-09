@@ -13,7 +13,11 @@ const loading = ref(true)
 const saving = ref(false)
 const webhookSaving = ref(false)
 const tokenSaving = ref(false)
-const tokenStatus = reactive<{ configured: boolean; ok: boolean; message: string }>({ configured: false, ok: false, message: '' })
+const tokenStatus = reactive<{ configured: boolean; ok: boolean; message: string }>({
+  configured: false,
+  ok: false,
+  message: ''
+})
 
 const settings = reactive<SiteSettings>({
   banner_enabled: false,
@@ -85,7 +89,7 @@ async function testWebhook() {
   testResult.value = null
   try {
     const r = await settingsApi.testWebhook()
-    testResult.value = r.ok ? 'Test inviato con successo' : (r.message || 'Test fallito')
+    testResult.value = r.ok ? 'Test inviato con successo' : r.message || 'Test fallito'
   } catch (e) {
     testResult.value = 'Errore: ' + (e instanceof Error ? e.message : String(e))
   } finally {
@@ -153,85 +157,98 @@ onMounted(load)
     </div>
 
     <AdminOnly>
-    <div v-if="loading" class="arc-empty-side">Caricamento…</div>
+      <div v-if="loading" class="arc-empty-side">Caricamento…</div>
 
-    <div class="arc-settings-grid">
-      <div class="arc-panel">
-        <h3 class="arc-panel-title">Banner e disclaimer</h3>
-        <label class="arc-toggle-line">
-          <input v-model="settings.banner_enabled" type="checkbox" /> Banner abilitato
-        </label>
-        <label class="arc-fld">
-          <span>Testo banner</span>
-          <textarea v-model="settings.banner_text" class="in" rows="2" placeholder="Annuncio in alto…"></textarea>
-        </label>
-        <label class="arc-toggle-line">
-          <input v-model="settings.disclaimer_enabled" type="checkbox" /> Disclaimer abilitato
-        </label>
-        <label class="arc-fld">
-          <span>Testo disclaimer</span>
-          <textarea v-model="settings.disclaimer_text" class="in" rows="2" placeholder="Disclaimer…"></textarea>
-        </label>
-        <div class="arc-form-actions">
-          <span style="flex:1"></span>
-          <button class="btn btn-p btn-sm" type="button" :disabled="saving" @click="saveSettings">💾 Salva</button>
+      <div class="arc-settings-grid">
+        <div class="arc-panel">
+          <h3 class="arc-panel-title">Banner e disclaimer</h3>
+          <label class="arc-toggle-line">
+            <input v-model="settings.banner_enabled" type="checkbox" /> Banner abilitato
+          </label>
+          <label class="arc-fld">
+            <span>Testo banner</span>
+            <textarea v-model="settings.banner_text" class="in" rows="2" placeholder="Annuncio in alto…"></textarea>
+          </label>
+          <label class="arc-toggle-line">
+            <input v-model="settings.disclaimer_enabled" type="checkbox" /> Disclaimer abilitato
+          </label>
+          <label class="arc-fld">
+            <span>Testo disclaimer</span>
+            <textarea v-model="settings.disclaimer_text" class="in" rows="2" placeholder="Disclaimer…"></textarea>
+          </label>
+          <div class="arc-form-actions">
+            <span style="flex: 1"></span>
+            <button class="btn btn-p btn-sm" type="button" :disabled="saving" @click="saveSettings">💾 Salva</button>
+          </div>
+        </div>
+
+        <div class="arc-panel">
+          <h3 class="arc-panel-title">Webhook Discord</h3>
+          <label class="arc-fld">
+            <span>URL</span>
+            <input v-model="webhook.url" class="in" placeholder="https://discord.com/api/webhooks/…" />
+          </label>
+          <label class="arc-toggle-line"> <input v-model="webhook.enabled" type="checkbox" /> Abilitato </label>
+          <div class="arc-form-actions">
+            <button class="btn btn-soft btn-sm" type="button" :disabled="webhookSaving" @click="testWebhook">
+              Prova
+            </button>
+            <span v-if="testResult" style="font-size: 12px; opacity: 0.8">{{ testResult }}</span>
+            <span style="flex: 1"></span>
+            <button class="btn btn-p btn-sm" type="button" :disabled="webhookSaving" @click="saveWebhook">
+              💾 Salva
+            </button>
+          </div>
+        </div>
+
+        <div class="arc-panel">
+          <h3 class="arc-panel-title">Token GitHub</h3>
+          <p class="arc-hint">
+            Stato:
+            <span :style="{ color: tokenStatus.ok ? '#8fceaa' : '#e28383' }">
+              {{
+                tokenStatus.configured
+                  ? tokenStatus.ok
+                    ? 'configurato e valido'
+                    : 'configurato ma non valido'
+                  : 'non configurato'
+              }}
+            </span>
+            <template v-if="tokenStatus.message"> — {{ tokenStatus.message }}</template>
+          </p>
+          <label class="arc-fld">
+            <span>Nuovo token (PAT con diritti sul repo)</span>
+            <input v-model="newToken" type="password" class="in" placeholder="ghp_…" />
+          </label>
+          <div class="arc-form-actions">
+            <span style="flex: 1"></span>
+            <button class="btn btn-p btn-sm" type="button" :disabled="tokenSaving" @click="saveToken">
+              💾 Imposta
+            </button>
+          </div>
+        </div>
+
+        <div class="arc-panel">
+          <h3 class="arc-panel-title">Sezioni del registro</h3>
+          <div class="arc-form-actions" style="flex-wrap: wrap; margin-bottom: 10px">
+            <span v-for="s in registry.sections" :key="s.v" class="arc-chip">
+              {{ s.l }} <code>{{ s.v }}</code>
+              <button class="arc-chip-x" type="button" @click="removeSection(s.v)">✕</button>
+            </span>
+          </div>
+          <div class="arc-form-actions">
+            <input v-model="newSection.v" class="in" style="max-width: 120px" placeholder="chiave" />
+            <input v-model="newSection.l" class="in" style="flex: 1" placeholder="etichetta" />
+            <button class="btn btn-soft btn-sm" type="button" @click="addSection">+</button>
+          </div>
+          <div class="arc-form-actions" style="margin-top: 10px">
+            <span style="flex: 1"></span>
+            <button class="btn btn-p btn-sm" type="button" :disabled="saving" @click="saveSections">
+              💾 Salva sezioni
+            </button>
+          </div>
         </div>
       </div>
-
-      <div class="arc-panel">
-        <h3 class="arc-panel-title">Webhook Discord</h3>
-        <label class="arc-fld">
-          <span>URL</span>
-          <input v-model="webhook.url" class="in" placeholder="https://discord.com/api/webhooks/…" />
-        </label>
-        <label class="arc-toggle-line">
-          <input v-model="webhook.enabled" type="checkbox" /> Abilitato
-        </label>
-        <div class="arc-form-actions">
-          <button class="btn btn-soft btn-sm" type="button" :disabled="webhookSaving" @click="testWebhook">Prova</button>
-          <span v-if="testResult" style="font-size:12px;opacity:.8">{{ testResult }}</span>
-          <span style="flex:1"></span>
-          <button class="btn btn-p btn-sm" type="button" :disabled="webhookSaving" @click="saveWebhook">💾 Salva</button>
-        </div>
-      </div>
-
-      <div class="arc-panel">
-        <h3 class="arc-panel-title">Token GitHub</h3>
-        <p class="arc-hint">
-          Stato: <span :style="{ color: tokenStatus.ok ? '#8fceaa' : '#e28383' }">
-            {{ tokenStatus.configured ? (tokenStatus.ok ? 'configurato e valido' : 'configurato ma non valido') : 'non configurato' }}
-          </span>
-          <template v-if="tokenStatus.message"> — {{ tokenStatus.message }}</template>
-        </p>
-        <label class="arc-fld">
-          <span>Nuovo token (PAT con diritti sul repo)</span>
-          <input v-model="newToken" type="password" class="in" placeholder="ghp_…" />
-        </label>
-        <div class="arc-form-actions">
-          <span style="flex:1"></span>
-          <button class="btn btn-p btn-sm" type="button" :disabled="tokenSaving" @click="saveToken">💾 Imposta</button>
-        </div>
-      </div>
-
-      <div class="arc-panel">
-        <h3 class="arc-panel-title">Sezioni del registro</h3>
-        <div class="arc-form-actions" style="flex-wrap:wrap;margin-bottom:10px">
-          <span v-for="s in registry.sections" :key="s.v" class="arc-chip">
-            {{ s.l }} <code>{{ s.v }}</code>
-            <button class="arc-chip-x" type="button" @click="removeSection(s.v)">✕</button>
-          </span>
-        </div>
-        <div class="arc-form-actions">
-          <input v-model="newSection.v" class="in" style="max-width:120px" placeholder="chiave" />
-          <input v-model="newSection.l" class="in" style="flex:1" placeholder="etichetta" />
-          <button class="btn btn-soft btn-sm" type="button" @click="addSection">+</button>
-        </div>
-        <div class="arc-form-actions" style="margin-top:10px">
-          <span style="flex:1"></span>
-          <button class="btn btn-p btn-sm" type="button" :disabled="saving" @click="saveSections">💾 Salva sezioni</button>
-        </div>
-      </div>
-    </div>
     </AdminOnly>
   </section>
 </template>

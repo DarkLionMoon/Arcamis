@@ -13,6 +13,15 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure'
   },
+  webServer: process.env.PLAYWRIGHT_BASE_URL
+    ? undefined
+    : {
+        command:
+          'cd .. && npm run build && npm --prefix admin run build && rm -rf dist/admin && cp -R export/admin dist/admin && npx vite preview --host 0.0.0.0 --port 4173',
+        url: 'http://localhost:4173',
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000
+      },
   projects: [
     {
       name: 'chromium',

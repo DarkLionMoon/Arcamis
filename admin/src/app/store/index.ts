@@ -41,6 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = u
     role.value = r
     csrfToken.value = token
+    if (typeof sessionStorage === 'undefined') return
     sessionStorage.setItem('arcadmin', '1')
     sessionStorage.setItem('arcadmin_user', u)
     sessionStorage.setItem('arcadmin_role', r)
@@ -50,12 +51,14 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     role.value = 'viewer'
     csrfToken.value = null
+    if (typeof sessionStorage === 'undefined') return
     sessionStorage.removeItem('arcadmin')
     sessionStorage.removeItem('arcadmin_user')
     sessionStorage.removeItem('arcadmin_role')
   }
 
   function restoreFromSession() {
+    if (typeof sessionStorage === 'undefined') return
     if (sessionStorage.getItem('arcadmin') === '1') {
       const u = sessionStorage.getItem('arcadmin_user')
       const r = sessionStorage.getItem('arcadmin_role') as UserRole
@@ -104,19 +107,19 @@ export const useRegistryStore = defineStore('registry', () => {
 
   const pagesByKey = computed(() => {
     const map = new Map<string, PageRegistryEntry>()
-    pages.value.forEach(p => map.set(p.k, p))
+    pages.value.forEach((p) => map.set(p.k, p))
     return map
   })
 
   const pagesById = computed(() => {
     const map = new Map<string, PageRegistryEntry>()
-    pages.value.forEach(p => map.set(p.id, p))
+    pages.value.forEach((p) => map.set(p.id, p))
     return map
   })
 
   const sectionsByValue = computed(() => {
     const map = new Map<string, SectionRegistryEntry>()
-    sections.value.forEach(s => map.set(s.v, s))
+    sections.value.forEach((s) => map.set(s.v, s))
     return map
   })
 
@@ -127,7 +130,7 @@ export const useRegistryStore = defineStore('registry', () => {
   }
 
   function updatePage(key: string, updates: Partial<PageRegistryEntry>) {
-    const idx = pages.value.findIndex(p => p.k === key)
+    const idx = pages.value.findIndex((p) => p.k === key)
     if (idx !== -1) {
       pages.value[idx] = { ...pages.value[idx], ...updates }
     }
@@ -138,7 +141,7 @@ export const useRegistryStore = defineStore('registry', () => {
   }
 
   function removePage(key: string) {
-    pages.value = pages.value.filter(p => p.k !== key)
+    pages.value = pages.value.filter((p) => p.k !== key)
   }
 
   function reorderPages(fromIndex: number, toIndex: number) {
@@ -147,7 +150,7 @@ export const useRegistryStore = defineStore('registry', () => {
   }
 
   function updateSection(value: string, updates: Partial<SectionRegistryEntry>) {
-    const idx = sections.value.findIndex(s => s.v === value)
+    const idx = sections.value.findIndex((s) => s.v === value)
     if (idx !== -1) {
       sections.value[idx] = { ...sections.value[idx], ...updates }
     }
@@ -158,7 +161,7 @@ export const useRegistryStore = defineStore('registry', () => {
   }
 
   function removeSection(value: string) {
-    sections.value = sections.value.filter(s => s.v !== value)
+    sections.value = sections.value.filter((s) => s.v !== value)
   }
 
   function setUIConfig(config: UIConfig) {
@@ -287,11 +290,11 @@ export const useMapStore = defineStore('map', () => {
   ] as const
 
   function typeColor(type: string) {
-    return pinTypes.find(t => t.v === type)?.c || 'rgba(200,155,60,.9)'
+    return pinTypes.find((t) => t.v === type)?.c || 'rgba(200,155,60,.9)'
   }
 
   function typeLabel(type: string) {
-    return pinTypes.find(t => t.v === type)?.l || type
+    return pinTypes.find((t) => t.v === type)?.l || type
   }
 
   function setMapData(data: MapData) {
@@ -367,14 +370,16 @@ export const useCarouselStore = defineStore('carousel', () => {
       image: '',
       tag: 'Città Portuale — Marche di Arcamis',
       title: 'ARCAMIS',
-      description: 'Città portuale delle Marche di Arcamis, porta d\'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.',
+      description:
+        "Città portuale delle Marche di Arcamis, porta d'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.",
       buttons: [
         { label: 'Entra nel Discord', href: 'https://discord.gg/JZPnXZbXEJ' },
         { label: 'Scopri la città ↓', href: '' }
       ],
       defTag: 'Città Portuale — Marche di Arcamis',
       defTit: 'ARCAMIS',
-      defDesc: 'Città portuale delle Marche di Arcamis, porta d\'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.',
+      defDesc:
+        "Città portuale delle Marche di Arcamis, porta d'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.",
       defBtns: [
         { label: 'Entra nel Discord', href: 'https://discord.gg/JZPnXZbXEJ' },
         { label: 'Scopri la città ↓', href: '' }
@@ -386,16 +391,13 @@ export const useCarouselStore = defineStore('carousel', () => {
       image: '',
       tag: 'Pantheon di Arcamis',
       title: 'LE DIVINITÀ DI ARCAMIS',
-      description: 'Ogni dio ha lasciato il proprio segno sulla terra. Scopri il Pantheon e i culti che plasmano il mondo.',
-      buttons: [
-        { label: 'Scopri il Pantheon →', href: '' }
-      ],
+      description:
+        'Ogni dio ha lasciato il proprio segno sulla terra. Scopri il Pantheon e i culti che plasmano il mondo.',
+      buttons: [{ label: 'Scopri il Pantheon →', href: '' }],
       defTag: 'Pantheon di Arcamis',
       defTit: 'LE DIVINITÀ DI ARCAMIS',
       defDesc: 'Ogni dio ha lasciato il proprio segno sulla terra. Scopri il Pantheon e i culti che plasmano il mondo.',
-      defBtns: [
-        { label: 'Scopri il Pantheon →', href: '' }
-      ]
+      defBtns: [{ label: 'Scopri il Pantheon →', href: '' }]
     },
     {
       key: 'carousel_2',
@@ -404,15 +406,11 @@ export const useCarouselStore = defineStore('carousel', () => {
       tag: 'Crea il tuo eroe',
       title: 'CREA IL TUO PERSONAGGIO',
       description: 'Scegli la tua classe, forgia la tua storia. Il tuo personaggio esiste solo su Arcamis.',
-      buttons: [
-        { label: 'Come si inizia →', href: '' }
-      ],
+      buttons: [{ label: 'Come si inizia →', href: '' }],
       defTag: 'Crea il tuo eroe',
       defTit: 'CREA IL TUO PERSONAGGIO',
       defDesc: 'Scegli la tua classe, forgia la tua storia. Il tuo personaggio esiste solo su Arcamis.',
-      defBtns: [
-        { label: 'Come si inizia →', href: '' }
-      ]
+      defBtns: [{ label: 'Come si inizia →', href: '' }]
     }
   ])
   const loading = ref(false)
@@ -422,14 +420,14 @@ export const useCarouselStore = defineStore('carousel', () => {
   }
 
   function updateSlide(key: string, updates: Partial<CarouselSlide>) {
-    const idx = slides.value.findIndex(s => s.key === key)
+    const idx = slides.value.findIndex((s) => s.key === key)
     if (idx !== -1) {
       slides.value[idx] = { ...slides.value[idx], ...updates }
     }
   }
 
   function clear() {
-    slides.value = slides.value.map(s => ({
+    slides.value = slides.value.map((s) => ({
       ...s,
       image: '',
       tag: s.defTag,
@@ -487,7 +485,19 @@ export const useCoversStore = defineStore('covers', () => {
 export const useUIStore = defineStore('ui', () => {
   const sidebarOpen = ref(false)
   const mobileSidebarOpen = ref(false)
-  const activeView = ref<'dashboard' | 'page' | 'map' | 'carousel' | 'covers' | 'navigation' | 'interface' | 'settings' | 'users' | 'audit' | 'media'>('dashboard')
+  const activeView = ref<
+    | 'dashboard'
+    | 'page'
+    | 'map'
+    | 'carousel'
+    | 'covers'
+    | 'navigation'
+    | 'interface'
+    | 'settings'
+    | 'users'
+    | 'audit'
+    | 'media'
+  >('dashboard')
   const status = ref<'idle' | 'saving' | 'ok' | 'err'>('idle')
   const statusLabel = ref('pronto')
 
@@ -503,13 +513,25 @@ export const useUIStore = defineStore('ui', () => {
   // Modals
   const modals = ref<Record<string, boolean>>({})
 
-  function showSidebar() { sidebarOpen.value = true }
-  function hideSidebar() { sidebarOpen.value = false }
-  function toggleSidebar() { sidebarOpen.value = !sidebarOpen.value }
+  function showSidebar() {
+    sidebarOpen.value = true
+  }
+  function hideSidebar() {
+    sidebarOpen.value = false
+  }
+  function toggleSidebar() {
+    sidebarOpen.value = !sidebarOpen.value
+  }
 
-  function showMobileSidebar() { mobileSidebarOpen.value = true }
-  function hideMobileSidebar() { mobileSidebarOpen.value = false }
-  function toggleMobileSidebar() { mobileSidebarOpen.value = !mobileSidebarOpen.value }
+  function showMobileSidebar() {
+    mobileSidebarOpen.value = true
+  }
+  function hideMobileSidebar() {
+    mobileSidebarOpen.value = false
+  }
+  function toggleMobileSidebar() {
+    mobileSidebarOpen.value = !mobileSidebarOpen.value
+  }
 
   function setActiveView(view: typeof activeView.value) {
     activeView.value = view
@@ -526,7 +548,7 @@ export const useUIStore = defineStore('ui', () => {
     const id = ++toastId
     toasts.value.push({ id, message, type })
     setTimeout(() => {
-      toasts.value = toasts.value.filter(t => t.id !== id)
+      toasts.value = toasts.value.filter((t) => t.id !== id)
     }, 4000)
   }
 

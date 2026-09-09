@@ -7,15 +7,15 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "eslint src --ext .ts,.vue",
-    "lint:fix": "eslint src --ext .ts,.vue --fix",
-    "format": "prettier --write \"src/**/*.{ts,vue,css,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,vue,css,json}\"",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.{ts,vue,css,json}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"src/**/*.{ts,vue,css,json}\" --ignore-path .prettierignore",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:ui": "vitest --ui",
-    "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test": "vitest run --config vitest.config.ts",
+    "test:ui": "vitest --ui --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "test:e2e": "playwright test --config playwright.config.ts"
   },
   "dependencies": {
     "pinia": "^2.1.7",

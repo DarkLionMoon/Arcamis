@@ -28,7 +28,7 @@ const editForm = reactive({
 })
 
 const selected = computed<MapPin | null>(() => {
-  return selectedIndex.value === null ? null : map.pins[selectedIndex.value] ?? null
+  return selectedIndex.value === null ? null : (map.pins[selectedIndex.value] ?? null)
 })
 
 async function load() {
@@ -47,7 +47,10 @@ async function load() {
 onMounted(load)
 
 /* ── click sulla mappa → nuova puntina ── */
-interface Point { x: number; y: number }
+interface Point {
+  x: number
+  y: number
+}
 function toPercent(e: PointerEvent | MouseEvent): Point | null {
   const el = container.value
   if (!el) return null
@@ -102,8 +105,14 @@ function onPinPointerMove(e: PointerEvent) {
   if (!p) return
   const pin = map.pins[dragIndex]
   if (!pin) return
-  const left = Math.max(0, Math.min(100, p.x - (dragOffsetX / (container.value?.getBoundingClientRect().width ?? 1)) * 100))
-  const top = Math.max(0, Math.min(100, p.y - (dragOffsetY / (container.value?.getBoundingClientRect().height ?? 1)) * 100))
+  const left = Math.max(
+    0,
+    Math.min(100, p.x - (dragOffsetX / (container.value?.getBoundingClientRect().width ?? 1)) * 100)
+  )
+  const top = Math.max(
+    0,
+    Math.min(100, p.y - (dragOffsetY / (container.value?.getBoundingClientRect().height ?? 1)) * 100)
+  )
   pin.left = left.toFixed(2) + '%'
   pin.top = top.toFixed(2) + '%'
 }
@@ -192,28 +201,23 @@ async function save() {
     <div class="arc-head-row">
       <h1 class="arc-page-title">Editor Mappa</h1>
       <div class="arc-head-actions">
-        <button v-if="dirty" class="btn btn-p" type="button" :disabled="saving" @click="save">
-          💾 Salva
-        </button>
+        <button v-if="dirty" class="btn btn-p" type="button" :disabled="saving" @click="save">💾 Salva</button>
         <button class="btn btn-soft" type="button" @click="load">⟳ Aggiorna</button>
       </div>
     </div>
 
     <div class="arc-panel arc-map-panel">
       <div class="arc-form-row">
-        <input v-model="mapUrl" class="in" style="flex:1" placeholder="/mappa.webp" />
+        <input v-model="mapUrl" class="in" style="flex: 1" placeholder="/mappa.webp" />
         <button class="btn btn-soft btn-sm" type="button" @click="applyMapUrl">Applica URL</button>
       </div>
-      <p class="arc-hint">Clicca sulla mappa per aggiungere una puntina. Trascina per spostare. Click su una puntina per editarla.</p>
+      <p class="arc-hint">
+        Clicca sulla mappa per aggiungere una puntina. Trascina per spostare. Click su una puntina per editarla.
+      </p>
     </div>
 
     <div class="arc-map-wrap">
-      <div
-        ref="container"
-        class="arc-map-canvas"
-        :class="{ 'arc-map-canvas--dirty': dirty }"
-        @click="onMapClick"
-      >
+      <div ref="container" class="arc-map-canvas" :class="{ 'arc-map-canvas--dirty': dirty }" @click="onMapClick">
         <img v-if="map.mapImage" :src="map.mapImage" alt="Mappa" class="arc-map-img" draggable="false" />
         <div class="arc-map-loading" v-if="loading">Caricamento…</div>
 
@@ -252,7 +256,7 @@ async function save() {
           </div>
           <label class="arc-fld">
             <span>Descrizione</span>
-            <textarea v-model="editForm.desc" class="in" rows="2" style="resize:vertical"></textarea>
+            <textarea v-model="editForm.desc" class="in" rows="2" style="resize: vertical"></textarea>
           </label>
           <div class="arc-form-grid">
             <label class="arc-fld">
@@ -280,7 +284,7 @@ async function save() {
           </label>
           <div class="arc-form-actions">
             <button class="btn btn-d btn-sm" type="button" @click="deletePin">🗑 Elimina</button>
-            <span style="flex:1"></span>
+            <span style="flex: 1"></span>
             <button class="btn btn-soft btn-sm" type="button" @click="closeEdit">Chiudi</button>
             <button class="btn btn-p btn-sm" type="button" @click="savePin">Salva</button>
           </div>

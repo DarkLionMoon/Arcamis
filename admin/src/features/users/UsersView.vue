@@ -30,7 +30,7 @@ async function load() {
   loading.value = true
   try {
     const list = await authApi.getUsers()
-    users.value = list.map(u => ({ ...u }))
+    users.value = list.map((u) => ({ ...u }))
     dirty.value = false
   } catch (e) {
     ui.toast('Errore caricamento utenti: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -44,7 +44,7 @@ function markDirty() {
 }
 
 function setRole(username: string, role: UserRole) {
-  const u = users.value.find(x => x.username === username)
+  const u = users.value.find((x) => x.username === username)
   if (u) {
     u.role = role
     u.updated = new Date().toISOString()
@@ -53,7 +53,7 @@ function setRole(username: string, role: UserRole) {
 }
 
 async function setPassword(username: string) {
-  const u = users.value.find(x => x.username === username)
+  const u = users.value.find((x) => x.username === username)
   const pw = (passwordField[username] || '').trim()
   if (!u) return
   if (!pw) {
@@ -80,7 +80,7 @@ async function addUser() {
     ui.toast('Username e password obbligatori', 'error')
     return
   }
-  if (users.value.some(u => u.username === username)) {
+  if (users.value.some((u) => u.username === username)) {
     ui.toast('Utente già esistente', 'error')
     return
   }
@@ -105,11 +105,11 @@ async function addUser() {
 
 function removeUser(username: string) {
   if (username === 'admin') {
-    ui.toast('L\'utente admin non può essere eliminato', 'error')
+    ui.toast("L'utente admin non può essere eliminato", 'error')
     return
   }
-  if (!confirm('Eliminare l\'utente ' + username + '?')) return
-  users.value = users.value.filter(u => u.username !== username)
+  if (!confirm("Eliminare l'utente " + username + '?')) return
+  users.value = users.value.filter((u) => u.username !== username)
   markDirty()
   ui.toast('Utente eliminato — ricorda di salvare', 'success')
 }
@@ -143,9 +143,9 @@ onMounted(load)
     <div class="arc-alert" v-if="!auth.isAdmin">Solo gli amministratori gestiscono gli utenti.</div>
 
     <template v-if="auth.isAdmin">
-      <div class="arc-panel" style="margin-bottom:16px">
+      <div class="arc-panel" style="margin-bottom: 16px">
         <h3 class="arc-panel-title">Nuovo utente</h3>
-        <div class="arc-form-grid" style="grid-template-columns:1fr 1fr 1fr auto">
+        <div class="arc-form-grid" style="grid-template-columns: 1fr 1fr 1fr auto">
           <label class="arc-fld">
             <span>Username</span>
             <input v-model="newUser.username" class="in" placeholder="nome" />
@@ -162,7 +162,7 @@ onMounted(load)
               <option value="viewer">Viewer</option>
             </select>
           </label>
-          <button class="btn btn-p" type="button" style="align-self:end" @click="addUser">+ Aggiungi</button>
+          <button class="btn btn-p" type="button" style="align-self: end" @click="addUser">+ Aggiungi</button>
         </div>
       </div>
 
@@ -186,15 +186,25 @@ onMounted(load)
             <tr v-for="u in users" :key="u.username">
               <td>{{ u.username }}</td>
               <td>
-                <select class="in" :value="u.role" @change="setRole(u.username, ($event.target as HTMLSelectElement).value as UserRole)">
+                <select
+                  class="in"
+                  :value="u.role"
+                  @change="setRole(u.username, ($event.target as HTMLSelectElement).value as UserRole)"
+                >
                   <option value="editor">Editor</option>
                   <option value="admin">Admin</option>
                   <option value="viewer">Viewer</option>
                 </select>
               </td>
               <td>
-                <div style="display:flex;gap:6px">
-                  <input v-model="passwordField[u.username]" type="password" class="in" style="flex:1;min-width:90px" placeholder="nuova password" />
+                <div style="display: flex; gap: 6px">
+                  <input
+                    v-model="passwordField[u.username]"
+                    type="password"
+                    class="in"
+                    style="flex: 1; min-width: 90px"
+                    placeholder="nuova password"
+                  />
                   <button class="btn btn-soft btn-sm" type="button" @click="setPassword(u.username)">Imposta</button>
                 </div>
               </td>
@@ -203,7 +213,14 @@ onMounted(load)
               <td v-if="u.updated">{{ new Date(u.updated).toLocaleDateString() }}</td>
               <td v-else>—</td>
               <td>
-                <button v-if="u.username !== 'admin'" class="btn btn-d btn-sm" type="button" @click="removeUser(u.username)">🗑</button>
+                <button
+                  v-if="u.username !== 'admin'"
+                  class="btn btn-d btn-sm"
+                  type="button"
+                  @click="removeUser(u.username)"
+                >
+                  🗑
+                </button>
               </td>
             </tr>
           </tbody>

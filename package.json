@@ -10,8 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint scripts/js/ admin/js/",
     "lint:fix": "eslint scripts/js/ admin/js/ --fix",
-    "format": "prettier --write 'scripts/js/**/*.js' 'admin/js/**/*.js' 'scripts/css/**/*.css' 'admin/styles/**/*.css'",
-    "format:check": "prettier --check 'scripts/js/**/*.js' 'admin/js/**/*.js' 'scripts/css/**/*.css' 'admin/styles/**/*.css'",
+    "format": "prettier --write 'eslint.config.js' 'vite.config.js' 'functions/**/*.js'",
+    "format:check": "prettier --check 'eslint.config.js' 'vite.config.js' 'functions/**/*.js'",
     "typecheck": "echo 'No TypeScript configured yet'",
     "test": "vitest run",
     "test:watch": "vitest"

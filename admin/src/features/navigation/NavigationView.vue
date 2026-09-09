@@ -17,11 +17,11 @@ const newSection = reactive({ v: '', l: '' })
 const editForm = reactive<{ l: string; i: string; id: string; sec: string }>({ l: '', i: '', id: '', sec: '' })
 
 function seclabel(sec: string) {
-  const s = registry.sections.find(x => x.v === sec)
+  const s = registry.sections.find((x) => x.v === sec)
   return s ? `${s.l} (${s.v})` : 'Senza sezione'
 }
 
-const sectionLabel = (v: string) => registry.sections.find(x => x.v === v)?.l || v
+const sectionLabel = (v: string) => registry.sections.find((x) => x.v === v)?.l || v
 
 const grouped = computed(() => {
   const g = new Map<string, PageRegistryEntry[]>()
@@ -51,16 +51,16 @@ async function load() {
 
 /* Move a page one position up/down within its own group */
 function move(key: string, dir: number) {
-  const idx = registry.pages.findIndex(p => p.k === key)
+  const idx = registry.pages.findIndex((p) => p.k === key)
   if (idx < 0) return
   const sec = registry.pages[idx].sec || ''
-  const same = registry.pages.map((p, i) => ({ p, i })).filter(x => (x.p.sec || '') === sec)
-  const fromIdx = same.findIndex(x => x.p.k === key)
+  const same = registry.pages.map((p, i) => ({ p, i })).filter((x) => (x.p.sec || '') === sec)
+  const fromIdx = same.findIndex((x) => x.p.k === key)
   const toIdx = fromIdx + dir
   if (toIdx < 0 || toIdx >= same.length) return
   const targetKey = same[toIdx].p.k
-  const fromReal = registry.pages.findIndex(p => p.k === key)
-  const toReal = registry.pages.findIndex(p => p.k === targetKey)
+  const fromReal = registry.pages.findIndex((p) => p.k === key)
+  const toReal = registry.pages.findIndex((p) => p.k === targetKey)
   const [m] = registry.pages.splice(fromReal, 1)
   registry.pages.splice(toReal, 0, m)
 }
@@ -98,7 +98,7 @@ function addSection() {
     ui.toast('Chiave e etichetta sezione obbligatorie', 'error')
     return
   }
-  if (registry.sections.some(s => s.v === v)) {
+  if (registry.sections.some((s) => s.v === v)) {
     ui.toast('Sezione già esistente', 'error')
     return
   }
@@ -140,51 +140,60 @@ onMounted(load)
     </div>
 
     <AdminOnly>
-      <div class="arc-panel" style="margin-bottom:16px">
-      <h3 class="arc-panel-title">Sezioni</h3>
-      <div class="arc-form-actions" style="flex-wrap:wrap">
-        <span v-for="s in registry.sections" :key="s.v" class="arc-chip">
-          {{ s.l }} <code>{{ s.v }}</code>
-          <button class="arc-chip-x" type="button" title="Elimina sezione" @click="removeSection(s.v)">✕</button>
-        </span>
-        <input v-model="newSection.v" class="in" style="max-width:140px" placeholder="chiave" />
-        <input v-model="newSection.l" class="in" style="max-width:160px" placeholder="etichetta" />
-        <button class="btn btn-soft btn-sm" type="button" @click="addSection">+ Sezione</button>
-      </div>
-    </div>
-
-    <div v-if="loading" class="arc-empty-side">Caricamento…</div>
-
-    <div v-for="[sec, pages] in grouped" :key="sec || '__'" class="arc-panel" style="margin-bottom:16px">
-      <h3 class="arc-panel-title">📁 {{ seclabel(sec) }} <span style="opacity:.5">({{ pages.length }})</span></h3>
-      <div class="arc-navlist">
-        <div v-for="(p, idx) in pages" :key="p.k" class="arc-navrow">
-          <div class="arc-navrow-move">
-            <button class="btn btn-soft btn-sm" type="button" :disabled="idx === 0" @click="move(p.k, -1)">↑</button>
-            <button class="btn btn-soft btn-sm" type="button" :disabled="idx === pages.length - 1" @click="move(p.k, 1)">↓</button>
-          </div>
-          <template v-if="editingKey === p.k">
-            <input v-model="editForm.l" class="in" style="max-width:220px" placeholder="etichetta" />
-            <input v-model="editForm.i" class="in" style="max-width:70px" placeholder="📄" />
-            <input v-model="editForm.id" class="in" style="max-width:180px" placeholder="pag-xxx" />
-            <select v-model="editForm.sec" class="in" style="max-width:160px">
-              <option value="">— nessuna —</option>
-              <option v-for="s in registry.sections" :key="s.v" :value="s.v">{{ s.l }}</option>
-            </select>
-            <button class="btn btn-p btn-sm" type="button" @click="applyEdit">OK</button>
-            <button class="btn btn-soft btn-sm" type="button" @click="editingKey = null">✕</button>
-          </template>
-          <template v-else>
-            <span class="arc-navrow-icon">{{ p.i || '📄' }}</span>
-            <span class="arc-navrow-label">{{ p.l || p.k }}</span>
-            <code style="font-size:12px;opacity:.5">{{ p.k }}</code>
-            <span style="flex:1"></span>
-            <button class="btn btn-soft btn-sm" type="button" @click="startEdit(p)">✏️</button>
-            <button class="btn btn-d btn-sm" type="button" @click="removePage(p)">🗑</button>
-          </template>
+      <div class="arc-panel" style="margin-bottom: 16px">
+        <h3 class="arc-panel-title">Sezioni</h3>
+        <div class="arc-form-actions" style="flex-wrap: wrap">
+          <span v-for="s in registry.sections" :key="s.v" class="arc-chip">
+            {{ s.l }} <code>{{ s.v }}</code>
+            <button class="arc-chip-x" type="button" title="Elimina sezione" @click="removeSection(s.v)">✕</button>
+          </span>
+          <input v-model="newSection.v" class="in" style="max-width: 140px" placeholder="chiave" />
+          <input v-model="newSection.l" class="in" style="max-width: 160px" placeholder="etichetta" />
+          <button class="btn btn-soft btn-sm" type="button" @click="addSection">+ Sezione</button>
         </div>
       </div>
-    </div>
+
+      <div v-if="loading" class="arc-empty-side">Caricamento…</div>
+
+      <div v-for="[sec, pages] in grouped" :key="sec || '__'" class="arc-panel" style="margin-bottom: 16px">
+        <h3 class="arc-panel-title">
+          📁 {{ seclabel(sec) }} <span style="opacity: 0.5">({{ pages.length }})</span>
+        </h3>
+        <div class="arc-navlist">
+          <div v-for="(p, idx) in pages" :key="p.k" class="arc-navrow">
+            <div class="arc-navrow-move">
+              <button class="btn btn-soft btn-sm" type="button" :disabled="idx === 0" @click="move(p.k, -1)">↑</button>
+              <button
+                class="btn btn-soft btn-sm"
+                type="button"
+                :disabled="idx === pages.length - 1"
+                @click="move(p.k, 1)"
+              >
+                ↓
+              </button>
+            </div>
+            <template v-if="editingKey === p.k">
+              <input v-model="editForm.l" class="in" style="max-width: 220px" placeholder="etichetta" />
+              <input v-model="editForm.i" class="in" style="max-width: 70px" placeholder="📄" />
+              <input v-model="editForm.id" class="in" style="max-width: 180px" placeholder="pag-xxx" />
+              <select v-model="editForm.sec" class="in" style="max-width: 160px">
+                <option value="">— nessuna —</option>
+                <option v-for="s in registry.sections" :key="s.v" :value="s.v">{{ s.l }}</option>
+              </select>
+              <button class="btn btn-p btn-sm" type="button" @click="applyEdit">OK</button>
+              <button class="btn btn-soft btn-sm" type="button" @click="editingKey = null">✕</button>
+            </template>
+            <template v-else>
+              <span class="arc-navrow-icon">{{ p.i || '📄' }}</span>
+              <span class="arc-navrow-label">{{ p.l || p.k }}</span>
+              <code style="font-size: 12px; opacity: 0.5">{{ p.k }}</code>
+              <span style="flex: 1"></span>
+              <button class="btn btn-soft btn-sm" type="button" @click="startEdit(p)">✏️</button>
+              <button class="btn btn-d btn-sm" type="button" @click="removePage(p)">🗑</button>
+            </template>
+          </div>
+        </div>
+      </div>
     </AdminOnly>
   </section>
 </template>

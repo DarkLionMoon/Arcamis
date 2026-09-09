@@ -99,14 +99,14 @@ function warnUnsaved(e: BeforeUnloadEvent) {
   <section class="arc-page-editor">
     <template v-if="editor.currentPage">
       <div class="arc-head-row">
-        <div style="display:flex;align-items:center;gap:12px;min-width:0">
+        <div style="display: flex; align-items: center; gap: 12px; min-width: 0">
           <button class="btn btn-soft btn-sm" type="button" @click="backToList">← Pagine</button>
-          <h1 class="arc-page-title" style="margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          <h1 class="arc-page-title" style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
             {{ editor.currentPage.icon || '📄' }} {{ editor.currentPage.title || editor.currentPage.k }}
           </h1>
         </div>
         <div class="arc-head-actions">
-          <span style="font-size:12px;opacity:.6">
+          <span style="font-size: 12px; opacity: 0.6">
             {{ editor.modified ? '● modifiche non salvate' : lastSavedAt ? 'salvato' : '' }}
           </span>
           <button class="btn btn-soft btn-sm" type="button" @click="editor.toggleStructuredMode()">
@@ -116,7 +116,7 @@ function warnUnsaved(e: BeforeUnloadEvent) {
         </div>
       </div>
 
-      <div v-if="editor.structuredMode" class="arc-panel" style="margin-bottom:16px">
+      <div v-if="editor.structuredMode" class="arc-panel" style="margin-bottom: 16px">
         <p class="arc-hint">Editor strutturato (yaml front matter + blocchi). Campo di contenuto sotto.</p>
         <CodeMirrorEditor
           :model-value="editor.currentPage.content"
@@ -130,10 +130,10 @@ function warnUnsaved(e: BeforeUnloadEvent) {
       </div>
 
       <div v-else class="arc-editor-grid">
-        <div class="arc-panel" style="display:flex;flex-direction:column">
-          <div class="arc-form-actions" style="margin-bottom:8px">
+        <div class="arc-panel" style="display: flex; flex-direction: column">
+          <div class="arc-form-actions" style="margin-bottom: 8px">
             <button
-              v-for="m in (['md','split','pv'] as const)"
+              v-for="m in ['md', 'split', 'pv'] as const"
               :key="m"
               class="btn btn-sm"
               :class="editor.viewMode === m ? 'btn-p' : 'btn-soft'"
@@ -142,8 +142,8 @@ function warnUnsaved(e: BeforeUnloadEvent) {
             >
               {{ m === 'md' ? 'Markdown' : m === 'split' ? 'Split' : 'Anteprima' }}
             </button>
-            <span style="flex:1"></span>
-            <label style="font-size:12px;opacity:.7;display:flex;align-items:center;gap:4px">
+            <span style="flex: 1"></span>
+            <label style="font-size: 12px; opacity: 0.7; display: flex; align-items: center; gap: 4px">
               <input v-model="editor.autosaveEnabled" type="checkbox" @change="ensureAutosave" /> autosave
             </label>
           </div>

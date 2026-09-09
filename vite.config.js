@@ -1,7 +1,46 @@
 import { defineConfig } from 'vite';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const projectRoot = process.cwd();
+
+function copyStaticAssets() {
+  const directories = ['scripts/js', 'content', 'images', 'audio', 'imprese-standalone'];
+  const files = ['sw.js', 'robots.txt', 'sitemap.xml', 'cover.webp', 'mappa.webp', 'Artboard_1.png'];
+
+  function emitTree(pluginContext, relativeDir) {
+    const absoluteDir = path.join(projectRoot, relativeDir);
+    if (!fs.existsSync(absoluteDir)) return;
+
+    for (const entry of fs.readdirSync(absoluteDir, { withFileTypes: true })) {
+      const relativePath = path.join(relativeDir, entry.name);
+      if (entry.isDirectory()) emitTree(pluginContext, relativePath);
+      else
+        pluginContext.emitFile({
+          type: 'asset',
+          fileName: relativePath.replaceAll(path.sep, '/'),
+          source: fs.readFileSync(path.join(projectRoot, relativePath)),
+        });
+    }
+  }
+
+  return {
+    name: 'copy-static-assets',
+    generateBundle() {
+      for (const directory of directories) emitTree(this, directory);
+      for (const file of files) {
+        const absoluteFile = path.join(projectRoot, file);
+        if (fs.existsSync(absoluteFile)) {
+          this.emitFile({ type: 'asset', fileName: file, source: fs.readFileSync(absoluteFile) });
+        }
+      }
+    },
+  };
+}
 
 export default defineConfig({
   root: '.',
+  plugins: [copyStaticAssets()],
   build: {
     outDir: 'dist',
     emptyOutDir: true,

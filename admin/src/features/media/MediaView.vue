@@ -16,7 +16,7 @@ const uploadingName = ref('')
 const filtered = computed(() => {
   const q = filter.value.trim().toLowerCase()
   if (!q) return items.value
-  return items.value.filter(f => (f.name || '').toLowerCase().includes(q) || (f.path || '').toLowerCase().includes(q))
+  return items.value.filter((f) => (f.name || '').toLowerCase().includes(q) || (f.path || '').toLowerCase().includes(q))
 })
 
 const sorted = computed(() => {
@@ -27,7 +27,7 @@ async function load() {
   loading.value = true
   try {
     const list = await ghApi.list('images')
-    items.value = list.filter(f => f.type === 'file')
+    items.value = list.filter((f) => f.type === 'file')
   } catch (e) {
     ui.toast('Errore caricamento media: ' + (e instanceof Error ? e.message : String(e)), 'error')
   } finally {
@@ -48,7 +48,8 @@ async function upload() {
       uploadingName.value = file.name
       try {
         const dataUri = await compressImage(file)
-        const name = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.[a-zA-Z0-9]+$/, '') + '-' + Date.now() + '.webp'
+        const name =
+          file.name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.[a-zA-Z0-9]+$/, '') + '-' + Date.now() + '.webp'
         await uploadImage(dataUri, name)
         ui.toast('Caricata: ' + name, 'success')
       } catch (e) {
@@ -66,7 +67,7 @@ async function removeFile(f: GHFile) {
   if (!confirm(`Eliminare "${f.name}" dal repo?`)) return
   try {
     await ghApi.delete(f.path, `admin: delete media ${f.name}`, f.sha)
-    items.value = items.value.filter(x => x.path !== f.path)
+    items.value = items.value.filter((x) => x.path !== f.path)
     ui.toast('Eliminata', 'success')
   } catch (e) {
     ui.toast('Errore: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -90,8 +91,8 @@ onMounted(load)
       </div>
     </div>
 
-    <div class="arc-panel" style="margin-bottom:16px">
-      <input v-model="filter" class="in" style="width:100%" placeholder="🔎 Cerca immagine…" />
+    <div class="arc-panel" style="margin-bottom: 16px">
+      <input v-model="filter" class="in" style="width: 100%" placeholder="🔎 Cerca immagine…" />
     </div>
 
     <div v-if="loading || uploading" class="arc-empty-side">
@@ -106,8 +107,10 @@ onMounted(load)
           </a>
         </div>
         <div class="arc-media-name" :title="f.path">{{ f.name }}</div>
-        <div style="font-size:11px;opacity:.55">{{ (f.size / 1024).toFixed(1) }} kB</div>
-        <button class="btn btn-d btn-sm" type="button" style="width:100%;margin-top:8px" @click="removeFile(f)">🗑 Elimina</button>
+        <div style="font-size: 11px; opacity: 0.55">{{ (f.size / 1024).toFixed(1) }} kB</div>
+        <button class="btn btn-d btn-sm" type="button" style="width: 100%; margin-top: 8px" @click="removeFile(f)">
+          🗑 Elimina
+        </button>
       </div>
     </div>
 

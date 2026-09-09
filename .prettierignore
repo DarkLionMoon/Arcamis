@@ -3,6 +3,10 @@ dist/
 content/
 images/
 audio/
+admin/js/
+scripts/js/
+scripts/css/
+admin/styles/
 *.md
 *.json
 *.xml

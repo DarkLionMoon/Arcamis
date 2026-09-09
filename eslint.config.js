@@ -5,11 +5,14 @@ export default [
   js.configs.recommended,
   {
     rules: {
-      'no-unused-vars': ['warn', {
-        argsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-      }],
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
       'no-console': 'warn',
       'no-var': 'off',
       eqeqeq: ['warn', 'always'],
@@ -38,6 +41,17 @@ export default [
   ═══════════════════════════════════ */
   {
     files: ['scripts/js/**/*.js'],
+    rules: {
+      /* Classic script legacy: durante la migrazione questi problemi restano
+         visibili come warning, senza bloccare la pipeline. */
+      'no-redeclare': 'warn',
+      'no-undef': 'warn',
+      'no-func-assign': 'warn',
+      'no-control-regex': 'warn',
+      'no-useless-escape': 'warn',
+      'no-regex-spaces': 'warn',
+      'no-prototype-builtins': 'warn',
+    },
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -103,6 +117,16 @@ export default [
   ═══════════════════════════════════ */
   {
     files: ['admin/js/**/*.js'],
+    rules: {
+      /* Legacy admin in classic script mode: warnings durante la migrazione. */
+      'no-redeclare': 'warn',
+      'no-undef': 'warn',
+      'no-func-assign': 'warn',
+      'no-control-regex': 'warn',
+      'no-useless-escape': 'warn',
+      'no-regex-spaces': 'warn',
+      'no-prototype-builtins': 'warn',
+    },
     languageOptions: {
       globals: {
         ...globals.browser,

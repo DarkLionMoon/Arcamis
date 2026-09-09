@@ -360,13 +360,3 @@ function _uiPrevReload() {
     }, 80);
   }
 }
-function _uiPrevReload() {
-  var f = document.getElementById('ui-preview-frame');
-  if (f) {
-    var src = f.src;
-    f.src = 'about:blank';
-    setTimeout(function () {
-      f.src = src;
-    }, 80);
-  }
-}

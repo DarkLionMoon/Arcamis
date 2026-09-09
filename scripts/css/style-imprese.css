@@ -3,6 +3,24 @@
    Sezione dedicata, coerente col sito
    ════════════════════════════════════ */
 
+/* The complete standalone application is embedded for CSS/JS isolation. */
+.imprese-embedded {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  background: transparent;
+}
+.imprese-frame {
+  display: block;
+  width: 100%;
+  min-height: 78rem;
+  border: 0;
+  background: #0a0a14;
+}
+@media (max-width: 700px) {
+  .imprese-frame { min-height: 100rem; }
+}
+
 .imprese-app {
   --imp-font: 'Crimson Pro', serif;
   --imp-font-heading: 'Cinzel', serif;

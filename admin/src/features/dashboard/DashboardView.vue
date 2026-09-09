@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
-import { analyticsApi, deployApi, ghApi } from '@/shared/api'
+import { analyticsApi, decodeBase64Utf8, deployApi, ghApi } from '@/shared/api'
 import { useAnalyticsStore, useDeployStore, useRegistryStore, useUIStore } from '@/app/store'
 import type { RegistryData } from '@/types'
 
@@ -18,12 +18,12 @@ async function loadDashboard() {
     const [a, d, reg] = await Promise.all([
       analyticsApi.getAnalytics(),
       deployApi.getStatus(),
-      ghApi.get('content/registry.json')
+      ghApi.get('content/pages/registry.json')
     ])
     analytics.setData(a)
     deploy.setStatus(d)
-    const parsed = JSON.parse(reg.content) as RegistryData
-    registry.setRegistry(parsed.pages, (parsed.pages ?? []).length ? [] : [], parsed.ui)
+    const parsed = JSON.parse(decodeBase64Utf8(reg.content)) as RegistryData
+    registry.setRegistry(parsed.pages, parsed.sections || [], parsed.ui)
     pageCount.value = parsed.pages?.length ?? 0
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
@@ -64,7 +64,10 @@ onMounted(loadDashboard)
       <h2 class="arc-panel-title">Pagine più viste</h2>
       <table class="arc-table">
         <thead>
-          <tr><th>Pagina</th><th>Visualizzazioni</th></tr>
+          <tr>
+            <th>Pagina</th>
+            <th>Visualizzazioni</th>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="p in analytics.data.pages.slice(0, 10)" :key="p.pageKey">

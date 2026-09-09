@@ -54,7 +54,7 @@ watch(q, () => {
     searchApi
       .searchContent(term)
       .catch(() => [])
-      .then(res => {
+      .then((res) => {
         fullText.value = res
         searching.value = false
       })
@@ -63,7 +63,7 @@ watch(q, () => {
 
 watch(
   () => props.open,
-  open => {
+  (open) => {
     if (open) {
       q.value = ''
       fullText.value = []
@@ -129,9 +129,9 @@ onBeforeUnmount(() => {
           <span class="arc-search-hit-kind">{{ h.kind === 'content' ? 'contenuto' : 'pagina' }}</span>
         </button>
 
-        <div v-if="searching" class="arc-empty-side" style="padding:16px">Ricerca…</div>
-        <div v-else-if="q && !hits.length" class="arc-empty-side" style="padding:16px">Nessun risultato.</div>
-        <div v-else-if="!q" class="arc-empty-side" style="padding:16px;opacity:.4">
+        <div v-if="searching" class="arc-empty-side" style="padding: 16px">Ricerca…</div>
+        <div v-else-if="q && !hits.length" class="arc-empty-side" style="padding: 16px">Nessun risultato.</div>
+        <div v-else-if="!q" class="arc-empty-side" style="padding: 16px; opacity: 0.4">
           Premi ↑/↓ per navigare, Invio per aprire l'editor.
         </div>
       </div>

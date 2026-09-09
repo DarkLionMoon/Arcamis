@@ -480,8 +480,11 @@ async function _gpRender(id, label, icon) {
             _localHtml = _renderSchede(_localJson.content);
           else if (_layout === 'wide') {
             _localHtml = _mdToHtml(_localJson.content);
-          }           else if (_layout === 'imprese') {
-            _localHtml = '<div class="imprese-app" id="imprese-app-root"></div>';
+          } else if (_layout === 'imprese') {
+            _localHtml =
+              '<div class="imprese-app imprese-embedded" id="imprese-app-root">' +
+              '<iframe class="imprese-frame" src="/imprese-standalone/index.html" title="Imprese e Licenze" loading="lazy"></iframe>' +
+              '</div>';
           } else {
             /* Auto-detect by page key (legacy fallback) */
             _localHtml =
@@ -540,11 +543,6 @@ async function _gpRender(id, label, icon) {
           }
           applyGlossary(pbody);
           _maybeBuildToc(pbody, !!_localJson.toc);
-          /* Imprese: init sezione dedicata */
-          if (_layout === 'imprese' && typeof window._impreseInit === 'function') {
-            var _impRoot = document.getElementById('imprese-app-root');
-            if (_impRoot) window._impreseInit(_impRoot);
-          }
           if (typeof afterPageRender === 'function') afterPageRender();
           return;
         }
@@ -562,9 +560,9 @@ async function _gpRender(id, label, icon) {
   phEyebrow.textContent = 'Archivi di Arcamis';
   document.title = (label || 'Pagina') + ' — Arcamis';
   phCrumb.innerHTML = buildCrumb(label || 'Pagina');
-  var acc = iconAccent(icon || '📄');
-  phHero.style.setProperty('--ph-acc', acc.c);
-  phHero.style.setProperty('--ph-accbg', acc.bg);
+  var placeholderAccent = iconAccent(icon || '📄');
+  phHero.style.setProperty('--ph-acc', placeholderAccent.c);
+  phHero.style.setProperty('--ph-accbg', placeholderAccent.bg);
   phCovbg.style.backgroundImage = '';
   phOverlay.style.opacity = '0';
   phIcon.style.opacity = '0.06';

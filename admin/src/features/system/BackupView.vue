@@ -38,15 +38,17 @@ async function createBackup() {
     </div>
 
     <AdminOnly>
-      <div class="arc-panel" style="max-width:520px">
-      <p class="arc-hint">Scarica un JSON con tutti i contenuti delle pagine dal repository. Il download parte immediatamente.</p>
-      <div class="arc-form-actions" style="margin-top:16px">
-        <button class="btn btn-p" type="button" :disabled="loading" @click="createBackup">
-          {{ loading ? 'Creazione in corso…' : '⬇ Scarica backup' }}
-        </button>
+      <div class="arc-panel" style="max-width: 520px">
+        <p class="arc-hint">
+          Scarica un JSON con tutti i contenuti delle pagine dal repository. Il download parte immediatamente.
+        </p>
+        <div class="arc-form-actions" style="margin-top: 16px">
+          <button class="btn btn-p" type="button" :disabled="loading" @click="createBackup">
+            {{ loading ? 'Creazione in corso…' : '⬇ Scarica backup' }}
+          </button>
+        </div>
+        <p v-if="count" style="font-size: 12px; opacity: 0.6; margin-top: 8px">{{ count }} pagine incluse.</p>
       </div>
-      <p v-if="count" style="font-size:12px;opacity:.6;margin-top:8px">{{ count }} pagine incluse.</p>
-    </div>
     </AdminOnly>
   </section>
 </template>

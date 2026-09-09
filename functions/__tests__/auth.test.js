@@ -7,7 +7,7 @@ import {
   verifyPassword,
   genToken,
   parseCookie,
-  rateLimitCheck
+  rateLimitCheck,
 } from '../api/_lib/auth.js';
 
 describe('constantTimeEqual', () => {
@@ -128,8 +128,12 @@ describe('rateLimitCheck', () => {
   const makeKV = () => {
     const map = new Map();
     return {
-      async get(key) { return map.has(key) ? map.get(key) : null; },
-      async put(key, value) { map.set(key, value); }
+      async get(key) {
+        return map.has(key) ? map.get(key) : null;
+      },
+      async put(key, value) {
+        map.set(key, value);
+      },
     };
   };
 

@@ -19,7 +19,7 @@ export default defineConfig({
         manualChunks: {
           'vendor-vue': ['vue', 'vue-router', 'pinia'],
           'vendor-codemirror': ['@codemirror/view', '@codemirror/state', '@codemirror/lang-markdown'],
-          'vendor-zod': ['zod'],
+          'vendor-zod': ['zod']
         }
       }
     }
@@ -44,9 +44,7 @@ export default defineConfig({
         theme_color: '#080a0e',
         background_color: '#0b0e14',
         display: 'standalone',
-        icons: [
-          { src: '/Artboard_1.png', sizes: '512x512', type: 'image/png' }
-        ]
+        icons: [{ src: '/Artboard_1.png', sizes: '512x512', type: 'image/png' }]
       }
     })
   ],

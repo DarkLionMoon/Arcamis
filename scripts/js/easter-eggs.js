@@ -407,11 +407,11 @@
 
     /* Sprite per ogni faccia */
     var sprites = [];
-    for (var i = 0; i < 20; i++) {
-      var fc = faceCentroids[i],
-        fn = faceNormals[i];
+    for (var faceIndex = 0; faceIndex < 20; faceIndex++) {
+      var fc = faceCentroids[faceIndex],
+        fn = faceNormals[faceIndex];
       var sm = new THREE.SpriteMaterial({
-        map: _makeNumTex(THREE, i + 1),
+        map: _makeNumTex(THREE, faceIndex + 1),
         transparent: true,
         opacity: 0,
         depthTest: false,

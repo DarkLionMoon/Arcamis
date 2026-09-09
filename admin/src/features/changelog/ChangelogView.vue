@@ -113,32 +113,40 @@ onMounted(load)
 
     <div v-if="loading" class="arc-empty-side">Caricamento…</div>
 
-    <div v-if="adding || editingIdx !== null" class="arc-panel" style="margin-bottom:16px">
+    <div v-if="adding || editingIdx !== null" class="arc-panel" style="margin-bottom: 16px">
       <h3 class="arc-panel-title">{{ adding ? 'Nuova entry' : 'Modifica entry' }}</h3>
       <div class="arc-form-grid">
         <label class="arc-fld"><span>Versione</span><input v-model="form.versione" class="in" placeholder="1" /></label>
-        <label class="arc-fld"><span>Sottoversione</span><input v-model="form.sottoversione" class="in" placeholder="2" /></label>
+        <label class="arc-fld"
+          ><span>Sottoversione</span><input v-model="form.sottoversione" class="in" placeholder="2"
+        /></label>
         <label class="arc-fld"><span>Patch</span><input v-model="form.patch" class="in" placeholder="0" /></label>
         <label class="arc-fld"><span>Data</span><input v-model="form.date" type="date" class="in" /></label>
-        <label class="arc-fld" style="grid-column:1 / -1"><span>Titolo</span><input v-model="form.title" class="in" /></label>
-        <label class="arc-fld" style="grid-column:1 / -1"><span>Contenuto (markdown)</span><textarea v-model="form.content" class="in" rows="6"></textarea></label>
+        <label class="arc-fld" style="grid-column: 1 / -1"
+          ><span>Titolo</span><input v-model="form.title" class="in"
+        /></label>
+        <label class="arc-fld" style="grid-column: 1 / -1"
+          ><span>Contenuto (markdown)</span><textarea v-model="form.content" class="in" rows="6"></textarea>
+        </label>
       </div>
       <div class="arc-form-actions">
         <button class="btn btn-soft btn-sm" type="button" @click="cancelEdit">Annulla</button>
-        <span style="flex:1"></span>
+        <span style="flex: 1"></span>
         <button class="btn btn-p btn-sm" type="button" @click="applyForm">OK</button>
       </div>
     </div>
 
     <div class="arc-panel">
       <div v-for="(e, idx) in entries" :key="versionLabel(e) + idx" class="arc-changelog-item">
-        <div style="flex:1">
+        <div style="flex: 1">
           <div class="arc-changelog-head">
             <strong>{{ versionLabel(e) }}</strong>
-            <span v-if="e.title" style="margin-left:8px">{{ e.title }}</span>
-            <span style="margin-left:auto;font-size:12px;opacity:.5">{{ e.date || '' }}</span>
+            <span v-if="e.title" style="margin-left: 8px">{{ e.title }}</span>
+            <span style="margin-left: auto; font-size: 12px; opacity: 0.5">{{ e.date || '' }}</span>
           </div>
-          <p v-if="e.content" style="font-size:13px;opacity:.8;white-space:pre-wrap;margin:6px 0 0">{{ e.content }}</p>
+          <p v-if="e.content" style="font-size: 13px; opacity: 0.8; white-space: pre-wrap; margin: 6px 0 0">
+            {{ e.content }}
+          </p>
         </div>
         <div class="arc-form-actions">
           <button class="btn btn-soft btn-sm" type="button" @click="startEdit(idx)">✏️</button>

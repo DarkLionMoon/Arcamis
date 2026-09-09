@@ -137,10 +137,10 @@
     var id = SEC[v] && SEC[v].dd ? SEC[v].dd : 'dd-' + v;
     var dd = document.getElementById(id);
     if (dd) {
-      var t = dd.querySelector(':scope > .tn');
-      if (t) t.textContent = label;
-      var lbl = dd.querySelector('.tn-menu-label');
-      if (lbl) lbl.textContent = label;
+      var existingTitle = dd.querySelector(':scope > .tn');
+      if (existingTitle) existingTitle.textContent = label;
+      var existingLabel = dd.querySelector('.tn-menu-label');
+      if (existingLabel) existingLabel.textContent = label;
       return dd.querySelector('.tn-menu');
     }
     var nav = document.getElementById('tnav');
@@ -149,22 +149,22 @@
     dd.className = 'tn-drop';
     dd.id = id;
     dd.setAttribute('role', 'menu');
-    var t = document.createElement('div');
-    t.className = 'tn';
-    t.setAttribute('role', 'menuitem');
-    t.setAttribute('aria-expanded', 'false');
-    t.setAttribute('tabindex', '0');
-    t.textContent = label;
-    t.onclick = function (e) {
+    var title = document.createElement('div');
+    title.className = 'tn';
+    title.setAttribute('role', 'menuitem');
+    title.setAttribute('aria-expanded', 'false');
+    title.setAttribute('tabindex', '0');
+    title.textContent = label;
+    title.onclick = function (e) {
       toggleDd(id, e);
     };
     var menu = document.createElement('div');
     menu.className = 'tn-menu';
-    var lbl = document.createElement('div');
-    lbl.className = 'tn-menu-label';
-    lbl.textContent = label;
-    menu.appendChild(lbl);
-    dd.appendChild(t);
+    var menuLabel = document.createElement('div');
+    menuLabel.className = 'tn-menu-label';
+    menuLabel.textContent = label;
+    menu.appendChild(menuLabel);
+    dd.appendChild(title);
     dd.appendChild(menu);
     nav.appendChild(dd);
     return menu;
@@ -180,8 +180,8 @@
       mnEl = document.getElementById('mn-sec-' + v);
     }
     if (mnEl) {
-      var lbl = mnEl.querySelector('.mn-label');
-      if (lbl) lbl.textContent = label;
+      var existingLabel = mnEl.querySelector('.mn-label');
+      if (existingLabel) existingLabel.textContent = label;
       return mnEl;
     }
     var drawer = document.getElementById('mobile-nav');
@@ -189,10 +189,10 @@
     mnEl = document.createElement('div');
     mnEl.className = 'mn-section';
     mnEl.id = 'mn-sec-' + v;
-    var lbl = document.createElement('div');
-    lbl.className = 'mn-label';
-    lbl.textContent = label;
-    mnEl.appendChild(lbl);
+    var menuLabel = document.createElement('div');
+    menuLabel.className = 'mn-label';
+    menuLabel.textContent = label;
+    mnEl.appendChild(menuLabel);
     var discord = drawer.querySelector('a.mn-discord');
     if (discord) drawer.insertBefore(mnEl, discord);
     else drawer.appendChild(mnEl);

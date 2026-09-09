@@ -20,6 +20,26 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
 
+  admin:
+    name: Admin typecheck, tests & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
   test:
     name: Tests
     runs-on: ubuntu-latest
@@ -31,11 +51,12 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: python3 scripts/sync-registry.py --check
 
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [lint, test]
+    needs: [lint, test, admin]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

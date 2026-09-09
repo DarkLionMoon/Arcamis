@@ -1,8 +1,16 @@
 export async function onRequest(context) {
   const { request, env } = context;
+  const requestOrigin = new URL(request.url).origin;
+  const allowedOrigin =
+    requestOrigin === 'https://arcamis.pages.dev' || requestOrigin === 'http://localhost:5173'
+      ? requestOrigin
+      : 'https://arcamis.pages.dev';
   const cors = {
-    'Access-Control-Allow-Origin': 'https://arcamis.pages.dev',
-    'Content-Type': 'application/json'
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json',
+    Vary: 'Origin',
   };
 
   if (request.method === 'OPTIONS') {
@@ -27,19 +35,24 @@ export async function onRequest(context) {
       const raw = await KV.get(rlKey);
       const count = raw ? parseInt(raw, 10) : 0;
       if (count >= 3) {
-        return new Response(JSON.stringify({ error: 'Hai già inviato più messaggi. Riprova più tardi.' }), { status: 429, headers: cors });
+        return new Response(JSON.stringify({ error: 'Hai già inviato più messaggi. Riprova più tardi.' }), {
+          status: 429,
+          headers: cors,
+        });
       }
       await KV.put(rlKey, String(count + 1), { expirationTtl: 3600 });
     } catch (_) {}
   }
 
   let body;
-  try { body = await request.json(); } catch (e) {
+  try {
+    body = await request.json();
+  } catch (e) {
     return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
   }
 
-  const name = (body.name || '').trim().slice(0, 60);
-  const msg = (body.message || '').trim().slice(0, 500);
+  const name = typeof body.name === 'string' ? body.name.trim().slice(0, 60) : '';
+  const msg = typeof body.message === 'string' ? body.message.trim().slice(0, 500) : '';
   if (!msg) {
     return new Response(JSON.stringify({ error: 'Messaggio mancante' }), { status: 400, headers: cors });
   }
@@ -51,17 +64,19 @@ export async function onRequest(context) {
       body: JSON.stringify({
         username: 'Oracolo di Arcamis',
         avatar_url: 'https://arcamis.pages.dev/favicon.png',
-        embeds: [{
-          title: 'Messaggio al DM',
-          color: 0xC89B3C,
-          fields: [
-            { name: 'Mittente', value: name || '(anonimo)', inline: true },
-            { name: 'Messaggio', value: msg }
-          ],
-          footer: { text: 'Arcamis Help Widget' },
-          timestamp: new Date().toISOString()
-        }]
-      })
+        embeds: [
+          {
+            title: 'Messaggio al DM',
+            color: 0xc89b3c,
+            fields: [
+              { name: 'Mittente', value: name || '(anonimo)', inline: true },
+              { name: 'Messaggio', value: msg },
+            ],
+            footer: { text: 'Arcamis Help Widget' },
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      }),
     });
 
     if (!res.ok) throw new Error('Webhook error: ' + res.status);

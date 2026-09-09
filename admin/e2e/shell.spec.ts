@@ -2,12 +2,19 @@ import { test, expect } from 'playwright/test'
 
 test.describe('Vue admin shell', () => {
   test.beforeEach(async ({ page }) => {
+    await page.route('**/api/admin?action=check', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, user: 'viewer', role: 'viewer', csrf: 'e2e-csrf' })
+      })
+    })
     await page.goto('/admin/app.html#/')
   })
 
   test('renders navigation with all migrated views (viewer set)', async ({ page }) => {
     const links = await page.locator('.arc-nav-link').allTextContents()
-    expect(links.map(l => l.trim())).toEqual([
+    expect(links.map((l) => l.trim())).toEqual([
       '📊 Dashboard',
       '📄 Pagine',
       '🖼 Copertine',
@@ -26,6 +33,14 @@ test.describe('Vue admin shell', () => {
   })
 
   test('hash router renders the users route (login gate)', async ({ page }) => {
+    await page.unroute('**/api/admin?action=check')
+    await page.route('**/api/admin?action=check', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, user: 'viewer', role: 'viewer', csrf: 'e2e-csrf' })
+      })
+    })
     await page.goto('/admin/app.html#/utenti')
     await expect(page.locator('.arc-page-title')).toContainText('Utenti')
     await expect(page.locator('.arc-alert')).toBeVisible()
@@ -42,6 +57,14 @@ test.describe('Vue admin shell', () => {
   })
 
   test('hash router renders the settings route (admin gate)', async ({ page }) => {
+    await page.unroute('**/api/admin?action=check')
+    await page.route('**/api/admin?action=check', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, user: 'viewer', role: 'viewer', csrf: 'e2e-csrf' })
+      })
+    })
     await page.goto('/admin/app.html#/impostazioni')
     await expect(page.locator('.arc-page-title')).toContainText('Impostazioni')
     await expect(page.locator('.arc-alert')).toBeVisible()

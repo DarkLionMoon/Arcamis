@@ -90,7 +90,7 @@ ensureRenderer()
 
 .arc-md-toc a {
   color: inherit;
-  opacity: .75;
+  opacity: 0.75;
   text-decoration: none;
 }
 
