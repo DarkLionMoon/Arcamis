@@ -538,7 +538,7 @@ async function _gpRender(id, label, icon) {
       var _localResp = await fetch('/content/pages/' + _localPage.k + '.json');
       if (_localResp.ok) {
         var _localJson = await _localResp.json();
-        if (_localJson.content) {
+        if (_localJson.content || _localJson.layout === 'imprese') {
           /* Render markdown locally */
           var ptitle = _localJson.title || label || 'Pagina';
           var picon = _localJson.icon || icon || '📄';
