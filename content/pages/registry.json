@@ -3,17 +3,6 @@
   "guild": "1348723468157456425",
   "pages": [
     {
-      "k": "imprese",
-      "l": "Imprese e Licenze",
-      "i": "⚖️",
-      "id": "pag-imprese",
-      "sec": "imprese",
-      "menu": true,
-      "admin": true,
-      "path": "imprese",
-      "layout": "imprese"
-    },
-    {
       "k": "la-storia-di-gandora",
       "l": "La Storia di Gandora",
       "i": "🐉",
