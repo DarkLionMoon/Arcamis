@@ -1,6 +1,9 @@
-/admin    /admin/app.html    302
-/admin/   /admin/app.html    302
-/admin/*  /export/admin/:splat    200
+/admin/app/     /admin   302
+/admin/app      /admin   302
+/admin/app.html /admin   302
+/admin/         /admin   302
+/admin          /export/admin/app    200
+/admin/*        /export/admin/:splat    200
 /export   /export/   301
 /p/:id    /index.html    200
 /content/*    /content/:splat    200
