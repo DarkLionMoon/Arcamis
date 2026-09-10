@@ -8,7 +8,6 @@ declare global {
   interface Window {
     mdRender?: (md: string) => string
     mdToc?: (md: string) => Array<{ id: string; text: string; level: number }>
-    DOMPurify?: typeof DOMPurify
   }
 }
 
@@ -35,9 +34,12 @@ async function ensureRenderer() {
 
 const html = computed(() => {
   if (!window.mdRender) return ''
-  let out = window.mdRender(props.content || '')
-  if (window.DOMPurify) out = window.DOMPurify.sanitize(out)
-  return out
+  const out = window.mdRender(props.content || '')
+  return DOMPurify.sanitize(out, {
+    USE_PROFILES: { html: true, svg: true, mathml: true },
+    ALLOWED_URI_REGEXP:
+      /^(?:(?:https?|mailto|ftp|tel|sms|data|blob|file):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i
+  })
 })
 
 const tocItems = computed(() => {
