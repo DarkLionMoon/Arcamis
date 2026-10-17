@@ -1,0 +1,61 @@
+{
+  "name": "Arcamis Wiki — D&D",
+  "short_name": "Arcamis",
+  "description": "Wiki ufficiale del server D&D Arcamis: regole, lore delle Marche di Arcamis, pantheon, mestieri e creazione del personaggio.",
+  "lang": "it",
+  "dir": "ltr",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#080a0e",
+  "theme_color": "#080a0e",
+  "categories": ["games", "books", "education"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Regole del server",
+      "short_name": "Regole",
+      "url": "/regole/regole-del-server",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Pantheon",
+      "short_name": "Pantheon",
+      "url": "/lore/pantheon",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Creazione personaggio",
+      "short_name": "Personaggio",
+      "url": "/personaggio/come-si-inizia",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

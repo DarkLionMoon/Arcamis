@@ -3,6 +3,18 @@
   "guild": "1348723468157456425",
   "pages": [
     {
+      "k": "imprese",
+      "l": "Imprese e Licenze",
+      "i": "⚖️",
+      "id": "pag-imprese",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "imprese",
+      "sec": "imprese",
+      "sub": ""
+    },
+    {
       "k": "la-storia-di-gandora",
       "l": "La Storia di Gandora",
       "i": "🐉",
@@ -148,7 +160,7 @@
     },
     {
       "k": "mappa-arcamis",
-      "l": "Arcamis",
+      "l": "Mappa di Arcamis",
       "i": "🏙️",
       "id": "pag-mappa-arcamis",
       "c": 1,
@@ -323,6 +335,18 @@
       "menu": true,
       "admin": true,
       "path": "lore/rovine-di-kaldur",
+      "sec": "",
+      "sub": ""
+    },
+    {
+      "k": "credits",
+      "l": "Crediti & Legale",
+      "i": "⚖️",
+      "id": "pag-credits",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "credits",
       "sec": "",
       "sub": ""
     }
