@@ -29,10 +29,10 @@
 }
 
 /* ─────────────── Token di design ───────────────
-   Gli stessi valori del sito pubblico (scripts/css/style-base.css):
-   fondo, superfici, bordi e oro sono identici, così pannello e wiki
-   non sembrano due prodotti diversi. I ruoli di testo sono allineati
-   su --white/--parch/--copper, scelti per restare sopra 4,5:1. */
+   ATTENZIONE: i valori attivi sono in arc-admin-theme.css (tema chiaro
+   di default + variante scura). Questo blocco resta come fallback se il
+   livello di tema non viene caricato, e tiene nota della palette della
+   wiki da cui il tema scuro deriva. */
 
 .arc-app,
 .arc-auth-page {

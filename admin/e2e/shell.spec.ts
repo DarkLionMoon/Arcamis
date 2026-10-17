@@ -19,12 +19,23 @@ async function openAs(page: Page, role: Role) {
   page.on('console', (message) => {
     if (message.type() === 'error') console.log('[console.error]', message.text())
   })
-  await page.route('**/api/admin?action=check', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify(SESSIONS[role])
-    })
+  /* Le viste chiamano anche altri endpoint: senza un finto backend
+     risponderebbero 401 e l'handler globale di sessione scaduta
+     riporterebbe al login, facendo fallire il test per un motivo che non
+     c'entra con ciò che verifica. La route più specifica si registra per
+     ultima: Playwright prova le route in ordine inverso. */
+  await page.route(
+    (url) => url.pathname.startsWith('/api/'),
+    (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '{}' })
+  )
+  await page.route(
+    (url) => url.pathname === '/api/admin' && url.searchParams.get('action') === 'check',
+    (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(SESSIONS[role])
+      })
   )
   await page.goto('/admin/app.html#/')
   await expect(page.locator('.arc-sidebar')).toBeVisible()
@@ -104,5 +115,23 @@ test.describe('shell', () => {
     await openAs(page, 'editor')
     await expect(page.locator('.arc-role')).toContainText('editor-user')
     await expect(page.locator('.arc-role')).toContainText('Editor')
+  })
+
+  test('il tema si applica a tutta la shell e resta al reload', async ({ page }) => {
+    await openAs(page, 'admin')
+    const html = page.locator('html')
+
+    /* Il tema chiaro è il default: nessuna preferenza salvata all'avvio. */
+    await expect(html).toHaveAttribute('data-theme', 'light')
+
+    await page.locator('.arc-theme-toggle').click()
+    await expect(html).toHaveAttribute('data-theme', 'dark')
+
+    await page.reload()
+    await expect(page.locator('.arc-sidebar')).toBeVisible()
+    await expect(html).toHaveAttribute('data-theme', 'dark')
+
+    await page.locator('.arc-theme-toggle').click()
+    await expect(html).toHaveAttribute('data-theme', 'light')
   })
 })

@@ -3,6 +3,8 @@ import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { authApi } from '@/shared/api'
+import { theme, toggleTheme } from '@/shared/theme'
+import VIcon from '@/shared/components/VIcon.vue'
 import { useAuthStore, useUIStore } from '@/app/store'
 
 const router = useRouter()
@@ -37,7 +39,19 @@ async function login() {
 <template>
   <main class="arc-auth-page">
     <form class="arc-auth-card" @submit.prevent="login">
-      <div class="arc-auth-brand">ARCAMIS <span>ADMIN</span></div>
+      <div class="arc-auth-head">
+        <div class="arc-auth-brand">ARCAMIS <span>ADMIN</span></div>
+        <button
+          class="btn btn-soft btn-sm arc-theme-toggle"
+          type="button"
+          :aria-pressed="theme === 'dark'"
+          :title="theme === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro'"
+          @click="toggleTheme"
+        >
+          <VIcon :name="theme === 'dark' ? 'sun' : 'moon'" :size="15" />
+          {{ theme === 'dark' ? 'Chiaro' : 'Scuro' }}
+        </button>
+      </div>
       <h1>Accedi</h1>
       <p class="arc-hint">Gestisci contenuti, media e configurazione della wiki.</p>
       <label class="arc-fld">

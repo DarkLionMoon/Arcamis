@@ -5,7 +5,12 @@ import App from './App.vue'
 import { resetSessionCheck, router } from './app/router'
 import { useAuthStore, useUIStore } from './app/store'
 import { onUnauthorized } from './shared/api'
+import { initTheme } from './shared/theme'
 import './shared/styles/arc-admin-app.css'
+import './shared/styles/arc-admin-theme.css'
+
+/* Prima del mount: il tema scelto non deve lampeggiare al primo paint. */
+initTheme()
 
 const app = createApp(App)
 app.use(createPinia())

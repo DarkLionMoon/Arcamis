@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useAuthStore, useEditorStore, useMapStore, useUIStore } from '@/app/store'
 import { authApi, errorText } from '@/shared/api'
+import { theme, toggleTheme } from '@/shared/theme'
 import GlobalSearch from '@/features/interface/components/GlobalSearch.vue'
 import ToastHost from '@/shared/components/ToastHost.vue'
 import VIcon from '@/shared/components/VIcon.vue'
@@ -193,6 +194,16 @@ const pageTitle = computed(() => {
         </span>
         <div class="arc-topbar-user">
           <span class="arc-topbar-hint"><kbd>⌘K</kbd> Cerca</span>
+          <button
+            class="btn btn-soft btn-sm arc-theme-toggle"
+            type="button"
+            :aria-pressed="theme === 'dark'"
+            :title="theme === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro'"
+            @click="toggleTheme"
+          >
+            <VIcon :name="theme === 'dark' ? 'sun' : 'moon'" :size="15" />
+            {{ theme === 'dark' ? 'Chiaro' : 'Scuro' }}
+          </button>
           <span class="arc-role" :class="auth.role"> {{ auth.user || 'admin' }} · {{ roleLabel }} </span>
           <button class="btn btn-soft btn-sm" type="button" @click="logout">
             <VIcon :name="'logout'" :size="15" />

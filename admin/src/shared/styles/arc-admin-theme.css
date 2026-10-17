@@ -1,0 +1,806 @@
+/* ════════════════════════════════════════════════════════════════════
+   ARCAMIS ADMIN — livello di tema moderno
+   Caricato DOPO arc-admin-app.css: ridefinisce i token e affina i
+   componenti, senza toccare la struttura delle viste.
+
+   Due temi:
+     · chiaro  → default (questo file), superfici bianche, testo scuro
+     · scuro   → :root[data-theme='dark'], mantiene la palette della wiki
+
+   Regole di questo livello:
+     1. nessun colore scritto a mano nei componenti: tutto passa da token,
+        così i due temi non divergono;
+     2. contrasto minimo 4,5:1 per ogni ruolo di testo sulle superfici
+        su cui compare (verificato da shared/styles/palette.test.ts);
+     3. testo dei bottoni pieni scelto dal token --accent-ink: su oro
+        chiaro è scuro (7,15:1), su oro scuro è bianco (5,01:1) —
+        il bianco su oro #c89b3c era 2,56:1, sotto la soglia AA;
+     4. niente Cinzel nei titoli di sezione, nelle etichette e nelle
+        intestazioni di tabella: il serif resta solo al marchio.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────── Token: tema chiaro (default) ─────────────── */
+
+.arc-app,
+.arc-auth-page {
+  --abg: #f4f6f9;
+  --asurface: #ffffff;
+  --asurface-2: #eef1f6;
+  --asurface-3: #e4e8f0;
+  --aline: #e4e8f0;
+  --aline-2: #cfd6e2;
+  --afg: #15202e;
+  --afg-2: #4a5768;
+  --afg-3: #5b687b;
+  --accent: #8a6b12;
+  --accent-strong: #6f5507;
+  --accent-ink: #ffffff;
+  --accent-soft: #f7f2e4;
+  --good: #1c7a52;
+  --good-soft: #e8f4ee;
+  --warn: #8a5a08;
+  --warn-soft: #fbf2e1;
+  --bad: #b3261e;
+  --bad-soft: #fdeeec;
+  --info: #1f5da8;
+  --info-soft: #eaf1fb;
+  --well: var(--asurface-2);
+  --overlay: rgba(15, 23, 36, 0.42);
+  --scrim: rgba(9, 13, 20, 0.72);
+  --ring: rgba(138, 107, 18, 0.28);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+  --shadow-lg: 0 18px 44px rgba(16, 24, 40, 0.18);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --afont-body: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --afont-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+
+  --bg: var(--abg);
+  --panel: var(--asurface);
+  --border: var(--aline);
+  --bdr2: var(--aline-2);
+}
+
+/* ─────────────── Token: tema scuro (palette della wiki) ─────────────── */
+
+:root[data-theme='dark'] .arc-app,
+:root[data-theme='dark'] .arc-auth-page {
+  --abg: #080a0e;
+  --asurface: #0e121a;
+  --asurface-2: #10141c;
+  --asurface-3: #161c26;
+  --aline: rgba(200, 155, 60, 0.14);
+  --aline-2: rgba(200, 155, 60, 0.3);
+  --afg: #f0e6d2;
+  --afg-2: #c4a862;
+  --afg-3: #a8925c;
+  --accent: #c89b3c;
+  --accent-strong: #e8c86a;
+  --accent-ink: #1a1408;
+  --accent-soft: rgba(200, 155, 60, 0.14);
+  --good: #58c08c;
+  --good-soft: rgba(88, 192, 140, 0.14);
+  --warn: #e0b24a;
+  --warn-soft: rgba(224, 178, 74, 0.14);
+  --bad: #e8746f;
+  --bad-soft: rgba(232, 116, 111, 0.14);
+  --info: #7fb2f0;
+  --info-soft: rgba(127, 178, 240, 0.14);
+  --well: #090b10;
+  --overlay: rgba(4, 5, 9, 0.66);
+  --scrim: rgba(0, 0, 0, 0.62);
+  --ring: rgba(200, 155, 60, 0.3);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 28px 70px rgba(0, 0, 0, 0.55);
+}
+
+/* ─────────────── Componenti ───────────────
+   Da qui in giù solo token: nessun colore letterale nei componenti
+   (guardia in palette.test.ts). */
+
+.arc-app {
+  background: var(--abg);
+  color: var(--afg);
+  font-family: var(--afont-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.arc-sidebar {
+  background: var(--asurface);
+  border-right: 1px solid var(--aline);
+}
+
+.arc-brand {
+  gap: 12px;
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid var(--aline);
+}
+
+.arc-logo-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--accent);
+  border: none;
+  color: var(--accent-ink);
+  font-family: var(--afont-display);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.arc-brand-text .arc-brand-sub {
+  font-size: 11.5px;
+}
+
+.arc-nav {
+  padding: 12px 10px;
+  gap: 3px;
+}
+
+.arc-nav-group-title {
+  padding: 16px 10px 7px;
+  font-family: var(--afont-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--afg-3);
+}
+
+.arc-nav-link {
+  padding: 9px 11px;
+  border-radius: 10px;
+  color: var(--afg-2);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.arc-nav-link:hover {
+  background: var(--asurface-2);
+  color: var(--afg);
+}
+
+.arc-nav-link.active {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.arc-nav-link.active::before {
+  left: 0;
+  top: 9px;
+  bottom: 9px;
+  width: 3px;
+  background: var(--accent);
+}
+
+.arc-nav-link.active:hover {
+  background: var(--accent-soft);
+}
+
+.arc-side-foot {
+  font-size: 11.5px;
+}
+
+/* ─────────────── Topbar ─────────────── */
+
+.arc-topbar {
+  height: 60px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--aline);
+  background: var(--asurface);
+  backdrop-filter: none;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+/* Il titolo della topbar è un riferimento di posizione, non un secondo
+   titolo: resta secondario rispetto all'H1 della vista. */
+.arc-topbar-title {
+  font-family: var(--afont-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--afg-3);
+}
+
+.arc-topbar-hint {
+  font-size: 11.5px;
+  background: var(--asurface-2);
+  border-color: var(--aline);
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.arc-topbar-hint kbd {
+  font-size: 10.5px;
+  background: var(--asurface);
+  border-color: var(--aline-2);
+  color: var(--afg-2);
+}
+
+.arc-role {
+  font-size: 12.5px;
+  padding: 5px 12px;
+  border-color: var(--aline-2);
+  background: var(--asurface-2);
+}
+
+.arc-role.admin {
+  color: var(--accent-strong);
+  border-color: transparent;
+  background: var(--accent-soft);
+}
+
+.arc-role.editor {
+  color: var(--good);
+  border-color: transparent;
+  background: var(--good-soft);
+}
+
+.arc-role.viewer {
+  color: var(--afg-2);
+}
+
+/* Interruttore tema: icona + etichetta breve, allineato ai bottoni soft. */
+.arc-theme-toggle {
+  gap: 6px;
+}
+
+.arc-content {
+  padding: 28px 30px 48px;
+}
+
+/* ─────────────── Bottoni ─────────────── */
+
+.arc-app .btn,
+.arc-auth-page .btn {
+  height: 38px;
+  padding: 0 15px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--aline-2);
+  background: var(--asurface);
+  color: var(--afg);
+  font-size: 14px;
+  font-weight: 550;
+  box-shadow: var(--shadow-sm);
+}
+
+.arc-app .btn:hover,
+.arc-auth-page .btn:hover {
+  background: var(--asurface-2);
+  border-color: var(--aline-2);
+}
+
+.arc-app .btn-p,
+.arc-auth-page .btn-p {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.arc-app .btn-p:hover,
+.arc-auth-page .btn-p:hover {
+  background: var(--accent-strong);
+  box-shadow: var(--shadow-md);
+}
+
+:root[data-theme='dark'] .arc-app .btn-p:hover,
+:root[data-theme='dark'] .arc-auth-page .btn-p:hover {
+  background: var(--accent-strong);
+}
+
+.arc-app .btn-soft,
+.arc-auth-page .btn-soft {
+  background: var(--asurface);
+  border-color: var(--aline-2);
+  color: var(--afg-2);
+  box-shadow: none;
+}
+
+.arc-app .btn-soft:hover,
+.arc-auth-page .btn-soft:hover {
+  background: var(--asurface-2);
+  color: var(--afg);
+  border-color: var(--aline-2);
+}
+
+.arc-app .btn-d,
+.arc-auth-page .btn-d {
+  color: var(--bad);
+  background: var(--bad-soft);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.arc-app .btn-d:hover,
+.arc-auth-page .btn-d:hover {
+  background: var(--bad-soft);
+  border-color: var(--bad);
+}
+
+.arc-app .btn-sm,
+.arc-auth-page .btn-sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+  border-radius: 9px;
+}
+
+/* ─────────────── Input ─────────────── */
+
+.arc-app .in,
+.arc-auth-page .in {
+  height: 38px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--aline-2);
+  background: var(--asurface);
+  color: var(--afg);
+  font-size: 14px;
+}
+
+.arc-app textarea.in,
+.arc-auth-page textarea.in {
+  padding: 10px 12px;
+  line-height: 1.6;
+}
+
+.arc-app .in::placeholder,
+.arc-auth-page .in::placeholder {
+  color: var(--afg-3);
+}
+
+.arc-app .in:focus,
+.arc-auth-page .in:focus {
+  border-color: var(--accent);
+  background: var(--asurface);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.arc-app select.in,
+.arc-auth-page select.in {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--afg-3) 50%),
+    linear-gradient(135deg, var(--afg-3) 50%, transparent 50%);
+}
+
+/* ─────────────── Tipografia ─────────────── */
+
+.arc-page-title {
+  margin: 0 0 24px;
+  font-family: var(--afont-body);
+  font-size: 23px;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--afg);
+}
+
+.arc-panel-title {
+  font-family: var(--afont-body);
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: normal;
+  margin: 0 0 16px;
+}
+
+.arc-hint {
+  font-size: 13px;
+}
+
+.arc-empty-side {
+  font-size: 13.5px;
+  padding: 30px 0;
+}
+
+/* ─────────────── Card e pannelli ─────────────── */
+
+.arc-cards {
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.arc-card,
+.arc-panel,
+.arc-media-card,
+.arc-carousel-card,
+.arc-map-edit {
+  background: var(--asurface);
+  border: 1px solid var(--aline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.arc-card {
+  padding: 18px 20px;
+}
+
+.arc-card:hover {
+  border-color: var(--aline-2);
+  box-shadow: var(--shadow-md);
+}
+
+.arc-panel {
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+
+.arc-stat-ico {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.arc-card-label {
+  font-family: var(--afont-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--afg-3);
+  margin-bottom: 6px;
+}
+
+.arc-card-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* ─────────────── Dashboard ─────────────── */
+
+.arc-quick-title {
+  font-family: var(--afont-body);
+  font-size: 15px;
+  font-weight: 650;
+  margin: 4px 0 14px;
+}
+
+.arc-quick-grid {
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.arc-quick {
+  padding: 14px 15px;
+  gap: 12px;
+  font-size: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.arc-quick:hover {
+  border-color: var(--accent);
+  background: var(--asurface);
+  box-shadow: var(--shadow-md);
+  transform: none;
+}
+
+.arc-quick-ico {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--asurface-2);
+  color: var(--accent-strong);
+}
+
+.arc-quick-label {
+  font-size: 14px;
+}
+
+.arc-quick-desc {
+  font-size: 11.5px;
+}
+
+/* ─────────────── Tabelle ─────────────── */
+
+.arc-table {
+  font-size: 14px;
+}
+
+.arc-table th,
+.arc-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--aline);
+}
+
+.arc-table thead th {
+  font-family: var(--afont-body);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--afg-3);
+  background: var(--asurface-2);
+}
+
+.arc-table thead th:first-child {
+  border-top-left-radius: var(--radius-sm);
+}
+
+.arc-table thead th:last-child {
+  border-top-right-radius: var(--radius-sm);
+}
+
+.arc-table tbody tr:hover td {
+  background: var(--asurface-2);
+}
+
+/* ─────────────── Alert e chip ─────────────── */
+
+.arc-alert {
+  padding: 12px 15px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  border: 1px solid var(--aline);
+  background: var(--asurface-2);
+  color: var(--afg-2);
+}
+
+.arc-alert--error {
+  background: var(--bad-soft);
+  border-color: transparent;
+  color: var(--bad);
+}
+
+.arc-chip {
+  background: var(--asurface-2);
+  border: 1px solid var(--aline-2);
+  padding: 5px 12px;
+  font-size: 12.5px;
+}
+
+.arc-pending {
+  border-color: transparent;
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ─────────────── Toast ─────────────── */
+
+.arc-toast {
+  background: var(--asurface);
+  border: 1px solid var(--aline);
+  border-left: 3px solid var(--aline-2);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  font-size: 13.5px;
+}
+
+.arc-toast--error {
+  background: var(--asurface);
+  border-left-color: var(--bad);
+}
+
+.arc-toast--success {
+  background: var(--asurface);
+  border-left-color: var(--good);
+}
+
+.arc-toast--warning {
+  background: var(--asurface);
+  border-left-color: var(--warn);
+}
+
+.arc-toast-ico {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.arc-toast--error .arc-toast-ico {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+
+.arc-toast--success .arc-toast-ico {
+  background: var(--good-soft);
+  color: var(--good);
+}
+
+.arc-toast--warning .arc-toast-ico {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.arc-toast-title {
+  font-family: var(--afont-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.arc-toast-x:hover {
+  color: var(--afg);
+  background: var(--asurface-2);
+}
+
+/* ─────────────── Login ─────────────── */
+
+.arc-auth-page {
+  background: var(--abg);
+  color: var(--afg);
+  font-family: var(--afont-body);
+}
+
+.arc-auth-card {
+  width: min(392px, 100%);
+  border: 1px solid var(--aline);
+  border-radius: 18px;
+  padding: 30px 30px 28px;
+  gap: 8px;
+  box-shadow: var(--shadow-lg);
+}
+
+.arc-auth-card h1 {
+  font-family: var(--afont-body);
+  font-size: 22px;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  margin: 6px 0 2px;
+}
+
+.arc-auth-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.arc-auth-brand {
+  font-family: var(--afont-display);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+}
+
+.arc-auth-card .btn-p {
+  height: 42px;
+  margin-top: 12px;
+}
+
+/* ─────────────── Modali, ricerca, backdrop ─────────────── */
+
+.arc-modal-backdrop,
+.arc-search-overlay {
+  background: var(--overlay);
+}
+
+.arc-modal {
+  border: 1px solid var(--aline);
+  border-radius: 16px;
+  padding: 24px 26px;
+  box-shadow: var(--shadow-lg);
+}
+
+.arc-search-dialog {
+  border: 1px solid var(--aline);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+}
+
+.arc-search-hit:hover,
+.arc-search-hit.active {
+  background: var(--asurface-2);
+}
+
+.arc-modal-title {
+  font-family: var(--afont-body);
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.arc-modal--danger {
+  border-color: var(--bad);
+}
+
+.arc-sidebar-backdrop {
+  background: var(--overlay);
+}
+
+/* ─────────────── Anteprime e tele (immagini) ─────────────── */
+
+.arc-map-canvas,
+.arc-carousel-img,
+.arc-covers-thumb,
+.arc-media-thumb {
+  background: var(--well);
+  border-color: var(--aline);
+}
+
+.arc-pin-label {
+  background: var(--scrim);
+  color: #ffffff;
+  font-size: 11.5px;
+  padding: 2px 7px;
+}
+
+.arc-pin-dot {
+  box-shadow: 0 0 0 3px var(--scrim);
+}
+
+.arc-pin--active .arc-pin-dot {
+  box-shadow:
+    0 0 0 3px var(--asurface),
+    0 0 0 6px var(--pc);
+}
+
+.arc-carousel-img--empty {
+  opacity: 0.6;
+}
+
+/* ─────────────── Navigazione interna / liste ─────────────── */
+
+.arc-navrow {
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--asurface);
+  border-color: var(--aline);
+}
+
+.arc-dropzone {
+  border-color: var(--aline-2);
+  background: var(--asurface-2);
+  padding: 18px 16px;
+  font-size: 13px;
+}
+
+/* ─────────────── Skeleton ─────────────── */
+
+.arc-skel-bar,
+.arc-skel-block {
+  background: linear-gradient(90deg, var(--asurface-2) 25%, var(--asurface-3) 50%, var(--asurface-2) 75%);
+  background-size: 200% 100%;
+}
+
+/* ─────────────── Accessibilità ─────────────── */
+
+.arc-app :focus-visible,
+.arc-auth-page :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.arc-app a,
+.arc-auth-page a {
+  color: var(--accent-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc-app *,
+  .arc-auth-page * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ─────────────── Responsive ─────────────── */
+
+@media (max-width: 900px) {
+  .arc-topbar {
+    padding: 0 16px;
+  }
+  .arc-content {
+    padding: 20px 16px 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .arc-page-title {
+    font-size: 20px;
+  }
+  .arc-card-value {
+    font-size: 24px;
+  }
+}
