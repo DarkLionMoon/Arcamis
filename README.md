@@ -40,7 +40,7 @@ Contenuto 100% local-first: tutto servito da JSON statici (nessun ping alla Noti
 │   └── pages/*.json        ← Pagine in markdown (usate dal client)
 │
 ├── functions/api/*.js      ← Cloudflare Pages Functions
-├── admin/                  ← Pannello amministrazione Vue (accesso da /admin/app.html)
+├── admin/                  ← Pannello amministrazione Vue (sorgenti; si apre da /admin)
 ├── export/index.html       ← Tool export contenuti
 ├── images/                 ← Immagini caricate dall'editor admin
 └── audio/                  ← Effetti sonori (ambient, footsteps, …)
@@ -177,7 +177,8 @@ nel browser: tutte le operazioni passano da `functions/api/gh.js` (session-authe
 
 ## Pannello admin Vue
 
-Il pannello legacy è stato rimosso. Il pannello Vue è disponibile su `/admin/app.html` e offre:
+Il pannello legacy è stato rimosso. Il pannello Vue è disponibile su `/admin`
+(gli URL `/admin/`, `/admin/app` e `/admin/app.html` reindirizzano lì) e offre:
 
 - **Login server-side** con "ricordami".
 - **📜 STORIA** — cronologia commit di una pagina e ripristino di una versione
