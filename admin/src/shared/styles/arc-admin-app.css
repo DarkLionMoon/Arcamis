@@ -4,25 +4,55 @@
    Riscrittura completa della UI admin (chrome + componenti).
    ════════════════════════════════════════════════════ */
 
-/* ─────────────── Token di design ─────────────── */
+/* ─────────────── Font del sito (self-hosted, stessa origine) ───────────────
+   Caricati dal build pubblico: i nomi contengono l'hash del contenuto
+   e vengono rigenerati da scripts/fetch-fonts.mjs. Un test
+   (src/shared/styles/palette.test.ts) verifica che i file esistano
+   ancora, così il pannello non perde i font in silenzio. */
+
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/fonts/cinzel-normal-latin.e3007b72.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url('/fonts/crimson-pro-normal-latin.a62fce62.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+
+/* ─────────────── Token di design ───────────────
+   Gli stessi valori del sito pubblico (scripts/css/style-base.css):
+   fondo, superfici, bordi e oro sono identici, così pannello e wiki
+   non sembrano due prodotti diversi. I ruoli di testo sono allineati
+   su --white/--parch/--copper, scelti per restare sopra 4,5:1. */
 
 .arc-app,
 .arc-auth-page {
-  --abg: #08090d;
-  --asurface: #10131a;
-  --asurface-2: #151925;
-  --asurface-3: #1a1f2c;
-  --aline: rgba(255, 255, 255, 0.07);
-  --aline-2: rgba(255, 255, 255, 0.12);
-  --afg: #e8eaf1;
-  --afg-2: #a6adbb;
-  --afg-3: #6d7583;
-  --accent: #6a76f0;
-  --accent-strong: #8591ff;
-  --accent-soft: rgba(106, 118, 240, 0.14);
-  --good: #3bb07f;
-  --warn: #d9a13b;
-  --bad: #e2605d;
+  --abg: #080a0e;
+  --asurface: #0e121a;
+  --asurface-2: #10141c;
+  --asurface-3: #161c26;
+  --aline: rgba(200, 155, 60, 0.14);
+  --aline-2: rgba(200, 155, 60, 0.28);
+  --afg: #f0e6d2;
+  --afg-2: #c4a862;
+  --afg-3: #a8925c;
+  --accent: #c89b3c;
+  --accent-strong: #e8c86a;
+  --accent-soft: rgba(200, 155, 60, 0.14);
+  --good: #58c08c;
+  --warn: #e0b24a;
+  --bad: #e8746f;
+  --afont-display: 'Cinzel', 'Trajan Pro', 'Palatino Linotype', Georgia, serif;
+  --afont-body: 'Crimson Pro', Georgia, 'Times New Roman', serif;
   --radius: 10px;
   --radius-sm: 8px;
 
@@ -38,13 +68,10 @@
 .arc-app {
   display: flex;
   min-height: 100vh;
-  background:
-    radial-gradient(1200px 500px at 80% -10%, rgba(106, 118, 240, 0.05), transparent 60%),
-    var(--abg);
+  background: radial-gradient(1200px 500px at 80% -10%, rgba(200, 155, 60, 0.05), transparent 60%), var(--abg);
   color: var(--afg);
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 14px;
+  font-family: var(--afont-body);
+  font-size: 14.5px;
   line-height: 1.5;
 }
 
@@ -411,9 +438,12 @@
 .arc-app select.in,
 .arc-auth-page select.in {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--afg-3) 50%),
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--afg-3) 50%),
     linear-gradient(135deg, var(--afg-3) 50%, transparent 50%);
-  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+  background-position:
+    calc(100% - 16px) 50%,
+    calc(100% - 11px) 50%;
   background-size: 5px 5px;
   background-repeat: no-repeat;
   padding-right: 30px;
@@ -788,12 +818,9 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background:
-    radial-gradient(900px 420px at 50% -10%, rgba(106, 118, 240, 0.1), transparent 60%),
-    var(--abg);
+  background: radial-gradient(900px 420px at 50% -10%, rgba(106, 118, 240, 0.1), transparent 60%), var(--abg);
   color: var(--afg);
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .arc-auth-card {
@@ -1180,12 +1207,40 @@
 }
 
 .arc-media-thumb {
+  display: block;
+  width: 100%;
   height: 110px;
+  padding: 0;
+  cursor: zoom-in;
   border-radius: 9px;
   overflow: hidden;
   border: 1px solid var(--aline);
   background: #090b10;
   margin-bottom: 8px;
+}
+
+.arc-media-thumb:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Zona di trascinamento per l'upload delle immagini */
+.arc-dropzone {
+  border: 1px dashed var(--aline-2);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  font-size: 12.5px;
+  color: var(--afg-3);
+  text-align: center;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.arc-dropzone.is-busy {
+  border-color: var(--accent);
+  color: var(--afg-2);
 }
 
 .arc-media-thumb img {
@@ -1223,7 +1278,9 @@
 
 /* ─────────────── Responsive ─────────────── */
 
-.arc-topbar-burger {
+/* Il selettore deve battere `.arc-app .btn` (specificità 0,2,0):
+   altrimenti il pulsante hamburger restava visibile anche su desktop. */
+.arc-app .arc-topbar-burger {
   display: none;
 }
 
@@ -1231,7 +1288,7 @@
   .arc-topbar-hint {
     display: none;
   }
-  .arc-topbar-burger {
+  .arc-app .arc-topbar-burger {
     display: inline-flex;
   }
   .arc-sidebar {
@@ -1258,5 +1315,314 @@
   }
   .arc-form-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   Tipografia del sito pubblico (Cinzel per i titoli)
+   ════════════════════════════════════════════════════ */
+
+.arc-brand-name,
+.arc-page-title,
+.arc-topbar-title,
+.arc-panel-title,
+.arc-quick-title,
+.arc-card-label,
+.arc-nav-group-title,
+.arc-modal-title,
+.arc-auth-brand {
+  font-family: var(--afont-display);
+  letter-spacing: 0.02em;
+}
+
+.arc-page-title {
+  color: var(--afg);
+}
+
+.arc-task-table th,
+.arc-table th {
+  font-family: var(--afont-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 10.5px;
+}
+
+code,
+kbd,
+.arc-nav-badge {
+  font-family: 'JetBrains Mono', 'Cascadia Mono', Consolas, 'Courier New', monospace;
+}
+
+/* ════════════════════════════════════════════════════
+   Sidebar mobile: backdrop + stato modifiche pendenti
+   ════════════════════════════════════════════════════ */
+
+.arc-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  border: 0;
+  padding: 0;
+  background: rgba(4, 5, 9, 0.55);
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+}
+
+@media (min-width: 901px) {
+  .arc-sidebar-backdrop {
+    display: none;
+  }
+}
+
+.arc-pending {
+  align-self: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 155, 60, 0.45);
+  background: rgba(200, 155, 60, 0.12);
+  color: var(--accent-strong);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+/* ════════════════════════════════════════════════════
+   Toast: icona, testo, chiusura e barra di scadenza
+   ════════════════════════════════════════════════════ */
+
+.arc-toast {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 260px;
+  max-width: 380px;
+  padding: 12px 14px;
+  overflow: hidden;
+}
+
+.arc-toast--error {
+  background: #1b1214;
+}
+
+.arc-toast--success {
+  background: #101a15;
+}
+
+.arc-toast--warning {
+  background: #1c1709;
+}
+
+.arc-toast-ico {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.arc-toast--error .arc-toast-ico {
+  background: rgba(232, 116, 111, 0.16);
+  color: var(--bad);
+}
+
+.arc-toast--success .arc-toast-ico {
+  background: rgba(88, 192, 140, 0.16);
+  color: var(--good);
+}
+
+.arc-toast--warning .arc-toast-ico {
+  background: rgba(224, 178, 74, 0.16);
+  color: var(--warn);
+}
+
+.arc-toast-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.arc-toast-title {
+  font-family: var(--afont-display);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--afg-2);
+}
+
+.arc-toast-msg {
+  font-size: 13.5px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.arc-toast-x {
+  flex: 0 0 auto;
+  border: 0;
+  background: none;
+  color: var(--afg-3);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 6px;
+}
+
+.arc-toast-x:hover {
+  color: var(--afg);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.arc-toast-timer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  opacity: 0.35;
+  transform-origin: left center;
+  animation-name: arc-toast-shrink;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.arc-toast:hover .arc-toast-timer,
+.arc-toast:focus .arc-toast-timer {
+  animation-play-state: paused;
+}
+
+@keyframes arc-toast-shrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc-toast-timer {
+    animation: none;
+    opacity: 0.2;
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   Skeleton loader (tabelle e pannelli in caricamento)
+   ════════════════════════════════════════════════════ */
+
+.arc-skel-bar,
+.arc-skel-block {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--asurface-3) 25%, rgba(200, 155, 60, 0.16) 50%, var(--asurface-3) 75%);
+  background-size: 200% 100%;
+  animation: arc-skel 1.4s ease-in-out infinite;
+}
+
+.arc-skel-block {
+  height: 14px;
+  margin: 10px 0;
+}
+
+.arc-skel-block:first-child {
+  width: 45%;
+}
+
+@keyframes arc-skel {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc-skel-bar,
+  .arc-skel-block {
+    animation: none;
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   Modale di conferma (conferma digitata per i casi gravi)
+   ════════════════════════════════════════════════════ */
+
+.arc-confirm {
+  max-width: 480px;
+}
+
+.arc-modal--danger {
+  border-color: rgba(232, 116, 111, 0.4);
+}
+
+.arc-modal-title {
+  margin: 0 0 8px;
+  font-size: 17px;
+  color: var(--afg);
+}
+
+.arc-modal-text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--afg-2);
+}
+
+.arc-modal-detail {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: var(--afg-3);
+}
+
+.arc-modal-keyword {
+  display: block;
+  margin-top: 16px;
+  font-size: 12.5px;
+  color: var(--afg-2);
+}
+
+.arc-modal-keyword .in {
+  margin-top: 6px;
+  width: 100%;
+}
+
+.arc-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ════════════════════════════════════════════════════
+   Tabelle: mai far uscire il contenuto dal pannello
+   ════════════════════════════════════════════════════ */
+
+.arc-panel:has(.arc-table) {
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .arc-toasts {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .arc-toast {
+    max-width: none;
+  }
+
+  .arc-head-row {
+    flex-wrap: wrap;
+    gap: 10px;
   }
 }

@@ -25,7 +25,7 @@
   background: none; white-space: nowrap;
 }
 .cmp-tab:hover, .sl-tab:hover {
-  color: var(--parch); background: rgba(200,155,60,.05);
+  color: var(--parch); background: rgba(var(--gold-rgb),.05);
   border-color: var(--bdr);
 }
 .cmp-tab.active, .sl-tab.active {
@@ -50,7 +50,7 @@
 /* ── SIDENAV ── */
 .cmp-sidenav, .sl-sidenav {
   width: 200px; flex-shrink: 0;
-  background: rgba(200,155,60,.02);
+  background: rgba(var(--gold-rgb),.02);
   border-right: 1px solid var(--bdr);
   padding: 20px 0; position: sticky;
   top: 120px; max-height: calc(100vh - 140px);
@@ -69,11 +69,11 @@
   border-left: 3px solid transparent;
 }
 .cmp-sidenav-btn:hover, .sl-sidenav-btn:hover {
-  color: var(--gold2); background: rgba(200,155,60,.05);
+  color: var(--gold2); background: rgba(var(--gold-rgb),.05);
 }
 .cmp-sidenav-btn.active, .sl-sidenav-btn.active {
   color: var(--gold2); border-left-color: var(--gold);
-  background: rgba(200,155,60,.08); font-weight: 600;
+  background: rgba(var(--gold-rgb),.08); font-weight: 600;
 }
 .cmp-sidenav-btn:focus-visible, .sl-sidenav-btn:focus-visible {
   outline: 2px solid var(--gold); outline-offset: -2px;
@@ -87,7 +87,7 @@
 
 /* ── GUIDE ── */
 .cmp-guide-hero, .sl-guide-hero {
-  background: linear-gradient(135deg, rgba(200,155,60,.04) 0%, var(--bg3) 100%);
+  background: linear-gradient(135deg, rgba(var(--gold-rgb),.04) 0%, var(--bg3) 100%);
   border: 1px solid var(--bdr2);
   border-radius: 6px; padding: 28px 32px;
   margin-bottom: 24px; position: relative; overflow: hidden;
@@ -124,7 +124,7 @@
   gap: 12px;
 }
 .cmp-guide-card, .sl-guide-card {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--bdr);
   border-radius: 6px; padding: 14px 16px;
   transition: border-color .2s, box-shadow .2s;
@@ -144,7 +144,7 @@
   display: inline-block; font-family: 'Cinzel', serif;
   font-size: 7px; font-weight: 700; letter-spacing: .08em;
   padding: 2px 7px; border-radius: 3px; margin: 2px 4px 2px 0;
-  background: rgba(200,155,60,.08); color: var(--gold);
+  background: rgba(var(--gold-rgb),.08); color: var(--gold);
   border: 1px solid var(--bdr);
 }
 .cmp-guide-note, .sl-guide-note, .sl-note-box {
@@ -179,7 +179,7 @@
 }
 .cmp-mobile-fab:focus-visible, .sl-mobile-fab:focus-visible {
   outline: 2px solid var(--gold3); outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(200,155,60,.2);
+  box-shadow: 0 0 0 4px rgba(var(--gold-rgb),.2);
 }
 
 /* ── MOBILE DRAWER ── */
@@ -244,7 +244,7 @@ body.drawer-open {
 
 /* ── INTRO / HERO CARD ── */
 .cmp-intro-card {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--bdr);
   border-left: 3px solid var(--gold);
   border-radius: 4px; padding: 24px 28px;
@@ -293,7 +293,7 @@ body.drawer-open {
   border-bottom: 1px solid var(--bdr);
 }
 .cmp-lv-badge {
-  background: linear-gradient(135deg, rgba(200,155,60,.3), var(--violet));
+  background: linear-gradient(135deg, rgba(var(--gold-rgb),.3), var(--violet));
   border: 1px solid var(--bdr2);
   border-radius: 50%; width: 48px; height: 48px;
   display: flex; align-items: center; justify-content: center;
@@ -329,7 +329,7 @@ body.drawer-open {
   transition: background .15s;
 }
 .cmp-table tbody tr:hover td {
-  background: rgba(200,155,60,.04);
+  background: rgba(var(--gold-rgb),.04);
 }
 .cmp-table tbody td {
   padding: 9px 12px; color: var(--parch);
@@ -341,7 +341,7 @@ body.drawer-open {
   color: var(--white); letter-spacing: .04em;
 }
 .cmp-table tbody tr:nth-child(odd) td {
-  background: rgba(200,155,60,.015);
+  background: rgba(var(--gold-rgb),.015);
 }
 
 /* ── BADGES ── */
@@ -388,7 +388,7 @@ body.drawer-open {
   gap: 14px;
 }
 .cmp-mat-card {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--bdr);
   border-radius: 6px; padding: 16px 18px;
   transition: border-color .2s, box-shadow .2s;
@@ -433,7 +433,7 @@ body.drawer-open {
   border-bottom: 1px solid var(--bdr);
   font-family: 'Crimson Pro', serif;
 }
-.cmp-dt-table tr:hover td { background: rgba(200,155,60,.03); }
+.cmp-dt-table tr:hover td { background: rgba(var(--gold-rgb),.03); }
 .cmp-dt-table td:first-child {
   color: var(--gold2); font-weight: 600;
   font-family: 'Cinzel', serif;
@@ -482,7 +482,7 @@ body.drawer-open {
 
 /* ── PAGE HERO ── */
 .sl-page-hero {
-  background: linear-gradient(135deg, rgba(200,155,60,.04) 0%, var(--bg3) 100%);
+  background: linear-gradient(135deg, rgba(var(--gold-rgb),.04) 0%, var(--bg3) 100%);
   border: 1px solid var(--bdr2);
   border-radius: 6px; padding: 28px 32px;
   margin-bottom: 24px; position: relative; overflow: hidden;
@@ -525,7 +525,7 @@ body.drawer-open {
   padding: 2px 8px; border-radius: 3px;
   text-transform: uppercase; white-space: nowrap;
 }
-.sl-badge-gold    { border:1px solid rgba(200,155,60,.3);color:var(--gold);background:rgba(200,155,60,.06); }
+.sl-badge-gold    { border:1px solid rgba(var(--gold-rgb),.3);color:var(--gold);background:rgba(var(--gold-rgb),.06); }
 .sl-badge-green   { border:1px solid rgba(96,184,64,.3);color:rgba(96,184,64,.8);background:rgba(96,184,64,.06); }
 .sl-badge-amber   { border:1px solid rgba(212,149,74,.3);color:var(--parch);background:rgba(212,149,74,.06); }
 .sl-badge-purple  { border:1px solid rgba(138,80,176,.3);color:var(--violet2);background:rgba(138,80,176,.06); }
@@ -540,7 +540,7 @@ body.drawer-open {
 .sl-list-icon {
   flex-shrink: 0; width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(200,155,60,.06); border-radius: 4px;
+  background: rgba(var(--gold-rgb),.06); border-radius: 4px;
   font-size: 14px;
 }
 .sl-list-body { flex: 1; min-width: 0; }
@@ -560,7 +560,7 @@ body.drawer-open {
   gap: 14px; margin-bottom: 20px;
 }
 .sl-card {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--bdr);
   border-radius: 6px; padding: 16px 18px;
   transition: border-color .2s, box-shadow .2s;
@@ -588,7 +588,7 @@ body.drawer-open {
 
 /* ── IMPRESA CARD ── */
 .sl-impresa-card {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--bdr);
   border-radius: 6px; margin-bottom: 20px;
   overflow: hidden;
@@ -652,7 +652,7 @@ body.drawer-open {
   gap: 12px; margin-bottom: 20px;
 }
 .sl-strutt-card {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--bdr);
   border-radius: 5px; padding: 14px 16px;
   transition: border-color .2s;
@@ -675,7 +675,7 @@ body.drawer-open {
 
 /* ── LICENZA CARD ── */
 .sl-licenza-card {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--bdr);
   border-radius: 6px; margin-bottom: 22px;
   overflow: hidden;

@@ -43,7 +43,7 @@ var pages = [
   {k:'piani-di-esistenza',l:'Piani di esistenza',i:'🌌',id:'pag-piani-di-esistenza'},
   {k:'bibliografia-scoperta',l:'Bibliografia scoperta',i:'📚',id:'pag-bibliografia-scoperta'},
   {k:'mappe',l:'Mappe',i:'🗺️',id:'pag-mappe'},
-  {k:'mappa-arcamis',l:'Arcamis',i:'🏙️',id:'pag-mappa-arcamis'},
+  {k:'mappa-arcamis',l:'Mappa di Arcamis',i:'🏙️',id:'pag-mappa-arcamis'},
   {k:'regole-homebrew',l:'Regole Homebrew',i:'📐',id:'pag-regole-homebrew',sec:'homebrew'},
   {k:'specie-homebrew',l:'Specie Homebrew',i:'🧬',id:'pag-specie-homebrew',sec:'homebrew'},
   {k:'sottoclassi-homebrew',l:'Sottoclassi Homebrew',i:'⚔️',id:'pag-sottoclassi-homebrew',sec:'homebrew'},
@@ -57,7 +57,8 @@ var pages = [
   {k:'forte-vigilus',l:'Forte Vigilus',i:'🏰',id:'pag-forte-vigilus'},
   {k:'riva-di-ferro',l:'Riva di Ferro',i:'⚓',id:'pag-riva-di-ferro'},
   {k:'fumofosco',l:'Fumofosco',i:'🌫️',id:'pag-fumofosco'},
-  {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'}
+  {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'},
+  {k:'credits',l:'Crediti & Legale',i:'⚖️',id:'pag-credits'}
 ];
 
 function getPage(idOrK){

@@ -5,9 +5,56 @@
    (Classic script — variabili globali condivise)
 ════════════════════════════════════ */
 
-/* ════ CAROUSEL HOME ════ */
+/* ════ CAROUSEL HOME ════
+   L'avanzamento automatico è fermabile dall'utente (WCAG 2.2.2):
+   pulsante Pausa/Play, rispetto di prefers-reduced-motion e preferenza
+   ricordata in localStorage. Il timer non gira a scheda nascosta. */
 var _slideIdx = 0;
 var _carTimer = null;
+var CAR_CAROUSEL_MS = 6000;
+function _carPrefersReducedMotion() {
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+var _carPaused = (function () {
+  var saved = null;
+  try {
+    saved = localStorage.getItem('arc-car-paused');
+  } catch (_e) {
+    saved = null;
+  }
+  if (saved === '1') return true;
+  if (saved === '0') return false;
+  return _carPrefersReducedMotion();
+})();
+window._carouselPaused = _carPaused;
+
+function _syncCarPauseBtn() {
+  var btn = document.getElementById('car-pause');
+  var icon = document.getElementById('car-pause-icon');
+  var label = document.getElementById('car-pause-label');
+  if (btn) {
+    btn.setAttribute('aria-pressed', String(_carPaused));
+    btn.setAttribute('aria-label', _carPaused ? 'Avvia il carosello automatico' : 'Metti in pausa il carosello');
+  }
+  if (icon) icon.textContent = _carPaused ? '▶' : '❚❚';
+  if (label) label.textContent = _carPaused ? 'Avvia' : 'Pausa';
+}
+function _stopCarTimer() {
+  if (_carTimer) clearInterval(_carTimer);
+  _carTimer = null;
+}
+function toggleCarouselPause() {
+  _carPaused = !_carPaused;
+  window._carouselPaused = _carPaused;
+  try {
+    localStorage.setItem('arc-car-paused', _carPaused ? '1' : '0');
+  } catch (_e) {
+    /* storage negato: la scelta vale solo per questa visita */
+  }
+  _syncCarPauseBtn();
+  if (_carPaused) _stopCarTimer();
+  else _resetCarTimer();
+}
 function _escH(s) {
   return String(s)
     .replace(/&/g, '&amp;')
@@ -53,10 +100,12 @@ function updateDots() {
   });
 }
 function _resetCarTimer() {
-  if (_carTimer) clearInterval(_carTimer);
+  _stopCarTimer();
+  if (_carPaused) return;
   _carTimer = setInterval(function () {
-    if (!window._carouselPaused) changeSlide(1);
-  }, 6000);
+    if (_carPaused || document.hidden) return;
+    changeSlide(1);
+  }, CAR_CAROUSEL_MS);
 }
 window.addEventListener('load', function () {
   _applySlide();
@@ -64,12 +113,71 @@ window.addEventListener('load', function () {
     if (window.applyRecentBadges) applyRecentBadges();
   }, 1500);
 });
-_carTimer = setInterval(function () {
-  if (!window._carouselPaused) changeSlide(1);
-}, 6000);
+_syncCarPauseBtn();
+_resetCarTimer();
 
-/* ════ COVERS ════ */
+/* FAB Oracolo: su mobile resta nascosto finché la hero è in vista,
+   così non copre il bottone principale della prima slide. */
+(function () {
+  if (typeof IntersectionObserver === 'undefined') return;
+  var hero = document.getElementById('carousel-wrap');
+  if (!hero) return;
+  var io = new IntersectionObserver(
+    function (entries) {
+      var entry = entries[0];
+      var inView = entry.isIntersecting && entry.intersectionRatio > 0.15;
+      document.body.classList.toggle('hero-in-view', inView);
+    },
+    { threshold: [0, 0.15, 0.5] }
+  );
+  io.observe(hero);
+})();
+
+/* ════ COVERS ════
+   Le cover arrivano come URL (/api/cover/<id>): quelle sotto la piega
+   vengono applicate solo quando si avvicinano al viewport, così la home
+   non scarica decine di immagini inutili. */
 var _cachedCovers = null;
+var _coverIO = null;
+
+function _coverObserver() {
+  if (_coverIO || typeof IntersectionObserver === 'undefined') return _coverIO;
+  _coverIO = new IntersectionObserver(
+    function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        obs.unobserve(el);
+        var url = el.getAttribute('data-cover-url');
+        if (!url) return;
+        el.style.backgroundImage = "url('" + url + "')";
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = el.getAttribute('data-cover-pos') || 'center';
+        el.removeAttribute('data-cover-url');
+        el.removeAttribute('data-cover-pos');
+      });
+    },
+    { root: document.getElementById('main'), rootMargin: '400px 0px' }
+  );
+  return _coverIO;
+}
+
+function _applyCoverLazily(el, url, pos) {
+  if (!el || !url) return;
+  if (el.hasAttribute('data-cover-url')) return;
+  if (el.style.backgroundImage && el.style.backgroundImage !== 'none') return;
+  var io = _coverObserver();
+  if (!io) {
+    el.style.backgroundImage = "url('" + url + "')";
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = pos || 'center';
+    return;
+  }
+  el.setAttribute('data-cover-url', url);
+  if (pos) el.setAttribute('data-cover-pos', pos);
+  io.observe(el);
+}
+
 function _applyCovers(covers) {
   _cachedCovers = covers;
   var slideEls = document.querySelectorAll('.slide');
@@ -123,18 +231,13 @@ function _applyCovers(covers) {
     if (!m) return;
     var pageId = m[1];
     if (!covers[pageId]) return;
-    card.style.backgroundImage = "url('" + covers[pageId] + "')";
-    card.style.backgroundSize = 'cover';
-    card.style.backgroundPosition = 'center';
+    _applyCoverLazily(card, covers[pageId], 'center');
   });
   document.querySelectorAll('.gs-card').forEach(function (card) {
     var pageId = card.id.replace('gsc-', '');
     if (!pageId || !covers[pageId]) return;
     var bgEl = card.querySelector('.gs-card-bg');
-    if (bgEl) {
-      bgEl.style.backgroundImage = "url('" + covers[pageId] + "')";
-      if (covers[pageId + '_pos']) bgEl.style.backgroundPosition = covers[pageId + '_pos'];
-    }
+    _applyCoverLazily(bgEl, covers[pageId], covers[pageId + '_pos']);
   });
 }
 (function () {

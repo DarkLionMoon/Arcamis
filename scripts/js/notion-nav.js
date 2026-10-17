@@ -3,9 +3,17 @@
    Navigazione SPA: gp(), _gpRender(),
    gpBack(), buildCrumb(), glossario,
    history API.
-════════════════════════════════════ */
+════════════════════════════════════ */var navStack = [];
 
-var navStack = [];
+/* Stato condiviso fra le viste.
+   Prima erano globali impliciti: leggere un identificatore mai dichiarato
+   lancia ReferenceError anche in sloppy mode, quindi le funzioni che li
+   usavano uscivano silenziosamente dal try/catch. Sintomi: le schede del
+   Pantheon restavano vuote ("Pagina") e dalla seconda navigazione la pagina
+   non veniva più renderizzata. Dichiararli qui li rende verificabili. */
+var _scrollPositions = {};
+var _pantheonData = null;
+var _panCollCache = null;
 
 /* Helper HTML — esc()/attr() sono privati nell'IIFE di md-render.js,
    quindi qui servono versioni locali per il render dei JSON locali. */
@@ -162,6 +170,24 @@ function _getIdToPath() {
   return _idToPath;
 }
 
+/* Costruisce l'URL pulito per un dato id (pantheon, lavori, mappa o UUID).
+   Indispensabile per il pushState di gp(): senza questa funzione ogni
+   navigazione lancia ReferenceError e la pagina non viene renderizzata. */
+function _urlForId(id) {
+  /* Pantheon — pagina dedicata a una divinità */
+  if (id && id.indexOf('pantheon-') === 0) {
+    return '/lore/pantheon/' + id.slice(9);
+  }
+  /* Lavori — pagina dedicata a un lavoro (stesso meccanismo del Pantheon) */
+  if (id && id.indexOf('lavori-') === 0) {
+    return '/personaggio/lavori/' + id.slice(7);
+  }
+  var map = _getIdToPath();
+  if (map[id]) return map[id];
+  /* Nessuna mappa — genera path automatico da UUID */
+  return '/p/' + id;
+}
+
 var _navMap = {
 
 };
@@ -312,7 +338,7 @@ async function gp(id, label, icon, _fromPop) {
   phHero.style.removeProperty('--ph-acc');
   phHero.style.removeProperty('--ph-accbg');
   phCrumb.innerHTML = buildCrumb(label || '');
-  document.title = (label || 'Pagina') + ' — Arcamis';
+  document.title = (label || 'Pagina') + ' — Arcamis Wiki';
 
   if (hv.style.display === 'block') {
     xfade(hv, pv);
@@ -386,10 +412,13 @@ async function _gpRender(id, label, icon) {
       if (_deity) {
         var _dic = _panIcon(_deity, _collKey);
         var _collLabel = _collKey === 'lavori' ? 'Lavori ad Arcamis' : 'Archivi di Arcamis';
+        /* Stesso schema dei meta prerenderizzati: Nome — <Collezione> di Arcamis */
+        var _titleColl =
+          _collKey === 'pantheon' ? 'Pantheon' : _collKey === 'lavori' ? 'Lavori' : 'Archivi';
         phTitle.textContent = _deity.n;
         phIcon.textContent = _dic;
         phEyebrow.textContent = _collLabel;
-        document.title = _deity.n + ' — Arcamis';
+        document.title = _deity.n + ' — ' + _titleColl + ' di Arcamis';
         phCrumb.innerHTML = buildCrumb(_deity.n);
         var _dacc = iconAccent(_dic);
         phHero.style.setProperty('--ph-acc', _dacc.c);
@@ -441,7 +470,7 @@ async function _gpRender(id, label, icon) {
           phTitle.textContent = ptitle;
           phIcon.textContent = picon;
           phEyebrow.textContent = 'Archivi di Arcamis';
-          document.title = ptitle + ' — Arcamis';
+          document.title = ptitle + ' — Arcamis Wiki';
           phCrumb.innerHTML = buildCrumb(ptitle);
           var acc = iconAccent(picon);
           phHero.style.setProperty('--ph-acc', acc.c);
@@ -558,7 +587,7 @@ async function _gpRender(id, label, icon) {
   phTitle.textContent = label || 'Pagina';
   phIcon.textContent = icon || '📄';
   phEyebrow.textContent = 'Archivi di Arcamis';
-  document.title = (label || 'Pagina') + ' — Arcamis';
+  document.title = (label || 'Pagina') + ' — Arcamis Wiki';
   phCrumb.innerHTML = buildCrumb(label || 'Pagina');
   var placeholderAccent = iconAccent(icon || '📄');
   phHero.style.setProperty('--ph-acc', placeholderAccent.c);
@@ -814,6 +843,13 @@ function _renderRegole(md) {
 
   /* Primo blocco: intro + regole brevi */
   var introBlock = blocks.shift() || '';
+
+  /* Se il primo blocco è già una regola (## …) va trattato come sezione:
+     prima finiva dentro l'intro e le regole successive sparivano. */
+  if (/^#{2,3}\s+/m.test(introBlock)) {
+    blocks.unshift(introBlock);
+    introBlock = '';
+  }
   var introLines = introBlock.split('\n').filter(function (l) {
     return l.trim();
   });
@@ -834,7 +870,7 @@ function _renderRegole(md) {
     subpageLinks.push(title.trim());
   });
 
-  /* Sezioni con ### */
+  /* Sezioni: ### (formato admin) oppure ## (formato dei contenuti storici) */
   var sections = [];
   var currentSection = null;
   blocks.forEach(function (block) {
@@ -842,7 +878,7 @@ function _renderRegole(md) {
     var headerMatch = null;
     var body = [];
     lines.forEach(function (line) {
-      var hm = line.match(/^###\s+(.+)/);
+      var hm = line.match(/^#{2,3}\s+(.+)/);
       if (hm) {
         headerMatch = hm[1];
       } else if (line.trim() && !line.match(/^\[📄/)) {
@@ -931,6 +967,13 @@ function _renderLore(md, title, icon) {
   if (sections.length === 0) {
     html += '<div class="lore-intro">' + _mdToHtml(md) + '</div>';
     return '<div class="lore-page">' + html + '</div>';
+  }
+
+  /* Testo prima della prima sezione: è un'introduzione, non un titolo.
+     Prima il primo paragrafo finiva in .lore-section-title (tutto maiuscolo,
+     markdown non interpretato). */
+  if (!/^##\s/.test(md.trim()) && sections.length) {
+    html += '<div class="lore-intro">' + _mdToHtml(sections.shift()) + '</div>';
   }
 
   sections.forEach(function (sec) {
@@ -1206,8 +1249,29 @@ function _loadPantheonData(key) {
       return _panCollCache[key];
     });
 }
+/* Una scheda è "in lavorazione" se contiene segnaposto espliciti o
+   campi con l'etichetta ma senza valore. Il badge lo dice all'utente:
+   il contenuto manca per scelta, non per un errore di caricamento. */
+var _DRAFT_MARKERS = [
+  'da scrivere',
+  'tipo di tempio',
+  'cerimonie principali',
+  'chi lo/la adora',
+  'chi la adora',
+  'da definire',
+  'da completare',
+];
+function _isDraftMd(md) {
+  var low = (md || '').toLowerCase();
+  if (_DRAFT_MARKERS.some(function (m) { return low.indexOf(m) !== -1; })) return true;
+  return /(^|\n)[ \t]*[-*][ \t]*\*\*[^*]+\*\*[ \t]*:?[ \t]*(?=\r?\n|$)/.test(md || '');
+}
+function _draftBadge() {
+  return '<span class="draft-badge" title="Scheda in lavorazione">✎ Bozza</span>';
+}
 function _renderDeityPage(d, coll) {
   var ic = _panIcon(d, coll);
+  var isDraft = _isDraftMd(d.md);
   var hero =
     '<div class="pan-deity-hero">' +
     (d.img
@@ -1223,9 +1287,14 @@ function _renderDeityPage(d, coll) {
     _siteEsc(d.n) +
     '</span>' +
     (d.epi ? '<span class="pd-epi">' + _siteEsc(d.epi) + '</span>' : '') +
+    (isDraft ? _draftBadge() : '') +
     '</div></div>';
   var body = d.md ? _mdToHtml(d.md) : '';
-  return '<div class="pan-deity">' + hero + '<div class="pan-deity-body">' + body + '</div></div>';
+  var note = isDraft
+    ? '<div class="pan-draft-note"><span aria-hidden="true">✎</span><span><strong>Scheda in lavorazione.</strong> ' +
+      'Alcune sezioni sono ancora da completare: i contenuti mancanti sono volutamente in sospeso, non un errore di caricamento.</span></div>'
+    : '';
+  return '<div class="pan-deity">' + hero + '<div class="pan-deity-body">' + note + body + '</div></div>';
 }
 function _renderPantheon(md, pageKey) {
   pageKey = pageKey || 'pantheon';
@@ -1242,6 +1311,7 @@ function _renderPantheon(md, pageKey) {
       html +=
         '<div class="pan-section"><div class="pan-section-title">' +
         _siteEsc(d.n) +
+        (_isDraftMd(d.md) ? _draftBadge() : '') +
         '</div>' +
         '<div class="pan-section-body">' +
         _mdToHtml(d.md) +
@@ -1267,6 +1337,7 @@ function _renderPantheon(md, pageKey) {
       ' onerror="' +
       _cfb +
       '">' +
+      (_isDraftMd(d.md) ? _draftBadge() : '') +
       '<div class="pan-tile-caption"><span class="pan-tile-name">' +
       _siteEsc(d.n) +
       '</span>' +

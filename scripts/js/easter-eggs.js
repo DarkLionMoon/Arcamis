@@ -172,9 +172,13 @@
 #arc-d20-result.show #arc-d20-actions { opacity: 1; }
 .arc-d20-action-btn {
   font-family: 'Cinzel', serif;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: .16em;
   text-transform: uppercase;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 9px 20px;
   border: 1px solid rgba(200,155,60,.3);
   background: transparent;

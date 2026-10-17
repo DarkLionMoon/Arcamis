@@ -42,9 +42,9 @@
   --imp-bg: #0c0c14;
   --imp-bg2: #10101c;
   --imp-bg3: #14141f;
-  --imp-border: rgba(200,155,60,.12);
-  --imp-border2: rgba(200,155,60,.25);
-  --imp-glow: 0 0 12px rgba(200,155,60,.1);
+  --imp-border: rgba(var(--gold-rgb),.12);
+  --imp-border2: rgba(var(--gold-rgb),.25);
+  --imp-glow: 0 0 12px rgba(var(--gold-rgb),.1);
 }
 
 .imprese-app { background: var(--imp-bg); color: var(--imp-text); font-family: var(--imp-font); line-height: 1.6; }
@@ -52,7 +52,7 @@
 
 /* ── TITOLO SEZIONE ── */
 .imprese-app .imp-section-hero {
-  background: linear-gradient(135deg, rgba(200,155,60,.04) 0%, var(--imp-bg2) 100%);
+  background: linear-gradient(135deg, rgba(var(--gold-rgb),.04) 0%, var(--imp-bg2) 100%);
   border: 1px solid var(--imp-border2);
   border-radius: 6px;
   padding: 28px 32px;
@@ -111,7 +111,7 @@
   width: 100%;
 }
 .imprese-app .imp-tab-btn {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--imp-border);
   border-bottom: none;
   color: var(--imp-text2);
@@ -127,11 +127,11 @@
   white-space: nowrap;
 }
 .imprese-app .imp-tab-btn:hover {
-  background: rgba(200,155,60,.06);
+  background: rgba(var(--gold-rgb),.06);
   color: var(--imp-gold2);
 }
 .imprese-app .imp-tab-btn.active {
-  background: rgba(200,155,60,.1);
+  background: rgba(var(--gold-rgb),.1);
   color: var(--imp-gold2);
   border-color: var(--imp-border2);
   border-bottom-color: transparent;
@@ -168,7 +168,7 @@
   align-items: center;
   gap: 4px;
   padding: 2px 8px;
-  background: rgba(200,155,60,.06);
+  background: rgba(var(--gold-rgb),.06);
   border: 1px solid var(--imp-border);
   border-radius: 3px;
   font-family: var(--imp-font-heading);
@@ -199,7 +199,7 @@
 .imprese-app .imp-sidenav {
   width: 220px;
   flex-shrink: 0;
-  background: rgba(200,155,60,.02);
+  background: rgba(var(--gold-rgb),.02);
   border: 1px solid var(--imp-border);
   border-radius: 4px;
   padding: 16px 0;
@@ -236,12 +236,12 @@
 }
 .imprese-app .imp-sidenav-btn:hover {
   color: var(--imp-gold);
-  background: rgba(200,155,60,.04);
+  background: rgba(var(--gold-rgb),.04);
 }
 .imprese-app .imp-sidenav-btn.active {
   color: var(--imp-gold2);
   border-left-color: var(--imp-gold);
-  background: rgba(200,155,60,.06);
+  background: rgba(var(--gold-rgb),.06);
   font-weight: 700;
 }
 
@@ -277,7 +277,7 @@
 
 /* ── CARDS ── */
 .imprese-app .imp-card-type {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--imp-border);
   border-radius: 6px;
   margin-bottom: 20px;
@@ -332,7 +332,7 @@
   margin-bottom: 20px;
 }
 .imprese-app .imp-card {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--imp-border);
   border-radius: 6px;
   padding: 16px 18px;
@@ -358,7 +358,7 @@
 
 /* ── RULE BOX ── */
 .imprese-app .imp-rule-box {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--imp-border);
   border-radius: 4px;
   padding: 14px 18px;
@@ -407,8 +407,8 @@
 
 /* ── NOTE BOX ── */
 .imprese-app .imp-note-box {
-  background: rgba(200,155,60,.04);
-  border: 1px solid rgba(200,155,60,.15);
+  background: rgba(var(--gold-rgb),.04);
+  border: 1px solid rgba(var(--gold-rgb),.15);
   border-left: 3px solid var(--imp-gold);
   border-radius: 4px;
   padding: 12px 16px;
@@ -452,14 +452,14 @@
 }
 .imprese-app .imp-tbl td {
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(200,155,60,.06);
+  border-bottom: 1px solid rgba(var(--gold-rgb),.06);
   vertical-align: top;
 }
 .imprese-app .imp-tbl tbody tr {
   transition: background .15s;
 }
 .imprese-app .imp-tbl tbody tr:hover {
-  background: rgba(200,155,60,.04);
+  background: rgba(var(--gold-rgb),.04);
 }
 .imprese-app .imp-tbl tbody tr:last-child td {
   border-bottom: none;
@@ -480,7 +480,7 @@
 
 /* ── LICENZA CARD ── */
 .imprese-app .imp-licenza-card {
-  background: rgba(200,155,60,.03);
+  background: rgba(var(--gold-rgb),.03);
   border: 1px solid var(--imp-border);
   border-radius: 6px;
   margin-bottom: 22px;
@@ -563,7 +563,7 @@
   font-family: var(--imp-font);
   font-size: inherit;
   cursor: pointer;
-  border-bottom: 1px dotted rgba(200,155,60,.35);
+  border-bottom: 1px dotted rgba(var(--gold-rgb),.35);
   transition: .15s;
   padding: 0;
 }
@@ -572,7 +572,7 @@
 /* ── TOOLTIP ── */
 .imprese-app .imp-tip {
   position: relative;
-  border-bottom: 1px dashed rgba(200,155,60,.4);
+  border-bottom: 1px dashed rgba(var(--gold-rgb),.4);
   cursor: help;
 }
 .imprese-app .imp-tip::after {
@@ -582,7 +582,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: rgba(6,8,18,.98);
-  border: 1px solid rgba(200,155,60,.25);
+  border: 1px solid rgba(var(--gold-rgb),.25);
   color: var(--imp-parch);
   font-family: var(--imp-font);
   font-size: 12px;
@@ -602,7 +602,7 @@
 
 /* ── BUTTONS ── */
 .imprese-app .imp-btn {
-  background: rgba(200,155,60,.08);
+  background: rgba(var(--gold-rgb),.08);
   border: 1px solid var(--imp-border2);
   color: var(--imp-gold2);
   font-family: var(--imp-font-heading);
@@ -617,7 +617,7 @@
   white-space: nowrap;
 }
 .imprese-app .imp-btn:hover {
-  background: rgba(200,155,60,.15);
+  background: rgba(var(--gold-rgb),.15);
   border-color: var(--imp-gold);
   box-shadow: var(--imp-glow);
 }
@@ -627,7 +627,7 @@
   color: var(--imp-text2);
 }
 .imprese-app .imp-btn.secondary:hover {
-  background: rgba(200,155,60,.06);
+  background: rgba(var(--gold-rgb),.06);
   color: var(--imp-gold2);
   border-color: var(--imp-border2);
 }
@@ -704,7 +704,7 @@
   margin-top: 16px;
 }
 .imprese-app .imp-hero-link-btn {
-  background: rgba(200,155,60,.06);
+  background: rgba(var(--gold-rgb),.06);
   border: 1px solid var(--imp-border);
   color: var(--imp-gold2);
   font-family: var(--imp-font-heading);
@@ -718,7 +718,7 @@
   transition: all .2s;
 }
 .imprese-app .imp-hero-link-btn:hover {
-  background: rgba(200,155,60,.12);
+  background: rgba(var(--gold-rgb),.12);
   border-color: var(--imp-border2);
   box-shadow: var(--imp-glow);
 }
@@ -781,7 +781,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 14px;
-  border-bottom: 1px solid rgba(200,155,60,.06);
+  border-bottom: 1px solid rgba(var(--gold-rgb),.06);
   font-size: 14px;
 }
 .imprese-app .imp-calc-row:last-child { border-bottom: none; }
@@ -793,7 +793,7 @@
   color: var(--imp-gold2);
 }
 .imprese-app .imp-calc-row.total {
-  background: rgba(200,155,60,.04);
+  background: rgba(var(--gold-rgb),.04);
   border-radius: 4px;
   border: 1px solid var(--imp-border);
   margin-top: 4px;
@@ -871,7 +871,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: rgba(200,155,60,.15);
+  background: rgba(var(--gold-rgb),.15);
   border: 1px solid var(--imp-border2);
   color: var(--imp-gold2);
   font-size: 20px;
