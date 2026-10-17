@@ -37,8 +37,7 @@ const html = computed(() => {
   const out = window.mdRender(props.content || '')
   return DOMPurify.sanitize(out, {
     USE_PROFILES: { html: true, svg: true, mathml: true },
-    ALLOWED_URI_REGEXP:
-      /^(?:(?:https?|mailto|ftp|tel|sms|data|blob|file):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i
+    ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|ftp|tel|sms|data|blob|file):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i
   })
 })
 

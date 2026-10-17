@@ -1,9 +1,14 @@
 import js from '@eslint/js'
 import tsParser from '@typescript-eslint/parser'
+import globals from 'globals'
 
+/* L'elenco di globali era scritto a mano e mancavano API standard
+   (AbortController, URLSearchParams, clearTimeout, BeforeUnloadEvent…):
+   il lint falliva su codice corretto. `globals.browser` è la fonte
+   aggiornata per l'ambiente del browser. */
 export default [
   {
-    ignores: ['dist/**', 'node_modules/**', 'src/**/*.vue']
+    ignores: ['dist/**', 'node_modules/**', 'src/**/*.vue', '../export/**']
   },
   js.configs.recommended,
   {
@@ -15,27 +20,15 @@ export default [
         sourceType: 'module'
       },
       globals: {
-        browser: 'readonly',
-        document: 'readonly',
-        window: 'readonly',
-        sessionStorage: 'readonly',
-        fetch: 'readonly',
-        HeadersInit: 'readonly',
-        Response: 'readonly',
-        File: 'readonly',
-        Image: 'readonly',
-        URL: 'readonly',
-        btoa: 'readonly',
-        atob: 'readonly',
-        crypto: 'readonly',
-        TextEncoder: 'readonly',
-        setTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly'
+        ...globals.browser
       }
     },
     rules: {
-      'no-unused-vars': 'off'
+      'no-unused-vars': 'off',
+      /* Con TypeScript il controllo dei simboli non definiti lo fa il
+         compilatore: no-undef segnala solo i tipi della lib DOM
+         (RequestInit, AbortSignal…) usati come annotazione. */
+      'no-undef': 'off'
     }
   }
 ]

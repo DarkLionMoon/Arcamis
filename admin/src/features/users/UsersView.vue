@@ -2,6 +2,8 @@
 import { onMounted, reactive, ref } from 'vue'
 
 import { authApi } from '@/shared/api'
+import { confirmAction } from '@/shared/confirm'
+import { useUnsavedGuard } from '@/shared/guard'
 import { useAuthStore, useUIStore } from '@/app/store'
 import { hashPassword } from '@/shared/passwords'
 import type { User, UserRole } from '@/types'
@@ -103,12 +105,21 @@ async function addUser() {
   }
 }
 
-function removeUser(username: string) {
+async function removeUser(username: string) {
   if (username === 'admin') {
     ui.toast("L'utente admin non può essere eliminato", 'error')
     return
   }
-  if (!confirm("Eliminare l'utente " + username + '?')) return
+  const ok = await confirmAction({
+    title: 'Elimina utente',
+    message: `Eliminare l'utente «${username}»?`,
+    detail:
+      "L'accesso viene revocato al salvataggio dell'elenco utenti. Le sessioni già aperte restano valide fino alla scadenza.",
+    keyword: username,
+    confirmLabel: 'Elimina utente',
+    danger: true
+  })
+  if (!ok) return
   users.value = users.value.filter((u) => u.username !== username)
   markDirty()
   ui.toast('Utente eliminato — ricorda di salvare', 'success')
@@ -126,6 +137,9 @@ async function save() {
     saving.value = false
   }
 }
+
+/* Utenti modificati ma non salvati: uscire senza salvare li perde. */
+useUnsavedGuard(() => dirty.value, 'modifiche agli utenti non salvate')
 
 onMounted(load)
 </script>

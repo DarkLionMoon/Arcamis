@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { searchApi } from '@/shared/api'
@@ -63,13 +63,15 @@ watch(q, () => {
 
 watch(
   () => props.open,
-  (open) => {
-    if (open) {
-      q.value = ''
-      fullText.value = []
-      focusIdx.value = 0
-      setTimeout(() => inputEl.value?.focus(), 0)
-    }
+  async (open) => {
+    if (!open) return
+    q.value = ''
+    fullText.value = []
+    focusIdx.value = 0
+    /* Focus appena il DOM è aggiornato: con setTimeout(0) i tasti
+       digitati subito dopo ⌘K potevano perdersi (gara con il timer). */
+    await nextTick()
+    inputEl.value?.focus()
   }
 )
 

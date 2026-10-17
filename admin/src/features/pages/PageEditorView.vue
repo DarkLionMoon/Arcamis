@@ -3,6 +3,8 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { pagesApi } from '@/shared/api'
+import { confirmAction } from '@/shared/confirm'
+import { useUnsavedGuard } from '@/shared/guard'
 import { useEditorStore, useUIStore } from '@/app/store'
 import CodeMirrorEditor from '@/features/interface/components/CodeMirrorEditor.vue'
 import MarkdownPreview from '@/features/interface/components/MarkdownPreview.vue'
@@ -65,34 +67,36 @@ function backToList() {
   router.push({ name: 'pages' })
 }
 
-watch(key, (newKey, oldKey) => {
+watch(key, async (newKey, oldKey) => {
   if (newKey && newKey !== oldKey) {
     if (editor.hasUnsavedChanges) {
-      if (!confirm('Ci sono modifiche non salvate. Continuare?')) return
+      const ok = await confirmAction({
+        title: 'Modifiche non salvate',
+        message: `Aprire un'altra pagina e perdere le modifiche a «${oldKey}»?`,
+        confirmLabel: 'Apri senza salvare',
+        cancelLabel: 'Resta qui',
+        danger: true
+      })
+      if (!ok) return
     }
     void load(newKey)
   }
 })
+
+/* Blocca l'uscita (navigazione interna e chiusura tab) se ci sono
+   modifiche pendenti: prima solo il refresh era protetto. */
+useUnsavedGuard(() => editor.hasUnsavedChanges, 'modifiche non salvate sulla pagina')
 
 onMounted(() => {
   if (key.value) {
     if (editor.autosaveEnabled) ensureAutosave()
     void load(key.value)
   }
-  window.addEventListener('beforeunload', warnUnsaved)
 })
 
 onBeforeUnmount(() => {
   if (autosaveTimer.value) clearInterval(autosaveTimer.value)
-  window.removeEventListener('beforeunload', warnUnsaved)
 })
-
-function warnUnsaved(e: BeforeUnloadEvent) {
-  if (editor.hasUnsavedChanges) {
-    e.preventDefault()
-    e.returnValue = ''
-  }
-}
 </script>
 
 <template>
@@ -112,7 +116,9 @@ function warnUnsaved(e: BeforeUnloadEvent) {
           <button class="btn btn-soft btn-sm" type="button" @click="editor.toggleStructuredMode()">
             {{ editor.structuredMode ? 'Markdown' : 'Strutturato' }}
           </button>
-          <button class="btn btn-p" type="button" :disabled="saving" @click="save">💾 Salva</button>
+          <button class="btn btn-p" type="button" :disabled="saving || !editor.modified" @click="save">
+            {{ saving ? 'Salvataggio…' : '💾 Salva' }}
+          </button>
         </div>
       </div>
 
@@ -166,8 +172,13 @@ function warnUnsaved(e: BeforeUnloadEvent) {
       </div>
     </template>
 
-    <div v-else class="arc-empty-side">
-      {{ loading ? 'Caricamento…' : 'Pagina non trovata.' }}
+    <div v-else class="arc-panel">
+      <template v-if="loading">
+        <span class="arc-skel-bar" style="width: 45%"></span>
+        <span class="arc-skel-block"></span>
+        <span class="arc-skel-block" style="width: 80%"></span>
+      </template>
+      <div v-else class="arc-empty-side">Pagina non trovata.</div>
     </div>
   </section>
 </template>

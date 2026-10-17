@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
-import { scannerApi } from '@/shared/api'
+import { errorText, formatBytes, mediaUrl, scannerApi } from '@/shared/api'
+import { confirmAction } from '@/shared/confirm'
 import { useUIStore } from '@/app/store'
 import AdminOnly from '@/features/interface/components/AdminOnly.vue'
 import type { OrphanMediaItem } from '@/types'
@@ -20,7 +21,7 @@ async function load() {
     orphans.value = res.orphans || []
     for (const o of orphans.value) selected.value[o.filename] = selected.value[o.filename] ?? true
   } catch (e) {
-    ui.toast('Errore scan: ' + (e instanceof Error ? e.message : String(e)), 'error')
+    ui.toast(errorText(e), 'error', { title: 'Scansione non riuscita' })
   } finally {
     loading.value = false
   }
@@ -36,14 +37,22 @@ async function deleteSelected() {
     ui.toast('Nessun file selezionato', 'error')
     return
   }
-  if (!confirm(`Eliminare definitivamente ${list.length} file dal repo?`)) return
+  const ok = await confirmAction({
+    title: 'Elimina media orfani',
+    message: `Eliminare definitivamente ${list.length} file dal repository?`,
+    detail: 'Nessuna pagina li referenzia. Il commit di eliminazione non è reversibile dal pannello.',
+    keyword: 'ELIMINA',
+    confirmLabel: 'Elimina file',
+    danger: true
+  })
+  if (!ok) return
   deleting.value = true
   try {
     await scannerApi.deleteOrphanMedia(list)
     ui.toast(`${list.length} file eliminati`, 'success')
     orphans.value = orphans.value.filter((o) => !selected.value[o.filename])
   } catch (e) {
-    ui.toast('Errore: ' + (e instanceof Error ? e.message : String(e)), 'error')
+    ui.toast(errorText(e), 'error', { title: 'Eliminazione non riuscita' })
   } finally {
     deleting.value = false
   }
@@ -74,7 +83,11 @@ onMounted(load)
         </div>
       </div>
 
-      <div v-if="loading" class="arc-empty-side">Scan in corso…</div>
+      <div v-if="loading" class="arc-panel">
+        <span class="arc-skel-bar" style="width: 38%"></span>
+        <span class="arc-skel-block"></span>
+        <span class="arc-skel-block" style="width: 64%"></span>
+      </div>
 
       <div v-else class="arc-panel">
         <div v-for="o in orphans" :key="o.filename" class="arc-changelog-item">
@@ -82,15 +95,16 @@ onMounted(load)
             <input v-model="selected[o.filename]" type="checkbox" />
           </label>
           <img
-            :src="'/images/' + o.filename"
+            :src="mediaUrl(o.filename)"
             :alt="o.filename"
+            loading="lazy"
             style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px"
           />
           <div style="flex: 1">
             <div class="arc-changelog-head">
               <code>{{ o.filename }}</code>
               <span style="margin-left: auto; font-size: 12px; opacity: 0.5">
-                {{ o.size ? (o.size / 1024).toFixed(1) + ' kB' : '' }} · {{ o.path }}
+                {{ formatBytes(o.size) }} · {{ o.path }}
               </span>
             </div>
           </div>

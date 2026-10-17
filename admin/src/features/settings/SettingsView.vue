@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 
-import { settingsApi, registryApi } from '@/shared/api'
+import { registryApi, settingsApi } from '@/shared/api'
+import { confirmAction } from '@/shared/confirm'
+import { useUnsavedGuard } from '@/shared/guard'
 import { useRegistryStore, useUIStore } from '@/app/store'
 import AdminOnly from '@/features/interface/components/AdminOnly.vue'
 import type { SiteSettings, SectionRegistryEntry } from '@/types'
@@ -129,8 +131,15 @@ function addSection() {
   ui.toast('Sezione aggiunta — ricordati di salvare', 'success')
 }
 
-function removeSection(v: string) {
-  if (!confirm(`Eliminare la sezione "${v}"?`)) return
+async function removeSection(v: string) {
+  const ok = await confirmAction({
+    title: 'Elimina sezione',
+    message: `Eliminare la sezione «${v}»?`,
+    detail: 'Le pagine restano nel registro senza gruppo. Diventa effettivo salvando le sezioni.',
+    confirmLabel: 'Elimina sezione',
+    danger: true
+  })
+  if (!ok) return
   registry.removeSection(v)
 }
 
@@ -138,6 +147,7 @@ async function saveSections() {
   saving.value = true
   try {
     await registryApi.save(registry.pages, registry.uiConfig, 'admin: update sections')
+    registry.clearDirty()
     ui.toast('Sezioni salvate', 'success')
   } catch (e) {
     ui.toast('Errore: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -145,6 +155,8 @@ async function saveSections() {
     saving.value = false
   }
 }
+
+useUnsavedGuard(() => registry.dirty, 'sezioni non salvate')
 
 onMounted(load)
 </script>

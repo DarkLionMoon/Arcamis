@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue'
 
 import { registryApi } from '@/shared/api'
+import { useUnsavedGuard } from '@/shared/guard'
 import { useRegistryStore, useUIStore } from '@/app/store'
 import AdminOnly from '@/features/interface/components/AdminOnly.vue'
 import type { UIBottomNavItem, UIAction } from '@/types'
@@ -56,6 +57,7 @@ async function save() {
   try {
     registry.setUIConfig({ bottomNav: items.value, drawerSearch: drawerSearch.value })
     await registryApi.save(registry.pages, registry.uiConfig, 'admin: update ui config')
+    registry.clearDirty()
     ui.toast('Interfaccia salvata — deploy in corso (~30s)', 'success')
   } catch (e) {
     ui.toast('Errore salvataggio: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -63,6 +65,8 @@ async function save() {
     saving.value = false
   }
 }
+
+useUnsavedGuard(() => registry.dirty, 'modifiche all’interfaccia non salvate')
 
 onMounted(load)
 </script>

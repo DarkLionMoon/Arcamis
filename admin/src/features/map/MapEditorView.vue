@@ -2,6 +2,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 
 import { mapApi } from '@/shared/api'
+import { confirmAction } from '@/shared/confirm'
+import { useUnsavedGuard } from '@/shared/guard'
 import { useMapStore, useUIStore } from '@/app/store'
 import type { MapPin } from '@/types'
 
@@ -43,6 +45,9 @@ async function load() {
     loading.value = false
   }
 }
+
+/* Puntine spostate e non salvate: la navigazione lo segnala. */
+useUnsavedGuard(() => map.dirty, 'puntine non salvate sulla mappa')
 
 onMounted(load)
 
@@ -164,9 +169,17 @@ function savePin() {
   ui.toast('Puntina aggiornata — ricorda di salvare', 'success')
 }
 
-function deletePin() {
+async function deletePin() {
   if (selectedIndex.value === null) return
-  if (!confirm('Eliminare questa puntina?')) return
+  const pin = map.pins[selectedIndex.value]
+  const ok = await confirmAction({
+    title: 'Elimina puntina',
+    message: `Eliminare la puntina «${pin?.name || 'senza nome'}»?`,
+    detail: 'La rimozione diventa effettiva solo salvando la mappa.',
+    confirmLabel: 'Elimina puntina',
+    danger: true
+  })
+  if (!ok) return
   map.deletePin(selectedIndex.value)
   selectedIndex.value = null
   ui.toast('Puntina eliminata — ricorda di salvare', 'success')
@@ -187,6 +200,7 @@ async function save() {
   saving.value = true
   try {
     await mapApi.save({ mapImage: map.mapImage, pins: map.pins })
+    map.markSaved()
     ui.toast('Salvato nel repo — deploy in corso (~30s)', 'success')
   } catch (e) {
     ui.toast('Errore di salvataggio: ' + (e instanceof Error ? e.message : String(e)), 'error')

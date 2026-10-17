@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
-import { analyticsApi, decodeBase64Utf8, deployApi, ghApi } from '@/shared/api'
+import { analyticsApi, deployApi, errorText, ghApi, decodeBase64Utf8 } from '@/shared/api'
 import { useAnalyticsStore, useDeployStore, useRegistryStore, useUIStore } from '@/app/store'
 import VIcon from '@/shared/components/VIcon.vue'
 import type { IconName } from '@/shared/icons'
@@ -14,23 +14,47 @@ const ui = useUIStore()
 
 const pageCount = ref(0)
 const error = ref<string | null>(null)
+const series = ref<Array<{ date: string; views: number }>>([])
+const refreshing = ref(false)
 
 async function loadDashboard() {
   try {
-    const [a, d, reg] = await Promise.all([
+    const [a, d, reg, ts] = await Promise.all([
       analyticsApi.getAnalytics(),
-      deployApi.getStatus(),
-      ghApi.get('content/pages/registry.json')
+      deployApi.getStatus().catch(() => null),
+      ghApi.get('content/pages/registry.json'),
+      analyticsApi.getTimeSeries(30).catch(() => ({ series: [] }))
     ])
     analytics.setData(a)
-    deploy.setStatus(d)
+    if (d) deploy.setStatus(d)
+    series.value = ts.series || []
     const parsed = JSON.parse(decodeBase64Utf8(reg.content)) as RegistryData
     registry.setRegistry(parsed.pages, parsed.sections || [], parsed.ui)
     pageCount.value = parsed.pages?.length ?? 0
+    error.value = null
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
-    error.value = msg
-    ui.toast('Errore caricamento dashboard: ' + msg, 'error')
+    error.value = errorText(e)
+    ui.toast(errorText(e), 'error', { title: 'Dashboard non caricata' })
+  }
+}
+
+/** Ricontrolla lo stato del deploy senza ricaricare tutto il pannello. */
+async function refreshDeploy() {
+  refreshing.value = true
+  try {
+    const status = await deployApi.getStatus()
+    deploy.setStatus(status)
+    deploy.startTimer(45)
+    ui.toast(
+      status.configured === false
+        ? 'Token Cloudflare non configurato: stato deploy non disponibile'
+        : 'Stato deploy aggiornato',
+      status.configured === false ? 'warning' : 'success'
+    )
+  } catch (e) {
+    ui.toast(errorText(e), 'error', { title: 'Deploy' })
+  } finally {
+    refreshing.value = false
   }
 }
 
@@ -50,11 +74,39 @@ const deployLabel = computed(() => {
     case 'ok':
       return 'Completato'
     case 'error':
+    case 'failure':
     case 'failed':
       return 'Errore'
     default:
       return s
   }
+})
+
+const deployTone = computed(() => {
+  const s = deploy.status?.status
+  if (!s) return ''
+  if (['success', 'published', 'ok'].includes(s)) return 'is-good'
+  if (['error', 'failure', 'failed'].includes(s)) return 'is-bad'
+  if (['running', 'building', 'queued'].includes(s)) return 'is-warn'
+  return ''
+})
+
+const lastDeploy = computed(() => {
+  const created = deploy.status?.created_on
+  if (!created) return ''
+  const when = new Date(created)
+  return Number.isNaN(when.getTime()) ? '' : when.toLocaleString('it-IT')
+})
+
+/** Sparkline 30 giorni: SVG inline, nessuna libreria di grafici. */
+const sparkline = computed(() => {
+  const values = series.value.map((p) => p.views)
+  if (values.length < 2) return null
+  const max = Math.max(...values, 1)
+  const step = 100 / (values.length - 1)
+  const points = values.map((v, i) => `${(i * step).toFixed(2)},${(30 - (v / max) * 28).toFixed(2)}`)
+  const total = values.reduce((sum, v) => sum + v, 0)
+  return { points: points.join(' '), total, max }
 })
 
 const quickActions: Array<{ label: string; to: string; icon: IconName; desc: string }> = [
@@ -65,6 +117,7 @@ const quickActions: Array<{ label: string; to: string; icon: IconName; desc: str
 ]
 
 onMounted(loadDashboard)
+onBeforeUnmount(() => deploy.stopTimer())
 </script>
 
 <template>
@@ -94,14 +147,42 @@ onMounted(loadDashboard)
         <div class="arc-stat-ico"><VIcon :name="'settings'" :size="20" /></div>
         <div>
           <div class="arc-card-label">Stato deploy</div>
-          <div
-            class="arc-card-value"
-            :class="deploy.status ? 'arc-status-' + deploy.status.status : ''"
-          >
-            {{ deployLabel }}
-          </div>
+          <div class="arc-card-value" :class="deployTone">{{ deployLabel }}</div>
+          <div v-if="deploy.timerActive" class="arc-card-hint">controllo tra {{ deploy.timerSeconds }}s</div>
         </div>
       </div>
+    </div>
+
+    <div class="arc-panel" style="margin-bottom: 16px">
+      <div class="arc-head-row" style="margin-bottom: 10px">
+        <h2 class="arc-panel-title">Visite — ultimi 30 giorni</h2>
+        <div class="arc-head-actions">
+          <span v-if="sparkline" style="font-size: 12px; color: var(--afg-3)">
+            {{ sparkline.total }} visite · picco {{ sparkline.max }}
+          </span>
+          <button class="btn btn-soft btn-sm" type="button" :disabled="refreshing" @click="refreshDeploy">
+            {{ refreshing ? 'Controllo…' : '⟳ Verifica deploy' }}
+          </button>
+        </div>
+      </div>
+
+      <svg
+        v-if="sparkline"
+        class="arc-spark"
+        viewBox="0 0 100 30"
+        preserveAspectRatio="none"
+        role="img"
+        :aria-label="'Andamento delle visite negli ultimi ' + series.length + ' giorni'"
+      >
+        <polyline :points="sparkline.points" fill="none" stroke="var(--accent)" stroke-width="0.8" />
+      </svg>
+      <p v-else class="arc-hint">Serie storica non disponibile (nessuna visita registrata nel periodo).</p>
+
+      <p class="arc-hint" style="margin-top: 10px">
+        Ogni salvataggio nel pannello crea un commit: Cloudflare Pages ricostruisce il sito (~30 s) e l'edge cache viene
+        invalidato per i file modificati. Non serve svuotare la cache a mano.
+        <template v-if="lastDeploy"> Ultimo deploy: {{ lastDeploy }}.</template>
+      </p>
     </div>
 
     <div class="arc-quick-title">Azioni rapide</div>
@@ -135,3 +216,28 @@ onMounted(loadDashboard)
     </div>
   </section>
 </template>
+
+<style scoped>
+.arc-spark {
+  display: block;
+  width: 100%;
+  height: 90px;
+}
+
+.arc-card-value.is-good {
+  color: var(--good);
+}
+
+.arc-card-value.is-bad {
+  color: var(--bad);
+}
+
+.arc-card-value.is-warn {
+  color: var(--warn);
+}
+
+.arc-card-hint {
+  font-size: 11.5px;
+  color: var(--afg-3);
+}
+</style>

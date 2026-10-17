@@ -2,12 +2,14 @@
    ARCAMIS — functions/api/carousel.js
    Endpoint pubblico: legge config carousel da KV e la restituisce.
 ════════════════════════════════════════════════════════ */
+import { coverToUrl } from './_lib/covers.js';
+
 export async function onRequest(context) {
   const KV = context.env.ARCAMIS_CACHE;
   const cors = {
     'Access-Control-Allow-Origin': 'https://arcamis.pages.dev',
     'Content-Type': 'application/json',
-    'Cache-Control': 'no-store',
+    'Cache-Control': 'public, max-age=60, stale-while-revalidate=600',
   };
 
   const SLIDE_KEYS = ['carousel_0', 'carousel_1', 'carousel_2'];
@@ -33,7 +35,7 @@ export async function onRequest(context) {
 
         return {
           key,
-          img: img || null,
+          img: img ? coverToUrl(key, img) : null,
           meta: meta || null,
           btns: btns || null,
         };

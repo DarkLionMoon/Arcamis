@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
-import { scannerApi } from '@/shared/api'
+import { errorText, scannerApi } from '@/shared/api'
 import { useUIStore } from '@/app/store'
 import AdminOnly from '@/features/interface/components/AdminOnly.vue'
 import type { ScanIssue } from '@/types'
@@ -17,7 +17,7 @@ async function load() {
     const res = await scannerApi.scanLinks()
     issues.value = res.issues || []
   } catch (e) {
-    ui.toast('Errore scan: ' + (e instanceof Error ? e.message : String(e)), 'error')
+    ui.toast(errorText(e), 'error', { title: 'Scansione non riuscita' })
   } finally {
     loading.value = false
   }
@@ -42,7 +42,12 @@ onMounted(load)
     <AdminOnly>
       <div class="arc-panel">
         <h3 class="arc-panel-title">Problemi trovati ({{ issues.length }})</h3>
-        <div v-if="loading" class="arc-empty-side">Scan in corso…</div>
+        <div v-if="loading" class="arc-scan-skel">
+          <span class="arc-skel-bar" style="width: 32%"></span>
+          <span class="arc-skel-block"></span>
+          <span class="arc-skel-block" style="width: 72%"></span>
+          <span class="arc-skel-block" style="width: 55%"></span>
+        </div>
         <div v-for="issue in issues" :key="issue.pageKey + issue.type" class="arc-changelog-item">
           <div style="flex: 1">
             <div class="arc-changelog-head">

@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue'
 
 import { ghApi } from '@/shared/api'
+import { confirmAction } from '@/shared/confirm'
 import { useUIStore } from '@/app/store'
 import type { ChangelogEntry } from '@/types'
 
@@ -55,8 +56,16 @@ function cancelEdit() {
   editingIdx.value = null
 }
 
-function remove(idx: number) {
-  if (!confirm(`Eliminare l'entry ${versionLabel(entries.value[idx])}?`)) return
+async function remove(idx: number) {
+  const label = versionLabel(entries.value[idx])
+  const ok = await confirmAction({
+    title: 'Elimina entry del changelog',
+    message: `Eliminare l'entry ${label}?`,
+    detail: 'La rimozione diventa effettiva solo salvando il changelog.',
+    confirmLabel: 'Elimina entry',
+    danger: true
+  })
+  if (!ok) return
   entries.value.splice(idx, 1)
   ui.toast('Entry rimossa — ricordati di salvare', 'success')
 }

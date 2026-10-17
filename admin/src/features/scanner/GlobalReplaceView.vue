@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { searchApi, pagesApi } from '@/shared/api'
+import { pagesApi, searchApi } from '@/shared/api'
+import { confirmAction } from '@/shared/confirm'
 import { useUIStore } from '@/app/store'
 import AdminOnly from '@/features/interface/components/AdminOnly.vue'
 
@@ -50,7 +51,14 @@ async function doReplace() {
     ui.toast('Nessuna pagina selezionata', 'error')
     return
   }
-  if (!confirm(`Sostituire "${q}" in ${keys.length} pagina/e?`)) return
+  const ok = await confirmAction({
+    title: 'Sostituzione globale',
+    message: `Sostituire «${q}» in ${keys.length} pagina/e?`,
+    detail: `Ogni pagina viene riscritta con un commit separato. Dopo la sostituzione il deploy parte automaticamente.`,
+    confirmLabel: `Sostituisci in ${keys.length} pagine`,
+    danger: true
+  })
+  if (!ok) return
   let done = 0
   for (const k of keys) {
     try {

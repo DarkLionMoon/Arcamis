@@ -104,6 +104,10 @@ export const useRegistryStore = defineStore('registry', () => {
   })
   const loading = ref(false)
   const error = ref<string | null>(null)
+  /* Modifiche non salvate del registro (menu, sezioni, configurazione UI):
+     prima solo lo store sapeva di essere stato toccato, quindi nessun guard
+     poteva avvisare prima di perdere il lavoro. */
+  const dirty = ref(false)
 
   const pagesByKey = computed(() => {
     const map = new Map<string, PageRegistryEntry>()
@@ -127,45 +131,62 @@ export const useRegistryStore = defineStore('registry', () => {
     pages.value = p
     sections.value = s
     if (ui) uiConfig.value = ui
+    dirty.value = false
+  }
+
+  function markDirty() {
+    dirty.value = true
+  }
+
+  function clearDirty() {
+    dirty.value = false
   }
 
   function updatePage(key: string, updates: Partial<PageRegistryEntry>) {
     const idx = pages.value.findIndex((p) => p.k === key)
     if (idx !== -1) {
       pages.value[idx] = { ...pages.value[idx], ...updates }
+      dirty.value = true
     }
   }
 
   function addPage(page: PageRegistryEntry) {
     pages.value.push(page)
+    dirty.value = true
   }
 
   function removePage(key: string) {
     pages.value = pages.value.filter((p) => p.k !== key)
+    dirty.value = true
   }
 
   function reorderPages(fromIndex: number, toIndex: number) {
     const [moved] = pages.value.splice(fromIndex, 1)
     pages.value.splice(toIndex, 0, moved)
+    dirty.value = true
   }
 
   function updateSection(value: string, updates: Partial<SectionRegistryEntry>) {
     const idx = sections.value.findIndex((s) => s.v === value)
     if (idx !== -1) {
       sections.value[idx] = { ...sections.value[idx], ...updates }
+      dirty.value = true
     }
   }
 
   function addSection(section: SectionRegistryEntry) {
     sections.value.push(section)
+    dirty.value = true
   }
 
   function removeSection(value: string) {
     sections.value = sections.value.filter((s) => s.v !== value)
+    dirty.value = true
   }
 
   function setUIConfig(config: UIConfig) {
     uiConfig.value = config
+    dirty.value = true
   }
 
   return {
@@ -174,6 +195,9 @@ export const useRegistryStore = defineStore('registry', () => {
     uiConfig,
     loading,
     error,
+    dirty,
+    markDirty,
+    clearDirty,
     pagesByKey,
     pagesById,
     sectionsByValue,
@@ -331,6 +355,10 @@ export const useMapStore = defineStore('map', () => {
     dirty.value = true
   }
 
+  function markSaved() {
+    dirty.value = false
+  }
+
   function clear() {
     pins.value = []
     mapImage.value = '/mappa.webp'
@@ -350,6 +378,7 @@ export const useMapStore = defineStore('map', () => {
     typeColor,
     typeLabel,
     setMapData,
+    markSaved,
     addPin,
     updatePin,
     deletePin,
@@ -505,10 +534,21 @@ export const useUIStore = defineStore('ui', () => {
   interface Toast {
     id: number
     message: string
+    title?: string
     type: 'success' | 'error' | 'info' | 'warning'
+    duration: number
   }
   const toasts = ref<Toast[]>([])
+  const toastTimers = new Map<number, ReturnType<typeof setTimeout>>()
   let toastId = 0
+  /* Gli errori restano più a lungo: vanno letti, non intravisti. */
+  const TOAST_DURATION: Record<Toast['type'], number> = {
+    success: 4000,
+    info: 5000,
+    warning: 6000,
+    error: 8000
+  }
+  const MAX_TOASTS = 4
 
   // Modals
   const modals = ref<Record<string, boolean>>({})
@@ -544,12 +584,44 @@ export const useUIStore = defineStore('ui', () => {
     if (label) statusLabel.value = label
   }
 
-  function toast(message: string, type: Toast['type'] = 'info') {
+  function clearToastTimer(id: number) {
+    const timer = toastTimers.get(id)
+    if (timer !== undefined) {
+      clearTimeout(timer)
+      toastTimers.delete(id)
+    }
+  }
+
+  function scheduleToast(id: number, duration: number) {
+    clearToastTimer(id)
+    toastTimers.set(
+      id,
+      setTimeout(() => dismissToast(id), duration)
+    )
+  }
+
+  function dismissToast(id: number) {
+    clearToastTimer(id)
+    toasts.value = toasts.value.filter((t) => t.id !== id)
+  }
+
+  function toast(message: string, type: Toast['type'] = 'info', options: { title?: string; duration?: number } = {}) {
     const id = ++toastId
-    toasts.value.push({ id, message, type })
-    setTimeout(() => {
-      toasts.value = toasts.value.filter((t) => t.id !== id)
-    }, 4000)
+    const duration = options.duration ?? TOAST_DURATION[type]
+    toasts.value.push({ id, message, title: options.title, type, duration })
+    /* Mai accumulare decine di avvisi: i più vecchi escono da soli. */
+    while (toasts.value.length > MAX_TOASTS) dismissToast(toasts.value[0].id)
+    scheduleToast(id, duration)
+    return id
+  }
+
+  /** Sospende il timer (hover/focus): l'avviso non sparisce mentre lo si legge. */
+  function holdToast(id: number) {
+    clearToastTimer(id)
+  }
+
+  function releaseToast(id: number) {
+    if (toasts.value.some((t) => t.id === id)) scheduleToast(id, 2500)
   }
 
   function openModal(id: string) {
@@ -581,6 +653,9 @@ export const useUIStore = defineStore('ui', () => {
     setActiveView,
     setStatus,
     toast,
+    dismissToast,
+    holdToast,
+    releaseToast,
     openModal,
     closeModal,
     isModalOpen

@@ -2,7 +2,9 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { registryApi, pagesApi, carouselApi } from '@/shared/api'
+import { carouselApi, pagesApi, registryApi } from '@/shared/api'
+import { confirmAction } from '@/shared/confirm'
+import { useUnsavedGuard } from '@/shared/guard'
 import { useCoversStore, useRegistryStore, useUIStore } from '@/app/store'
 import type { PageRegistryEntry, SectionRegistryEntry } from '@/types'
 
@@ -87,10 +89,18 @@ function openPage(key: string) {
 }
 
 async function deletePage(p: PageRegistryEntry) {
-  if (!confirm(`Eliminare la pagina "${p.l}" dal registro?`)) return
+  const ok = await confirmAction({
+    title: 'Rimuovi pagina dal registro',
+    message: `Eliminare «${p.l}» dal registro di navigazione?`,
+    detail: 'Il file della pagina non viene toccato: potrai recuperarlo dal repository o dalla cronologia.',
+    confirmLabel: 'Rimuovi dal registro',
+    danger: true
+  })
+  if (!ok) return
   try {
     registry.removePage(p.k)
     await registryApi.save(registry.pages)
+    registry.clearDirty()
     ui.toast('Pagina rimossa dal registro — ricorda di eliminare il file', 'success')
   } catch (e) {
     ui.toast('Errore: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -143,6 +153,10 @@ async function createPage() {
     savingNew.value = false
   }
 }
+
+/* Riordino/rimozione restano nel registro: senza guard si perdevano
+   navigando altrove prima del salvataggio. */
+useUnsavedGuard(() => registry.dirty, 'modifiche al registro pagine non salvate')
 
 onMounted(load)
 </script>

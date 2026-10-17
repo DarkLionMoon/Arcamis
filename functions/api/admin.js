@@ -7,6 +7,7 @@ import {
   isAllowedDiscordWebhook,
   rateLimitCheck,
 } from './_lib/auth.js';
+import { coverToUrl } from './_lib/covers.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -29,6 +30,23 @@ export async function onRequest(context) {
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: cors });
   }
+
+  /*
+    ── Matrice di accesso delle action ─────────────────────────────
+    PUBBLICHE (nessuna sessione):
+      login, logout, check, get_csrf,
+      track_view      (beacon dei visitatori, protetto da Origin/Referer)
+      get_covers      (la home pubblica mostra le copertine)
+      get_site_settings (il sito pubblico legge banner/disclaimer)
+    PRIVATE (richiedono una sessione valida, 401 senza cookie):
+      tutte le altre — log di audit, bozze, analytics, scanner, cestino,
+      backup, versioni, utenti, impostazioni e ogni scrittura.
+    SCRITTURE: oltre alla sessione richiedono il token CSRF
+      (header X-CSRF-Token) e sono rate limited.
+    Solo admin (403 per editor): set_users, set_gh_token, set_webhook,
+      test_webhook, publish_draft, empty/restore_trash, delete_orphan_media,
+      save/restore_version, find_orphan_media, nav_audit*.
+  */
 
   /* ── Helper: legge cookie ── */
   function getCookie(name) {
@@ -295,10 +313,14 @@ export async function onRequest(context) {
   if (action === 'get_users') {
     const authed = await checkSession();
     if (!authed) return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    /* L'elenco utenti è una funzione di amministrazione: la UI nasconde
+       la sezione agli editor, l'API deve comportarsi allo stesso modo. */
+    if ((await sessionRole()) !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo admin' }), { status: 403, headers: cors });
+    }
     try {
       const raw = await KV.get('admin_users');
       const users = raw ? JSON.parse(raw) : [];
-      const role = await sessionRole();
       /* Gli hash non devono mai lasciare il backend: set_users li conserva
          automaticamente quando il client non sta cambiando la password. */
       const safeUsers = users.map((u) => ({
@@ -467,20 +489,29 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
 
-  /* ════ LEGGI TUTTE LE COVER ADMIN — pubblica ════ */
+  /* ════ LEGGI TUTTE LE COVER ADMIN — pubblica ════
+     I data URL base64 vengono sostituiti da /api/cover/<id>:
+     il JSON passa da ~7 MB a pochi KB e le immagini vengono
+     scaricate (e messe in cache) solo quando servono. */
   if (action === 'get_covers') {
+    const publicHeaders = {
+      'Access-Control-Allow-Origin': url.origin,
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, max-age=60, stale-while-revalidate=600',
+    };
     try {
       const list = await KV.list({ prefix: 'admin_cover_' });
       const covers = {};
       await Promise.all(
         list.keys.map(async function (k) {
           const pageId = k.name.replace('admin_cover_', '');
-          covers[pageId] = await KV.get(k.name);
+          const value = await KV.get(k.name);
+          covers[pageId] = coverToUrl(pageId, value);
         })
       );
-      return new Response(JSON.stringify({ covers }), { headers: cors });
+      return new Response(JSON.stringify({ covers }), { headers: publicHeaders });
     } catch (e) {
-      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: publicHeaders });
     }
   }
 
@@ -552,6 +583,9 @@ export async function onRequest(context) {
 
   /* ════ STATO GITHUB TOKEN ════ */
   if (action === 'gh_token_status') {
+    if (!(await sessionRole())) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
     const stored = KV ? await KV.get('gh_token') : null;
     const configured = !!(env.GH_TOKEN || stored);
     return new Response(
@@ -589,6 +623,9 @@ export async function onRequest(context) {
 
   /* ════ GET LOG ════ */
   if (action === 'get_log') {
+    if (!(await sessionRole())) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
     let entries = [];
     try {
       const raw = await KV.get('admin_log', 'text');
@@ -607,6 +644,10 @@ export async function onRequest(context) {
 
   /* ════ AUDIT LOG (scrittura da client admin) ════ */
   if (action === 'audit' && request.method === 'POST') {
+    const sessRole = await sessionRole();
+    if (!sessRole) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
     const csrfOk = await verifyCsrf(request);
     if (!csrfOk)
       return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
@@ -714,6 +755,9 @@ export async function onRequest(context) {
 
   /* ════ VALIDATE PAGE ════ */
   if (action === 'validate_page' && request.method === 'POST') {
+    if (!(await sessionRole())) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
     let body;
     try {
       body = await request.json();
@@ -781,6 +825,9 @@ export async function onRequest(context) {
 
   /* ════ GET DRAFT ════ */
   if (action === 'get_draft') {
+    if (!(await sessionRole())) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
     const url2 = new URL(request.url);
     const pageKey = url2.searchParams.get('pageKey');
     if (!validPageKey(pageKey)) {
@@ -814,6 +861,9 @@ export async function onRequest(context) {
 
   /* ════ LIST DRAFTS ════ */
   if (action === 'list_drafts') {
+    if (!(await sessionRole())) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
     const list = await KV.list({ prefix: 'draft_' });
     const drafts = [];
     for (const key of list.keys) {
@@ -989,6 +1039,9 @@ export async function onRequest(context) {
 
   /* ════ GET PAGE VIEWS ════ */
   if (action === 'get_page_views' && request.method === 'POST') {
+    if (!(await sessionRole())) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
     let body;
     try {
       body = await request.json();
@@ -1005,6 +1058,9 @@ export async function onRequest(context) {
 
   /* ════ GET ANALYTICS ════ */
   if (action === 'get_analytics') {
+    if (!(await sessionRole())) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
     const list = await KV.list({ prefix: 'views_' });
     const pages = [];
     for (const key of list.keys) {
@@ -1021,6 +1077,9 @@ export async function onRequest(context) {
 
   /* ════ TIME SERIES ANALYTICS ════ */
   if (action === 'get_analytics_timeseries') {
+    if (!(await sessionRole())) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
     const days = parseInt(url.searchParams.get('days') || '30', 10);
     const limit = Math.min(Math.max(days, 1), 90);
     const series = [];

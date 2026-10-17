@@ -2,24 +2,34 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { useAuthStore, useUIStore } from '@/app/store'
-import { authApi } from '@/shared/api'
+import { useAuthStore, useEditorStore, useMapStore, useUIStore } from '@/app/store'
+import { authApi, errorText } from '@/shared/api'
 import GlobalSearch from '@/features/interface/components/GlobalSearch.vue'
+import ToastHost from '@/shared/components/ToastHost.vue'
 import VIcon from '@/shared/components/VIcon.vue'
+import { canAccess } from '@/app/router/roles'
 import type { IconName } from '@/shared/icons'
 
 const auth = useAuthStore()
 const ui = useUIStore()
+const editor = useEditorStore()
+const map = useMapStore()
 const router = useRouter()
 const route = useRoute()
 const sidebarOpen = ref(false)
 const searchOpen = ref(false)
 
+/* Modifiche pendenti in qualunque punto del pannello: visibili in topbar
+   così l'utente capisce perché la navigazione chiede conferma. */
+const pending = computed(() => editor.hasUnsavedChanges || map.dirty)
+
 function onGlobalKeydown(e: KeyboardEvent) {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault()
     searchOpen.value = !searchOpen.value
+    return
   }
+  if (e.key === 'Escape' && sidebarOpen.value) sidebarOpen.value = false
 }
 
 onMounted(() => window.addEventListener('keydown', onGlobalKeydown))
@@ -39,8 +49,9 @@ const roleLabel = computed(() => {
 async function logout() {
   try {
     await authApi.logout()
-  } catch {
-    /* best effort */
+  } catch (e) {
+    /* best effort: la sessione locale viene comunque chiusa */
+    ui.toast(errorText(e), 'warning', { title: 'Logout' })
   }
   auth.clearAuth()
   ui.toast('Logout effettuato', 'info')
@@ -69,14 +80,17 @@ const groups: Array<{ title: string; items: NavItem[] }> = [
     title: 'Contenuti',
     items: [
       { label: 'Pagine', to: '/pagine', icon: 'pages' },
-      { label: 'Copertine', to: '/copertine', icon: 'covers' }
+      { label: 'Copertine', to: '/copertine', icon: 'covers', minRole: 'editor' },
+      { label: 'Media', to: '/media', icon: 'media' },
+      { label: 'Cestino', to: '/cestino', icon: 'trash', minRole: 'admin' }
     ]
   },
   {
     title: 'Feature',
     items: [
-      { label: 'Mappa', to: '/mapa', icon: 'map' },
-      { label: 'Carousel', to: '/carousel', icon: 'carousel' }
+      { label: 'Mappa', to: '/mapa', icon: 'map', minRole: 'editor' },
+      { label: 'Carousel', to: '/carousel', icon: 'carousel', minRole: 'editor' },
+      { label: 'Changelog', to: '/changelog', icon: 'changelog', minRole: 'editor' }
     ]
   },
   {
@@ -85,14 +99,6 @@ const groups: Array<{ title: string; items: NavItem[] }> = [
       { label: 'Navigazione', to: '/navigazione', icon: 'navigate', minRole: 'admin' },
       { label: 'Interfaccia', to: '/interfaccia', icon: 'interface', minRole: 'admin' },
       { label: 'Impostazioni', to: '/impostazioni', icon: 'settings', minRole: 'admin' }
-    ]
-  },
-  {
-    title: 'Contenuto',
-    items: [
-      { label: 'Media', to: '/media', icon: 'media' },
-      { label: 'Cestino', to: '/cestino', icon: 'trash', minRole: 'admin' },
-      { label: 'Changelog', to: '/changelog', icon: 'changelog' }
     ]
   },
   {
@@ -108,8 +114,7 @@ const groups: Array<{ title: string; items: NavItem[] }> = [
 ]
 
 function visible(items: NavItem[]) {
-  if (auth.role === 'admin') return items
-  return items.filter((i) => !i.minRole || auth.role === i.minRole)
+  return items.filter((item) => canAccess(auth.role, item.minRole))
 }
 
 function normalize(p: string) {
@@ -121,6 +126,7 @@ const pageTitle = computed(() => {
     const hit = g.items.find((i) => normalize(i.to) === normalize(route.path))
     if (hit) return hit.label
   }
+  if (route.name === 'editor') return 'Editor pagina'
   return 'Pannello'
 })
 </script>
@@ -136,20 +142,22 @@ const pageTitle = computed(() => {
         </div>
       </div>
 
-      <nav class="arc-nav">
+      <nav id="arc-nav" class="arc-nav">
         <template v-for="group in groups" :key="group.title">
-          <div class="arc-nav-group-title">{{ group.title }}</div>
-          <router-link
-            v-for="item in visible(group.items)"
-            :key="item.to"
-            :to="item.to"
-            class="arc-nav-link"
-            active-class="active"
-            @click="closeSidebar"
-          >
-            <span class="arc-nav-ico"><VIcon :name="item.icon" /></span>
-            <span class="arc-nav-label">{{ item.label }}</span>
-          </router-link>
+          <template v-if="visible(group.items).length">
+            <div class="arc-nav-group-title">{{ group.title }}</div>
+            <router-link
+              v-for="item in visible(group.items)"
+              :key="item.to"
+              :to="item.to"
+              class="arc-nav-link"
+              active-class="active"
+              @click="closeSidebar"
+            >
+              <span class="arc-nav-ico"><VIcon :name="item.icon" /></span>
+              <span class="arc-nav-label">{{ item.label }}</span>
+            </router-link>
+          </template>
         </template>
       </nav>
 
@@ -159,12 +167,30 @@ const pageTitle = computed(() => {
       </div>
     </aside>
 
+    <button
+      v-if="sidebarOpen"
+      class="arc-sidebar-backdrop"
+      type="button"
+      aria-label="Chiudi navigazione"
+      @click="closeSidebar"
+    ></button>
+
     <div class="arc-main">
       <header class="arc-topbar">
-        <button class="arc-topbar-burger btn btn-soft btn-sm" type="button" @click="sidebarOpen = !sidebarOpen">
+        <button
+          class="arc-topbar-burger btn btn-soft btn-sm"
+          type="button"
+          :aria-expanded="sidebarOpen"
+          aria-controls="arc-nav"
+          aria-label="Apri o chiudi la navigazione"
+          @click="sidebarOpen = !sidebarOpen"
+        >
           ☰
         </button>
         <span class="arc-topbar-title">{{ pageTitle }}</span>
+        <span v-if="pending" class="arc-pending" title="Ci sono modifiche non ancora salvate">
+          ● modifiche non salvate
+        </span>
         <div class="arc-topbar-user">
           <span class="arc-topbar-hint"><kbd>⌘K</kbd> Cerca</span>
           <span class="arc-role" :class="auth.role"> {{ auth.user || 'admin' }} · {{ roleLabel }} </span>
@@ -181,13 +207,6 @@ const pageTitle = computed(() => {
     </div>
 
     <GlobalSearch :open="searchOpen" @close="searchOpen = false" />
-
-    <div class="arc-toasts">
-      <transition-group name="arc-toast">
-        <div v-for="t in ui.toasts" :key="t.id" class="arc-toast" :class="'arc-toast--' + t.type">
-          {{ t.message }}
-        </div>
-      </transition-group>
-    </div>
+    <ToastHost />
   </div>
 </template>

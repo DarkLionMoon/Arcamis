@@ -2,6 +2,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 
 import { registryApi } from '@/shared/api'
+import { confirmAction } from '@/shared/confirm'
+import { useUnsavedGuard } from '@/shared/guard'
 import { useRegistryStore, useUIStore } from '@/app/store'
 import AdminOnly from '@/features/interface/components/AdminOnly.vue'
 import type { PageRegistryEntry, SectionRegistryEntry } from '@/types'
@@ -86,7 +88,15 @@ function applyEdit() {
 }
 
 async function removePage(p: PageRegistryEntry) {
-  if (!confirm(`Rimuovere "${p.l}" dal registro?`)) return
+  const ok = await confirmAction({
+    title: 'Rimuovi dal registro',
+    message: `Rimuovere «${p.l}» dalla navigazione?`,
+    detail:
+      'Il file della pagina resta nel repository: viene tolta solo la voce di menu. Diventa effettivo al salvataggio.',
+    confirmLabel: 'Rimuovi voce',
+    danger: true
+  })
+  if (!ok) return
   registry.removePage(p.k)
   ui.toast('Rimossa — ricordati di salvare', 'success')
 }
@@ -108,8 +118,15 @@ function addSection() {
   ui.toast('Sezione aggiunta — ricordati di salvare', 'success')
 }
 
-function removeSection(v: string) {
-  if (!confirm(`Eliminare la sezione "${sectionLabel(v)}"?`)) return
+async function removeSection(v: string) {
+  const ok = await confirmAction({
+    title: 'Elimina sezione',
+    message: `Eliminare la sezione «${sectionLabel(v)}»?`,
+    detail: 'Le pagine collegate alla sezione restano nel registro ma senza gruppo. Diventa effettivo al salvataggio.',
+    confirmLabel: 'Elimina sezione',
+    danger: true
+  })
+  if (!ok) return
   registry.removeSection(v)
   ui.toast('Sezione rimossa — ricordati di salvare', 'success')
 }
@@ -118,6 +135,7 @@ async function save() {
   saving.value = true
   try {
     await registryApi.save(registry.pages, registry.uiConfig)
+    registry.clearDirty()
     ui.toast('Navigazione salvata — deploy in corso (~30s)', 'success')
   } catch (e) {
     ui.toast('Errore salvataggio: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -125,6 +143,9 @@ async function save() {
     saving.value = false
   }
 }
+
+/* Il registro è condiviso: il guard copre ordine, sezioni e voci rimosse. */
+useUnsavedGuard(() => registry.dirty, 'modifiche alla navigazione non salvate')
 
 onMounted(load)
 </script>
