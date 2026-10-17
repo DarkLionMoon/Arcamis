@@ -30,3 +30,6 @@ __pycache__/
 .vercel/
 .netlify/
 .wrangler/
+
+# Report e artefatti locali dei test
+admin/test-results/

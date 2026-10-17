@@ -11,21 +11,22 @@ import { test, expect } from 'playwright/test'
 
   Default: skipped (nessun ambiente/credenziali in CI locale).
 */
-const testSkip = (!process.env.ADMIN_USER || !process.env.ADMIN_PASSWORD)
-  ? test.skip
-  : test
+const testSkip = !process.env.ADMIN_USER || !process.env.ADMIN_PASSWORD ? test.skip : test
 
 testSkip('login → dashboard', async ({ page }) => {
-  await page.goto('/admin/')
-  await page.fill('#login input[type=text], #login input[name=username], #login input:not([type=password])', process.env.ADMIN_USER!)
-  await page.fill('#login input[type=password], #login input[name=password]', process.env.ADMIN_PASSWORD!)
-  await page.click('#login button[type=submit], #login .btn-primary, #login button')
-  await expect(page.locator('#app')).toBeVisible({ timeout: 15_000 })
+  /* DOM della shell Vue: login su #/login, pannello in .arc-app. */
+  await page.goto('/admin/app#/login')
+  await page.getByLabel('Username').fill(process.env.ADMIN_USER!)
+  await page.getByLabel('Password').fill(process.env.ADMIN_PASSWORD!)
+  await page.getByRole('button', { name: 'Accedi' }).click()
+
+  await expect(page.locator('.arc-sidebar')).toBeVisible({ timeout: 15_000 })
+  await expect(page.locator('.arc-role')).toBeVisible()
 })
 
 testSkip('ricerca globale ⌘K mostra risultati', async ({ page }) => {
-  await page.goto('/admin/')
-  await page.waitForSelector('#app', { timeout: 20_000 })
+  await page.goto('/admin/app#/')
+  await expect(page.locator('.arc-sidebar')).toBeVisible({ timeout: 20_000 })
   await page.keyboard.press('Control+K')
-  await expect(page.locator('#gs-modal')).toBeVisible()
+  await expect(page.locator('.arc-search-overlay')).toBeVisible()
 })
