@@ -78,7 +78,11 @@ describe('rotte pubbliche (sorgente)', () => {
 });
 
 describe.skipIf(!hasDist)('artefatti di build (dist)', () => {
-  const shell = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
+  /* Le letture avvengono dentro gli `it`, mai nel corpo della suite: il
+     factory di describe viene eseguito anche quando la suite è skippata,
+     quindi un readFileSync qui faceva fallire `npm test` (che non builda)
+     con ENOENT su dist/index.html. */
+  const read = (rel) => fs.readFileSync(path.join(dist, rel), 'utf8');
 
   it('prerenderizza ogni rotta con un head dedicato', () => {
     for (const route of routes.filter((item) => item.path)) {
@@ -143,6 +147,7 @@ describe.skipIf(!hasDist)('artefatti di build (dist)', () => {
   });
 
   it('serve i font dal proprio dominio', () => {
+    const shell = read('index.html');
     expect(shell).not.toContain('fonts.googleapis.com');
     expect(shell).not.toContain('fonts.gstatic.com');
     expect(shell).toContain('/scripts/css/');
