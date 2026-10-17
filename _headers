@@ -4,7 +4,7 @@
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), autoplay=(self)
-  Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https: http:; media-src 'self' blob: https:; frame-src 'self' https://www.youtube.com https://player.vimeo.com; connect-src 'self' https://discord.com https://arcamis.pages.dev https://docs.google.com https://api.github.com; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https: http:; media-src 'self' blob: https:; frame-src 'self' https://www.youtube.com https://player.vimeo.com; connect-src 'self' https://discord.com https://arcamis.pages.dev https://docs.google.com https://api.github.com; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
 
 /content/*
   Cache-Control: public, max-age=0, must-revalidate
@@ -25,11 +25,32 @@
   Pragma: no-cache
   Expires: 0
 
+# Asset con hash nel nome: possono essere immutabili per un anno.
+# I nomi sono generati dal build (scripts/build-post.mjs + vite).
+/scripts/css/main.*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/scripts/js/*.*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fallback per file senza hash (es. dev o vecchi deploy):
+/scripts/css/*
+  Cache-Control: public, max-age=0, must-revalidate
+
 /scripts/js/*
   Cache-Control: public, max-age=0, must-revalidate
 
-/scripts/css/*
+*.{png,webp,jpg,svg,ico}
+  Cache-Control: public, max-age=604800
+
+# Font self-hosted: nome con hash del contenuto → cache immutabile.
+/fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
-/*.{png,webp,jpg,svg,ico}
-  Cache-Control: public, max-age=604800
+/manifest.webmanifest
+  Cache-Control: public, max-age=86400
+  Content-Type: application/manifest+json
+
+/sitemap.xml
+/robots.txt
+  Cache-Control: public, max-age=3600

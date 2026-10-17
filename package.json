@@ -6,15 +6,21 @@
   "description": "Wiki ufficiale del server D&D Arcamis",
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:site && npm --prefix admin run build && rm -rf dist/admin && cp -R export/admin dist/admin",
-    "build:site": "vite build",
+    "build": "npm run build:site",
+    "build:site": "vite build && node scripts/build-post.mjs",
+    "build:admin": "npm --prefix admin run build",
+    "seo": "node scripts/gen-seo-static.mjs",
+    "icons": "node scripts/make-icons.mjs",
+    "fonts": "node scripts/fetch-fonts.mjs",
+    "deploy": "npm run build && npx wrangler pages deploy dist --project-name arcamis",
     "preview": "vite preview",
     "lint": "eslint scripts/js/",
     "lint:fix": "eslint scripts/js/ --fix",
-    "format": "prettier --write 'eslint.config.js' 'vite.config.js' 'functions/**/*.js'",
-    "format:check": "prettier --check 'eslint.config.js' 'vite.config.js' 'functions/**/*.js'",
+    "format": "prettier --write eslint.config.js vite.config.js \"functions/**/*.js\"",
+    "format:check": "prettier --check eslint.config.js vite.config.js \"functions/**/*.js\"",
     "typecheck": "echo 'No TypeScript configured yet'",
     "test": "vitest run",
+    "test:routes": "npm run build:site && vitest run scripts/__tests__/routes.test.js",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -22,6 +28,7 @@
   },
   "devDependencies": {
     "vite": "^6.0.0",
+    "esbuild": "^0.25.0",
     "eslint": "^9.0.0",
     "@eslint/js": "^9.0.0",
     "prettier": "^3.4.0",

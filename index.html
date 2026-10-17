@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="it" dir="ltr">
 <head>
-<link rel="icon" type="image/png" href="/Artboard_1.png">
-<link rel="apple-touch-icon" href="/Artboard_1.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Arcamis</title>
+<title>Arcamis Wiki — Il mondo di Arcamis</title>
 <meta name="cf-pages-sha" content="$CF_PAGES_COMMIT_SHA">
 <meta name="description" content="Wiki ufficiale del server D&D Arcamis — regole, lore, personaggi e mestieri del mondo.">
 <meta name="author" content="DarkLionMoon">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#080a0e">
 <!-- Open Graph -->
-<meta property="og:title" content="Arcamis Wiki">
+<meta property="og:title" content="Arcamis Wiki — Il mondo di Arcamis">
 <meta property="og:description" content="Wiki ufficiale del server D&D Arcamis. Scopri la lore, le regole e i segreti del mondo.">
 <meta property="og:image" content="https://arcamis.pages.dev/Artboard_1.png">
 <meta property="og:type" content="website">
@@ -21,14 +23,12 @@
 <meta property="og:locale" content="it_IT">
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Arcamis Wiki">
+<meta name="twitter:title" content="Arcamis Wiki — Il mondo di Arcamis">
 <meta name="twitter:description" content="Wiki ufficiale del server D&D Arcamis.">
 <meta name="twitter:image" content="https://arcamis.pages.dev/Artboard_1.png">
 <link rel="canonical" href="https://arcamis.pages.dev">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Arcamis Wiki","url":"https://arcamis.pages.dev","description":"Wiki ufficiale del server D&D Arcamis","inLanguage":"it","publisher":{"@type":"Organization","name":"Arcamis"}}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preload" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/></noscript>
+<link rel="stylesheet" href="/scripts/css/fonts.css">
 <link rel="stylesheet" href="/scripts/css/style-base.css">
 <link rel="stylesheet" href="/scripts/css/changelog.css">
 <link rel="stylesheet" href="/scripts/css/style-home.css">
@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="/scripts/css/style-page.css">
 <link rel="stylesheet" href="/scripts/css/style-fx.css">
 <link rel="stylesheet" href="/scripts/css/style-ui.css">
+<link rel="stylesheet" href="/scripts/css/style-shell.css">
 <link rel="stylesheet" href="/scripts/css/style-rep.css">
 <link rel="stylesheet" href="/scripts/css/style-compendio.css">
 <link rel="stylesheet" href="/scripts/css/style-imprese.css">
@@ -119,6 +120,9 @@
   </div>
   <div class="mn-section mn-section--lavori"></div>
   <!-- Le sezioni mobile vengono generate dinamicamente da custom-nav.js -->
+  <div class="mn-section">
+    <div class="mn-item" onclick="closeMobileNav();gp('pag-credits','Crediti &amp; Legale','⚖️')"><span class="mn-ii">⚖️</span>Crediti &amp; Legale</div>
+  </div>
   <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="mn-discord">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
     ENTRA NEL DISCORD
@@ -131,10 +135,14 @@
   <!-- HOME VIEW -->
   <div id="hv" class="vp" style="display:block">
 
+    <!-- H1 della home: la hero è fatta di slide, quindi il titolo
+         semantico resta qui (visibile solo ai lettori di schermo). -->
+    <h1 class="sr-only">Arcamis — wiki del server D&amp;D: regole, lore e personaggi</h1>
+
     <!-- ═══ HERO CAROUSEL ═══ -->
     <div id="carousel-wrap">
-      <div class="cnav" id="cprev" onclick="changeSlide(-1)">&#10094;</div>
-      <div class="cnav" id="cnext" onclick="changeSlide(1)">&#10095;</div>
+      <div class="cnav" id="cprev" role="button" tabindex="0" aria-label="Slide precedente" onclick="changeSlide(-1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();changeSlide(-1)}">&#10094;</div>
+      <div class="cnav" id="cnext" role="button" tabindex="0" aria-label="Slide successiva" onclick="changeSlide(1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();changeSlide(1)}">&#10095;</div>
       <div id="hero-particles" aria-hidden="true"></div>
       <div id="ctrack">
         <!-- SLIDE 1 -->
@@ -173,10 +181,14 @@
         </div>
       </div><!-- /ctrack -->
       <div class="cdots">
-        <div class="cdot ca" onclick="jumpToSlide(0)"></div>
-        <div class="cdot" onclick="jumpToSlide(1)"></div>
-        <div class="cdot" onclick="jumpToSlide(2)"></div>
+        <div class="cdot ca" role="button" tabindex="0" aria-label="Vai alla slide 1" onclick="jumpToSlide(0)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();jumpToSlide(0)}"></div>
+        <div class="cdot" role="button" tabindex="0" aria-label="Vai alla slide 2" onclick="jumpToSlide(1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();jumpToSlide(1)}"></div>
+        <div class="cdot" role="button" tabindex="0" aria-label="Vai alla slide 3" onclick="jumpToSlide(2)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();jumpToSlide(2)}"></div>
       </div>
+      <button id="car-pause" type="button" aria-pressed="false" aria-label="Metti in pausa il carosello" onclick="toggleCarouselPause()">
+        <span id="car-pause-icon" aria-hidden="true">❚❚</span>
+        <span id="car-pause-label">Pausa</span>
+      </button>
       <div class="scroll-ind" onclick="document.getElementById('main').scrollTo({top:window.innerHeight,behavior:'smooth'})">
         <span>SCORRI</span><span>↓</span>
       </div>
@@ -195,7 +207,7 @@
       <div class="sec-h">MARCHE DI ARCAMIS</div>
       <p class="sec-p">La città portuale di Arcamis e i territori circostanti. Un piccolo angolo di un regno molto più vasto, ancora in gran parte sconosciuto.</p>
       <div class="map-container" id="arcamis-map" style="border-radius:2px;position:relative;overflow:hidden;background:#030608;line-height:0">
-        <img src="/mappa.webp" alt="Mappa delle Marche di Arcamis" style="width:100%;display:block;pointer-events:none" draggable="false"/>
+        <img src="/mappa.webp" alt="Mappa delle Marche di Arcamis" loading="lazy" decoding="async" style="width:100%;display:block;pointer-events:none" draggable="false"/>
 
 
         <div id="dynamic-pins"></div>
@@ -340,7 +352,7 @@
       <div class="ph-inner">
         <div class="ph-crumb" id="ph-crumb"></div>
         <div class="ph-eyebrow" id="ph-eyebrow"></div>
-        <div class="ph-title" id="ph-title"></div>
+        <h1 class="ph-title" id="ph-title"></h1>
         <div class="ph-sub" id="ph-sub"></div>
         <div class="ph-divider"><div class="ph-divider-line"></div><div class="ph-divider-gem">◆</div></div>
         <button class="ph-copy-btn" onclick="copyPageLink()" title="Copia link pagina">⛓ Copia link</button>
@@ -348,6 +360,22 @@
     </div>
     <div id="pbody"></div>
   </div>
+
+  <!-- ═══ FOOTER (tutte le viste) ═══ -->
+  <footer id="site-footer">
+    <div class="sf-inner">
+      <div class="sf-brand">
+        <span class="sf-name">ARCAMIS</span>
+        <span class="sf-tag">Wiki amatoriale di una campagna D&amp;D 5e</span>
+      </div>
+      <nav class="sf-links" aria-label="Informazioni sul sito">
+        <button type="button" class="sf-link" onclick="gp('pag-credits','Crediti &amp; Legale','⚖️')">Crediti &amp; legale</button>
+        <a class="sf-link" href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener">Contatti · Discord</a>
+        <a class="sf-link" href="/changelog">Changelog</a>
+      </nav>
+      <p class="sf-legal">Non affiliato a Riot Games né a Wizards of the Coast. Le immagini di League of Legends appartengono ai rispettivi titolari.</p>
+    </div>
+  </footer>
 
 </div><!-- /main -->
   <div id="arc-options-panel" role="dialog" aria-label="Opzioni">

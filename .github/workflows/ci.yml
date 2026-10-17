@@ -19,6 +19,8 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
+      - name: sitemap.xml e robots.txt allineati alle rotte
+        run: node scripts/gen-seo-static.mjs --check
 
   admin:
     name: Admin typecheck, tests & build
@@ -64,7 +66,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run build:site
+      # build + test di integrità delle rotte (meta, sitemap, 404, PWA, font)
+      - run: npm run test:routes
       - uses: actions/upload-artifact@v4
         with:
           name: dist

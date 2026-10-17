@@ -373,28 +373,10 @@ def generate_admin_inline(reg):
     sections = [f'{{v:"{s["v"]}",l:"{escape_js(s["l"])}"}}' for s in reg['sections']]
     return pages, sections
 
-def generate_sitemap(reg):
-    base_url = 'https://arcamis.pages.dev'
-    urls = [
-        {'loc': base_url, 'changefreq': 'weekly', 'priority': '1.0'}
-    ]
-
-    for e in reg.get('sitemap', []):
-        urls.append({
-            'loc': f"{base_url}/{e['path']}",
-            'changefreq': e.get('changefreq', 'monthly'),
-            'priority': e.get('priority', '0.7')
-        })
-
-    xml_lines = [
-        f'  <url><loc>{u["loc"]}</loc><changefreq>{u["changefreq"]}</changefreq><priority>{u["priority"]}</priority></url>'
-        for u in urls
-    ]
-
-    return f'''<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-{chr(10).join(xml_lines)}
-</urlset>'''
+# La sitemap NON è più generata qui: scripts/lib/routes.mjs raccoglie tutte le
+# rotte reali (pagine + sottopagine di Pantheon e Lavori) e viene usato sia da
+# `node scripts/gen-seo-static.mjs` (copie in root) sia da scripts/build-post.mjs
+# (dist/sitemap.xml). Una sola fonte evita sitemap con URL inesistenti.
 
 def replace_between(content, pattern, replacement):
     """Replace a block between pattern markers."""
@@ -506,8 +488,7 @@ def main():
     # Keep the registry generator focused on the public site and Vue admin.
     # Legacy admin intentionally excluded from generated artifacts.
 
-    # 8. sitemap.xml
-    write_file('sitemap.xml', generate_sitemap(reg))
+    # 8. sitemap.xml / robots.txt: esegui `npm run seo` (scripts/lib/routes.mjs)
 
     print('\n✓ All artifacts generated successfully!')
     return 0

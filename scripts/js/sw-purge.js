@@ -1,26 +1,12 @@
-/* ════════════════════════════════════
+/* ════════════════════════════════════════════════════════
    ARCAMIS — sw-purge.js
-   Purge vecchio SW + registrazione nuovo
-   ════════════════════════════════════ */
+   Registra il service worker. La pulizia delle cache vecchie è
+   gestita dal SW stesso nell'evento `activate` (CACHE_NAME è
+   versionato dal build): cancellarle qui a ogni page load
+   azzererebbe la cache appena creata.
+════════════════════════════════════════════════════════ */
 if ('serviceWorker' in navigator) {
-  /* 1. Elimina tutti i vecchi SW e cache vecchie */
-  navigator.serviceWorker.getRegistrations().then(function (regs) {
-    regs.forEach(function (r) {
-      /* Salta se è già il SW attuale */
-      if (r.scope === self.location.origin + '/') {
-        return;
-      }
-      r.unregister();
-    });
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () {});
   });
-  caches.keys().then(function (ks) {
-    ks.forEach(function (k) {
-      if (k !== 'arcamis-v1') {
-        caches.delete(k);
-      }
-    });
-  });
-
-  /* 2. Registra il nuovo service worker */
-  navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () {});
 }

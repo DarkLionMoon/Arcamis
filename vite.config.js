@@ -6,7 +6,8 @@ const projectRoot = process.cwd();
 
 function copyStaticAssets() {
   const directories = ['scripts/js', 'content', 'images', 'audio', 'imprese-standalone'];
-  const files = ['sw.js', 'robots.txt', 'sitemap.xml', 'cover.webp', 'mappa.webp', 'Artboard_1.png'];
+  /* sw.js è generato da scripts/build-post.mjs con versione e precache reali. */
+  const files = ['robots.txt', 'sitemap.xml', 'cover.webp', 'mappa.webp', 'Artboard_1.png'];
 
   function emitTree(pluginContext, relativeDir) {
     const absoluteDir = path.join(projectRoot, relativeDir);
@@ -56,7 +57,8 @@ export default defineConfig({
         chunkFileNames: 'scripts/js/[name].js',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name?.endsWith('.css')) {
-            return 'scripts/css/[name][extname]';
+            /* hash nel nome: consente Cache-Control immutable senza stale CSS */
+            return 'scripts/css/[name].[hash][extname]';
           }
           return 'assets/[name][extname]';
         },

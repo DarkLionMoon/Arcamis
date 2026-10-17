@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://arcamis.pages.dev/api/sitemap
+Sitemap: https://arcamis.pages.dev/sitemap.xml

@@ -1,5 +1,5 @@
-import js from '@eslint/js'
-import globals from 'globals'
+import js from '@eslint/js';
+import globals from 'globals';
 
 export default [
   js.configs.recommended,
@@ -10,8 +10,8 @@ export default [
         {
           argsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
-          varsIgnorePattern: '^_'
-        }
+          varsIgnorePattern: '^_',
+        },
       ],
       'no-console': 'warn',
       'no-var': 'off',
@@ -19,8 +19,8 @@ export default [
       'no-eval': 'error',
       'no-implied-eval': 'error',
       'no-new-func': 'error',
-      'no-empty': ['error', { allowEmptyCatch: true }]
-    }
+      'no-empty': ['error', { allowEmptyCatch: true }],
+    },
   },
   {
     ignores: [
@@ -34,8 +34,8 @@ export default [
       'scripts/sync-registry.py',
       'scripts/import-notion.js',
       'scripts/backup-kv.js',
-      '.github/'
-    ]
+      '.github/',
+    ],
   },
   {
     files: ['scripts/js/**/*.js'],
@@ -46,7 +46,7 @@ export default [
       'no-control-regex': 'warn',
       'no-useless-escape': 'warn',
       'no-regex-spaces': 'warn',
-      'no-prototype-builtins': 'warn'
+      'no-prototype-builtins': 'warn',
     },
     languageOptions: {
       globals: {
@@ -91,18 +91,18 @@ export default [
         arcPreviewCancel: 'readonly',
         showToast: 'readonly',
         applyRecentBadges: 'readonly',
-        esc: 'readonly'
-      }
-    }
+        esc: 'readonly',
+      },
+    },
   },
   {
     files: ['functions/**/*.js'],
     languageOptions: {
       globals: {
         ...globals.worker,
-        crypto: 'readonly'
-      }
-    }
+        crypto: 'readonly',
+      },
+    },
   },
   {
     files: ['**/__tests__/**/*.test.js'],
@@ -114,8 +114,8 @@ export default [
         it: 'readonly',
         expect: 'readonly',
         beforeEach: 'readonly',
-        afterEach: 'readonly'
-      }
-    }
-  }
-]
+        afterEach: 'readonly',
+      },
+    },
+  },
+];
