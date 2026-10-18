@@ -53,17 +53,22 @@ jobs:
       - name: Deploy to Cloudflare Pages
         id: deploy
         if: steps.check.outputs.configured == 'true'
-        uses: cloudflare/pages-action@v1
+        # `cloudflare/pages-action` è deprecata e archiviata: la sostituisce
+        # wrangler-action, che esegue `wrangler pages deploy` (in wrangler 4
+        # `pages publish` è stato rimosso). Stesso progetto, stesso branch.
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          projectName: ${{ secrets.CF_PAGES_PROJECT || 'arcamis' }}
-          directory: dist
-          branch: ${{ github.ref_name }}
+          # I flag sono quelli verificati con `wrangler pages deploy --help`:
+          # `--project-name` e `--branch`. Il valore è fra apici singoli YAML,
+          # quindi l'apice interno di 'arcamis' è raddoppiato.
+          command: 'pages deploy dist --project-name=${{ secrets.CF_PAGES_PROJECT || ''arcamis'' }} --branch=${{ github.ref_name }}'
+          # La major è fissata: senza `wranglerVersion` l'action installa l'ultima v4,
+          # che è comunque quella attesa, ma così il deploy non cambia da solo.
+          wranglerVersion: '4'
+          gitHubToken: ${{ github.token }}
           # preview deployments get unique URLs like: https://<branch>.<project>.pages.dev
-        env:
-          # Pass any needed env vars to the deploy
-          NODE_ENV: production
 
       # Prima di annunciare la preview: se il digest pubblicato non è quello
       # costruito (e quindi testato), la preview non va considerata pronta.
@@ -71,7 +76,8 @@ jobs:
         if: steps.check.outputs.configured == 'true'
         run: |
           node scripts/verify-deploy.mjs \
-            "${{ steps.deploy.outputs.url }}" \
+            "${{ steps.deploy.outputs.deployment-url }}" \
+            "${{ steps.deploy.outputs.pages-deployment-alias-url }}" \
             "https://${{ github.head_ref || github.ref_name }}.${{ secrets.CF_PAGES_PROJECT || 'arcamis' }}.pages.dev"
 
       - name: Post preview URL

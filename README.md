@@ -394,7 +394,9 @@ npm run verify:deploy https://arcamis.pages.dev   # il digest online è quello l
 
 Il workflow `staging.yml` fa questo controllo da solo dopo il deploy di una
 preview: legge l'URL del deploy (con l'alias del branch come ripiego) e confronta
-i digest **prima** di annunciare la preview nei commenti della PR. Per il deploy
+i digest **prima** di annunciare la preview nei commenti della PR. Il deploy usa
+`cloudflare/wrangler-action@v4` (comando `pages deploy`, wrangler fissato alla
+major 4), non la `cloudflare/pages-action` deprecata e archiviata. Per il deploy
 di produzione fatto dall'integrazione Git di Cloudflare non c'è un workflow che
 lo controlli: si verifica da locale con `npm run verify:deploy` puntando al
 dominio di produzione.
