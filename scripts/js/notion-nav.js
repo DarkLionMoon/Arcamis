@@ -23,6 +23,24 @@ function _siteEsc(s) {
 function _siteAttr(s) {
   return _siteEsc(s).replace(/"/g, '&quot;');
 }
+/* Markdown inline senza il paragrafo esterno: serve per titoli, etichette
+e   e voci brevi, dove un <p> romperebbe il layout. */
+function _siteInline(md) {
+  var out = _mdToHtml(String(md == null ? '' : md).trim());
+  return out.replace(/^<p class="n-p">/, '').replace(/<\/p>\s*$/, '');
+}
+/* Avviso di pagina goliardica: una pagina può dichiararsi `meme` nel suo
+   JSON e il banner compare prima del contenuto, senza toccare il markdown. */
+function _memeBannerHtml() {
+  return (
+    '<aside class="meme-banner" role="note" aria-label="Pagina meme">' +
+    '<span class="meme-banner-icon" aria-hidden="true">🃏</span>' +
+    '<span class="meme-banner-kicker">Attenzione</span>' +
+    '<span class="meme-banner-title">Pagina meme</span>' +
+    '<span class="meme-banner-text">Quanto segue è goliardico e fuori canone: prendilo come una burla della community, non come lore ufficiale di Arcamis.</span>' +
+    '</aside>'
+  );
+}
 
 /* ════ MARKDOWN → HTML (per JSON locali) ════
    Delega a md-render.js (condiviso con l'admin, così
@@ -409,6 +427,25 @@ async function _gpRender(id, label, icon) {
       var _deity = _pd.deities.find(function (x) {
         return x.slug === _slug;
       });
+      /* La collezione non è pubblica: la scheda nemmeno. */
+      if (_panGate[_collKey]) {
+        var _ct = _deity ? _deity.n : label || 'Pagina';
+        phTitle.textContent = _ct;
+        phIcon.textContent = _deity ? _panIcon(_deity, _collKey) : icon || '📄';
+        phEyebrow.textContent = 'Archivi di Arcamis';
+        document.title = _ct + ' — Arcamis Wiki';
+        phCrumb.innerHTML = buildCrumb(_ct);
+        phCovbg.style.backgroundImage = '';
+        phOverlay.style.opacity = '0';
+        var _cbp = document.getElementById('pbody');
+        _cbp.className = 'page-' + id;
+        _cbp.style.maxWidth = '';
+        _cbp.style.width = '';
+        _cbp.innerHTML = _wfNoticeHtml(_ct, _panGate[_collKey]);
+        _wfNoindex();
+        if (typeof afterPageRender === 'function') afterPageRender();
+        return;
+      }
       if (_deity) {
         var _dic = _panIcon(_deity, _collKey);
         var _collLabel = _collKey === 'lavori' ? 'Lavori ad Arcamis' : 'Archivi di Arcamis';
@@ -463,6 +500,31 @@ async function _gpRender(id, label, icon) {
       var _localResp = await fetch('/content/pages/' + _localPage.k + '.json');
       if (_localResp.ok) {
         var _localJson = await _localResp.json();
+        /* Bozza, in revisione o programmata: nessun contenuto. */
+        var _wfState = _wfGate(_localJson);
+        if (_wfState) {
+          var _wt = _localJson.title || label || 'Pagina';
+          var _wi = _localJson.icon || icon || '📄';
+          phTitle.textContent = _wt;
+          phIcon.textContent = _wi;
+          phEyebrow.textContent = 'Archivi di Arcamis';
+          document.title = _wt + ' — Arcamis Wiki';
+          phCrumb.innerHTML = buildCrumb(_wt);
+          var _wacc = iconAccent(_wi);
+          phHero.style.setProperty('--ph-acc', _wacc.c);
+          phHero.style.setProperty('--ph-accbg', _wacc.bg);
+          phCovbg.style.backgroundImage = '';
+          phOverlay.style.opacity = '0';
+          phIcon.style.opacity = '0.06';
+          var _wpbody = document.getElementById('pbody');
+          _wpbody.className = 'page-' + id + ' page-default';
+          _wpbody.style.maxWidth = '';
+          _wpbody.style.width = '';
+          _wpbody.innerHTML = _wfNoticeHtml(_wt, _wfState);
+          _wfNoindex();
+          if (typeof afterPageRender === 'function') afterPageRender();
+          return;
+        }
         if (_localJson.content || _localJson.layout === 'imprese') {
           /* Render markdown locally */
           var ptitle = _localJson.title || label || 'Pagina';
@@ -539,10 +601,12 @@ async function _gpRender(id, label, icon) {
           pbody.className = 'page-' + id + ' page-' + layoutClass;
           pbody.style.maxWidth = '';
           pbody.style.width = '';
-          if (_layout === 'wide') {
+          if (_layout === 'wide' || _layout === 'imprese') {
             pbody.style.maxWidth = 'none';
             pbody.style.width = '100%';
           }
+          /* Pagina dichiarata meme: banner prima del contenuto. */
+          if (_localJson.meme) _localHtml = _memeBannerHtml() + _localHtml;
           var _emptyHtml =
             '<div class="n-empty"><div class="n-empty-icon">' +
             picon +
@@ -654,70 +718,63 @@ function applyGlossary(root) {
 
 /* ══════════════════════════════════════
    RENDER MATERIALE APPROVATO
-   Layout multi-colonna, classi raggruppate
+   Layout multi-colonna; classi in accordion
    ══════════════════════════════════════ */
+
+/* Una voce dell'elenco: «Nome (FONTE)» oppure «Nome — *FONTE*».
+   Gli asterischi attorno alla fonte sono markdown, non testo da mostrare. */
+function _matParseEntry(raw) {
+  /* Gli asterischi sono decorazione markdown: via prima di separare
+     nome e fonte, altrimenti «(PHB'24)*» non viene riconosciuto. */
+  var text = String(raw == null ? '' : raw)
+    .trim()
+    .replace(/\*/g, '');
+  var name = text;
+  var source = '';
+  var dash = text.match(/^(.*?)\s+[—–]\s+(.+?)\s*$/);
+  if (dash) {
+    name = dash[1];
+    source = dash[2];
+  } else {
+    var paren = text.match(/^(.*?)\s*\(([^()]+)\)\s*$/);
+    if (paren) {
+      name = paren[1];
+      source = paren[2];
+    }
+  }
+  name = name.replace(/\*/g, '').trim();
+  source = source.replace(/\*/g, '').trim();
+  /* Togli le parentesi solo se racchiudono tutta la fonte. */
+  if (/^\(.*\)$/.test(source)) source = source.slice(1, -1).trim();
+  /* «PHB'24» → «PHB '24»: il badge deve leggersi, non sembrare un refuso. */
+  source = source.replace(/([A-Za-z])'(\d{2})\b/g, "$1 '$2");
+  return { name: name, source: source };
+}
+
+function _matItems(txt) {
+  var items = [];
+  String(txt || '').replace(/^\s*[-*+]\s+(.+)$/gm, function (_, line) {
+    var it = _matParseEntry(line);
+    if (it.name) items.push(it);
+  });
+  return items;
+}
+
+function _matCard(it) {
+  return (
+    '<div class="mat-card">' +
+    '<span class="mat-name">' +
+    _siteEsc(it.name) +
+    '</span>' +
+    (it.source ? '<span class="mat-badge">' + _siteEsc(it.source) + '</span>' : '') +
+    '</div>'
+  );
+}
+
 function _renderMateriale(md) {
   if (!md) return '';
   var html = '';
   var sections = md.split(/^## /m).filter(Boolean);
-
-  function parseItems(txt) {
-    var items = [];
-    txt.replace(/^- (.+)$/gm, function (_, line) {
-      var source = '';
-      var name = line
-        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-        .replace(/^(.+?)\s*\(([A-Z0-9' ]+)\)\s*$/, function (_, n, s) {
-          source = s.trim();
-          return n;
-        });
-      items.push({ name: name, source: source });
-    });
-    return items;
-  }
-
-  function renderCards(items) {
-    var out = '<div class="mat-grid">';
-    items.forEach(function (it) {
-      out +=
-        '<div class="mat-card">' +
-        '<span class="mat-name">' +
-        it.name +
-        '</span>' +
-        (it.source ? '<span class="mat-badge">' + it.source + '</span>' : '') +
-        '</div>';
-    });
-    return out + '</div>';
-  }
-
-  function groupClasses(txt) {
-    var classes = {};
-    var currentClass = null;
-    txt.split('\n').forEach(function (line) {
-      var m = line.match(/^- (.+)$/);
-      if (!m) return;
-      var item = m[1];
-      var clean = item
-        .replace(/\s*\([^)]+\)\s*$/, '')
-        .replace(/\*\*/g, '')
-        .trim();
-      var isBase =
-        /^(Artificer|Barbarian|Bard|Cleric|Druid|Fighter|Monk|Paladin|Ranger|Rogue|Sorcerer|Warlock|Wizard)$/i.test(
-          clean
-        );
-      if (isBase) {
-        currentClass = clean;
-        classes[currentClass] = { base: item, subs: [] };
-      } else if (currentClass) {
-        classes[currentClass].subs.push(item);
-      } else {
-        if (!classes['_other']) classes['_other'] = [];
-        classes['_other'].push(item);
-      }
-    });
-    return classes;
-  }
 
   sections.forEach(function (sec) {
     var lines = sec.split('\n');
@@ -733,96 +790,152 @@ function _renderMateriale(md) {
     var subsections = body.split(/^### /m).filter(Boolean);
     var allItems = [];
     subsections.forEach(function (sub) {
-      var subLines = sub.split('\n');
+      var subLines = sub.replace(/^\s*\n/, '').split('\n');
+      var first = (subLines[0] || '').trim();
       var subTitle = null;
-      if (subLines.length > 1 && !subLines[0].trim().startsWith('-') && !subLines[0].trim().startsWith('**')) {
+      if (
+        subLines.length > 1 &&
+        first &&
+        !/^[-*+]\s/.test(first) &&
+        !/^[>|]/.test(first) &&
+        !/^\d+[.)]\s/.test(first)
+      ) {
         subTitle = subLines.shift().trim();
       }
       if (subTitle) allItems.push({ type: 'subtitle', text: subTitle });
-      parseItems(subLines.join('\n')).forEach(function (it) {
+      _matItems(subLines.join('\n')).forEach(function (it) {
         allItems.push({ type: 'item', data: it });
       });
     });
     if (allItems.length === 0) {
-      parseItems(body).forEach(function (it) {
+      _matItems(body).forEach(function (it) {
         allItems.push({ type: 'item', data: it });
       });
     }
 
-    /* Specie / Talenti / Spell */
-    if (/^(Specie|Talenti|Spell)$/i.test(sectionTitle)) {
+    /* Specie / Talenti / Spell (il titolo può iniziare con un'emoji) */
+    if (/\b(Specie|Talenti|Spell)\b/i.test(sectionTitle)) {
       html += '<div class="mat-section">';
-      html += '<h2 class="mat-section-title">' + sectionTitle + '</h2>';
-      var cards = allItems
-        .filter(function (i) {
-          return i.type === 'item';
-        })
-        .map(function (i) {
-          return i.data;
-        });
-      if (cards.length) html += renderCards(cards);
+      html += '<h2 class="mat-section-title">' + _siteEsc(sectionTitle) + '</h2>';
+      var cards = [];
+      var shown = '';
+      var flushCards = function () {
+        if (!cards.length) return;
+        shown += '<div class="mat-grid">' + cards.join('') + '</div>';
+        cards = [];
+      };
+      allItems.forEach(function (i) {
+        if (i.type === 'subtitle') {
+          flushCards();
+          shown +=
+            '<h3 class="mat-subtitle">' + _siteEsc(_matParseEntry(i.text).name) + '</h3>';
+        } else if (i.type === 'item') {
+          cards.push(_matCard(i.data));
+        }
+      });
+      flushCards();
+      html += shown;
       callouts.forEach(function (c) {
-        html += '<div class="mat-callout">💡 ' + c + '</div>';
+        html += '<div class="mat-callout">💡 ' + _siteInline(c) + '</div>';
       });
       html += '</div>';
       return;
     }
 
-    /* Classi raggruppate */
-    if (/^Classi/i.test(sectionTitle)) {
-      html += '<div class="mat-section">';
-      html += '<h2 class="mat-section-title">' + sectionTitle + '</h2>';
-      var rawItems = allItems
-        .filter(function (i) {
-          return i.type === 'item';
-        })
-        .map(function (i) {
-          return i.data.name;
+    /* Classi: ogni classe è un accordion con le sue sottoclassi */
+    if (/\bClassi\b/i.test(sectionTitle)) {
+      var groups = [];
+      var current = null;
+      allItems.forEach(function (entry) {
+        if (entry.type === 'subtitle') {
+          var head = _matParseEntry(entry.text);
+          current = { name: head.name, source: head.source, subs: [] };
+          groups.push(current);
+        } else if (current) {
+          current.subs.push(entry.data);
+        }
+      });
+      /* Contenuti storici senza titoli ###: raggruppa dal nome della classe. */
+      if (!groups.length) {
+        current = null;
+        allItems.forEach(function (entry) {
+          if (entry.type !== 'item') return;
+          var it = entry.data;
+          var isBase =
+            /^(Artificer|Barbarian|Bard|Cleric|Druid|Fighter|Monk|Paladin|Ranger|Rogue|Sorcerer|Warlock|Wizard)$/i.test(
+              it.name
+            );
+          if (isBase) {
+            current = { name: it.name, source: it.source, subs: [] };
+            groups.push(current);
+          } else if (current) {
+            current.subs.push(it);
+          }
         });
-      var grouped = groupClasses(rawItems.join('\n'));
+      }
+
+      html += '<div class="mat-section">';
+      html += '<h2 class="mat-section-title">' + _siteEsc(sectionTitle) + '</h2>';
+      if (groups.length) {
+        html +=
+          '<p class="mat-classes-hint">Apri una classe per vedere le sottoclassi approvate.</p>';
+      }
       html += '<div class="mat-classes">';
-      Object.keys(grouped).forEach(function (cls) {
-        if (cls === '_other') return;
-        var g = grouped[cls];
-        html += '<div class="mat-class-group">';
-        html += '<div class="mat-class-base">' + g.base + '</div>';
+      groups.forEach(function (g) {
+        html += '<details class="mat-class-group">';
+        html += '<summary class="mat-class-base">';
+        html += '<span class="mat-class-name">' + _siteEsc(g.name) + '</span>';
+        if (g.source) html += '<span class="mat-class-src">(' + _siteEsc(g.source) + ')</span>';
+        html +=
+          '<span class="mat-class-count">' +
+          g.subs.length +
+          (g.subs.length === 1 ? ' sottoclasse' : ' sottoclassi') +
+          '</span>';
+        html += '<span class="mat-class-chevron" aria-hidden="true">▾</span>';
+        html += '</summary>';
         html += '<div class="mat-class-subs">';
         g.subs.forEach(function (s) {
-          var source = '';
-          var name = s.replace(/\s*\(([A-Z0-9' ]+)\)\s*$/, function (_, src) {
-            source = src.trim();
-            return '';
-          });
           html +=
             '<div class="mat-sub-card">' +
             '<span class="mat-sub-name">' +
-            name.replace(/\*\*/g, '').trim() +
+            _siteEsc(s.name) +
             '</span>' +
-            (source ? '<span class="mat-badge">' + source + '</span>' : '') +
+            (s.source ? '<span class="mat-badge">' + _siteEsc(s.source) + '</span>' : '') +
             '</div>';
         });
-        html += '</div></div>';
+        html += '</div></details>';
       });
       html += '</div>';
       callouts.forEach(function (c) {
-        html += '<div class="mat-callout">💡 ' + c + '</div>';
+        html += '<div class="mat-callout">💡 ' + _siteInline(c) + '</div>';
       });
       html += '</div>';
       return;
     }
 
     /* Fallback */
-    html += '<div class="mat-section">';
-    html += '<h2 class="mat-section-title">' + sectionTitle + '</h2>';
+    var fallback = '';
+    var fallbackCards = [];
     allItems.forEach(function (i) {
       if (i.type === 'subtitle') {
-        html += '<h3 class="mat-subtitle">' + i.text + '</h3>';
-      } else {
-        html += renderCards([i.data]);
+        if (fallbackCards.length) {
+          fallback += '<div class="mat-grid">' + fallbackCards.join('') + '</div>';
+          fallbackCards = [];
+        }
+        fallback +=
+          '<h3 class="mat-subtitle">' + _siteEsc(_matParseEntry(i.text).name) + '</h3>';
+      } else if (i.type === 'item') {
+        fallbackCards.push(_matCard(i.data));
       }
     });
+    if (fallbackCards.length) {
+      fallback += '<div class="mat-grid">' + fallbackCards.join('') + '</div>';
+    }
+    html += '<div class="mat-section">';
+    html += '<h2 class="mat-section-title">' + _siteEsc(sectionTitle) + '</h2>';
+    html += fallback;
     callouts.forEach(function (c) {
-      html += '<div class="mat-callout">💡 ' + c + '</div>';
+      html += '<div class="mat-callout">💡 ' + _siteInline(c) + '</div>';
     });
     html += '</div>';
   });
@@ -832,67 +945,98 @@ function _renderMateriale(md) {
 
 /* ══════════════════════════════════════
    RENDER REGOLE
-   Layout organizzato con sezioni e card
+   Categorie (macro-aree) → regole in card
    ══════════════════════════════════════ */
 function _renderRegole(md) {
   if (!md) return '';
   var html = '';
 
-  /* Split in blocchi principali separati da --- */
-  var blocks = md.split(/\n---\n/);
-
-  /* Primo blocco: intro + regole brevi */
-  var introBlock = blocks.shift() || '';
-
-  /* Se il primo blocco è già una regola (## …) va trattato come sezione:
-     prima finiva dentro l'intro e le regole successive sparivano. */
-  if (/^#{2,3}\s+/m.test(introBlock)) {
-    blocks.unshift(introBlock);
-    introBlock = '';
-  }
-  var introLines = introBlock.split('\n').filter(function (l) {
-    return l.trim();
-  });
-  var introText = '';
-  var briefRules = [];
-  introLines.forEach(function (line) {
-    var m = line.match(/^\d+\)\s*(.+)/);
-    if (m) {
-      briefRules.push(m[1]);
-    } else if (!line.match(/^\[📄/)) {
-      introText += line + ' ';
-    }
-  });
-
-  /* Link alle sotto-pagine */
-  var subpageLinks = [];
-  md.replace(/\[📄\s*([^\]]+)\]/g, function (_, title) {
-    subpageLinks.push(title.trim());
-  });
-
-  /* Sezioni: ### (formato admin) oppure ## (formato dei contenuti storici) */
-  var sections = [];
-  var currentSection = null;
-  blocks.forEach(function (block) {
-    var lines = block.split('\n');
-    var headerMatch = null;
-    var body = [];
-    lines.forEach(function (line) {
-      var hm = line.match(/^#{2,3}\s+(.+)/);
-      if (hm) {
-        headerMatch = hm[1];
-      } else if (line.trim() && !line.match(/^\[📄/)) {
-        body.push(line);
-      }
+  /* I bullet possono essere scritti con -, * o +: qui diventano tutti
+     elenchi standard, così non resta mai un asterisco a schermo. */
+  var lines = String(md)
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .map(function (line) {
+      return line.replace(/^(\s*)[*+]\s+/, '$1- ');
     });
-    if (headerMatch) {
-      sections.push({ title: headerMatch, body: body.join('\n') });
+
+  var introLines = [];
+  var briefRules = [];
+  var subpageLinks = [];
+  var groups = [];
+  var currentGroup = null;
+  var currentRule = null;
+
+  function ensureGroup() {
+    if (!currentGroup) {
+      currentGroup = { title: '', intro: [], rules: [] };
+      groups.push(currentGroup);
     }
+    return currentGroup;
+  }
+
+  lines.forEach(function (line) {
+    var link = line.match(/^\[📄\s*([^\]]+)\]/);
+    if (link) {
+      subpageLinks.push(link[1].trim());
+      return;
+    }
+
+    /* # Titolo → categoria; ## Regola → regola dentro la categoria. */
+    var cat = line.match(/^#\s+(.+)$/);
+    if (cat) {
+      currentGroup = { title: cat[1].trim(), intro: [], rules: [] };
+      groups.push(currentGroup);
+      currentRule = null;
+      return;
+    }
+    var rule = line.match(/^#{2,3}\s+(.+)$/);
+    if (rule) {
+      ensureGroup();
+      currentRule = { title: rule[1].trim(), body: [] };
+      currentGroup.rules.push(currentRule);
+      return;
+    }
+
+    if (/^\s*---\s*$/.test(line)) {
+      if (currentRule) currentRule.body.push('');
+      return;
+    }
+    if (!line.trim()) {
+      if (currentRule) currentRule.body.push('');
+      return;
+    }
+    if (currentRule) {
+      currentRule.body.push(line);
+      return;
+    }
+    if (currentGroup) {
+      currentGroup.intro.push(line);
+      return;
+    }
+    var brief = line.match(/^\d+[.)]\s*(.+)/);
+    if (brief) briefRules.push(brief[1]);
+    else introLines.push(line);
   });
+
+  function ruleCard(r) {
+    var body = r.body.join('\n').trim();
+    return (
+      '<div class="regle-section">' +
+      '<div class="regle-section-title">' +
+      _siteInline(r.title) +
+      (_isDraftMd(body) ? _draftBadge() : '') +
+      '</div>' +
+      '<div class="regle-section-body">' +
+      (body ? _mdToHtml(body) : '<p class="regle-empty">Contenuto in arrivo.</p>') +
+      '</div></div>'
+    );
+  }
 
   /* ── Intro callout ── */
-  if (introText.trim()) {
-    html += '<div class="regle-intro">' + _mdToHtml(introText.trim()) + '</div>';
+  var introText = introLines.join('\n').trim();
+  if (introText) {
+    html += '<div class="regle-intro">' + _mdToHtml(introText) + '</div>';
   }
 
   /* ── Regole brevi ── */
@@ -905,7 +1049,7 @@ function _renderRegole(md) {
         (i + 1) +
         '</span>' +
         '<span class="regle-brief-text">' +
-        rule +
+        _siteInline(rule) +
         '</span>' +
         '</div>';
     });
@@ -920,21 +1064,52 @@ function _renderRegole(md) {
         '<div class="regle-link-card">' +
         '<span class="regle-link-icon">📄</span>' +
         '<span class="regle-link-title">' +
-        title +
+        _siteEsc(title) +
         '</span>' +
         '</div>';
     });
     html += '</div>';
   }
 
-  /* ── Sezioni regole ── */
-  if (sections.length) {
+  /* ── Regole, raggruppate per categoria ── */
+  var visible = groups.filter(function (g) {
+    return g.rules.length || g.intro.length;
+  });
+  var hasCategories = visible.some(function (g) {
+    return !!g.title;
+  });
+
+  if (hasCategories) {
+    html += '<div class="regle-cats">';
+    visible.forEach(function (g) {
+      var title = g.title || 'Regole Generali';
+      html += '<section class="regle-cat">';
+      html +=
+        '<div class="regle-cat-head">' +
+        '<h2 class="regle-cat-title">' +
+        _siteInline(title) +
+        '</h2>' +
+        '<span class="regle-cat-count">' +
+        g.rules.length +
+        (g.rules.length === 1 ? ' regola' : ' regole') +
+        '</span>' +
+        '</div>';
+      if (g.intro.length) {
+        html += '<div class="regle-cat-intro">' + _mdToHtml(g.intro.join('\n')) + '</div>';
+      }
+      html += '<div class="regle-sections">';
+      g.rules.forEach(function (r) {
+        html += ruleCard(r);
+      });
+      html += '</div></section>';
+    });
+    html += '</div>';
+  } else if (visible.length) {
     html += '<div class="regle-sections">';
-    sections.forEach(function (sec) {
-      html += '<div class="regle-section">';
-      html += '<div class="regle-section-title">' + sec.title + '</div>';
-      html += '<div class="regle-section-body">' + _mdToHtml(sec.body) + '</div>';
-      html += '</div>';
+    visible.forEach(function (g) {
+      g.rules.forEach(function (r) {
+        html += ruleCard(r);
+      });
     });
     html += '</div>';
   }
@@ -989,7 +1164,7 @@ function _renderLore(md, title, icon) {
     });
 
     html += '<div class="lore-section">';
-    html += '<h2 class="lore-section-title">' + sectionTitle + '</h2>';
+    html += '<h2 class="lore-section-title">' + sectionTitle + (_isDraftMd(body) ? _draftBadge() : '') + '</h2>';
     if (body) {
       html += '<div class="lore-section-body">' + _mdToHtml(body) + '</div>';
     }
@@ -1086,7 +1261,7 @@ function _renderLavoro(md) {
     html += '<div class="lv-sections">';
     sections.forEach(function (sec, i) {
       html += '<div class="lv-section" id="lv-sec-' + i + '">';
-      html += '<div class="lv-sec-title">' + esc(sec.title) + '</div>';
+      html += '<div class="lv-sec-title">' + esc(sec.title) + (_isDraftMd(sec.body) ? _draftBadge() : '') + '</div>';
       html += '<div class="lv-sec-body">' + _mdToHtml(sec.body) + '</div>';
       html += '</div>';
     });
@@ -1233,6 +1408,9 @@ function _parsePantheon(md) {
   });
   return { intro: intro, deities: deities };
 }
+/* Stato di pubblicazione della pagina a collezione: le schede sono sue
+   sottopagine, quindi non possono essere pubbliche se il padre non lo è. */
+var _panGate = {};
 function _loadPantheonData(key) {
   key = key || 'pantheon';
   /* Cache per collezione: pantheon → pantheon.json, lavori → lavori.json */
@@ -1244,6 +1422,7 @@ function _loadPantheonData(key) {
       return r.json();
     })
     .then(function (j) {
+      _panGate[key] = _wfGate(j);
       _panCollCache[key] = _parsePantheon(j.content || '');
       if (key === 'pantheon') _pantheonData = _panCollCache[key];
       return _panCollCache[key];
@@ -1268,6 +1447,48 @@ function _isDraftMd(md) {
 }
 function _draftBadge() {
   return '<span class="draft-badge" title="Scheda in lavorazione">✎ Bozza</span>';
+}
+/* ── Stato di pubblicazione ──
+   La specifica sta in scripts/js/page-status.js, caricato prima di questo
+   file. Senza quello script (o senza dati) la pagina si mostra: il gate
+   non deve diventare un modo per far sparire contenuti per errore. */
+function _wf() {
+  return typeof window !== 'undefined' ? window.arcPageWorkflow : null;
+}
+function _wfGate(doc) {
+  var wf = _wf();
+  if (!wf || !doc) return null;
+  var state = wf.gate(doc);
+  return state && state.blocked ? state : null;
+}
+/* Una pagina non pubblica non deve finire nei motori di ricerca nemmeno
+   quando la si apre per link diretto. */
+function _wfNoindex() {
+  var meta = document.querySelector('meta[name="robots"]');
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute('name', 'robots');
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content', 'noindex, nofollow');
+}
+/* Etichetta di stato + nota: al posto del contenuto, mai insieme. */
+function _wfNoticeHtml(title, state) {
+  return (
+    '<div class="nc" style="animation:fi .22s ease forwards">' +
+    '<div class="n-empty"><div class="n-empty-icon">✎</div>' +
+    '<div class="n-empty-title">' +
+    _siteEsc(state.title) +
+    '</div>' +
+    '<div class="n-empty-msg">' +
+    _siteEsc(state.message) +
+    '</div></div>' +
+    '<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>' +
+    '<div class="n-page-footer-text">Archivi di Arcamis — ' +
+    _siteEsc(title) +
+    '</div></div>' +
+    '</div>'
+  );
 }
 function _renderDeityPage(d, coll) {
   var ic = _panIcon(d, coll);

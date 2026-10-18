@@ -1,184 +1,566 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { pagesApi } from '@/shared/api'
+import { useAuthStore, useEditorStore, useUIStore } from '@/app/store'
 import { confirmAction } from '@/shared/confirm'
 import { useUnsavedGuard } from '@/shared/guard'
-import { useEditorStore, useUIStore } from '@/app/store'
+import { CODE_SNIPPET, TABLE_SNIPPET } from '@/shared/markdownCommands'
 import CodeMirrorEditor from '@/features/interface/components/CodeMirrorEditor.vue'
 import MarkdownPreview from '@/features/interface/components/MarkdownPreview.vue'
+import VIcon from '@/shared/components/VIcon.vue'
+import EditorStatusBar from './editor/EditorStatusBar.vue'
+import EditorToolbar from './editor/EditorToolbar.vue'
+import MediaDrawer from './editor/MediaDrawer.vue'
+import ShortcutsDialog from './editor/ShortcutsDialog.vue'
+import TemplateForm from './editor/TemplateForm.vue'
+import TemplatePicker from './editor/TemplatePicker.vue'
+import WorkflowPanel from './editor/WorkflowPanel.vue'
+import { usePageEditor } from './editor/usePageEditor'
+import type { WorkflowActionId } from './workflow'
+import type { CodeMirrorHandle } from '@/features/interface/components/codemirrorHandle'
+import { LAYOUT_OPTIONS } from './layouts'
 
 const route = useRoute()
 const router = useRouter()
 const editor = useEditorStore()
 const ui = useUIStore()
+const auth = useAuthStore()
+
+const {
+  loading,
+  saveState,
+  firstError,
+  page,
+  template,
+  templateMissing,
+  data,
+  drafts,
+  markdown,
+  validation,
+  stats,
+  dirty,
+  undoAvailable,
+  redoAvailable,
+  workflowStatus,
+  workflowLabel,
+  runWorkflowAction,
+  load,
+  setField,
+  toggleDraft,
+  addItem,
+  removeItem,
+  moveItem,
+  undo,
+  redo,
+  applyTemplate,
+  removeTemplate,
+  setMode,
+  save,
+  updateMeta,
+  startAutosave
+} = usePageEditor()
 
 const key = computed(() => String(route.params.key || ''))
-const loading = ref(true)
-const saving = ref(false)
-const autosaveTimer = ref<ReturnType<typeof setInterval> | null>(null)
-const lastSavedAt = ref<string | null>(null)
+const cmRef = ref<CodeMirrorHandle | null>(null)
 
-async function load(keyToLoad: string) {
-  loading.value = true
-  try {
-    const page = await pagesApi.get(keyToLoad)
-    editor.setPage(page)
-    lastSavedAt.value = page.lastModified || null
-  } catch (e) {
-    ui.toast('Errore apertura pagina: ' + (e instanceof Error ? e.message : String(e)), 'error')
-  } finally {
-    loading.value = false
+const showShortcuts = ref(false)
+const showDetails = ref(false)
+const showPicker = ref(false)
+const linkOpen = ref(false)
+const linkUrl = ref('')
+
+const mediaOpen = ref(false)
+const mediaPath = ref('')
+const mediaForMarkdown = ref(false)
+
+const structure = computed(() => editor.mode === 'structure' && Boolean(template.value && data.value))
+const markdownReadonly = computed(() => Boolean(template.value))
+const previewOpen = computed(() => editor.previewOpen)
+
+const saveLabel = computed(() => {
+  if (saveState.value === 'saving') return 'Salvataggio…'
+  if (saveState.value === 'error') return 'Salvataggio non riuscito'
+  if (dirty.value) return 'Modifiche non salvate'
+  return 'Tutto salvato'
+})
+
+const saveClass = computed(() => {
+  if (saveState.value === 'saving') return 'is-saving'
+  if (saveState.value === 'error') return 'is-error'
+  return dirty.value ? 'is-dirty' : 'is-saved'
+})
+
+function backToList(): void {
+  void router.push({ name: 'pages' })
+}
+
+function openMediaForField(path: string): void {
+  mediaPath.value = path
+  mediaForMarkdown.value = false
+  mediaOpen.value = true
+}
+
+function openMediaForMarkdown(): void {
+  mediaPath.value = ''
+  mediaForMarkdown.value = true
+  mediaOpen.value = true
+}
+
+function onMediaPick(path: string): void {
+  if (mediaForMarkdown.value) {
+    cmRef.value?.insertImage(path, cmRef.value.selectedText() || 'immagine')
+    return
+  }
+  setField(mediaPath.value, path)
+}
+
+function runCommand(name: string): void {
+  const cm = cmRef.value
+  switch (name) {
+    case 'bold':
+      cm?.wrap('**', 'grassetto')
+      break
+    case 'italic':
+      cm?.wrap('*', 'corsivo')
+      break
+    case 'strike':
+      cm?.wrap('~~', 'barrato')
+      break
+    case 'h2':
+      cm?.prefix('## ')
+      break
+    case 'h3':
+      cm?.prefix('### ')
+      break
+    case 'list':
+      cm?.prefix('- ')
+      break
+    case 'quote':
+      cm?.prefix('> ')
+      break
+    case 'code':
+      cm?.insertSnippet(CODE_SNIPPET)
+      break
+    case 'table':
+      cm?.insertSnippet(TABLE_SNIPPET)
+      break
+    case 'link':
+      linkOpen.value = true
+      break
+    default:
+      break
   }
 }
 
-async function save() {
-  if (!editor.currentPage || saving.value) return
-  saving.value = true
-  try {
-    const page = editor.currentPage
-    const result = await pagesApi.save({ ...page, sha: page.sha }, `admin: update page ${page.k}`)
-    editor.setPage({ ...editor.currentPage, sha: result.sha, lastModified: new Date().toISOString() })
-    editor.markSaved()
-    lastSavedAt.value = editor.currentPage.lastModified || null
-    ui.toast('Pagina salvata — deploy in corso (~30s)', 'success')
-  } catch (e) {
-    ui.toast('Errore salvataggio: ' + (e instanceof Error ? e.message : String(e)), 'error')
-  } finally {
-    saving.value = false
+function insertLink(): void {
+  const url = linkUrl.value.trim()
+  if (!url) return
+  cmRef.value?.insertLink(url)
+  linkOpen.value = false
+  linkUrl.value = ''
+  ui.toast('Link inserito', 'success')
+}
+
+async function requestMode(next: 'structure' | 'markdown'): Promise<void> {
+  const ok = await setMode(next)
+  if (!ok) return
+  await nextTick()
+  if (next === 'markdown') cmRef.value?.focus()
+}
+
+async function requestRemoveTemplate(): Promise<void> {
+  const ok = await confirmAction({
+    title: 'Rimuovi modello',
+    message: 'Tornare al markdown libero?',
+    detail: 'La pagina mantiene il testo compilato, ma i campi strutturati vengono rimossi: potrai riapplicare un modello in seguito.',
+    confirmLabel: 'Rimuovi modello',
+    danger: true
+  })
+  if (ok) {
+    removeTemplate()
+    showDetails.value = false
   }
 }
 
-function autosave() {
-  if (editor.hasUnsavedChanges && !saving.value) {
-    void save()
-  }
+async function onApplyTemplate(templateId: string): Promise<void> {
+  showPicker.value = false
+  await applyTemplate(templateId)
 }
 
-function ensureAutosave() {
-  if (autosaveTimer.value) return
-  if (editor.autosaveEnabled) {
-    autosaveTimer.value = setInterval(autosave, 20000)
-  }
+function onWorkflowAction(payload: { id: WorkflowActionId; publishAt?: string; note?: string }): void {
+  runWorkflowAction(payload.id, { publishAt: payload.publishAt, note: payload.note })
 }
 
-function backToList() {
-  router.push({ name: 'pages' })
+function saveNow(): void {
+  void save()
 }
 
-watch(key, async (newKey, oldKey) => {
-  if (newKey && newKey !== oldKey) {
-    if (editor.hasUnsavedChanges) {
-      const ok = await confirmAction({
-        title: 'Modifiche non salvate',
-        message: `Aprire un'altra pagina e perdere le modifiche a «${oldKey}»?`,
-        confirmLabel: 'Apri senza salvare',
-        cancelLabel: 'Resta qui',
-        danger: true
-      })
-      if (!ok) return
+function onGlobalKeydown(event: KeyboardEvent): void {
+  const mod = event.metaKey || event.ctrlKey
+  if (mod && event.key.toLowerCase() === 's') {
+    /* CodeMirror gestisce già Ctrl+S e chiama preventDefault. */
+    if (!event.defaultPrevented) {
+      event.preventDefault()
+      saveNow()
     }
-    void load(newKey)
+    return
   }
-})
-
-/* Blocca l'uscita (navigazione interna e chiusura tab) se ci sono
-   modifiche pendenti: prima solo il refresh era protetto. */
-useUnsavedGuard(() => editor.hasUnsavedChanges, 'modifiche non salvate sulla pagina')
-
-onMounted(() => {
-  if (key.value) {
-    if (editor.autosaveEnabled) ensureAutosave()
-    void load(key.value)
+  if (mod && event.shiftKey && event.key.toLowerCase() === 'p') {
+    event.preventDefault()
+    editor.previewOpen = !editor.previewOpen
+    return
   }
+  if (editor.mode === 'structure' && mod && event.key.toLowerCase() === 'z') {
+    /* Dentro un campo di testo Ctrl+Z resta l'undo nativo della battitura;
+       l'undo strutturato si usa dalla toolbar (o fuori dai campi). */
+    const target = event.target as HTMLElement | null
+    const typing = Boolean(
+      target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+    )
+    if (typing) return
+    event.preventDefault()
+    if (event.shiftKey) redo()
+    else undo()
+    return
+  }
+  if (event.key === 'Escape') {
+    if (mediaOpen.value) mediaOpen.value = false
+    if (linkOpen.value) linkOpen.value = false
+    if (showShortcuts.value) showShortcuts.value = false
+    if (showPicker.value) showPicker.value = false
+    if (showDetails.value) showDetails.value = false
+  }
+}
+
+watch(firstError, async (path) => {
+  if (!path) return
+  await nextTick()
+  const element = document.getElementById('f-' + path) as HTMLElement | null
+  if (!element) return
+  element.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  element.focus?.()
 })
 
-onBeforeUnmount(() => {
-  if (autosaveTimer.value) clearInterval(autosaveTimer.value)
+watch(key, async (next, previous) => {
+  if (!next || next === previous) return
+  if (dirty.value) {
+    const ok = await confirmAction({
+      title: 'Modifiche non salvate',
+      message: `Aprire un'altra pagina e perdere le modifiche a «${previous}»?`,
+      confirmLabel: 'Apri senza salvare',
+      cancelLabel: 'Resta qui',
+      danger: true
+    })
+    if (!ok) return
+  }
+  await load(next)
 })
+
+useUnsavedGuard(() => dirty.value, 'modifiche non salvate sulla pagina')
+
+onMounted(async () => {
+  window.addEventListener('keydown', onGlobalKeydown)
+  if (key.value) await load(key.value)
+  startAutosave()
+})
+
+onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
 </script>
 
 <template>
-  <section class="arc-page-editor">
-    <template v-if="editor.currentPage">
-      <div class="arc-head-row">
-        <div style="display: flex; align-items: center; gap: 12px; min-width: 0">
-          <button class="btn btn-soft btn-sm" type="button" @click="backToList">← Pagine</button>
-          <h1 class="arc-page-title" style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-            {{ editor.currentPage.icon || '📄' }} {{ editor.currentPage.title || editor.currentPage.k }}
-          </h1>
-        </div>
-        <div class="arc-head-actions">
-          <span style="font-size: 12px; opacity: 0.6">
-            {{ editor.modified ? '● modifiche non salvate' : lastSavedAt ? 'salvato' : '' }}
-          </span>
-          <button class="btn btn-soft btn-sm" type="button" @click="editor.toggleStructuredMode()">
-            {{ editor.structuredMode ? 'Markdown' : 'Strutturato' }}
-          </button>
-          <button class="btn btn-p" type="button" :disabled="saving || !editor.modified" @click="save">
-            {{ saving ? 'Salvataggio…' : '💾 Salva' }}
-          </button>
-        </div>
-      </div>
+  <section class="arc-workspace" :class="{ 'is-single': !previewOpen }">
+    <header class="arc-ws-bar">
+      <button class="arc-icon-btn" type="button" title="Torna alle pagine" aria-label="Torna alle pagine" @click="backToList">
+        ←
+      </button>
 
-      <div v-if="editor.structuredMode" class="arc-panel" style="margin-bottom: 16px">
-        <p class="arc-hint">Editor strutturato (yaml front matter + blocchi). Campo di contenuto sotto.</p>
-        <CodeMirrorEditor
-          :model-value="editor.currentPage.content"
-          mode="markdown"
-          :font-size="editor.editorFontSize"
-          :word-wrap="editor.wordWrap"
-          :line-numbers="editor.showLineNumbers"
-          @update:model-value="editor.setContent($event)"
-          @save="save"
+      <template v-if="page">
+        <input
+          v-model="page.icon"
+          class="arc-ws-icon"
+          maxlength="4"
+          aria-label="Icona della pagina"
+          @input="updateMeta({ icon: page.icon })"
         />
-      </div>
+        <input
+          v-model="page.title"
+          class="arc-ws-title"
+          aria-label="Titolo della pagina"
+          placeholder="Titolo della pagina"
+          @input="updateMeta({ title: page.title })"
+        />
+        <span v-if="template" class="arc-chip">
+          {{ template.icon }} {{ template.label }}
+        </span>
+        <span v-if="templateMissing" class="arc-chip is-warning">modello non disponibile</span>
+        <span class="arc-chip" :class="'arc-status-' + workflowStatus" :title="'Flusso di pubblicazione: ' + workflowLabel">
+          {{ workflowLabel }}
+        </span>
+        <span class="arc-ws-key">
+          {{ page.k }}{{ !template && page.layout ? ' · ' + page.layout : '' }}
+        </span>
+      </template>
 
-      <div v-else class="arc-editor-grid">
-        <div class="arc-panel" style="display: flex; flex-direction: column">
-          <div class="arc-form-actions" style="margin-bottom: 8px">
+      <span class="arc-toolbar-spacer"></span>
+
+      <span class="arc-ws-save" :class="saveClass">
+        <span class="arc-dot"></span>
+        {{ saveLabel }}
+      </span>
+
+      <button
+        class="btn btn-soft btn-sm"
+        type="button"
+        :aria-expanded="showDetails"
+        title="Metadati della pagina"
+        @click="showDetails = !showDetails"
+      >
+        <VIcon name="settings" :size="14" /> Dettagli
+      </button>
+      <button
+        class="btn btn-p btn-sm"
+        type="button"
+        :disabled="saveState === 'saving' || !dirty"
+        title="Salva (Ctrl+S)"
+        @click="saveNow"
+      >
+        <VIcon name="save" :size="14" />
+        {{ saveState === 'saving' ? 'Salvo…' : 'Salva' }}
+      </button>
+    </header>
+
+    <div v-if="showDetails && page" class="arc-meta-panel">
+      <label class="arc-fld">
+        <span>Layout sul sito</span>
+        <select v-model="page.layout" class="in" :disabled="Boolean(template)" @change="updateMeta({ layout: page.layout })">
+          <option v-for="layout in LAYOUT_OPTIONS" :key="layout.value" :value="layout.value">{{ layout.label }}</option>
+        </select>
+        <small v-if="template" class="arc-field-help">Deciso dal modello «{{ template.label }}».</small>
+      </label>
+      <label class="arc-fld">
+        <span>Indice</span>
+        <label class="arc-check">
+          <input
+            type="checkbox"
+            :checked="page.toc === true"
+            @change="
+              page.toc = !page.toc;
+              updateMeta({ toc: page.toc })
+            "
+          />
+          <span>Mostra l'indice dei titoli</span>
+        </label>
+      </label>
+      <label class="arc-fld">
+        <span>Descrizione SEO</span>
+        <input
+          v-model="page.description"
+          class="in"
+          placeholder="Una frase per i motori di ricerca"
+          @input="updateMeta({ description: page.description })"
+        />
+      </label>
+      <WorkflowPanel :page="page" :role="auth.role" :disabled="saveState === 'saving'" @action="onWorkflowAction" />
+
+      <div class="arc-meta-actions">
+        <button class="btn btn-soft btn-sm" type="button" @click="showPicker = true">
+          <VIcon name="structure" :size="14" /> {{ template ? 'Cambia modello' : 'Applica modello' }}
+        </button>
+        <button v-if="template" class="btn btn-soft btn-sm" type="button" @click="requestRemoveTemplate">
+          <VIcon name="trash" :size="14" /> Rimuovi modello
+        </button>
+      </div>
+    </div>
+
+    <div v-if="loading" class="arc-ws-loading arc-panel">
+      <span class="arc-skel-bar" style="width: 38%"></span>
+      <span class="arc-skel-block"></span>
+      <span class="arc-skel-block" style="width: 72%"></span>
+    </div>
+
+    <div v-else-if="!page" class="arc-panel">
+      <div class="arc-empty-side">
+        Pagina non trovata.
+        <button class="btn btn-soft btn-sm" type="button" style="margin-left: 10px" @click="backToList">Torna alle pagine</button>
+      </div>
+    </div>
+
+    <div v-else class="arc-ws-body">
+      <div class="arc-ws-pane arc-ws-editor">
+        <div class="arc-pane-head">
+          <div class="arc-mode-tabs" role="tablist" aria-label="Modalità di editing">
             <button
-              v-for="m in ['md', 'split', 'pv'] as const"
-              :key="m"
-              class="btn btn-sm"
-              :class="editor.viewMode === m ? 'btn-p' : 'btn-soft'"
+              class="arc-mode-tab"
               type="button"
-              @click="editor.setViewMode(m)"
+              role="tab"
+              :aria-selected="editor.mode === 'structure'"
+              :class="{ active: editor.mode === 'structure' }"
+              @click="requestMode('structure')"
             >
-              {{ m === 'md' ? 'Markdown' : m === 'split' ? 'Split' : 'Anteprima' }}
+              <VIcon name="structure" :size="14" /> Struttura
             </button>
-            <span style="flex: 1"></span>
-            <label style="font-size: 12px; opacity: 0.7; display: flex; align-items: center; gap: 4px">
-              <input v-model="editor.autosaveEnabled" type="checkbox" @change="ensureAutosave" /> autosave
-            </label>
+            <button
+              class="arc-mode-tab"
+              type="button"
+              role="tab"
+              :aria-selected="editor.mode === 'markdown'"
+              :class="{ active: editor.mode === 'markdown' }"
+              @click="requestMode('markdown')"
+            >
+              <VIcon name="code" :size="14" /> Markdown
+            </button>
+          </div>
+          <span class="arc-pane-hint">
+            {{ structure ? template?.collections[0]?.label || 'Campi' : markdownReadonly ? 'generato dal modello' : 'testo libero' }}
+          </span>
+        </div>
+
+        <EditorToolbar
+          :mode="structure ? 'structure' : 'markdown'"
+          :can-undo="undoAvailable"
+          :can-redo="redoAvailable"
+          :preview-open="previewOpen"
+          :readonly="markdownReadonly"
+          @undo="undo"
+          @redo="redo"
+          @command="runCommand"
+          @pick-image="openMediaForMarkdown"
+          @toggle-preview="editor.previewOpen = !editor.previewOpen"
+          @help="showShortcuts = true"
+        />
+
+        <div class="arc-pane-scroll">
+          <template v-if="structure && template && data">
+            <p v-if="templateMissing" class="arc-warn-banner">
+              Il modello «{{ page.template }}» non è più disponibile: il markdown resta salvato, ma i campi non sono
+              modificabili. Applica un modello o rimuovilo.
+            </p>
+            <TemplateForm
+              :template="template"
+              :data="data"
+              :drafts="drafts"
+              :issues="validation.issues"
+              @update="setField"
+              @toggle-draft="toggleDraft"
+              @pick-media="openMediaForField"
+              @add-item="addItem"
+              @remove-item="removeItem"
+              @move-item="moveItem"
+            />
+            <div v-if="!template.collections.length" class="arc-panel-note">
+              Questo modello non ha schede: compila i campi qui sopra.
+            </div>
+          </template>
+
+          <div v-else-if="editor.mode === 'structure'" class="arc-editor-empty">
+            <div class="arc-editor-empty-icon">🧩</div>
+            <h2>Nessun modello applicato</h2>
+            <p>
+              Questa pagina è testo libero. Scegli un modello — divinità, regolamento, lore, mestiere — per compilare campi
+              validati e vedere l'anteprima live.
+            </p>
+            <button class="btn btn-p" type="button" @click="showPicker = true">Scegli un modello</button>
           </div>
 
-          <CodeMirrorEditor
-            :model-value="editor.currentPage.content"
-            mode="markdown"
-            :font-size="editor.editorFontSize"
-            :word-wrap="editor.wordWrap"
-            :line-numbers="editor.showLineNumbers"
-            class="arc-editor-fill"
-            @update:model-value="editor.setContent($event)"
-            @save="save"
-          />
-        </div>
-
-        <div class="arc-panel" v-if="editor.viewMode !== 'md'">
-          <MarkdownPreview :content="editor.currentPage.content" toc />
+          <template v-else>
+            <p v-if="markdownReadonly" class="arc-warn-banner is-info">
+              Il markdown è generato dal modello «{{ template?.label }}»: modifiche qui non vengono salvate. Modifica i campi
+              in <button class="arc-link" type="button" @click="requestMode('structure')">Struttura</button> oppure rimuovi
+              il modello per scrivere liberamente.
+            </p>
+            <CodeMirrorEditor
+              ref="cmRef"
+              :model-value="page.content"
+              mode="markdown"
+              :readonly="markdownReadonly"
+              :font-size="editor.editorFontSize"
+              :word-wrap="editor.wordWrap"
+              :line-numbers="editor.showLineNumbers"
+              aria-label="Contenuto markdown della pagina"
+              class="arc-editor-cm"
+              @update:model-value="editor.setContent($event)"
+              @save="saveNow"
+              @request-link="linkOpen = true"
+            />
+          </template>
         </div>
       </div>
-    </template>
 
-    <div v-else class="arc-panel">
-      <template v-if="loading">
-        <span class="arc-skel-bar" style="width: 45%"></span>
-        <span class="arc-skel-block"></span>
-        <span class="arc-skel-block" style="width: 80%"></span>
-      </template>
-      <div v-else class="arc-empty-side">Pagina non trovata.</div>
+      <aside v-if="previewOpen" class="arc-ws-pane arc-ws-preview" aria-label="Anteprima live">
+        <div class="arc-pane-head">
+          <span class="arc-preview-title"><VIcon name="eye" :size="14" /> Anteprima live</span>
+          <span v-if="workflowStatus !== 'published'" class="arc-chip" :class="'arc-status-' + workflowStatus">
+            {{ workflowLabel }}
+          </span>
+          <span class="arc-toolbar-spacer"></span>
+          <span class="arc-pane-hint">{{ stats.words }} parole</span>
+          <button
+            class="arc-icon-btn"
+            type="button"
+            title="Nascondi anteprima"
+            aria-label="Nascondi anteprima"
+            @click="editor.previewOpen = false"
+          >
+            <VIcon name="close" :size="14" />
+          </button>
+        </div>
+        <div class="arc-preview-frame">
+          <MarkdownPreview :content="markdown" toc />
+        </div>
+      </aside>
     </div>
+
+    <EditorStatusBar
+      v-if="page"
+      :save-state="saveState"
+      :last-saved-at="editor.lastSavedAt"
+      :dirty="dirty"
+      :words="stats.words"
+      :chars="stats.chars"
+      :errors="validation.errors.length"
+      :warnings="validation.warnings.length"
+      :drafts="stats.drafts"
+      :filled="stats.filled"
+      :total="stats.total"
+      :autosave="editor.autosaveEnabled"
+      @toggle-autosave="editor.autosaveEnabled = !editor.autosaveEnabled"
+    />
+
+    <MediaDrawer
+      :open="mediaOpen"
+      :title="mediaForMarkdown ? 'Inserisci immagine nel testo' : 'Immagine per il campo'"
+      @close="mediaOpen = false"
+      @pick="onMediaPick"
+    />
+
+    <ShortcutsDialog :open="showShortcuts" @close="showShortcuts = false" />
+
+    <TemplatePicker
+      :open="showPicker"
+      mode="apply"
+      :current-template-id="page?.template"
+      @close="showPicker = false"
+      @apply="onApplyTemplate"
+    />
+
+    <div v-if="linkOpen" class="arc-modal-backdrop" @click.self="linkOpen = false">
+      <div class="arc-modal arc-link-dialog" role="dialog" aria-modal="true" aria-label="Inserisci link">
+        <h2 class="arc-modal-title">Inserisci link</h2>
+        <input
+          v-model="linkUrl"
+          class="in"
+          placeholder="https://… oppure /pagina"
+          aria-label="URL del link"
+          @keydown.enter="insertLink"
+        />
+        <p class="arc-hint">Con una selezione attiva nel testo, l'etichetta resta quella selezionata.</p>
+        <div class="arc-modal-actions">
+          <button class="btn btn-soft btn-sm" type="button" @click="linkOpen = false">Annulla</button>
+          <button class="btn btn-p btn-sm" type="button" :disabled="!linkUrl.trim()" @click="insertLink">Inserisci</button>
+        </div>
+      </div>
+    </div>
+
   </section>
 </template>

@@ -1,0 +1,9 @@
+{
+  "k": "changelog",
+  "title": "Changelog",
+  "icon": "📜",
+  "layout": "wide",
+  "toc": false,
+  "lastModified": "2026-10-18T06:42:27.642Z",
+  "content": "Ogni aggiornamento della wiki viene registrato qui, diviso per versione e patch. Le voci più recenti sono in cima: apri una versione per leggere cosa è cambiato.\n\n---\n\n*Il changelog racconta la wiki; le patch della campagna sono annunciate sul Discord.*\n"
+}

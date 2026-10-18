@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "id": "lore",
+  "label": "Pagina Lore",
+  "icon": "📜",
+  "description": "Storia, luoghi ed eventi del mondo: un'introduzione, un riquadro informativo e sezioni narrative con immagini.",
+  "layout": "lore",
+  "separator": "none",
+  "page": {
+    "fields": [
+      {
+        "key": "intro",
+        "label": "Introduzione",
+        "type": "markdown",
+        "rows": 6,
+        "placeholder": "Di cosa parla questa pagina…",
+        "help": "Testo di apertura, prima delle sezioni."
+      },
+      { "key": "sinossi", "label": "Sinossi", "type": "text", "placeholder": "Una riga che riassume la pagina" },
+      { "key": "epoca", "label": "Epoca", "type": "text", "placeholder": "Terza Era, 812 d.C." },
+      { "key": "luoghi", "label": "Luoghi", "type": "tags", "placeholder": "Gandora, Foresta dello Smarrimento" }
+    ],
+    "sections": [
+      {
+        "blocks": [{ "kind": "markdown", "field": "intro" }]
+      },
+      {
+        "heading": "Informazioni",
+        "blocks": [{ "kind": "definition", "fields": ["sinossi", "epoca", "luoghi"] }]
+      }
+    ]
+  },
+  "collections": [
+    {
+      "key": "sezioni",
+      "label": "Sezioni",
+      "singular": "sezione",
+      "description": "Ogni voce è un capitolo della pagina, con titolo, immagine e testo.",
+      "fields": [
+        { "key": "titolo", "label": "Titolo", "type": "text", "required": true, "placeholder": "Le origini di Gandora" },
+        {
+          "key": "tipo",
+          "label": "Tipo",
+          "type": "select",
+          "options": [
+            { "value": "Panoramica", "label": "Panoramica" },
+            { "value": "Storia", "label": "Storia" },
+            { "value": "Luogo", "label": "Luogo" },
+            { "value": "Personaggi", "label": "Personaggi" },
+            { "value": "Eventi", "label": "Eventi" },
+            { "value": "Cronologia", "label": "Cronologia" }
+          ]
+        },
+        { "key": "immagine", "label": "Immagine", "type": "image" },
+        { "key": "ritaglio", "label": "Ritaglio", "type": "text", "placeholder": "50,50" },
+        { "key": "corpo", "label": "Testo", "type": "markdown", "rows": 8, "required": true },
+        { "key": "approfondimenti", "label": "Approfondimenti", "type": "markdown", "rows": 4 }
+      ],
+      "item": {
+        "heading": "{titolo}",
+        "level": 2,
+        "titleField": "titolo",
+        "sections": [
+          {
+            "blocks": [{ "kind": "image", "field": "immagine", "altField": "titolo", "posField": "ritaglio" }]
+          },
+          {
+            "blocks": [{ "kind": "markdown", "field": "corpo" }]
+          },
+          {
+            "heading": "Approfondimenti",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "approfondimenti" }]
+          }
+        ]
+      }
+    }
+  ]
+}

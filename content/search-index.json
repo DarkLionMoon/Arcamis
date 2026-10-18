@@ -168,6 +168,12 @@
   "text": "Contenuto in arrivo."
  },
  {
+  "id": "pag-changelog",
+  "title": "Changelog",
+  "icon": "📜",
+  "text": "Ogni aggiornamento della wiki viene registrato qui, diviso per versione e patch. Le voci più recenti sono in cima: apri una versione per leggere cosa è cambiato. Il changelog racconta la wiki; le patch della campagna sono annunciate sul Discord."
+ },
+ {
   "id": "pag-credits",
   "title": "Crediti & Legale",
   "icon": "⚖️",

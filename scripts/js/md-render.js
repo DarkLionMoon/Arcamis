@@ -187,7 +187,17 @@
       roots = stack[0].children;
     items.forEach(function (it) {
       while (stack.length > 1 && stack[stack.length - 1].indent >= it.indent) stack.pop();
-      var node = { type: it.type, content: it.content, checked: it.checked, task: it.task, children: [] };
+      /* `indent` deve finire nel nodo: senza, il confronto qui sopra era
+         sempre `undefined >= n` e ogni voce diventava figlia della
+         precedente (elenchi annidati a catena). */
+      var node = {
+        indent: it.indent,
+        type: it.type,
+        content: it.content,
+        checked: it.checked,
+        task: it.task,
+        children: [],
+      };
       stack[stack.length - 1].children.push(node);
       stack.push(node);
     });

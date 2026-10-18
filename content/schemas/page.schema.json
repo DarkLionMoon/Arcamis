@@ -11,6 +11,7 @@
     "icon": { "type": "string" },
     "content": { "type": "string" },
     "layout": { "type": "string", "enum": ["", "contenuto", "luoghi", "cronache", "personaggio", "bestiario", "oggetti", "fazioni", "materiale", "pantheon", "collezione", "generico", "lore", "regole", "lavoro", "wide", "timeline", "glossario", "galleria", "tabelle", "sessione", "quest", "npc", "spell", "specie", "citta", "evento", "imprese"] },
+    "meme": { "type": "boolean", "description": "Mostra il banner «Pagina meme» prima del contenuto" },
     "lastModified": { "type": "string", "format": "date-time" }
   },
   "additionalProperties": true

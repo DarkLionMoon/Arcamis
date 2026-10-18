@@ -138,6 +138,7 @@ const COLOR_TOKENS = [
   '--accent-strong',
   '--accent-ink',
   '--accent-soft',
+  '--accent-rgb',
   '--good',
   '--good-soft',
   '--warn',

@@ -200,6 +200,12 @@
       "l": "Rovine di Kaldur",
       "i": "🗿",
       "id": "pag-rovine-di-kaldur"
+    },
+    {
+      "k": "changelog",
+      "l": "Changelog",
+      "i": "📜",
+      "id": "pag-changelog"
     }
   ],
   "sections": [

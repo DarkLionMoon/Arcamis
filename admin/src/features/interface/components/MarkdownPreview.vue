@@ -2,6 +2,13 @@
 import { computed, ref, watch } from 'vue'
 import DOMPurify from 'dompurify'
 
+/* Lo stesso renderer del sito pubblico, importato dal sorgente della wiki:
+   l'anteprima non può divergere da ciò che i lettori vedranno. Prima veniva
+   scaricato da /scripts/js/md-render.js, che in produzione non esiste più
+   (la build genera nomi con hash) e l'anteprima restava su «Preparazione…». */
+// @ts-expect-error modulo JS puro della wiki, privo di dichiarazioni di tipo
+import '../../../../../scripts/js/md-render.js'
+
 const props = defineProps<{ content: string; toc?: boolean }>()
 
 declare global {
@@ -32,19 +39,53 @@ async function ensureRenderer() {
   loaded.value = !!window.mdRender
 }
 
-const html = computed(() => {
-  if (!window.mdRender) return ''
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') || 'sezione'
+}
+
+interface TocItem {
+  id: string
+  text: string
+  level: number
+}
+
+/* `mdRender` non emette id sui titoli e `mdToc` restituisce solo testo e
+   livello: il sommario finiva per puntare a `#undefined`. Gli id vengono
+   quindi assegnati qui, dopo la sanitizzazione, e il sommario nasce dagli
+   stessi nodi: l'ancora esiste sempre e l'ordine è quello del documento. */
+const rendered = computed<{ html: string; toc: TocItem[] }>(() => {
+  if (!window.mdRender) return { html: '', toc: [] }
   const out = window.mdRender(props.content || '')
-  return DOMPurify.sanitize(out, {
+  const safe = DOMPurify.sanitize(out, {
     USE_PROFILES: { html: true, svg: true, mathml: true },
     ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|ftp|tel|sms|data|blob|file):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i
   })
+
+  const holder = document.createElement('div')
+  holder.innerHTML = safe
+  const toc: TocItem[] = []
+  const seen = new Map<string, number>()
+  holder.querySelectorAll('h1, h2, h3, h4').forEach((heading) => {
+    const text = (heading.textContent || '').replace(/\s+/g, ' ').trim()
+    if (!text) return
+    const base = slugify(text)
+    const count = seen.get(base) ?? 0
+    seen.set(base, count + 1)
+    const id = count ? `${base}-${count + 1}` : base
+    heading.id = id
+    toc.push({ id, text, level: Number(heading.tagName.slice(1)) })
+  })
+
+  return { html: holder.innerHTML, toc: props.toc ? toc : [] }
 })
 
-const tocItems = computed(() => {
-  if (!props.toc || !window.mdToc) return []
-  return window.mdToc(props.content || '')
-})
+const html = computed(() => rendered.value.html)
+const tocItems = computed(() => rendered.value.toc)
 
 watch(loaded, (ok) => {
   /* re-render once the renderer is available */
@@ -59,7 +100,13 @@ ensureRenderer()
     <div v-if="!loaded" class="arc-empty-side">Preparazione anteprima…</div>
     <template v-else>
       <nav v-if="tocItems.length" class="arc-md-toc">
-        <a v-for="t in tocItems" :key="t.id" :href="'#' + t.id">{{ t.text }}</a>
+        <a
+          v-for="t in tocItems"
+          :key="t.id"
+          :href="'#' + t.id"
+          :style="{ paddingLeft: (t.level - 1) * 10 + 'px' }"
+          >{{ t.text }}</a
+        >
       </nav>
       <div class="n-content" v-html="html"></div>
     </template>

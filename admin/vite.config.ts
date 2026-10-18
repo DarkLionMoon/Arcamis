@@ -30,6 +30,12 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8788',
         changeOrigin: true
+      },
+      /* In sviluppo l'anteprima dell'editor carica le immagini pubblicate:
+         senza proxy resterebbero 404 sotto /admin/. */
+      '/images': {
+        target: 'http://localhost:8788',
+        changeOrigin: true
       }
     }
   },

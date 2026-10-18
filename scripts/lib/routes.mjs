@@ -55,6 +55,49 @@ export function stripMarkdown(md) {
     .trim();
 }
 
+/* ── Stati di pubblicazione ──────────────────────────────────────
+   Stessa specifica di admin/src/features/pages/workflow.ts e di
+   scripts/js/page-status.js (§ scripts/__tests__/page-status.test.js).
+   Una pagina non pubblicata non entra in sitemap e non viene
+   prerenderizzata: sarebbe un link indicizzato a un contenuto che il
+   sito, a runtime, si rifiuta di mostrare. */
+const PAGE_STATUSES = ['draft', 'review', 'scheduled', 'published'];
+
+export function parsePublishWhen(value) {
+  if (!value) return null;
+  const time = Date.parse(value);
+  return Number.isNaN(time) ? null : time;
+}
+
+/** Stato dichiarato, senza guardare l'orologio. */
+export function declaredPageStatus(page) {
+  if (!page) return 'draft';
+  if (PAGE_STATUSES.includes(page.status)) {
+    if (page.status === 'scheduled' && parsePublishWhen(page.publishAt) === null) return 'draft';
+    if (page.status === 'published' && page.isDraft === true) return 'draft';
+    return page.status;
+  }
+  return page.isDraft === true ? 'draft' : 'published';
+}
+
+/** Stato effettivo: una programmata scaduta è pubblica. */
+export function pageStatusOf(page, now = Date.now()) {
+  const declared = declaredPageStatus(page);
+  if (declared !== 'scheduled') return declared;
+  const when = parsePublishWhen(page?.publishAt);
+  if (when === null) return 'draft';
+  return when <= now ? 'published' : 'scheduled';
+}
+
+export function isPagePublic(page, now = Date.now()) {
+  return pageStatusOf(page, now) === 'published';
+}
+
+/** Programmata e già scaduta: pubblica, ma il dist è indietro. */
+export function isPageDue(page, now = Date.now()) {
+  return declaredPageStatus(page) === 'scheduled' && pageStatusOf(page, now) === 'published';
+}
+
 /* Le pagine ancora vuote dicono solo "Contenuto in arrivo": come
    description non serve a nessuno (né a un motore di ricerca né a chi
    condivide il link). In quel caso si usa un testo costruito dal titolo. */
@@ -161,7 +204,25 @@ function readJson(file) {
  *                  image:string|null,type:string,section:string|null,
  *                  updated:string|null,changefreq:string,priority:string}>}
  */
-export function collectRoutes(root = process.cwd()) {
+/**
+ * Chiavi delle pagine non pubbliche in questo momento. La build le inietta
+ * nel sito (`window.__ARC_HIDDEN_PAGES__`) perché anche menu, home e
+ * ricerca smettano di proporle.
+ * @returns {string[]}
+ */
+export function hiddenPageKeys(root = process.cwd(), now = Date.now()) {
+  const pagesDir = path.join(root, 'content', 'pages');
+  const registry = readJson(path.join(pagesDir, 'registry.json'));
+  const hidden = [];
+  for (const page of registry.pages || []) {
+    const file = path.join(pagesDir, `${page.k}.json`);
+    if (!fs.existsSync(file)) continue;
+    if (!isPagePublic(readJson(file), now)) hidden.push(page.k);
+  }
+  return hidden;
+}
+
+export function collectRoutes(root = process.cwd(), now = Date.now()) {
   const pagesDir = path.join(root, 'content', 'pages');
   const registry = readJson(path.join(pagesDir, 'registry.json'));
   const routes = [];
@@ -185,6 +246,8 @@ export function collectRoutes(root = process.cwd()) {
     if (!page.path) continue;
     const file = path.join(pagesDir, `${page.k}.json`);
     const doc = fs.existsSync(file) ? readJson(file) : {};
+    /* Bozza, in revisione o programmata: niente rotta pubblica. */
+    if (!isPagePublic(doc, now)) continue;
     const content = contentBody(doc.content || '');
     const sectionLabel = page.sec ? (registry.sections || []).find((s) => s.v === page.sec)?.l || page.sec : null;
     const summary = excerpt(content, 155);
@@ -213,6 +276,9 @@ export function collectRoutes(root = process.cwd()) {
     const file = path.join(pagesDir, `${coll.key}.json`);
     if (!fs.existsSync(file)) continue;
     const doc = readJson(file);
+    /* Se la pagina a collezione non è pubblica, non lo sono nemmeno le
+       sue schede: sono sottopagine della stessa. */
+    if (!isPagePublic(doc, now)) continue;
     for (const item of parseCollection(doc.content || '')) {
       /* Le sezioni senza immagine sono blocchi introduttivi, non entità. */
       if (!item.img) continue;

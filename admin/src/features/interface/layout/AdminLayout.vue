@@ -122,6 +122,10 @@ function normalize(p: string) {
   return p === '/' ? '/' : p.replace(/\/+$/, '')
 }
 
+/* Le viste che si prendono tutto lo spazio (editor) dichiarano
+   `meta.wide`: niente max-width né padding del contenuto. */
+const wide = computed(() => route.meta.wide === true)
+
 const pageTitle = computed(() => {
   for (const g of groups) {
     const hit = g.items.find((i) => normalize(i.to) === normalize(route.path))
@@ -212,7 +216,7 @@ const pageTitle = computed(() => {
         </div>
       </header>
 
-      <main class="arc-content">
+      <main class="arc-content" :class="{ 'arc-content--wide': wide }">
         <router-view />
       </main>
     </div>

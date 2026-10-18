@@ -102,6 +102,7 @@ var _pathMap = {
   'lore/riva-di-ferro': 'pag-riva-di-ferro',
   'lore/fumofosco': 'pag-fumofosco',
   'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur',
+  'changelog': 'pag-changelog',
   'credits': 'pag-credits'
 };
 

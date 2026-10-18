@@ -17,7 +17,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { transform } from 'esbuild';
-import { collectRoutes, renderSitemap, renderRobots, writePages, routeFile, SITE_URL } from './lib/routes.mjs';
+import {
+  collectRoutes,
+  hiddenPageKeys,
+  renderSitemap,
+  renderRobots,
+  writePages,
+  routeFile,
+  SITE_URL,
+} from './lib/routes.mjs';
 
 const root = process.cwd();
 const dist = path.join(root, 'dist');
@@ -42,6 +50,22 @@ if (!fs.existsSync(distPath('index.html'))) {
 /* ── 1. JS: minify + content hash ─────────────────────────── */
 const jsDir = distPath('scripts/js');
 const jsMap = new Map();
+
+/* Le pagine non pubbliche (bozza, in revisione, programmate) vengono
+   tolte da menu, home e ricerca del sito: l'elenco vive nel file di
+   stato, generato qui dalla stessa fonte che decide rotte e sitemap.
+   Prima della minificazione, così anche la lista finisce nell'hash. */
+const statusFile = path.join(jsDir, 'page-status.js');
+if (fs.existsSync(statusFile)) {
+  const hidden = hiddenPageKeys(root);
+  const source = fs.readFileSync(statusFile, 'utf8');
+  fs.writeFileSync(
+    statusFile,
+    `/* Generato da scripts/build-post.mjs — elenco delle pagine non pubbliche. */\nwindow.__ARC_HIDDEN_PAGES__ = ${JSON.stringify(hidden)};\n` +
+      source
+  );
+  if (hidden.length) console.log('  Pagine non pubbliche tolte dal sito: ' + hidden.join(', '));
+}
 let jsBefore = 0;
 let jsAfter = 0;
 

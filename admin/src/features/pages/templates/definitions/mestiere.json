@@ -1,0 +1,191 @@
+{
+  "version": 1,
+  "id": "mestiere",
+  "label": "Mestiere / Lavoro",
+  "icon": "💼",
+  "description": "Scheda tecnica di un lavoro: categoria, requisiti, strumenti, stipendio e come si svolge. Genera la griglia dei mestieri.",
+  "layout": "collezione",
+  "separator": "hr",
+  "page": {
+    "title": "Lavori ad Arcamis",
+    "fields": [
+      {
+        "key": "intro",
+        "label": "Introduzione",
+        "type": "markdown",
+        "rows": 5,
+        "placeholder": "Ogni lavoro richiede turni di 8 ore al giorno per 7 giorni…",
+        "help": "Testo mostrato sotto il titolo, prima della griglia dei mestieri."
+      }
+    ],
+    "sections": [
+      {
+        "blocks": [
+          {
+            "kind": "markdown",
+            "field": "intro"
+          }
+        ]
+      }
+    ]
+  },
+  "collections": [
+    {
+      "key": "mestieri",
+      "label": "Mestieri",
+      "singular": "mestiere",
+      "description": "Ogni voce diventa una tessera della griglia e una sezione della pagina.",
+      "fields": [
+        {
+          "key": "nome",
+          "label": "Nome",
+          "type": "text",
+          "required": true,
+          "placeholder": "Biblioteca"
+        },
+        {
+          "key": "categoria",
+          "label": "Categoria",
+          "type": "select",
+          "options": [
+            {
+              "value": "Artigiano",
+              "label": "Artigiano"
+            },
+            {
+              "value": "Commerciante",
+              "label": "Commerciante"
+            },
+            {
+              "value": "Servizio",
+              "label": "Servizio"
+            },
+            {
+              "value": "Intrattenimento",
+              "label": "Intrattenimento"
+            },
+            {
+              "value": "Accademico",
+              "label": "Accademico"
+            },
+            {
+              "value": "Militare",
+              "label": "Militare"
+            },
+            {
+              "value": "Altro",
+              "label": "Altro"
+            }
+          ]
+        },
+        {
+          "key": "immagine",
+          "label": "Immagine",
+          "type": "image"
+        },
+        {
+          "key": "ritaglio",
+          "label": "Ritaglio",
+          "type": "text",
+          "placeholder": "50,50"
+        },
+        {
+          "key": "requisiti",
+          "label": "Requisiti",
+          "type": "tags",
+          "placeholder": "Forza 12, Resistenza 10"
+        },
+        {
+          "key": "strumenti",
+          "label": "Strumenti",
+          "type": "tags",
+          "placeholder": "Martello, Incudine"
+        },
+        {
+          "key": "modificatori",
+          "label": "Modificatori",
+          "type": "text",
+          "placeholder": "Intelligenza (INT) o Carisma (CHA)"
+        },
+        {
+          "key": "stipendio",
+          "label": "Stipendio",
+          "type": "markdown",
+          "rows": 6
+        },
+        {
+          "key": "descrizione",
+          "label": "Descrizione",
+          "type": "markdown",
+          "rows": 5
+        },
+        {
+          "key": "come",
+          "label": "Come si svolge",
+          "type": "markdown",
+          "rows": 5
+        }
+      ],
+      "item": {
+        "heading": "{nome}",
+        "level": 1,
+        "titleField": "nome",
+        "sections": [
+          {
+            "blocks": [
+              {
+                "kind": "image",
+                "field": "immagine",
+                "altField": "nome",
+                "posField": "ritaglio"
+              }
+            ]
+          },
+          {
+            "blocks": [
+              {
+                "kind": "definition",
+                "fields": [
+                  "categoria",
+                  "requisiti",
+                  "strumenti",
+                  "modificatori"
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Stipendio",
+            "level": 2,
+            "blocks": [
+              {
+                "kind": "markdown",
+                "field": "stipendio"
+              }
+            ]
+          },
+          {
+            "heading": "Descrizione",
+            "level": 2,
+            "blocks": [
+              {
+                "kind": "markdown",
+                "field": "descrizione"
+              }
+            ]
+          },
+          {
+            "heading": "Come si svolge",
+            "level": 2,
+            "blocks": [
+              {
+                "kind": "markdown",
+                "field": "come"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

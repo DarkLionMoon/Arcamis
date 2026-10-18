@@ -121,6 +121,110 @@
     setTimeout(_attachNavReset, 100);
   });
 })();
+
+/* ════════════════════════════════════
+   4. INVITO DISCORD SEMPRE VALIDO
+   Gli inviti Discord scadono: se il codice scritto
+   nell'HTML non è più valido il pulsante muore, e
+   nessuno se ne accorge. Qui l'invito viene
+   verificato all'avvio e, solo se non risponde,
+   sostituito con quello corrente del widget del
+   server. Un invito permanente configurato a mano
+   resta quindi intoccato.
+════════════════════════════════════ */
+(function () {
+  var INVITE_RE = /discord(?:\.gg|\.com\/invite)\/([A-Za-z0-9-]+)/;
+  var CACHE_KEY = 'arc_discord_invite';
+  var CACHE_TTL = 6 * 60 * 60 * 1000; /* 6h: il widget ruota l'invito */
+
+  function _anchors() {
+    return Array.prototype.slice.call(
+      document.querySelectorAll('a[href*="discord.gg/"], a[href*="discord.com/invite/"]')
+    );
+  }
+  function _code(href) {
+    var m = String(href || '').match(INVITE_RE);
+    return m ? m[1] : '';
+  }
+  function _apply(invite) {
+    if (!invite) return;
+    _anchors().forEach(function (a) {
+      a.setAttribute('href', invite);
+    });
+  }
+  /* La cache vale solo per lo stesso codice configurato: se l'HTML
+     cambia (nuovo invito permanente) si rivalida invece di sovrascrivere. */
+  function _cached(code) {
+    try {
+      var raw = JSON.parse(sessionStorage.getItem(CACHE_KEY) || 'null');
+      if (raw && raw.code === code && raw.invite && Date.now() - raw.at < CACHE_TTL) {
+        return raw.invite;
+      }
+    } catch (_e) {
+      return '';
+    }
+    return '';
+  }
+  function _remember(code, invite) {
+    try {
+      sessionStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({ code: code, invite: invite, at: Date.now() })
+      );
+    } catch (e) {
+      /* sessionStorage non disponibile: nessun problema, si rivalida. */
+    }
+  }
+  function _widgetInvite() {
+    return fetch('https://discord.com/api/guilds/' + (typeof GUILD !== 'undefined' ? GUILD : '') + '/widget.json')
+      .then(function (r) {
+        return r.ok ? r.json() : null;
+      })
+      .then(function (d) {
+        return d && (d.instant_invite || d.discord_invite) ? d.instant_invite || d.discord_invite : '';
+      })
+      .catch(function () {
+        return '';
+      });
+  }
+
+  function _check() {
+    var anchors = _anchors();
+    if (!anchors.length) return;
+    var code = _code(anchors[0].getAttribute('href'));
+    var cached = _cached(code);
+    if (cached) {
+      _apply(cached);
+      return;
+    }
+    var api = code
+      ? 'https://discord.com/api/v10/invites/' + encodeURIComponent(code)
+      : '';
+    var valid = api
+      ? fetch(api, { cache: 'no-store' }).then(function (r) {
+          return r.ok;
+        })
+      : Promise.resolve(false);
+    valid
+      .catch(function () {
+        return true; /* rete assente: non toccare il link configurato */
+      })
+      .then(function (ok) {
+        if (ok) return;
+        return _widgetInvite().then(function (invite) {
+          if (!invite) return;
+          _remember(code, invite);
+          _apply(invite);
+        });
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _check);
+  } else {
+    _check();
+  }
+})();
 function toggleTnAcc(header) {
   var menu = header.closest('.tn-menu--acc');
   // chiudi tutti gli altri header della stessa menu

@@ -68,6 +68,7 @@ const ALL_ACTIONS = [
   'list_trash',
   'restore_trash',
   'empty_trash',
+  'pages_status',
   'backup_content',
   'get_diff',
   'save_version',

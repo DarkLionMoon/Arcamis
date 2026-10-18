@@ -142,7 +142,9 @@
   .sidenav-btn.active { color: var(--gold2); border-left-color: var(--gold); background: rgba(201,168,76,0.08); font-weight: 600; }
 
   /* ── CONTENT ── */
-  .content { flex: 1; padding: 28px 28px; overflow-x: auto; max-width: 960px; }
+  /* Il modulo vive in un iframe a tutta larghezza: 960px lasciava
+     troppo vuoto ai lati su desktop. */
+  .content { flex: 1; padding: 28px 28px; overflow-x: auto; max-width: 1180px; }
 
   /* ── HERO / INTRO ── */
   .page-hero {
@@ -2381,11 +2383,37 @@ function patentiImport() {
 //  THEME
 // ════════════════════════════════════════════════
 var THEME_KEY = 'arcamis_theme';
+/* Incorporata nel sito, l'app deve seguire il tema della pagina ospite
+   (`arc_theme`); in standalone resta valida la sua chiave storica. */
+function _embedded() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    return true;
+  }
+}
+function _preferredTheme() {
+  try {
+    return (_embedded() ? localStorage.getItem('arc_theme') : null) ||
+      localStorage.getItem(THEME_KEY) ||
+      'dark';
+  } catch (e) {
+    return 'dark';
+  }
+}
 function applyTheme() {
-  var light = localStorage.getItem(THEME_KEY) === 'light';
+  var light = _preferredTheme() === 'light';
   document.body.classList.toggle('light', light);
   var btn = document.getElementById('themeToggle');
   if (btn) btn.textContent = light ? '☀️' : '🌙';
+}
+window.addEventListener('storage', function (e) {
+  if (e.key === 'arc_theme') applyTheme();
+});
+/* Nel sito il toggle del tema è già nella barra: qui sarebbe un doppione. */
+if (_embedded()) {
+  var _themeBtn = document.getElementById('themeToggle');
+  if (_themeBtn) _themeBtn.style.display = 'none';
 }
 function toggleTheme() {
   var light = document.body.classList.toggle('light');

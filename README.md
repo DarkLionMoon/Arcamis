@@ -191,6 +191,43 @@ Il pannello legacy è stato rimosso. Il pannello Vue è disponibile su `/admin`
   altrimenti countdown di fallback.
 - Sidebar off-canvas con hamburger su mobile.
 
+### Editor di pagine a modelli
+
+Le pagine si scrivono in due modi: markdown libero, oppure compilando un
+**modello** (Scheda Divinità, Regolamento, Pagina Lore, Mestiere/Lavoro) i cui
+campi validati generano da soli il markdown che il sito già rende. L'editor è un
+workspace a due pannelli con form strutturato + anteprima live, validazione
+mentre si scrive, cassetto media, cronologia undo/redo, autosave e guard delle
+modifiche non salvate; i campi vuoti diventano segnaposto che accendono il badge
+«✎ Bozza» sul sito. I modelli sono dati JSON (`admin/src/features/pages/templates/definitions/`)
+e se ne possono importare di personalizzati dal pannello.
+
+Dettagli su componenti, schema dei modelli e flusso dei dati:
+[`admin/src/features/pages/EDITOR.md`](admin/src/features/pages/EDITOR.md).
+
+### Flusso di pubblicazione (bozza · revisione · programmata · pubblicata)
+
+Il badge «bozza» è diventato uno **stato dichiarato** nel file della pagina, e
+vale per tutte le pagine, libere o a modello:
+
+- **Bozza** → non pubblica, in lavorazione;
+- **In revisione** → un editor l'ha consegnata, aspetta un amministratore;
+- **Programmata** → esce da sola alla data scelta (`publishAt`);
+- **Pubblicata** → visibile nel sito.
+
+Un editor può solo *chiedere* la revisione; approvare, pubblicare e programmare
+richiedono il ruolo amministratore, e la pubblicazione si ferma se un campo
+obbligatorio del modello è vuoto. Nel pannello la lista Pagine filtra e mostra i
+chip per stato (con azioni rapide Approva / Invia in revisione), l'editor ha il
+pannello del flusso con data di programmazione, nota di revisione e chi ha
+chiesto o firmato l'approvazione.
+
+Il sito e la build applicano la stessa specifica (`scripts/js/page-status.js`,
+`scripts/lib/routes.mjs`): una pagina non pubblica non viene servita e resta
+fuori da prerender e sitemap; una **programmata già scaduta è pubblica** anche
+prima della build, che si allinea al deploy successivo. Le pagine storiche senza
+`status` continuano a valere con il vecchio `isDraft`, senza migrazioni.
+
 ## SEO, meta per pagina e 404
 
 Ogni pagina pubblica viene **prerenderizzata** durante la build: per ogni rotta

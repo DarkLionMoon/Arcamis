@@ -1,6 +1,12 @@
 {
  "pages": [
   {
+   "id": "pag-changelog",
+   "title": "Changelog",
+   "icon": "📜",
+   "lastEdited": "2026-10-18T06:42:27.642Z"
+  },
+  {
    "id": "pag-imprese",
    "title": "Imprese e Licenze",
    "icon": "⚖️",
@@ -41,12 +47,6 @@
    "title": "Foresta dello Smarrimento",
    "icon": "🌑",
    "lastEdited": "2026-08-25T14:49:32.831917Z"
-  },
-  {
-   "id": "pag-sottoclassi-homebrew",
-   "title": "Sottoclassi Homebrew",
-   "icon": "📄",
-   "lastEdited": "2026-08-25T14:49:09.687390Z"
   }
  ]
 }

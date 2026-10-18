@@ -3,6 +3,8 @@
    Single source of truth for all domain types
    ════════════════════════════════════════════════════════════════ */
 
+import type { TemplateData } from '@/features/pages/templates/schema'
+
 // ──────────────────────────────────────────────
 // Auth & User
 // ──────────────────────────────────────────────
@@ -25,9 +27,34 @@ export interface AuthState {
 }
 
 // ──────────────────────────────────────────────
+// Flusso di pubblicazione
+// ──────────────────────────────────────────────
+/* Stati di una pagina. La logica (transizioni, ruoli, visibilità) sta in
+   features/pages/workflow.ts; qui solo i nomi, condivisi da tipi e UI. */
+export const PAGE_STATUSES = ['draft', 'review', 'scheduled', 'published'] as const
+export type PageStatus = (typeof PAGE_STATUSES)[number]
+
+/** Traccia di chi ha chiesto e fatto la revisione. */
+export interface PageReview {
+  requestedBy?: string
+  requestedAt?: string
+  reviewedBy?: string
+  reviewedAt?: string
+  note?: string
+}
+
+/** I campi che il flusso di lavoro scrive su pagina e registro. */
+export interface PageWorkflowFields {
+  status?: PageStatus
+  publishAt?: string
+  isDraft?: boolean
+  review?: PageReview
+}
+
+// ──────────────────────────────────────────────
 // Pages & Registry
 // ──────────────────────────────────────────────
-export interface PageRegistryEntry {
+export interface PageRegistryEntry extends PageWorkflowFields {
   k: string // slug key
   l: string // label
   i: string // icon (emoji)
@@ -52,18 +79,25 @@ export interface RegistryData {
 // ──────────────────────────────────────────────
 // Page Content
 // ──────────────────────────────────────────────
-export interface PageContent {
+export interface PageContent extends PageWorkflowFields {
   k: string
   title: string
   icon: string
   content: string
   layout?: string
   toc?: boolean
+  /* Pagina goliardica: il sito mostra un banner «Pagina meme» prima del
+     contenuto. Il campo è opzionale e viene preservato al salvataggio. */
+  meme?: boolean
   description?: string
   lastModified: string
-  publishAt?: string
-  isDraft?: boolean
   sha?: string
+  /* Authoring strutturato: il modello applicato, i dati dei campi e i
+     percorsi marcati "in lavorazione". `content` resta compilato per il
+     sito pubblico, che questi campi non li legge. */
+  template?: string
+  templateData?: TemplateData
+  draftFields?: string[]
 }
 
 // ──────────────────────────────────────────────

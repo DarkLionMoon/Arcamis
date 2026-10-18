@@ -20,8 +20,8 @@ export type { RequestOptions } from './http'
 
 export { b64encode, decodeBase64Utf8, ghApi } from './github'
 
-export { carouselApi, coversApi, layoutsApi, mapApi, pagesApi, registryApi, searchApi } from './content'
-export type { RegistryDoc } from './content'
+export { carouselApi, coversApi, layoutsApi, mapApi, pagesApi, registryApi, searchApi, statusApi } from './content'
+export type { PageWorkflowStatus, RegistryDoc } from './content'
 
 export {
   analyticsApi,

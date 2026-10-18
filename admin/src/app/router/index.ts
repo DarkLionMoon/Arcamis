@@ -34,7 +34,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', name: 'dashboard', component: DashboardView },
       { path: 'pagine', name: 'pages', component: PageListView },
-      { path: 'editor/:key', name: 'editor', component: PageEditorView, meta: { minRole: 'editor' } },
+      { path: 'editor/:key', name: 'editor', component: PageEditorView, meta: { minRole: 'editor', wide: true } },
       { path: 'mapa', name: 'map', component: MapEditorView, meta: { minRole: 'editor' } },
       { path: 'carousel', name: 'carousel', component: CarouselView, meta: { minRole: 'editor' } },
       { path: 'copertine', name: 'covers', component: CoversView, meta: { minRole: 'editor' } },

@@ -27,6 +27,20 @@ export interface RegistryDoc {
   sha?: string
 }
 
+/* Campi del flusso di pubblicazione, come li espone l'endpoint. */
+export type PageWorkflowStatus = Pick<PageContent, 'status' | 'publishAt' | 'isDraft' | 'review'>
+
+/**
+ * Stato del flusso di tutte le pagine in una chiamata: la lista del
+ * pannello mostra i chip giusti anche quando il registro è indietro
+ * (pagine create prima di questo flusso, o scritture fallite).
+ */
+export const statusApi = {
+  async getAll(): Promise<Record<string, PageWorkflowStatus>> {
+    return request<Record<string, PageWorkflowStatus>>(adminUrl('pages_status'))
+  }
+}
+
 export const pagesApi = {
   async get(key: string): Promise<PageContent> {
     const data = await ghApi.get(`${CONTENT_PATH}/${key}.json`)

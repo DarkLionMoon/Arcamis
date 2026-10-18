@@ -216,78 +216,94 @@ export const useRegistryStore = defineStore('registry', () => {
 // ──────────────────────────────────────────────
 // Current Page Editor Store
 // ──────────────────────────────────────────────
+/* L'impronta esclude ciò che cambia senza che l'utente tocchi nulla:
+   lo sha della revisione GitHub e lastModified. Tutto il resto — testo,
+   metadati, dati del modello, campi in lavorazione — conta come modifica. */
+export function pageSnapshot(page: PageContent | null): string {
+  if (!page) return ''
+  const { sha: _sha, lastModified: _lastModified, ...rest } = page
+  return JSON.stringify(rest)
+}
+
 export const useEditorStore = defineStore('editor', () => {
   const currentPage = ref<PageContent | null>(null)
-  const modified = ref(false)
   const saving = ref(false)
-  const lastSavedContent = ref('')
+  const savedSnapshot = ref('')
+  const lastSavedAt = ref<string | null>(null)
   const autosaveEnabled = ref(true)
-  const viewMode = ref<'md' | 'pv' | 'split' | 'site'>('split')
-  const structuredMode = ref(false)
+  const mode = ref<'structure' | 'markdown'>('structure')
+  const previewOpen = ref(true)
   const editorFontSize = ref(13)
   const showLineNumbers = ref(false)
   const wordWrap = ref(true)
 
-  const hasUnsavedChanges = computed(() => modified.value)
+  /* Confronto a impronta invece del solo testo: prima modificare titolo,
+     icona o campi strutturati non risultava come modifica non salvata. */
+  const hasUnsavedChanges = computed(() => Boolean(currentPage.value) && pageSnapshot(currentPage.value) !== savedSnapshot.value)
+  const modified = hasUnsavedChanges
 
   function setPage(page: PageContent | null) {
     currentPage.value = page
-    modified.value = false
-    lastSavedContent.value = page?.content || ''
+    savedSnapshot.value = pageSnapshot(page)
+    lastSavedAt.value = page?.lastModified || null
   }
 
   function setContent(content: string) {
-    if (currentPage.value) {
-      currentPage.value.content = content
-      modified.value = content !== lastSavedContent.value
-    }
+    if (currentPage.value) currentPage.value.content = content
   }
 
   function setMetadata(updates: Partial<PageContent>) {
-    if (currentPage.value) {
-      Object.assign(currentPage.value, updates)
-      modified.value = true
-    }
+    if (currentPage.value) Object.assign(currentPage.value, updates)
   }
 
-  function markSaved() {
-    modified.value = false
-    lastSavedContent.value = currentPage.value?.content || ''
+  function setTemplateData(data: PageContent['templateData']) {
+    if (currentPage.value) currentPage.value.templateData = data
   }
 
-  function toggleStructuredMode() {
-    structuredMode.value = !structuredMode.value
+  function setDraftFields(paths: string[]) {
+    if (currentPage.value) currentPage.value.draftFields = [...paths]
   }
 
-  function setViewMode(mode: 'md' | 'pv' | 'split' | 'site') {
-    viewMode.value = mode
+  function applyTemplate(templateId: string | undefined) {
+    if (currentPage.value) currentPage.value.template = templateId
+  }
+
+  function markSaved(savedAt?: string) {
+    savedSnapshot.value = pageSnapshot(currentPage.value)
+    lastSavedAt.value = savedAt || currentPage.value?.lastModified || new Date().toISOString()
+  }
+
+  function setMode(next: 'structure' | 'markdown') {
+    mode.value = next
   }
 
   function clear() {
     currentPage.value = null
-    modified.value = false
-    lastSavedContent.value = ''
-    structuredMode.value = false
+    savedSnapshot.value = ''
+    lastSavedAt.value = null
+    mode.value = 'structure'
   }
 
   return {
     currentPage,
-    modified,
     saving,
-    lastSavedContent,
+    lastSavedAt,
     autosaveEnabled,
-    viewMode,
-    structuredMode,
+    mode,
+    previewOpen,
     editorFontSize,
     showLineNumbers,
     wordWrap,
+    modified,
     hasUnsavedChanges,
     setPage,
     setContent,
     setMetadata,
+    setTemplateData,
+    setDraftFields,
+    applyTemplate,
     markSaved,
-    toggleStructuredMode,
-    setViewMode,
+    setMode,
     clear
   }
 })

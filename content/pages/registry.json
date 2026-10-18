@@ -339,6 +339,16 @@
       "sub": ""
     },
     {
+      "k": "changelog",
+      "l": "Changelog",
+      "i": "📜",
+      "id": "pag-changelog",
+      "menu": true,
+      "admin": true,
+      "path": "changelog",
+      "c": 1
+    },
+    {
       "k": "credits",
       "l": "Crediti & Legale",
       "i": "⚖️",

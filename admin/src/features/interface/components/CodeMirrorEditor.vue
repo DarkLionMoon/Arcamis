@@ -1,10 +1,29 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { EditorState, Compartment } from '@codemirror/state'
-import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection, type KeyBinding } from '@codemirror/view'
+import { Compartment, EditorSelection, EditorState } from '@codemirror/state'
+import {
+  EditorView,
+  keymap,
+  lineNumbers,
+  highlightActiveLine,
+  drawSelection,
+  type KeyBinding
+} from '@codemirror/view'
+import { defaultKeymap, history, historyKeymap, indentWithTab, redo, undo } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
 import { html } from '@codemirror/lang-html'
 import { yaml } from '@codemirror/lang-yaml'
+
+import {
+  insertImage,
+  insertLink,
+  insertSnippet,
+  toggleLinePrefix,
+  wrapSelection,
+  type EditResult,
+  type EditState
+} from '@/shared/markdownCommands'
+import type { CodeMirrorHandle } from './codemirrorHandle'
 
 const props = defineProps<{
   modelValue: string
@@ -13,11 +32,13 @@ const props = defineProps<{
   lineNumbers?: boolean
   wordWrap?: boolean
   fontSize?: number
+  ariaLabel?: string
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'save'): void
+  (e: 'request-link'): void
 }>()
 
 const host = ref<HTMLElement | null>(null)
@@ -33,7 +54,8 @@ let localUpdate = false
 const fontTheme = (size: number) =>
   EditorView.theme({
     '&': { fontSize: size + 'px', height: '100%' },
-    '.cm-content': { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }
+    '.cm-content': { fontFamily: 'var(--afont-mono, ui-monospace, monospace)' },
+    '.cm-line': { padding: '0 2px' }
   })
 
 function langFor(mode: string) {
@@ -42,12 +64,48 @@ function langFor(mode: string) {
   return markdown()
 }
 
-const saveBindings: KeyBinding[] = [
+function selectionState(): EditState | null {
+  if (!view) return null
+  const range = view.state.selection.main
+  return { text: view.state.doc.toString(), from: range.from, to: range.to }
+}
+
+/** Applica il risultato di un comando puro: testo + nuova selezione. */
+function apply(result: EditResult): void {
+  if (!view) return
+  view.dispatch({
+    changes: { from: 0, to: view.state.doc.length, insert: result.text },
+    selection: EditorSelection.range(result.from, result.to),
+    scrollIntoView: true
+  })
+  view.focus()
+}
+
+function run(command: (state: EditState) => EditResult): boolean {
+  const state = selectionState()
+  if (!state) return false
+  apply(command(state))
+  return true
+}
+
+const shortcuts: KeyBinding[] = [
   {
     key: 'Mod-s',
     preventDefault: true,
     run: () => {
       emit('save')
+      return true
+    }
+  },
+  { key: 'Mod-b', preventDefault: true, run: () => run((state) => wrapSelection(state, '**', 'grassetto')) },
+  { key: 'Mod-i', preventDefault: true, run: () => run((state) => wrapSelection(state, '*', 'corsivo')) },
+  { key: 'Mod-Shift-x', preventDefault: true, run: () => run((state) => wrapSelection(state, '~~', 'barrato')) },
+  { key: 'Mod-Shift-7', run: () => run((state) => toggleLinePrefix(state, '1. ')) },
+  {
+    key: 'Mod-k',
+    preventDefault: true,
+    run: () => {
+      emit('request-link')
       return true
     }
   }
@@ -66,12 +124,15 @@ function makeState(initial: string) {
       langFor(props.mode || 'markdown'),
       highlightActiveLine(),
       drawSelection(),
-      EditorView.lineWrapping !== undefined
-        ? wrapComp.of(props.wordWrap === false ? [] : [EditorView.lineWrapping])
-        : wrapComp.of([]),
+      history(),
+      EditorView.contentAttributes.of({
+        'aria-label': props.ariaLabel || 'Contenuto markdown',
+        spellcheck: 'true'
+      }),
+      wrapComp.of(props.wordWrap === false ? [] : [EditorView.lineWrapping]),
       fontSizeComp.of(fontTheme(props.fontSize || 13)),
       readonlyComp.of(props.readonly ? [EditorView.editable.of(false)] : []),
-      keymap.of(saveBindings),
+      keymap.of([...shortcuts, ...defaultKeymap, ...historyKeymap, indentWithTab]),
       sync,
       EditorView.theme({
         '&': { backgroundColor: 'transparent', color: 'inherit' },
@@ -128,6 +189,50 @@ onBeforeUnmount(() => {
   view?.destroy()
   view = null
 })
+
+const handle: CodeMirrorHandle = {
+  focus() {
+    view?.focus()
+  },
+  wrap(marker, placeholder) {
+    run((state) => wrapSelection(state, marker, placeholder))
+  },
+  prefix(prefix) {
+    run((state) => toggleLinePrefix(state, prefix))
+  },
+  insertLink(url) {
+    run((state) => insertLink(state, url))
+  },
+  insertImage(path, alt) {
+    run((state) => insertImage(state, path, alt))
+  },
+  insertSnippet(text) {
+    run((state) => insertSnippet(state, text))
+  },
+  undo() {
+    if (view) undo(view)
+  },
+  redo() {
+    if (view) redo(view)
+  },
+  selectedText() {
+    if (!view) return ''
+    const range = view.state.selection.main
+    return view.state.sliceDoc(range.from, range.to)
+  },
+  revealLine(line) {
+    if (!view) return
+    const target = Math.min(Math.max(line, 0), view.state.doc.lines - 1)
+    const info = view.state.doc.line(target + 1)
+    view.dispatch({
+      selection: EditorSelection.cursor(info.from),
+      effects: EditorView.scrollIntoView(info.from, { y: 'center' })
+    })
+    view.focus()
+  }
+}
+
+defineExpose<CodeMirrorHandle>(handle)
 </script>
 
 <template>
@@ -137,8 +242,9 @@ onBeforeUnmount(() => {
 <style scoped>
 .arc-cm-host {
   height: 100%;
-  min-height: 200px;
+  min-height: 160px;
   overflow: auto;
+  background: var(--asurface);
 }
 
 .arc-cm-host :deep(.cm-editor) {
@@ -146,7 +252,22 @@ onBeforeUnmount(() => {
 }
 
 .arc-cm-host :deep(.cm-scroller) {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  padding: 8px 0;
+  padding: 10px 0 60px;
+  line-height: 1.65;
+}
+
+.arc-cm-host :deep(.cm-gutters) {
+  background: var(--asurface);
+  border-right: 1px solid var(--aline);
+  color: var(--afg-3);
+}
+
+.arc-cm-host :deep(.cm-activeLine) {
+  background: var(--asurface-2);
+}
+
+.arc-cm-host :deep(.cm-selectionBackground),
+.arc-cm-host :deep(.cm-editor.cm-focused .cm-selectionBackground) {
+  background: var(--accent-soft);
 }
 </style>

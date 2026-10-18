@@ -8,6 +8,8 @@ import { onUnauthorized } from './shared/api'
 import { initTheme } from './shared/theme'
 import './shared/styles/arc-admin-app.css'
 import './shared/styles/arc-admin-theme.css'
+import './shared/styles/arc-editor.css'
+import './shared/styles/arc-preview.css'
 
 /* Prima del mount: il tema scelto non deve lampeggiare al primo paint. */
 initTheme()

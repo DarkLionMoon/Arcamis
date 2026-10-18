@@ -1645,6 +1645,62 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ ok: true, deleted: expired.length }), { headers: cors });
   }
 
+  /* ════ PAGES STATUS ════ */
+  /* Stato del flusso di pubblicazione di tutte le pagine in una sola
+     chiamata: la lista del pannello mostra i chip senza aprire un file
+     per riga. Vengono restituiti solo i campi del flusso, mai il testo. */
+  if (action === 'pages_status') {
+    const sessRole = await sessionRole();
+    if (!sessRole) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
+    }
+    const ghToken = await getGhToken();
+    if (!ghToken) {
+      return new Response(JSON.stringify({ error: 'GH_TOKEN non configurato' }), { status: 501, headers: cors });
+    }
+    const GH_REPO = env.GH_REPO || 'DarkLionMoon/Arcamis';
+    const GH_BRANCH = env.GH_BRANCH || 'main';
+    const apiBase = 'https://api.github.com/repos/' + GH_REPO;
+    const ghHeaders = {
+      Authorization: 'token ' + ghToken,
+      Accept: 'application/vnd.github.v3+json',
+      'User-Agent': 'ArcamisAdmin',
+    };
+    try {
+      const listRes = await fetch(apiBase + '/contents/content/pages?ref=' + GH_BRANCH, { headers: ghHeaders });
+      if (!listRes.ok) {
+        return new Response(JSON.stringify({ error: 'Impossibile elencare le pagine: ' + listRes.status }), {
+          status: 502,
+          headers: cors,
+        });
+      }
+      const files = await listRes.json();
+      const statuses = {};
+      for (const file of files) {
+        if (file.type !== 'file' || !file.name.endsWith('.json') || file.name === 'registry.json') continue;
+        const key = file.name.replace(/\.json$/, '');
+        if (!validPageKey(key)) continue;
+        try {
+          const contentRes = await fetch(file.url, { headers: ghHeaders });
+          if (!contentRes.ok) continue;
+          const data = await contentRes.json();
+          const doc = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+          statuses[key] = {
+            status: typeof doc.status === 'string' ? doc.status : undefined,
+            publishAt: typeof doc.publishAt === 'string' ? doc.publishAt : undefined,
+            isDraft: doc.isDraft === true,
+            review: doc.review && typeof doc.review === 'object' ? doc.review : undefined,
+          };
+        } catch (_) {
+          /* file illeggibile: per quella pagina la lista resta senza stato */
+        }
+      }
+      return new Response(JSON.stringify(statuses), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    }
+  }
+
   /* ════ BACKUP CONTENT ════ */
   if (action === 'backup_content') {
     const sessRole = await sessionRole();

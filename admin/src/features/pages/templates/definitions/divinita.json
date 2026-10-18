@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "id": "divinita",
+  "label": "Scheda Divinità",
+  "icon": "🛐",
+  "description": "Pantheon e figure sacre: una scheda per entità con identità, personalità e culto. Genera la griglia di tessere e una sottopagina per ogni divinità.",
+  "layout": "pantheon",
+  "separator": "hr",
+  "page": {
+    "title": "Divinità",
+    "fields": [
+      {
+        "key": "intro",
+        "label": "Introduzione",
+        "type": "markdown",
+        "rows": 6,
+        "placeholder": "Come funziona il pantheon di Aetherion, come si rapportano gli dèi ai mortali…",
+        "help": "Testo mostrato sopra la griglia delle divinità."
+      }
+    ],
+    "sections": [
+      {
+        "blocks": [{ "kind": "markdown", "field": "intro" }]
+      }
+    ]
+  },
+  "collections": [
+    {
+      "key": "entita",
+      "label": "Schede",
+      "singular": "divinità",
+      "description": "Ogni voce diventa una tessera della griglia e una pagina /lore/pantheon/<slug>.",
+      "fields": [
+        { "key": "nome", "label": "Nome", "type": "text", "required": true, "placeholder": "Anivia" },
+        { "key": "epiteto", "label": "Epiteto", "type": "text", "placeholder": "La Criofenice" },
+        {
+          "key": "allineamento",
+          "label": "Allineamento",
+          "type": "select",
+          "options": [
+            { "value": "Legale Buono", "label": "Legale Buono" },
+            { "value": "Neutrale Buono", "label": "Neutrale Buono" },
+            { "value": "Caotico Buono", "label": "Caotico Buono" },
+            { "value": "Legale Neutrale", "label": "Legale Neutrale" },
+            { "value": "Neutrale Puro", "label": "Neutrale Puro" },
+            { "value": "Caotico Neutrale", "label": "Caotico Neutrale" },
+            { "value": "Legale Malvagio", "label": "Legale Malvagio" },
+            { "value": "Neutrale Malvagio", "label": "Neutrale Malvagio" },
+            { "value": "Caotico Malvagio", "label": "Caotico Malvagio" },
+            { "value": "Non allineato", "label": "Non allineato" }
+          ]
+        },
+        { "key": "sfere", "label": "Sfere", "type": "tags", "placeholder": "Gelo, Libertà, Speranza" },
+        { "key": "simbolo", "label": "Simbolo", "type": "text", "placeholder": "Piuma di ghiaccio" },
+        {
+          "key": "immagine",
+          "label": "Immagine",
+          "type": "image",
+          "help": "Immagine della tessera: 3:2 in orizzontale, viene ritagliata al centro."
+        },
+        {
+          "key": "ritaglio",
+          "label": "Ritaglio",
+          "type": "text",
+          "placeholder": "50,50",
+          "help": "Coordinate X,Y del centro (0-100). Vuoto = centro dell'immagine."
+        },
+        { "key": "citazione", "label": "Citazione", "type": "text", "placeholder": "I am the fury of the blizzard…" },
+        { "key": "personalita", "label": "Personalità", "type": "markdown", "rows": 5 },
+        { "key": "tempio", "label": "Tempio", "type": "text" },
+        { "key": "rituali", "label": "Rituali", "type": "text" },
+        { "key": "seguaci", "label": "Seguaci", "type": "text" }
+      ],
+      "item": {
+        "heading": "{nome}",
+        "level": 1,
+        "titleField": "nome",
+        "sections": [
+          {
+            "blocks": [{ "kind": "image", "field": "immagine", "altField": "nome", "posField": "ritaglio" }]
+          },
+          {
+            "blocks": [{ "kind": "quote", "field": "citazione" }]
+          },
+          {
+            "heading": "Identità",
+            "blocks": [
+              { "kind": "definition", "fields": ["nome", "epiteto", "allineamento", "sfere", "simbolo"] }
+            ]
+          },
+          {
+            "heading": "Personalità",
+            "blocks": [{ "kind": "markdown", "field": "personalita" }]
+          },
+          {
+            "heading": "Culto",
+            "blocks": [{ "kind": "definition", "fields": ["tempio", "rituali", "seguaci"] }]
+          }
+        ]
+      }
+    }
+  ]
+}

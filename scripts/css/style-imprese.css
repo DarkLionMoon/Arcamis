@@ -15,7 +15,10 @@
   width: 100%;
   min-height: 78rem;
   border: 0;
-  background: #0a0a14;
+  /* L'app dentro l'iframe segue il tema del sito: lo sfondo del frame deve
+     fare lo stesso, altrimenti in tema chiaro resta una cornice scura. */
+  background: var(--bg, #0a0a14);
+  color-scheme: normal;
 }
 @media (max-width: 700px) {
   .imprese-frame { min-height: 100rem; }

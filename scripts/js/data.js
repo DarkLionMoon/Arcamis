@@ -58,6 +58,7 @@ var pages = [
   {k:'riva-di-ferro',l:'Riva di Ferro',i:'⚓',id:'pag-riva-di-ferro'},
   {k:'fumofosco',l:'Fumofosco',i:'🌫️',id:'pag-fumofosco'},
   {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'},
+  {k:'changelog',l:'Changelog',i:'📜',id:'pag-changelog'},
   {k:'credits',l:'Crediti & Legale',i:'⚖️',id:'pag-credits'}
 ];
 

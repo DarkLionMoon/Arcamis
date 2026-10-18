@@ -1,0 +1,70 @@
+/* ════════════════════════════════════════════════════════════════════
+   ARCAMIS ADMIN — anteprima dell'editor
+
+   Il pannello destro dell'editor deve mostrare il contenuto ESATTAMENTE
+   come lo vedrà chi legge. Il markup è già quello del sito (md-render.js,
+   importato da MarkdownPreview.vue): qui arriva anche il suo CSS, preso
+   dal sorgente della wiki invece di essere ricopiato, così non può
+   divergere.
+
+   L'unico adattamento è la mappatura dei token: la wiki ha la sua
+   palette scura, il pannello ha due temi. Nel tema scuro i valori
+   coincidono con quelli del sito (vedi palette.test.ts), quindi
+   l'anteprima è fedele al pixel; nel tema chiaro gli stessi ruoli
+   restano leggibili con i token chiari.
+   ════════════════════════════════════════════════════════════════════ */
+
+@import '../../../../scripts/css/style-notion.css';
+
+.arc-md-preview {
+  --text: var(--afg-2);
+  --text3: var(--afg-3);
+  --parch: var(--afg-2);
+  --gold: var(--accent);
+  --gold2: var(--accent);
+  --gold3: var(--accent-strong);
+  --gold-rgb: var(--accent-rgb);
+  --bdr: var(--aline);
+  --bdr2: var(--aline-2);
+  --callout-c: var(--accent);
+  --cpacc: var(--accent-strong);
+  --font-scale: 1;
+}
+
+/* Le regole del sito usano `!important`: qui si riporta il blocco dentro
+   il pannello, che ha larghezze e sfondi suoi. */
+.arc-md-preview .n-content {
+  font-size: 15px;
+}
+
+.arc-md-preview .n-h1,
+.arc-md-preview .n-h2 {
+  margin-top: 22px !important;
+}
+
+.arc-md-preview .n-h1:first-child {
+  margin-top: 4px !important;
+}
+
+.arc-md-preview img.n-image {
+  margin: 14px auto;
+  box-shadow: none;
+}
+
+/* Il badge bozza non è un blocco markdown: il renderer del sito lo emette
+   solo nelle viste a schede, quindi qui si mantiene lo stesso aspetto. */
+.arc-md-preview .draft-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border: 1px solid var(--aline-2);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-family: var(--afont-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  text-transform: none;
+}

@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "id": "regola",
+  "label": "Regolamento",
+  "icon": "📋",
+  "description": "Regole del server e sezioni normative: introduzione, regole numerate con testo, eccezioni e nota. Il sito le impagina in blocchi.",
+  "layout": "regole",
+  "separator": "hr",
+  "page": {
+    "fields": [
+      {
+        "key": "intro",
+        "label": "Introduzione",
+        "type": "markdown",
+        "rows": 6,
+        "placeholder": "Prima di entrare nel server…",
+        "help": "Testo che precede le regole. Le righe «1) …» diventano regole brevi in cima alla pagina."
+      }
+    ],
+    "sections": [
+      {
+        "blocks": [{ "kind": "markdown", "field": "intro" }]
+      }
+    ]
+  },
+  "collections": [
+    {
+      "key": "regole",
+      "label": "Regole",
+      "singular": "regola",
+      "description": "Ogni voce è un blocco normativo autonomo, numerato e ordinabile.",
+      "fields": [
+        { "key": "numero", "label": "Numero", "type": "number", "required": true, "placeholder": "1" },
+        { "key": "titolo", "label": "Titolo", "type": "text", "required": true, "placeholder": "Accesso al Server" },
+        {
+          "key": "corpo",
+          "label": "Testo della regola",
+          "type": "markdown",
+          "rows": 6,
+          "required": true,
+          "placeholder": "Entrando nel server dichiari di essere maggiorenne…"
+        },
+        {
+          "key": "eccezioni",
+          "label": "Eccezioni",
+          "type": "tags",
+          "placeholder": "Una voce per riga, Invio per aggiungere"
+        },
+        {
+          "key": "nota",
+          "label": "Nota",
+          "type": "markdown",
+          "rows": 3,
+          "placeholder": "Approfondimento o esempio mostrato come citazione."
+        }
+      ],
+      "item": {
+        "heading": "Regola {numero} — {titolo}",
+        "level": 2,
+        "titleField": "titolo",
+        "sections": [
+          {
+            "blocks": [
+              { "kind": "markdown", "field": "corpo" },
+              { "kind": "bullets", "field": "eccezioni", "label": "Eccezioni" },
+              { "kind": "quote", "field": "nota" }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
