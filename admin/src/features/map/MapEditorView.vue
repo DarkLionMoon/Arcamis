@@ -6,6 +6,7 @@ import { confirmAction } from '@/shared/confirm'
 import { useUnsavedGuard } from '@/shared/guard'
 import { useMapStore, useUIStore } from '@/app/store'
 import type { MapPin } from '@/types'
+import { dragPosition, formatPercent, grabOffset, parsePercent, pointFromClient, type PercentPoint } from './coords'
 
 const map = useMapStore()
 const ui = useUIStore()
@@ -52,17 +53,13 @@ useUnsavedGuard(() => map.dirty, 'puntine non salvate sulla mappa')
 onMounted(load)
 
 /* ── click sulla mappa → nuova puntina ── */
-interface Point {
-  x: number
-  y: number
-}
-function toPercent(e: PointerEvent | MouseEvent): Point | null {
+/* `getBoundingClientRect()` del canvas è l'unico sistema di riferimento:
+   clientX/clientY sono viewport, la percentuale è relativa al box visibile
+   (quindi scroll e zoom del browser sono già inclusi). */
+function toPercent(e: PointerEvent | MouseEvent): PercentPoint | null {
   const el = container.value
   if (!el) return null
-  const rect = el.getBoundingClientRect()
-  const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
-  const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100))
-  return { x, y }
+  return pointFromClient(e.clientX, e.clientY, el.getBoundingClientRect())
 }
 
 function onMapClick(e: MouseEvent) {
@@ -72,8 +69,8 @@ function onMapClick(e: MouseEvent) {
   if (!p) return
   map.addPin({
     id: 'pin-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7),
-    left: p.x.toFixed(2) + '%',
-    top: p.y.toFixed(2) + '%',
+    left: formatPercent(p.x),
+    top: formatPercent(p.y),
     type: 'village',
     name: 'Nuova puntina',
     desc: '',
@@ -85,44 +82,51 @@ function onMapClick(e: MouseEvent) {
   ui.toast('Puntina aggiunta — modifica i dettagli', 'success')
 }
 
-/* ── drag & drop ── */
+/* ── drag & drop ──
+   L'offset si misura in punti percentuali tra il cursore e il centro della
+   puntina: sommarlo/sottrarlo in percentuale evita di mescolare coordinate
+   del viewport e coordinate del canvas (il bug che mandava la Y a 0%). */
 let dragging = false
 let dragIndex = -1
-let dragOffsetX = 0
-let dragOffsetY = 0
+let grab: PercentPoint = { x: 0, y: 0 }
 
 function onPinPointerDown(index: number, e: PointerEvent) {
-  const el = container.value
-  if (!el) return
+  const pin = map.pins[index]
+  const point = toPercent(e)
+  if (!pin || !point) return
   dragging = true
   dragIndex = index
+  grab = grabOffset(point, { x: parsePercent(pin.left), y: parsePercent(pin.top) })
   const pinEl = e.currentTarget as HTMLElement
-  const rect = pinEl.getBoundingClientRect()
-  const cRect = el.getBoundingClientRect()
-  dragOffsetX = e.clientX - (rect.left + rect.width / 2 - cRect.left)
-  dragOffsetY = e.clientY - (rect.top + rect.height / 2 - cRect.top)
-  pinEl.setPointerCapture(e.pointerId)
+  try {
+    pinEl.setPointerCapture(e.pointerId)
+  } catch {
+    /* puntatore sintetico o già rilasciato: il drag funziona lo stesso */
+  }
 }
 
 function onPinPointerMove(e: PointerEvent) {
   if (!dragging || dragIndex < 0) return
-  const p = toPercent(e)
-  if (!p) return
+  const point = toPercent(e)
   const pin = map.pins[dragIndex]
-  if (!pin) return
-  const left = Math.max(
-    0,
-    Math.min(100, p.x - (dragOffsetX / (container.value?.getBoundingClientRect().width ?? 1)) * 100)
-  )
-  const top = Math.max(
-    0,
-    Math.min(100, p.y - (dragOffsetY / (container.value?.getBoundingClientRect().height ?? 1)) * 100)
-  )
-  pin.left = left.toFixed(2) + '%'
-  pin.top = top.toFixed(2) + '%'
+  if (!point || !pin) return
+  e.preventDefault()
+  const next = dragPosition(point, grab)
+  pin.left = formatPercent(next.x)
+  pin.top = formatPercent(next.y)
+  /* Il form aperto deve seguire la puntina mentre la si trascina. */
+  if (selectedIndex.value === dragIndex) {
+    editForm.left = pin.left
+    editForm.top = pin.top
+  }
 }
 
 function onPinPointerUp() {
+  if (dragging && dragIndex >= 0) {
+    /* Il click può non arrivare dopo un trascinamento: riallinea il form
+       alla posizione finale, così X/Y mostrano ciò che è stato salvato. */
+    selectPin(dragIndex)
+  }
   dragging = false
   dragIndex = -1
 }
@@ -160,8 +164,8 @@ function savePin() {
     name,
     type: editForm.type,
     desc: editForm.desc.trim(),
-    left: editForm.left.trim() || '50%',
-    top: editForm.top.trim() || '50%',
+    left: formatPercent(parsePercent(editForm.left)),
+    top: formatPercent(parsePercent(editForm.top)),
     sub: editForm.sub.trim(),
     pageId: editForm.pageId.trim(),
     explored: editForm.explored
@@ -274,14 +278,17 @@ async function save() {
           </label>
           <div class="arc-form-grid">
             <label class="arc-fld">
-              <span>Posizione X</span>
-              <input v-model="editForm.left" class="in" />
+              <span>Posizione X (%)</span>
+              <input v-model="editForm.left" class="in" inputmode="decimal" placeholder="50.00" />
             </label>
             <label class="arc-fld">
-              <span>Posizione Y</span>
-              <input v-model="editForm.top" class="in" />
+              <span>Posizione Y (%)</span>
+              <input v-model="editForm.top" class="in" inputmode="decimal" placeholder="50.00" />
             </label>
           </div>
+          <p class="arc-hint">
+            Valori in percentuale del canvas: 0% è il bordo alto/sinistro, 100% quello basso/destro.
+          </p>
           <div class="arc-form-grid">
             <label class="arc-fld">
               <span>Sub-mappa</span>
