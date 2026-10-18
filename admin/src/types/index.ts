@@ -172,6 +172,29 @@ export interface CarouselSlide {
   defBtns: CarouselButton[]
 }
 
+/** Testi di una slide come stanno in KV (chiavi opzionali). */
+export interface CarouselMeta {
+  tag?: string
+  tit?: string
+  desc?: string
+}
+
+/** Configurazione salvata di una slide, come la restituisce get_carousel. */
+export interface CarouselSlideConfig {
+  key: string
+  img: string
+  meta: CarouselMeta
+  btns: CarouselButton[]
+}
+
+/** Modifica inviata a set_carousel: `img` assente = non toccare l'immagine. */
+export interface CarouselSlideUpdate {
+  key: string
+  img?: string
+  meta?: CarouselMeta
+  btns?: CarouselButton[]
+}
+
 // ──────────────────────────────────────────────
 // Covers
 // ──────────────────────────────────────────────

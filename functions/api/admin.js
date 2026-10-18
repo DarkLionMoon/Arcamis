@@ -168,6 +168,48 @@ export async function onRequest(context) {
     return typeof value === 'string' && /^[a-z0-9-]{1,120}$/i.test(value);
   }
 
+  /* ── Helper: immagini salvabili in KV ──
+     Le cover accettano un URL https, un percorso pubblico del sito
+     (/images/…, che è ciò che restituisce il Media Manager) o un data URL
+     legacy caricato dal vecchio editor della home. Il limite dei data URL
+     è più alto: prima erano rifiutati oltre i 2048 caratteri, quindi gli
+     upload dal sito fallivano senza dirlo. */
+  const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+  function validImageValue(value) {
+    if (typeof value !== 'string' || !value) return false;
+    if (/^data:image\/[a-z0-9.+-]+;base64,/i.test(value)) return value.length <= MAX_IMAGE_BYTES;
+    if (value.length > 2048) return false;
+    if (/^https:\/\//i.test(value)) return true;
+    /* Percorso interno: niente `//host` (protocollo-relativo) né `..`. */
+    return /^\/(?!\/)/.test(value) && !value.includes('..');
+  }
+
+  /* ── Helper: link dei bottoni del carousel ──
+     Il sito trasforma in onclick qualsiasi valore non-http: qui passano
+     solo URL esterni, ancore e percorsi interni. */
+  function validCarouselHref(value) {
+    if (typeof value !== 'string' || value.length > 2048) return false;
+    if (!value) return true;
+    if (/^https?:\/\//i.test(value)) return true;
+    if (value.startsWith('#')) return true;
+    return /^\/(?!\/)/.test(value) && !value.includes('..');
+  }
+
+  const CAROUSEL_KEYS = ['carousel_0', 'carousel_1', 'carousel_2'];
+  function isCarouselKey(value) {
+    return CAROUSEL_KEYS.includes(value);
+  }
+  function carouselMetaKey(key, suffix) {
+    return 'admin_cover_' + key + (suffix || '');
+  }
+  function parseJson(value, fallback) {
+    try {
+      return value ? JSON.parse(value) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
   /* ── Helper: notifica webhook Discord (fire & forget) ── */
   async function notifyWebhook(message) {
     try {
@@ -690,10 +732,35 @@ export async function onRequest(context) {
       return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
     }
     const { pageId, coverUrl } = body;
+    /* `carousel_N_meta` e `carousel_N_btns`: il vecchio editor della home
+       salvava testi e bottoni come JSON attraverso questa stessa action.
+       Restano supportati, altrimenti chi usa ancora l'overlay li perde.
+       Sono gestiti prima di validPageKey: le chiavi del carousel contengono
+       un underscore, che i page key non ammettono. */
+    const carouselField = typeof pageId === 'string' ? /^carousel_([0-2])_(meta|btns)$/.exec(pageId) : null;
+    if (carouselField) {
+      if (!coverUrl || typeof coverUrl !== 'string' || coverUrl.length > 8192) {
+        await KV.delete('admin_cover_' + pageId);
+        return new Response(JSON.stringify({ ok: true }), { headers: cors });
+      }
+      let parsed;
+      try {
+        parsed = JSON.parse(coverUrl);
+      } catch (e) {
+        return new Response(JSON.stringify({ error: 'JSON non valido' }), { status: 400, headers: cors });
+      }
+      const isOk = carouselField[2] === 'meta' ? parsed && typeof parsed === 'object' : Array.isArray(parsed);
+      if (!isOk) {
+        return new Response(JSON.stringify({ error: 'Formato non valido' }), { status: 400, headers: cors });
+      }
+      await KV.put('admin_cover_' + pageId, coverUrl);
+      await writeAdminLog('cover_page', pageId);
+      return new Response(JSON.stringify({ ok: true }), { headers: cors });
+    }
     if (!validPageKey(pageId)) {
       return new Response(JSON.stringify({ error: 'pageId non valido' }), { status: 400, headers: cors });
     }
-    if (coverUrl && (typeof coverUrl !== 'string' || coverUrl.length > 2048 || !/^https:\/\//i.test(coverUrl))) {
+    if (coverUrl && !validImageValue(coverUrl)) {
       return new Response(JSON.stringify({ error: 'coverUrl non valido' }), { status: 400, headers: cors });
     }
     const key = 'admin_cover_' + pageId.replace(/-/g, '');
@@ -709,6 +776,128 @@ export async function onRequest(context) {
     notifyWebhook('🖼️ Cover aggiornata per pagina `' + pageId + '` da ' + (await sessionUser()));
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
+  /* ════ CAROUSEL HOMEPAGE — lettura per l'editor ════
+     Restituisce, per ogni slide, l'immagine come URL servibile e i testi
+     grezzi (meta/btns) che il sito applica già via /api/carousel. */
+  if (action === 'get_carousel') {
+    try {
+      const slides = await Promise.all(
+        CAROUSEL_KEYS.map(async function (key) {
+          const [img, metaRaw, btnsRaw] = await Promise.all([
+            KV.get(carouselMetaKey(key)).catch(() => null),
+            KV.get(carouselMetaKey(key, '_meta')).catch(() => null),
+            KV.get(carouselMetaKey(key, '_btns')).catch(() => null),
+          ]);
+          return {
+            key,
+            img: img ? coverToUrl(key, img) : '',
+            meta: parseJson(metaRaw, {}),
+            btns: parseJson(btnsRaw, []),
+          };
+        })
+      );
+      return new Response(JSON.stringify({ slides }), { headers: cors });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    }
+  }
+
+  /* ════ CAROUSEL HOMEPAGE — salvataggio di una slide ════
+     Una sola chiamata per sfondo + testi + bottoni: l'editor non deve
+     poter lasciare la slide a metà (immagine nuova con testi vecchi).
+     `img` assente significa «non toccare»: così un'immagine legacy in
+     KV (data URL) non viene riscritta quando si salvano solo i testi. */
+  if (action === 'set_carousel' && request.method === 'POST') {
+    const csrfOk = await verifyCsrf(request);
+    if (!csrfOk)
+      return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
+    if (await genericRateLimit('set_carousel', 20, 60)) {
+      return new Response(JSON.stringify({ error: 'Troppe richieste, riprova più tardi' }), {
+        status: 429,
+        headers: cors,
+      });
+    }
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    const key = body.key;
+    if (!isCarouselKey(key)) {
+      return new Response(JSON.stringify({ error: 'key non valida' }), { status: 400, headers: cors });
+    }
+
+    if (body.img !== undefined) {
+      const img = typeof body.img === 'string' ? body.img.trim() : '';
+      if (img && !validImageValue(img)) {
+        return new Response(JSON.stringify({ error: 'Immagine non valida' }), { status: 400, headers: cors });
+      }
+      if (!img) await KV.delete(carouselMetaKey(key));
+      else await KV.put(carouselMetaKey(key), img);
+    }
+
+    if (body.meta !== undefined) {
+      const meta = body.meta && typeof body.meta === 'object' ? body.meta : {};
+      const clean = {};
+      for (const field of ['tag', 'tit', 'desc']) {
+        const raw = meta[field];
+        if (typeof raw !== 'string') continue;
+        const value = raw.trim();
+        if (value.length > (field === 'desc' ? 800 : 200)) {
+          return new Response(JSON.stringify({ error: 'Testo troppo lungo' }), { status: 400, headers: cors });
+        }
+        if (value) clean[field] = value;
+      }
+      if (Object.keys(clean).length) {
+        await KV.put(carouselMetaKey(key, '_meta'), JSON.stringify(clean));
+      } else {
+        await KV.delete(carouselMetaKey(key, '_meta'));
+      }
+    }
+
+    if (body.btns !== undefined) {
+      if (!Array.isArray(body.btns)) {
+        return new Response(JSON.stringify({ error: 'btns deve essere una lista' }), { status: 400, headers: cors });
+      }
+      if (body.btns.length > 3) {
+        return new Response(JSON.stringify({ error: 'Massimo 3 bottoni per slide' }), { status: 400, headers: cors });
+      }
+      const clean = [];
+      for (const btn of body.btns) {
+        if (!btn || typeof btn !== 'object') continue;
+        const label = typeof btn.label === 'string' ? btn.label.trim() : '';
+        const href = typeof btn.href === 'string' ? btn.href.trim() : '';
+        if (!label && !href) continue;
+        if (!label) {
+          return new Response(JSON.stringify({ error: 'Ogni bottone ha bisogno di un testo' }), {
+            status: 400,
+            headers: cors,
+          });
+        }
+        if (label.length > 80) {
+          return new Response(JSON.stringify({ error: 'Testo del bottone troppo lungo' }), {
+            status: 400,
+            headers: cors,
+          });
+        }
+        if (!validCarouselHref(href)) {
+          return new Response(JSON.stringify({ error: 'Link del bottone non valido' }), {
+            status: 400,
+            headers: cors,
+          });
+        }
+        clean.push({ label, href });
+      }
+      if (clean.length) await KV.put(carouselMetaKey(key, '_btns'), JSON.stringify(clean));
+      else await KV.delete(carouselMetaKey(key, '_btns'));
+    }
+
+    await writeAdminLog('carousel_slide', key);
+    notifyWebhook('🎠 Slide `' + key + '` aggiornata da ' + (await sessionUser()));
+    return new Response(JSON.stringify({ ok: true }), { headers: cors });
+  }
+
   /* ════ SALVA POSA ════ */
   if (action === 'set_posa' && request.method === 'POST') {
     const csrfOk = await verifyCsrf(request);

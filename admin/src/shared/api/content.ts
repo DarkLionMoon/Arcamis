@@ -7,6 +7,8 @@
 import { adminUrl, request } from './http'
 import { decodeBase64Utf8, ghApi } from './github'
 import type {
+  CarouselSlideConfig,
+  CarouselSlideUpdate,
   CoversMap,
   GHFile,
   LayoutRegistryEntry,
@@ -130,6 +132,21 @@ export const carouselApi = {
     const result = await request<{ ok: boolean }>(adminUrl('set_cover'), {
       method: 'POST',
       body: { pageId: key, coverUrl: value }
+    })
+    return !!result.ok
+  },
+
+  /** Immagini, testi e bottoni delle tre slide della home. */
+  async getSlides(): Promise<CarouselSlideConfig[]> {
+    const result = await request<{ slides: CarouselSlideConfig[] }>(adminUrl('get_carousel'))
+    return result.slides || []
+  },
+
+  /** Salva una slide in una sola scrittura (sfondo + testi + bottoni). */
+  async saveSlide(slide: CarouselSlideUpdate): Promise<boolean> {
+    const result = await request<{ ok: boolean }>(adminUrl('set_carousel'), {
+      method: 'POST',
+      body: slide
     })
     return !!result.ok
   }
