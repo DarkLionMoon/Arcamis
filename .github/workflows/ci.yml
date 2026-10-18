@@ -102,6 +102,10 @@ jobs:
       - run: npm run build
       # integrità delle rotte sul dist appena prodotto (meta, sitemap, 404, PWA, font)
       - run: npm run test:dist
+      # Il digest resta nel riepilogo della run: è il valore con cui il deploy
+      # verifica che ciò che pubblica sia l'artefatto appena testato.
+      - name: Digest dell'artefatto nel riepilogo
+        run: node scripts/build-summary.mjs >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: dist

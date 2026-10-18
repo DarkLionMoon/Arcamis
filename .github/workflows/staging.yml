@@ -51,6 +51,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Cloudflare Pages
+        id: deploy
         if: steps.check.outputs.configured == 'true'
         uses: cloudflare/pages-action@v1
         with:
@@ -63,6 +64,15 @@ jobs:
         env:
           # Pass any needed env vars to the deploy
           NODE_ENV: production
+
+      # Prima di annunciare la preview: se il digest pubblicato non è quello
+      # costruito (e quindi testato), la preview non va considerata pronta.
+      - name: Verifica che il deploy corrisponda all'artefatto costruito
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          node scripts/verify-deploy.mjs \
+            "${{ steps.deploy.outputs.url }}" \
+            "https://${{ github.head_ref || github.ref_name }}.${{ secrets.CF_PAGES_PROJECT || 'arcamis' }}.pages.dev"
 
       - name: Post preview URL
         if: github.event_name == 'pull_request'

@@ -10,6 +10,8 @@
     "build:site": "vite build && node scripts/build-post.mjs",
     "build:admin": "npm --prefix admin run build",
     "seo": "node scripts/gen-seo-static.mjs",
+    "build:summary": "node scripts/build-summary.mjs",
+    "verify:deploy": "node scripts/verify-deploy.mjs",
     "icons": "node scripts/make-icons.mjs",
     "fonts": "node scripts/fetch-fonts.mjs",
     "deploy": "npm run build && npx wrangler pages deploy dist --project-name arcamis",

@@ -75,15 +75,32 @@ function digest(dir) {
     hash.update(file);
     hash.update(fs.readFileSync(path.join(root, file)));
   }
-  return { count: files.length, digest: hash.digest('hex').slice(0, 16) };
+  return { files: files.length, digest: hash.digest('hex').slice(0, 16) };
 }
 
 const admin = digest('export/admin');
 const dist = digest('dist');
-const maps = fs.readdirSync(path.join(root, 'dist/admin'), { recursive: true }).filter((name) => String(name).endsWith('.map'));
+const maps = fs
+  .readdirSync(path.join(root, 'dist/admin'), { recursive: true })
+  .filter((name) => String(name).endsWith('.map'));
+
+/* ── Riepilogo leggibile dalle macchine ──────────────────────
+   Vive in dist/ e quindi viene pubblicato: chi vuole sapere cosa gira
+   in produzione legge /build-info.json, e verify-deploy.mjs confronta
+   quel valore con il dist locale. Il file è scritto dopo il calcolo
+   del digest, quindi non entra nel digest stesso. */
+const git = spawnSync('git rev-parse --short HEAD', { cwd: root, encoding: 'utf8', shell: true });
+const commit = git.status === 0 ? String(git.stdout).trim() || null : null;
+fs.writeFileSync(
+  path.join(root, 'dist/build-info.json'),
+  JSON.stringify({ commit, admin, dist }, null, 2) + '\n'
+);
 
 console.log('\n✔ Build pronta per il deploy');
-console.log('  Pannello : export/admin — ' + admin.count + ' file, digest ' + admin.digest);
-console.log('  Sito     : dist — ' + dist.count + ' file (pannello incluso), digest ' + dist.digest);
+console.log('  Pannello : export/admin — ' + admin.files + ' file, digest ' + admin.digest);
+console.log(
+  '  Sito     : dist — ' + dist.files + ' file (pannello incluso, build-info.json escluso), digest ' + dist.digest
+);
+console.log('  Commit   : ' + (commit || 'sconosciuto') + ' · dist/build-info.json pubblica il digest');
 console.log('  Source map in dist/admin: ' + maps.length);
 if (maps.length) fail('dist/admin contiene source map: il deploy non deve esporre i sorgenti del pannello');

@@ -32,6 +32,8 @@ Contenuto 100% local-first: tutto servito da JSON statici (nessun ping alla Noti
 │   ├── lib/routes.mjs      ← Fonte unica delle rotte (prerender + sitemap + robots)
 │   ├── build-all.mjs       ← Build unica: admin → sito (usata da CI e deploy)
 │   ├── build-post.mjs      ← Post-build: hash JS, prerender, sitemap, sw.js
+│   ├── build-summary.mjs   ← Digest dell'artefatto in Markdown (job summary)
+│   ├── verify-deploy.mjs   ← Confronta il digest pubblicato con quello locale
 │   ├── gen-seo-static.mjs  ← Riscrive sitemap.xml/robots.txt in root
 │   ├── fetch-fonts.mjs     ← Scarica i woff2 e genera scripts/css/fonts.css
 │   ├── make-icons.mjs      ← Genera icone PWA/favicon da Artboard_1.png
@@ -302,9 +304,23 @@ passano tutti da `scripts/build-all.mjs`, che compila **prima** il pannello in
 `dist/admin`. Al contrario `dist/` finirebbe con il pannello del commit
 precedente (o senza pannello, in un checkout pulito). Lo script verifica che
 `dist/admin/app.html` esista, che in `dist/admin` non finiscano source map e
-stampa il digest di `export/admin` e `dist`: due build dello stesso commit
-devono dare lo stesso digest, altrimenti ciò che è stato testato non è ciò che
-si sta pubblicando.
+stampa il digest di `export/admin` e `dist`. Il digest è la prova che l'artefatto
+testato è quello pubblicato: due build dello stesso commit devono dare lo stesso
+valore, e `dist/build-info.json` — escluso dal calcolo, altrimenti si
+referenzierebbe da solo — pubblica quel valore insieme al commit.
+
+```bash
+npm run build          # stampa i digest di export/admin e dist
+npm run build:summary  # gli stessi digest in Markdown (in CI → job summary)
+npm run verify:deploy https://arcamis.pages.dev
+```
+
+`verify-deploy.mjs` scarica `/build-info.json` dal deploy e lo confronta con il
+`dist` locale, ritentando finché la propagazione non è finita: se i due digest
+differiscono, la run **fallisce**, perché online c'è qualcos'altro rispetto a ciò
+che è stato costruito e testato. Gli stessi numeri finiscono nel riepilogo della
+run di CI (`$GITHUB_STEP_SUMMARY`), quindi restano consultabili anche quando i
+log scadono.
 
 `scripts/build-post.mjs` (eseguito dopo `vite build`):
 
@@ -373,7 +389,15 @@ In alternativa, da locale:
 
 ```bash
 npm run deploy   # build + npx wrangler pages deploy dist --project-name arcamis
+npm run verify:deploy https://arcamis.pages.dev   # il digest online è quello locale?
 ```
+
+Il workflow `staging.yml` fa questo controllo da solo dopo il deploy di una
+preview: legge l'URL del deploy (con l'alias del branch come ripiego) e confronta
+i digest **prima** di annunciare la preview nei commenti della PR. Per il deploy
+di produzione fatto dall'integrazione Git di Cloudflare non c'è un workflow che
+lo controlli: si verifica da locale con `npm run verify:deploy` puntando al
+dominio di produzione.
 
 ### Cache e service worker
 
