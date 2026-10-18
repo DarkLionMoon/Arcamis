@@ -50,6 +50,16 @@ jobs:
         if: steps.check.outputs.configured == 'true'
         run: npm run build
 
+      # L'action senza `wranglerVersion` riusa il wrangler del progetto; se non
+      # lo trovasse installerebbe l'ultima v4, cioè una versione diversa da
+      # quella fissata in package.json. Qui si fallisce prima, con un messaggio
+      # chiaro, invece di deployare con un wrangler non previsto.
+      - name: Versione di wrangler fissata dal progetto
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          npx --no-install wrangler --version
+          node -e "const p=require('./package.json');process.stdout.write('package.json: ' + p.devDependencies.wrangler + '\n')"
+
       - name: Deploy to Cloudflare Pages
         id: deploy
         if: steps.check.outputs.configured == 'true'
@@ -64,9 +74,6 @@ jobs:
           # `--project-name` e `--branch`. Il valore è fra apici singoli YAML,
           # quindi l'apice interno di 'arcamis' è raddoppiato.
           command: 'pages deploy dist --project-name=${{ secrets.CF_PAGES_PROJECT || ''arcamis'' }} --branch=${{ github.ref_name }}'
-          # La major è fissata: senza `wranglerVersion` l'action installa l'ultima v4,
-          # che è comunque quella attesa, ma così il deploy non cambia da solo.
-          wranglerVersion: '4'
           gitHubToken: ${{ github.token }}
           # preview deployments get unique URLs like: https://<branch>.<project>.pages.dev
 
@@ -77,8 +84,7 @@ jobs:
         run: |
           node scripts/verify-deploy.mjs \
             "${{ steps.deploy.outputs.deployment-url }}" \
-            "${{ steps.deploy.outputs.pages-deployment-alias-url }}" \
-            "https://${{ github.head_ref || github.ref_name }}.${{ secrets.CF_PAGES_PROJECT || 'arcamis' }}.pages.dev"
+            "${{ steps.deploy.outputs.pages-deployment-alias-url }}" \            "https://${{ github.head_ref || github.ref_name }}.${{ secrets.CF_PAGES_PROJECT || 'arcamis' }}.pages.dev"
 
       - name: Post preview URL
         if: github.event_name == 'pull_request'

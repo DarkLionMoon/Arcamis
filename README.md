@@ -388,15 +388,23 @@ veloce.
 In alternativa, da locale:
 
 ```bash
-npm run deploy   # build + npx wrangler pages deploy dist --project-name arcamis
+npm run deploy   # build + wrangler pages deploy dist --project-name arcamis
 npm run verify:deploy https://arcamis.pages.dev   # il digest online è quello locale?
 ```
+
+`wrangler` è una devDependency con **versione esatta** (non un range): il comando
+di deploy risolve il binario in `node_modules/.bin`, quindi locale, CI e staging
+usano lo stesso rilascio. L'action di staging non riceve `wranglerVersion` e per
+questo riusa il wrangler installato dal progetto — se non lo trovasse,
+installerebbe l'ultima v4, cioè una versione diversa da quella fissata: il
+workflow lo controlla prima del deploy con `npx --no-install wrangler --version`
+e fallisce invece di deployare con un wrangler non previsto.
 
 Il workflow `staging.yml` fa questo controllo da solo dopo il deploy di una
 preview: legge l'URL del deploy (con l'alias del branch come ripiego) e confronta
 i digest **prima** di annunciare la preview nei commenti della PR. Il deploy usa
-`cloudflare/wrangler-action@v4` (comando `pages deploy`, wrangler fissato alla
-major 4), non la `cloudflare/pages-action` deprecata e archiviata. Per il deploy
+`cloudflare/wrangler-action@v4` (comando `pages deploy`, con il wrangler fissato
+dal progetto), non la `cloudflare/pages-action` deprecata e archiviata. Per il deploy
 di produzione fatto dall'integrazione Git di Cloudflare non c'è un workflow che
 lo controlli: si verifica da locale con `npm run verify:deploy` puntando al
 dominio di produzione.
