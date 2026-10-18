@@ -40,12 +40,14 @@ async function ensureRenderer() {
 }
 
 function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '') || 'sezione'
+  return (
+    text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') || 'sezione'
+  )
 }
 
 interface TocItem {
@@ -100,13 +102,9 @@ ensureRenderer()
     <div v-if="!loaded" class="arc-empty-side">Preparazione anteprima…</div>
     <template v-else>
       <nav v-if="tocItems.length" class="arc-md-toc">
-        <a
-          v-for="t in tocItems"
-          :key="t.id"
-          :href="'#' + t.id"
-          :style="{ paddingLeft: (t.level - 1) * 10 + 'px' }"
-          >{{ t.text }}</a
-        >
+        <a v-for="t in tocItems" :key="t.id" :href="'#' + t.id" :style="{ paddingLeft: (t.level - 1) * 10 + 'px' }">{{
+          t.text
+        }}</a>
       </nav>
       <div class="n-content" v-html="html"></div>
     </template>

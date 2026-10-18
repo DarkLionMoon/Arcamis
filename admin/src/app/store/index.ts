@@ -239,7 +239,9 @@ export const useEditorStore = defineStore('editor', () => {
 
   /* Confronto a impronta invece del solo testo: prima modificare titolo,
      icona o campi strutturati non risultava come modifica non salvata. */
-  const hasUnsavedChanges = computed(() => Boolean(currentPage.value) && pageSnapshot(currentPage.value) !== savedSnapshot.value)
+  const hasUnsavedChanges = computed(
+    () => Boolean(currentPage.value) && pageSnapshot(currentPage.value) !== savedSnapshot.value
+  )
   const modified = hasUnsavedChanges
 
   function setPage(page: PageContent | null) {

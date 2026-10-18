@@ -145,12 +145,7 @@
             "blocks": [
               {
                 "kind": "definition",
-                "fields": [
-                  "categoria",
-                  "requisiti",
-                  "strumenti",
-                  "modificatori"
-                ]
+                "fields": ["categoria", "requisiti", "strumenti", "modificatori"]
               }
             ]
           },

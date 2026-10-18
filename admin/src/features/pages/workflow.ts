@@ -178,9 +178,17 @@ export function availableActions(role: UserRole, status: PageStatus): WorkflowAc
   const allowed = WORKFLOW_ACTIONS.filter((action) => roleSatisfies(role, action.minRole))
   switch (status) {
     case 'draft':
-      return allowed.filter((action) => action.id === 'request-review' || action.id === 'publish' || action.id === 'schedule')
+      return allowed.filter(
+        (action) => action.id === 'request-review' || action.id === 'publish' || action.id === 'schedule'
+      )
     case 'review':
-      return allowed.filter((action) => action.id === 'approve' || action.id === 'publish' || action.id === 'schedule' || action.id === 'back-to-draft')
+      return allowed.filter(
+        (action) =>
+          action.id === 'approve' ||
+          action.id === 'publish' ||
+          action.id === 'schedule' ||
+          action.id === 'back-to-draft'
+      )
     case 'scheduled':
       return allowed.filter((action) => action.id === 'publish' || action.id === 'back-to-draft')
     default:
@@ -193,11 +201,7 @@ export function findAction(id: WorkflowActionId): WorkflowAction | undefined {
 }
 
 /** L'azione è eseguibile? (ruolo giusto + azione prevista dallo stato) */
-export function canRunAction(
-  role: UserRole,
-  status: PageStatus,
-  id: WorkflowActionId
-): boolean {
+export function canRunAction(role: UserRole, status: PageStatus, id: WorkflowActionId): boolean {
   return availableActions(role, status).some((action) => action.id === id)
 }
 
@@ -248,7 +252,10 @@ export function applyAction(
         isDraft: true,
         publishAt: undefined,
         review: { ...previous, note: options.note ?? previous.note },
-        message: current === 'scheduled' ? 'Programmazione annullata: la pagina è di nuovo in bozza' : 'Pagina riportata in bozza'
+        message:
+          current === 'scheduled'
+            ? 'Programmazione annullata: la pagina è di nuovo in bozza'
+            : 'Pagina riportata in bozza'
       }
     case 'approve':
       return {
@@ -263,7 +270,12 @@ export function applyAction(
         status: 'published',
         isDraft: false,
         publishAt: undefined,
-        review: { ...previous, reviewedBy: actor ?? previous.reviewedBy, reviewedAt: at, note: options.note ?? previous.note },
+        review: {
+          ...previous,
+          reviewedBy: actor ?? previous.reviewedBy,
+          reviewedAt: at,
+          note: options.note ?? previous.note
+        },
         message: 'Pagina pubblicata'
       }
     case 'schedule':
@@ -271,7 +283,12 @@ export function applyAction(
         status: 'scheduled',
         isDraft: false,
         publishAt: options.publishAt,
-        review: { ...previous, reviewedBy: actor ?? previous.reviewedBy, reviewedAt: at, note: options.note ?? previous.note },
+        review: {
+          ...previous,
+          reviewedBy: actor ?? previous.reviewedBy,
+          reviewedAt: at,
+          note: options.note ?? previous.note
+        },
         message: 'Pagina programmata'
       }
     default:
@@ -320,8 +337,9 @@ export function formatWhen(iso: string | undefined | null): string {
 /* ─────────────── Ponte con il registro ed i dati salvati ─────────────── */
 
 /** I soli campi del flusso, nell forma che il registro e il sito leggono. */
-export function workflowFields(page: WorkflowFields | null | undefined): Required<Pick<WorkflowFields, 'status' | 'isDraft'>> &
-  Pick<WorkflowFields, 'publishAt' | 'review'> {
+export function workflowFields(
+  page: WorkflowFields | null | undefined
+): Required<Pick<WorkflowFields, 'status' | 'isDraft'>> & Pick<WorkflowFields, 'publishAt' | 'review'> {
   const status = declaredStatus(page)
   return {
     status,

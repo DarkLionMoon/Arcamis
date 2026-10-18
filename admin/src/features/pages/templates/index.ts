@@ -31,7 +31,10 @@ function customTemplates(): PageTemplate[] {
 
 export function getTemplate(id: string | null | undefined): PageTemplate | undefined {
   if (!id) return undefined
-  return BUILT_IN_TEMPLATES.find((template) => template.id === id) ?? customTemplates().find((template) => template.id === id)
+  return (
+    BUILT_IN_TEMPLATES.find((template) => template.id === id) ??
+    customTemplates().find((template) => template.id === id)
+  )
 }
 
 /** Solo i built-in: usato quando un modello salvato non deve sparire dai dati. */

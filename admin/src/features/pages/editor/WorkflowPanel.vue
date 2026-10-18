@@ -62,10 +62,13 @@ const due = computed(() => isDue(props.page, now.value))
 const actions = computed<WorkflowAction[]>(() => availableActions(props.role, status.value))
 
 const canSchedule = computed(() => actions.value.some((action) => action.id === 'schedule'))
-const scheduleError = computed(() => (scheduleTouched.value ? validateSchedule(fromLocalInput(publishAtLocal.value), now.value)?.message || '' : ''))
+const scheduleError = computed(() =>
+  scheduleTouched.value ? validateSchedule(fromLocalInput(publishAtLocal.value), now.value)?.message || '' : ''
+)
 
 const whenText = computed(() => {
-  if (status.value === 'scheduled') return `${formatWhen(props.page.publishAt)} (${scheduleHint(props.page, now.value)})`
+  if (status.value === 'scheduled')
+    return `${formatWhen(props.page.publishAt)} (${scheduleHint(props.page, now.value)})`
   if (due.value) return `Data raggiunta: ${formatWhen(props.page.publishAt)}`
   return ''
 })
@@ -73,8 +76,10 @@ const whenText = computed(() => {
 const trail = computed(() => {
   const review = props.page.review
   const rows: Array<{ label: string; value: string }> = []
-  if (review?.requestedBy) rows.push({ label: 'In revisione da', value: `${review.requestedBy} · ${formatWhen(review.requestedAt)}` })
-  if (review?.reviewedBy) rows.push({ label: 'Revisionata da', value: `${review.reviewedBy} · ${formatWhen(review.reviewedAt)}` })
+  if (review?.requestedBy)
+    rows.push({ label: 'In revisione da', value: `${review.requestedBy} · ${formatWhen(review.requestedAt)}` })
+  if (review?.reviewedBy)
+    rows.push({ label: 'Revisionata da', value: `${review.reviewedBy} · ${formatWhen(review.reviewedAt)}` })
   return rows
 })
 
@@ -108,8 +113,8 @@ function run(action: WorkflowAction): void {
     <p class="arc-field-help">{{ meta.hint }}</p>
 
     <p v-if="due" class="arc-field-msg is-warning">
-      La data è passata e la pagina è pubblica, ma l'ultima build è precedente: menu, sitemap e prerender si allineano al
-      prossimo deploy.
+      La data è passata e la pagina è pubblica, ma l'ultima build è precedente: menu, sitemap e prerender si allineano
+      al prossimo deploy.
     </p>
 
     <label v-if="canSchedule" class="arc-fld">
@@ -145,7 +150,9 @@ function run(action: WorkflowAction): void {
       >
         {{ label(action) }}
       </button>
-      <span v-if="!actions.length" class="arc-field-help">Il tuo ruolo non può cambiare lo stato di questa pagina.</span>
+      <span v-if="!actions.length" class="arc-field-help"
+        >Il tuo ruolo non può cambiare lo stato di questa pagina.</span
+      >
     </div>
 
     <dl v-if="trail.length" class="arc-workflow-trail">

@@ -196,9 +196,7 @@ function sameHeading(a: string, b: string): boolean {
 }
 
 function cleanMarkdown(text: string): string {
-  return text
-    .replace(/\n{3,}/g, '\n\n')
-    .replace(/^\s+|\s+$/g, '')
+  return text.replace(/\n{3,}/g, '\n\n').replace(/^\s+|\s+$/g, '')
 }
 
 function fillItem(template: PageTemplate, collectionIndex: number, parsed: ParsedItem): Record<string, FieldValue> {
@@ -271,9 +269,7 @@ function splitHead(markdown: string, template: PageTemplate): { head: string; bl
   if ((template.separator ?? 'hr') === 'none') {
     const parts = normalized.split(/^##\s+/m)
     const pageSections = new Set(
-      template.page.sections
-        .map((section) => (section.heading ? normalizeLabel(section.heading) : ''))
-        .filter(Boolean)
+      template.page.sections.map((section) => (section.heading ? normalizeLabel(section.heading) : '')).filter(Boolean)
     )
     let head = parts.shift() || ''
     const blocks: string[] = []

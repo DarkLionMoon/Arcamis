@@ -142,9 +142,13 @@ async function quickAction(event: MouseEvent, page: PageRegistryEntry, id: Workf
       if (template && current.templateData) {
         const errors = validateTemplateData(template, current.templateData, current.draftFields || []).errors
         if (errors.length) {
-          ui.toast(`${errors.length} camp${errors.length === 1 ? 'o' : 'i'} da correggere: apri la pagina per completarla`, 'error', {
-            title: 'Pubblicazione bloccata'
-          })
+          ui.toast(
+            `${errors.length} camp${errors.length === 1 ? 'o' : 'i'} da correggere: apri la pagina per completarla`,
+            'error',
+            {
+              title: 'Pubblicazione bloccata'
+            }
+          )
           return
         }
       }
@@ -159,7 +163,15 @@ async function quickAction(event: MouseEvent, page: PageRegistryEntry, id: Workf
 
     const result = applyAction(id, current, { actor: auth.user || undefined })
     await pagesApi.save({ ...current, ...result, lastModified: new Date().toISOString() }, `admin: ${id} ${page.k}`)
-    Object.assign(page, workflowFields({ status: result.status, publishAt: result.publishAt, isDraft: result.isDraft, review: result.review }))
+    Object.assign(
+      page,
+      workflowFields({
+        status: result.status,
+        publishAt: result.publishAt,
+        isDraft: result.isDraft,
+        review: result.review
+      })
+    )
     await registryApi.save(registry.pages)
     registry.clearDirty()
     ui.toast(result.message || 'Stato aggiornato', 'success')
@@ -328,7 +340,11 @@ onMounted(load)
               <div class="arc-page-meta">
                 <span>{{ page.k }}</span>
                 <span v-if="page.layout" class="arc-chip">{{ page.layout }}</span>
-                <span class="arc-chip" :class="'arc-status-' + statusOfEntry(page)" :title="statusMeta(statusOfEntry(page)).hint">
+                <span
+                  class="arc-chip"
+                  :class="'arc-status-' + statusOfEntry(page)"
+                  :title="statusMeta(statusOfEntry(page)).hint"
+                >
                   {{ statusMeta(statusOfEntry(page)).label }}
                 </span>
               </div>

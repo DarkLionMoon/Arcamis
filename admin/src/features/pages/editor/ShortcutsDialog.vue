@@ -66,7 +66,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         <dl>
           <div v-for="item in group.items" :key="item.label" class="arc-shortcut-row">
             <dt>
-              <kbd v-for="(key, index) in item.keys" :key="key">{{ key }}<span v-if="index < item.keys.length - 1">+</span></kbd>
+              <kbd v-for="(key, index) in item.keys" :key="key"
+                >{{ key }}<span v-if="index < item.keys.length - 1">+</span></kbd
+              >
             </dt>
             <dd>{{ item.label }}</dd>
           </div>

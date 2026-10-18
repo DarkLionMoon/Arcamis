@@ -54,7 +54,11 @@ function deity(overrides: Record<string, FieldValue> = {}): Record<string, Field
   }
 }
 
-function dataWith(templateId: string, items: Array<Record<string, FieldValue>>, fields: Record<string, FieldValue> = {}) {
+function dataWith(
+  templateId: string,
+  items: Array<Record<string, FieldValue>>,
+  fields: Record<string, FieldValue> = {}
+) {
   const tpl = template(templateId)
   const data = emptyTemplateData(tpl)
   data.fields = { ...data.fields, ...fields }
@@ -285,7 +289,9 @@ describe('validazione', () => {
   it('rifiuta percorsi immagine non validi e URL malformati', () => {
     const tpl = template('divinita')
     const data = dataWith('divinita', [deity({ immagine: 'anivia.jpg', citazione: 'x' })])
-    expect(validateTemplateData(tpl, data).errors.some((issue) => issue.message.includes('percorso immagine'))).toBe(true)
+    expect(validateTemplateData(tpl, data).errors.some((issue) => issue.message.includes('percorso immagine'))).toBe(
+      true
+    )
   })
 
   it('accetta tag come array e li normalizza nel markdown', () => {

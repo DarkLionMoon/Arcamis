@@ -62,7 +62,10 @@ function onTagKeydown(event: KeyboardEvent): void {
 
 function removeTag(index: number): void {
   const current = Array.isArray(props.modelValue) ? props.modelValue : []
-  emit('update:modelValue', current.filter((_, i) => i !== index))
+  emit(
+    'update:modelValue',
+    current.filter((_, i) => i !== index)
+  )
 }
 
 const tags = computed(() => (Array.isArray(props.modelValue) ? props.modelValue : []))
@@ -182,6 +185,8 @@ const imagePath = computed(() => textValue())
       {{ issue.message }}
     </p>
     <p v-else-if="field.help" class="arc-field-help">{{ field.help }}</p>
-    <p v-if="field.type === 'markdown' && !issue" class="arc-field-hint">Markdown · <kbd>Ctrl</kbd>+<kbd>B</kbd> grassetto</p>
+    <p v-if="field.type === 'markdown' && !issue" class="arc-field-hint">
+      Markdown · <kbd>Ctrl</kbd>+<kbd>B</kbd> grassetto
+    </p>
   </div>
 </template>

@@ -23,10 +23,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'close'): void
-  (
-    e: 'create',
-    payload: { templateId: string | null; title: string; key: string; icon: string; section: string }
-  ): void
+  (e: 'create', payload: { templateId: string | null; title: string; key: string; icon: string; section: string }): void
   (e: 'apply', templateId: string): void
 }>()
 
@@ -45,7 +42,9 @@ const templates = computed(() => {
   return allTemplates()
 })
 
-const customIds = computed(() => new Set(templates.value.filter((tpl) => !BUILT_IN_TEMPLATES.includes(tpl)).map((tpl) => tpl.id)))
+const customIds = computed(
+  () => new Set(templates.value.filter((tpl) => !BUILT_IN_TEMPLATES.includes(tpl)).map((tpl) => tpl.id))
+)
 
 function slugify(value: string): string {
   return value
@@ -241,13 +240,23 @@ async function removeCustom(template: PageTemplate, event: MouseEvent): Promise<
         </div>
       </div>
 
-      <details v-if="mode === 'create'" class="arc-picker-import" :open="importOpen" @toggle="importOpen = ($event.target as HTMLDetailsElement).open">
+      <details
+        v-if="mode === 'create'"
+        class="arc-picker-import"
+        :open="importOpen"
+        @toggle="importOpen = ($event.target as HTMLDetailsElement).open"
+      >
         <summary><VIcon name="code" :size="14" /> Importa un modello JSON</summary>
         <p class="arc-hint">
-          Incolla un modello con lo stesso formato di quelli built-in (campi, collezioni, sezioni). Viene validato prima di
-          essere salvato.
+          Incolla un modello con lo stesso formato di quelli built-in (campi, collezioni, sezioni). Viene validato prima
+          di essere salvato.
         </p>
-        <textarea v-model="importText" class="in arc-textarea-mono" rows="6" placeholder="{ &quot;version&quot;: 1, &quot;id&quot;: … }"></textarea>
+        <textarea
+          v-model="importText"
+          class="in arc-textarea-mono"
+          rows="6"
+          placeholder='{ "version": 1, "id": … }'
+        ></textarea>
         <p v-if="importError" class="arc-field-msg is-error">{{ importError }}</p>
         <button class="btn btn-soft btn-sm" type="button" :disabled="!importText.trim()" @click="importTemplate">
           Importa modello

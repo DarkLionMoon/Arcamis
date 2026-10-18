@@ -84,9 +84,7 @@
           },
           {
             "heading": "Identità",
-            "blocks": [
-              { "kind": "definition", "fields": ["nome", "epiteto", "allineamento", "sfere", "simbolo"] }
-            ]
+            "blocks": [{ "kind": "definition", "fields": ["nome", "epiteto", "allineamento", "sfere", "simbolo"] }]
           },
           {
             "heading": "Personalità",

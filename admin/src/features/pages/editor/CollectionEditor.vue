@@ -89,9 +89,8 @@ function itemDraftCount(index: number): number {
 
 function itemErrorCount(index: number): number {
   const prefix = `collections.${props.collection.key}.${index}.`
-  return Object.values(props.issueMap).filter(
-    (issue) => issue.severity === 'error' && issue.path.startsWith(prefix)
-  ).length
+  return Object.values(props.issueMap).filter((issue) => issue.severity === 'error' && issue.path.startsWith(prefix))
+    .length
 }
 
 const totalErrors = computed(() => Object.values(props.issueMap).filter((issue) => issue.severity === 'error').length)
@@ -132,9 +131,7 @@ const shownItems = computed(() => {
     <p v-if="!items.length" class="arc-collection-empty">
       Nessuna scheda: aggiungi la prima {{ collection.singular }} per iniziare.
     </p>
-    <p v-else-if="!shownItems.length" class="arc-collection-empty">
-      Nessuna scheda corrisponde al filtro.
-    </p>
+    <p v-else-if="!shownItems.length" class="arc-collection-empty">Nessuna scheda corrisponde al filtro.</p>
 
     <article
       v-for="{ index, record } in shownItems"

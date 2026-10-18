@@ -37,7 +37,13 @@
       "singular": "sezione",
       "description": "Ogni voce è un capitolo della pagina, con titolo, immagine e testo.",
       "fields": [
-        { "key": "titolo", "label": "Titolo", "type": "text", "required": true, "placeholder": "Le origini di Gandora" },
+        {
+          "key": "titolo",
+          "label": "Titolo",
+          "type": "text",
+          "required": true,
+          "placeholder": "Le origini di Gandora"
+        },
         {
           "key": "tipo",
           "label": "Tipo",

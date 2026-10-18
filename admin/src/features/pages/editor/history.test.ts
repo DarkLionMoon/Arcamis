@@ -1,15 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  HISTORY_LIMIT,
-  canRedo,
-  canUndo,
-  createHistory,
-  record,
-  redo,
-  shouldCoalesce,
-  undo
-} from './history'
+import { HISTORY_LIMIT, canRedo, canUndo, createHistory, record, redo, shouldCoalesce, undo } from './history'
 
 describe('cronologia dell’editor', () => {
   it('parte senza passi da annullare', () => {

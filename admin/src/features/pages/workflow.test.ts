@@ -146,7 +146,11 @@ describe('azioni', () => {
   const AT = '2026-10-17T12:00:00.000Z'
 
   it('inviare in revisione traccia chi e quando', () => {
-    const result = applyAction('request-review', { status: 'draft' }, { actor: 'brian', at: AT, note: 'Controlla le regole' })
+    const result = applyAction(
+      'request-review',
+      { status: 'draft' },
+      { actor: 'brian', at: AT, note: 'Controlla le regole' }
+    )
     expect(result.status).toBe('review')
     expect(result.isDraft).toBe(true)
     expect(result.publishAt).toBeUndefined()

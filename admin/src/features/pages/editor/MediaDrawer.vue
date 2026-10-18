@@ -2,15 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useUIStore } from '@/app/store'
-import {
-  compressImage,
-  errorText,
-  formatBytes,
-  mediaApi,
-  mediaName,
-  mediaUrl,
-  uploadImage
-} from '@/shared/api'
+import { compressImage, errorText, formatBytes, mediaApi, mediaName, mediaUrl, uploadImage } from '@/shared/api'
 import VIcon from '@/shared/components/VIcon.vue'
 import type { GHFile } from '@/types'
 

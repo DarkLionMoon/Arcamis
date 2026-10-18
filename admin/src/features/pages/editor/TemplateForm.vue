@@ -103,6 +103,13 @@ const hiddenCount = computed(() => {
 
 const filtering = computed(() => Boolean(query.value.trim()) || onlyMissing.value)
 
+/* Handler nel template con una sola espressione: Prettier riformatta gli
+   attributi e un blocco di due istruzioni senza `;` diventa invalido. */
+function resetFilter(): void {
+  query.value = ''
+  onlyMissing.value = false
+}
+
 /** Primo campo che blocca il salvataggio: ci si arriva anche da qui. */
 const firstErrorPath = computed(() => {
   const issues = props.issues.filter((issue) => issue.severity === 'error' && issue.path)
@@ -124,7 +131,13 @@ function goToFirstError(): void {
     <div class="arc-form-filter">
       <span class="arc-form-filter-search">
         <VIcon name="search" :size="14" />
-        <input v-model="query" class="in" type="search" placeholder="Cerca un campo…" aria-label="Cerca un campo del modello" />
+        <input
+          v-model="query"
+          class="in"
+          type="search"
+          placeholder="Cerca un campo…"
+          aria-label="Cerca un campo del modello"
+        />
       </span>
       <button
         class="btn btn-soft btn-sm"
@@ -139,9 +152,15 @@ function goToFirstError(): void {
       <span class="arc-toolbar-spacer"></span>
       <span v-if="filtering" class="arc-form-filter-count">
         {{ hiddenCount }} camp{{ hiddenCount === 1 ? 'o' : 'i' }} nascost{{ hiddenCount === 1 ? 'o' : 'i' }}
-        <button class="arc-link" type="button" @click="query = ''; onlyMissing = false">azzera filtro</button>
+        <button class="arc-link" type="button" @click="resetFilter">azzera filtro</button>
       </span>
-      <button v-if="firstErrorPath" class="btn btn-d btn-sm" type="button" title="Vai al primo campo da correggere" @click="goToFirstError">
+      <button
+        v-if="firstErrorPath"
+        class="btn btn-d btn-sm"
+        type="button"
+        title="Vai al primo campo da correggere"
+        @click="goToFirstError"
+      >
         <VIcon name="alert" :size="14" /> Primo errore
       </button>
     </div>

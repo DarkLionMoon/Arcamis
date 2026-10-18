@@ -68,7 +68,11 @@ export function formatFieldValue(field: TemplateField, value: FieldValue): strin
 }
 
 /** `{nome}` / `{numero}` dentro i titoli delle schede. */
-export function interpolateHeading(heading: string, fields: TemplateField[], record: Record<string, FieldValue>): string {
+export function interpolateHeading(
+  heading: string,
+  fields: TemplateField[],
+  record: Record<string, FieldValue>
+): string {
   const rendered = heading.replace(/\{([a-z][a-z0-9_]*)\}/g, (_, key: string) => {
     const field = fields.find((candidate) => candidate.key === key)
     return field ? formatFieldValue(field, record[key]) : ''
