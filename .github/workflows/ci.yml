@@ -70,9 +70,6 @@ jobs:
             admin/package-lock.json
       - run: npm ci
       - run: npm ci --prefix admin
-      # L'admin va compilato per primo: build-post copia export/admin in dist.
-      - name: Build dell'admin in export/admin
-        run: npm run build --prefix admin
       - name: Installa Chromium
         working-directory: admin
         run: npx playwright install --with-deps chromium
@@ -99,8 +96,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      # build + test di integrità delle rotte (meta, sitemap, 404, PWA, font)
-      - run: npm run test:routes
+      - run: npm ci --prefix admin
+      # Lo stesso script di build usato dallo staging: dist/ dell'artefatto
+      # testato e di quello pubblicato nascono dallo stesso percorso.
+      - run: npm run build
+      # integrità delle rotte sul dist appena prodotto (meta, sitemap, 404, PWA, font)
+      - run: npm run test:dist
       - uses: actions/upload-artifact@v4
         with:
           name: dist

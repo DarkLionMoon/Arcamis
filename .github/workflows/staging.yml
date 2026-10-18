@@ -48,11 +48,7 @@ jobs:
 
       - name: Build site and Vue admin
         if: steps.check.outputs.configured == 'true'
-        run: |
-          npm run build
-          npm run build --prefix admin
-          rm -rf dist/admin
-          cp -R export/admin dist/admin
+        run: npm run build
 
       - name: Deploy to Cloudflare Pages
         if: steps.check.outputs.configured == 'true'

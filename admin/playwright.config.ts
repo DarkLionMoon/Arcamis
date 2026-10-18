@@ -13,6 +13,8 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure'
   },
+  /* Gli E2E girano su ciò che si pubblica: `npm run build` compila pannello e
+     sito con lo stesso script di CI e deploy, non su un export/admin vecchio. */
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
@@ -20,7 +22,7 @@ export default defineConfig({
           'cd .. && npm run build && npx vite preview --host 0.0.0.0 --port 4173',
         url: 'http://localhost:4173',
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000
+        timeout: 240_000
       },
   projects: [
     {

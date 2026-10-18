@@ -6,7 +6,7 @@
   "description": "Wiki ufficiale del server D&D Arcamis",
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:site",
+    "build": "node scripts/build-all.mjs",
     "build:site": "vite build && node scripts/build-post.mjs",
     "build:admin": "npm --prefix admin run build",
     "seo": "node scripts/gen-seo-static.mjs",
@@ -20,7 +20,8 @@
     "format:check": "prettier --check eslint.config.js vite.config.js \"functions/**/*.js\"",
     "typecheck": "echo 'No TypeScript configured yet'",
     "test": "vitest run",
-    "test:routes": "npm run build:site && vitest run scripts/__tests__/routes.test.js",
+    "test:routes": "npm run build:site && npm run test:dist",
+    "test:dist": "vitest run scripts/__tests__/routes.test.js",
     "test:watch": "vitest"
   },
   "dependencies": {

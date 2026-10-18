@@ -30,6 +30,7 @@ Contenuto 100% local-first: tutto servito da JSON statici (nessun ping alla Noti
 │   ├── css/*.css           ← Stili (base, home, page, notion, fx, ui, shell, …)
 │   ├── js/*.js             ← Logica SPA
 │   ├── lib/routes.mjs      ← Fonte unica delle rotte (prerender + sitemap + robots)
+│   ├── build-all.mjs       ← Build unica: admin → sito (usata da CI e deploy)
 │   ├── build-post.mjs      ← Post-build: hash JS, prerender, sitemap, sw.js
 │   ├── gen-seo-static.mjs  ← Riscrive sitemap.xml/robots.txt in root
 │   ├── fetch-fonts.mjs     ← Scarica i woff2 e genera scripts/css/fonts.css
@@ -288,12 +289,22 @@ npm run test:routes    # build + test di integrità di tutte le rotte
 ## Build
 
 ```bash
-npm run build        # → dist/ pronto per il deploy (sito + admin già compilato)
+npm run build        # → dist/ pronto per il deploy: pannello + sito
 npm run build:site   # solo sito: vite build + scripts/build-post.mjs
-npm run build:admin  # ricompila il pannello Vue in export/admin
+npm run build:admin  # solo pannello Vue → export/admin
 npm run icons        # rigenera icone PWA/favicon
 npm run fonts        # riscarica i font self-hosted
 ```
+
+`npm run build` è l'unico percorso di build: CI, staging e deploy da locale
+passano tutti da `scripts/build-all.mjs`, che compila **prima** il pannello in
+`export/admin` e **poi** il sito, perché `build-post.mjs` copia quel pannello in
+`dist/admin`. Al contrario `dist/` finirebbe con il pannello del commit
+precedente (o senza pannello, in un checkout pulito). Lo script verifica che
+`dist/admin/app.html` esista, che in `dist/admin` non finiscano source map e
+stampa il digest di `export/admin` e `dist`: due build dello stesso commit
+devono dare lo stesso digest, altrimenti ciò che è stato testato non è ciò che
+si sta pubblicando.
 
 `scripts/build-post.mjs` (eseguito dopo `vite build`):
 
@@ -328,7 +339,8 @@ reali e fallisce se un tema non definisce un token o se un colore di testo
 
 ```bash
 npm test             # unit test (functions/ + integrità rotte)
-npm run test:routes  # build + verifica degli artefatti (meta, sitemap, 404, PWA, font)
+npm run test:routes  # build del sito + verifica degli artefatti (meta, sitemap, 404, PWA, font)
+npm run test:dist    # come sopra ma sull'attuale dist/ (usato dopo npm run build)
 ```
 
 `scripts/__tests__/routes.test.js` controlla che ogni rotta abbia titolo,
@@ -341,9 +353,15 @@ catch-all che mascherava i 404. La CI esegue anche
 ## Deployment
 
 Cloudflare Pages:
-- Build command: `npm run build`
+- Build command: `npm ci --prefix admin && npm run build`
 - Output directory: `dist`
 - Funzioni in `functions/` (restano nella root del repo)
+
+Il comando di build installa anche le dipendenze del pannello: Pages installa
+solo quelle della root, quindi senza `npm ci --prefix admin` non si potrebbe
+ricompilare `admin/`. Lo script di build se ne accorge e le installa da solo se
+mancano, ma dichiararlo nel build command rende il deploy esplicito e più
+veloce.
 
 > Il catch-all SPA è stato rimosso: se in dashboard resta un output diverso da
 > `dist` (o una vecchia regola `/* /index.html 200`), le rotte prerenderizzate e
