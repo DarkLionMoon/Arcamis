@@ -39,7 +39,9 @@ function loadSiteRenderers() {
   vm.runInContext(fs.readFileSync(path.join(root, 'scripts/js/notion-nav.js'), 'utf8'), sandbox)
   return {
     regole: vm.runInContext('_renderRegole', sandbox),
-    materiale: vm.runInContext('_renderMateriale', sandbox)
+    materiale: vm.runInContext('_renderMateriale', sandbox),
+    schede: vm.runInContext('_renderSchede', sandbox),
+    source: fs.readFileSync(path.join(root, 'scripts/js/notion-nav.js'), 'utf8')
   }
 }
 
@@ -96,6 +98,24 @@ describe('renderer del materiale approvato', () => {
 
   it('interpreta il markdown dei callout', () => {
     expect(html).toContain('<strong>"5.5"</strong>')
+  })
+})
+
+describe('layout a schede dell\'editor', () => {
+  const html = renderers.schede('## Guerriero\nCorpo\n\n## Mago\nAltro corpo')
+
+  it('rende ogni sezione ## come card della griglia', () => {
+    expect(html).toContain('class="sch-page"')
+    expect(count(html, /class="sch-card"/g)).toBe(2)
+    expect(html).toContain('>Guerriero<')
+  })
+
+  it('il sito riconosce il layout scelto dall\'editor', () => {
+    expect(renderers.source).toContain("_layout === 'schede'")
+    const schema = JSON.parse(
+      fs.readFileSync(path.join(root, 'content/schemas/page.schema.json'), 'utf8')
+    )
+    expect(schema.properties.layout.enum).toContain('schede')
   })
 })
 
