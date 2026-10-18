@@ -80,8 +80,12 @@ dalla chiave (es. `pantheon`, `regole`, …).
 La lista completa dei layout è gestita dal pannello admin Vue e dai tipi condivisi in `admin/src/types/index.ts`.
 `contenuto`, `luoghi`, `cronache`, `personaggio`, `materiale`, `wide`,
 `pantheon`, `collezione`, `bestiario`, `timeline`, `fazioni`, `oggetti`,
-`glossario`, `galleria`, `tabelle` e i layout a card `sessione`, `quest`,
-`npc`, `spell`, `specie`, `citta`, `evento`.
+`glossario`, `galleria`, `tabelle`, `schede` e i layout a card `sessione`,
+`quest`, `npc`, `spell`, `specie`, `citta`, `evento`.
+
+Nell'editor il layout si sceglie da tre preset — **Wiki standard** (`""` + indice),
+**Immersivo / full width** (`wide`) e **Schede / griglia** (`schede`, ogni `##`
+diventa una card in griglia) — con il selettore avanzato per i layout specifici.
 
 Il layout `collezione` è la versione generica del Pantheon: stessa griglia
 di tile con immagini e schede dedicate (`<chiave-pagina>-<slug>`), ma con
@@ -91,18 +95,18 @@ I layout a card sono renderizzati da `_renderSchede` in `notion-nav.js`
 (markdown → card con campi `- **Chiave:** valore`); gli altri da
 renderer dedicati (`_renderPantheon`, `_renderBestiario`, …).
 
-L'editor a blocchi del pannello Vue copre **due modalità**:
-- `pantheon`: blocchi divinità/sezioni con immagine, citazione, identità,
-  personalità e culto (separati da `---` nel markdown). Il layout
-  `collezione` usa lo stesso editor con etichette generiche ("elementi",
-  sezione "Dettagli" al posto di "Identità", senza Personalità/Culto);
-- schede a card: `bestiario`, `fazioni`, `oggetti` e i layout a card
-  `sessione`, `quest`, `npc`, `spell`, `specie`, `citta`, `evento` — ogni
-  blocco produce `## Titolo` + campi `- **Chiave:** valore` + sezioni `###`.
+I blocchi dell'editor sono solo markdown: le carte sono `:::cards` con
+`### Titolo`, le gallerie `:::gallery` con una riga di immagine ciascuna, e
+`md-render.js` le rende in `.n-cards` / `.n-gal` (il layout `schede`
+trasforma invece ogni `##` in una card della griglia).
 
-Sui layout strutturati si può passare in qualsiasi momento dall'editor a
-blocchi al markdown grezzo col pulsante **✍ Markdown** / **🧱 Blocchi**
-in toolbar (il markdown viene sempre risincronizzato).
+Le pagine davvero strutturate (`pantheon` e `collezione`, `bestiario`,
+`fazioni`, `oggetti` e i layout a card `sessione`, `quest`, `npc`, `spell`,
+`specie`, `citta`, `evento`) si scrivono con i **modelli** dell'editor: ogni
+scheda produce `## Titolo` + campi `- **Chiave:** valore` + sezioni `###`.
+
+Le schede dei tab dell'editor sono **Blocchi** e **Markdown**: si passa
+dall'una all'altra in qualsiasi momento e il markdown resta la fonte di verità.
 
 Per le immagini delle divinità, **trascinando** sull'anteprima si sceglie la
 parte visibile nella card: la posizione viene salvata come frammento
@@ -189,18 +193,31 @@ Il pannello legacy è stato rimosso. Il pannello Vue è disponibile su `/admin`
 - **🔎 Cerca nel contenuto** — ricerca full-text nelle pagine (lazy index).
 - **Deploy status reale** via `/api/deploy` quando `CF_API_TOKEN` è configurato,
   altrimenti countdown di fallback.
+- **🎠 Carousel** — sfondo scelto dalla libreria media (o trascinato sulla card),
+tag, titolo, descrizione e bottoni delle tre slide, con anteprima live nella
+card e salvataggio in una sola scrittura (`set_carousel`).
+- **📍 Mappa** — puntine trascinabili: le coordinate sono percentuali
+`getBoundingClientRect()` del canvas, quindi restano corrette anche con la
+mappa scrollata o zoomata.
 - Sidebar off-canvas con hamburger su mobile.
 
 ### Editor di pagine a modelli
 
-Le pagine si scrivono in due modi: markdown libero, oppure compilando un
-**modello** (Scheda Divinità, Regolamento, Pagina Lore, Mestiere/Lavoro) i cui
-campi validati generano da soli il markdown che il sito già rende. L'editor è un
-workspace a due pannelli con form strutturato + anteprima live, validazione
-mentre si scrive, cassetto media, cronologia undo/redo, autosave e guard delle
-modifiche non salvate; i campi vuoti diventano segnaposto che accendono il badge
-«✎ Bozza» sul sito. I modelli sono dati JSON (`admin/src/features/pages/templates/definitions/`)
-e se ne possono importare di personalizzati dal pannello.
+Le pagine si scrivono in tre modi: **blocchi visuali**, markdown libero, oppure
+compilando un **modello** (Scheda Divinità, Regolamento, Pagina Lore,
+Mestiere/Lavoro) i cui campi validati generano da soli il markdown che il sito
+già rende. L'editor è un workspace a due pannelli con editor + anteprima live,
+validazione mentre si scrive, cassetto media, cronologia undo/redo, autosave e
+guard delle modifiche non salvate; i campi vuoti diventano segnaposto che
+accendono il badge «✎ Bozza» sul sito. I modelli sono dati JSON
+(`admin/src/features/pages/templates/definitions/`) e se ne possono importare di
+personalizzati dal pannello.
+
+L'editor a blocchi compone titoli H1–H3, paragrafi, callout, accordion/FAQ,
+griglia di carte, galleria, immagini, tabelle e separatori: ogni modifica
+riserializza il markdown reale, quindi il passaggio **Blocchi ⇄ Markdown** non
+perde nulla (ciò che i blocchi non riconoscono resta in un blocco «markdown
+grezzo»).
 
 Dettagli su componenti, schema dei modelli e flusso dei dati:
 [`admin/src/features/pages/EDITOR.md`](admin/src/features/pages/EDITOR.md).

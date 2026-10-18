@@ -559,6 +559,9 @@ async function _gpRender(id, label, icon) {
           else if (_layout === 'glossario') _localHtml = _renderGlossario(_localJson.content);
           else if (_layout === 'galleria') _localHtml = _renderGalleria(_localJson.content);
           else if (_layout === 'tabelle') _localHtml = _renderTabelle(_localJson.content);
+          /* Layout a schede scelto dall'editor: ogni `##` diventa una card
+             della griglia (lo stesso renderer delle pagine sessione). */
+          else if (_layout === 'schede') _localHtml = _renderSchede(_localJson.content);
           else if (
             _layout === 'sessione' ||
             _layout === 'quest' ||

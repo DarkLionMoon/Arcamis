@@ -9,6 +9,7 @@ import { CODE_SNIPPET, TABLE_SNIPPET } from '@/shared/markdownCommands'
 import CodeMirrorEditor from '@/features/interface/components/CodeMirrorEditor.vue'
 import MarkdownPreview from '@/features/interface/components/MarkdownPreview.vue'
 import VIcon from '@/shared/components/VIcon.vue'
+import BlockEditor from './editor/BlockEditor.vue'
 import EditorStatusBar from './editor/EditorStatusBar.vue'
 import EditorToolbar from './editor/EditorToolbar.vue'
 import MediaDrawer from './editor/MediaDrawer.vue'
@@ -19,7 +20,8 @@ import WorkflowPanel from './editor/WorkflowPanel.vue'
 import { usePageEditor } from './editor/usePageEditor'
 import type { WorkflowActionId } from './workflow'
 import type { CodeMirrorHandle } from '@/features/interface/components/codemirrorHandle'
-import { LAYOUT_OPTIONS } from './layouts'
+import { LAYOUT_OPTIONS, LAYOUT_PRESETS, presetFor, type LayoutPreset } from './layouts'
+import { blockIssues, parseBlocks, serializeBlocks, type Block } from './blocks'
 
 const route = useRoute()
 const router = useRouter()
@@ -44,6 +46,7 @@ const {
   redoAvailable,
   workflowStatus,
   workflowLabel,
+  isPublicPage,
   runWorkflowAction,
   load,
   setField,
@@ -77,6 +80,50 @@ const mediaForMarkdown = ref(false)
 const structure = computed(() => editor.mode === 'structure' && Boolean(template.value && data.value))
 const markdownReadonly = computed(() => Boolean(template.value))
 const previewOpen = computed(() => editor.previewOpen)
+
+/* ── Modalità blocchi (pagine libere) ──
+   I blocchi sono una vista sul markdown: si rileggono dal contenuto solo
+   quando la modalità torna su Blocchi e il testo è cambiato altrove
+   (markdown, caricamento pagina). Ogni modifica riserializza subito, così
+   anteprima e salvataggio vedono lo stesso testo. */
+const blocks = ref<Block[]>([])
+let blocksSource: string | null = null
+const blocksMode = computed(() => editor.mode === 'structure' && !template.value && !page.value?.template)
+
+function syncBlocksFromContent(): void {
+  const content = page.value?.content ?? ''
+  if (blocksSource === content) return
+  blocks.value = parseBlocks(content)
+  blocksSource = content
+}
+
+function onBlocksUpdate(next: Block[]): void {
+  blocks.value = next
+  const markdown = serializeBlocks(next)
+  blocksSource = markdown
+  editor.setContent(markdown)
+}
+
+const pageBlocks = computed<Block[]>(() => {
+  if (template.value) return []
+  return blocksMode.value ? blocks.value : parseBlocks(page.value?.content || '')
+})
+const blocksIncomplete = computed(() => pageBlocks.value.filter((block) => blockIssues(block).length).length)
+const blocksFilled = computed(() => pageBlocks.value.length - blocksIncomplete.value)
+
+/* Descrizione breve della modalità attiva, accanto ai tab. */
+const paneHint = computed(() => {
+  if (structure.value) return template.value?.collections[0]?.label || 'Campi'
+  if (blocksMode.value) return 'blocchi visuali'
+  return markdownReadonly.value ? 'generato dal modello' : 'testo libero'
+})
+
+watch(
+  () => [editor.mode, template.value?.id, page.value?.k] as const,
+  () => {
+    if (blocksMode.value) syncBlocksFromContent()
+  }
+)
 
 const saveLabel = computed(() => {
   if (saveState.value === 'saving') return 'Salvataggio…'
@@ -165,15 +212,53 @@ function insertLink(): void {
 async function requestMode(next: 'structure' | 'markdown'): Promise<void> {
   const ok = await setMode(next)
   if (!ok) return
+  if (next === 'structure' && blocksMode.value) syncBlocksFromContent()
   await nextTick()
   if (next === 'markdown') cmRef.value?.focus()
+}
+
+/* Un solo punto di scrittura per l'indice: l'handler multi-istruzione nel
+   template diventava invalido appena Prettier lo riformattava. */
+function toggleToc(value: boolean): void {
+  if (!page.value) return
+  page.value.toc = value
+  updateMeta({ toc: value })
+}
+
+function applyLayoutPreset(preset: LayoutPreset): void {
+  if (!page.value) return
+  if (template.value) {
+    ui.toast('Il layout è deciso dal modello della pagina', 'info')
+    return
+  }
+  updateMeta({ layout: preset.layout, toc: preset.toc })
+}
+
+async function markDraft(): Promise<void> {
+  if (!page.value) return
+  if (workflowStatus.value === 'draft') {
+    ui.toast('La pagina è già una bozza / in lavorazione', 'info')
+    return
+  }
+  if (isPublicPage.value) {
+    const ok = await confirmAction({
+      title: 'Segna come bozza',
+      message: 'La pagina smetterà di essere pubblica al prossimo deploy.',
+      detail: 'Puoi ripubblicarla con «Approva e pubblica» dal pannello Dettagli.',
+      confirmLabel: 'Segna come bozza',
+      danger: true
+    })
+    if (!ok) return
+  }
+  runWorkflowAction('back-to-draft')
 }
 
 async function requestRemoveTemplate(): Promise<void> {
   const ok = await confirmAction({
     title: 'Rimuovi modello',
     message: 'Tornare al markdown libero?',
-    detail: 'La pagina mantiene il testo compilato, ma i campi strutturati vengono rimossi: potrai riapplicare un modello in seguito.',
+    detail:
+      'La pagina mantiene il testo compilato, ma i campi strutturati vengono rimossi: potrai riapplicare un modello in seguito.',
     confirmLabel: 'Rimuovi modello',
     danger: true
   })
@@ -271,7 +356,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
 <template>
   <section class="arc-workspace" :class="{ 'is-single': !previewOpen }">
     <header class="arc-ws-bar">
-      <button class="arc-icon-btn" type="button" title="Torna alle pagine" aria-label="Torna alle pagine" @click="backToList">
+      <button
+        class="arc-icon-btn"
+        type="button"
+        title="Torna alle pagine"
+        aria-label="Torna alle pagine"
+        @click="backToList"
+      >
         ←
       </button>
 
@@ -290,16 +381,16 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
           placeholder="Titolo della pagina"
           @input="updateMeta({ title: page.title })"
         />
-        <span v-if="template" class="arc-chip">
-          {{ template.icon }} {{ template.label }}
-        </span>
+        <span v-if="template" class="arc-chip"> {{ template.icon }} {{ template.label }} </span>
         <span v-if="templateMissing" class="arc-chip is-warning">modello non disponibile</span>
-        <span class="arc-chip" :class="'arc-status-' + workflowStatus" :title="'Flusso di pubblicazione: ' + workflowLabel">
+        <span
+          class="arc-chip"
+          :class="'arc-status-' + workflowStatus"
+          :title="'Flusso di pubblicazione: ' + workflowLabel"
+        >
           {{ workflowLabel }}
         </span>
-        <span class="arc-ws-key">
-          {{ page.k }}{{ !template && page.layout ? ' · ' + page.layout : '' }}
-        </span>
+        <span class="arc-ws-key"> {{ page.k }}{{ !template && page.layout ? ' · ' + page.layout : '' }} </span>
       </template>
 
       <span class="arc-toolbar-spacer"></span>
@@ -331,24 +422,43 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
     </header>
 
     <div v-if="showDetails && page" class="arc-meta-panel">
+      <div class="arc-fld arc-layout-field">
+        <span>Layout della pagina</span>
+        <div class="arc-layout-presets" role="radiogroup" aria-label="Layout della pagina">
+          <button
+            v-for="preset in LAYOUT_PRESETS"
+            :key="preset.id"
+            class="arc-layout-preset"
+            type="button"
+            role="radio"
+            :aria-checked="presetFor(page.layout) === preset.id"
+            :class="{ active: presetFor(page.layout) === preset.id }"
+            :disabled="Boolean(template)"
+            @click="applyLayoutPreset(preset)"
+          >
+            <span class="arc-layout-icon">{{ preset.icon }}</span>
+            <span class="arc-layout-label">{{ preset.label }}</span>
+            <span class="arc-layout-desc">{{ preset.description }}</span>
+          </button>
+        </div>
+        <small v-if="template" class="arc-field-help">Deciso dal modello «{{ template.label }}».</small>
+      </div>
       <label class="arc-fld">
-        <span>Layout sul sito</span>
-        <select v-model="page.layout" class="in" :disabled="Boolean(template)" @change="updateMeta({ layout: page.layout })">
+        <span>Layout avanzato</span>
+        <select
+          v-model="page.layout"
+          class="in"
+          :disabled="Boolean(template)"
+          @change="updateMeta({ layout: page.layout })"
+        >
           <option v-for="layout in LAYOUT_OPTIONS" :key="layout.value" :value="layout.value">{{ layout.label }}</option>
         </select>
-        <small v-if="template" class="arc-field-help">Deciso dal modello «{{ template.label }}».</small>
+        <small class="arc-field-help">Layout specifici del sito (regolamento, pantheon, galleria…).</small>
       </label>
       <label class="arc-fld">
         <span>Indice</span>
         <label class="arc-check">
-          <input
-            type="checkbox"
-            :checked="page.toc === true"
-            @change="
-              page.toc = !page.toc;
-              updateMeta({ toc: page.toc })
-            "
-          />
+          <input type="checkbox" :checked="page.toc === true" @change="toggleToc(!page.toc)" />
           <span>Mostra l'indice dei titoli</span>
         </label>
       </label>
@@ -370,6 +480,16 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
         <button v-if="template" class="btn btn-soft btn-sm" type="button" @click="requestRemoveTemplate">
           <VIcon name="trash" :size="14" /> Rimuovi modello
         </button>
+        <button
+          v-if="workflowStatus !== 'draft'"
+          class="btn btn-soft btn-sm"
+          type="button"
+          title="La pagina non viene pubblicata finché resta una bozza"
+          @click="markDraft"
+        >
+          <VIcon name="eye" :size="14" /> Segna come bozza
+        </button>
+        <span v-else class="arc-chip arc-status-draft">Bozza / in lavorazione</span>
       </div>
     </div>
 
@@ -382,7 +502,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
     <div v-else-if="!page" class="arc-panel">
       <div class="arc-empty-side">
         Pagina non trovata.
-        <button class="btn btn-soft btn-sm" type="button" style="margin-left: 10px" @click="backToList">Torna alle pagine</button>
+        <button class="btn btn-soft btn-sm" type="button" style="margin-left: 10px" @click="backToList">
+          Torna alle pagine
+        </button>
       </div>
     </div>
 
@@ -398,7 +520,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
               :class="{ active: editor.mode === 'structure' }"
               @click="requestMode('structure')"
             >
-              <VIcon name="structure" :size="14" /> Struttura
+              <VIcon name="structure" :size="14" /> {{ template ? 'Struttura' : 'Blocchi' }}
             </button>
             <button
               class="arc-mode-tab"
@@ -411,13 +533,11 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
               <VIcon name="code" :size="14" /> Markdown
             </button>
           </div>
-          <span class="arc-pane-hint">
-            {{ structure ? template?.collections[0]?.label || 'Campi' : markdownReadonly ? 'generato dal modello' : 'testo libero' }}
-          </span>
+          <span class="arc-pane-hint">{{ paneHint }}</span>
         </div>
 
         <EditorToolbar
-          :mode="structure ? 'structure' : 'markdown'"
+          :mode="editor.mode"
           :can-undo="undoAvailable"
           :can-redo="redoAvailable"
           :preview-open="previewOpen"
@@ -453,20 +573,28 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
             </div>
           </template>
 
+          <BlockEditor
+            v-else-if="blocksMode"
+            :blocks="blocks"
+            @update:blocks="onBlocksUpdate"
+            @mark-draft="markDraft"
+          />
+
           <div v-else-if="editor.mode === 'structure'" class="arc-editor-empty">
             <div class="arc-editor-empty-icon">🧩</div>
-            <h2>Nessun modello applicato</h2>
+            <h2>Modello non disponibile</h2>
             <p>
-              Questa pagina è testo libero. Scegli un modello — divinità, regolamento, lore, mestiere — per compilare campi
-              validati e vedere l'anteprima live.
+              Il modello «{{ page.template }}» non è più caricato: il markdown salvato resta leggibile. Scegli un altro
+              modello oppure rimuovilo per tornare ai blocchi liberi.
             </p>
             <button class="btn btn-p" type="button" @click="showPicker = true">Scegli un modello</button>
           </div>
 
           <template v-else>
             <p v-if="markdownReadonly" class="arc-warn-banner is-info">
-              Il markdown è generato dal modello «{{ template?.label }}»: modifiche qui non vengono salvate. Modifica i campi
-              in <button class="arc-link" type="button" @click="requestMode('structure')">Struttura</button> oppure rimuovi
+              Il markdown è generato dal modello «{{ template?.label }}»: modifiche qui non vengono salvate. Modifica i
+              campi in
+              <button class="arc-link" type="button" @click="requestMode('structure')">Struttura</button> oppure rimuovi
               il modello per scrivere liberamente.
             </p>
             <CodeMirrorEditor
@@ -519,10 +647,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
       :words="stats.words"
       :chars="stats.chars"
       :errors="validation.errors.length"
-      :warnings="validation.warnings.length"
+      :warnings="validation.warnings.length + (template ? 0 : blocksIncomplete)"
       :drafts="stats.drafts"
-      :filled="stats.filled"
-      :total="stats.total"
+      :filled="template ? stats.filled : blocksFilled"
+      :total="template ? stats.total : pageBlocks.length"
       :autosave="editor.autosaveEnabled"
       @toggle-autosave="editor.autosaveEnabled = !editor.autosaveEnabled"
     />
@@ -557,10 +685,11 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
         <p class="arc-hint">Con una selezione attiva nel testo, l'etichetta resta quella selezionata.</p>
         <div class="arc-modal-actions">
           <button class="btn btn-soft btn-sm" type="button" @click="linkOpen = false">Annulla</button>
-          <button class="btn btn-p btn-sm" type="button" :disabled="!linkUrl.trim()" @click="insertLink">Inserisci</button>
+          <button class="btn btn-p btn-sm" type="button" :disabled="!linkUrl.trim()" @click="insertLink">
+            Inserisci
+          </button>
         </div>
       </div>
     </div>
-
   </section>
 </template>

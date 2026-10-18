@@ -289,6 +289,57 @@
     );
   }
 
+  /* ── GRIGLIA DI CARTE E GALLERIA ──────────────────────────
+     Blocchi dell'editor admin: le carte sono `### Titolo` dentro
+     `:::cards`, la galleria una riga per immagine dentro `:::gallery`.
+     Fuori da questi fence la sintassi non cambia. */
+  function renderCards(body) {
+    var cards = [],
+      current = null;
+    body.forEach(function (line) {
+      var m = line.match(/^###\s+(.*)$/);
+      if (m) {
+        if (current) cards.push(current);
+        current = { title: m[1], body: [] };
+        return;
+      }
+      if (current) current.body.push(line);
+    });
+    if (current) cards.push(current);
+    var html = cards
+      .map(function (card) {
+        return (
+          '<div class="n-card"><div class="n-card-title">' +
+          inline(card.title) +
+          '</div><div class="n-card-body">' +
+          renderBlocks(card.body.join('\n')) +
+          '</div></div>'
+        );
+      })
+      .join('');
+    return '<div class="n-cards">' + html + '</div>';
+  }
+  function renderGallery(body) {
+    var html = '';
+    body.forEach(function (line) {
+      var m = line.trim().match(/^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)$/);
+      if (!m || !safeImg(m[2])) return;
+      var alt = m[1] || m[3] || '';
+      html +=
+        '<figure class="n-gal-item">' +
+        '<img src="' +
+        attr(m[2]) +
+        '" alt="' +
+        attr(alt) +
+        '" loading="lazy" decoding="async" class="n-zoomable"' +
+        (window.arcZoom ? ' onclick="arcZoom(\'' + m[2].replace(/'/g, "\\'") + '\')"' : '') +
+        '>' +
+        (alt ? '<figcaption>' + inline(alt) + '</figcaption>' : '') +
+        '</figure>';
+    });
+    return '<div class="n-gal">' + html + '</div>';
+  }
+
   /* ── BLOCCHI ─────────────────────────────────────────────── */
   var HR_RE = /^(\s*([-*_])\2{2,}\s*)$/;
   var HEAD_RE = /^(#{1,6})\s+(.+)$/;
@@ -305,6 +356,22 @@
       var line = lines[i];
       if (!line.trim()) {
         i++;
+        continue;
+      }
+      /* griglia / galleria (fence dell'editor) */
+      var gf = line.match(/^:::\s*([a-z]+)\s*$/i);
+      if (gf) {
+        var gbuf = [],
+          gj = i + 1;
+        while (gj < n && !/^:::\s*$/.test(lines[gj])) {
+          gbuf.push(lines[gj]);
+          gj++;
+        }
+        var gkind = gf[1].toLowerCase();
+        if (gkind === 'cards') html += renderCards(gbuf);
+        else if (gkind === 'gallery') html += renderGallery(gbuf);
+        else html += '<pre class="n-code">' + esc(gbuf.join('\n')) + '</pre>';
+        i = gj < n ? gj + 1 : n;
         continue;
       }
       /* code fence */
@@ -400,7 +467,7 @@
       while (i < n) {
         var pl = lines[i];
         if (!pl.trim()) break;
-        if (/^(#{1,6}\s|>|```)/.test(pl)) break;
+        if (/^(#{1,6}\s|>|```|:::)/.test(pl)) break;
         if (/^[-*+]\s/.test(pl)) break;
         if (/^\d+[.)]\s/.test(pl)) break;
         if (pl.charAt(0) === '|' && i + 1 < n && /^\|?[\s:|-]+\|?$/.test(lines[i + 1])) break;
@@ -488,7 +555,18 @@
   function mdToc(md) {
     var toc = [];
     if (!md) return toc;
+    var inFence = false;
     md.split('\n').forEach(function (line, idx) {
+      /* I titoli delle carte non sono sezioni della pagina. */
+      if (/^:::\s*[a-z]+\s*$/i.test(line)) {
+        inFence = true;
+        return;
+      }
+      if (/^:::\s*$/.test(line)) {
+        inFence = false;
+        return;
+      }
+      if (inFence) return;
       var m = line.match(/^(#{1,4})\s+(.+)$/);
       if (m) {
         toc.push({

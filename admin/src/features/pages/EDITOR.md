@@ -1,9 +1,13 @@
-# Editor a modelli (Pagine)
+# Editor pagine (blocchi, modelli e layout)
 
-La sezione **Pagine** non è un editor di testo: è una suite di authoring
-strutturata. Una pagina può essere *libera* (solo markdown) oppure *basata su
-un modello* (`template` + `templateData`), e in quel caso i campi del modello
-compilano da soli il markdown che il sito pubblico già sa rendere.
+La sezione **Pagine** non è un editor di testo: è una suite di authoring. Una
+pagina può essere *libera* (blocchi o markdown) oppure *basata su un modello*
+(`template` + `templateData`), e in quel caso i campi del modello compilano da
+soli il markdown che il sito pubblico già sa rendere.
+
+Le schede in alto sono **Blocchi** e **Markdown**; per le pagine a modello la
+prima diventa **Struttura**. Una pagina libera si apre nei blocchi. Il markdown
+resta la fonte di verità in ogni caso: i blocchi sono una vista sopra di esso.
 
 ```
 content/pages/<key>.json
@@ -31,7 +35,9 @@ formato "nuovo" da supportare lato sito.
 
 | Componente | Ruolo |
 | --- | --- |
-| `PageEditorView.vue` | workspace a due pannelli: form/markdown a sinistra, anteprima live a destra |
+| `PageEditorView.vue` | workspace a due pannelli: blocchi/form/markdown a sinistra, anteprima live a destra |
+| `blocks.ts` | markdown ⇄ blocchi: riconoscimento, serializzazione, campi vuoti |
+| `editor/BlockEditor.vue` | card dei blocchi: campi per tipo, riordino, duplica/elimina, scelta media |
 | `editor/TemplateForm.vue` | rende il modello: campi pagina, sezioni, schede della collezione con riordino, filtro rapido dei campi |
 | `editor/TemplateField.vue` | un campo (text, markdown, select, image, tags, number, boolean, url) + chip «Da completare / In lavorazione» |
 | `editor/TemplatePicker.vue` | scelta del modello alla creazione (`create`) o cambio modello (`apply`), import JSON di modelli personalizzati |
@@ -49,6 +55,68 @@ formato "nuovo" da supportare lato sito.
 | `templates/definitions/*.json` | i quattro modelli built-in (dati, non codice) |
 | `workflow.ts` | specifica del flusso: stati, azioni per ruolo, programmazione, conversione delle date |
 | `scripts/js/page-status.js` | la stessa specifica lato sito (script classico, `window.arcPageWorkflow`) |
+
+## Editor a blocchi (pagine libere)
+
+`blocks.ts` traduce markdown ⇄ blocchi senza inventare un formato: ogni blocco
+corrisponde alla sintassi che `scripts/js/md-render.js` sa già rendere.
+
+| Blocco | Markdown prodotto |
+| --- | --- |
+| Titolo H1–H3 | `#`, `##`, `###` |
+| Paragrafo | testo (le righe singole restano a capo) |
+| Callout | `> [!TIPO] Titolo` + corpo |
+| Accordion / FAQ | `> [!TIPO]- Titolo` + corpo (il renderer lo fa `<details>`) |
+| Griglia / Carte | `:::cards` con `### Titolo` per carta |
+| Galleria | `:::gallery` con una riga `![didascalia](/immagine)` per foto |
+| Immagine | `![didascalia](/immagine)` |
+| Tabella | tabella a pipe con separatore |
+| Separatore | `---` |
+| Markdown grezzo | testo identico (elenchi, citazioni, codice, H4+) |
+
+Regole che tengono in piedi la promessa «niente perdite»:
+
+- **aprire i blocchi non riscrive nulla.** Il markdown si rilegge solo quando
+  si torna sui Blocchi e il testo è cambiato altrove; la prima modifica a un
+  blocco riserializza tutto;
+- **ciò che i blocchi non riconoscono** (elenchi, citazioni semplici, blocchi di
+  codice, titoli H4+) finisce in un blocco *markdown grezzo* che conserva le
+  righe originali: è modificabile a mano e non viene riformattato;
+- **i toni dei callout non si normalizzano**: un `[!FAQ]` scritto a mano resta
+  `FAQ` anche se non è nel menu, altrimenti il solo aprire i blocchi cambierebbe
+  il file;
+- `blocks.test.ts` verifica il giro completo (markdown → blocchi → markdown),
+  l'idempotenza e che nessuna riga vada persa.
+
+`BlockEditor.vue` disegna una card per blocco: maniglia per il trascinamento (o
+frecce su/giù, con la stessa semantica), duplica, elimina, e campi per tipo.
+Griglia, galleria e immagine aprono `MediaDrawer` per scegliere un file da
+`images/` invece di incollare un URL; le immagini con una sorgente mostrano
+l'anteprima. `blockIssues()` segnala i blocchi incompleti (paragrafo vuoto,
+immagine senza file, carta senza titolo): sono avvisi nel piè di pagina, non
+bloccano il salvataggio di una bozza.
+
+Il layout a schede (`schede`) e le card `:::cards` condividono il renderer
+`_renderSchede` / `.n-cards` del sito, quindi l'anteprima è quella dei lettori.
+
+## Selettore del layout di pagina
+
+All'inizio di *Dettagli* ci sono tre preset (`layouts.ts`), pensati per coprire
+i casi reali senza inventare valori che il sito non sa rendere:
+
+| Preset | `layout` | Indice |
+| --- | --- | --- |
+| Wiki standard | `""` | attivo |
+| Immersivo / full width | `wide` | spento |
+| Schede / griglia | `schede` | spento |
+
+Sotto c'è il selettore avanzato con tutti i layout specifici (`regole`,
+`pantheon`, `galleria`, …). Su una pagina a modello i preset sono disabilitati:
+il layout lo decide il modello.
+
+Aprire una pagina non basta per pubblicarla: lo stato si cambia dal pannello del
+flusso (`WorkflowPanel`) o dal pulsante **Segna come bozza** in *Dettagli*, che
+usa la stessa azione `back-to-draft` (e chiede conferma se la pagina è online).
 
 ## I quattro modelli built-in
 
@@ -223,7 +291,11 @@ La barra superiore mostra `Tutto salvato` / `Modifiche non salvate`.
 
 ```bash
 npm --prefix admin run typecheck
-npm --prefix admin test          # 210 test, modelli + compilazione + flusso + guard + palette
-npm --prefix admin run test:e2e  # 13 test sull'editor (mock di /api/gh e di /api/admin)
+npm --prefix admin test          # 242 test: blocchi, modelli, compilazione, flusso, guard, palette, mappa
+npm --prefix admin run test:e2e  # 34 test (mock di /api/gh e di /api/admin): editor, mappa, carousel, shell
 npm --prefix admin run build
 ```
+
+La mappa e il carousel hanno i loro test: `features/map/coords.test.ts`
+(conversione coordinate, il bug della Y a 0) e i casi e2e di
+`admin/e2e/map-carousel.spec.ts` (drag col mouse vero, salvataggio della slide).

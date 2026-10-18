@@ -36,16 +36,7 @@ import {
   type TemplateData
 } from '../templates/schema'
 import { validateTemplateData } from '../templates/validate'
-import {
-  canRedo,
-  canUndo,
-  createHistory,
-  record,
-  redo,
-  shouldCoalesce,
-  undo,
-  type HistoryState
-} from './history'
+import { canRedo, canUndo, createHistory, record, redo, shouldCoalesce, undo, type HistoryState } from './history'
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
@@ -123,7 +114,9 @@ export function usePageEditor() {
         if (found && !loaded.templateData) loaded.templateData = emptyTemplateData(found)
       }
       editor.setPage(loaded)
-      editor.setMode(loaded.template ? 'structure' : 'markdown')
+      /* Le pagine libere si aprono nei blocchi ("struttura" senza modello):
+         il markdown resta a un click, con il testo già sincronizzato. */
+      editor.setMode('structure')
       resetHistory()
       saveState.value = 'idle'
       firstError.value = null
@@ -212,7 +205,10 @@ export function usePageEditor() {
     }
 
     const next = items.filter((_, i) => i !== index)
-    commit({ ...data.value, collections: { ...data.value.collections, [collectionKey]: next } }, `remove:${collectionKey}`)
+    commit(
+      { ...data.value, collections: { ...data.value.collections, [collectionKey]: next } },
+      `remove:${collectionKey}`
+    )
     reindexDraftPaths(collectionKey, (current) => {
       if (current === index) return undefined
       return current > index ? current - 1 : current
@@ -226,7 +222,10 @@ export function usePageEditor() {
     const next = [...items]
     const [moved] = next.splice(from, 1)
     next.splice(to, 0, moved)
-    commit({ ...data.value, collections: { ...data.value.collections, [collectionKey]: next } }, `move:${collectionKey}`)
+    commit(
+      { ...data.value, collections: { ...data.value.collections, [collectionKey]: next } },
+      `move:${collectionKey}`
+    )
     reindexDraftPaths(collectionKey, (current) => {
       if (current === from) return to
       if (from < to && current > from && current <= to) return current - 1
@@ -260,7 +259,8 @@ export function usePageEditor() {
       const ok = await confirmAction({
         title: 'Cambia modello',
         message: `Sostituire i campi attuali con il modello «${next.label}»?`,
-        detail: 'Il testo compilato viene reimportato nei campi del nuovo modello, ma i dati strutturati precedenti vengono sostituiti.',
+        detail:
+          'Il testo compilato viene reimportato nei campi del nuovo modello, ma i dati strutturati precedenti vengono sostituiti.',
         confirmLabel: 'Cambia modello'
       })
       if (!ok) return false
@@ -316,7 +316,8 @@ export function usePageEditor() {
         const ok = await confirmAction({
           title: 'Markdown modificato a mano',
           message: 'Reimportare il testo nei campi del modello?',
-          detail: 'La struttura viene ricostruita dal markdown corrente; ciò che non è riconosciuto resta fuori dai campi.',
+          detail:
+            'La struttura viene ricostruita dal markdown corrente; ciò che non è riconosciuto resta fuori dai campi.',
           confirmLabel: 'Reimporta'
         })
         if (!ok) return false
@@ -339,9 +340,13 @@ export function usePageEditor() {
       if (errors.length) {
         firstError.value = errors[0].path
         saveState.value = 'error'
-        ui.toast(`${errors.length} ${errors.length === 1 ? 'campo da correggere' : 'campi da correggere'} prima di salvare`, 'error', {
-          title: 'Salvataggio bloccato'
-        })
+        ui.toast(
+          `${errors.length} ${errors.length === 1 ? 'campo da correggere' : 'campi da correggere'} prima di salvare`,
+          'error',
+          {
+            title: 'Salvataggio bloccato'
+          }
+        )
         return false
       }
       editor.setContent(compiled.value?.markdown ?? '')
@@ -403,7 +408,11 @@ export function usePageEditor() {
       return false
     }
 
-    const result = applyAction(id, current, { actor: auth.user || undefined, publishAt: options.publishAt, note: options.note })
+    const result = applyAction(id, current, {
+      actor: auth.user || undefined,
+      publishAt: options.publishAt,
+      note: options.note
+    })
     editor.setMetadata({
       status: result.status,
       publishAt: result.publishAt,

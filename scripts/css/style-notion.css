@@ -635,3 +635,94 @@ table.n-tbl tr:hover td{background:rgba(var(--gold-rgb),.05)}
   border-radius: 8px;
   border: 1px solid rgba(var(--gold-rgb),.18);
 }
+
+/* ════ GRIGLIA DI CARTE E GALLERIA ════
+   Sintassi prodotta dai blocchi dell'editor (`:::cards`, `:::gallery`). */
+.n-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 26px 0;
+}
+
+.n-card {
+  background: rgba(var(--gold-rgb), .04);
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  padding: 16px 18px;
+  transition: border-color .18s, transform .18s;
+}
+
+.n-card:hover {
+  border-color: rgba(var(--gold-rgb), .34);
+  transform: translateY(-2px);
+}
+
+.n-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--gold2);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(var(--gold-rgb), .16);
+}
+
+.n-card-body {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text2);
+}
+
+.n-card-body>*:first-child { margin-top: 0; }
+.n-card-body>*:last-child { margin-bottom: 0; }
+
+/* Dentro una carta le immagini restano leggere (niente figure a piena pagina). */
+.n-card-body .n-image {
+  margin: 0 0 10px;
+}
+
+.n-card-body .n-image img {
+  border-radius: 7px;
+  max-height: 160px;
+}
+
+.n-gal {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 26px 0;
+}
+
+.n-gal-item {
+  margin: 0;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid var(--bdr);
+  background: rgba(0, 0, 0, .25);
+}
+
+.n-gal-item img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  cursor: zoom-in;
+  transition: transform .2s;
+}
+
+.n-gal-item:hover img { transform: scale(1.03); }
+
+.n-gal-item figcaption {
+  padding: 7px 10px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text3);
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .n-cards { grid-template-columns: 1fr; }
+  .n-gal { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}

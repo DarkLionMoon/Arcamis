@@ -23,6 +23,7 @@ export const LAYOUT_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'glossario', label: 'Glossario' },
   { value: 'galleria', label: 'Galleria' },
   { value: 'tabelle', label: 'Tabelle' },
+  { value: 'schede', label: 'Schede / griglia' },
   { value: 'sessione', label: 'Sessione' },
   { value: 'quest', label: 'Quest' },
   { value: 'npc', label: 'NPC' },
@@ -32,3 +33,51 @@ export const LAYOUT_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'evento', label: 'Evento' },
   { value: 'imprese', label: 'Imprese' }
 ]
+
+/* ── Preset di layout ─────────────────────────────────────────────
+   La scelta rapida all'inizio della configurazione pagina. Ogni preset
+   è una combinazione di valori che il sito sa già rendere: nessun
+   layout "magico" lato client, solo `layout` + indice dei titoli. */
+
+export interface LayoutPreset {
+  id: 'wiki' | 'immersivo' | 'schede'
+  label: string
+  description: string
+  icon: string
+  layout: string
+  toc: boolean
+}
+
+export const LAYOUT_PRESETS: LayoutPreset[] = [
+  {
+    id: 'wiki',
+    label: 'Wiki standard',
+    description: 'Larghezza di lettura, indice dei titoli e navigazione laterale.',
+    icon: '📖',
+    layout: '',
+    toc: true
+  },
+  {
+    id: 'immersivo',
+    label: 'Immersivo / full width',
+    description: 'Contenuto a tutta larghezza, senza indice: mappe, imprese, landing.',
+    icon: '🖼️',
+    layout: 'wide',
+    toc: false
+  },
+  {
+    id: 'schede',
+    label: 'Schede / griglia',
+    description: 'Ogni sezione ## diventa una card in griglia: archivi e indici.',
+    icon: '🗂️',
+    layout: 'schede',
+    toc: false
+  }
+]
+
+/** Preset che corrisponde al layout attuale (null se è un layout avanzato). */
+export function presetFor(layout: string | undefined): string | null {
+  const current = layout || ''
+  const preset = LAYOUT_PRESETS.find((candidate) => candidate.layout === current)
+  return preset ? preset.id : null
+}
