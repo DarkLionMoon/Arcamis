@@ -10,7 +10,12 @@ export default defineConfig({
     outDir: '../export/admin',
     emptyOutDir: true,
     copyPublicDir: false,
-    sourcemap: true,
+    /* Niente source map: contenevano path assoluti della macchina che compila
+       (workbox scrive lo sw in una cartella temporanea) e cambiavano a ogni
+       build, quindi `npm run build` sporcava il working tree e la CI non
+       poteva confrontare gli artefatti. Il deploy non li ha mai serviti:
+       `build-post.mjs` li salta copiando il pannello in dist/admin. */
+    sourcemap: false,
     rollupOptions: {
       input: {
         app: 'app.html'
