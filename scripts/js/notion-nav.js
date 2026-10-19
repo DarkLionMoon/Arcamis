@@ -381,6 +381,12 @@ async function _gpRender(id, label, icon) {
     return;
   }
 
+  /* Smonta l'eventuale istanza precedente dell'app Imprese: i suoi listener
+     vivono sul container che sta per essere sostituito. */
+  try {
+    if (typeof window !== 'undefined' && window._impreseDestroy) window._impreseDestroy();
+  } catch (_impe) {}
+
   /* ═══ TRACKING VISTA PAGINA (fire & forget, mai bloccante) ═══ */
   try {
     var _tvKey = String(id).replace(/^pag-/, '');
@@ -575,10 +581,8 @@ async function _gpRender(id, label, icon) {
           else if (_layout === 'wide') {
             _localHtml = _mdToHtml(_localJson.content);
           } else if (_layout === 'imprese') {
-            _localHtml =
-              '<div class="imprese-app imprese-embedded" id="imprese-app-root">' +
-              '<iframe class="imprese-frame" src="/imprese-standalone/index.html" title="Imprese e Licenze" loading="lazy"></iframe>' +
-              '</div>';
+            /* App integrata: il mount avviene dopo l'inserimento nel DOM. */
+            _localHtml = '<div class="imprese-app" id="imprese-app-root"></div>';
           } else {
             /* Auto-detect by page key (legacy fallback) */
             _localHtml =
@@ -637,6 +641,13 @@ async function _gpRender(id, label, icon) {
             else _nc.appendChild(_clWrap);
             window.loadChangelog(_clWrap);
           }
+          /* Monta l'app Imprese & Licenze nel contenitore integrato. */
+          if (_layout === 'imprese' && window._impreseInit) {
+            var _impRoot = document.getElementById('imprese-app-root');
+            if (_impRoot) window._impreseInit(_impRoot);
+          }
+          /* Attiva ricerca live e filtri del browser del materiale. */
+          if (window.matBrowserInit) window.matBrowserInit(pbody);
           applyGlossary(pbody);
           _maybeBuildToc(pbody, !!_localJson.toc);
           if (typeof afterPageRender === 'function') afterPageRender();
@@ -764,12 +775,158 @@ function _matItems(txt) {
 }
 
 function _matCard(it) {
+  var cardId = '';
+  if (_matCollector) {
+    cardId = _matUid('mat-voce', it.name);
+    _matCollector({
+      kind: 'item',
+      id: cardId,
+      name: it.name,
+      source: it.source || '',
+      parent: _matCollectorParent || ''
+    });
+  }
   return (
-    '<div class="mat-card">' +
+    '<div class="mat-card"' +
+    (cardId ? ' id="' + cardId + '"' : '') +
+    '>' +
     '<span class="mat-name">' +
     _siteEsc(it.name) +
     '</span>' +
-    (it.source ? '<span class="mat-badge">' + _siteEsc(it.source) + '</span>' : '') +
+    _matBadge(it.source) +
+    '</div>'
+  );
+}
+
+/* ═══ BROWSER DEL MATERIALE (indice + dettaglio, stile 5e.tools) ═══
+   Il renderer resta una stringa HTML pura (testabile in vm senza DOM):
+   ogni voce riceve un id stabile e viene registrata nel collettore, così
+   in coda si assemblano barra di ricerca, chip di fonte e indice laterale.
+   La ricerca/filtri live è progressive enhancement in materiale-browser.js. */
+var _matUidSeq = 0;
+var _matCollector = null;
+var _matCollectorParent = '';
+function _matUid(prefix, name) {
+  _matUidSeq++;
+  var slug = String(name || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
+  return prefix + '-' + (slug || 'voce') + '-' + _matUidSeq;
+}
+/* Badge di fonte colorato con tooltip (data-tip) per la consultazione rapida. */
+function _matSrcClass(source) {
+  var s = String(source || '')
+    .toLowerCase()
+    .replace(/\s+/g, '');
+  if (!s) return 'mat-src-none';
+  if (s.indexOf('homebrew') !== -1) return 'mat-src-homebrew';
+  if (s.indexOf('phb') !== -1) return 'mat-src-phb';
+  if (s.indexOf('xge') !== -1) return 'mat-src-xge';
+  if (s.indexOf('tce') !== -1) return 'mat-src-tce';
+  if (s.indexOf('mpmm') !== -1) return 'mat-src-mpmm';
+  if (s.indexOf('motm') !== -1) return 'mat-src-motm';
+  if (s.indexOf('bigby') !== -1 || s.indexOf('fizban') !== -1) return 'mat-src-bigby';
+  if (s.indexOf('scag') !== -1) return 'mat-src-scag';
+  if (s.indexOf('dmg') !== -1) return 'mat-src-dmg';
+  return 'mat-src-altro';
+}
+function _matBadge(source, tip) {
+  if (!source) return '';
+  return (
+    '<span class="mat-badge ' +
+    _matSrcClass(source) +
+    '" data-tip="' +
+    _siteAttr(tip || 'Fonte: ' + source) +
+    '">' +
+    _siteEsc(source) +
+    '</span>'
+  );
+}
+/* Una riga dell'indice laterale: link àncora al dettaglio con badge e tooltip. */
+function _matIdxItem(e) {
+  var cls =
+    e.kind === 'section'
+      ? 'mat-index-sec'
+      : e.kind === 'group'
+        ? 'mat-index-group'
+        : e.kind === 'class'
+          ? 'mat-index-item mat-idx-class'
+          : e.kind === 'sub'
+            ? 'mat-index-item mat-idx-sub'
+            : 'mat-index-item mat-idx-item';
+  var tip = e.kind === 'section' ? e.name : e.name + (e.parent ? ' — ' + e.parent : '') + (e.source ? ' · Fonte: ' + e.source : '');
+  var h =
+    '<li class="' +
+    cls +
+    '" data-src="' +
+    _siteAttr(e.source || '') +
+    '" data-name="' +
+    _siteAttr((e.name + ' ' + (e.parent || '')).toLowerCase()) +
+    '">' +
+    '<a href="#' +
+    e.id +
+    '" title="' +
+    _siteAttr(tip) +
+    '">';
+  if (e.kind === 'section') {
+    h += '<span class="mat-idx-sec-t">' + _siteEsc(e.name) + '</span>';
+  } else {
+    h += '<span class="mat-idx-name">' + _siteEsc(e.name) + '</span>';
+    if (e.kind === 'class' && e.count != null) h += '<span class="mat-idx-count">' + e.count + '</span>';
+    if (e.kind !== 'group' && e.source) h += _matBadge(e.source, 'Fonte: ' + e.source);
+  }
+  return h + '</a></li>';
+}
+/* Barra di ricerca + chip di fonte + indice: il dettaglio resta sotto in .mat-detail. */
+function _matBrowserChrome(entries, detailHtml) {
+  var srcs = {};
+  var count = 0;
+  entries.forEach(function (e) {
+    if (e.kind === 'section' || e.kind === 'group') return;
+    count++;
+    if (e.source) srcs[e.source] = true;
+  });
+  var srcList = Object.keys(srcs).sort(function (a, b) {
+    var ah = /homebrew/i.test(a) ? 0 : 1;
+    var bh = /homebrew/i.test(b) ? 0 : 1;
+    if (ah !== bh) return ah - bh;
+    return a.localeCompare(b);
+  });
+  var chips = '<button type="button" class="mat-chip is-on" data-src="">Tutte</button>';
+  srcList.forEach(function (s) {
+    chips +=
+      '<button type="button" class="mat-chip" data-src="' +
+      _siteAttr(s) +
+      '">' +
+      _siteEsc(s) +
+      '</button>';
+  });
+  return (
+    '<div class="mat-browser">' +
+    '<div class="mat-tools">' +
+    '<input type="search" class="mat-index-search" placeholder="Cerca tra le voci…" aria-label="Cerca nel materiale approvato">' +
+    '<div class="mat-chips">' +
+    chips +
+    '</div>' +
+    '</div>' +
+    '<div class="mat-cols">' +
+    '<nav class="mat-index" aria-label="Indice del materiale">' +
+    '<p class="mat-index-count" role="status">' +
+    count +
+    (count === 1 ? ' voce' : ' voci') +
+    '</p>' +
+    '<ul class="mat-index-list">' +
+    entries.map(_matIdxItem).join('') +
+    '</ul>' +
+    '</nav>' +
+    '<div class="mat-detail">' +
+    detailHtml +
+    '</div>' +
+    '</div>' +
     '</div>'
   );
 }
@@ -778,6 +935,25 @@ function _renderMateriale(md) {
   if (!md) return '';
   var html = '';
   var sections = md.split(/^## /m).filter(Boolean);
+  /* Collettore dell'indice: ogni sezione/sottotitolo/voce vi lascia una riga. */
+  var _matIdx = [];
+  var _prevCollector = _matCollector;
+  _matCollectorParent = '';
+  _matCollector = function (e) {
+    _matIdx.push(e);
+  };
+  /* Coda delle sezioni: gli id vengono assegnati nell'ordine di rendering. */
+  var _matSecQueue = sections.map(function (sec) {
+    var t = ((sec.split('\n')[0] || '').trim());
+    return { title: t, id: _matUid('mat-sez', t) };
+  });
+  var _matCurrentSec = '';
+  var _matSecId = function () {
+    var s = _matSecQueue.shift() || { title: '', id: _matUid('mat-sez', 'sezione') };
+    _matCurrentSec = s.id;
+    _matIdx.push({ kind: 'section', id: s.id, name: s.title, source: '', parent: '' });
+    return s.id;
+  };
 
   sections.forEach(function (sec) {
     var lines = sec.split('\n');
@@ -818,7 +994,7 @@ function _renderMateriale(md) {
 
     /* Specie / Talenti / Spell (il titolo può iniziare con un'emoji) */
     if (/\b(Specie|Talenti|Spell)\b/i.test(sectionTitle)) {
-      html += '<div class="mat-section">';
+      html += '<div class="mat-section" id="' + _matSecId() + '">';
       html += '<h2 class="mat-section-title">' + _siteEsc(sectionTitle) + '</h2>';
       var cards = [];
       var shown = '';
@@ -827,15 +1003,20 @@ function _renderMateriale(md) {
         shown += '<div class="mat-grid">' + cards.join('') + '</div>';
         cards = [];
       };
+      _matCollectorParent = '';
       allItems.forEach(function (i) {
         if (i.type === 'subtitle') {
           flushCards();
-          shown +=
-            '<h3 class="mat-subtitle">' + _siteEsc(_matParseEntry(i.text).name) + '</h3>';
+          var _grpName = _matParseEntry(i.text).name;
+          var _grpId = _matUid('mat-grp', _grpName);
+          _matCollectorParent = _grpName;
+          _matIdx.push({ kind: 'group', id: _grpId, name: _grpName, source: '', parent: '' });
+          shown += '<h3 class="mat-subtitle" id="' + _grpId + '">' + _siteEsc(_grpName) + '</h3>';
         } else if (i.type === 'item') {
           cards.push(_matCard(i.data));
         }
       });
+      _matCollectorParent = '';
       flushCards();
       html += shown;
       callouts.forEach(function (c) {
@@ -877,7 +1058,7 @@ function _renderMateriale(md) {
         });
       }
 
-      html += '<div class="mat-section">';
+      html += '<div class="mat-section" id="' + _matSecId() + '">';
       html += '<h2 class="mat-section-title">' + _siteEsc(sectionTitle) + '</h2>';
       if (groups.length) {
         html +=
@@ -885,7 +1066,17 @@ function _renderMateriale(md) {
       }
       html += '<div class="mat-classes">';
       groups.forEach(function (g) {
-        html += '<details class="mat-class-group">';
+        var _clsId = _matUid('mat-cls', g.name);
+        _matIdx.push({
+          kind: 'class',
+          id: _clsId,
+          name: g.name,
+          source: g.source || '',
+          parent: '',
+          count: g.subs.length + (g.subs.length === 1 ? ' sottoclasse' : ' sottoclassi')
+        });
+        _matCollectorParent = g.name;
+        html += '<details class="mat-class-group" id="' + _clsId + '">';
         html += '<summary class="mat-class-base">';
         html += '<span class="mat-class-name">' + _siteEsc(g.name) + '</span>';
         if (g.source) html += '<span class="mat-class-src">(' + _siteEsc(g.source) + ')</span>';
@@ -898,14 +1089,19 @@ function _renderMateriale(md) {
         html += '</summary>';
         html += '<div class="mat-class-subs">';
         g.subs.forEach(function (s) {
+          var _subId = _matUid('mat-sub', s.name);
+          _matIdx.push({ kind: 'sub', id: _subId, name: s.name, source: s.source || '', parent: g.name });
           html +=
-            '<div class="mat-sub-card">' +
+            '<div class="mat-sub-card" id="' +
+            _subId +
+            '">' +
             '<span class="mat-sub-name">' +
             _siteEsc(s.name) +
             '</span>' +
-            (s.source ? '<span class="mat-badge">' + _siteEsc(s.source) + '</span>' : '') +
+            _matBadge(s.source, s.name + ' — ' + g.name + ' · Fonte: ' + (s.source || '?')) +
             '</div>';
         });
+        _matCollectorParent = '';
         html += '</div></details>';
       });
       html += '</div>';
@@ -919,22 +1115,27 @@ function _renderMateriale(md) {
     /* Fallback */
     var fallback = '';
     var fallbackCards = [];
+    _matCollectorParent = '';
     allItems.forEach(function (i) {
       if (i.type === 'subtitle') {
         if (fallbackCards.length) {
           fallback += '<div class="mat-grid">' + fallbackCards.join('') + '</div>';
           fallbackCards = [];
         }
-        fallback +=
-          '<h3 class="mat-subtitle">' + _siteEsc(_matParseEntry(i.text).name) + '</h3>';
+        var _fbName = _matParseEntry(i.text).name;
+        var _fbId = _matUid('mat-grp', _fbName);
+        _matCollectorParent = _fbName;
+        _matIdx.push({ kind: 'group', id: _fbId, name: _fbName, source: '', parent: '' });
+        fallback += '<h3 class="mat-subtitle" id="' + _fbId + '">' + _siteEsc(_fbName) + '</h3>';
       } else if (i.type === 'item') {
         fallbackCards.push(_matCard(i.data));
       }
     });
+    _matCollectorParent = '';
     if (fallbackCards.length) {
       fallback += '<div class="mat-grid">' + fallbackCards.join('') + '</div>';
     }
-    html += '<div class="mat-section">';
+    html += '<div class="mat-section" id="' + _matSecId() + '">';
     html += '<h2 class="mat-section-title">' + _siteEsc(sectionTitle) + '</h2>';
     html += fallback;
     callouts.forEach(function (c) {
@@ -943,7 +1144,11 @@ function _renderMateriale(md) {
     html += '</div>';
   });
 
-  return '<div class="mat-page">' + html + '</div>';
+  var _detail = '<div class="mat-page">' + html + '</div>';
+  var _out = _matBrowserChrome(_matIdx, _detail);
+  _matCollector = _prevCollector;
+  _matCollectorParent = '';
+  return _out;
 }
 
 /* ══════════════════════════════════════

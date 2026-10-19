@@ -91,9 +91,42 @@ const maps = fs
    del digest, quindi non entra nel digest stesso. */
 const git = spawnSync('git rev-parse --short HEAD', { cwd: root, encoding: 'utf8', shell: true });
 const commit = git.status === 0 ? String(git.stdout).trim() || null : null;
+
+/* ── Toolchain ───────────────────────────────────────────────
+   Con cosa è stato costruito, non solo cosa: un artefatto senza
+   queste righe non permette di distinguere una build fatta con un
+   Node diverso o senza wrangler installato. La versione di wrangler
+   è quella in node_modules, cioè quella che `npm run deploy` esegue,
+   non l'ultima pubblicata su npm. */
+function npmVersion() {
+  const fromAgent = /\bnpm\/(\S+)/.exec(process.env.npm_config_user_agent || '');
+  if (fromAgent) return fromAgent[1];
+  const result = spawnSync('npm --version', {
+    cwd: root,
+    encoding: 'utf8',
+    shell: true
+  });
+  return result.status === 0 ? String(result.stdout).trim() || null : null;
+}
+
+function installedVersion(name) {
+  try {
+    const manifest = path.join(root, 'node_modules', name, 'package.json');
+    return JSON.parse(fs.readFileSync(manifest, 'utf8')).version || null;
+  } catch {
+    return null;
+  }
+}
+
+const toolchain = {
+  node: process.version.replace(/^v/, ''),
+  npm: npmVersion(),
+  wrangler: installedVersion('wrangler')
+};
+
 fs.writeFileSync(
   path.join(root, 'dist/build-info.json'),
-  JSON.stringify({ commit, admin, dist }, null, 2) + '\n'
+  JSON.stringify({ commit, toolchain, admin, dist }, null, 2) + '\n'
 );
 
 console.log('\n✔ Build pronta per il deploy');
@@ -102,5 +135,13 @@ console.log(
   '  Sito     : dist — ' + dist.files + ' file (pannello incluso, build-info.json escluso), digest ' + dist.digest
 );
 console.log('  Commit   : ' + (commit || 'sconosciuto') + ' · dist/build-info.json pubblica il digest');
+console.log(
+  '  Toolchain: node ' +
+    toolchain.node +
+    ' · npm ' +
+    (toolchain.npm || 'sconosciuto') +
+    ' · wrangler ' +
+    (toolchain.wrangler || 'non installato')
+);
 console.log('  Source map in dist/admin: ' + maps.length);
 if (maps.length) fail('dist/admin contiene source map: il deploy non deve esporre i sorgenti del pannello');

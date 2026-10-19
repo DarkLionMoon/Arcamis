@@ -190,6 +190,38 @@
   padding: 0 2px;
 }
 .imprese-app .imp-filter-badge button:hover { color: var(--imp-red); }
+.imprese-app .imp-hide { display: none !important; }
+.imprese-app .imp-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 12px;
+  background: rgba(var(--gold-rgb),.08);
+  border: 1px solid var(--imp-border2);
+  border-radius: 20px;
+  font-family: var(--imp-font);
+  font-size: 13px;
+  color: var(--imp-gold2);
+  white-space: nowrap;
+}
+.imprese-app .imp-filter-pill.imp-filter-none {
+  color: var(--imp-red);
+  border-color: rgba(192,64,64,.4);
+  background: rgba(192,64,64,.07);
+}
+.imprese-app .imp-filter-x {
+  background: rgba(var(--gold-rgb),.1);
+  border: 1px solid var(--imp-border);
+  border-radius: 50%;
+  color: var(--imp-text2);
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+}
+.imprese-app .imp-filter-x:hover { color: var(--imp-red); border-color: var(--imp-red); }
 
 /* ── LAYOUT ── */
 .imprese-app .imp-main {

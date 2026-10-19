@@ -29,6 +29,16 @@ console.log(
   'Commit `' + (info.commit || 'sconosciuto') + '` · il digest copre percorsi e contenuti; ' +
     '`dist/build-info.json` ne è escluso perché pubblica il digest stesso.'
 );
+const toolchain = info.toolchain || {};
+console.log(
+  'Costruito con Node `' +
+    (toolchain.node || 'sconosciuto') +
+    '`, npm `' +
+    (toolchain.npm || 'sconosciuto') +
+    '`, wrangler `' +
+    (toolchain.wrangler || 'non installato') +
+    '`.'
+);
 console.log('');
 console.log(
   'Lo stesso digest è leggibile dal deploy su `/build-info.json`: se non coincide con ' +

@@ -1170,6 +1170,11 @@
       case 'closeModal': closeModal(); break;
       case 'openDrawer': openDrawer(); break;
       case 'closeDrawer': closeDrawer(); break;
+      case 'clearSearch':
+        var _si = $('globalSearch');
+        if (_si) _si.value = '';
+        applySearch('');
+        break;
       case 'newEmpty': trackerNew({}); gInit(); break;
       case 'newRandom': trackerNew(gRandomData()); gInit(); break;
       case 'select':
@@ -1216,7 +1221,55 @@
   }
 
   function onInput(e) {
-    if (e.target.matches('[data-imp-save]')) gSave();
+    if (e.target.matches('[data-imp-save]')) { gSave(); return; }
+    if (e.target.id === 'imp-globalSearch') applySearch(e.target.value);
+  }
+
+  /* ══════════════════════════════════
+     RICERCA GLOBALE
+     Filtra i blocchi di contenuto della sezione corrente: nasconde le
+     unità che non contengono la query e le sezioni rimaste vuote,
+     mostrando il conteggio nel pill di filtro. Soglia: 2 caratteri.
+     ══════════════════════════════════ */
+  var SEARCH_SEL = '.imp-rule-box, .imp-note-box, .imp-tbl tbody tr, .imp-hero-links a, .imp-stat-card';
+  function applySearch(raw) {
+    var content = $('content');
+    var f = $('activeFilters');
+    if (!content || !content.querySelectorAll) { if (f) f.innerHTML = ''; return 0; }
+    var q = (raw == null ? '' : String(raw)).trim().toLowerCase();
+    var units = content.querySelectorAll(SEARCH_SEL);
+    var i, k;
+    if (q.length < 2) {
+      for (i = 0; i < units.length; i++) units[i].classList.remove('imp-hide');
+      var allSecs = content.querySelectorAll('.imp-doc-section');
+      for (i = 0; i < allSecs.length; i++) allSecs[i].classList.remove('imp-hide');
+      if (f) f.innerHTML = '';
+      return units.length;
+    }
+    var hits = 0;
+    for (i = 0; i < units.length; i++) {
+      var hit = (units[i].textContent || '').toLowerCase().indexOf(q) !== -1;
+      units[i].classList.toggle('imp-hide', !hit);
+      if (hit) hits++;
+    }
+    /* Nasconde le sezioni il cui titolo non matcha e che non hanno più unità visibili. */
+    var sections = content.querySelectorAll('.imp-doc-section');
+    for (i = 0; i < sections.length; i++) {
+      var sec = sections[i];
+      var titleEl = sec.querySelector('.imp-doc-section-title');
+      var titleHit = titleEl && (titleEl.textContent || '').toLowerCase().indexOf(q) !== -1;
+      var kids = sec.querySelectorAll('.imp-rule-box, .imp-note-box, .imp-tbl tbody tr');
+      var vis = 0;
+      for (k = 0; k < kids.length; k++) { if (!kids[k].classList.contains('imp-hide')) vis++; }
+      sec.classList.toggle('imp-hide', !titleHit && kids.length > 0 && vis === 0);
+    }
+    if (f) {
+      var label = hits === 1 ? '1 risultato' : hits + ' risultati';
+      var cls = hits ? 'imp-filter-pill' : 'imp-filter-pill imp-filter-none';
+      f.innerHTML = '<span class="' + cls + '">' + label + ' per \u201C' + escH(String(raw).trim()) + '\u201D'
+        + ' <button class="imp-filter-x" data-imp-action="clearSearch" title="Azzera ricerca">\u2715</button></span>';
+    }
+    return hits;
   }
 
   /* ══════════════════════════════════
@@ -1250,15 +1303,36 @@
 
   /* ══════════════════════════════════
      PUBLIC INIT
+     I listener vivono sul container (delegation): un'unica coppia
+     click/input serve tab, sidenav, modal, drawer e form del gestore.
      ══════════════════════════════════ */
+  var _onClickBound = null;
+  var _onInputBound = null;
   window._impreseInit = function(container) {
+    window._impreseDestroy();
     _container = container;
     container.innerHTML = shellHTML();
+    _onClickBound = function(e) { onClick(e); };
+    _onInputBound = function(e) { onInput(e); };
+    if (container.addEventListener) {
+      container.addEventListener('click', _onClickBound);
+      container.addEventListener('input', _onInputBound);
+    }
     render();
   };
 
   window._impreseDestroy = function() {
+    if (_container && _container.removeEventListener) {
+      if (_onClickBound) _container.removeEventListener('click', _onClickBound);
+      if (_onInputBound) _container.removeEventListener('input', _onInputBound);
+    }
     _container = null;
+    _onClickBound = null;
+    _onInputBound = null;
   };
+
+  /* Smistamento azioni e ricerca, esposti per i test automatici (vm senza DOM). */
+  window._impHandle = handleAction;
+  window._impSearch = applySearch;
 
 })();

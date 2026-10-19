@@ -80,7 +80,7 @@ describe('renderer del materiale approvato', () => {
     expect(count(html, /class="mat-class-group"/g)).toBe(13)
     expect(count(html, /class="mat-sub-card"/g)).toBeGreaterThan(150)
     expect(html).toContain('<summary class="mat-class-base">')
-    expect(html).toContain('<details class="mat-class-group">')
+    expect(html).toContain('<details class="mat-class-group"')
   })
 
   it('pulisce i titoli: niente asterischi e fonte leggibile', () => {
@@ -90,14 +90,54 @@ describe('renderer del materiale approvato', () => {
     expect(summaries.join(' ')).not.toContain('*')
   })
 
-  it('rende le fonti come badge e non come testo markdown', () => {
-    expect(html).toContain('<span class="mat-badge">MPMM</span>')
-    expect(html).toContain('<span class="mat-badge">PHB \'24</span>')
+  it('rende le fonti come badge colorati con tooltip e non come testo markdown', () => {
+    expect(html).toContain('>MPMM</span>')
+    expect(html).toContain('>PHB \'24</span>')
+    expect(html).toContain('mat-badge mat-src-mpmm')
+    expect(html).toContain('mat-badge mat-src-phb')
+    expect(html).toContain('mat-badge mat-src-homebrew')
+    expect(html).toContain('data-tip="Fonte: MPMM"')
     expect(html).not.toContain('*')
   })
 
   it('interpreta il markdown dei callout', () => {
     expect(html).toContain('<strong>"5.5"</strong>')
+  })
+})
+
+describe('browser del materiale (indice + dettaglio)', () => {
+  const html = renderers.materiale(readPage('materiale-approvato').content)
+  const hrefs = [...html.matchAll(/href="#(mat-[a-z0-9-]+)"/g)].map((m) => m[1])
+  const ids = new Set([...html.matchAll(/id="(mat-[a-z0-9-]+)"/g)].map((m) => m[1]))
+
+  it('avvolge il contenuto in sidebar + vista dettaglio con ricerca', () => {
+    expect(html).toContain('class="mat-browser"')
+    expect(html).toContain('class="mat-index-search"')
+    expect(html).toContain('class="mat-index-list"')
+    expect(html).toContain('class="mat-detail"')
+    expect(html).toContain('class="mat-page"')
+  })
+
+  it('offre un chip di filtro per ogni fonte con Tutte attivo', () => {
+    expect(html).toContain('<button type="button" class="mat-chip is-on" data-src="">Tutte</button>')
+    expect(html).toContain('data-src="Homebrew"')
+    expect(html).toContain('data-src="PHB \'24"')
+  })
+
+  it('ogni riga dell\'indice punta a un dettaglio esistente', () => {
+    expect(hrefs.length).toBeGreaterThan(200)
+    expect(hrefs.filter((h) => !ids.has(h))).toEqual([])
+  })
+
+  it('le righe portano fonte, contesto e tooltip per la consultazione', () => {
+    expect(html).toContain('mat-index-item mat-idx-class')
+    expect(html).toContain('mat-index-item mat-idx-sub')
+    expect(html).toContain('mat-index-sec')
+    expect(html).toMatch(/<li class="mat-index-item mat-idx-sub" data-src="[^"]+" data-name="[^"]+"/)
+  })
+
+  it('il sito attiva la ricerca live dopo il render', () => {
+    expect(renderers.source).toContain('window.matBrowserInit(pbody)')
   })
 })
 
