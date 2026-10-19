@@ -393,12 +393,7 @@ onMounted(load)
           </label>
           <label class="arc-fld">
             <span>Sottotitolo (tra titolo e descrizione)</span>
-            <input
-              v-model="form.sub"
-              class="in"
-              placeholder="Sottotitolo della slide"
-              maxlength="200"
-            />
+            <input v-model="form.sub" class="in" placeholder="Sottotitolo della slide" maxlength="200" />
           </label>
           <label class="arc-fld">
             <span>Descrizione</span>
