@@ -206,6 +206,47 @@
       "l": "Changelog",
       "i": "📜",
       "id": "pag-changelog"
+    },
+    {
+      "k": "credits",
+      "l": "Crediti & Legale",
+      "i": "⚖️",
+      "id": "pag-credits"
+    },
+    {
+      "k": "missioni",
+      "l": "Bacheca Missioni",
+      "i": "🎯",
+      "id": "pag-missioni",
+      "sec": "gioco"
+    },
+    {
+      "k": "generatori",
+      "l": "Generatori",
+      "i": "🎲",
+      "id": "pag-generatori",
+      "sec": "gioco"
+    },
+    {
+      "k": "calendario",
+      "l": "Calendario di Arcamis",
+      "i": "📅",
+      "id": "pag-calendario",
+      "sec": "gioco"
+    },
+    {
+      "k": "diario",
+      "l": "Diario di Campagna",
+      "i": "📓",
+      "id": "pag-diario",
+      "sec": "gioco"
+    },
+    {
+      "k": "combattimento",
+      "l": "Tracker di Combattimento",
+      "i": "⚔️",
+      "id": "pag-combattimento",
+      "sec": "gioco"
     }
   ],
   "sections": [
@@ -232,6 +273,10 @@
     {
       "v": "homebrew",
       "l": "Homebrew"
+    },
+    {
+      "v": "gioco",
+      "l": "Tavolo da gioco"
     }
   ],
   "lavori": []

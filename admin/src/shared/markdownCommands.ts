@@ -114,3 +114,17 @@ export function insertSnippet(state: EditState, snippet: string): EditResult {
 /** Tabella pronta con intestazioni generiche, sostituibili subito. */
 export const TABLE_SNIPPET = '| Colonna | Colonna |\n| --- | --- |\n| Valore | Valore |'
 export const CODE_SNIPPET = '```\ncodice\n```'
+
+/** Blocco creatura pronto da compilare (reso come `.n-statblock` dal sito). */
+export const STATBLOCK_SNIPPET =
+  ':::statblock\n### Nome creatura\n*Taglia, tipo, allineamento*\n- **Classe Armatura:** 10\n- **Punti Ferita:** 10 (3d6)\n- **Velocità:** 9 m\n---\n**Tratto.** Descrizione del tratto.\n:::'
+
+/** Tabella pipe con righe e colonne a scelta (dialogo Tabella della toolbar). */
+export function buildTable(rows: number, cols: number): string {
+  const c = Math.min(Math.max(Math.floor(cols) || 2, 1), 10)
+  const r = Math.min(Math.max(Math.floor(rows) || 2, 1), 20)
+  const header = Array.from({ length: c }, (_, i) => `Colonna ${i + 1}`).join(' | ')
+  const sep = Array.from({ length: c }, () => '---').join(' | ')
+  const body = Array.from({ length: r }, () => Array.from({ length: c }, () => 'Valore').join(' | '))
+  return [`| ${header} |`, `| ${sep} |`, ...body.map((line) => `| ${line} |`)].join('\n')
+}

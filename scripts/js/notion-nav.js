@@ -583,6 +583,18 @@ async function _gpRender(id, label, icon) {
           } else if (_layout === 'imprese') {
             /* App integrata: il mount avviene dopo l'inserimento nel DOM. */
             _localHtml = '<div class="imprese-app" id="imprese-app-root"></div>';
+          } else if (
+            _layout === 'missioni' ||
+            _layout === 'generatori' ||
+            _layout === 'calendario' ||
+            _layout === 'diario' ||
+            _layout === 'combattimento'
+          ) {
+            /* App Tavolo da gioco: il mount avviene dopo l'inserimento nel DOM. */
+            _localHtml =
+              '<div class="arc-tool-app" id="arc-tool-root" data-layout="' +
+              _layout +
+              '"><p style="opacity:.6">Caricamento…</p></div>';
           } else {
             /* Auto-detect by page key (legacy fallback) */
             _localHtml =
@@ -608,7 +620,15 @@ async function _gpRender(id, label, icon) {
           pbody.className = 'page-' + id + ' page-' + layoutClass;
           pbody.style.maxWidth = '';
           pbody.style.width = '';
-          if (_layout === 'wide' || _layout === 'imprese') {
+          if (
+            _layout === 'wide' ||
+            _layout === 'imprese' ||
+            _layout === 'missioni' ||
+            _layout === 'generatori' ||
+            _layout === 'calendario' ||
+            _layout === 'diario' ||
+            _layout === 'combattimento'
+          ) {
             pbody.style.maxWidth = 'none';
             pbody.style.width = '100%';
           }
@@ -645,6 +665,26 @@ async function _gpRender(id, label, icon) {
           if (_layout === 'imprese' && window._impreseInit) {
             var _impRoot = document.getElementById('imprese-app-root');
             if (_impRoot) window._impreseInit(_impRoot);
+          }
+          /* Monta le app del Tavolo da gioco nel contenitore integrato. */
+          if (
+            _layout === 'missioni' ||
+            _layout === 'generatori' ||
+            _layout === 'calendario' ||
+            _layout === 'diario' ||
+            _layout === 'combattimento'
+          ) {
+            var _toolRoot = document.getElementById('arc-tool-root');
+            if (_toolRoot) {
+              if (_layout === 'missioni' && window.initQuestBoard) window.initQuestBoard(_toolRoot);
+              else if (_layout === 'generatori' && window.initGenerators) window.initGenerators(_toolRoot);
+              else if (_layout === 'calendario' && window.initCalendar) window.initCalendar(_toolRoot);
+              else if (_layout === 'diario' && window.initDiary) window.initDiary(_toolRoot);
+              else if (_layout === 'combattimento' && window.initCombat) {
+                _toolRoot.setAttribute('data-page', (_localPage && _localPage.id) || 'combattimento');
+                window.initCombat(_toolRoot);
+              }
+            }
           }
           /* Attiva ricerca live e filtri del browser del materiale. */
           if (window.matBrowserInit) window.matBrowserInit(pbody);

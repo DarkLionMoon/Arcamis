@@ -198,6 +198,12 @@ const precache = [
   '/sitemap.xml',
   '/manifest.webmanifest',
   '/offline.html',
+  /* Contenuti dati per l'uso offline: ricerca, missioni, calendario, mappa. */
+  '/content/search-index.json',
+  '/content/recent.json',
+  '/content/quests.json',
+  '/content/calendar.json',
+  '/content/mappins.json',
   cssHref,
 ];
 for (const target of jsMap.values()) precache.push(target);

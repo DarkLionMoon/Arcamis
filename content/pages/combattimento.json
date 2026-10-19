@@ -1,0 +1,9 @@
+{
+  "k": "combattimento",
+  "title": "Tracker di Combattimento",
+  "icon": "⚔️",
+  "content": "Iniziativa, round e punti ferita sotto controllo: il tracker da tenere aperto durante gli scontri.",
+  "layout": "combattimento",
+  "toc": false,
+  "lastModified": "2026-10-19T10:00:00.000Z"
+}

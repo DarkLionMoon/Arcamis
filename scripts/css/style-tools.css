@@ -1,0 +1,475 @@
+/* ════════════════════════════════════
+   ARCAMIS — style-tools.css
+   Stili delle pagine "Tavolo da gioco" (missioni, generatori,
+   calendario, diario, combattimento) e del blocco `:::statblock`.
+   Usa solo i token del tema (funziona con tutti i temi).
+════════════════════════════════════ */
+.arc-tool-app {
+  max-width: 1020px;
+  margin: 0 auto;
+}
+.arc-tool-app button {
+  cursor: pointer;
+}
+.arc-tool-app .gen-in,
+.arc-tool-app .qb-in,
+.arc-tool-app .cal-in,
+.arc-tool-app .dy-in,
+.arc-tool-app .cb-in {
+  background: var(--bg2);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.25));
+  color: var(--parch);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+/* ── Generatori ── */
+.gen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+.gen-card {
+  background: var(--bg2);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.25));
+  border-radius: 10px;
+  padding: 14px;
+}
+.gen-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  color: var(--gold3, var(--gold));
+  margin-bottom: 4px;
+}
+.gen-icon {
+  font-size: 20px;
+}
+.gen-desc {
+  font-size: 13px;
+  opacity: 0.75;
+  margin: 0 0 10px;
+}
+.gen-opts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.gen-roll,
+.qb-btn,
+.dy-tools button,
+.dy-main button[data-act],
+.cb-actions button,
+.cb-add button {
+  background: rgba(var(--gold-rgb, 200, 155, 60), 0.12);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.35));
+  color: var(--parch);
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+.gen-roll:hover,
+.qb-btn:hover,
+.cb-actions button:hover,
+.cb-add button:hover {
+  background: rgba(var(--gold-rgb, 200, 155, 60), 0.22);
+}
+.gen-out {
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 44px;
+}
+.gen-out strong {
+  color: var(--gold3, var(--gold));
+}
+
+/* ── Calendario ── */
+.cal-today {
+  text-align: center;
+  background: var(--bg2);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.25));
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.cal-label {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.cal-big {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  color: var(--gold3, var(--gold));
+  margin: 6px 0;
+}
+.cal-festa {
+  font-size: 15px;
+  margin-top: 4px;
+}
+.cal-real {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 6px;
+}
+.cal-months {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.cal-month {
+  background: var(--bg2);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.2));
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.cal-month strong {
+  font-family: 'Cinzel', serif;
+  color: var(--parch);
+}
+.cal-month ul {
+  margin: 6px 0 0;
+  padding-left: 16px;
+}
+.cal-nofesta {
+  display: block;
+  opacity: 0.5;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* ── Combat tracker ── */
+.cb-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.cb-round {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: var(--parch);
+}
+.cb-actions,
+.cb-add {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cb-add {
+  margin-bottom: 12px;
+}
+.cb-in {
+  max-width: 150px;
+}
+.cb-num {
+  max-width: 80px;
+}
+.cb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.2));
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.cb-row.active {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+.cb-row.down {
+  opacity: 0.55;
+}
+.cb-init {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  color: var(--gold3, var(--gold));
+  min-width: 28px;
+  text-align: center;
+}
+.cb-name {
+  flex: 1;
+  font-weight: 600;
+}
+.cb-hp {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+.cb-rowbtns {
+  display: flex;
+  gap: 4px;
+}
+.cb-rowbtns button {
+  background: transparent;
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.3));
+  color: var(--parch);
+  border-radius: 5px;
+  width: 26px;
+  height: 26px;
+  line-height: 1;
+}
+.cb-empty {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* ── Quest board ── */
+.qb-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.qb-count {
+  font-size: 13px;
+  opacity: 0.65;
+  margin-left: auto;
+}
+.qb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.qb-card {
+  background: var(--bg2);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.25));
+  border-radius: 10px;
+  padding: 14px;
+}
+.qb-card.mine {
+  border-color: var(--gold);
+}
+.qb-card h3 {
+  margin: 6px 0;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--parch);
+}
+.qb-card p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+.qb-stato {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.qb-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+.qb-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+.qb-btn {
+  width: 100%;
+}
+.qb-empty {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* ── Diario ── */
+.dy-cols {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 14px;
+}
+.dy-side {
+  background: var(--bg2);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.2));
+  border-radius: 10px;
+  padding: 12px;
+  align-self: start;
+}
+.dy-side h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+.dy-pg {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--parch);
+  border-radius: 6px;
+  padding: 7px 9px;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+.dy-pg.active {
+  border-color: var(--gold);
+  background: rgba(var(--gold-rgb, 200, 155, 60), 0.1);
+}
+.dy-newpg {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.dy-newpg .dy-in {
+  flex: 1;
+  min-width: 0;
+}
+.dy-tools {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.dy-import {
+  background: rgba(var(--gold-rgb, 200, 155, 60), 0.12);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.35));
+  color: var(--parch);
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.dy-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.dy-compose textarea {
+  resize: vertical;
+}
+.dy-entry {
+  background: var(--bg2);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.2));
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.dy-entry h4 {
+  margin: 2px 0 6px;
+  font-family: 'Cinzel', serif;
+  color: var(--parch);
+}
+.dy-date {
+  font-size: 12px;
+  opacity: 0.6;
+}
+.dy-entry p {
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0 0 8px;
+  white-space: normal;
+}
+.dy-del {
+  background: transparent;
+  border: none;
+  color: var(--text3, #8f7b4b);
+  font-size: 12px;
+  padding: 0;
+}
+.dy-empty {
+  opacity: 0.6;
+  font-style: italic;
+}
+@media (max-width: 720px) {
+  .dy-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Statblock (:::statblock) ── */
+.n-statblock {
+  background: var(--bg2);
+  border: 1px solid var(--bdr, rgba(200, 155, 60, 0.35));
+  border-top: 4px solid var(--gold, #c89b3c);
+  border-bottom: 4px solid var(--gold, #c89b3c);
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin: 1em 0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.n-statblock h4 {
+  font-family: 'Cinzel', serif;
+  color: var(--gold3, var(--gold));
+  font-size: 18px;
+  margin: 0;
+}
+.n-statblock .n-sb-sub {
+  font-style: italic;
+  opacity: 0.8;
+  margin: 0 0 8px;
+}
+.n-statblock hr {
+  border: none;
+  border-top: 1px solid var(--gold, #c89b3c);
+  margin: 8px 0;
+}
+.n-statblock dl {
+  margin: 0;
+}
+.n-statblock dt {
+  font-weight: 700;
+  display: inline;
+}
+.n-statblock dd {
+  display: inline;
+  margin: 0;
+}
+.n-statblock dd::after {
+  content: '';
+  display: block;
+}
+.n-statblock .n-sb-trait {
+  margin: 6px 0 0;
+}
+.n-statblock .n-sb-trait strong {
+  color: var(--parch);
+}
+
+/* ── Ricerca: risultato selezionato da tastiera ── */
+.sri.sel {
+  outline: 2px solid var(--gold, #c89b3c);
+  outline-offset: -2px;
+}
+
+/* ── Mappa: contatore esplorazione ── */
+.map-fog-count {
+  text-align: center;
+  font-size: 13px;
+  color: var(--parch);
+  opacity: 0.85;
+  margin-top: 8px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.05em;
+}

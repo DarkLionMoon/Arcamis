@@ -340,6 +340,70 @@
     return '<div class="n-gal">' + html + '</div>';
   }
 
+  /* ── STAT BLOCK ─────────────────────────────────────────
+     `:::statblock` dell'editor: `### Nome`, sottotitolo in corsivo,
+     campi `- **Chiave:** valore`, `---` come separatori e tratti. */
+  function renderStatblock(body) {
+    var title = '',
+      sub = '',
+      image = null,
+      fields = [],
+      traits = [];
+    body.forEach(function (line) {
+      var t = line.trim();
+      if (!t) return;
+      var hm = t.match(/^###\s+(.*)$/);
+      if (hm && !title) {
+        title = hm[1];
+        return;
+      }
+      var im = t.match(/^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)$/);
+      if (im && !image && safeImg(im[2])) {
+        image = { src: im[2], alt: im[1] };
+        return;
+      }
+      if (/^\*[^*]+\*$/.test(t) && !sub) {
+        sub = t.replace(/^\*|\*$/g, '');
+        return;
+      }
+      var fm = t.match(/^-\s+\*\*([^*]+)\*\*\s*(.*)$/);
+      if (fm) {
+        fields.push({ k: fm[1].replace(/:$/, ''), v: fm[2] });
+        return;
+      }
+      if (/^(-{3,}|\*{3,}|_{3,})$/.test(t)) {
+        traits.push({ hr: true });
+        return;
+      }
+      traits.push({ html: inline(t) });
+    });
+    var html = '<div class="n-statblock">';
+    if (image)
+      html +=
+        '<img src="' +
+        attr(image.src) +
+        '" alt="' +
+        attr(image.alt) +
+        '" loading="lazy" decoding="async" class="n-sb-img">';
+    if (title) html += '<h4>' + inline(title) + '</h4>';
+    if (sub) html += '<p class="n-sb-sub">' + inline(sub) + '</p><hr>';
+    if (fields.length) {
+      html +=
+        '<dl>' +
+        fields
+          .map(function (f) {
+            return '<dt>' + inline(f.k) + ':</dt> <dd>' + inline(f.v) + '</dd>';
+          })
+          .join('') +
+        '</dl><hr>';
+    }
+    traits.forEach(function (tr) {
+      if (tr.hr) html += '<hr>';
+      else html += '<p class="n-sb-trait">' + tr.html + '</p>';
+    });
+    return html + '</div>';
+  }
+
   /* ── BLOCCHI ─────────────────────────────────────────────── */
   var HR_RE = /^(\s*([-*_])\2{2,}\s*)$/;
   var HEAD_RE = /^(#{1,6})\s+(.+)$/;
@@ -370,6 +434,7 @@
         var gkind = gf[1].toLowerCase();
         if (gkind === 'cards') html += renderCards(gbuf);
         else if (gkind === 'gallery') html += renderGallery(gbuf);
+        else if (gkind === 'statblock') html += renderStatblock(gbuf);
         else html += '<pre class="n-code">' + esc(gbuf.join('\n')) + '</pre>';
         i = gj < n ? gj + 1 : n;
         continue;

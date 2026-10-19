@@ -9,6 +9,8 @@
 import { computed, onBeforeUnmount, shallowRef, ref, watch } from 'vue'
 
 import { errorText, pagesApi, registryApi } from '@/shared/api'
+import { ApiError } from '@/shared/api/http'
+import type { PageContent } from '@/types'
 import type { PageRegistryEntry } from '@/types'
 import { confirmAction } from '@/shared/confirm'
 import { useAuthStore, useEditorStore, useRegistryStore, useUIStore } from '@/app/store'
@@ -357,8 +359,20 @@ export function usePageEditor() {
     firstError.value = null
     try {
       const payload = { ...page.value, lastModified: new Date().toISOString() }
-      const result = await pagesApi.save(payload, `admin: update page ${payload.k}`)
-      editor.setPage({ ...payload, sha: result.sha })
+      let sha: string
+      try {
+        sha = (await pagesApi.save(payload, `admin: update page ${payload.k}`)).sha
+      } catch (e) {
+        /* SHA non più valido: qualcun altro ha salvato nel frattempo. */
+        if (!isShaConflict(e)) throw e
+        const retried = await resolveConflict(payload)
+        if (!retried) {
+          saveState.value = 'error'
+          return false
+        }
+        sha = retried
+      }
+      editor.setPage({ ...payload, sha })
       await syncRegistryWorkflow()
       saveState.value = 'saved'
       if (!options.silent) ui.toast('Pagina salvata — deploy in corso (~30s)', 'success')
@@ -370,6 +384,76 @@ export function usePageEditor() {
     } finally {
       editor.saving = false
     }
+  }
+
+  /** GitHub risponde 422 quando lo SHA non è più quello corrente. */
+  function isShaConflict(e: unknown): boolean {
+    if (e instanceof ApiError) {
+      if (e.status === 422 || e.status === 409) return true
+      return /\bsha\b|conflitto|conflict|version/i.test(e.message)
+    }
+    return /\bsha\b|conflitto|conflict/i.test(e instanceof Error ? e.message : String(e))
+  }
+
+  /** Salva la copia locale nel browser e propone la sovrascrittura. */
+  function backupConflict(payload: PageContent): void {
+    try {
+      localStorage.setItem(
+        `arcamis-conflict-${payload.k}`,
+        JSON.stringify({ date: new Date().toISOString(), page: payload })
+      )
+    } catch {
+      /* storage pieno: il conflitto resta comunque gestibile a mano */
+    }
+  }
+
+  /**
+   * Risolve un salvataggio in conflitto: ricarica la versione remota per
+   * lo SHA fresco e, solo con conferma esplicita, riprova con i contenuti
+   * locali. Ritorna lo SHA salvato oppure null se l'utente annulla.
+   */
+  async function resolveConflict(payload: PageContent): Promise<string | null> {
+    let remote: PageContent
+    try {
+      remote = await pagesApi.get(payload.k)
+    } catch {
+      ui.toast('Conflitto di salvataggio e pagina remota non leggibile: riprova', 'error')
+      return null
+    }
+    backupConflict(payload)
+    const remoteWhen = remote.lastModified ? new Date(remote.lastModified).toLocaleString('it-IT') : 'sconosciuta'
+    const ok = await confirmAction({
+      title: 'Modifica concorrente',
+      message: `«${payload.title || payload.k}» è stata modificata da un altro editor (remota: ${remoteWhen}).`,
+      detail:
+        'La tua copia è al sicuro nel browser. Sovrascrivere la versione remota con la tua, o annullare e confrontare a mano?',
+      confirmLabel: 'Sovrascrivi con la mia',
+      cancelLabel: 'Annulla',
+      danger: true
+    })
+    if (!ok) {
+      ui.toast('Salvataggio annullato: la tua bozza resta aperta', 'warning')
+      return null
+    }
+    payload.sha = remote.sha
+    const result = await pagesApi.save(payload, `admin: resolve conflict ${payload.k}`)
+    return result.sha
+  }
+
+  /**
+   * Ripristina una versione (cronologia o snapshot) in memoria: i campi
+   * tornano quelli dello snapshot, lo SHA resta quello corrente così il
+   * salvataggio funziona e risulta come modifica da salvare.
+   */
+  function restoreVersion(snapshot: PageContent): void {
+    const current = page.value
+    if (!current) return
+    const { sha: _sha, lastModified: _lastModified, k: _k, ...rest } = snapshot
+    Object.assign(current, rest)
+    resetHistory()
+    saveState.value = 'idle'
+    firstError.value = null
+    ui.toast('Versione ripristinata in memoria — salva per applicarla', 'warning', { title: 'Cronologia' })
   }
 
   function updateMeta(updates: Record<string, unknown>): void {
@@ -507,6 +591,7 @@ export function usePageEditor() {
     removeTemplate,
     setMode,
     save,
+    restoreVersion,
     updateMeta,
     startAutosave,
     stopAutosave

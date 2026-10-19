@@ -32,6 +32,8 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'save'): void
   (e: 'request-link'): void
+  (e: 'drop-files', files: File[]): void
+  (e: 'wiki-suggest', suggest: { query: string; x: number; y: number } | null): void
 }>()
 
 const host = ref<HTMLElement | null>(null)
@@ -101,6 +103,13 @@ const shortcuts: KeyBinding[] = [
       emit('request-link')
       return true
     }
+  },
+  {
+    key: 'Escape',
+    run: () => {
+      emit('wiki-suggest', null)
+      return false
+    }
   }
 ]
 
@@ -108,6 +117,39 @@ function makeState(initial: string) {
   const sync = EditorView.updateListener.of((up) => {
     if (up.docChanged && !localUpdate) {
       emit('update:modelValue', view?.state.doc.toString() ?? initial)
+      /* Suggerimento `[[Pagina`: cerca il marcatore prima del cursore. */
+      const pos = up.state.selection.main.head
+      const before = up.state.sliceDoc(Math.max(0, pos - 60), pos)
+      const m = before.match(/\[\[([^\]\n]*)$/)
+      if (!m) {
+        emit('wiki-suggest', null)
+        return
+      }
+      let x = 0
+      let y = 0
+      try {
+        const coords = view?.coordsAtPos(pos)
+        if (coords) {
+          x = coords.left
+          y = coords.bottom
+        }
+      } catch {
+        /* caret non misurabile: il menu appare in alto */
+      }
+      emit('wiki-suggest', { query: m[1], x, y })
+    }
+  })
+  /* Drag-and-drop di immagini dal desktop: l'upload lo fa la vista. */
+  const dropFiles = EditorView.domEventHandlers({
+    dragover(e) {
+      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) e.preventDefault()
+    },
+    drop(e) {
+      const files = e.dataTransfer ? Array.from(e.dataTransfer.files || []) : []
+      const images = files.filter((f) => f.type.startsWith('image/'))
+      if (!images.length) return
+      e.preventDefault()
+      emit('drop-files', images)
     }
   })
   return EditorState.create({
@@ -127,6 +169,7 @@ function makeState(initial: string) {
       readonlyComp.of(props.readonly ? [EditorView.editable.of(false)] : []),
       keymap.of([...shortcuts, ...defaultKeymap, ...historyKeymap, indentWithTab]),
       sync,
+      dropFiles,
       EditorView.theme({
         '&': { backgroundColor: 'transparent', color: 'inherit' },
         '&.cm-focused': { outline: 'none' }
@@ -201,6 +244,24 @@ const handle: CodeMirrorHandle = {
   },
   insertSnippet(text) {
     run((state) => insertSnippet(state, text))
+  },
+  replaceWikiLink(label, path) {
+    if (!view) return
+    const pos = view.state.selection.main.head
+    const before = view.state.sliceDoc(Math.max(0, pos - 60), pos)
+    const m = before.match(/\[\[([^\]\n]*)$/)
+    if (!m) {
+      run((state) => insertLink(state, path, label))
+      return
+    }
+    const from = pos - m[0].length
+    const snippet = `[${label}](${path})`
+    view.dispatch({
+      changes: { from, to: pos, insert: snippet },
+      selection: EditorSelection.cursor(from + snippet.length),
+      scrollIntoView: true
+    })
+    view.focus()
   },
   undo() {
     if (view) undo(view)

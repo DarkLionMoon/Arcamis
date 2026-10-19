@@ -58,6 +58,7 @@ Tutto ciò che il sito mostra vive nel repo:
 | `content/databases/*.json` | Database/gallerie (`{ "pages": [...] }`: pantheon, lavori, …) |
 | `content/search-index.json` | Indice full-text per la ricerca locale |
 | `content/changelog.json`, `content/mappins.json`, `content/recent.json` | Changelog, puntine della mappa, attività recente |
+| `content/quests.json`, `content/calendar.json` | Missioni della bacheca e datario del mondo (vedi Tavolo da gioco) |
 | `images/`, `audio/` | Immagini caricate dall'editor e effetti sonori |
 
 Se una pagina JSON manca, il client mostra un placeholder "non disponibile":
@@ -104,7 +105,20 @@ admin — vedi Parte 2.)
 - **Blocchi editor**: `:::cards` con `### Titolo` e `:::gallery` con una
   immagine per riga, resi da `md-render.js` in `.n-cards` / `.n-gal`.
 - **Mappa**: puntine da `mappins.json`, coordinate in percentuali (stabili a
-  zoom/scroll), tooltip e navigazione alle schede luogo.
+  zoom/scroll), tooltip e navigazione alle schede luogo. Le puntine non
+  esplorate (`explored: false`, si imposta dal pannello Mappa) mostrano
+  "Inesplorato" e la home conta i luoghi rivelati (`map-public.js`).
+- **Tavolo da gioco** (sezione `gioco`, 5 app integrate nelle pagine):
+  **Bacheca Missioni** (`missioni`, da `content/quests.json`: filtri per
+  stato/tag/livello, accettazione in `localStorage`), **Generatori**
+  (`generatori`: nomi per specie, taverne, bottini, incontri),
+  **Calendario di Arcamis** (`calendario`, da `content/calendar.json`:
+  converte la data reale nel datario del mondo con feste),
+  **Diario di Campagna** (`diario`: personaggi e pagine in `localStorage`
+  con export/import JSON) e **Tracker di Combattimento**
+  (`combattimento`: iniziativa, round, PF, persistenza locale). Stili in
+  `style-tools.css`, logica in `scripts/js/{quest-board,generators,
+  calendar,diary,combat,map-public}.js`.
 - **Changelog e Novità**: widget e pagina dedicata dai JSON locali.
 
 ### Layout disponibili
@@ -112,8 +126,10 @@ admin — vedi Parte 2.)
 Ogni pagina dichiara un `layout` (se manca, rilevato dalla chiave):
 `contenuto`, `luoghi`, `cronache`, `personaggio`, `materiale`, `wide`,
 `pantheon`, `collezione`, `bestiario`, `timeline`, `fazioni`, `oggetti`,
-`glossario`, `galleria`, `tabelle`, `schede`, più i layout a card `sessione`,
-`quest`, `npc`, `spell`, `specie`, `citta`, `evento`. Nell'editor si sceglie
+`glossario`, `galleria`, `tabelle`, `schede`, i layout del Tavolo da gioco
+(`missioni`, `generatori`, `calendario`, `diario`, `combattimento`), più i
+layout a card `sessione`, `quest`, `npc`, `spell`, `specie`, `citta`,
+`evento`. Nell'editor si sceglie
 tra tre preset — **Wiki standard**, **Immersivo / full width** (`wide`),
 **Schede / griglia** (`schede`) — con selettore avanzato per gli altri.
 
@@ -121,7 +137,8 @@ tra tre preset — **Wiki standard**, **Immersivo / full width** (`wide`),
 
 - **Ricerca**: client-side sull'indice statico (`app-ui.js` → fetch di
   `/content/search-index.json`, lazy al primo uso): minimo 2 caratteri,
-  debounce, punteggio titolo > testo, snippet. Zero server.
+  debounce, punteggio titolo > testo, snippet, navigazione da tastiera
+  (↑/↓ + Invio). Zero server.
 - **Temi** (`dark`, `light`, `theme-blood`, `theme-forest`, `theme-abyss`,
   `theme-alchemy`): stesso set di token in `:root` (`--bg…--bg5`, `--panel`,
   `--gold…--gold4`, `--gold-rgb`, `--text/2/3`, `--parch`, …). Le superfici
@@ -129,8 +146,9 @@ tra tre preset — **Wiki standard**, **Immersivo / full width** (`wide`),
   `themes.test.js` fallisce se un token manca o un testo scende sotto 4.5:1.
 - **PWA/offline**: manifest + icone (`npm run icons`), font self-hosted
   (`npm run fonts`, nessun ping a Google Fonts — la CSP non lo permette),
-  service worker versionato per build con precache reale e fallback
-  `offline.html`. Le copertine non sono più base64 nei JSON: URL
+  service worker versionato per build con precache reale (shell, JS/CSS e
+  JSON dati: indice ricerca, missioni, calendario, mappa) e fallback
+  `offline.html`: le pagine già visitate restano leggibili senza rete. Le copertine non sono più base64 nei JSON: URL
   `/api/cover/<id>` scaricati on demand.
 - **Pagina crediti** (`/credits`): disclaimer e attribuzioni, informativa sul
   conteggio visite (`track_view`: nessun IP, nessun cookie, solo aggregati) e
@@ -153,16 +171,19 @@ ricostruisce il sito (~30 s) e la modifica va online da sola.
 2. In alto a destra leggi `nome · Ruolo`. I ruoli sono **Admin**, **Editor**,
    **Viewer** (sola lettura): le voci proibite non compaiono nel menu e le
    rotte protette rimandano alla Dashboard.
-3. Scorciatoie: **Ctrl+K** (⌘K) ricerca globale, **Esc** chiude la sidebar.
-   Il pallino "● modifiche non salvate" in topbar avverte prima di cambiare
-   pagina con modifiche pendenti.
+3. Scorciatoie: **Ctrl+K** (⌘K) ricerca globale e command palette (`>`
+   filtra solo le azioni: nuova pagina, vai alle sezioni…), **Esc** chiude
+   la sidebar. Il pallino "● modifiche non salvate" in topbar avverte
+   prima di cambiare pagina con modifiche pendenti.
 
 La sidebar è in 5 gruppi: **Pannello** (Dashboard, Utenti), **Contenuti**
 (Pagine, Copertine, Media, Cestino), **Feature** (Mappa, Carousel, Changelog),
 **Sistema** (Navigazione, Interfaccia, Impostazioni), **Sicurezza** (Audit,
 Scanner link, Trova & Sostituisci, Media orfani, Backup). La **Dashboard**
 mostra visite totali, pagine nel registro, stato del deploy (con riverifica),
-grafico a 30 giorni, pagine più viste e azioni rapide.
+grafico a 30 giorni, pagine più viste, azioni rapide e il pannello
+**Operatività redazione** (bozze, in revisione, programmate con prossima
+data, scorciatoie a Scanner e Media orfani).
 
 ## 2.2 Tutorial 1 — creare una nuova pagina
 
@@ -185,19 +206,27 @@ repo); recuperi dal **Cestino** con **♻️ Ripristina**.
 ## 2.3 Tutorial 2 — modificare una pagina
 
 1. In **Pagine** cerca per titolo/chiave/layout o filtra per stato, poi
-   **Modifica** (o doppio click sulla riga).
+   **Modifica** (o doppio click sulla riga). Con le checkbox fai azioni
+   **bulk**: invio in revisione o rimozione dal registro di N pagine.
 2. Schede **Blocchi ⇄ Markdown** intercambiabili: il markdown è la fonte di
    verità, nulla si perde nel passaggio (l'irriconosciuto resta in un blocco
    "markdown grezzo").
 3. Toolbar: annulla/ripeti (Ctrl+Z), formattazione, titoli, elenchi,
-   citazioni, link, immagini, codice, tabelle, anteprima e guida ai tasti.
-4. Immagini dal cassetto **Media**; per le divinità il trascinamento
+   citazioni, link, immagini, codice, tabelle, **stat block creatura**
+   (blocco `:::statblock` reso dal sito), anteprima e guida ai tasti.
+   Scrivendo `[[` si apre il collegamento rapido alle pagine wiki.
+4. Immagini dal cassetto **Media** o **trascinate dal desktop** nel testo
+   (upload WebP automatico); per le divinità il trascinamento
    sull'anteprima regola anche il ritaglio (`![](...#30,70)`).
 5. Il selettore **Layout** cambia il rendering e può applicare il template
    del layout (conferma richiesta se c'è contenuto).
-6. Schede **📜 STORIA** (cronologia commit + ripristino), **🔗 LINKS**
-   (controllo link interni), pulsanti **URL / APRI**. Il guard blocca
-   l'uscita con modifiche non salvate.
+6. Pannello **Dettagli**: metadati, flusso di pubblicazione e **Cronologia**
+   (commit git con diff riga/parola + ripristino in memoria) con **Snapshot**
+   nominati nel browser prima dei grossi rimaneggiamenti. La validazione dei
+   modelli è live (errori sotto i campi, blocco salvataggio/pubblicazione).
+   Se un altro editor salva prima di te, il salvataggio propone la
+   sovrascrittura consapevole (la tua copia è salvata nel browser). Il guard
+   blocca l'uscita con modifiche non salvate.
 
 ## 2.4 Tutorial 3 — pubblicare
 
@@ -220,6 +249,8 @@ controllare se una pagina "sparisce".
   I manifest salvati prima del sottotitolo restano validi (migrazione in lettura).
 - **Mappa**: click per aggiungere puntine, trascina per spostare, click per
   modificare, Salva. Coordinate in percentuali: valgono a ogni zoom.
+  La spunta "esplorato" decide se il sito mostra il luogo o "Inesplorato"
+  (fog of war) con conteggio in home.
 - **Changelog**: voci versione/sottoversione/patch + data, titolo, markdown.
 - **Media**: upload con conversione WebP e resize a 1920 px automatici;
   l'eliminazione chiede di digitare il nome (è un commit, non va nel cestino).
@@ -229,8 +260,10 @@ controllare se una pagina "sparisce".
 - **Utenti** (admin): crea/cambia ruolo e password/elimina (mai `admin`);
   tutto parte con **💾 Salva**.
 - **Scanner link / Trova & Sostituisci / Media orfani** (admin): link rotti e
-  `alt` mancanti; cerca-e-sostituisci sulle pagine selezionate; immagini
-  inutilizzate. **Audit**: chi ha fatto cosa. **Navigazione / Interfaccia /
+  `alt` mancanti più **menzioni non linkate** (pagine che nominano un'altra
+  pagina senza collegarla, con suggerimento pronto e apertura editor);
+  cerca-e-sostituisci sulle pagine selezionate; immagini inutilizzate.
+  **Audit**: chi ha fatto cosa. **Navigazione / Interfaccia /
   Impostazioni**: menu, testi UI, opzioni del sito.
 
 ---
@@ -247,9 +280,10 @@ controllare se una pagina "sparisce".
 ├── sw.js                   ← template service worker (versionato in build)
 ├── public/                 ← manifest PWA, icone, favicon, fonts/*.woff2
 ├── scripts/
-│   ├── css/*.css           ← base, home, page, notion, imprese, fx, ui, shell, …
+│   ├── css/*.css           ← base, home, page, notion, imprese, tools, fx, ui, shell, …
 │   ├── js/*.js             ← SPA (app, app-home, app-ui, notion-nav, notion-render,
-│   │                           md-render, imprese, materiale-browser, carousel-loader, …)
+│   │                           md-render, imprese, materiale-browser, carousel-loader,
+│   │                           quest-board, generators, calendar, diary, combat, map-public, …)
 │   ├── lib/routes.mjs      ← fonte unica rotte (prerender + sitemap + robots)
 │   ├── build-all.mjs       ← build unica (CI e deploy): prima admin, poi sito
 │   ├── build-post.mjs      ← hash JS, preload, prerender, sitemap, sw.js, copia admin
@@ -258,6 +292,7 @@ controllare se una pagina "sparisce".
 │   ├── sync-registry.py    ← rigenera _pathMap in app.js (non editare a mano)
 │   └── import-notion.js    ← export Notion → JSON (one-shot)
 ├── content/pages/*.json    ← pagine · databases/ · search-index · changelog/mappins
+├── content/quests.json / calendar.json ← missioni e datario del Tavolo da gioco
 ├── functions/api/          ← admin, carousel, cover/, deploy, gh, send-help, sitemap
 ├── admin/                  ← pannello Vue (compilato in export/admin → dist/admin)
 └── images/ / audio/        ← media caricati dall'editor / effetti sonori
@@ -272,6 +307,18 @@ npm run build:admin  # solo pannello Vue → export/admin
 npm test             # unit test (functions/ + integrità rotte)
 npm run test:routes  # build + verifica artefatti (meta, sitemap, 404, PWA, font)
 npm run verify:deploy https://arcamis.pages.dev
+```
+
+```bash
+cd admin && npm test   # unit test pannello (workflow, modelli, diff, comandi…)
+```
+
+Dopo aver aggiunto pagine/rotte ai contenuti, rigenera gli artefatti
+prima di committare (la CI li verifica con `--check`):
+
+```bash
+python3 scripts/sync-registry.py  # data.js/json, _pathMap, indice ricerca, recent
+npm run seo                        # sitemap.xml + robots.txt allineati alle rotte
 ```
 
 L'ordine conta: `build-post.mjs` copia il pannello da `export/admin` in

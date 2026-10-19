@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import { carouselApi, errorText, pagesApi, registryApi, statusApi } from '@/shared/api'
 import { confirmAction } from '@/shared/confirm'
@@ -25,6 +25,7 @@ import {
 import type { PageContent, PageRegistryEntry, SectionRegistryEntry } from '@/types'
 
 const router = useRouter()
+const route = useRoute()
 const registry = useRegistryStore()
 const covers = useCoversStore()
 const ui = useUIStore()
@@ -36,6 +37,7 @@ const busyKey = ref('')
 const searchQuery = ref('')
 const showPicker = ref(false)
 const statusFilter = ref<PageStatus | 'all'>('all')
+const selected = ref<string[]>([])
 
 /* Lo stato effettivo del registro: una «programmata» scaduta è già
    pubblica, e la lista deve dirlo senza aspettare la build. */
@@ -117,6 +119,65 @@ async function syncStatuses(): Promise<void> {
   } catch {
     /* endpoint non disponibile (o GH non configurato): chip dal registro */
   }
+}
+
+/* ── Selezione multipla e azioni bulk ── */
+const visibleKeys = computed(() => filteredPages.value.map((entry) => entry.k))
+
+const allChecked = computed(
+  () => visibleKeys.value.length > 0 && visibleKeys.value.every((key) => selected.value.includes(key))
+)
+
+function toggleSelect(key: string): void {
+  selected.value = selected.value.includes(key)
+    ? selected.value.filter((candidate) => candidate !== key)
+    : [...selected.value, key]
+}
+
+function toggleAll(): void {
+  selected.value = allChecked.value
+    ? selected.value.filter((key) => !visibleKeys.value.includes(key))
+    : [...new Set([...selected.value, ...visibleKeys.value])]
+}
+
+async function bulkReview(): Promise<void> {
+  const targets = registry.pages.filter(
+    (entry) =>
+      selected.value.includes(entry.k) &&
+      statusOfEntry(entry) === 'draft' &&
+      canRunAction(auth.role, 'draft', 'request-review')
+  )
+  if (!targets.length) {
+    ui.toast('Nessuna bozza selezionata che puoi inviare in revisione', 'warning')
+    return
+  }
+  for (const entry of targets) {
+    await quickAction({ stopPropagation() {} } as unknown as MouseEvent, entry, 'request-review')
+  }
+  selected.value = []
+  ui.toast(`${targets.length} pagine inviate in revisione`, 'success')
+}
+
+async function bulkRemove(): Promise<void> {
+  const targets = registry.pages.filter((entry) => selected.value.includes(entry.k))
+  if (!targets.length) return
+  const ok = await confirmAction({
+    title: 'Rimuovi pagine dal registro',
+    message: `Rimuovere ${targets.length} pagine dal registro di navigazione?`,
+    detail: 'I file delle pagine non vengono toccati.',
+    confirmLabel: `Rimuovi ${targets.length} pagine`,
+    danger: true
+  })
+  if (!ok) return
+  try {
+    for (const entry of targets) registry.removePage(entry.k)
+    await registryApi.save(registry.pages)
+    registry.clearDirty()
+    ui.toast(`${targets.length} pagine rimosse dal registro`, 'success')
+  } catch (e) {
+    ui.toast('Errore rimozione: ' + errorText(e), 'error')
+  }
+  selected.value = []
 }
 
 function openPage(key: string): void {
@@ -271,7 +332,11 @@ async function createPage(payload: {
    navigando altrove prima del salvataggio. */
 useUnsavedGuard(() => registry.dirty, 'modifiche al registro pagine non salvate')
 
-onMounted(load)
+onMounted(() => {
+  void load()
+  /* Dalla command palette (`>nuova pagina`): apre subito il creatore. */
+  if (route.query.new) showPicker.value = true
+})
 </script>
 
 <template>
@@ -315,7 +380,23 @@ onMounted(load)
         >
           {{ statusMeta(status).label }} <span>{{ statusCounts[status] }}</span>
         </button>
+        <label class="arc-select-all">
+          <input type="checkbox" :checked="allChecked" @change="toggleAll" />
+          <span>Seleziona visibili</span>
+        </label>
       </div>
+    </div>
+
+    <div v-if="selected.length" class="arc-panel arc-bulkbar">
+      <strong>{{ selected.length }} selezionate</strong>
+      <button class="btn btn-soft btn-sm" type="button" @click="bulkReview">
+        <VIcon name="eye" :size="14" /> Invia in revisione
+      </button>
+      <button class="btn btn-d btn-sm" type="button" @click="bulkRemove">
+        <VIcon name="trash" :size="14" /> Rimuovi dal registro
+      </button>
+      <span class="arc-toolbar-spacer"></span>
+      <button class="btn btn-soft btn-sm" type="button" @click="selected = []">Deseleziona</button>
     </div>
 
     <div v-if="loading" class="arc-panel">
@@ -332,6 +413,15 @@ onMounted(load)
       <table class="arc-table">
         <tbody>
           <tr v-for="page in pages" :key="page.k" class="arc-page-row" @dblclick="openPage(page.k)">
+            <td style="width: 30px">
+              <input
+                type="checkbox"
+                :checked="selected.includes(page.k)"
+                :aria-label="'Seleziona ' + (page.l || page.k)"
+                @click.stop
+                @change="toggleSelect(page.k)"
+              />
+            </td>
             <td style="width: 38px; font-size: 20px">{{ page.i || '📄' }}</td>
             <td>
               <button class="arc-page-link" type="button" @click="openPage(page.k)">
@@ -403,3 +493,23 @@ onMounted(load)
     />
   </section>
 </template>
+
+<style scoped>
+.arc-select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  opacity: 0.8;
+  margin-left: 8px;
+  cursor: pointer;
+}
+.arc-bulkbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  border-color: var(--accent, #c89b3c);
+}
+</style>

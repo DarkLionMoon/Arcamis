@@ -6,6 +6,7 @@ export interface CodeMirrorHandle {
   insertLink(url: string): void
   insertImage(path: string, alt?: string): void
   insertSnippet(text: string): void
+  replaceWikiLink(label: string, path: string): void
   undo(): void
   redo(): void
   selectedText(): string

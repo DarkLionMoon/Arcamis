@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { analyticsApi, deployApi, errorText, ghApi, decodeBase64Utf8 } from '@/shared/api'
 import { useAnalyticsStore, useDeployStore, useRegistryStore, useUIStore } from '@/app/store'
+import { statusOf } from '@/features/pages/workflow'
 import VIcon from '@/shared/components/VIcon.vue'
 import type { IconName } from '@/shared/icons'
 import type { RegistryData } from '@/types'
@@ -109,6 +110,25 @@ const sparkline = computed(() => {
   return { points: points.join(' '), total, max }
 })
 
+/* ── Operatività redazione: conteggi dal registro caricato sopra ── */
+const opsCounts = computed(() => {
+  const counts = { draft: 0, review: 0, scheduled: 0, published: 0 }
+  for (const entry of registry.pages) counts[statusOf(entry)]++
+  return counts
+})
+
+const nextScheduled = computed(() => {
+  let best: string | null = null
+  for (const entry of registry.pages) {
+    if (statusOf(entry) === 'scheduled' && entry.publishAt && (!best || entry.publishAt < best)) {
+      best = entry.publishAt
+    }
+  }
+  if (!best) return ''
+  const date = new Date(best)
+  return Number.isNaN(date.getTime()) ? best : date.toLocaleString('it-IT')
+})
+
 const quickActions: Array<{ label: string; to: string; icon: IconName; desc: string }> = [
   { label: 'Pagine', to: '/pagine', icon: 'pages', desc: 'Crea e modifica' },
   { label: 'Copertine', to: '/copertine', icon: 'covers', desc: 'Gestisci copertine' },
@@ -151,6 +171,32 @@ onBeforeUnmount(() => deploy.stopTimer())
           <div v-if="deploy.timerActive" class="arc-card-hint">controllo tra {{ deploy.timerSeconds }}s</div>
         </div>
       </div>
+    </div>
+
+    <div class="arc-panel" style="margin-bottom: 16px">
+      <div class="arc-head-row" style="margin-bottom: 10px">
+        <h2 class="arc-panel-title">Operatività redazione</h2>
+        <router-link class="btn btn-soft btn-sm" to="/pagine">Vai alle pagine</router-link>
+      </div>
+      <div class="arc-ops-grid">
+        <router-link class="arc-ops-item" to="/pagine">
+          <strong>{{ opsCounts.draft }}</strong
+          ><span>Bozze</span>
+        </router-link>
+        <router-link class="arc-ops-item is-warn" to="/pagine">
+          <strong>{{ opsCounts.review }}</strong
+          ><span>In revisione</span>
+        </router-link>
+        <router-link class="arc-ops-item" to="/pagine">
+          <strong>{{ opsCounts.scheduled }}</strong
+          ><span>Programmate</span>
+        </router-link>
+        <router-link class="arc-ops-item" to="/link-scanner"> <strong>⟳</strong><span>Scanner link</span> </router-link>
+        <router-link class="arc-ops-item" to="/media-orfani"> <strong>🖼</strong><span>Media orfani</span> </router-link>
+      </div>
+      <p v-if="nextScheduled" class="arc-hint" style="margin: 8px 0 0">
+        Prossima pubblicazione programmata: {{ nextScheduled }}
+      </p>
     </div>
 
     <div class="arc-panel" style="margin-bottom: 16px">
@@ -239,5 +285,36 @@ onBeforeUnmount(() => deploy.stopTimer())
 .arc-card-hint {
   font-size: 11.5px;
   color: var(--afg-3);
+}
+
+.arc-ops-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+.arc-ops-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 8px;
+  border: 1px solid var(--aline, rgba(200, 155, 60, 0.25));
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+.arc-ops-item:hover {
+  border-color: var(--accent, #c89b3c);
+}
+.arc-ops-item strong {
+  font-size: 22px;
+  font-family: 'Cinzel', serif;
+}
+.arc-ops-item span {
+  font-size: 12px;
+  opacity: 0.75;
+}
+.arc-ops-item.is-warn strong {
+  color: var(--warn, #d4a017);
 }
 </style>

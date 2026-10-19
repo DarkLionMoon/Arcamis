@@ -1,0 +1,9 @@
+{
+  "k": "diario",
+  "title": "Diario di Campagna",
+  "icon": "📓",
+  "content": "Il diario personale dei personaggi: annota le sessioni, resta tutto nel tuo browser.",
+  "layout": "diario",
+  "toc": false,
+  "lastModified": "2026-10-19T10:00:00.000Z"
+}

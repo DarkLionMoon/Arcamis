@@ -103,7 +103,12 @@ var _pathMap = {
   'lore/fumofosco': 'pag-fumofosco',
   'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur',
   'changelog': 'pag-changelog',
-  'credits': 'pag-credits'
+  'credits': 'pag-credits',
+  'gioco/missioni': 'pag-missioni',
+  'gioco/generatori': 'pag-generatori',
+  'gioco/calendario': 'pag-calendario',
+  'gioco/diario': 'pag-diario',
+  'gioco/combattimento': 'pag-combattimento'
 };
 
 /* ════ DEEP LINK ════ */

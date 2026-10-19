@@ -375,6 +375,53 @@ function csearch() {
   clearTimeout(_searchDebounce);
 }
 
+/* ════ SEARCH KEYBOARD NAV (↑/↓/Invio sui risultati #sr) ════ */
+(function () {
+  function items() {
+    var sr = document.getElementById('sr');
+    if (!sr) return [];
+    return Array.prototype.filter.call(sr.querySelectorAll('.sri'), function (el) {
+      return el.hasAttribute('onclick');
+    });
+  }
+  function selected() {
+    var sr = document.getElementById('sr');
+    return sr ? sr.querySelector('.sri.sel') : null;
+  }
+  function select(el) {
+    items().forEach(function (x) {
+      x.classList.remove('sel');
+    });
+    if (el) el.classList.add('sel');
+  }
+  function attach() {
+    var ts = document.getElementById('ts');
+    if (!ts || ts._kbdNav) return;
+    ts._kbdNav = true;
+    ts.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter') return;
+      var list = items();
+      if (!list.length) return;
+      e.preventDefault();
+      if (e.key === 'Enter') {
+        (selected() || list[0]).click();
+        return;
+      }
+      var idx = list.indexOf(selected());
+      idx = e.key === 'ArrowDown' ? Math.min(idx + 1, list.length - 1) : Math.max(idx - 1, 0);
+      select(list[idx]);
+    });
+    var sr = document.getElementById('sr');
+    if (sr && typeof MutationObserver !== 'undefined') {
+      new MutationObserver(function () {
+        select(null);
+      }).observe(sr, { childList: true });
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attach);
+  else attach();
+})();
+
 /* ════ SEARCH MOBILE (drawer) ════ */
 function msearch(val) {
   var sr = document.getElementById('m-sr');

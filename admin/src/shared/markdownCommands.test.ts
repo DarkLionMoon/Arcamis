@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { insertImage, insertLink, insertSnippet, toggleLinePrefix, wrapSelection } from './markdownCommands'
+import {
+  buildTable,
+  insertImage,
+  insertLink,
+  insertSnippet,
+  STATBLOCK_SNIPPET,
+  toggleLinePrefix,
+  wrapSelection
+} from './markdownCommands'
 
 describe('wrapSelection', () => {
   it('avvolge la selezione e mantiene il testo selezionato', () => {
@@ -89,6 +97,27 @@ describe('insertSnippet', () => {
     const result = insertSnippet({ text: 'testo', from: 5, to: 5 }, '---')
     expect(result.text).toBe('testo\n\n---\n\n')
     expect(result.from).toBe(result.text.length)
+  })
+
+  it('lo snippet statblock apre e chiude il fence', () => {
+    expect(STATBLOCK_SNIPPET.startsWith(':::statblock\n### ')).toBe(true)
+    expect(STATBLOCK_SNIPPET.endsWith('\n:::')).toBe(true)
+    expect(STATBLOCK_SNIPPET).toContain('- **Classe Armatura:**')
+  })
+
+  it('buildTable genera intestazione, separatore e celle', () => {
+    const table = buildTable(2, 3)
+    const lines = table.split('\n')
+    expect(lines).toHaveLength(4)
+    expect(lines[0]).toBe('| Colonna 1 | Colonna 2 | Colonna 3 |')
+    expect(lines[1]).toBe('| --- | --- | --- |')
+    expect(lines[2]).toBe('| Valore | Valore | Valore |')
+  })
+
+  it('buildTable limita righe e colonne a intervalli sensati', () => {
+    const table = buildTable(99, 99)
+    expect(table.split('\n')).toHaveLength(22)
+    expect(buildTable(0, 0).split('\n')).toHaveLength(4)
   })
 
   it('non aggiunge una riga vuota in testa a un documento vuoto', () => {

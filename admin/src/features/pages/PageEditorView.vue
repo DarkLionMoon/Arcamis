@@ -2,10 +2,12 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { useAuthStore, useEditorStore, useUIStore } from '@/app/store'
+import { useAuthStore, useEditorStore, useRegistryStore, useUIStore } from '@/app/store'
+import { errorText, registryApi } from '@/shared/api'
 import { confirmAction } from '@/shared/confirm'
 import { useUnsavedGuard } from '@/shared/guard'
-import { CODE_SNIPPET, TABLE_SNIPPET } from '@/shared/markdownCommands'
+import { CODE_SNIPPET, STATBLOCK_SNIPPET, TABLE_SNIPPET } from '@/shared/markdownCommands'
+import { compressImage, mediaName, uploadImage } from '@/shared/api/media'
 import CodeMirrorEditor from '@/features/interface/components/CodeMirrorEditor.vue'
 import MarkdownPreview from '@/features/interface/components/MarkdownPreview.vue'
 import VIcon from '@/shared/components/VIcon.vue'
@@ -16,9 +18,11 @@ import MediaDrawer from './editor/MediaDrawer.vue'
 import ShortcutsDialog from './editor/ShortcutsDialog.vue'
 import TemplateForm from './editor/TemplateForm.vue'
 import TemplatePicker from './editor/TemplatePicker.vue'
+import VersionsPanel from './editor/VersionsPanel.vue'
 import WorkflowPanel from './editor/WorkflowPanel.vue'
 import { usePageEditor } from './editor/usePageEditor'
 import type { WorkflowActionId } from './workflow'
+import type { PageRegistryEntry } from '@/types'
 import type { CodeMirrorHandle } from '@/features/interface/components/codemirrorHandle'
 import { LAYOUT_OPTIONS, LAYOUT_PRESETS, presetFor, type LayoutPreset } from './layouts'
 import { blockIssues, parseBlocks, serializeBlocks, type Block } from './blocks'
@@ -60,6 +64,7 @@ const {
   removeTemplate,
   setMode,
   save,
+  restoreVersion,
   updateMeta,
   startAutosave
 } = usePageEditor()
@@ -192,11 +197,65 @@ function runCommand(name: string): void {
     case 'table':
       cm?.insertSnippet(TABLE_SNIPPET)
       break
+    case 'statblock':
+      cm?.insertSnippet(STATBLOCK_SNIPPET)
+      break
     case 'link':
       linkOpen.value = true
       break
     default:
       break
+  }
+}
+
+/* ── Suggerimenti [[wiki]] ── */
+interface WikiSuggest {
+  query: string
+  x: number
+  y: number
+}
+
+const registry = useRegistryStore()
+const wikiSuggest = ref<WikiSuggest | null>(null)
+
+async function onWikiSuggest(suggest: WikiSuggest | null): Promise<void> {
+  wikiSuggest.value = suggest
+  if (suggest && !registry.pages.length) {
+    try {
+      const doc = await registryApi.get()
+      registry.setRegistry(doc.pages as PageRegistryEntry[], doc.sections || [], doc.ui)
+    } catch {
+      /* registro non leggibile: nessun suggerimento */
+    }
+  }
+}
+
+const wikiHits = computed(() => {
+  const q = (wikiSuggest.value?.query || '').trim().toLowerCase()
+  return registry.pages
+    .filter(
+      (entry) =>
+        entry.path && (!q || (entry.l || '').toLowerCase().includes(q) || (entry.k || '').toLowerCase().includes(q))
+    )
+    .slice(0, 8)
+})
+
+function insertWikiLink(entry: PageRegistryEntry): void {
+  cmRef.value?.replaceWikiLink(entry.l || entry.k, '/' + (entry.path || entry.k))
+  wikiSuggest.value = null
+}
+
+/* ── Drag-and-drop di immagini nel testo ── */
+async function onDropFiles(files: File[]): Promise<void> {
+  for (const file of files) {
+    try {
+      const dataUri = await compressImage(file)
+      const path = await uploadImage(dataUri, mediaName(file.name))
+      cmRef.value?.insertImage(path, file.name.replace(/\.[a-zA-Z0-9]+$/, '') || 'immagine')
+      ui.toast('Immagine caricata nel testo', 'success')
+    } catch (e) {
+      ui.toast('Upload fallito: ' + errorText(e), 'error')
+    }
   }
 }
 
@@ -310,6 +369,7 @@ function onGlobalKeydown(event: KeyboardEvent): void {
     return
   }
   if (event.key === 'Escape') {
+    if (wikiSuggest.value) wikiSuggest.value = null
     if (mediaOpen.value) mediaOpen.value = false
     if (linkOpen.value) linkOpen.value = false
     if (showShortcuts.value) showShortcuts.value = false
@@ -473,6 +533,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
       </label>
       <WorkflowPanel :page="page" :role="auth.role" :disabled="saveState === 'saving'" @action="onWorkflowAction" />
 
+      <VersionsPanel :page-key="page.k" :page="page" :current-markdown="markdown" @restore="restoreVersion" />
+
       <div class="arc-meta-actions">
         <button class="btn btn-soft btn-sm" type="button" @click="showPicker = true">
           <VIcon name="structure" :size="14" /> {{ template ? 'Cambia modello' : 'Applica modello' }}
@@ -610,7 +672,28 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
               @update:model-value="editor.setContent($event)"
               @save="saveNow"
               @request-link="linkOpen = true"
+              @drop-files="onDropFiles"
+              @wiki-suggest="onWikiSuggest"
             />
+            <div
+              v-if="wikiSuggest && wikiHits.length"
+              class="arc-wiki-suggest"
+              :style="{ left: wikiSuggest.x + 'px', top: wikiSuggest.y + 4 + 'px' }"
+              role="listbox"
+              aria-label="Collega a una pagina"
+            >
+              <button
+                v-for="hit in wikiHits"
+                :key="hit.k"
+                class="arc-wiki-hit"
+                type="button"
+                @click="insertWikiLink(hit)"
+              >
+                <span>{{ hit.i || '📄' }}</span>
+                <span class="arc-wiki-hit-label">{{ hit.l || hit.k }}</span>
+                <code>/{{ hit.path }}</code>
+              </button>
+            </div>
           </template>
         </div>
       </div>
@@ -693,3 +776,46 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
     </div>
   </section>
 </template>
+
+<style scoped>
+.arc-wiki-suggest {
+  position: fixed;
+  z-index: 300;
+  min-width: 260px;
+  max-width: 340px;
+  max-height: 260px;
+  overflow: auto;
+  background: var(--asurface-2, #141821);
+  border: 1px solid var(--aline, rgba(200, 155, 60, 0.35));
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+.arc-wiki-hit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 8px;
+  color: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.arc-wiki-hit:hover {
+  background: var(--accent-soft, rgba(200, 155, 60, 0.15));
+}
+.arc-wiki-hit-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.arc-wiki-hit code {
+  font-size: 11px;
+  opacity: 0.6;
+}
+</style>

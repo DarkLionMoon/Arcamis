@@ -54,7 +54,8 @@ const markdownTools: Array<{ group: string; tools: Tool[] }> = [
       { name: 'link', icon: 'link', label: 'Link', keys: 'Ctrl+K' },
       { name: 'image', icon: 'image', label: 'Immagine dalla libreria' },
       { name: 'code', icon: 'code', label: 'Blocco codice' },
-      { name: 'table', icon: 'table', label: 'Tabella' }
+      { name: 'table', icon: 'table', label: 'Tabella' },
+      { name: 'statblock', icon: 'statblock', label: 'Stat block creatura' }
     ]
   }
 ]

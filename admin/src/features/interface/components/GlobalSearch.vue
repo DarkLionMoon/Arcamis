@@ -21,9 +21,125 @@ let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 type Hit = PageRegistryEntry | { k: string; title: string; icon: string }
 
-const hits = computed<Array<Hit & { kind: 'page' | 'content'; match: string }>>(() => {
+type SearchHit = Hit & { kind: 'page' | 'content' | 'action'; match: string }
+
+interface AdminAction {
+  id: string
+  label: string
+  icon: string
+  hint: string
+  keywords: string
+  run: () => void
+}
+
+/* Command palette: `>azione` filtra solo le azioni, altrimenti si mescolano
+   ai risultati delle pagine. */
+const ADMIN_ACTIONS: AdminAction[] = [
+  {
+    id: 'new-page',
+    label: 'Nuova pagina',
+    icon: '➕',
+    hint: 'crea dal registro',
+    keywords: 'crea nuova pagina',
+    run: () => router.push('/pagine?new=1')
+  },
+  {
+    id: 'go-dashboard',
+    label: 'Vai alla dashboard',
+    icon: '📊',
+    hint: 'panoramica',
+    keywords: 'home dashboard',
+    run: () => router.push('/')
+  },
+  {
+    id: 'go-pages',
+    label: 'Vai alle pagine',
+    icon: '📄',
+    hint: 'elenco e stati',
+    keywords: 'pagine elenco',
+    run: () => router.push('/pagine')
+  },
+  {
+    id: 'go-media',
+    label: 'Vai ai media',
+    icon: '🖼',
+    hint: 'libreria immagini',
+    keywords: 'media immagini',
+    run: () => router.push('/media')
+  },
+  {
+    id: 'go-map',
+    label: 'Vai alla mappa',
+    icon: '🗺',
+    hint: 'puntine ed esplorazione',
+    keywords: 'mappa pins',
+    run: () => router.push('/mapa')
+  },
+  {
+    id: 'go-carousel',
+    label: 'Vai al carousel',
+    icon: '🎠',
+    hint: 'slide della home',
+    keywords: 'carousel slide home',
+    run: () => router.push('/carousel')
+  },
+  {
+    id: 'go-changelog',
+    label: 'Vai al changelog',
+    icon: '📜',
+    hint: 'note di versione',
+    keywords: 'changelog versioni',
+    run: () => router.push('/changelog')
+  },
+  {
+    id: 'go-scanner',
+    label: 'Vai allo scanner link',
+    icon: '🔗',
+    hint: 'link rotti e menzioni',
+    keywords: 'scanner link rotti',
+    run: () => router.push('/link-scanner')
+  },
+  {
+    id: 'go-backup',
+    label: 'Vai ai backup',
+    icon: '💾',
+    hint: 'salvataggi contenuti',
+    keywords: 'backup salvataggio',
+    run: () => router.push('/backup')
+  },
+  {
+    id: 'go-audit',
+    label: "Vai all'audit",
+    icon: '📋',
+    hint: 'registro attività',
+    keywords: 'audit log attività',
+    run: () => router.push('/audit')
+  },
+  {
+    id: 'go-users',
+    label: 'Vai agli utenti',
+    icon: '👥',
+    hint: 'ruoli e accessi',
+    keywords: 'utenti ruoli',
+    run: () => router.push('/utenti')
+  }
+]
+
+const actionOnly = computed(() => q.value.trim().startsWith('>'))
+
+const actionTerm = computed(() => q.value.trim().replace(/^>\s*/, '').toLowerCase())
+
+const actionHits = computed<SearchHit[]>(() => {
+  const term = actionOnly.value ? actionTerm.value : q.value.trim().toLowerCase()
+  return ADMIN_ACTIONS.filter((a) => !term || a.label.toLowerCase().includes(term) || a.keywords.includes(term)).map(
+    (a) => ({ k: a.id, title: a.label, icon: a.icon, kind: 'action' as const, match: a.hint })
+  )
+})
+
+const hits = computed<SearchHit[]>(() => {
   const term = q.value.trim().toLowerCase()
-  const out: Array<Hit & { kind: 'page' | 'content'; match: string }> = []
+  if (actionOnly.value) return actionHits.value
+  const out: SearchHit[] = []
   if (term) {
     for (const p of registry.pages) {
       const k = (p.k || '').toLowerCase()
@@ -36,6 +152,9 @@ const hits = computed<Array<Hit & { kind: 'page' | 'content'; match: string }>>(
     for (const r of fullText.value) {
       out.push({ ...r, kind: 'content', match: 'contenuto: ' + r.title })
     }
+    out.push(...actionHits.value.slice(0, 3))
+  } else {
+    out.push(...actionHits.value.slice(0, 5))
   }
   return out
 })
@@ -75,8 +194,13 @@ watch(
   }
 )
 
-function go(h: Hit & { kind: 'page' | 'content' }) {
+function go(h: SearchHit) {
   emit('close')
+  if (h.kind === 'action') {
+    const action = ADMIN_ACTIONS.find((a) => a.id === h.k)
+    action?.run()
+    return
+  }
   router.push('/editor/' + encodeURIComponent(h.k))
 }
 
@@ -128,13 +252,15 @@ onBeforeUnmount(() => {
           <span>{{ h.icon || (h.kind === 'content' ? '📄' : '◦') }}</span>
           <span class="arc-search-hit-label">{{ h.title || h.l || h.k }}</span>
           <code class="arc-search-hit-key">{{ h.k }}</code>
-          <span class="arc-search-hit-kind">{{ h.kind === 'content' ? 'contenuto' : 'pagina' }}</span>
+          <span class="arc-search-hit-kind">{{
+            h.kind === 'content' ? 'contenuto' : h.kind === 'action' ? 'azione' : 'pagina'
+          }}</span>
         </button>
 
         <div v-if="searching" class="arc-empty-side" style="padding: 16px">Ricerca…</div>
         <div v-else-if="q && !hits.length" class="arc-empty-side" style="padding: 16px">Nessun risultato.</div>
         <div v-else-if="!q" class="arc-empty-side" style="padding: 16px; opacity: 0.4">
-          Premi ↑/↓ per navigare, Invio per aprire l'editor.
+          ↑/↓ per navigare, Invio per aprire. Digita <code>&gt;</code> per le azioni.
         </div>
       </div>
     </div>
