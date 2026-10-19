@@ -15,7 +15,7 @@ export async function onRequest(context) {
   const cors = {
     'Access-Control-Allow-Origin': 'https://arcamis.pages.dev',
     'Content-Type': 'application/json',
-    'Cache-Control': 'public, max-age=60, stale-while-revalidate=600'
+    'Cache-Control': 'public, max-age=60, stale-while-revalidate=600',
   };
 
   const SLIDE_KEYS = ['carousel_0', 'carousel_1', 'carousel_2'];
@@ -37,14 +37,14 @@ export async function onRequest(context) {
           tit: s.tit || '',
           sub: s.sub || '',
           desc: s.desc || '',
-          btns: Array.isArray(s.btns) ? s.btns : []
+          btns: Array.isArray(s.btns) ? s.btns : [],
         };
       });
       return new Response(
         JSON.stringify({
           managed: true,
           settings: { ...DEFAULT_SETTINGS, ...(manifest.settings || {}) },
-          slides
+          slides,
         }),
         { headers: cors }
       );
@@ -55,7 +55,7 @@ export async function onRequest(context) {
         const [img, metaRaw, btnsRaw] = await Promise.all([
           KV.get('admin_cover_' + key).catch(() => null),
           KV.get('admin_cover_' + key + '_meta').catch(() => null),
-          KV.get('admin_cover_' + key + '_btns').catch(() => null)
+          KV.get('admin_cover_' + key + '_btns').catch(() => null),
         ]);
 
         let meta = null;
@@ -72,7 +72,7 @@ export async function onRequest(context) {
           key,
           img: img ? coverToUrl(key, img) : null,
           meta: meta || null,
-          btns: btns || null
+          btns: btns || null,
         };
       })
     );
@@ -81,7 +81,7 @@ export async function onRequest(context) {
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), {
       status: 500,
-      headers: cors
+      headers: cors,
     });
   }
 }

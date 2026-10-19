@@ -828,7 +828,7 @@ export async function onRequest(context) {
           JSON.stringify({
             managed: true,
             slides: manifest.slides,
-            settings: { ...DEFAULT_SETTINGS, ...(manifest.settings || {}) }
+            settings: { ...DEFAULT_SETTINGS, ...(manifest.settings || {}) },
           }),
           { headers: cors }
         );
@@ -838,13 +838,13 @@ export async function onRequest(context) {
           const [img, metaRaw, btnsRaw] = await Promise.all([
             KV.get(carouselMetaKey(key)).catch(() => null),
             KV.get(carouselMetaKey(key, '_meta')).catch(() => null),
-            KV.get(carouselMetaKey(key, '_btns')).catch(() => null)
+            KV.get(carouselMetaKey(key, '_btns')).catch(() => null),
           ]);
           return {
             key,
             img: img ? coverToUrl(key, img) : '',
             meta: parseJson(metaRaw, {}),
-            btns: parseJson(btnsRaw, [])
+            btns: parseJson(btnsRaw, []),
           };
         })
       );
@@ -852,7 +852,7 @@ export async function onRequest(context) {
         JSON.stringify({
           managed: false,
           slides: seedSlidesFromLegacy(slides),
-          settings: { ...DEFAULT_SETTINGS }
+          settings: { ...DEFAULT_SETTINGS },
         }),
         { headers: cors }
       );
@@ -867,7 +867,7 @@ export async function onRequest(context) {
     if (await genericRateLimit('set_carousel_config', 20, 60)) {
       return new Response(JSON.stringify({ error: 'Troppe richieste, riprova più tardi' }), {
         status: 429,
-        headers: cors
+        headers: cors,
       });
     }
     let body;
@@ -887,7 +887,7 @@ export async function onRequest(context) {
     }
     const { config, error } = sanitizeConfig(body, {
       isValidImage: validImageValue,
-      isValidHref: validCarouselHref
+      isValidHref: validCarouselHref,
     });
     if (error) {
       return new Response(JSON.stringify({ error }), { status: 400, headers: cors });
