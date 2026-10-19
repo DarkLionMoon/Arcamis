@@ -64,6 +64,7 @@
   }
 
   var STATO_LABEL = { aperta: '🟢 Aperta', attiva: '🟡 In corso', completata: '✅ Completata' };
+  var STATO_CLASS = { aperta: ' is-open', attiva: '', completata: ' is-done' };
 
   window.initQuestBoard = function (root) {
     if (!root || root._qbInit) return;
@@ -98,7 +99,7 @@
             var mine = accepted.indexOf(x.id) !== -1;
             html +=
               '<article class="qb-card' + (mine ? ' mine' : '') + '">' +
-              '<div class="qb-stato">' + (STATO_LABEL[x.stato] || esc(x.stato)) + (mine ? ' · ⚔️ accettata' : '') + '</div>' +
+              '<div class="qb-stato' + (STATO_CLASS[x.stato] || '') + '">' + (STATO_LABEL[x.stato] || esc(x.stato)) + (mine ? ' · ⚔️ accettata' : '') + '</div>' +
               '<h3>' + esc(x.titolo) + '</h3>' +
               '<p>' + esc(x.descrizione || '') + '</p>' +
               '<div class="qb-meta">' +

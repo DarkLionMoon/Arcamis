@@ -177,7 +177,7 @@ ricostruisce il sito (~30 s) e la modifica va online da sola.
    prima di cambiare pagina con modifiche pendenti.
 
 La sidebar è in 5 gruppi: **Pannello** (Dashboard, Utenti), **Contenuti**
-(Pagine, Copertine, Media, Cestino), **Feature** (Mappa, Carousel, Changelog),
+(Pagine, Copertine, Media, Cestino), **Feature** (Mappa, Carousel, Missioni, Calendario, Changelog),
 **Sistema** (Navigazione, Interfaccia, Impostazioni), **Sicurezza** (Audit,
 Scanner link, Trova & Sostituisci, Media orfani, Backup). La **Dashboard**
 mostra visite totali, pagine nel registro, stato del deploy (con riverifica),
@@ -251,6 +251,13 @@ controllare se una pagina "sparisce".
   modificare, Salva. Coordinate in percentuali: valgono a ogni zoom.
   La spunta "esplorato" decide se il sito mostra il luogo o "Inesplorato"
   (fog of war) con conteggio in home.
+- **Missioni** (Tavolo da gioco): crea/modifica/riordina/elimina le missioni
+  di `content/quests.json` (titolo, stato, descrizione, ricompensa, livello,
+  master, tag); un solo salvataggio per tutto. Le accettazioni dei party
+  restano nei browser dei giocatori, qui si gestisce lo stato ufficiale.
+- **Calendario** (Tavolo da gioco): epoca, giorni per mese, mesi (uno per
+  riga), giorni della settimana e feste di `content/calendar.json`; il sito
+  converte da solo la data reale nel datario del mondo.
 - **Changelog**: voci versione/sottoversione/patch + data, titolo, markdown.
 - **Media**: upload con conversione WebP e resize a 1920 px automatici;
   l'eliminazione chiede di digitare il nome (è un commit, non va nel cestino).

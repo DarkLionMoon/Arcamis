@@ -8,6 +8,8 @@ import { canAccess, deniedMessage, type RequiredRole } from './roles'
 import DashboardView from '@/features/dashboard/DashboardView.vue'
 import MapEditorView from '@/features/map/MapEditorView.vue'
 import CarouselView from '@/features/carousel/CarouselView.vue'
+import QuestsView from '@/features/quests/QuestsView.vue'
+import CalendarView from '@/features/calendar/CalendarView.vue'
 import UsersView from '@/features/users/UsersView.vue'
 import PageListView from '@/features/pages/PageListView.vue'
 import PageEditorView from '@/features/pages/PageEditorView.vue'
@@ -36,6 +38,8 @@ const routes: RouteRecordRaw[] = [
       { path: 'pagine', name: 'pages', component: PageListView },
       { path: 'editor/:key', name: 'editor', component: PageEditorView, meta: { minRole: 'editor', wide: true } },
       { path: 'mapa', name: 'map', component: MapEditorView, meta: { minRole: 'editor' } },
+      { path: 'missioni', name: 'quests', component: QuestsView, meta: { minRole: 'editor' } },
+      { path: 'calendario', name: 'calendar', component: CalendarView, meta: { minRole: 'editor' } },
       { path: 'carousel', name: 'carousel', component: CarouselView, meta: { minRole: 'editor' } },
       { path: 'copertine', name: 'covers', component: CoversView, meta: { minRole: 'editor' } },
       { path: 'navigazione', name: 'navigation', component: NavigationView, meta: { minRole: 'admin' } },

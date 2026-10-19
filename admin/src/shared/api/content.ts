@@ -7,6 +7,7 @@
 import { adminUrl, request } from './http'
 import { decodeBase64Utf8, ghApi } from './github'
 import type {
+  CalendarConfig,
   CarouselConfig,
   CarouselConfigResponse,
   CoversMap,
@@ -15,6 +16,8 @@ import type {
   MapData,
   PageContent,
   PageRegistryEntry,
+  Quest,
+  QuestsDoc,
   SectionRegistryEntry,
   UIConfig
 } from '@/types'
@@ -196,6 +199,49 @@ export const layoutsApi = {
       JSON.stringify(registry, null, 2) + '\n',
       sha
     )
+    return { sha: result.content.sha }
+  }
+}
+
+/* ── Tavolo da gioco: missioni e calendario vivono nel repo ── */
+async function getRepoJson<T>(path: string, fallback: T): Promise<{ data: T; sha: string | null }> {
+  try {
+    const file = await ghApi.get(path)
+    return { data: JSON.parse(decodeBase64Utf8(file.content)) as T, sha: file.sha }
+  } catch {
+    return { data: fallback, sha: null }
+  }
+}
+
+export const questsApi = {
+  async get(): Promise<{ quests: Quest[]; sha: string | null }> {
+    const { data, sha } = await getRepoJson<QuestsDoc>('content/quests.json', { quests: [] })
+    return { quests: Array.isArray(data.quests) ? data.quests : [], sha }
+  },
+
+  async save(quests: Quest[], sha: string | null, message = 'admin: update quests'): Promise<{ sha: string }> {
+    const result = await ghApi.put('content/quests.json', message, JSON.stringify({ quests }, null, 2) + '\n', sha)
+    return { sha: result.content.sha }
+  }
+}
+
+const CALENDAR_FALLBACK: CalendarConfig = {
+  epochGregorian: '2024-01-01',
+  epochArcamis: { anno: 1492, mese: 0, giorno: 1 },
+  mesi: ['Primofiore'],
+  giorniMese: 30,
+  giorniSettimana: [],
+  feste: []
+}
+
+export const calendarApi = {
+  async get(): Promise<{ config: CalendarConfig; sha: string | null }> {
+    const { data, sha } = await getRepoJson<CalendarConfig>('content/calendar.json', CALENDAR_FALLBACK)
+    return { config: data, sha }
+  },
+
+  async save(config: CalendarConfig, sha: string | null, message = 'admin: update calendar'): Promise<{ sha: string }> {
+    const result = await ghApi.put('content/calendar.json', message, JSON.stringify(config, null, 2) + '\n', sha)
     return { sha: result.content.sha }
   }
 }
