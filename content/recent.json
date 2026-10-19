@@ -37,16 +37,16 @@
    "lastEdited": "2026-10-18T06:42:27.642Z"
   },
   {
+   "id": "pag-credits",
+   "title": "Crediti & Legale",
+   "icon": "⚖️",
+   "lastEdited": "2026-10-18T06:42:06.504Z"
+  },
+  {
    "id": "pag-imprese",
    "title": "Imprese e Licenze",
    "icon": "⚖️",
    "lastEdited": "2026-09-09T00:00:00Z"
-  },
-  {
-   "id": "pag-specie-homebrew",
-   "title": "Specie Homebrew",
-   "icon": "🧬",
-   "lastEdited": "2026-08-26T20:24:46.885Z"
   }
  ]
 }
