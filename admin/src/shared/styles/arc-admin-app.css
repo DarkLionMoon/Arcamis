@@ -1114,6 +1114,14 @@
   color: #ffffff;
 }
 
+.arc-slide-sub {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(216, 178, 92, 0.9);
+}
+
 .arc-slide-desc {
   margin: 0;
   font-size: 12px;

@@ -77,9 +77,10 @@ admin — vedi Parte 2.)
 
 ## 1.4 Le pagine speciali
 
-- **Home** (`app-home.js`): hero con **carousel da 3 slide** i cui testi,
-  bottoni e sfondi si gestiscono dal pannello (chiavi KV `admin_cover_*`,
-  servite da `/api/carousel`; senza override restano i default hardcoded).
+- **Home** (`app-home.js`): hero con **carousel dinamico** — numero, ordine,
+  visibilità, testi, bottoni, sfondi e rotazione si gestiscono dal pannello
+  (manifest KV `admin_carousel` servito da `/api/carousel`; senza manifest
+  restano le 3 slide hardcoded con gli override legacy `admin_cover_*`).
   Card delle pagine con copertine lazy (`/api/cover/<id>`, ETag + revalidate).
 - **Materiale Approvato** (layout `materiale`): browser stile 5e.tools —
   **indice laterale** ricercabile con filtri per fonte (35+ manuali,
@@ -212,8 +213,11 @@ controllare se una pagina "sparisce".
 ## 2.5 Le altre sezioni
 
 - **Copertine**: un'anteprima per pagina (URL, upload, reset) per homepage e card.
-- **Carousel**: le 3 slide della home — sfondo dalla libreria o trascinato,
-  tag, titolo, descrizione, bottoni (max 3), anteprima live, salvataggio unico.
+- **Carousel**: slide a piacere (max 8) — aggiungi, elimina, riordina ↑↓,
+  nascondi, id/nome/tag/titolo/**sottotitolo**/descrizione, sfondo dalla libreria o trascinato,
+  bottoni (max 3), più intervallo autoplay e pausa su hover; anteprima live e
+  un solo salvataggio per tutto; Reset cancella il manifest e torna ai default.
+  I manifest salvati prima del sottotitolo restano validi (migrazione in lettura).
 - **Mappa**: click per aggiungere puntine, trascina per spostare, click per
   modificare, Salva. Coordinate in percentuali: valgono a ogni zoom.
 - **Changelog**: voci versione/sottoversione/patch + data, titolo, markdown.

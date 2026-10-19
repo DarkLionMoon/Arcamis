@@ -12,7 +12,9 @@ import type {
   PageContent,
   MapPin,
   MapData,
-  CarouselSlide,
+  CarouselConfig,
+  CarouselSettings,
+  CarouselSlideFull,
   UIConfig,
   AuditEntry,
   AnalyticsData,
@@ -409,87 +411,84 @@ export const useMapStore = defineStore('map', () => {
 // ──────────────────────────────────────────────
 // Carousel Store
 // ──────────────────────────────────────────────
+/* Le slide sono dinamiche (manifest KV): questi sono solo i seed usati
+   quando il manifest non esiste ancora — gli stessi default hardcoded
+   della home, così l'editor parte senza migrazioni. */
+export const CAROUSEL_SEED_SLIDES: CarouselSlideFull[] = [
+  {
+    id: 'carousel_0',
+    label: 'Slide 1 — Arcamis Porto',
+    img: '',
+    tag: 'Città Portuale — Marche di Arcamis',
+    tit: 'ARCAMIS',
+    sub: '',
+    desc: "Città portuale delle Marche di Arcamis, porta d'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.",
+    btns: [
+      { label: 'Entra nel Discord', href: 'https://discord.gg/JZPnXZbXEJ' },
+      { label: 'Scopri la città ↓', href: '' }
+    ],
+    hidden: false
+  },
+  {
+    id: 'carousel_1',
+    label: 'Slide 2 — Pantheon',
+    img: '',
+    tag: 'Pantheon di Arcamis',
+    tit: 'LE DIVINITÀ DI ARCAMIS',
+    sub: '',
+    desc: 'Ogni dio ha lasciato il proprio segno sulla terra. Scopri il Pantheon e i culti che plasmano il mondo.',
+    btns: [{ label: 'Scopri il Pantheon →', href: '' }],
+    hidden: false
+  },
+  {
+    id: 'carousel_2',
+    label: 'Slide 3 — Personaggio',
+    img: '',
+    tag: 'Crea il tuo eroe',
+    tit: 'CREA IL TUO PERSONAGGIO',
+    sub: '',
+    desc: 'Scegli la tua classe, forgia la tua storia. Il tuo personaggio esiste solo su Arcamis.',
+    btns: [{ label: 'Come si inizia →', href: '' }],
+    hidden: false
+  }
+]
+
+export const CAROUSEL_DEFAULT_SETTINGS: CarouselSettings = { intervalMs: 6000, pauseOnHover: true }
+export const CAROUSEL_MAX_SLIDES = 8
+
 export const useCarouselStore = defineStore('carousel', () => {
-  const slides = ref<CarouselSlide[]>([
-    {
-      key: 'carousel_0',
-      label: 'Slide 1 — Arcamis Porto',
-      image: '',
-      tag: 'Città Portuale — Marche di Arcamis',
-      title: 'ARCAMIS',
-      description:
-        "Città portuale delle Marche di Arcamis, porta d'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.",
-      buttons: [
-        { label: 'Entra nel Discord', href: 'https://discord.gg/JZPnXZbXEJ' },
-        { label: 'Scopri la città ↓', href: '' }
-      ],
-      defTag: 'Città Portuale — Marche di Arcamis',
-      defTit: 'ARCAMIS',
-      defDesc:
-        "Città portuale delle Marche di Arcamis, porta d'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.",
-      defBtns: [
-        { label: 'Entra nel Discord', href: 'https://discord.gg/JZPnXZbXEJ' },
-        { label: 'Scopri la città ↓', href: '' }
-      ]
-    },
-    {
-      key: 'carousel_1',
-      label: 'Slide 2 — Pantheon',
-      image: '',
-      tag: 'Pantheon di Arcamis',
-      title: 'LE DIVINITÀ DI ARCAMIS',
-      description:
-        'Ogni dio ha lasciato il proprio segno sulla terra. Scopri il Pantheon e i culti che plasmano il mondo.',
-      buttons: [{ label: 'Scopri il Pantheon →', href: '' }],
-      defTag: 'Pantheon di Arcamis',
-      defTit: 'LE DIVINITÀ DI ARCAMIS',
-      defDesc: 'Ogni dio ha lasciato il proprio segno sulla terra. Scopri il Pantheon e i culti che plasmano il mondo.',
-      defBtns: [{ label: 'Scopri il Pantheon →', href: '' }]
-    },
-    {
-      key: 'carousel_2',
-      label: 'Slide 3 — Personaggio',
-      image: '',
-      tag: 'Crea il tuo eroe',
-      title: 'CREA IL TUO PERSONAGGIO',
-      description: 'Scegli la tua classe, forgia la tua storia. Il tuo personaggio esiste solo su Arcamis.',
-      buttons: [{ label: 'Come si inizia →', href: '' }],
-      defTag: 'Crea il tuo eroe',
-      defTit: 'CREA IL TUO PERSONAGGIO',
-      defDesc: 'Scegli la tua classe, forgia la tua storia. Il tuo personaggio esiste solo su Arcamis.',
-      defBtns: [{ label: 'Come si inizia →', href: '' }]
-    }
-  ])
+  const slides = ref<CarouselSlideFull[]>([])
+  const settings = ref<CarouselSettings>({ ...CAROUSEL_DEFAULT_SETTINGS })
+  const managed = ref(false)
   const loading = ref(false)
 
-  function setSlides(s: CarouselSlide[]) {
-    slides.value = s
-  }
-
-  function updateSlide(key: string, updates: Partial<CarouselSlide>) {
-    const idx = slides.value.findIndex((s) => s.key === key)
-    if (idx !== -1) {
-      slides.value[idx] = { ...slides.value[idx], ...updates }
-    }
-  }
-
-  function clear() {
-    slides.value = slides.value.map((s) => ({
-      ...s,
-      image: '',
-      tag: s.defTag,
-      title: s.defTit,
-      description: s.defDesc,
-      buttons: [...s.defBtns]
+  function setConfig(config: CarouselConfig, isManaged: boolean): void {
+    slides.value = (config.slides || []).map((s) => ({
+      id: s.id,
+      label: s.label || s.id,
+      img: s.img || '',
+      tag: s.tag || '',
+      tit: s.tit || '',
+      sub: s.sub || '',
+      desc: s.desc || '',
+      btns: (s.btns || []).map((b) => ({ label: b.label || '', href: b.href || '' })),
+      hidden: s.hidden === true
     }))
+    settings.value = { ...CAROUSEL_DEFAULT_SETTINGS, ...(config.settings || {}) }
+    managed.value = isManaged
+  }
+
+  function setSlides(s: CarouselSlideFull[]): void {
+    slides.value = s
   }
 
   return {
     slides,
+    settings,
+    managed,
     loading,
-    setSlides,
-    updateSlide,
-    clear
+    setConfig,
+    setSlides
   }
 })
 

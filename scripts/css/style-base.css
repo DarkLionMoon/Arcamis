@@ -290,6 +290,13 @@ nav#tnav{display:flex;align-items:stretch}
   color:#f0e6d2;line-height:.95;margin-bottom:18px;
   text-shadow:0 4px 50px rgba(0,0,0,.95),0 0 100px rgba(80,60,180,.25);
 }
+/* Subtitle (sottotitolo tra titolo e descrizione) */
+.ssub{
+  font-family:'Cinzel',serif;font-size:20px;font-weight:400;letter-spacing:.14em;
+  color:rgba(200,170,255,.85);text-transform:uppercase;margin:-8px 0 16px;
+  text-shadow:0 2px 20px rgba(0,0,0,.9);
+}
+.ssub:empty{display:none}
 /* Description */
 .sdesc{
   font-size:15.5px;color:rgba(210,195,230,.78);line-height:1.75;
@@ -889,6 +896,7 @@ nav#tnav{display:flex;align-items:stretch}
   .stag{font-size:12px;letter-spacing:.24em;margin-bottom:10px}
   .stag::before{width:20px}
   .stit{font-size:38px;margin-bottom:12px}
+  .ssub{font-size:15px;margin:-4px 0 12px}
   .sdesc{font-size:13.5px;line-height:1.6;margin-bottom:20px}
   .cnav{width:34px;height:64px;font-size:16px}
   .cdots{right:22px;bottom:32px}
@@ -901,6 +909,7 @@ nav#tnav{display:flex;align-items:stretch}
   #carousel-wrap{min-height:100svh}
   .scnt{padding:0 22px 64px}
   .stit{font-size:30px;margin-bottom:8px}
+  .ssub{display:none}
   .sdesc{display:none}
   .scroll-ind{display:none}
 }

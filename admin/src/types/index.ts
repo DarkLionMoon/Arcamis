@@ -158,41 +158,34 @@ export interface CarouselButton {
   href: string
 }
 
-export interface CarouselSlide {
-  key: string
+/* ── Manifest dinamico (get/set_carousel_config) ── */
+
+/** Una slide completa del manifest: tutto è modificabile, anche l'id. */
+export interface CarouselSlideFull {
+  id: string
   label: string
-  image: string
-  tag: string
-  title: string
-  description: string
-  buttons: CarouselButton[]
-  defTag: string
-  defTit: string
-  defDesc: string
-  defBtns: CarouselButton[]
-}
-
-/** Testi di una slide come stanno in KV (chiavi opzionali). */
-export interface CarouselMeta {
-  tag?: string
-  tit?: string
-  desc?: string
-}
-
-/** Configurazione salvata di una slide, come la restituisce get_carousel. */
-export interface CarouselSlideConfig {
-  key: string
   img: string
-  meta: CarouselMeta
+  tag: string
+  tit: string
+  sub: string
+  desc: string
   btns: CarouselButton[]
+  hidden: boolean
 }
 
-/** Modifica inviata a set_carousel: `img` assente = non toccare l'immagine. */
-export interface CarouselSlideUpdate {
-  key: string
-  img?: string
-  meta?: CarouselMeta
-  btns?: CarouselButton[]
+export interface CarouselSettings {
+  intervalMs: number
+  pauseOnHover: boolean
+}
+
+export interface CarouselConfig {
+  slides: CarouselSlideFull[]
+  settings: CarouselSettings
+}
+
+export interface CarouselConfigResponse extends CarouselConfig {
+  /** false = seed da default + override legacy, manifest non ancora salvato. */
+  managed: boolean
 }
 
 // ──────────────────────────────────────────────

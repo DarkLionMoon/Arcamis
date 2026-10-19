@@ -7,8 +7,8 @@
 import { adminUrl, request } from './http'
 import { decodeBase64Utf8, ghApi } from './github'
 import type {
-  CarouselSlideConfig,
-  CarouselSlideUpdate,
+  CarouselConfig,
+  CarouselConfigResponse,
   CoversMap,
   GHFile,
   LayoutRegistryEntry,
@@ -136,17 +136,30 @@ export const carouselApi = {
     return !!result.ok
   },
 
-  /** Immagini, testi e bottoni delle tre slide della home. */
-  async getSlides(): Promise<CarouselSlideConfig[]> {
-    const result = await request<{ slides: CarouselSlideConfig[] }>(adminUrl('get_carousel'))
-    return result.slides || []
+  /** Manifest completo: slide dinamiche + impostazioni di rotazione. */
+  async getConfig(): Promise<CarouselConfigResponse> {
+    const result = await request<CarouselConfigResponse>(adminUrl('get_carousel_config'))
+    return {
+      managed: !!result.managed,
+      slides: Array.isArray(result.slides) ? result.slides : [],
+      settings: result.settings || { intervalMs: 6000, pauseOnHover: true }
+    }
   },
 
-  /** Salva una slide in una sola scrittura (sfondo + testi + bottoni). */
-  async saveSlide(slide: CarouselSlideUpdate): Promise<boolean> {
-    const result = await request<{ ok: boolean }>(adminUrl('set_carousel'), {
+  /** Salva l'intero manifest in una sola scrittura atomica. */
+  async saveConfig(config: CarouselConfig): Promise<boolean> {
+    const result = await request<{ ok: boolean }>(adminUrl('set_carousel_config'), {
       method: 'POST',
-      body: slide
+      body: config
+    })
+    return !!result.ok
+  },
+
+  /** Cancella il manifest: il sito torna agli hardcoded. */
+  async resetConfig(): Promise<boolean> {
+    const result = await request<{ ok: boolean }>(adminUrl('set_carousel_config'), {
+      method: 'POST',
+      body: { reset: true }
     })
     return !!result.ok
   }

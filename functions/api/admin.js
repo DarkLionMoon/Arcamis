@@ -8,6 +8,13 @@ import {
   rateLimitCheck,
 } from './_lib/auth.js';
 import { coverToUrl } from './_lib/covers.js';
+import {
+  CAROUSEL_MANIFEST_KEY,
+  DEFAULT_SETTINGS,
+  defaultSlides,
+  sanitizeConfig,
+  seedSlidesFromLegacy,
+} from './_lib/carousel-config.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -802,6 +809,94 @@ export async function onRequest(context) {
     }
   }
 
+  /* ════ CAROUSEL HOMEPAGE — configurazione completa (manifest) ════
+     Il manifest (`admin_carousel`) rende le slide dinamiche: numero,
+     ordine, visibilità, contenuti e impostazioni di rotazione in un'unica
+     scrittura atomica. Se assente, si seminano i default + gli override
+     legacy così l'editor parte senza migrazioni. */
+  if (action === 'get_carousel_config') {
+    try {
+      const raw = await KV.get(CAROUSEL_MANIFEST_KEY).catch(() => null);
+      let manifest = null;
+      try {
+        manifest = raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        manifest = null;
+      }
+      if (manifest && Array.isArray(manifest.slides) && manifest.slides.length) {
+        return new Response(
+          JSON.stringify({
+            managed: true,
+            slides: manifest.slides,
+            settings: { ...DEFAULT_SETTINGS, ...(manifest.settings || {}) }
+          }),
+          { headers: cors }
+        );
+      }
+      const slides = await Promise.all(
+        CAROUSEL_KEYS.map(async function (key) {
+          const [img, metaRaw, btnsRaw] = await Promise.all([
+            KV.get(carouselMetaKey(key)).catch(() => null),
+            KV.get(carouselMetaKey(key, '_meta')).catch(() => null),
+            KV.get(carouselMetaKey(key, '_btns')).catch(() => null)
+          ]);
+          return {
+            key,
+            img: img ? coverToUrl(key, img) : '',
+            meta: parseJson(metaRaw, {}),
+            btns: parseJson(btnsRaw, [])
+          };
+        })
+      );
+      return new Response(
+        JSON.stringify({
+          managed: false,
+          slides: seedSlidesFromLegacy(slides),
+          settings: { ...DEFAULT_SETTINGS }
+        }),
+        { headers: cors }
+      );
+    } catch (e) {
+      return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    }
+  }
+  if (action === 'set_carousel_config' && request.method === 'POST') {
+    const csrfOk = await verifyCsrf(request);
+    if (!csrfOk)
+      return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
+    if (await genericRateLimit('set_carousel_config', 20, 60)) {
+      return new Response(JSON.stringify({ error: 'Troppe richieste, riprova più tardi' }), {
+        status: 429,
+        headers: cors
+      });
+    }
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return new Response(JSON.stringify({ error: 'Body non valido' }), { status: 400, headers: cors });
+    }
+    /* Reset: si torna agli hardcoded del sito cancellando il manifest. */
+    if (body && body.reset === true) {
+      try {
+        await KV.delete(CAROUSEL_MANIFEST_KEY);
+      } catch (e) {}
+      await writeAdminLog('carousel_reset', 'manifest');
+      notifyWebhook('🎠 Carousel resettato ai default da ' + (await sessionUser()));
+      return new Response(JSON.stringify({ ok: true }), { headers: cors });
+    }
+    const { config, error } = sanitizeConfig(body, {
+      isValidImage: validImageValue,
+      isValidHref: validCarouselHref
+    });
+    if (error) {
+      return new Response(JSON.stringify({ error }), { status: 400, headers: cors });
+    }
+    await KV.put(CAROUSEL_MANIFEST_KEY, JSON.stringify(config));
+    await writeAdminLog('carousel_config', `${config.slides.length} slide`);
+    notifyWebhook('🎠 Carousel aggiornato (`' + config.slides.length + '` slide) da ' + (await sessionUser()));
+    return new Response(JSON.stringify({ ok: true }), { headers: cors });
+  }
   /* ════ CAROUSEL HOMEPAGE — salvataggio di una slide ════
      Una sola chiamata per sfondo + testi + bottoni: l'editor non deve
      poter lasciare la slide a metà (immagine nuova con testi vecchi).
@@ -840,7 +935,7 @@ export async function onRequest(context) {
     if (body.meta !== undefined) {
       const meta = body.meta && typeof body.meta === 'object' ? body.meta : {};
       const clean = {};
-      for (const field of ['tag', 'tit', 'desc']) {
+      for (const field of ['tag', 'tit', 'sub', 'desc']) {
         const raw = meta[field];
         if (typeof raw !== 'string') continue;
         const value = raw.trim();

@@ -336,6 +336,33 @@
   ];
 
   async function injectCarouselHomeButtons() {
+    /* Carousel gestito dal manifest: gli editor per-slide del vecchio
+       modello scriverebbero chiavi ignorate dal sito. Si offre solo il
+       passaggio al pannello, dove si modifica davvero tutto. */
+    var managed = window.__arcCarouselManaged;
+    if (managed === undefined) {
+      try {
+        var r = await fetch('/api/carousel');
+        var d = await r.json();
+        managed = !!(d && d.managed);
+      } catch (e) {
+        managed = false;
+      }
+    }
+    window.__arcCarouselManaged = managed;
+    if (managed) {
+      var wrap = document.getElementById('carousel-wrap');
+      if (wrap && !document.getElementById('arc-carousel-manage-btn')) {
+        var go = document.createElement('a');
+        go.id = 'arc-carousel-manage-btn';
+        go.className = 'arc-edit-btn';
+        go.style.cssText = 'top:60px;right:20px;text-decoration:none;';
+        go.href = '/admin/app.html#/carousel';
+        go.innerHTML = '<span class="aeb-icon">🎠</span> Gestisci carousel';
+        wrap.appendChild(go);
+      }
+      return;
+    }
     var covers = await arcGetCovers();
     var slides = document.querySelectorAll('.slide');
     slides.forEach(function (slide, i) {
@@ -373,6 +400,7 @@
 
     var curTag = meta.tag || sl.defTag || '';
     var curTit = meta.tit || sl.defTit || '';
+    var curSub = meta.sub || '';
     var curDesc = meta.desc || sl.defDesc || '';
 
     var btnsHtml = sl.btns
@@ -431,6 +459,10 @@
       <div class="ap-field">
         <div class="ap-label">Titolo (grande)</div>
         <input class="ap-input" id="asl-tit-${idx}" value="${escH(curTit)}" placeholder="es. ARCAMIS"/>
+      </div>
+      <div class="ap-field">
+        <div class="ap-label">Sottotitolo (tra titolo e descrizione)</div>
+        <input class="ap-input" id="asl-sub-${idx}" value="${escH(curSub)}" placeholder="es. La città sul mare…"/>
       </div>
       <div class="ap-field">
         <div class="ap-label">Descrizione (paragrafo sotto il titolo)</div>
@@ -510,21 +542,29 @@
     arcToast(ok ? 'Sfondo salvato ✓' : 'Errore salvataggio', ok);
   }
 
-  /* ── Salva testi slide (tag + titolo + descrizione) ── */
+  /* ── Salva testi slide (tag + titolo + sottotitolo + descrizione) ── */
   window.arcSaveSlideText = async function (idx) {
     var key = SLIDES_DEF[idx].key;
     var tag = (document.getElementById('asl-tag-' + idx) || {}).value || '';
     var tit = (document.getElementById('asl-tit-' + idx) || {}).value || '';
+    var sub = (document.getElementById('asl-sub-' + idx) || {}).value || '';
     var desc = (document.getElementById('asl-desc-' + idx) || {}).value || '';
     setApStatus('asl-txt-status-' + idx, 'Salvataggio…', '');
-    var ok = await arcSave(key + '_meta', JSON.stringify({ tag: tag, tit: tit, desc: desc }));
+    var ok = await arcSave(key + '_meta', JSON.stringify({ tag: tag, tit: tit, sub: sub, desc: desc }));
     var slide = document.querySelectorAll('.slide')[idx];
     if (slide && ok) {
       var tagEl = slide.querySelector('.stag');
       var titEl = slide.querySelector('.stit');
+      var subEl = slide.querySelector('.ssub');
+      if (!subEl && sub) {
+        subEl = document.createElement('div');
+        subEl.className = 'ssub';
+        if (titEl && titEl.parentNode) titEl.parentNode.insertBefore(subEl, titEl.nextSibling);
+      }
       var descEl = slide.querySelector('.sdesc');
       if (tagEl) tagEl.textContent = tag;
       if (titEl) titEl.innerHTML = tit.replace(/\n/g, '<br>');
+      if (subEl) subEl.textContent = sub;
       if (descEl) descEl.textContent = desc;
     }
     setApStatus('asl-txt-status-' + idx, ok ? '✓ Salvati' : '✕ Errore', ok ? 'ok' : 'err');
