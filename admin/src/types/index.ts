@@ -151,7 +151,7 @@ export interface MapData {
 }
 
 // ──────────────────────────────────────────────
-// Tavolo da gioco: missioni e calendario
+// Bacheca Missioni
 // ──────────────────────────────────────────────
 export type QuestStatus = 'aperta' | 'attiva' | 'completata'
 
@@ -170,20 +170,6 @@ export interface QuestsDoc {
   quests: Quest[]
 }
 
-export interface CalendarFeast {
-  mese: number
-  giorno: number
-  nome: string
-}
-
-export interface CalendarConfig {
-  epochGregorian: string
-  epochArcamis: { anno: number; mese: number; giorno: number }
-  mesi: string[]
-  giorniMese: number
-  giorniSettimana: string[]
-  feste: CalendarFeast[]
-}
 
 // ──────────────────────────────────────────────
 // Carousel

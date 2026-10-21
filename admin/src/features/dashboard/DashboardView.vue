@@ -193,7 +193,6 @@ onBeforeUnmount(() => deploy.stopTimer())
         </router-link>
         <router-link class="arc-ops-item" to="/link-scanner"> <strong>⟳</strong><span>Scanner link</span> </router-link>
         <router-link class="arc-ops-item" to="/missioni"> <strong>🎯</strong><span>Missioni</span> </router-link>
-        <router-link class="arc-ops-item" to="/calendario"> <strong>📅</strong><span>Calendario</span> </router-link>
         <router-link class="arc-ops-item" to="/media-orfani"> <strong>🖼</strong><span>Media orfani</span> </router-link>
       </div>
       <p v-if="nextScheduled" class="arc-hint" style="margin: 8px 0 0">

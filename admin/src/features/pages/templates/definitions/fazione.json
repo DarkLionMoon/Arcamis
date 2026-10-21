@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "id": "fazione",
+  "label": "Casata / Fazione",
+  "icon": "🏰",
+  "description": "Casate, compagnie, gilde e ordini: identità, gerarchia, alleanze, rivalità e segreti. Ogni fazione diventa una card con stemma e scheda.",
+  "layout": "schede",
+  "separator": "none",
+  "page": {
+    "fields": [],
+    "sections": []
+  },
+  "collections": [
+    {
+      "key": "fazioni",
+      "label": "Fazioni",
+      "singular": "fazione",
+      "description": "Una scheda per casata, compagnia o organizzazione. Le alleanze restano leggibili a colpo d'occhio.",
+      "fields": [
+        { "key": "nome", "label": "Nome", "type": "text", "required": true, "placeholder": "Compagnia della Luna Nera" },
+        {
+          "key": "tipo",
+          "label": "Tipo",
+          "type": "select",
+          "options": [
+            { "value": "Casata", "label": "Casata" },
+            { "value": "Compagnia", "label": "Compagnia" },
+            { "value": "Gilda", "label": "Gilda" },
+            { "value": "Ordine", "label": "Ordine" },
+            { "value": "Culto", "label": "Culto" },
+            { "value": "Esercito", "label": "Esercito" }
+          ]
+        },
+        { "key": "sede", "label": "Sede", "type": "text", "placeholder": "Forte Vigilus" },
+        { "key": "leader", "label": "Leader", "type": "text", "placeholder": "Lady Morgana" },
+        { "key": "motto", "label": "Motto", "type": "text", "placeholder": "La notte ci appartiene" },
+        {
+          "key": "influenza",
+          "label": "Influenza",
+          "type": "select",
+          "options": [
+            { "value": "Locale", "label": "Locale" },
+            { "value": "Regionale", "label": "Regionale" },
+            { "value": "Cittadina", "label": "Cittadina" },
+            { "value": "Globale", "label": "Globale" }
+          ]
+        },
+        { "key": "stemma", "label": "Stemma / immagine", "type": "image" },
+        { "key": "ritaglio", "label": "Ritaglio", "type": "text", "placeholder": "50,50" },
+        { "key": "descrizione", "label": "Descrizione", "type": "markdown", "rows": 4 },
+        { "key": "storia", "label": "Storia", "type": "markdown", "rows": 6 },
+        { "key": "obiettivo", "label": "Obiettivo", "type": "markdown", "rows": 3 },
+        {
+          "key": "membri",
+          "label": "Membri illustri",
+          "type": "tags",
+          "placeholder": "Lady Morgana, Il Corvo"
+        },
+        { "key": "alleati", "label": "Alleati", "type": "tags", "placeholder": "Gilda dei Mercanti" },
+        { "key": "rivali", "label": "Rivali", "type": "tags", "placeholder": "Casata Vaelor" },
+        { "key": "segreti", "label": "Segreti", "type": "markdown", "rows": 4 }
+      ],
+      "item": {
+        "heading": "{nome}",
+        "level": 2,
+        "titleField": "nome",
+        "sections": [
+          {
+            "blocks": [{ "kind": "image", "field": "stemma", "altField": "nome", "posField": "ritaglio" }]
+          },
+          {
+            "blocks": [{ "kind": "markdown", "field": "descrizione" }]
+          },
+          {
+            "blocks": [{ "kind": "definition", "fields": ["tipo", "sede", "leader", "motto", "influenza"] }]
+          },
+          {
+            "heading": "Storia",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "storia" }]
+          },
+          {
+            "heading": "Obiettivo",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "obiettivo" }]
+          },
+          {
+            "heading": "Membri illustri",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "membri" }]
+          },
+          {
+            "heading": "Alleanze",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "alleati" }]
+          },
+          {
+            "heading": "Rivalità",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "rivali" }]
+          },
+          {
+            "heading": "Segreti",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "segreti" }]
+          }
+        ]
+      }
+    }
+  ]
+}

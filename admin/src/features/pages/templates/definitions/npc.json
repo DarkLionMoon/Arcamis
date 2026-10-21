@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "id": "npc",
+  "label": "Personaggio non giocante",
+  "icon": "🎭",
+  "description": "PNG e comprimari: ruolo, fazione, carattere, segreti e agganci narrativi. Pensato per il cast ricorrente della campagna.",
+  "layout": "schede",
+  "separator": "none",
+  "page": {
+    "fields": [],
+    "sections": []
+  },
+  "collections": [
+    {
+      "key": "personaggi",
+      "label": "Personaggi",
+      "singular": "personaggio",
+      "description": "Ogni voce è una card del cast: scheda rapida per il DM e agganci per i giocatori.",
+      "fields": [
+        { "key": "nome", "label": "Nome", "type": "text", "required": true, "placeholder": "Mira la Guaritrice" },
+        { "key": "ruolo", "label": "Ruolo", "type": "text", "placeholder": "Guaritrice del villaggio" },
+        { "key": "fazione", "label": "Fazione", "type": "text", "placeholder": "Compagnia della Luna Nera" },
+        { "key": "razza", "label": "Specie / origine", "type": "text", "placeholder": "Umana" },
+        {
+          "key": "allineamento",
+          "label": "Allineamento",
+          "type": "select",
+          "options": [
+            { "value": "Legale Buono", "label": "Legale Buono" },
+            { "value": "Neutrale Buono", "label": "Neutrale Buono" },
+            { "value": "Caotico Buono", "label": "Caotico Buono" },
+            { "value": "Legale Neutrale", "label": "Legale Neutrale" },
+            { "value": "Neutrale Puro", "label": "Neutrale Puro" },
+            { "value": "Caotico Neutrale", "label": "Caotico Neutrale" },
+            { "value": "Legale Malvagio", "label": "Legale Malvagio" },
+            { "value": "Neutrale Malvagio", "label": "Neutrale Malvagio" },
+            { "value": "Caotico Malvagio", "label": "Caotico Malvagio" },
+            { "value": "Non allineato", "label": "Non allineato" }
+          ]
+        },
+        { "key": "immagine", "label": "Ritratto", "type": "image" },
+        { "key": "ritaglio", "label": "Ritaglio", "type": "text", "placeholder": "50,50" },
+        { "key": "aspetto", "label": "Aspetto", "type": "markdown", "rows": 3 },
+        { "key": "personalita", "label": "Personalità", "type": "markdown", "rows": 4 },
+        {
+          "key": "agganci",
+          "label": "Agganci narrativi",
+          "type": "tags",
+          "placeholder": "Deve una promessa al party, Nasconde una mappa"
+        },
+        { "key": "segreti", "label": "Segreti", "type": "markdown", "rows": 3 }
+      ],
+      "item": {
+        "heading": "{nome}",
+        "level": 2,
+        "titleField": "nome",
+        "sections": [
+          {
+            "blocks": [{ "kind": "image", "field": "immagine", "altField": "nome", "posField": "ritaglio" }]
+          },
+          {
+            "blocks": [{ "kind": "definition", "fields": ["ruolo", "fazione", "razza", "allineamento"] }]
+          },
+          {
+            "heading": "Aspetto",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "aspetto" }]
+          },
+          {
+            "heading": "Personalità",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "personalita" }]
+          },
+          {
+            "heading": "Agganci narrativi",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "agganci" }]
+          },
+          {
+            "heading": "Segreti del DM",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "segreti" }]
+          }
+        ]
+      }
+    }
+  ]
+}

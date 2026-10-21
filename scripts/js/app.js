@@ -104,11 +104,7 @@ var _pathMap = {
   'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur',
   'changelog': 'pag-changelog',
   'credits': 'pag-credits',
-  'gioco/missioni': 'pag-missioni',
-  'gioco/generatori': 'pag-generatori',
-  'gioco/calendario': 'pag-calendario',
-  'gioco/diario': 'pag-diario',
-  'gioco/combattimento': 'pag-combattimento'
+  'missioni': 'pag-missioni'
 };
 
 /* ════ DEEP LINK ════ */

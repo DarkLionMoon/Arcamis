@@ -32,11 +32,7 @@ export const LAYOUT_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'citta', label: 'Città' },
   { value: 'evento', label: 'Evento' },
   { value: 'imprese', label: 'Imprese' },
-  { value: 'missioni', label: 'Bacheca missioni' },
-  { value: 'generatori', label: 'Generatori random' },
-  { value: 'calendario', label: 'Calendario del mondo' },
-  { value: 'diario', label: 'Diario di campagna' },
-  { value: 'combattimento', label: 'Tracker combattimento' }
+  { value: 'missioni', label: 'Bacheca missioni' }
 ]
 
 /* ── Preset di layout ─────────────────────────────────────────────

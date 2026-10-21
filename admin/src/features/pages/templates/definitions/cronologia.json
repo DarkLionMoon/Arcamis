@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "id": "cronologia",
+  "label": "Cronologia / Ere",
+  "icon": "⏳",
+  "description": "Storia del mondo a tappe: una sezione per epoca, con eventi in ordine cronologico. Il sito la impagina come timeline.",
+  "layout": "timeline",
+  "separator": "none",
+  "page": {
+    "fields": [],
+    "sections": []
+  },
+  "collections": [
+    {
+      "key": "epoche",
+      "label": "Epoche",
+      "singular": "epoca",
+      "description": "Ogni voce è una fascia temporale; gli eventi diventano le tappe della timeline.",
+      "fields": [
+        { "key": "titolo", "label": "Epoca", "type": "text", "required": true, "placeholder": "Terza Era" },
+        { "key": "periodo", "label": "Periodo", "type": "text", "placeholder": "812–1024 d.C." },
+        {
+          "key": "descrizione",
+          "label": "Descrizione",
+          "type": "markdown",
+          "rows": 4,
+          "placeholder": "Il periodo delle grandi migrazioni…"
+        },
+        {
+          "key": "eventi",
+          "label": "Eventi",
+          "type": "tags",
+          "placeholder": "812: fondazione di Arcamis, 940: la Piaga di Cenere"
+        }
+      ],
+      "item": {
+        "heading": "{titolo}",
+        "level": 2,
+        "titleField": "titolo",
+        "sections": [
+          {
+            "blocks": [{ "kind": "definition", "fields": ["periodo"] }]
+          },
+          {
+            "blocks": [{ "kind": "markdown", "field": "descrizione" }]
+          },
+          {
+            "heading": "Eventi",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "eventi" }]
+          }
+        ]
+      }
+    }
+  ]
+}

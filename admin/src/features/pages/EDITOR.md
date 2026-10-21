@@ -52,7 +52,7 @@ formato "nuovo" da supportare lato sito.
 | `templates/compile.ts` | modello → markdown, con segnaposto e badge bozza |
 | `templates/validate.ts` | errori che bloccano il salvataggio e avvisi che lo spiegano |
 | `templates/seed.ts` | import "best effort" del markdown esistente nei campi del modello |
-| `templates/definitions/*.json` | i quattro modelli built-in (dati, non codice) |
+| `templates/definitions/*.json` | gli undici modelli built-in (dati, non codice) |
 | `workflow.ts` | specifica del flusso: stati, azioni per ruolo, programmazione, conversione delle date |
 | `scripts/js/page-status.js` | la stessa specifica lato sito (script classico, `window.arcPageWorkflow`) |
 
@@ -118,7 +118,7 @@ Aprire una pagina non basta per pubblicarla: lo stato si cambia dal pannello del
 flusso (`WorkflowPanel`) o dal pulsante **Segna come bozza** in *Dettagli*, che
 usa la stessa azione `back-to-draft` (e chiede conferma se la pagina è online).
 
-## I quattro modelli built-in
+## I modelli built-in
 
 | id | Layout sul sito | Collezione | Forma generata |
 | --- | --- | --- | --- |
@@ -126,6 +126,13 @@ usa la stessa azione `back-to-draft` (e chiede conferma se la pagina è online).
 | `regola` | `regole` | regole | `## Regola N — Titolo`, corpo, `**Eccezioni:**` + elenco, nota `>` |
 | `lore` | `lore` | sezioni | `## Titolo`, sottosezioni `###`, nessun `---` |
 | `mestiere` | `lavori` | mestieri | `# Titolo` di pagina, poi `## Nome` con scheda tecnica |
+| `luogo` | `schede` | luoghi | `## Nome`, immagine, scheda geografica, storia, attrazioni e volti |
+| `fazione` | `schede` | fazioni | `## Nome`, stemma, identità, storia, alleanze, rivalità e segreti |
+| `npc` | `schede` | personaggi | `## Nome`, ritratto, ruolo, personalità, agganci e segreti del DM |
+| `creatura` | `bestiario` | creature | `## Nome`, statistiche, tratti, azioni, reazioni e tattiche |
+| `oggetto` | `oggetti` | oggetti | `## Nome`, immagine, rarità/sintonia, proprietà, poteri e varianti |
+| `sessione` | `schede` | sessioni | `## Sessione N — Titolo`, presenti, riassunto, momenti, premi e conseguenze |
+| `cronologia` | `timeline` | epoche | `## Epoca`, periodo, descrizione ed eventi in timeline |
 
 Il compilatore produce **esattamente** le forme che i renderer di
 `scripts/js/notion-nav.js` riconoscono: le classi di verifica stanno in
@@ -285,13 +292,13 @@ La barra superiore mostra `Tutto salvato` / `Modifiche non salvate`.
    `collections`, `separator`);
 2. registrarlo in `templates/index.ts` (`BUILT_IN_TEMPLATES`);
 3. `templates.test.ts` verifica automaticamente i riferimenti dei blocchi; il
-   test `espone i quattro modelli richiesti` va esteso all'elenco atteso.
+   test `espone i modelli per ogni scopo editoriale` va esteso all'elenco atteso.
 
 ## Verifiche
 
 ```bash
 npm --prefix admin run typecheck
-npm --prefix admin test          # 242 test: blocchi, modelli, compilazione, flusso, guard, palette, mappa
+npm --prefix admin test          # 258 test: blocchi, modelli, compilazione, flusso, guard, palette, mappa
 npm --prefix admin run test:e2e  # 34 test (mock di /api/gh e di /api/admin): editor, mappa, carousel, shell
 npm --prefix admin run build
 ```

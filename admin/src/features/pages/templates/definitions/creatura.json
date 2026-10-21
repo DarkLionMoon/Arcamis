@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "id": "creatura",
+  "label": "Creatura / Mostro",
+  "icon": "🐉",
+  "description": "Bestiario: caratteristiche, difese, tratti, azioni e tattiche. Il sito mostra ogni creatura come scheda da combattimento.",
+  "layout": "bestiario",
+  "separator": "none",
+  "page": {
+    "fields": [],
+    "sections": []
+  },
+  "collections": [
+    {
+      "key": "creature",
+      "label": "Creature",
+      "singular": "creatura",
+      "description": "Una scheda per mostro. I campi numerici restano leggibili anche a colpo d'occhio durante lo scontro.",
+      "fields": [
+        { "key": "nome", "label": "Nome", "type": "text", "required": true, "placeholder": "Goblin Furtivo" },
+        {
+          "key": "tipo",
+          "label": "Tipo",
+          "type": "select",
+          "options": [
+            { "value": "Aberrazione", "label": "Aberrazione" },
+            { "value": "Bestia", "label": "Bestia" },
+            { "value": "Celestiale", "label": "Celestiale" },
+            { "value": "Costrutto", "label": "Costrutto" },
+            { "value": "Drago", "label": "Drago" },
+            { "value": "Elementale", "label": "Elementale" },
+            { "value": "Fata", "label": "Fata" },
+            { "value": "Gigante", "label": "Gigante" },
+            { "value": "Immondo", "label": "Immondo" },
+            { "value": "Melma", "label": "Melma" },
+            { "value": "Mostruosità", "label": "Mostruosità" },
+            { "value": "Non morto", "label": "Non morto" },
+            { "value": "Pianta", "label": "Pianta" },
+            { "value": "Umanoide", "label": "Umanoide" }
+          ]
+        },
+        {
+          "key": "taglia",
+          "label": "Taglia",
+          "type": "select",
+          "options": [
+            { "value": "Minuscola", "label": "Minuscola" },
+            { "value": "Piccola", "label": "Piccola" },
+            { "value": "Media", "label": "Media" },
+            { "value": "Grande", "label": "Grande" },
+            { "value": "Enorme", "label": "Enorme" },
+            { "value": "Mastodontica", "label": "Mastodontica" }
+          ]
+        },
+        {
+          "key": "allineamento",
+          "label": "Allineamento",
+          "type": "text",
+          "placeholder": "Neutrale Malvagio"
+        },
+        { "key": "ca", "label": "Classe Armatura", "type": "number", "placeholder": "15" },
+        { "key": "pf", "label": "Punti Ferita", "type": "text", "placeholder": "7 (2d6)" },
+        { "key": "velocita", "label": "Velocità", "type": "text", "placeholder": "9 m" },
+        { "key": "sfida", "label": "Grado di Sfida", "type": "text", "placeholder": "1/4 (50 PE)" },
+        { "key": "linguaggi", "label": "Linguaggi", "type": "text", "placeholder": "Comune, Goblin" },
+        {
+          "key": "descrizione",
+          "label": "Descrizione",
+          "type": "text",
+          "placeholder": "Piccolo umanoide che tende agguati nei boschi."
+        },
+        {
+          "key": "tratti",
+          "label": "Tratti",
+          "type": "tags",
+          "placeholder": "Furtivo. Si nasconde come azione bonus."
+        },
+        {
+          "key": "azioni",
+          "label": "Azioni",
+          "type": "tags",
+          "placeholder": "Scimitarra. +4 al colpire, 1d6+2 danni taglienti."
+        },
+        {
+          "key": "reazioni",
+          "label": "Reazioni",
+          "type": "tags",
+          "placeholder": "Ritirata rapida. Si muove di metà velocità."
+        },
+        {
+          "key": "tattiche",
+          "label": "Tattiche",
+          "type": "tags",
+          "placeholder": "Attacca in branchi di almeno tre."
+        }
+      ],
+      "item": {
+        "heading": "{nome}",
+        "level": 2,
+        "titleField": "nome",
+        "sections": [
+          {
+            "blocks": [
+              {
+                "kind": "definition",
+                "fields": [
+                  "tipo",
+                  "taglia",
+                  "allineamento",
+                  "ca",
+                  "pf",
+                  "velocita",
+                  "sfida",
+                  "linguaggi",
+                  "descrizione"
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Tratti",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "tratti" }]
+          },
+          {
+            "heading": "Azioni",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "azioni" }]
+          },
+          {
+            "heading": "Reazioni",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "reazioni" }]
+          },
+          {
+            "heading": "Tattiche",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "tattiche" }]
+          }
+        ]
+      }
+    }
+  ]
+}

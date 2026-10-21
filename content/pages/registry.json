@@ -368,56 +368,8 @@
       "c": 1,
       "menu": true,
       "admin": true,
-      "path": "gioco/missioni",
-      "sec": "gioco",
-      "sub": ""
-    },
-    {
-      "k": "generatori",
-      "l": "Generatori",
-      "i": "🎲",
-      "id": "pag-generatori",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "gioco/generatori",
-      "sec": "gioco",
-      "sub": ""
-    },
-    {
-      "k": "calendario",
-      "l": "Calendario di Arcamis",
-      "i": "📅",
-      "id": "pag-calendario",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "gioco/calendario",
-      "sec": "gioco",
-      "sub": ""
-    },
-    {
-      "k": "diario",
-      "l": "Diario di Campagna",
-      "i": "📓",
-      "id": "pag-diario",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "gioco/diario",
-      "sec": "gioco",
-      "sub": ""
-    },
-    {
-      "k": "combattimento",
-      "l": "Tracker di Combattimento",
-      "i": "⚔️",
-      "id": "pag-combattimento",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "gioco/combattimento",
-      "sec": "gioco",
+      "path": "missioni",
+      "sec": "",
       "sub": ""
     }
   ],
@@ -448,10 +400,6 @@
     {
       "v": "homebrew",
       "l": "Homebrew"
-    },
-    {
-      "v": "gioco",
-      "l": "Tavolo da gioco"
     }
   ],
   "lavori": [],

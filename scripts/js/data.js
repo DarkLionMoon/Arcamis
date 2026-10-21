@@ -60,11 +60,7 @@ var pages = [
   {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'},
   {k:'changelog',l:'Changelog',i:'📜',id:'pag-changelog'},
   {k:'credits',l:'Crediti & Legale',i:'⚖️',id:'pag-credits'},
-  {k:'missioni',l:'Bacheca Missioni',i:'🎯',id:'pag-missioni',sec:'gioco'},
-  {k:'generatori',l:'Generatori',i:'🎲',id:'pag-generatori',sec:'gioco'},
-  {k:'calendario',l:'Calendario di Arcamis',i:'📅',id:'pag-calendario',sec:'gioco'},
-  {k:'diario',l:'Diario di Campagna',i:'📓',id:'pag-diario',sec:'gioco'},
-  {k:'combattimento',l:'Tracker di Combattimento',i:'⚔️',id:'pag-combattimento',sec:'gioco'}
+  {k:'missioni',l:'Bacheca Missioni',i:'🎯',id:'pag-missioni'}
 ];
 
 function getPage(idOrK){
@@ -78,8 +74,7 @@ var SECTIONS = [
   {v:"lavori",l:"Lavori"},
   {v:"imprese",l:"Imprese"},
   {v:"lore",l:"Lore"},
-  {v:"homebrew",l:"Homebrew"},
-  {v:"gioco",l:"Tavolo da gioco"}
+  {v:"homebrew",l:"Homebrew"}
 ];
 
 /* ════ LAVORI ════ */

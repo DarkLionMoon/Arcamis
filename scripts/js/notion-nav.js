@@ -583,14 +583,9 @@ async function _gpRender(id, label, icon) {
           } else if (_layout === 'imprese') {
             /* App integrata: il mount avviene dopo l'inserimento nel DOM. */
             _localHtml = '<div class="imprese-app" id="imprese-app-root"></div>';
-          } else if (
-            _layout === 'missioni' ||
-            _layout === 'generatori' ||
-            _layout === 'calendario' ||
-            _layout === 'diario' ||
-            _layout === 'combattimento'
-          ) {
-            /* App Tavolo da gioco: il mount avviene dopo l'inserimento nel DOM. */
+          } else if (_layout === 'missioni') {
+            /* Bacheca Missioni: app integrata, il mount avviene dopo
+               l'inserimento nel DOM. */
             _localHtml =
               '<div class="arc-tool-app" id="arc-tool-root" data-layout="' +
               _layout +
@@ -623,11 +618,7 @@ async function _gpRender(id, label, icon) {
           if (
             _layout === 'wide' ||
             _layout === 'imprese' ||
-            _layout === 'missioni' ||
-            _layout === 'generatori' ||
-            _layout === 'calendario' ||
-            _layout === 'diario' ||
-            _layout === 'combattimento'
+            _layout === 'missioni'
           ) {
             pbody.style.maxWidth = 'none';
             pbody.style.width = '100%';
@@ -666,25 +657,10 @@ async function _gpRender(id, label, icon) {
             var _impRoot = document.getElementById('imprese-app-root');
             if (_impRoot) window._impreseInit(_impRoot);
           }
-          /* Monta le app del Tavolo da gioco nel contenitore integrato. */
-          if (
-            _layout === 'missioni' ||
-            _layout === 'generatori' ||
-            _layout === 'calendario' ||
-            _layout === 'diario' ||
-            _layout === 'combattimento'
-          ) {
+          /* Monta la Bacheca Missioni nel contenitore integrato. */
+          if (_layout === 'missioni') {
             var _toolRoot = document.getElementById('arc-tool-root');
-            if (_toolRoot) {
-              if (_layout === 'missioni' && window.initQuestBoard) window.initQuestBoard(_toolRoot);
-              else if (_layout === 'generatori' && window.initGenerators) window.initGenerators(_toolRoot);
-              else if (_layout === 'calendario' && window.initCalendar) window.initCalendar(_toolRoot);
-              else if (_layout === 'diario' && window.initDiary) window.initDiary(_toolRoot);
-              else if (_layout === 'combattimento' && window.initCombat) {
-                _toolRoot.setAttribute('data-page', (_localPage && _localPage.id) || 'combattimento');
-                window.initCombat(_toolRoot);
-              }
-            }
+            if (_toolRoot && window.initQuestBoard) window.initQuestBoard(_toolRoot);
           }
           /* Attiva ricerca live e filtri del browser del materiale. */
           if (window.matBrowserInit) window.matBrowserInit(pbody);
@@ -1828,7 +1804,7 @@ function _renderBestiario(md) {
     var lines = sec.split('\n');
     var title = (lines.shift() || '').trim();
     var body = lines.join('\n');
-    var intro = '';
+    var intro = [];
     var fields = [];
     var blocks = {};
     var currentBlock = null;
@@ -1849,11 +1825,11 @@ function _renderBestiario(md) {
         blocks[currentBlock].push(line.replace(/^-\s+/, ''));
         return;
       }
-      if (!fm && !hm && line.trim() && !intro) intro = line.trim();
+      if (!fm && !hm && line.trim()) intro.push(line.trim());
     });
     html += '<div class="bst-card">';
     html += '<div class="bst-title">' + title + '</div>';
-    if (intro) html += '<div class="bst-intro">' + _mdToHtml(intro) + '</div>';
+    if (intro.length) html += '<div class="bst-intro">' + _mdToHtml(intro.join('\n')) + '</div>';
     if (fields.length) {
       html += '<div class="bst-fields">';
       fields.forEach(function (f) {
@@ -1890,7 +1866,7 @@ function _renderTimeline(md) {
     var lines = sec.split('\n');
     var title = (lines.shift() || '').trim();
     var body = lines.join('\n');
-    var intro = '';
+    var intro = [];
     var items = [];
     var currentSub = null;
     body.split('\n').forEach(function (line) {
@@ -1910,11 +1886,11 @@ function _renderTimeline(md) {
         items.push({ type: 'event', title: '', desc: bm[1], sub: currentSub });
         return;
       }
-      if (!sm && !im && !bm && line.trim() && !intro) intro = line.trim();
+      if (!sm && !im && !bm && line.trim()) intro.push(line.trim());
     });
     html += '<div class="tl-section">';
     html += '<div class="tl-title">' + title + '</div>';
-    if (intro) html += '<div class="tl-intro">' + _mdToHtml(intro) + '</div>';
+    if (intro.length) html += '<div class="tl-intro">' + _mdToHtml(intro.join('\n')) + '</div>';
     html += '<div class="tl-timeline">';
     items.forEach(function (it) {
       if (it.type === 'sub') {
@@ -2004,7 +1980,7 @@ function _renderOggetti(md) {
     var lines = sec.split('\n');
     var title = (lines.shift() || '').trim();
     var body = lines.join('\n');
-    var intro = '';
+    var intro = [];
     var fields = [];
     var currentBlock = null;
     var blockContent = [];
@@ -2027,7 +2003,7 @@ function _renderOggetti(md) {
         blockContent.push(line);
         return;
       }
-      if (!fm && !hm && line.trim() && !intro) intro = line.trim();
+      if (!fm && !hm && line.trim()) intro.push(line.trim());
     });
     if (currentBlock && blockContent.length) blocks[currentBlock] = blockContent.join('\n');
     var rarity = '';
@@ -2041,7 +2017,7 @@ function _renderOggetti(md) {
     else if (rarity.indexOf('non') > -1) rarityClass = 'obj-uncommon';
     html += '<div class="obj-card ' + rarityClass + '">';
     html += '<div class="obj-title">' + title + '</div>';
-    if (intro) html += '<div class="obj-intro">' + _mdToHtml(intro) + '</div>';
+    if (intro.length) html += '<div class="obj-intro">' + _mdToHtml(intro.join('\n')) + '</div>';
     if (fields.length) {
       html += '<div class="obj-fields">';
       fields.forEach(function (f) {

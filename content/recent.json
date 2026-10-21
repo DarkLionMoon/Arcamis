@@ -7,30 +7,6 @@
    "lastEdited": "2026-10-19T10:00:00.000Z"
   },
   {
-   "id": "pag-generatori",
-   "title": "Generatori",
-   "icon": "🎲",
-   "lastEdited": "2026-10-19T10:00:00.000Z"
-  },
-  {
-   "id": "pag-calendario",
-   "title": "Calendario di Arcamis",
-   "icon": "📅",
-   "lastEdited": "2026-10-19T10:00:00.000Z"
-  },
-  {
-   "id": "pag-diario",
-   "title": "Diario di Campagna",
-   "icon": "📓",
-   "lastEdited": "2026-10-19T10:00:00.000Z"
-  },
-  {
-   "id": "pag-combattimento",
-   "title": "Tracker di Combattimento",
-   "icon": "⚔️",
-   "lastEdited": "2026-10-19T10:00:00.000Z"
-  },
-  {
    "id": "pag-changelog",
    "title": "Changelog",
    "icon": "📜",
@@ -47,6 +23,30 @@
    "title": "Imprese e Licenze",
    "icon": "⚖️",
    "lastEdited": "2026-09-09T00:00:00Z"
+  },
+  {
+   "id": "pag-specie-homebrew",
+   "title": "Specie Homebrew",
+   "icon": "🧬",
+   "lastEdited": "2026-08-26T20:24:46.885Z"
+  },
+  {
+   "id": "pag-come-si-inizia",
+   "title": "Creazione",
+   "icon": "🌟",
+   "lastEdited": "2026-08-26T13:58:16.049Z"
+  },
+  {
+   "id": "pag-lavori",
+   "title": "Lavori",
+   "icon": "💼",
+   "lastEdited": "2026-08-26T09:52:29.371Z"
+  },
+  {
+   "id": "pag-regole-del-server",
+   "title": "Regole del Server",
+   "icon": "📋",
+   "lastEdited": "2026-08-25T15:50:23.012Z"
   }
  ]
 }

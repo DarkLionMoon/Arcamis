@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "id": "sessione",
+  "label": "Diario di Sessione",
+  "icon": "📓",
+  "description": "Riassunti delle sessioni di gioco: chi c'era, cosa è successo, premi e conseguenze. Ogni sessione è una card della cronaca.",
+  "layout": "schede",
+  "separator": "none",
+  "page": {
+    "fields": [],
+    "sections": []
+  },
+  "collections": [
+    {
+      "key": "sessioni",
+      "label": "Sessioni",
+      "singular": "sessione",
+      "description": "Una card per sessione: il riassunto resta separato da momenti salienti, premi e conseguenze.",
+      "fields": [
+        { "key": "numero", "label": "Numero", "type": "number", "required": true, "placeholder": "12" },
+        { "key": "titolo", "label": "Titolo", "type": "text", "required": true, "placeholder": "Il pozzo che canta" },
+        { "key": "data", "label": "Data", "type": "text", "placeholder": "12 Solealto 1493" },
+        { "key": "luogo", "label": "Luogo", "type": "text", "placeholder": "Volonx" },
+        {
+          "key": "presenti",
+          "label": "Presenti",
+          "type": "tags",
+          "placeholder": "Kael, Mira, Thorgrim"
+        },
+        { "key": "riassunto", "label": "Riassunto", "type": "markdown", "rows": 7 },
+        {
+          "key": "momenti",
+          "label": "Momenti salienti",
+          "type": "tags",
+          "placeholder": "Il patto con lo spirito del pozzo"
+        },
+        {
+          "key": "premi",
+          "label": "Premi e bottino",
+          "type": "tags",
+          "placeholder": "300 mo, Anello del sussurro"
+        },
+        { "key": "conseguenze", "label": "Conseguenze", "type": "markdown", "rows": 4 }
+      ],
+      "item": {
+        "heading": "Sessione {numero} — {titolo}",
+        "level": 2,
+        "titleField": "titolo",
+        "sections": [
+          {
+            "blocks": [{ "kind": "definition", "fields": ["data", "luogo", "presenti"] }]
+          },
+          {
+            "heading": "Riassunto",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "riassunto" }]
+          },
+          {
+            "heading": "Momenti salienti",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "momenti" }]
+          },
+          {
+            "heading": "Premi e bottino",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "premi" }]
+          },
+          {
+            "heading": "Conseguenze",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "conseguenze" }]
+          }
+        ]
+      }
+    }
+  ]
+}

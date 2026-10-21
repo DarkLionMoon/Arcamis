@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "id": "oggetto",
+  "label": "Oggetto / Equipaggiamento",
+  "icon": "🗡️",
+  "description": "Armi, armature e oggetti meravigliosi: rarità, sintonia, proprietà e poteri. Il sito colora la scheda in base alla rarità.",
+  "layout": "oggetti",
+  "separator": "none",
+  "page": {
+    "fields": [],
+    "sections": []
+  },
+  "collections": [
+    {
+      "key": "oggetti",
+      "label": "Oggetti",
+      "singular": "oggetto",
+      "description": "Una scheda per oggetto. Il campo Rarità decide il colore della card sul sito.",
+      "fields": [
+        { "key": "nome", "label": "Nome", "type": "text", "required": true, "placeholder": "Lama del Crepuscolo" },
+        {
+          "key": "rarita",
+          "label": "Rarità",
+          "type": "select",
+          "options": [
+            { "value": "Comune", "label": "Comune" },
+            { "value": "Non comune", "label": "Non comune" },
+            { "value": "Raro", "label": "Raro" },
+            { "value": "Molto raro", "label": "Molto raro" },
+            { "value": "Leggendario", "label": "Leggendario" },
+            { "value": "Artefatto", "label": "Artefatto" }
+          ]
+        },
+        {
+          "key": "tipo",
+          "label": "Tipo",
+          "type": "select",
+          "options": [
+            { "value": "Arma", "label": "Arma" },
+            { "value": "Armatura", "label": "Armatura" },
+            { "value": "Anello", "label": "Anello" },
+            { "value": "Amuleto", "label": "Amuleto" },
+            { "value": "Pozione", "label": "Pozione" },
+            { "value": "Pergamena", "label": "Pergamena" },
+            { "value": "Bacchetta", "label": "Bacchetta" },
+            { "value": "Oggetto meraviglioso", "label": "Oggetto meraviglioso" },
+            { "value": "Strumento", "label": "Strumento" },
+            { "value": "Altro", "label": "Altro" }
+          ]
+        },
+        {
+          "key": "sintonia",
+          "label": "Sintonia",
+          "type": "select",
+          "options": [
+            { "value": "No", "label": "Non richiesta" },
+            { "value": "Sì", "label": "Richiesta" }
+          ]
+        },
+        { "key": "prezzo", "label": "Prezzo", "type": "text", "placeholder": "500 mo" },
+        { "key": "peso", "label": "Peso", "type": "text", "placeholder": "1,5 kg" },
+        { "key": "immagine", "label": "Immagine", "type": "image" },
+        { "key": "ritaglio", "label": "Ritaglio", "type": "text", "placeholder": "50,50" },
+        { "key": "descrizione", "label": "Descrizione", "type": "markdown", "rows": 4 },
+        { "key": "proprieta", "label": "Proprietà", "type": "markdown", "rows": 4 },
+        { "key": "poteri", "label": "Poteri", "type": "markdown", "rows": 5 },
+        { "key": "maledizione", "label": "Maledizione", "type": "markdown", "rows": 3 },
+        {
+          "key": "varianti",
+          "label": "Varianti",
+          "type": "tags",
+          "placeholder": "Versione corrotta, Versione potenziata"
+        }
+      ],
+      "item": {
+        "heading": "{nome}",
+        "level": 2,
+        "titleField": "nome",
+        "sections": [
+          {
+            "blocks": [{ "kind": "image", "field": "immagine", "altField": "nome", "posField": "ritaglio" }]
+          },
+          {
+            "blocks": [{ "kind": "markdown", "field": "descrizione" }]
+          },
+          {
+            "blocks": [{ "kind": "definition", "fields": ["rarita", "tipo", "sintonia", "prezzo", "peso"] }]
+          },
+          {
+            "heading": "Proprietà",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "proprieta" }]
+          },
+          {
+            "heading": "Poteri",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "poteri" }]
+          },
+          {
+            "heading": "Maledizione",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "maledizione" }]
+          },
+          {
+            "heading": "Varianti",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "varianti" }]
+          }
+        ]
+      }
+    }
+  ]
+}

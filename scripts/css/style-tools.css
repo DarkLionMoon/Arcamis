@@ -1,7 +1,6 @@
 /* ════════════════════════════════════
    ARCAMIS — style-tools.css
-   Pagine "Tavolo da gioco" (missioni, generatori, calendario, diario,
-   combattimento) e blocco `:::statblock`.
+   Bacheca Missioni e blocco `:::statblock`.
 
    Linguaggio preso dalla home (style-home.css) e dalle carte pagina
    (style-notion.css `.n-card`): sfondi in gradiente scuro, bordi oro
@@ -18,10 +17,7 @@
 }
 
 /* ── Controlli (stesso fondo dei campi del sito) ── */
-.arc-tool-app .gen-in,
-.arc-tool-app .qb-in,
-.arc-tool-app .dy-in,
-.arc-tool-app .cb-in {
+.arc-tool-app .qb-in {
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.22);
   color: var(--parch);
@@ -31,23 +27,14 @@
   font-family: inherit;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-.arc-tool-app .gen-in:focus,
-.arc-tool-app .qb-in:focus,
-.arc-tool-app .dy-in:focus,
-.arc-tool-app .cb-in:focus {
+.arc-tool-app .qb-in:focus {
   outline: none;
   border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.5);
   box-shadow: 0 0 0 1px rgba(var(--gold-rgb, 200, 155, 60), 0.25);
 }
 
 /* ── Bottoni: outline oro come "Copia link", hover con bagliore ── */
-.gen-roll,
-.qb-btn,
-.dy-tools button,
-.dy-import,
-.dy-main button[data-act='addentry'],
-.cb-actions button,
-.cb-add button {
+.qb-btn {
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.35);
   color: var(--gold3, var(--gold));
@@ -60,317 +47,24 @@
   text-transform: uppercase;
   transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
-.gen-roll:hover,
-.qb-btn:hover,
-.dy-tools button:hover,
-.dy-import:hover,
-.dy-main button[data-act='addentry']:hover,
-.cb-actions button:hover,
-.cb-add button:hover {
+.qb-btn:hover {
   background: rgba(var(--gold-rgb, 200, 155, 60), 0.14);
   border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.55);
   box-shadow: 0 0 16px rgba(var(--gold-rgb, 200, 155, 60), 0.15);
 }
 
 /* ── Carte: gradiente scuro + bordo oro come le guild-card ── */
-.gen-card,
-.qb-card,
-.dy-entry,
-.cal-month,
-.cb-row {
+.qb-card {
   position: relative;
   background: linear-gradient(160deg, rgba(14, 18, 28, 0.97), rgba(8, 10, 18, 0.99)), var(--bg2);
   border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.14);
   border-radius: 10px;
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s, box-shadow 0.25s;
 }
-.gen-card:hover,
-.qb-card:hover,
-.cal-month:hover {
+.qb-card:hover {
   transform: translateY(-4px);
   border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.38);
   box-shadow: 0 14px 44px rgba(0, 0, 0, 0.55), 0 0 28px rgba(var(--gold-rgb, 200, 155, 60), 0.09);
-}
-
-/* ── Generatori ── */
-.gen-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 16px;
-}
-.gen-card {
-  padding: 18px;
-  overflow: hidden;
-}
-.gen-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(var(--gold-rgb, 200, 155, 60), 0.05), transparent 55%);
-  opacity: 0;
-  transition: opacity 0.25s;
-  pointer-events: none;
-}
-.gen-card:hover::before {
-  opacity: 1;
-}
-.gen-card-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--gold3, var(--gold));
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.16);
-}
-.gen-icon {
-  font-size: 22px;
-  filter: drop-shadow(0 0 8px rgba(var(--gold-rgb, 200, 155, 60), 0.5));
-}
-.gen-desc {
-  font-size: 13px;
-  color: var(--text3);
-  font-style: italic;
-  line-height: 1.6;
-  margin: 0 0 12px;
-}
-.gen-opts {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-.gen-out {
-  background: rgba(0, 0, 0, 0.3);
-  border-left: 3px solid rgba(var(--gold-rgb, 200, 155, 60), 0.5);
-  border-radius: 0 6px 6px 0;
-  padding: 10px 12px;
-  font-size: 15px;
-  line-height: 1.6;
-  min-height: 44px;
-}
-.gen-out strong {
-  color: var(--gold3, var(--gold));
-  font-family: 'Cinzel', serif;
-  letter-spacing: 0.03em;
-}
-
-/* ── Calendario ── */
-.cal-today {
-  text-align: center;
-  background: linear-gradient(160deg, rgba(10, 6, 22, 0.97), rgba(6, 8, 20, 0.99)), var(--bg2);
-  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.2);
-  border-radius: 10px;
-  padding: 26px 18px;
-  margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
-}
-.cal-today::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 70% 90% at 50% 0%, rgba(var(--gold-rgb, 200, 155, 60), 0.08), transparent 65%);
-  pointer-events: none;
-}
-.cal-label {
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--violet3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-.cal-label::before {
-  content: '';
-  width: 28px;
-  height: 1px;
-  background: var(--violet3);
-  opacity: 0.55;
-}
-.cal-big {
-  font-family: 'Cinzel', serif;
-  font-size: 26px;
-  font-weight: 900;
-  letter-spacing: 0.07em;
-  color: var(--white);
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
-  margin: 10px 0 6px;
-  position: relative;
-}
-.cal-festa {
-  font-size: 15px;
-  color: var(--gold2);
-  margin-top: 6px;
-  position: relative;
-}
-.cal-real {
-  font-size: 12px;
-  color: var(--text3);
-  margin-top: 8px;
-  position: relative;
-}
-.cal-months {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 14px;
-}
-.cal-month {
-  padding: 16px;
-}
-.cal-month strong {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  letter-spacing: 0.1em;
-  color: var(--gold2);
-  display: block;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.16);
-}
-.cal-month ul {
-  margin: 0;
-  padding-left: 16px;
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.7;
-}
-.cal-nofesta {
-  display: block;
-  color: var(--text3);
-  font-style: italic;
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-/* ── Combat tracker: righe banner come i loc-banner ── */
-.cb-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.cb-round {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--violet3);
-}
-.cb-round strong {
-  color: var(--gold3, var(--gold));
-  font-size: 18px;
-  letter-spacing: 0.05em;
-}
-.cb-actions,
-.cb-add {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.cb-add {
-  margin-bottom: 14px;
-}
-.cb-in {
-  max-width: 150px;
-}
-.cb-num {
-  max-width: 80px;
-}
-.cb-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.cb-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-radius: 6px;
-  padding: 12px 16px 12px 20px;
-  overflow: hidden;
-}
-.cb-row::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: rgba(var(--gold-rgb, 200, 155, 60), 0.4);
-}
-.cb-row:hover {
-  border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.35);
-  transform: translateX(4px);
-}
-.cb-row.active {
-  border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.5);
-  box-shadow: 0 0 0 1px rgba(var(--gold-rgb, 200, 155, 60), 0.35), 0 8px 28px rgba(0, 0, 0, 0.5);
-}
-.cb-row.active::before {
-  background: var(--gold, #c89b3c);
-  box-shadow: 0 0 12px rgba(var(--gold-rgb, 200, 155, 60), 0.8);
-}
-.cb-row.down {
-  opacity: 0.55;
-}
-.cb-init {
-  font-family: 'Cinzel', serif;
-  font-weight: 900;
-  font-size: 18px;
-  color: var(--gold3, var(--gold));
-  min-width: 30px;
-  text-align: center;
-}
-.cb-name {
-  flex: 1;
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: rgba(240, 230, 200, 0.9);
-  text-transform: uppercase;
-}
-.cb-hp {
-  font-variant-numeric: tabular-nums;
-  font-size: 13px;
-  color: var(--text);
-}
-.cb-rowbtns {
-  display: flex;
-  gap: 6px;
-}
-.cb-rowbtns button {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.3);
-  color: var(--parch);
-  border-radius: 5px;
-  width: 28px;
-  height: 28px;
-  line-height: 1;
-  font-size: 14px;
-  transition: border-color 0.2s, background 0.2s;
-}
-.cb-rowbtns button:hover {
-  border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.6);
-  background: rgba(var(--gold-rgb, 200, 155, 60), 0.12);
-}
-.cb-empty {
-  color: var(--text3);
-  font-style: italic;
-  font-size: 14px;
 }
 
 /* ── Quest board ── */
@@ -486,131 +180,6 @@
   font-size: 14px;
 }
 
-/* ── Diario ── */
-.dy-cols {
-  display: grid;
-  grid-template-columns: 230px 1fr;
-  gap: 16px;
-  align-items: start;
-}
-.dy-side {
-  background: linear-gradient(160deg, rgba(14, 18, 28, 0.97), rgba(8, 10, 18, 0.99)), var(--bg2);
-  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.14);
-  border-radius: 10px;
-  padding: 16px;
-  position: sticky;
-  top: 12px;
-}
-.dy-side h3 {
-  margin: 0 0 10px;
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--violet3);
-}
-.dy-pgs {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.dy-pg {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--parch);
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 14px;
-  font-family: 'Cinzel', serif;
-  letter-spacing: 0.04em;
-  transition: background 0.2s, border-color 0.2s;
-}
-.dy-pg:hover {
-  background: rgba(var(--gold-rgb, 200, 155, 60), 0.06);
-}
-.dy-pg.active {
-  border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.5);
-  background: rgba(var(--gold-rgb, 200, 155, 60), 0.1);
-  color: var(--gold3, var(--gold));
-}
-.dy-newpg {
-  display: flex;
-  gap: 6px;
-  margin-top: 10px;
-}
-.dy-newpg .dy-in {
-  flex: 1;
-  min-width: 0;
-}
-.dy-newpg button {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.35);
-  color: var(--gold3, var(--gold));
-  border-radius: 6px;
-  padding: 0 12px;
-  font-size: 16px;
-}
-.dy-tools {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-.dy-compose {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.dy-compose textarea {
-  resize: vertical;
-  min-height: 90px;
-}
-.dy-entry {
-  padding: 18px;
-  margin-bottom: 12px;
-}
-.dy-entry h4 {
-  margin: 4px 0 8px;
-  font-family: 'Cinzel', serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--gold2);
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.16);
-}
-.dy-date {
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--violet3);
-}
-.dy-entry p {
-  font-size: 15px;
-  line-height: 1.7;
-  color: var(--text2);
-  margin: 0 0 10px;
-}
-.dy-del {
-  background: transparent;
-  border: none;
-  color: var(--text3);
-  font-size: 12px;
-  padding: 0;
-}
-.dy-del:hover {
-  color: #d06060;
-}
-.dy-empty {
-  color: var(--text3);
-  font-style: italic;
-  font-size: 14px;
-}
-
 /* ── Statblock (:::statblock): oro sopra/sotto come i divisori home ── */
 .n-statblock {
   background: linear-gradient(160deg, rgba(10, 6, 22, 0.97), rgba(6, 8, 20, 0.99));
@@ -694,18 +263,6 @@
 
 /* ── Responsive come la home ── */
 @media (max-width: 720px) {
-  .dy-cols {
-    grid-template-columns: 1fr;
-  }
-  .dy-side {
-    position: static;
-  }
-  .cal-big {
-    font-size: 21px;
-  }
-  .cb-row {
-    flex-wrap: wrap;
-  }
   .qb-filters .qb-in {
     flex: 1 1 100%;
   }

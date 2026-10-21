@@ -21,7 +21,6 @@ export type { RequestOptions } from './http'
 export { b64encode, decodeBase64Utf8, ghApi } from './github'
 
 export {
-  calendarApi,
   carouselApi,
   coversApi,
   layoutsApi,

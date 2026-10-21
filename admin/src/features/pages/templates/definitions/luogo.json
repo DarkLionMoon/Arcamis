@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "id": "luogo",
+  "label": "Luogo / Città",
+  "icon": "🗺️",
+  "description": "Città, villaggi, foreste e rovine: una scheda per luogo con geografia, governo, storia, attrazioni e volti del posto. Il sito la impagina come griglia di card.",
+  "layout": "schede",
+  "separator": "none",
+  "page": {
+    "fields": [],
+    "sections": []
+  },
+  "collections": [
+    {
+      "key": "luoghi",
+      "label": "Luoghi",
+      "singular": "luogo",
+      "description": "Ogni voce è una card della pagina: nome, immagine, scheda informativa e sezioni narrative.",
+      "fields": [
+        { "key": "nome", "label": "Nome", "type": "text", "required": true, "placeholder": "Volonx" },
+        {
+          "key": "tipo",
+          "label": "Tipo",
+          "type": "select",
+          "options": [
+            { "value": "Città", "label": "Città" },
+            { "value": "Villaggio", "label": "Villaggio" },
+            { "value": "Foresta", "label": "Foresta" },
+            { "value": "Rovina", "label": "Rovina" },
+            { "value": "Fortezza", "label": "Fortezza" },
+            { "value": "Porto", "label": "Porto" },
+            { "value": "Regione", "label": "Regione" },
+            { "value": "Luogo sacro", "label": "Luogo sacro" }
+          ]
+        },
+        { "key": "regione", "label": "Regione", "type": "text", "placeholder": "Marche di Arcamis" },
+        { "key": "popolazione", "label": "Popolazione", "type": "text", "placeholder": "Circa 2.000 abitanti" },
+        { "key": "governo", "label": "Governo", "type": "text", "placeholder": "Consiglio degli anziani" },
+        { "key": "clima", "label": "Clima", "type": "text", "placeholder": "Umido, nebbie mattutine" },
+        { "key": "immagine", "label": "Immagine", "type": "image" },
+        { "key": "ritaglio", "label": "Ritaglio", "type": "text", "placeholder": "50,50" },
+        { "key": "descrizione", "label": "Descrizione", "type": "markdown", "rows": 4 },
+        { "key": "storia", "label": "Storia", "type": "markdown", "rows": 6 },
+        {
+          "key": "attrazioni",
+          "label": "Da vedere",
+          "type": "tags",
+          "placeholder": "Il pozzo che canta, La locanda del Corvo"
+        },
+        {
+          "key": "volti",
+          "label": "Volti del luogo",
+          "type": "tags",
+          "placeholder": "Sindaco Aldo, La guaritrice Mira"
+        },
+        { "key": "pericoli", "label": "Pericoli", "type": "markdown", "rows": 4 }
+      ],
+      "item": {
+        "heading": "{nome}",
+        "level": 2,
+        "titleField": "nome",
+        "sections": [
+          {
+            "blocks": [{ "kind": "image", "field": "immagine", "altField": "nome", "posField": "ritaglio" }]
+          },
+          {
+            "blocks": [{ "kind": "markdown", "field": "descrizione" }]
+          },
+          {
+            "blocks": [
+              { "kind": "definition", "fields": ["tipo", "regione", "popolazione", "governo", "clima"] }
+            ]
+          },
+          {
+            "heading": "Storia",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "storia" }]
+          },
+          {
+            "heading": "Da vedere",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "attrazioni" }]
+          },
+          {
+            "heading": "Volti del luogo",
+            "level": 3,
+            "blocks": [{ "kind": "bullets", "field": "volti" }]
+          },
+          {
+            "heading": "Pericoli",
+            "level": 3,
+            "blocks": [{ "kind": "markdown", "field": "pericoli" }]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -92,7 +92,6 @@ const groups: Array<{ title: string; items: NavItem[] }> = [
       { label: 'Mappa', to: '/mapa', icon: 'map', minRole: 'editor' },
       { label: 'Carousel', to: '/carousel', icon: 'carousel', minRole: 'editor' },
       { label: 'Missioni', to: '/missioni', icon: 'quest', minRole: 'editor' },
-      { label: 'Calendario', to: '/calendario', icon: 'calendar', minRole: 'editor' },
       { label: 'Changelog', to: '/changelog', icon: 'changelog', minRole: 'editor' }
     ]
   },

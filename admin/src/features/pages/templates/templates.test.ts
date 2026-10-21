@@ -68,8 +68,20 @@ function dataWith(
 }
 
 describe('modelli built-in', () => {
-  it('espone i quattro modelli richiesti, tutti validi', () => {
-    expect(BUILT_IN_TEMPLATES.map((tpl) => tpl.id)).toEqual(['divinita', 'regola', 'lore', 'mestiere'])
+  it('espone i modelli per ogni scopo editoriale, tutti validi', () => {
+    expect(BUILT_IN_TEMPLATES.map((tpl) => tpl.id)).toEqual([
+      'divinita',
+      'regola',
+      'lore',
+      'mestiere',
+      'luogo',
+      'fazione',
+      'npc',
+      'creatura',
+      'oggetto',
+      'sessione',
+      'cronologia'
+    ])
     for (const tpl of BUILT_IN_TEMPLATES) {
       expect(() => parseTemplate(tpl)).not.toThrow()
       expect(tpl.collections.length).toBeGreaterThan(0)
@@ -254,6 +266,111 @@ describe('compilazione lore e mestiere', () => {
     expect(markdown).toContain('- **Categoria:** Accademico')
     expect(markdown).toContain('## Stipendio')
     expect(markdown.match(/^# /gm)).toHaveLength(2)
+  })
+})
+
+describe('modelli per luoghi, fazioni, PNG, creature, oggetti, sessioni e cronologie', () => {
+  it('luogo produce una card ## con immagine, scheda e sezioni', () => {
+    const tpl = template('luogo')
+    const data = dataWith('luogo', [
+      {
+        nome: 'Volonx',
+        tipo: 'Villaggio',
+        regione: 'Marche di Arcamis',
+        popolazione: '800 abitanti',
+        governo: 'Consiglio degli anziani',
+        clima: 'Umido',
+        immagine: '/images/volonx.jpg',
+        ritaglio: '50,40',
+        descrizione: 'Un villaggio di pescatori.',
+        storia: 'Fondato dopo la piena.',
+        attrazioni: ['Il pozzo che canta'],
+        volti: ['Mira la guaritrice'],
+        pericoli: 'Nebbie notturne.'
+      }
+    ])
+    const { markdown } = compileTemplate(tpl, data)
+    expect(markdown).toContain('## Volonx')
+    expect(markdown).toContain('![Volonx](/images/volonx.jpg#50,40)')
+    expect(markdown).toContain('- **Governo:** Consiglio degli anziani')
+    expect(markdown).toContain('### Da vedere')
+    expect(markdown).not.toContain('---')
+  })
+
+  it('fazione e PNG restano schede complete con relazioni e segreti', () => {
+    const fazione = dataWith('fazione', [
+      { nome: 'Luna Nera', tipo: 'Compagnia', sede: 'Forte Vigilus', alleati: ['Gilda dei Mercanti'], segreti: 'Serve un culto.' }
+    ])
+    const fazioneMd = compileTemplate(template('fazione'), fazione).markdown
+    expect(fazioneMd).toContain('## Luna Nera')
+    expect(fazioneMd).toContain('### Alleanze')
+    expect(fazioneMd).toContain('- Gilda dei Mercanti')
+    expect(fazioneMd).toContain('### Segreti')
+
+    const npc = dataWith('npc', [{ nome: 'Mira', ruolo: 'Guaritrice', agganci: ['Deve una promessa al party'] }])
+    const npcMd = compileTemplate(template('npc'), npc).markdown
+    expect(npcMd).toContain('## Mira')
+    expect(npcMd).toContain('- **Ruolo:** Guaritrice')
+    expect(npcMd).toContain('### Agganci narrativi')
+  })
+
+  it('creatura compila la scheda da bestiario con statistiche e azioni', () => {
+    const data = dataWith('creatura', [
+      {
+        nome: 'Goblin Furtivo',
+        tipo: 'Umanoide',
+        taglia: 'Piccola',
+        allineamento: 'Neutrale Malvagio',
+        ca: 15,
+        pf: '7 (2d6)',
+        velocita: '9 m',
+        sfida: '1/4',
+        linguaggi: 'Comune, Goblin',
+        descrizione: 'Tende agguati nei boschi.',
+        azioni: ['Scimitarra. +4 al colpire.']
+      }
+    ])
+    const { markdown } = compileTemplate(template('creatura'), data)
+    expect(markdown).toContain('## Goblin Furtivo')
+    expect(markdown).toContain('- **Classe Armatura:** 15')
+    expect(markdown).toContain('### Azioni')
+    expect(markdown).toContain('- Scimitarra. +4 al colpire.')
+  })
+
+  it('oggetto e sessione usano heading composti e sezioni dedicate', () => {
+    const oggetto = dataWith('oggetto', [
+      {
+        nome: 'Lama del Crepuscolo',
+        rarita: 'Raro',
+        tipo: 'Arma',
+        sintonia: 'Sì',
+        descrizione: 'Una lama che assorbe la luce.',
+        poteri: 'Infligge 1d6 danni psichici extra.',
+        varianti: ['Versione corrotta']
+      }
+    ])
+    const oggettoMd = compileTemplate(template('oggetto'), oggetto).markdown
+    expect(oggettoMd).toContain('## Lama del Crepuscolo')
+    expect(oggettoMd).toContain('- **Rarità:** Raro')
+    expect(oggettoMd).toContain('### Poteri')
+
+    const sessione = dataWith('sessione', [
+      { numero: 12, titolo: 'Il pozzo che canta', data: '12 Solealto', presenti: ['Kael', 'Mira'], premi: ['300 mo'] }
+    ])
+    const sessioneMd = compileTemplate(template('sessione'), sessione).markdown
+    expect(sessioneMd).toContain('## Sessione 12 — Il pozzo che canta')
+    expect(sessioneMd).toContain('### Premi e bottino')
+  })
+
+  it('cronologia impagina epoche ed eventi per la timeline', () => {
+    const data = dataWith('cronologia', [
+      { titolo: 'Terza Era', periodo: '812–1024', descrizione: 'Le grandi migrazioni.', eventi: ['812: fondazione di Arcamis'] }
+    ])
+    const { markdown } = compileTemplate(template('cronologia'), data)
+    expect(markdown).toContain('## Terza Era')
+    expect(markdown).toContain('- **Periodo:** 812–1024')
+    expect(markdown).toContain('### Eventi')
+    expect(markdown).toContain('- 812: fondazione di Arcamis')
   })
 })
 

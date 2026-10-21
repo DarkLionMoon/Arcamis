@@ -58,7 +58,7 @@ Tutto ciò che il sito mostra vive nel repo:
 | `content/databases/*.json` | Database/gallerie (`{ "pages": [...] }`: pantheon, lavori, …) |
 | `content/search-index.json` | Indice full-text per la ricerca locale |
 | `content/changelog.json`, `content/mappins.json`, `content/recent.json` | Changelog, puntine della mappa, attività recente |
-| `content/quests.json`, `content/calendar.json` | Missioni della bacheca e datario del mondo (vedi Tavolo da gioco) |
+| `content/quests.json` | Missioni della Bacheca Missioni |
 | `images/`, `audio/` | Immagini caricate dall'editor e effetti sonori |
 
 Se una pagina JSON manca, il client mostra un placeholder "non disponibile":
@@ -108,17 +108,10 @@ admin — vedi Parte 2.)
   zoom/scroll), tooltip e navigazione alle schede luogo. Le puntine non
   esplorate (`explored: false`, si imposta dal pannello Mappa) mostrano
   "Inesplorato" e la home conta i luoghi rivelati (`map-public.js`).
-- **Tavolo da gioco** (sezione `gioco`, 5 app integrate nelle pagine):
-  **Bacheca Missioni** (`missioni`, da `content/quests.json`: filtri per
-  stato/tag/livello, accettazione in `localStorage`), **Generatori**
-  (`generatori`: nomi per specie, taverne, bottini, incontri),
-  **Calendario di Arcamis** (`calendario`, da `content/calendar.json`:
-  converte la data reale nel datario del mondo con feste),
-  **Diario di Campagna** (`diario`: personaggi e pagine in `localStorage`
-  con export/import JSON) e **Tracker di Combattimento**
-  (`combattimento`: iniziativa, round, PF, persistenza locale). Stili in
-  `style-tools.css`, logica in `scripts/js/{quest-board,generators,
-  calendar,diary,combat,map-public}.js`.
+- **Bacheca Missioni** (`missioni`, da `content/quests.json`): filtri per
+  stato/tag/livello e accettazione in `localStorage`; le missioni si
+  gestiscono dal pannello admin. Stili in `style-tools.css`, logica in
+  `scripts/js/quest-board.js`.
 - **Changelog e Novità**: widget e pagina dedicata dai JSON locali.
 
 ### Layout disponibili
@@ -126,10 +119,9 @@ admin — vedi Parte 2.)
 Ogni pagina dichiara un `layout` (se manca, rilevato dalla chiave):
 `contenuto`, `luoghi`, `cronache`, `personaggio`, `materiale`, `wide`,
 `pantheon`, `collezione`, `bestiario`, `timeline`, `fazioni`, `oggetti`,
-`glossario`, `galleria`, `tabelle`, `schede`, i layout del Tavolo da gioco
-(`missioni`, `generatori`, `calendario`, `diario`, `combattimento`), più i
-layout a card `sessione`, `quest`, `npc`, `spell`, `specie`, `citta`,
-`evento`. Nell'editor si sceglie
+`glossario`, `galleria`, `tabelle`, `schede`, `missioni`, più i layout a
+card `sessione`, `quest`, `npc`, `spell`, `specie`, `citta`, `evento`.
+Nell'editor si sceglie
 tra tre preset — **Wiki standard**, **Immersivo / full width** (`wide`),
 **Schede / griglia** (`schede`) — con selettore avanzato per gli altri.
 
@@ -147,7 +139,7 @@ tra tre preset — **Wiki standard**, **Immersivo / full width** (`wide`),
 - **PWA/offline**: manifest + icone (`npm run icons`), font self-hosted
   (`npm run fonts`, nessun ping a Google Fonts — la CSP non lo permette),
   service worker versionato per build con precache reale (shell, JS/CSS e
-  JSON dati: indice ricerca, missioni, calendario, mappa) e fallback
+  JSON dati: indice ricerca, missioni, mappa) e fallback
   `offline.html`: le pagine già visitate restano leggibili senza rete. Le copertine non sono più base64 nei JSON: URL
   `/api/cover/<id>` scaricati on demand.
 - **Pagina crediti** (`/credits`): disclaimer e attribuzioni, informativa sul
@@ -177,7 +169,7 @@ ricostruisce il sito (~30 s) e la modifica va online da sola.
    prima di cambiare pagina con modifiche pendenti.
 
 La sidebar è in 5 gruppi: **Pannello** (Dashboard, Utenti), **Contenuti**
-(Pagine, Copertine, Media, Cestino), **Feature** (Mappa, Carousel, Missioni, Calendario, Changelog),
+(Pagine, Copertine, Media, Cestino), **Feature** (Mappa, Carousel, Missioni, Changelog),
 **Sistema** (Navigazione, Interfaccia, Impostazioni), **Sicurezza** (Audit,
 Scanner link, Trova & Sostituisci, Media orfani, Backup). La **Dashboard**
 mostra visite totali, pagine nel registro, stato del deploy (con riverifica),
@@ -189,7 +181,9 @@ data, scorciatoie a Scanner e Media orfani).
 
 1. Vai in **Pagine** → **+ Nuova pagina**.
 2. Scegli il punto di partenza: un **modello** (Scheda Divinità, Regolamento,
-   Pagina Lore, Mestiere / Lavoro) oppure pagina vuota.
+   Pagina Lore, Mestiere / Lavoro, Luogo / Città, Casata / Fazione, PNG,
+   Creatura / Mostro, Oggetto, Diario di Sessione, Cronologia / Ere) oppure
+   pagina vuota.
 3. Compila **titolo**, **chiave** (lo slug, es. `nuova-gilda` — unica),
    **icona** (emoji) e **sezione del menu** (Regole, Personaggio, Lavori, Lore
    o nessuna).
@@ -251,13 +245,10 @@ controllare se una pagina "sparisce".
   modificare, Salva. Coordinate in percentuali: valgono a ogni zoom.
   La spunta "esplorato" decide se il sito mostra il luogo o "Inesplorato"
   (fog of war) con conteggio in home.
-- **Missioni** (Tavolo da gioco): crea/modifica/riordina/elimina le missioni
+- **Missioni** (Bacheca Missioni): crea/modifica/riordina/elimina le missioni
   di `content/quests.json` (titolo, stato, descrizione, ricompensa, livello,
   master, tag); un solo salvataggio per tutto. Le accettazioni dei party
   restano nei browser dei giocatori, qui si gestisce lo stato ufficiale.
-- **Calendario** (Tavolo da gioco): epoca, giorni per mese, mesi (uno per
-  riga), giorni della settimana e feste di `content/calendar.json`; il sito
-  converte da solo la data reale nel datario del mondo.
 - **Changelog**: voci versione/sottoversione/patch + data, titolo, markdown.
 - **Media**: upload con conversione WebP e resize a 1920 px automatici;
   l'eliminazione chiede di digitare il nome (è un commit, non va nel cestino).
@@ -299,7 +290,7 @@ controllare se una pagina "sparisce".
 │   ├── sync-registry.py    ← rigenera _pathMap in app.js (non editare a mano)
 │   └── import-notion.js    ← export Notion → JSON (one-shot)
 ├── content/pages/*.json    ← pagine · databases/ · search-index · changelog/mappins
-├── content/quests.json / calendar.json ← missioni e datario del Tavolo da gioco
+├── content/quests.json    ← missioni della Bacheca Missioni
 ├── functions/api/          ← admin, carousel, cover/, deploy, gh, send-help, sitemap
 ├── admin/                  ← pannello Vue (compilato in export/admin → dist/admin)
 └── images/ / audio/        ← media caricati dall'editor / effetti sonori

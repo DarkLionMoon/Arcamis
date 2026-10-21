@@ -7,18 +7,35 @@
    restano in localStorage e passano la stessa validazione.
    ════════════════════════════════════════════════════════════════ */
 
+import creatura from './definitions/creatura.json'
+import cronologia from './definitions/cronologia.json'
 import divinita from './definitions/divinita.json'
+import fazione from './definitions/fazione.json'
 import lore from './definitions/lore.json'
+import luogo from './definitions/luogo.json'
 import mestiere from './definitions/mestiere.json'
+import npc from './definitions/npc.json'
+import oggetto from './definitions/oggetto.json'
 import regola from './definitions/regola.json'
+import sessione from './definitions/sessione.json'
 import { parseTemplate, TemplateError, type PageTemplate } from './schema'
 
 export const CUSTOM_TEMPLATES_KEY = 'arcamis.custom-templates'
 
-/** I quattro modelli di authoring previsti dal pannello. */
-export const BUILT_IN_TEMPLATES: readonly PageTemplate[] = [divinita, regola, lore, mestiere].map((raw) =>
-  parseTemplate(raw)
-)
+/** Modelli di authoring per gli scopi editoriali del sito. */
+export const BUILT_IN_TEMPLATES: readonly PageTemplate[] = [
+  divinita,
+  regola,
+  lore,
+  mestiere,
+  luogo,
+  fazione,
+  npc,
+  creatura,
+  oggetto,
+  sessione,
+  cronologia
+].map((raw) => parseTemplate(raw))
 
 /* `getTemplate` è chiamato a ogni compilazione (ogni battitura): la
    lettura di localStorage va fatta una volta sola, non per campo. */
