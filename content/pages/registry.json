@@ -359,18 +359,6 @@
       "path": "credits",
       "sec": "",
       "sub": ""
-    },
-    {
-      "k": "missioni",
-      "l": "Bacheca Missioni",
-      "i": "🎯",
-      "id": "pag-missioni",
-      "c": 1,
-      "menu": true,
-      "admin": true,
-      "path": "missioni",
-      "sec": "",
-      "sub": ""
     }
   ],
   "sections": [
