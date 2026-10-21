@@ -55,7 +55,21 @@ test.describe('navigazione per ruolo', () => {
   test('l’editor vede le viste editoriali ma non quelle di amministrazione', async ({ page }) => {
     await openAs(page, 'editor')
     const labels = await navLabels(page)
-    expect(labels).toEqual(['Dashboard', 'Pagine', 'Copertine', 'Media', 'Mappa', 'Carousel', 'Changelog'])
+    /* Elenco completo delle voci `minRole: 'editor'` (o senza requisito) in
+       AdminLayout.vue, nello stesso ordine dei gruppi della sidebar: le
+       feature del Tavolo da gioco (Missioni, Calendario) sono editor, non
+       admin. Un item in più o in meno qui è una regressione di permessi. */
+    expect(labels).toEqual([
+      'Dashboard',
+      'Pagine',
+      'Copertine',
+      'Media',
+      'Mappa',
+      'Carousel',
+      'Missioni',
+      'Calendario',
+      'Changelog'
+    ])
     for (const forbidden of ['Utenti', 'Cestino', 'Impostazioni', 'Audit', 'Backup']) {
       expect(labels, `l’editor non deve vedere ${forbidden}`).not.toContain(forbidden)
     }
