@@ -67,9 +67,7 @@
             "blocks": [{ "kind": "markdown", "field": "descrizione" }]
           },
           {
-            "blocks": [
-              { "kind": "definition", "fields": ["tipo", "regione", "popolazione", "governo", "clima"] }
-            ]
+            "blocks": [{ "kind": "definition", "fields": ["tipo", "regione", "popolazione", "governo", "clima"] }]
           },
           {
             "heading": "Storia",

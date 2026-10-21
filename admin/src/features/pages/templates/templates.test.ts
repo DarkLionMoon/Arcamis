@@ -299,7 +299,13 @@ describe('modelli per luoghi, fazioni, PNG, creature, oggetti, sessioni e cronol
 
   it('fazione e PNG restano schede complete con relazioni e segreti', () => {
     const fazione = dataWith('fazione', [
-      { nome: 'Luna Nera', tipo: 'Compagnia', sede: 'Forte Vigilus', alleati: ['Gilda dei Mercanti'], segreti: 'Serve un culto.' }
+      {
+        nome: 'Luna Nera',
+        tipo: 'Compagnia',
+        sede: 'Forte Vigilus',
+        alleati: ['Gilda dei Mercanti'],
+        segreti: 'Serve un culto.'
+      }
     ])
     const fazioneMd = compileTemplate(template('fazione'), fazione).markdown
     expect(fazioneMd).toContain('## Luna Nera')
@@ -364,7 +370,12 @@ describe('modelli per luoghi, fazioni, PNG, creature, oggetti, sessioni e cronol
 
   it('cronologia impagina epoche ed eventi per la timeline', () => {
     const data = dataWith('cronologia', [
-      { titolo: 'Terza Era', periodo: '812–1024', descrizione: 'Le grandi migrazioni.', eventi: ['812: fondazione di Arcamis'] }
+      {
+        titolo: 'Terza Era',
+        periodo: '812–1024',
+        descrizione: 'Le grandi migrazioni.',
+        eventi: ['812: fondazione di Arcamis']
+      }
     ])
     const { markdown } = compileTemplate(template('cronologia'), data)
     expect(markdown).toContain('## Terza Era')

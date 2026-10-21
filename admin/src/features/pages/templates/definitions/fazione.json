@@ -17,7 +17,13 @@
       "singular": "fazione",
       "description": "Una scheda per casata, compagnia o organizzazione. Le alleanze restano leggibili a colpo d'occhio.",
       "fields": [
-        { "key": "nome", "label": "Nome", "type": "text", "required": true, "placeholder": "Compagnia della Luna Nera" },
+        {
+          "key": "nome",
+          "label": "Nome",
+          "type": "text",
+          "required": true,
+          "placeholder": "Compagnia della Luna Nera"
+        },
         {
           "key": "tipo",
           "label": "Tipo",

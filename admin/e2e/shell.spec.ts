@@ -56,9 +56,9 @@ test.describe('navigazione per ruolo', () => {
     await openAs(page, 'editor')
     const labels = await navLabels(page)
     /* Elenco completo delle voci `minRole: 'editor'` (o senza requisito) in
-       AdminLayout.vue, nello stesso ordine dei gruppi della sidebar: le
-       feature del Tavolo da gioco (Missioni, Calendario) sono editor, non
-       admin. Un item in più o in meno qui è una regressione di permessi. */
+       AdminLayout.vue, nello stesso ordine dei gruppi della sidebar: la
+       Bacheca Missioni è editor, non admin. Un item in più o in meno qui è
+       una regressione di permessi. */
     expect(labels).toEqual([
       'Dashboard',
       'Pagine',
@@ -67,7 +67,6 @@ test.describe('navigazione per ruolo', () => {
       'Mappa',
       'Carousel',
       'Missioni',
-      'Calendario',
       'Changelog'
     ])
     for (const forbidden of ['Utenti', 'Cestino', 'Impostazioni', 'Audit', 'Backup']) {
