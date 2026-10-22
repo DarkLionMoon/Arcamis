@@ -104,7 +104,6 @@ var _pathMap = {
   'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur',
   'changelog': 'pag-changelog',
   'credits': 'pag-credits',
-  'missioni': 'pag-missioni'
 };
 
 /* ════ DEEP LINK ════ */

@@ -556,7 +556,7 @@ window.gsSelect = function (id, name) {
       ? '<div class="gs-detail-cover-img" style="background-image:url(\'' + cover + '\')"></div>'
       : '<div class="gs-detail-cover-img" style="background:' + col.bg + '"></div>') +
     '<div class="gs-detail-cover-overlay"></div>' +
-    (posa ? '<img class="gs-posa" id="gs-posa-img" src="' + posa + '" alt="">' : '') +
+    (posa ? '<img class="gs-posa" id="gs-posa-img" src="' + posa + '" alt="" loading="lazy" decoding="async">' : '') +
     '</div>' +
     '<div class="gs-detail-body">' +
     '<div class="gs-corner gs-corner-tl"></div>' +

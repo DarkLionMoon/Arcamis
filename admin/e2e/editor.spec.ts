@@ -1,3 +1,6 @@
+import fs from 'node:fs'
+import path from 'node:path'
+
 import { test, expect, type Page, type Route } from 'playwright/test'
 
 /* ════════════════════════════════════════════════════════════
@@ -344,5 +347,271 @@ test.describe('editor di pagina', () => {
     await expect(page.locator('.arc-modal-backdrop')).toContainText('Modifiche non salvate')
     await page.getByRole('button', { name: 'Resta qui' }).click()
     await expect(page.locator('.arc-ws-title')).toHaveValue('Pantheon')
+  })
+})
+
+/* ── Contenuto reale importato da Notion ─────────────────────
+   Non una fixture: il file pubblicato del compendio sottoclassi, con
+   tutti i suoi blocchi. Serve a dimostrare che una pagina migrata
+   arriva nell'editor a blocchi e torna nel repository con lo stesso
+   contenuto, usando lo sha della lettura. */
+const REAL_PAGE = {
+  ...(JSON.parse(fs.readFileSync(path.resolve(process.cwd(), '../content/pages/sottoclassi-homebrew.json'), 'utf8')) as Record<string, unknown>),
+  sha: 'sha-imported'
+}
+
+const REAL_PANTHEON = {
+  ...(JSON.parse(fs.readFileSync(path.resolve(process.cwd(), '../content/pages/pantheon.json'), 'utf8')) as Record<string, unknown>),
+  sha: 'sha-pantheon'
+}
+
+const REAL_SPECIES = {
+  ...(JSON.parse(fs.readFileSync(path.resolve(process.cwd(), '../content/pages/specie-homebrew.json'), 'utf8')) as Record<string, unknown>),
+  sha: 'sha-species'
+}
+
+async function mockImportedContent(page: Page): Promise<GhCall[]> {
+  const calls: GhCall[] = []
+  const registry = {
+    root: 'root',
+    guild: 'guild',
+    pages: [
+      {
+        k: 'sottoclassi-homebrew',
+        l: 'Sottoclassi Homebrew',
+        i: '⚔️',
+        id: 'pag-sottoclassi-homebrew',
+        sec: 'homebrew',
+        admin: true,
+        layout: 'compendio'
+      }
+    ],
+    sections: [{ v: 'homebrew', l: 'Homebrew' }]
+  }
+
+  await page.route('**/api/admin?action=check', (route) =>
+    json(route, { ok: true, user: 'admin-user', role: 'admin', csrf: 'e2e-csrf' })
+  )
+  await page.route('**/api/admin?action=get_covers', (route) => json(route, {}))
+  await page.route('**/api/admin?action=pages_status', (route) => json(route, {}))
+  await page.route('**/api/gh', async (route) => {
+    const body = route.request().postDataJSON() as GhCall
+    calls.push(body)
+    const path = String(body.payload.path || '')
+    if (body.action === 'get' && path === 'content/pages/sottoclassi-homebrew.json')
+      return json(route, { data: { content: b64(JSON.stringify(REAL_PAGE)), sha: 'sha-imported' } })
+    if (body.action === 'get' && path === 'content/pages/registry.json')
+      return json(route, { data: { content: b64(JSON.stringify(registry)), sha: 'sha-registry' } })
+    if (body.action === 'get' && path === 'images') return json(route, { data: [] })
+    if (body.action === 'put') return json(route, { data: { content: { sha: 'sha-new' } } })
+    return json(route, { data: null })
+  })
+  return calls
+}
+
+async function mockSpeciesContent(page: Page): Promise<GhCall[]> {
+  const calls: GhCall[] = []
+  const registry = {
+    root: 'root',
+    guild: 'guild',
+    pages: [
+      {
+        k: 'specie-homebrew',
+        l: 'Specie Homebrew',
+        i: '🧬',
+        id: 'pag-specie-homebrew',
+        sec: 'homebrew',
+        admin: true,
+        layout: 'compendio'
+      }
+    ],
+    sections: [{ v: 'homebrew', l: 'Homebrew' }]
+  }
+
+  await page.route('**/api/admin?action=check', (route) =>
+    json(route, { ok: true, user: 'admin-user', role: 'admin', csrf: 'e2e-csrf' })
+  )
+  await page.route('**/api/admin?action=get_covers', (route) => json(route, {}))
+  await page.route('**/api/admin?action=pages_status', (route) => json(route, {}))
+  await page.route('**/api/gh', async (route) => {
+    const body = route.request().postDataJSON() as GhCall
+    calls.push(body)
+    const path = String(body.payload.path || '')
+    if (body.action === 'get' && path === 'content/pages/specie-homebrew.json')
+      return json(route, { data: { content: b64(JSON.stringify(REAL_SPECIES)), sha: 'sha-species' } })
+    if (body.action === 'get' && path === 'content/pages/registry.json')
+      return json(route, { data: { content: b64(JSON.stringify(registry)), sha: 'sha-registry' } })
+    if (body.action === 'get' && path === 'images') return json(route, { data: [] })
+    if (body.action === 'put') return json(route, { data: { content: { sha: 'sha-new' } } })
+    return json(route, { data: null })
+  })
+  return calls
+}
+
+async function mockPantheonContent(page: Page): Promise<GhCall[]> {
+  const calls: GhCall[] = []
+  const registry = {
+    root: 'root',
+    guild: 'guild',
+    pages: [
+      {
+        k: 'pantheon',
+        l: 'Pantheon',
+        i: '🛐',
+        id: 'pag-pantheon',
+        sec: 'lore',
+        admin: true,
+        layout: 'pantheon'
+      }
+    ],
+    sections: [{ v: 'lore', l: 'Lore' }]
+  }
+
+  await page.route('**/api/admin?action=check', (route) =>
+    json(route, { ok: true, user: 'admin-user', role: 'admin', csrf: 'e2e-csrf' })
+  )
+  await page.route('**/api/admin?action=get_covers', (route) => json(route, {}))
+  await page.route('**/api/admin?action=pages_status', (route) => json(route, {}))
+  await page.route('**/api/gh', async (route) => {
+    const body = route.request().postDataJSON() as GhCall
+    calls.push(body)
+    const path = String(body.payload.path || '')
+    if (body.action === 'get' && path === 'content/pages/pantheon.json')
+      return json(route, { data: { content: b64(JSON.stringify(REAL_PANTHEON)), sha: 'sha-pantheon' } })
+    if (body.action === 'get' && path === 'content/pages/registry.json')
+      return json(route, { data: { content: b64(JSON.stringify(registry)), sha: 'sha-registry' } })
+    if (body.action === 'get' && path === 'images') return json(route, { data: [] })
+    if (body.action === 'put') return json(route, { data: { content: { sha: 'sha-new' } } })
+    return json(route, { data: null })
+  })
+  return calls
+}
+
+test.describe('contenuti importati da Notion', () => {
+  test('il form Divinità apre 20 schede reali e salva i campi senza perdere le sezioni speciali', async ({ page }) => {
+    const calls = await mockPantheonContent(page)
+    await page.goto('/admin/app.html#/editor/pantheon')
+    await expect(page.locator('.arc-ws-title')).toHaveValue('Pantheon')
+
+    await page.getByRole('tab', { name: /Divinità/ }).click()
+    await expect(page.locator('.arc-pantheon-card:not(.is-raw)')).toHaveCount(20)
+    const first = page.locator('.arc-pantheon-card').filter({ hasText: 'Anivia' }).first()
+    await first.locator('.arc-pantheon-card-head').click()
+    await first.locator('input').nth(1).fill('La Fenice del Gelo')
+    await page.keyboard.press('Control+s')
+    await expect(page.locator('.arc-ws-save')).toContainText('Tutto salvato')
+
+    const put = calls.filter((call) => call.action === 'put' && call.payload.path === 'content/pages/pantheon.json').pop()
+    expect(put?.payload.sha).toBe('sha-pantheon')
+    const saved = JSON.parse(decode(put?.payload.content)) as { content: string }
+    expect(saved.content).toContain('- **Epiteto:** La Fenice del Gelo')
+    expect(saved.content).toContain('# Nota sulle fonti')
+  })
+
+  test('la pagina reale si apre nell’editor a blocchi e si salva senza perdere contenuto', async ({ page }) => {
+    const calls = await mockImportedContent(page)
+    const before = String(REAL_PAGE.content)
+
+    await page.goto('/admin/app.html#/editor/sottoclassi-homebrew')
+    await expect(page.locator('.arc-ws-title')).toHaveValue('Sottoclassi Homebrew')
+    await expect(page.locator('.arc-blocks')).toBeVisible()
+    await expect(page.locator('.arc-block')).not.toHaveCount(0)
+
+    const firstHeading = page.locator('.arc-block input.in').first()
+    await firstHeading.fill('Chemtecnico — prova editor')
+    await page.keyboard.press('Control+s')
+    await expect(page.locator('.arc-ws-save')).toContainText('Tutto salvato')
+
+    const put = calls.filter((call) => call.action === 'put' && call.payload.path === 'content/pages/sottoclassi-homebrew.json').pop()
+    expect(put?.payload.sha).toBe('sha-imported')
+    const saved = JSON.parse(decode(put?.payload.content)) as { content: string; layout: string; sha?: string }
+    expect(saved.layout).toBe('compendio')
+    expect(saved.content).toContain('Chemtecnico — prova editor')
+    expect(saved.content.length).toBeGreaterThan(before.length - 200)
+    expect(saved.content.length).toBeLessThan(before.length + 300)
+  })
+
+  test('il catalogo Schede apre tutte le 33 specie e salva una scheda senza perderne nessuna', async ({ page }) => {
+    const calls = await mockSpeciesContent(page)
+
+    await page.goto('/admin/app.html#/editor/specie-homebrew')
+    await expect(page.locator('.arc-ws-title')).toHaveValue('Specie Homebrew')
+    await page.getByRole('tab', { name: /Schede/ }).click()
+    await expect(page.locator('.arc-compendio-card:not(.is-raw)')).toHaveCount(33)
+    await expect(page.locator('.arc-compendio-group-title').first()).toBeVisible()
+
+    const first = page.locator('.arc-compendio-card').filter({ hasText: 'Ascesi' }).first()
+    await first.locator('.arc-compendio-card-title').click()
+    await first.locator('.arc-compendio-fields input').first().fill('Ascesi — prova catalogo')
+    const body = first.locator('textarea.arc-compendio-body')
+    await body.fill((await body.inputValue()) + '\n\nTratto aggiornato dall’Admin.')
+    await page.keyboard.press('Control+s')
+    await expect(page.locator('.arc-ws-save')).toContainText('Tutto salvato')
+
+    const put = calls.filter((call) => call.action === 'put' && call.payload.path === 'content/pages/specie-homebrew.json').pop()
+    expect(put?.payload.sha).toBe('sha-species')
+    const saved = JSON.parse(decode(put?.payload.content)) as { content: string; layout: string; sha?: string }
+    expect(saved.layout).toBe('compendio')
+    expect(saved.content).toContain('# Ascesi — prova catalogo')
+    expect(saved.content).toContain('Tratto aggiornato dall’Admin.')
+    expect(saved.content.split('\n').filter((line) => /^#\s+/.test(line))).toHaveLength(33)
+    expect(saved.sha).toBeUndefined()
+  })
+
+  test('la scheda Esplorazione crea schede, riordina, elimina e salva il pattern', async ({ page }) => {
+    const calls = await mockPantheonContent(page)
+
+    await page.goto('/admin/app.html#/editor/pantheon')
+    await expect(page.locator('.arc-ws-title')).toHaveValue('Pantheon')
+    await page.getByRole('tab', { name: /Esplorazione/ }).click()
+    await expect(page.locator('.arc-explorer')).toBeVisible()
+    await expect(page.locator('.arc-explorer-head .arc-chip')).toContainText('30 divinità')
+
+    /* Cambio di pattern: il drawer del pantheon diventa schede orizzontali. */
+    await page.getByRole('radio', { name: /Schede \+ indice/ }).click()
+    await expect(page.locator('.arc-explorer-mode[aria-checked="true"]')).toContainText('Schede + indice')
+    await expect(page.locator('.arc-explorer-block').first()).toContainText('Schede orizzontali')
+
+    /* Creazione, rinomina, associazione di una sezione e riordino di due schede. */
+    await page.getByRole('button', { name: /Nuova scheda/ }).click()
+    await page.getByRole('button', { name: /Nuova scheda/ }).click()
+    await expect(page.locator('.arc-explorer-group')).toHaveCount(2)
+
+    const names = page.locator('.arc-explorer-group-name')
+    await names.nth(0).fill('Divinità')
+    await names.nth(1).fill('Aspetti')
+    await page.locator('.arc-explorer-group').first().locator('.arc-section-chip', { hasText: 'Identità' }).first().click()
+
+    await page.locator('.arc-explorer-group').nth(1).locator('[title="Sposta su"]').click()
+    expect(await names.evaluateAll((nodes) => nodes.map((node) => (node as HTMLInputElement).value))).toEqual(['Aspetti', 'Divinità'])
+
+    await page.locator('.arc-explorer-group').nth(0).locator('[title="Elimina gruppo"]').click()
+    await expect(page.locator('.arc-explorer-group')).toHaveCount(1)
+
+    /* I filtri si eliminano e si ricreano senza toccare il codice. */
+    await page.locator('.arc-explorer-filter').first().locator('[title="Elimina filtro"]').click()
+    await expect(page.locator('.arc-explorer-filter')).toHaveCount(0)
+    await page.getByRole('button', { name: /Nuovo filtro/ }).click()
+    const filter = page.locator('.arc-explorer-filter').first()
+    await filter.locator('input').nth(0).fill('Fonte')
+    await filter.locator('input').nth(1).fill('Fonte')
+
+    await page.keyboard.press('Control+s')
+    await expect(page.locator('.arc-ws-save')).toContainText('Tutto salvato')
+
+    const put = calls.filter((call) => call.action === 'put' && call.payload.path === 'content/pages/pantheon.json').pop()
+    expect(put?.payload.sha).toBe('sha-pantheon')
+    const saved = JSON.parse(decode(put?.payload.content)) as {
+      content: string
+      explore?: { mode: string; tabs: Array<{ label: string; sections: string[] }>; filters: Array<{ label: string; field: string }> }
+    }
+    expect(saved.explore?.mode).toBe('tabs')
+    expect(saved.explore?.tabs).toHaveLength(1)
+    expect(saved.explore?.tabs[0].label).toBe('Divinità')
+    expect(saved.explore?.tabs[0].sections).toContain('Identità')
+    expect(saved.explore?.filters).toEqual([{ id: 'filtro-1', label: 'Fonte', field: 'Fonte' }])
+    /* Il contenuto della pagina resta quello importato: qui si salva solo il pattern. */
+    expect(saved.content).toContain('# Anivia')
+    expect(Math.abs(saved.content.length - String(REAL_PANTHEON.content).length)).toBeLessThan(400)
   })
 })

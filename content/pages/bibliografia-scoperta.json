@@ -2,9 +2,18 @@
   "k": "bibliografia-scoperta",
   "title": "Bibliografia scoperta",
   "icon": "📄",
-  "content": "In questa pagina, verranno elencati i libri scoperti dagli Avventurieri (giusto per ragion di cronaca).\nCi teniamo a precisare che, avere questo libro elencato qui, non equivale a conoscerlo o conoscerne il contenuto in-game (a meno che il vostro pg non lo abbia letto in-role).",
+  "content": "In questa pagina, verranno elencati i libri scoperti dagli Avventurieri (giusto per ragion di cronaca).\nCi teniamo a precisare che, avere questo libro elencato qui, non equivale a conoscerlo o conoscerne il contenuto in-game (a meno che il vostro pg non lo abbia letto in-role).\n\n## Opere catalogate\n\n| Opera | Autore / nota |\n| --- | --- |\n| Cocktail All in the World | — |\n| Compendium delle Piante Succulente | — |\n| De Caprini Abissali: Bulezau | — |\n| Echi dal Silenzio: Fenomenologia del Non-Essere | L'autore è l'antico studioso e cosmologo **Aristhos il Veggente** |\n| Il Caldo di Shirubia | — |\n| Il Mito del Salice Divino | — |\n| Il piccolo apprendista e le Torri di Aurenthar | — |\n| Il Prisma di Horok: Teoria sulla Rifrazione del Flusso Magico | — |\n| Il Respiro degli Dei: Guida alla Spiritualità del Mondo | — |\n| Iniziato alla Necromanzia | — |\n| Ionia: Il Respiro tra Due Mondi | — |\n| Kaelis, nuntius boni et iustitiae | — |\n| L'Anima della Forgia: Dinamiche Elementali e Leghe Reattive | — |\n| L'Arte dell'Inchiostro Vivente: Guida ai Sigilli Dermici | — |\n| L’entropia sinfonica | — |\n| L’inno dell’ora, la raccolta delle leggende Targoniane | — |\n| L`Eredità Verde: Cronache della Linfa e del Sangue | **Theren “Passolieve” Meliamne** |\n| La civiltà scomparsa degli Agareth | — |\n| La fame del CREPUSCOLO | — |\n| La minaccia del mare lavanda | — |\n| Le avventure del piccolo divoratore | — |\n| Le cronache di Icathia: Il velo infranto | Kadin al-Zahir, Astronomo Reale di una città di confine ormai cancellata. |\n| Memorie di Balthazar Thorne-Artorius | **Balthazar Thorne-Artoris** |\n| Metallurgia: tutto quello che deve sapere un fabbro imbranato | — |\n| Nuove tecnologie da tutti i continenti | — |\n| Riti primordiali di Ixtal | Maestro **Qh’ira Zal-Teth** |\n| Shurima, il Paese del deserto | — |\n| Sotto l’orizzonte degli eventi | Diario di **Kaelen Thorne**, cartografo scomparso. |\n| Trattato di Heimstark | — |\n",
   "layout": "",
-  "toc": false,
-  "lastModified": "2026-08-25T14:49:07.539746Z",
-  "migratedFrom": "3040274fdc1c80ed816ef58f6a606f21"
+  "toc": true,
+  "lastModified": "2026-10-22T13:25:32.087Z",
+  "explore": {
+    "mode": "drawer",
+    "source": "table",
+    "search": true,
+    "label": "Opera",
+    "plural": "opere",
+    "hash": "bibliografia",
+    "showHero": false,
+    "filters": []
+  }
 }

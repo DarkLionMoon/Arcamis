@@ -1,6 +1,12 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { describe, expect, it } from 'vitest'
 
 import { LAYOUT_OPTIONS, LAYOUT_PRESETS, presetFor } from './layouts'
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..')
 
 /* I preset sono combinazioni di layout che il sito sa rendere: se uno
    puntasse a un layout inesistente, il pannello salverebbe una pagina
@@ -24,6 +30,13 @@ describe('preset di layout', () => {
     const immersivo = LAYOUT_PRESETS.find((preset) => preset.id === 'immersivo')
     expect(wiki).toMatchObject({ layout: '', toc: true })
     expect(immersivo).toMatchObject({ layout: 'wide', toc: false })
+  })
+
+  it('elenca esattamente i layout ammessi dallo schema delle pagine', () => {
+    const schema = JSON.parse(fs.readFileSync(path.join(root, 'content/schemas/page.schema.json'), 'utf8')) as {
+      properties: { layout: { enum: string[] } }
+    }
+    expect([...known].sort()).toEqual([...schema.properties.layout.enum].sort())
   })
 
   it('riconosce il preset dal layout salvato', () => {

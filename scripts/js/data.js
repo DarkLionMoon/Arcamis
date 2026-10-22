@@ -60,7 +60,6 @@ var pages = [
   {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'},
   {k:'changelog',l:'Changelog',i:'📜',id:'pag-changelog'},
   {k:'credits',l:'Crediti & Legale',i:'⚖️',id:'pag-credits'},
-  {k:'missioni',l:'Bacheca Missioni',i:'🎯',id:'pag-missioni'}
 ];
 
 function getPage(idOrK){

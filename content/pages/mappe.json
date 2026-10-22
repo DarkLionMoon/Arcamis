@@ -2,9 +2,8 @@
   "k": "mappe",
   "title": "Mappe",
   "icon": "🗺️",
-  "content": "Sezione in allestimento. Contenuti disponibili:\n\n- [Arcamis](/lore/mappa-arcamis)",
+  "content": "Le mappe del mondo di Arcamis, aggiornate con i luoghi esplorati dagli avventurieri.\n\n## Marche di Arcamis\n\nLa carta delle Marche raccoglie la città di Arcamis e i suoi dintorni. Per i dettagli di ogni luogo, apri la [mappa interattiva](/lore/mappa-arcamis).\n\n![Mappa delle Marche di Arcamis](/mappa.webp)\n",
   "layout": "",
   "toc": false,
-  "lastModified": "2026-08-25T14:44:16.004405Z",
-  "migratedFrom": "2f10274fdc1c80489f23c49164747770"
+  "lastModified": "2026-10-22T13:25:32.444Z"
 }

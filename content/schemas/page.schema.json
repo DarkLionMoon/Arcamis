@@ -4,15 +4,209 @@
   "title": "Arcamis page",
   "description": "File singolo di una pagina admin (content/pages/<k>.json), salvato dall'editor.",
   "type": "object",
-  "required": ["k", "title", "icon", "content", "lastModified"],
+  "required": [
+    "k",
+    "title",
+    "icon",
+    "content",
+    "lastModified"
+  ],
   "properties": {
-    "k": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Chiave univoca della pagina (nome file)" },
-    "title": { "type": "string", "minLength": 1 },
-    "icon": { "type": "string" },
-    "content": { "type": "string" },
-    "layout": { "type": "string", "enum": ["", "contenuto", "luoghi", "cronache", "personaggio", "bestiario", "oggetti", "fazioni", "materiale", "pantheon", "collezione", "generico", "lore", "regole", "lavoro", "wide", "timeline", "glossario", "galleria", "tabelle", "schede", "sessione", "quest", "npc", "spell", "specie", "citta", "evento", "imprese", "missioni"] },
-    "meme": { "type": "boolean", "description": "Mostra il banner «Pagina meme» prima del contenuto" },
-    "lastModified": { "type": "string", "format": "date-time" }
+    "k": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Chiave univoca della pagina (nome file)"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "icon": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "layout": {
+      "type": "string",
+      "enum": [
+        "",
+        "contenuto",
+        "luoghi",
+        "cronache",
+        "personaggio",
+        "bestiario",
+        "oggetti",
+        "fazioni",
+        "materiale",
+        "pantheon",
+        "collezione",
+        "compendio",
+        "generico",
+        "lore",
+        "regole",
+        "lavoro",
+        "wide",
+        "timeline",
+        "glossario",
+        "galleria",
+        "tabelle",
+        "schede",
+        "sessione",
+        "quest",
+        "npc",
+        "spell",
+        "specie",
+        "citta",
+        "evento",
+        "imprese"
+      ]
+    },
+    "meme": {
+      "type": "boolean",
+      "description": "Mostra il banner «Pagina meme» prima del contenuto"
+    },
+    "lastModified": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "explore": {
+      "type": "object",
+      "description": "Pattern di esplorazione della pagina (master-detail, tabs, drawer, accordion).",
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "master-detail",
+            "tabs",
+            "drawer",
+            "accordion"
+          ]
+        },
+        "entryLevel": {
+          "type": "integer",
+          "enum": [
+            1,
+            2,
+            3
+          ]
+        },
+        "skipFirst": {
+          "type": "boolean"
+        },
+        "search": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "plural": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "groupBy": {
+          "type": "string"
+        },
+        "detailStyle": {
+          "type": "string",
+          "enum": [
+            "markdown",
+            "lavoro"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "headings",
+            "table"
+          ]
+        },
+        "entityHeading": {
+          "type": "string"
+        },
+        "showHero": {
+          "type": "boolean"
+        },
+        "unassigned": {
+          "type": "boolean"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "field": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "tabs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sections": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sections": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
   },
   "additionalProperties": true
 }

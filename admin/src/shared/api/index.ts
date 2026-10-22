@@ -26,7 +26,6 @@ export {
   layoutsApi,
   mapApi,
   pagesApi,
-  questsApi,
   registryApi,
   searchApi,
   statusApi

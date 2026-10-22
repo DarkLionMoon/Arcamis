@@ -2,9 +2,48 @@
   "k": "arcamis",
   "title": "Arcamis",
   "icon": "📍",
-  "content": "Sezione in allestimento. Contenuti disponibili:\n\n**Luoghi di Arcamis** (12 voci):\n  - 📄 Il Polpo Verde\n  - 📄 Sartoria\n  - 📄 Corporazione dei costruttori\n  - 📄 Bottega farmaceutica\n  - 📄 Forgia\n  - 📄 Porto\n  - 📄 Caserma\n  - 📄 Biblioteca\n  - 📄 Ospedale\n  - 📄 Locanda\n  - 📄 Piazza\n  - 📄 Arena",
+  "content": "Arcamis è la città portuale delle Marche: un crocevia di merci, giuramenti e storie che non sempre tornano. Qui si trovano i luoghi che ogni avventuriero impara presto a conoscere.\n\n## Arena\n\nIl cerchio di pietra dove si misurano le lame e si mettono alla prova i nuovi arrivati. Le rune dell’arena chiudono gli scontri prima che diventino funerali.\n\n![](/images/notion/5c92eff81f47-result_0.png)\n\n![](/images/notion/54f29e29705a-tv9crhh23nrmr0cwd288a094em.png)\n\n## Biblioteca\n\nUn silenzio rispettoso avvolge la biblioteca: chi alza troppo la voce scopre presto che il capo dello staff non ha pazienza per i curiosi.\n\n![](/images/notion/ad1303ef202c-immagine_2026-02-16_234220748.png)\n\n## Bottega farmaceutica\n\nAmpolle, erbe secche e odori che restano addosso per giorni. Qui si comprano rimedi, veleni e qualche risposta che non si trova altrove.\n\n![](/images/notion/3d36292b9bcf-2aebdb3b-5755-44c9-bef5-8c4a3268bcf2.webp)\n\n## Caserma\n\nIl cuore armato di Arcamis: armeria, celle e corridoi dove le guardie parlano più volentieri con chi porta ordini scritti.\n\n### Interni\n\n### Una delle ale laterali\n\n![](/images/notion/8ae69f55467e-immagine_2026-02-17_004257738.jpg)\n\n### Armeria C\n\n![](/images/notion/c339d6f949cf-aiease_1771285349448.jpg)\n\n### Sotterranei\n\n### Celle\n\n![](/images/notion/c6848a082a72-image.png)\n\n## Corporazione dei costruttori\n\nImprese, cantieri e contratti. Chi vuole costruire qualcosa ad Arcamis passa prima da questi banchi.\n\n![](/images/notion/9f81236f898e-immagine_2026-02-16_235144325.png)\n\n## Forgia\n\nIl fuoco non si spegne mai. La forgia lavora per la città, per le guardie e per chi paga abbastanza da non fare domande.\n\n![](/images/notion/1073a425f19d-73e8e4cb-e14f-4d88-9153-bed5b6c0eb70.webp)\n\n## Il Polpo Verde\n\nUna locanda dal proprietario molto particolare, dove le voci corrono più veloci del vino.\n\n![](/images/notion/1ec727e03402-image.png)\n\nIl proprietario. Una figura “molto particolare”\n\n![](/images/notion/5ec171c63995-image-1.png)\n\n## Locanda\n\nIl primo posto in cui un forestiero trova un letto, una birra e qualcuno disposto a raccontare ciò che non dovrebbe.\n\n![](/images/notion/5f38909e936a-immagine_2026-02-16_233402137.png)\n\n## Ospedale\n\nBende, preghiere e qualche miracolo minore. Le porte restano aperte anche quando le casse della città sono vuote.\n\n![](/images/notion/78890ffa4af5-immagine_2026-02-16_234152732.png)\n\n## Piazza\n\nIl centro di Arcamis, dove i banditori leggono gli editti e le notizie cambiano padrone prima di sera.\n\n![](/images/notion/75c75e034a40-wmrsvs63hdrmt0cwd2a8csx54r.png)\n\n![](/images/notion/671cf562b0bb-pn650s0wvhrmy0cwd2ard3sbyg.png)\n\n## Porto\n\nMoli, cordami e navi che arrivano da mezzo mondo. Al porto si trova lavoro, merce proibita e gente che non vuole essere ricordata.\n\n![](/images/notion/d0de008287d2-immagine_2026-02-16_234351292.png)\n\n## Sartoria\n\nAghi, stoffe e abiti su misura. Un buon sarto vale quanto una lama, soprattutto quando bisogna sembrare qualcun altro.\n\n![](/images/notion/bee035e357ad-immagine_2026-02-17_112259600.jpeg)\n",
   "layout": "",
-  "toc": false,
-  "lastModified": "2026-08-25T14:44:18.508540Z",
-  "migratedFrom": "3090274fdc1c80e1a365ce1c36873455"
+  "toc": true,
+  "lastModified": "2026-10-22T13:25:32.431Z",
+  "explore": {
+    "mode": "tabs",
+    "entryLevel": 2,
+    "search": false,
+    "label": "Luogo",
+    "plural": "luoghi",
+    "hash": "arcamis",
+    "tabs": [
+      {
+        "id": "quotidiano",
+        "label": "Vita quotidiana",
+        "sections": [
+          "Arena",
+          "Piazza",
+          "Locanda",
+          "Il Polpo Verde",
+          "Sartoria"
+        ]
+      },
+      {
+        "id": "istituzioni",
+        "label": "Istituzioni",
+        "sections": [
+          "Biblioteca",
+          "Caserma",
+          "Ospedale",
+          "Corporazione dei costruttori"
+        ]
+      },
+      {
+        "id": "mestieri",
+        "label": "Mestieri e porto",
+        "sections": [
+          "Bottega farmaceutica",
+          "Forgia",
+          "Porto"
+        ]
+      }
+    ]
+  }
 }

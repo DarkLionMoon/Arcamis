@@ -1,52 +1,52 @@
 {
- "pages": [
-  {
-   "id": "pag-missioni",
-   "title": "Bacheca Missioni",
-   "icon": "🎯",
-   "lastEdited": "2026-10-19T10:00:00.000Z"
-  },
-  {
-   "id": "pag-changelog",
-   "title": "Changelog",
-   "icon": "📜",
-   "lastEdited": "2026-10-18T06:42:27.642Z"
-  },
-  {
-   "id": "pag-credits",
-   "title": "Crediti & Legale",
-   "icon": "⚖️",
-   "lastEdited": "2026-10-18T06:42:06.504Z"
-  },
-  {
-   "id": "pag-imprese",
-   "title": "Imprese e Licenze",
-   "icon": "⚖️",
-   "lastEdited": "2026-09-09T00:00:00Z"
-  },
-  {
-   "id": "pag-specie-homebrew",
-   "title": "Specie Homebrew",
-   "icon": "🧬",
-   "lastEdited": "2026-08-26T20:24:46.885Z"
-  },
-  {
-   "id": "pag-come-si-inizia",
-   "title": "Creazione",
-   "icon": "🌟",
-   "lastEdited": "2026-08-26T13:58:16.049Z"
-  },
-  {
-   "id": "pag-lavori",
-   "title": "Lavori",
-   "icon": "💼",
-   "lastEdited": "2026-08-26T09:52:29.371Z"
-  },
-  {
-   "id": "pag-regole-del-server",
-   "title": "Regole del Server",
-   "icon": "📋",
-   "lastEdited": "2026-08-25T15:50:23.012Z"
-  }
- ]
+  "pages": [
+    {
+      "id": "pag-pantheon",
+      "title": "Pantheon",
+      "icon": "🛐",
+      "lastEdited": "2026-10-22T13:25:32.481Z"
+    },
+    {
+      "id": "pag-foresta-dello-smarrimento",
+      "title": "Foresta dello Smarrimento",
+      "icon": "🌑",
+      "lastEdited": "2026-10-22T13:25:32.477Z"
+    },
+    {
+      "id": "pag-selva-fogliabruna",
+      "title": "Selva Fogliabruna",
+      "icon": "🌲",
+      "lastEdited": "2026-10-22T13:25:32.475Z"
+    },
+    {
+      "id": "pag-rovine-di-kaldur",
+      "title": "Rovine di Kaldur",
+      "icon": "🗿",
+      "lastEdited": "2026-10-22T13:25:32.473Z"
+    },
+    {
+      "id": "pag-fumofosco",
+      "title": "Fumofosco",
+      "icon": "🌫️",
+      "lastEdited": "2026-10-22T13:25:32.470Z"
+    },
+    {
+      "id": "pag-riva-di-ferro",
+      "title": "Riva di Ferro",
+      "icon": "⚓",
+      "lastEdited": "2026-10-22T13:25:32.468Z"
+    },
+    {
+      "id": "pag-forte-vigilus",
+      "title": "Forte Vigilus",
+      "icon": "🏰",
+      "lastEdited": "2026-10-22T13:25:32.466Z"
+    },
+    {
+      "id": "pag-lago-di-gromot",
+      "title": "Lago di Gromot",
+      "icon": "🌊",
+      "lastEdited": "2026-10-22T13:25:32.464Z"
+    }
+  ]
 }

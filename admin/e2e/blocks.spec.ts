@@ -79,7 +79,7 @@ test.describe('editor a blocchi', () => {
     await mockBackend(page, saved)
     await page.goto('/admin/app.html#/editor/regole')
 
-    await expect(page.locator('.arc-mode-tab')).toHaveText(['Blocchi', 'Markdown'])
+    await expect(page.locator('.arc-mode-tab')).toHaveText([/Blocchi/, /Esplorazione/, /Markdown/])
     await expect(page.locator('.arc-block-type')).toHaveText(['Titolo', 'Paragrafo', 'Griglia / Carte'])
     await expect(page.locator('.arc-slide-state')).toHaveCount(0)
     /* La pagina si apre pulita: il passaggio ai blocchi è una lettura. */
@@ -102,7 +102,7 @@ test.describe('editor a blocchi', () => {
     await expect(page.locator('.n-content h2').first()).toHaveText('Regola 1 — Accesso al server')
 
     /* Il markdown è la fonte di verità: si vede passando alla modalità testo. */
-    await page.locator('.arc-mode-tab').nth(1).click()
+    await page.getByRole('tab', { name: /Markdown/ }).click()
     await expect(page.locator('.cm-content')).toContainText('## Regola 1 — Accesso al server')
     /* ...e il giro non perde la griglia di carte. */
     await expect(page.locator('.cm-content')).toContainText(':::cards')

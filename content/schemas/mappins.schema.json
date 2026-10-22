@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://arcamis.pages.dev/schemas/mappins.schema.json",
+  "title": "Arcamis map pins",
+  "description": "Puntine della mappa pubblica (content/mappins.json), modificate dall'editor Admin.",
+  "type": "object",
+  "required": ["mapImage", "pins"],
+  "properties": {
+    "mapImage": {
+      "type": "string",
+      "pattern": "^(/|https?://)"
+    },
+    "pins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "left", "top", "type", "name", "desc", "explored"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "left": {
+            "type": "string",
+            "pattern": "^([0-9]{1,2}(\\.[0-9]+)?|100(\\.0+)?)%$"
+          },
+          "top": {
+            "type": "string",
+            "pattern": "^([0-9]{1,2}(\\.[0-9]+)?|100(\\.0+)?)%$"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["city", "village", "fort", "forest", "water", "ruin", "fog"]
+          },
+          "name": { "type": "string", "minLength": 1 },
+          "desc": { "type": "string" },
+          "explored": { "type": "boolean" },
+          "sub": { "type": "string" },
+          "pageId": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

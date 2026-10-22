@@ -42,6 +42,22 @@ function _memeBannerHtml() {
   );
 }
 
+/* Le immagini Notion hanno spesso alt vuoto: meglio il nome file che
+   un'immagine muta per screen reader. */
+function _imgAlt(src, alt) {
+  var provided = String(alt || '').trim();
+  if (provided) return provided;
+  var name = String(src || '')
+    .split(/[?#]/)[0]
+    .split('/')
+    .pop()
+    .replace(/^[a-f0-9]{8,}-/i, '')
+    .replace(/\.[a-z0-9]+$/i, '')
+    .replace(/[-_]+/g, ' ')
+    .trim();
+  return name ? name.charAt(0).toUpperCase() + name.slice(1) : 'Immagine';
+}
+
 /* ════ MARKDOWN → HTML (per JSON locali) ════
    Delega a md-render.js (condiviso con l'admin, così
    l'anteprima dell'editor è identica al sito). Se il
@@ -141,7 +157,7 @@ function _mdToHtml(md) {
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .trim();
-    var safeAlt = (alt || '')
+    var safeAlt = _imgAlt(u, alt)
       .replace(/&amp;/g, '&')
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'")
@@ -547,8 +563,15 @@ async function _gpRender(id, label, icon) {
           phOverlay.style.opacity = '0';
           phIcon.style.opacity = '0.06';
           var _localHtml;
+          var _exploreBuilt = null;
           var _layout = _localJson.layout || '';
-          if (_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
+          if (_localJson.explore && window.ArcExplorer) {
+            _exploreBuilt = window.ArcExplorer.build(_localJson.content, _localJson.explore, {
+              pageKey: (_localPage && _localPage.k) || '',
+              title: ptitle
+            });
+            _localHtml = _exploreBuilt.html;
+          } else if (_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
           else if (_layout === 'regole' || _layout === 'contenuto') _localHtml = _renderRegole(_localJson.content);
           else if (_layout === 'lavoro') _localHtml = _renderLavoro(_localJson.content);
           else if (_layout === 'personaggio') _localHtml = _renderPersonaggio(_localJson.content);
@@ -558,6 +581,8 @@ async function _gpRender(id, label, icon) {
             _localHtml = _renderPantheon(_localJson.content, (_localPage && _localPage.k) || 'pantheon');
           else if (_layout === 'collezione')
             _localHtml = _renderPantheon(_localJson.content, (_localPage && _localPage.k) || 'pantheon');
+          else if (_layout === 'compendio')
+            _localHtml = _renderCompendio(_localJson.content, (_localPage && _localPage.k) || '');
           else if (_layout === 'bestiario') _localHtml = _renderBestiario(_localJson.content);
           else if (_layout === 'timeline' || _layout === 'cronache') _localHtml = _renderTimeline(_localJson.content);
           else if (_layout === 'fazioni') _localHtml = _renderFazioni(_localJson.content);
@@ -583,13 +608,6 @@ async function _gpRender(id, label, icon) {
           } else if (_layout === 'imprese') {
             /* App integrata: il mount avviene dopo l'inserimento nel DOM. */
             _localHtml = '<div class="imprese-app" id="imprese-app-root"></div>';
-          } else if (_layout === 'missioni') {
-            /* Bacheca Missioni: app integrata, il mount avviene dopo
-               l'inserimento nel DOM. */
-            _localHtml =
-              '<div class="arc-tool-app" id="arc-tool-root" data-layout="' +
-              _layout +
-              '"><p style="opacity:.6">Caricamento…</p></div>';
           } else {
             /* Auto-detect by page key (legacy fallback) */
             _localHtml =
@@ -611,14 +629,15 @@ async function _gpRender(id, label, icon) {
                       : _mdToHtml(_localJson.content);
           }
           var pbody = document.getElementById('pbody');
-          var layoutClass = _layout || 'default';
+          var layoutClass = _exploreBuilt ? 'explore' : _layout || 'default';
           pbody.className = 'page-' + id + ' page-' + layoutClass;
           pbody.style.maxWidth = '';
           pbody.style.width = '';
           if (
             _layout === 'wide' ||
+            _layout === 'compendio' ||
             _layout === 'imprese' ||
-            _layout === 'missioni'
+            _exploreBuilt
           ) {
             pbody.style.maxWidth = 'none';
             pbody.style.width = '100%';
@@ -657,15 +676,11 @@ async function _gpRender(id, label, icon) {
             var _impRoot = document.getElementById('imprese-app-root');
             if (_impRoot) window._impreseInit(_impRoot);
           }
-          /* Monta la Bacheca Missioni nel contenitore integrato. */
-          if (_layout === 'missioni') {
-            var _toolRoot = document.getElementById('arc-tool-root');
-            if (_toolRoot && window.initQuestBoard) window.initQuestBoard(_toolRoot);
-          }
           /* Attiva ricerca live e filtri del browser del materiale. */
           if (window.matBrowserInit) window.matBrowserInit(pbody);
           applyGlossary(pbody);
-          _maybeBuildToc(pbody, !!_localJson.toc);
+          if (_exploreBuilt && window.ArcExplorer) window.ArcExplorer.mount(pbody, _exploreBuilt);
+          else _maybeBuildToc(pbody, !!_localJson.toc);
           if (typeof afterPageRender === 'function') afterPageRender();
           return;
         }
@@ -1621,13 +1636,18 @@ function _parsePantheon(md) {
     var epi = '';
     var epiRe = rest.join('\n').match(/-\s*\*\*(?:Epiteto|Sottotitolo):?\*\*\s*:?\s*(.+)/);
     if (epiRe) epi = epiRe[1].trim();
+    var body = rest.join('\n').replace(/^\n+/, '').trim();
     deities.push({
       slug: _slugify(name),
       n: name,
       img: img,
       pos: pos,
       epi: epi,
-      md: rest.join('\n').replace(/^\n+/, '').trim(),
+      /* Solo le schede con la sezione Identità sono entità apribili:
+         le intestazioni di capitolo (Aspetti, Demoni, Pantheon locali)
+         restano blocchi di testo a tutta larghezza. */
+      entity: /^##\s+Identità\s*$/m.test(body),
+      md: body,
     });
   });
   return { intro: intro, deities: deities };
@@ -1752,7 +1772,12 @@ function _renderPantheon(md, pageKey) {
   html += '<div class="pan-grid">';
   data.deities.forEach(function (d) {
     var ic = _panIcon(d, pageKey);
-    if (!d.img) {
+    var _cfb = "this.onerror=null;this.style.display='none';this.parentNode.classList.add('pan-tile-none');";
+    var go = "gp('" + _pre + d.slug + "','" + _jsStr(d.n) + "','" + ic + "')";
+    /* Nel Pantheon solo le schede con Identità sono entità: i capitoli
+       (Aspetti, Demoni, pantheon locali) restano testi. Nelle altre
+       collezioni (lavori, luoghi) ogni blocco è una scheda. */
+    if (pageKey === 'pantheon' && !d.entity) {
       html +=
         '<div class="pan-section"><div class="pan-section-title">' +
         _siteEsc(d.n) +
@@ -1763,25 +1788,30 @@ function _renderPantheon(md, pageKey) {
         '</div></div>';
       return;
     }
-    var _cfb = "this.onerror=null;this.style.display='none';this.parentNode.classList.add('pan-tile-none');";
-    var go = "gp('" + _pre + d.slug + "','" + _jsStr(d.n) + "','" + ic + "')";
+    /* Anche un'entità senza immagine resta una tessera della stessa
+       griglia: il glifo nel riquadro evita la sezione fuori posto e
+       permette comunque di aprire la scheda completa. */
     html +=
-      '<div class="pan-tile" data-ic="' +
+      '<div class="pan-tile' +
+      (d.img ? '' : ' pan-tile-none') +
+      '" data-ic="' +
       ic +
       '" role="button" tabindex="0" onclick="' +
       go +
       '" onkeydown="if(event.key===\'Enter\')' +
       go +
       '">' +
-      '<img class="pan-tile-img" src="' +
-      _siteAttr(d.img) +
-      '" alt="' +
-      _siteAttr(d.n) +
-      '" loading="lazy" decoding="async"' +
-      (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '') +
-      ' onerror="' +
-      _cfb +
-      '">' +
+      (d.img
+        ? '<img class="pan-tile-img" src="' +
+          _siteAttr(d.img) +
+          '" alt="' +
+          _siteAttr(d.n) +
+          '" loading="lazy" decoding="async"' +
+          (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '') +
+          ' onerror="' +
+          _cfb +
+          '">'
+        : '') +
       (_isDraftMd(d.md) ? _draftBadge() : '') +
       '<div class="pan-tile-caption"><span class="pan-tile-name">' +
       _siteEsc(d.n) +
@@ -2174,6 +2204,94 @@ function _renderTabelle(md) {
     html += '</div>';
   });
   return '<div class="tab-page">' + html + '</div>';
+}
+
+/* ══════════════════════════════════════
+   RENDER COMPENDIO — sidebar + sezioni
+   Per i compendi lunghi (specie, sottoclassi) che non hanno immagini:
+   una colonna di navigazione sticky e il corpo completo accanto, così
+   non si perde il punto e non nascono schede vuote.
+   ══════════════════════════════════════ */
+function _renderCompendio(md, pageKey) {
+  if (!md) return '';
+  var data = _parsePantheon(md);
+  if (!data.deities.length) return _mdToHtml(md);
+
+  var isSubclass = /sottoclassi/.test(pageKey || '');
+  var isSpecies = /specie/.test(pageKey || '');
+  var groups = {};
+  var order = [];
+
+  data.deities.forEach(function (d, index) {
+    /* Lo slug può ripetersi (varianti della stessa specie): l'indice
+       mantiene univoci gli id delle ancore della sidebar. */
+    d._cmpId = 'cmp-' + d.slug + '-' + (index + 1);
+    var group = isSpecies ? 'Specie' : isSubclass ? 'Classi' : 'Schede';
+    if (isSubclass) {
+      var cls = d.md.match(/\*Classe:\*\s*([^\n]+)/);
+      if (cls && cls[1].trim()) group = cls[1].trim();
+    } else if (isSpecies) {
+      var typ = d.md.match(/-\s*\*\*Tipologia:\*\*\s*([^\n]+)/);
+      if (typ && typ[1].trim()) group = typ[1].trim();
+    }
+    if (!groups[group]) {
+      groups[group] = [];
+      order.push(group);
+    }
+    groups[group].push(d);
+  });
+
+  order.sort(function (a, b) {
+    return a.localeCompare(b, 'it');
+  });
+
+  var sidebar = '';
+  order.forEach(function (group) {
+    sidebar += '<div class="cmp-group">';
+    sidebar += '<div class="cmp-group-title">' + _siteEsc(group) + '<span>' + groups[group].length + '</span></div>';
+    groups[group].forEach(function (d) {
+      sidebar += '<a class="cmp-link" href="#' + _siteEsc(d._cmpId) + '">' + _siteEsc(d.n) + '</a>';
+    });
+    sidebar += '</div>';
+  });
+
+  var sections = '';
+  data.deities.forEach(function (d) {
+    /* `_parsePantheon` separa l'immagine dal corpo: nel compendio va
+       rimessa in cima alla scheda, altrimenti le due immagini delle
+       specie (Shurima e Darkin) sparirebbero senza alcun errore. */
+    var hero = d.img
+      ? '<figure class="n-image cmp-hero"><img src="' +
+        _siteAttr(d.img) +
+        '" alt="' +
+        _siteAttr(d.n) +
+        '" loading="lazy" decoding="async" class="n-image n-zoomable"' +
+        (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '') +
+        ' onclick="arcZoom(\'' +
+        _jsStr(d.img) +
+        '\')"></figure>'
+      : '';
+    sections +=
+      '<section class="cmp-section" id="' +
+      _siteEsc(d._cmpId) +
+      '">' +
+      '<h2 class="cmp-section-title">' +
+      _siteEsc(d.n) +
+      (_isDraftMd(d.md) ? _draftBadge() : '') +
+      '</h2>' +
+      '<div class="cmp-section-body">' +
+      hero +
+      _mdToHtml(d.md) +
+      '</div></section>';
+  });
+
+  var html = '<div class="cmp-page">';
+  if (data.intro) html += '<div class="cmp-intro">' + _mdToHtml(data.intro) + '</div>';
+  html += '<div class="cmp-layout">';
+  html += '<aside class="cmp-sidebar" aria-label="Indice del compendio">' + sidebar + '</aside>';
+  html += '<div class="cmp-content">' + sections + '</div>';
+  html += '</div></div>';
+  return html;
 }
 
 /* ══════════════════════════════════════

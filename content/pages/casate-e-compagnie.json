@@ -2,9 +2,18 @@
   "k": "casate-e-compagnie",
   "title": "Casate e Compagnie",
   "icon": "📄",
-  "content": "Contenuto in arrivo.",
+  "content": "Ad Arcamis il potere non passa solo dalle istituzioni: casate, compagnie mercantili e ordini antichi tessono alleanze, debiti e rivalità che gli avventurieri incontrano ogni giorno.\n\n## Compagnie Mercantili\n\nLe compagnie controllano rotte, magazzini e prestiti. Il loro peso cresce là dove le strade sono incerte e le guardie lontane.\n\n### La Cabala del Filo di Seta\n\nUna compagnia mercantile poco conosciuta (per ora)\n\n#### Primo vero approccio ad i player (10/03/2026)\n\n![](/images/notion/5b82cbf1ab39-wmremove-transformed_-6-.png)\n\n## Ordine Kikri\n\nUn antenato dell’ordine Kinkou, proveniente dalle antiche terre presenti oltre il regno di Arcadia\n",
   "layout": "",
-  "toc": false,
-  "lastModified": "2026-08-25T14:49:05.798758Z",
-  "migratedFrom": "31f0274fdc1c801ab723c7a00672c23c"
+  "toc": true,
+  "lastModified": "2026-10-22T13:25:32.307Z",
+  "explore": {
+    "mode": "drawer",
+    "entryLevel": 2,
+    "search": true,
+    "label": "Casata",
+    "plural": "casate",
+    "hash": "casate",
+    "showHero": true,
+    "filters": []
+  }
 }

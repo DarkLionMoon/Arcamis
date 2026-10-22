@@ -76,14 +76,6 @@ const ADMIN_ACTIONS: AdminAction[] = [
     run: () => router.push('/mapa')
   },
   {
-    id: 'go-quests',
-    label: 'Vai alle missioni',
-    icon: '🎯',
-    hint: 'bacheca incarichi',
-    keywords: 'missioni quest bacheca',
-    run: () => router.push('/missioni')
-  },
-  {
     id: 'go-carousel',
     label: 'Vai al carousel',
     icon: '🎠',

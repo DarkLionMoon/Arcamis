@@ -16,6 +16,7 @@ export const LAYOUT_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'fazioni', label: 'Fazioni' },
   { value: 'materiale', label: 'Materiale' },
   { value: 'collezione', label: 'Collezione' },
+  { value: 'compendio', label: 'Compendio (sidebar + schede)' },
   { value: 'generico', label: 'Generico' },
   { value: 'wide', label: 'Largo' },
   { value: 'timeline', label: 'Timeline' },
@@ -31,8 +32,7 @@ export const LAYOUT_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'specie', label: 'Specie' },
   { value: 'citta', label: 'Città' },
   { value: 'evento', label: 'Evento' },
-  { value: 'imprese', label: 'Imprese' },
-  { value: 'missioni', label: 'Bacheca missioni' }
+  { value: 'imprese', label: 'Imprese' }
 ]
 
 /* ── Preset di layout ─────────────────────────────────────────────

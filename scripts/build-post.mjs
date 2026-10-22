@@ -145,7 +145,6 @@ writeDist(
     '/admin/         /admin/app    302',
     '/admin          /admin/app    302',
     '/admin/*        /admin/:splat 200',
-    '/gioco/missioni /missioni     301',
     '/p/:id          /index.html   200',
     '/content/*      /content/:splat 200',
     '',
@@ -199,10 +198,9 @@ const precache = [
   '/sitemap.xml',
   '/manifest.webmanifest',
   '/offline.html',
-  /* Contenuti dati per l'uso offline: ricerca, missioni, mappa. */
+  /* Contenuti dati per l'uso offline: ricerca e mappa. */
   '/content/search-index.json',
   '/content/recent.json',
-  '/content/quests.json',
   '/content/mappins.json',
   cssHref,
 ];

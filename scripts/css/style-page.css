@@ -941,6 +941,28 @@
 @media(max-width:700px){.bst-page{grid-template-columns:1fr}}
 
 /* ════════ SCHEDE (sessione, quest, npc, spell, specie, citta, evento) ════════ */
+/* ════════ COMPENDIO — sidebar + contenuto (specie/sottoclassi) ════════ */
+.cmp-page{display:flex;flex-direction:column;gap:20px;max-width:1180px;margin:0 auto}
+.cmp-intro{font-size:14px;line-height:1.75;color:var(--text-muted,rgba(240,230,200,.72))}
+.cmp-layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:28px;align-items:start}
+.cmp-sidebar{position:sticky;top:96px;max-height:calc(100vh - 120px);overflow-y:auto;background:var(--panel,#0e121a);border:1px solid rgba(var(--gold-rgb),.15);border-radius:10px;padding:14px 10px;scrollbar-width:thin}
+.cmp-group{margin-bottom:14px}
+.cmp-group:last-child{margin-bottom:0}
+.cmp-group-title{display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);padding:0 8px 6px;border-bottom:1px solid rgba(var(--gold-rgb),.12);margin-bottom:4px}
+.cmp-group-title span{font-size:10px;opacity:.55;letter-spacing:0}
+.cmp-link{display:block;padding:6px 8px;border-radius:4px;color:var(--text-muted,rgba(240,230,200,.68));text-decoration:none;font-size:13px;line-height:1.35;transition:background .15s,color .15s}
+.cmp-link:hover,.cmp-link:focus-visible{background:rgba(var(--gold-rgb),.08);color:var(--gold3,#e8c86a)}
+.cmp-content{display:flex;flex-direction:column;gap:22px;min-width:0}
+.cmp-section{background:rgba(var(--gold-rgb),.025);border:1px solid rgba(var(--gold-rgb),.1);border-radius:10px;padding:22px 24px;scroll-margin-top:96px}
+.cmp-section-title{font-family:'Cinzel',serif;font-size:20px;font-weight:700;letter-spacing:.04em;color:rgba(var(--gold-rgb),.92);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(var(--gold-rgb),.12)}
+.cmp-section-body{font-size:14px;line-height:1.75;color:rgba(240,230,200,.8)}
+.cmp-section-body .n-h2,.cmp-section-body .n-h3{color:var(--gold2,#d4aa4a)}
+@media(max-width:850px){
+  .cmp-layout{grid-template-columns:1fr;gap:18px}
+  .cmp-sidebar{position:relative;top:0;max-height:240px}
+  .cmp-section{padding:18px 16px}
+}
+
 .sch-page{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
 .sch-card{background:rgba(var(--gold-rgb),.03);border:1px solid rgba(var(--gold-rgb),.1);border-radius:12px;padding:18px 20px;transition:border-color .15s}
 .sch-card:hover{border-color:rgba(var(--gold-rgb),.25)}

@@ -15,6 +15,9 @@
   /* --text3 era #8a7648: 4,50 sul fondo pagina ma 4,26 sul pannello.
      Alzato per rispettare AA su entrambe le superfici. */
   --text: #a08848; --text2:#94804d; --text3:#8f7b4b; --white:#f0e6d2;
+  /* Token semantico per i testi secondari dei nuovi layout (compendio,
+     schede): evita colori hardcoded e mantiene il contrasto AA. */
+  --text-muted:#b0a080;
   --violet:#6644aa; --violet2:#8866cc; --violet3:#aa88ee;
   --teal:#1a4455; --teal2:#226677; --teal3:#66bbdd;
   --topbar-h:56px;

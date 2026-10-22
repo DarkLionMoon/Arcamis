@@ -12,9 +12,12 @@ import CodeMirrorEditor from '@/features/interface/components/CodeMirrorEditor.v
 import MarkdownPreview from '@/features/interface/components/MarkdownPreview.vue'
 import VIcon from '@/shared/components/VIcon.vue'
 import BlockEditor from './editor/BlockEditor.vue'
+import CompendioEditor from './editor/CompendioEditor.vue'
 import EditorStatusBar from './editor/EditorStatusBar.vue'
+import ExplorerEditor from './editor/ExplorerEditor.vue'
 import EditorToolbar from './editor/EditorToolbar.vue'
 import MediaDrawer from './editor/MediaDrawer.vue'
+import PantheonEditor from './editor/PantheonEditor.vue'
 import ShortcutsDialog from './editor/ShortcutsDialog.vue'
 import TemplateForm from './editor/TemplateForm.vue'
 import TemplatePicker from './editor/TemplatePicker.vue'
@@ -22,7 +25,7 @@ import VersionsPanel from './editor/VersionsPanel.vue'
 import WorkflowPanel from './editor/WorkflowPanel.vue'
 import { usePageEditor } from './editor/usePageEditor'
 import type { WorkflowActionId } from './workflow'
-import type { PageRegistryEntry } from '@/types'
+import type { ExploreConfig, PageRegistryEntry } from '@/types'
 import type { CodeMirrorHandle } from '@/features/interface/components/codemirrorHandle'
 import { LAYOUT_OPTIONS, LAYOUT_PRESETS, presetFor, type LayoutPreset } from './layouts'
 import { blockIssues, parseBlocks, serializeBlocks, type Block } from './blocks'
@@ -75,6 +78,14 @@ const cmRef = ref<CodeMirrorHandle | null>(null)
 const showShortcuts = ref(false)
 const showDetails = ref(false)
 const showPicker = ref(false)
+/* Il Pantheon è una pagina unica: oltre ai blocchi liberi merita un
+   form a campi per le 20 divinità, senza cambiare lo storage JSON. */
+const pantheonOpen = ref(false)
+/* Specie e sottoclassi sono compendi di schede: un catalogo laterale
+   permette di aprire ogni scheda senza scorrere migliaia di blocchi. */
+const compendioOpen = ref(false)
+/* Pattern di esplorazione: si configura qui, senza toccare il codice. */
+const exploreOpen = ref(false)
 const linkOpen = ref(false)
 const linkUrl = ref('')
 
@@ -83,6 +94,16 @@ const mediaPath = ref('')
 const mediaForMarkdown = ref(false)
 
 const structure = computed(() => editor.mode === 'structure' && Boolean(template.value && data.value))
+const pantheonMode = computed(() => page.value?.layout === 'pantheon' && !template.value)
+const compendioMode = computed(() => page.value?.layout === 'compendio' && !template.value)
+watch(
+  () => page.value?.k,
+  () => {
+    pantheonOpen.value = false
+    compendioOpen.value = false
+    exploreOpen.value = false
+  }
+)
 const markdownReadonly = computed(() => Boolean(template.value))
 const previewOpen = computed(() => editor.previewOpen)
 
@@ -118,6 +139,9 @@ const blocksFilled = computed(() => pageBlocks.value.length - blocksIncomplete.v
 
 /* Descrizione breve della modalità attiva, accanto ai tab. */
 const paneHint = computed(() => {
+  if (exploreOpen.value) return 'pattern di esplorazione'
+  if (pantheonOpen.value && pantheonMode.value) return 'schede divinità'
+  if (compendioOpen.value && compendioMode.value) return 'catalogo schede'
   if (structure.value) return template.value?.collections[0]?.label || 'Campi'
   if (blocksMode.value) return 'blocchi visuali'
   return markdownReadonly.value ? 'generato dal modello' : 'testo libero'
@@ -268,7 +292,43 @@ function insertLink(): void {
   ui.toast('Link inserito', 'success')
 }
 
+function togglePantheon(): void {
+  if (editor.mode !== 'structure') void requestMode('structure')
+  compendioOpen.value = false
+  exploreOpen.value = false
+  pantheonOpen.value = !pantheonOpen.value
+}
+
+function onPantheonUpdate(value: string): void {
+  editor.setContent(value)
+}
+
+function toggleCompendio(): void {
+  if (editor.mode !== 'structure') void requestMode('structure')
+  pantheonOpen.value = false
+  exploreOpen.value = false
+  compendioOpen.value = !compendioOpen.value
+}
+
+function toggleExplore(): void {
+  if (editor.mode !== 'structure') void requestMode('structure')
+  pantheonOpen.value = false
+  compendioOpen.value = false
+  exploreOpen.value = !exploreOpen.value
+}
+
+function onExploreUpdate(next: ExploreConfig): void {
+  updateMeta({ explore: next })
+}
+
+function onCompendioUpdate(value: string): void {
+  editor.setContent(value)
+}
+
 async function requestMode(next: 'structure' | 'markdown'): Promise<void> {
+  pantheonOpen.value = false
+  compendioOpen.value = false
+  exploreOpen.value = false
   const ok = await setMode(next)
   if (!ok) return
   if (next === 'structure' && blocksMode.value) syncBlocksFromContent()
@@ -578,11 +638,43 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
               class="arc-mode-tab"
               type="button"
               role="tab"
-              :aria-selected="editor.mode === 'structure'"
-              :class="{ active: editor.mode === 'structure' }"
+              :aria-selected="editor.mode === 'structure' && !pantheonOpen && !compendioOpen && !exploreOpen"
+              :class="{ active: editor.mode === 'structure' && !pantheonOpen && !compendioOpen && !exploreOpen }"
               @click="requestMode('structure')"
             >
               <VIcon name="structure" :size="14" /> {{ template ? 'Struttura' : 'Blocchi' }}
+            </button>
+            <button
+              class="arc-mode-tab"
+              type="button"
+              role="tab"
+              :aria-selected="exploreOpen"
+              :class="{ active: exploreOpen }"
+              @click="toggleExplore"
+            >
+              🧭 Esplorazione
+            </button>
+            <button
+              v-if="pantheonMode"
+              class="arc-mode-tab"
+              type="button"
+              role="tab"
+              :aria-selected="pantheonOpen"
+              :class="{ active: pantheonOpen }"
+              @click="togglePantheon"
+            >
+              🛐 Divinità
+            </button>
+            <button
+              v-if="compendioMode"
+              class="arc-mode-tab"
+              type="button"
+              role="tab"
+              :aria-selected="compendioOpen"
+              :class="{ active: compendioOpen }"
+              @click="toggleCompendio"
+            >
+              🗂️ Schede
             </button>
             <button
               class="arc-mode-tab"
@@ -613,7 +705,27 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
         />
 
         <div class="arc-pane-scroll">
-          <template v-if="structure && template && data">
+          <ExplorerEditor
+            v-if="exploreOpen && page"
+            :page="page"
+            :content="page.content"
+            @update="onExploreUpdate"
+          />
+
+          <PantheonEditor
+            v-else-if="pantheonOpen && pantheonMode"
+            :content="page.content"
+            @update:content="onPantheonUpdate"
+          />
+
+          <CompendioEditor
+            v-else-if="compendioOpen && compendioMode"
+            :content="page.content"
+            :page-key="page.k"
+            @update:content="onCompendioUpdate"
+          />
+
+          <template v-else-if="structure && template && data">
             <p v-if="templateMissing" class="arc-warn-banner">
               Il modello «{{ page.template }}» non è più disponibile: il markdown resta salvato, ma i campi non sono
               modificabili. Applica un modello o rimuovilo.

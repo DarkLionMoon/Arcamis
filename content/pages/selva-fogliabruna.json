@@ -2,9 +2,8 @@
   "k": "selva-fogliabruna",
   "title": "Selva Fogliabruna",
   "icon": "🌲",
-  "content": "Sezione in allestimento. Contenuti disponibili:\n\n**New database** (1 voci):\n  - 📄 Rivorosso",
+  "content": "Gli alberi della Selva Fogliabruna sono troppo vecchi per essere abbattuti e troppo fitti per essere mappati. Chi entra non sempre torna, e chi torna non sempre racconta la stessa strada.\n\n## Punti d’interesse\n\n- **Rivorosso** — un nome che i cacciatori segnano sulle mappe senza spiegare perché.\n",
   "layout": "",
-  "toc": false,
-  "lastModified": "2026-08-25T14:44:19.209782Z",
-  "migratedFrom": "30d0274fdc1c800999feeb0ca6669b22"
+  "toc": true,
+  "lastModified": "2026-10-22T13:25:32.475Z"
 }

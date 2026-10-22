@@ -64,6 +64,12 @@
   --panel: var(--asurface);
   --border: var(--aline);
   --bdr2: var(--aline-2);
+  /* Alias del Design System della wiki: gli editor dei contenuti
+     importati usano gli stessi nomi del sito, senza duplicare colori. */
+  --gold: var(--accent);
+  --gold-rgb: var(--accent-rgb);
+  --parch: var(--afg-2);
+  --text-muted: var(--afg-3);
 }
 
 /* ─────────────── Token: tema scuro (palette della wiki) ─────────────── */

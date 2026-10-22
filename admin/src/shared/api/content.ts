@@ -15,8 +15,6 @@ import type {
   MapData,
   PageContent,
   PageRegistryEntry,
-  Quest,
-  QuestsDoc,
   SectionRegistryEntry,
   UIConfig
 } from '@/types'
@@ -48,11 +46,16 @@ export const statusApi = {
 export const pagesApi = {
   async get(key: string): Promise<PageContent> {
     const data = await ghApi.get(`${CONTENT_PATH}/${key}.json`)
-    return JSON.parse(decodeBase64Utf8(data.content)) as PageContent
+    /* Lo sha va conservato: senza, il PUT di un file esistente viene
+       interpretato come creazione e GitHub risponde 422. */
+    return { ...(JSON.parse(decodeBase64Utf8(data.content)) as PageContent), sha: data.sha }
   },
 
   async save(page: PageContent, message: string): Promise<{ sha: string }> {
-    const result = await ghApi.put(`${CONTENT_PATH}/${page.k}.json`, message, JSON.stringify(page, null, 2), page.sha)
+    /* `sha` è un dato di trasporto di GitHub, non del documento: va usato
+       per l'aggiornamento ma non riscritto dentro il JSON della pagina. */
+    const { sha, ...document } = page
+    const result = await ghApi.put(`${CONTENT_PATH}/${page.k}.json`, message, JSON.stringify(document, null, 2), sha)
     return { sha: result.content.sha }
   },
 
@@ -77,7 +80,7 @@ export const pagesApi = {
 
   async getAt(key: string, ref: string): Promise<PageContent> {
     const data = await ghApi.get(`${CONTENT_PATH}/${key}.json`, ref)
-    return JSON.parse(decodeBase64Utf8(data.content)) as PageContent
+    return { ...(JSON.parse(decodeBase64Utf8(data.content)) as PageContent), sha: data.sha }
   }
 }
 
@@ -198,28 +201,6 @@ export const layoutsApi = {
       JSON.stringify(registry, null, 2) + '\n',
       sha
     )
-    return { sha: result.content.sha }
-  }
-}
-
-/* ── Bacheca Missioni: le missioni vivono nel repo ── */
-async function getRepoJson<T>(path: string, fallback: T): Promise<{ data: T; sha: string | null }> {
-  try {
-    const file = await ghApi.get(path)
-    return { data: JSON.parse(decodeBase64Utf8(file.content)) as T, sha: file.sha }
-  } catch {
-    return { data: fallback, sha: null }
-  }
-}
-
-export const questsApi = {
-  async get(): Promise<{ quests: Quest[]; sha: string | null }> {
-    const { data, sha } = await getRepoJson<QuestsDoc>('content/quests.json', { quests: [] })
-    return { quests: Array.isArray(data.quests) ? data.quests : [], sha }
-  },
-
-  async save(quests: Quest[], sha: string | null, message = 'admin: update quests'): Promise<{ sha: string }> {
-    const result = await ghApi.put('content/quests.json', message, JSON.stringify({ quests }, null, 2) + '\n', sha)
     return { sha: result.content.sha }
   }
 }

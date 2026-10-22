@@ -7,6 +7,7 @@ import { useUnsavedGuard } from '@/shared/guard'
 import { useMapStore, useUIStore } from '@/app/store'
 import type { MapPin } from '@/types'
 import { dragPosition, formatPercent, grabOffset, parsePercent, pointFromClient, type PercentPoint } from './coords'
+import { mapDataError, parseMapData } from './schema'
 
 const map = useMapStore()
 const ui = useUIStore()
@@ -196,14 +197,24 @@ function applyMapUrl() {
     ui.toast('Inserisci un URL', 'error')
     return
   }
+  if (!/^(\/|https?:\/\/)/.test(url)) {
+    ui.toast('Usa un percorso locale (/mappa.webp) o un URL http(s)', 'error')
+    return
+  }
   map.setMapImage(url)
   ui.toast('Immagine mappa aggiornata — ricorda di salvare', 'success')
 }
 
 async function save() {
+  const payload = { mapImage: map.mapImage, pins: map.pins }
+  const invalid = mapDataError(payload)
+  if (invalid) {
+    ui.toast('Mappa non valida: ' + invalid, 'error')
+    return
+  }
   saving.value = true
   try {
-    await mapApi.save({ mapImage: map.mapImage, pins: map.pins })
+    await mapApi.save(parseMapData(payload))
     map.markSaved()
     ui.toast('Salvato nel repo — deploy in corso (~30s)', 'success')
   } catch (e) {
@@ -236,7 +247,15 @@ async function save() {
 
     <div class="arc-map-wrap">
       <div ref="container" class="arc-map-canvas" :class="{ 'arc-map-canvas--dirty': dirty }" @click="onMapClick">
-        <img v-if="map.mapImage" :src="map.mapImage" alt="Mappa" class="arc-map-img" draggable="false" />
+        <img
+          v-if="map.mapImage"
+          :src="map.mapImage"
+          alt="Mappa"
+          class="arc-map-img"
+          loading="lazy"
+          decoding="async"
+          draggable="false"
+        />
         <div class="arc-map-loading" v-if="loading">Caricamento…</div>
 
         <button

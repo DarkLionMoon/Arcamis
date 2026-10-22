@@ -1,10 +1,9 @@
 {
   "k": "mappa-arcamis",
-  "title": "Arcamis",
-  "icon": "📄",
-  "content": "Contenuto in arrivo.",
-  "layout": "",
+  "title": "Mappa di Arcamis",
+  "icon": "🏙️",
+  "content": "La mappa delle Marche di Arcamis raccoglie porti, fortezze, boschi e rovine. I puntini non sono decorazioni: ogni luogo è una porta verso una storia.\n\n![Mappa delle Marche di Arcamis](/mappa.webp)\n\n## Luoghi segnati\n\n- **Arcamis** — Città portuale delle Marche. Porto, commercio, avventura.\n- **Selva Fogliabruna** — Alberi troppo vecchi. Chi entra non sempre torna.\n- **Foresta dello Smarrimento** — Non ci sono mappe. I sentieri cambiano. Rune violacee compaiono di notte.\n- **Volonx** — Insediamento ai margini. Chi ci abita, raramente se ne va.\n- **Vigilius** — Città interna delle Marche. Centro politico e militare.\n- **Galeton** — Crocevia commerciale. Molte strade si incontrano qui.\n- **Lago di Gromot** — Acque scure e profonde. Nessuno sa quanto è fondo.\n- **Forte Vigilus** — Avamposto militare sulle alture. Controlla i passi verso est.\n- **Riva di Ferro** — Porto minore. Pescatori, contrabbandieri, qualche avventuriero di passaggio.\n- **Fumofosco** — Un villaggio avvolto da strane nebbie. I locali non parlano molto.\n- **Rovine di Kaldur** — Una civiltà è finita qui. Le pietre bruciano ancora.\n- **Foresta Infinita** — Luogo segnato sulla mappa.\n",
+  "layout": "wide",
   "toc": false,
-  "lastModified": "2026-08-25T14:49:08.576856Z",
-  "migratedFrom": "2f10274fdc1c80dca8caeb2e6de23146"
+  "lastModified": "2026-10-22T13:25:32.438Z"
 }

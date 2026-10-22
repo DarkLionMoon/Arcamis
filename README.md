@@ -54,11 +54,10 @@ Tutto ciò che il sito mostra vive nel repo:
 
 | Dove | Cosa |
 |------|------|
-| `content/pages/<slug>.json` | Le pagine: `k`, `title`, `icon`, `content` (markdown), `layout`, `toc`, `status`, `lastModified` |
+| `content/pages/<slug>.json` | Le pagine: `k`, `title`, `icon`, `content` (markdown), `layout`, `explore`, `toc`, `status`, `lastModified` |
 | `content/databases/*.json` | Database/gallerie (`{ "pages": [...] }`: pantheon, lavori, …) |
 | `content/search-index.json` | Indice full-text per la ricerca locale |
 | `content/changelog.json`, `content/mappins.json`, `content/recent.json` | Changelog, puntine della mappa, attività recente |
-| `content/quests.json` | Missioni della Bacheca Missioni |
 | `images/`, `audio/` | Immagini caricate dall'editor e effetti sonori |
 
 Se una pagina JSON manca, il client mostra un placeholder "non disponibile":
@@ -108,10 +107,14 @@ admin — vedi Parte 2.)
   zoom/scroll), tooltip e navigazione alle schede luogo. Le puntine non
   esplorate (`explored: false`, si imposta dal pannello Mappa) mostrano
   "Inesplorato" e la home conta i luoghi rivelati (`map-public.js`).
-- **Bacheca Missioni** (`missioni`, da `content/quests.json`): filtri per
-  stato/tag/livello e accettazione in `localStorage`; le missioni si
-  gestiscono dal pannello admin. Stili in `style-tools.css`, logica in
-  `scripts/js/quest-board.js`.
+- **Esplorazione delle pagine** (`explore` nel JSON pagina): le pagine lunghe
+  non sono più un unico listone. Il markdown resta la fonte delle voci; il
+  pattern scelto decide come leggerlo e disporlo — **master-detail** (elenco
+  ricercabile + scheda unica, deep link `#specie/ascesi`), **tabs** (schede
+  orizzontali + indice sticky con highlight), **drawer** (griglia di tessere +
+  cassetto laterale) e **accordion** (macro-categorie richiudibili). Logica in
+  `scripts/js/explorer.js`, stili in `style-explorer.css`; su mobile il
+  master-detail diventa lista → dettaglio con "Torna alla lista".
 - **Changelog e Novità**: widget e pagina dedicata dai JSON locali.
 
 ### Layout disponibili
@@ -119,7 +122,7 @@ admin — vedi Parte 2.)
 Ogni pagina dichiara un `layout` (se manca, rilevato dalla chiave):
 `contenuto`, `luoghi`, `cronache`, `personaggio`, `materiale`, `wide`,
 `pantheon`, `collezione`, `bestiario`, `timeline`, `fazioni`, `oggetti`,
-`glossario`, `galleria`, `tabelle`, `schede`, `missioni`, più i layout a
+`glossario`, `galleria`, `tabelle`, `schede`, più i layout a
 card `sessione`, `quest`, `npc`, `spell`, `specie`, `citta`, `evento`.
 Nell'editor si sceglie
 tra tre preset — **Wiki standard**, **Immersivo / full width** (`wide`),
@@ -139,7 +142,7 @@ tra tre preset — **Wiki standard**, **Immersivo / full width** (`wide`),
 - **PWA/offline**: manifest + icone (`npm run icons`), font self-hosted
   (`npm run fonts`, nessun ping a Google Fonts — la CSP non lo permette),
   service worker versionato per build con precache reale (shell, JS/CSS e
-  JSON dati: indice ricerca, missioni, mappa) e fallback
+  JSON dati: indice ricerca, mappa) e fallback
   `offline.html`: le pagine già visitate restano leggibili senza rete. Le copertine non sono più base64 nei JSON: URL
   `/api/cover/<id>` scaricati on demand.
 - **Pagina crediti** (`/credits`): disclaimer e attribuzioni, informativa sul
@@ -169,7 +172,7 @@ ricostruisce il sito (~30 s) e la modifica va online da sola.
    prima di cambiare pagina con modifiche pendenti.
 
 La sidebar è in 5 gruppi: **Pannello** (Dashboard, Utenti), **Contenuti**
-(Pagine, Copertine, Media, Cestino), **Feature** (Mappa, Carousel, Missioni, Changelog),
+(Pagine, Copertine, Media, Cestino), **Feature** (Mappa, Carousel, Changelog),
 **Sistema** (Navigazione, Interfaccia, Impostazioni), **Sicurezza** (Audit,
 Scanner link, Trova & Sostituisci, Media orfani, Backup). La **Dashboard**
 mostra visite totali, pagine nel registro, stato del deploy (con riverifica),
@@ -214,7 +217,12 @@ repo); recuperi dal **Cestino** con **♻️ Ripristina**.
    sull'anteprima regola anche il ritaglio (`![](...#30,70)`).
 5. Il selettore **Layout** cambia il rendering e può applicare il template
    del layout (conferma richiesta se c'è contenuto).
-6. Pannello **Dettagli**: metadati, flusso di pubblicazione e **Cronologia**
+6. La scheda **🧭 Esplorazione** sceglie il pattern della pagina
+   (master-detail, schede, griglia + cassetto, accordion), da quali titoli
+   leggere le voci, le etichette, il prefisso del deep link, i gruppi di tab e
+   i filtri rapidi ricavati dalle etichette del markdown. Nessuna modifica al
+   codice; il sito applica la configurazione alla build successiva.
+7. Pannello **Dettagli**: metadati, flusso di pubblicazione e **Cronologia**
    (commit git con diff riga/parola + ripristino in memoria) con **Snapshot**
    nominati nel browser prima dei grossi rimaneggiamenti. La validazione dei
    modelli è live (errori sotto i campi, blocco salvataggio/pubblicazione).
@@ -245,10 +253,6 @@ controllare se una pagina "sparisce".
   modificare, Salva. Coordinate in percentuali: valgono a ogni zoom.
   La spunta "esplorato" decide se il sito mostra il luogo o "Inesplorato"
   (fog of war) con conteggio in home.
-- **Missioni** (Bacheca Missioni): crea/modifica/riordina/elimina le missioni
-  di `content/quests.json` (titolo, stato, descrizione, ricompensa, livello,
-  master, tag); un solo salvataggio per tutto. Le accettazioni dei party
-  restano nei browser dei giocatori, qui si gestisce lo stato ufficiale.
 - **Changelog**: voci versione/sottoversione/patch + data, titolo, markdown.
 - **Media**: upload con conversione WebP e resize a 1920 px automatici;
   l'eliminazione chiede di digitare il nome (è un commit, non va nel cestino).
@@ -281,7 +285,7 @@ controllare se una pagina "sparisce".
 │   ├── css/*.css           ← base, home, page, notion, imprese, tools, fx, ui, shell, …
 │   ├── js/*.js             ← SPA (app, app-home, app-ui, notion-nav, notion-render,
 │   │                           md-render, imprese, materiale-browser, carousel-loader,
-│   │                           quest-board, generators, calendar, diary, combat, map-public, …)
+│   │                           explorer, generators, calendar, diary, combat, map-public, …)
 │   ├── lib/routes.mjs      ← fonte unica rotte (prerender + sitemap + robots)
 │   ├── build-all.mjs       ← build unica (CI e deploy): prima admin, poi sito
 │   ├── build-post.mjs      ← hash JS, preload, prerender, sitemap, sw.js, copia admin
@@ -290,7 +294,6 @@ controllare se una pagina "sparisce".
 │   ├── sync-registry.py    ← rigenera _pathMap in app.js (non editare a mano)
 │   └── import-notion.js    ← export Notion → JSON (one-shot)
 ├── content/pages/*.json    ← pagine · databases/ · search-index · changelog/mappins
-├── content/quests.json    ← missioni della Bacheca Missioni
 ├── functions/api/          ← admin, carousel, cover/, deploy, gh, send-help, sitemap
 ├── admin/                  ← pannello Vue (compilato in export/admin → dist/admin)
 └── images/ / audio/        ← media caricati dall'editor / effetti sonori

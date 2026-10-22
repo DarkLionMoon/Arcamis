@@ -23,6 +23,133 @@ test('la homepage mostra un carosello', async ({ page }) => {
   Il JSON della pagina viene sostituito nella risposta: è l'unico modo di
   provare il gate senza committare una pagina in bozza nel repository.
 */
+/* ── Contenuti importati: integrazione visiva reale ─────────
+   Non fixture: le rotte del build contengono i file migrati. Le pagine
+   lunghe non usano più i vecchi listoni: il pattern è quello configurato
+   in `explore` e reso da `explorer.js`. */
+test.describe('contenuti migrati sul sito', () => {
+  test('le specie sono un master-detail: 33 schede, filtro per tipologia e deep link', async ({ page }) => {
+    await page.goto('/lore/specie-homebrew')
+    await expect(page.locator('.exp-item')).toHaveCount(33)
+    await expect(page.locator('.exp-sidebar-count')).toHaveText('33 specie')
+    await expect(page.locator('.exp-pill', { hasText: 'Umanoide' })).toBeVisible()
+    await expect(page.locator('.exp-title')).not.toBeEmpty()
+
+    await page.locator('.exp-item').filter({ hasText: 'Besheb' }).click()
+    await expect(page.locator('.exp-title')).toHaveText('Besheb')
+    expect(page.url()).toContain('#specie/besheb')
+
+    await page.locator('.exp-pill', { hasText: 'Umanoide' }).click()
+    const filtered = await page.locator('.exp-item').count()
+    expect(filtered).toBeGreaterThan(0)
+    expect(filtered).toBeLessThan(33)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1)
+  })
+
+  test('le sottoclassi mostrano 18 schede con la classe di appartenenza', async ({ page }) => {
+    await page.goto('/lore/sottoclassi-homebrew')
+    await expect(page.locator('.exp-item')).toHaveCount(18)
+    await page.locator('.exp-item').filter({ hasText: 'Chemtecnico' }).click()
+    await expect(page.locator('.exp-detail')).toContainText('Artefice')
+  })
+
+  test('il pantheon è una griglia con drawer laterale, inclusa l’entità senza immagine', async ({ page }) => {
+    await page.goto('/lore/pantheon')
+    await expect(page.locator('.exp-tile')).toHaveCount(20)
+    await expect(page.locator('.exp-tile img')).toHaveCount(19)
+    expect(
+      await page.locator('.exp-tile img').evaluateAll((nodes) => nodes.filter((n) => n.getAttribute('loading') !== 'lazy').length)
+    ).toBe(0)
+
+    await page.locator('.exp-tile').filter({ hasText: 'Nocturne' }).click()
+    const drawer = page.locator('.exp-drawer')
+    await expect(drawer).toBeVisible()
+    await expect(drawer).toContainText('Il Demone degli Incubi')
+    expect(page.url()).toContain('#pantheon/')
+
+    await drawer.locator('[data-exp-close]').first().click()
+    await expect(drawer).toBeHidden()
+  })
+
+  test('i lavori sono un master-detail con 10 schede e la copertina nella scheda', async ({ page }) => {
+    await page.goto('/personaggio/lavori')
+    await expect(page.locator('.exp-item')).toHaveCount(10)
+    await page.locator('.exp-item').filter({ hasText: 'Biblioteca' }).click()
+    await expect(page.locator('.exp-hero img')).toHaveAttribute('src', /biblioteca/)
+  })
+
+  test('la mappa della home carica i 12 pin reali con coordinate valide', async ({ page }) => {
+    await page.goto('/')
+    const pins = page.locator('#dynamic-pins .mpin')
+    await expect(pins).toHaveCount(12)
+    const invalid = await pins.evaluateAll((nodes) =>
+      nodes.filter((n) => {
+        const left = Number.parseFloat((n as HTMLElement).style.left)
+        const top = Number.parseFloat((n as HTMLElement).style.top)
+        return !Number.isFinite(left) || !Number.isFinite(top) || left <= 0 || top <= 0
+      }).length
+    )
+    expect(invalid).toBe(0)
+  })
+})
+
+/* ── I quattro pattern sulle pagine reali ─────────────────── */
+test.describe('pattern di esplorazione', () => {
+  test('la lore lunga usa schede orizzontali e indice sticky', async ({ page }) => {
+    await page.goto('/lore/introduzione')
+    await expect(page.locator('.exp-tab')).toHaveCount(5)
+    await expect(page.locator('.exp-tab-section')).toHaveCount(3)
+    await expect(page.locator('.exp-toc a')).toHaveCount(3)
+
+    await page.locator('.exp-tab', { hasText: 'Valoran e città' }).click()
+    await expect(page.locator('.exp-tab-section')).toHaveCount(6)
+    await expect(page.locator('.exp-toc a')).toHaveCount(6)
+    expect(page.url()).toContain('#introduzione/valoran')
+  })
+
+  test('anche la storia di Gandora e i crediti usano le schede', async ({ page }) => {
+    await page.goto('/lore/la-storia-di-gandora')
+    await expect(page.locator('.exp-tab')).toHaveCount(4)
+    await page.locator('.exp-tab', { hasText: 'Il Soffio' }).click()
+    await expect(page.locator('.exp-tab-section')).toContainText('Il Drago non concedeva udienze')
+
+    await page.goto('/credits')
+    await expect(page.locator('.exp-tab')).toHaveCount(4)
+    await page.locator('.exp-tab', { hasText: 'Privacy' }).click()
+    await expect(page.locator('.exp-tab-section')).toContainText('Dati tecnici')
+  })
+
+  test('le regole sono macro-categorie richiudibili con ricerca', async ({ page }) => {
+    await page.goto('/regole/regole-del-server')
+    await expect(page.locator('.exp-acc-group')).toHaveCount(3)
+    await expect(page.locator('.exp-acc-item')).toHaveCount(22)
+    await expect(page.locator('.exp-acc-group[open]')).toHaveCount(1)
+
+    await page.locator('[data-exp-search]').fill('Erotic-Roleplay')
+    await expect(page.locator('.exp-acc-item:visible')).toHaveCount(1)
+    /* Azzerare la ricerca riporta l'accordion allo stato di partenza:
+       solo la prima macro-categoria aperta. */
+    await page.locator('[data-exp-search]').fill('')
+    await expect(page.locator('.exp-acc-group[open]')).toHaveCount(1)
+    await expect(page.locator('.exp-acc-item:visible')).toHaveCount(9)
+  })
+
+  test('su mobile il master-detail diventa lista → dettaglio', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/lore/specie-homebrew')
+    await expect(page.locator('.exp-sidebar')).toBeVisible()
+    await expect(page.locator('.exp-detail')).toBeHidden()
+
+    await page.locator('.exp-item').first().click()
+    await expect(page.locator('.exp-detail')).toBeVisible()
+    await expect(page.locator('.exp-sidebar')).toBeHidden()
+
+    await page.locator('.exp-back').click()
+    await expect(page.locator('.exp-sidebar')).toBeVisible()
+    await expect(page.locator('.exp-detail')).toBeHidden()
+  })
+})
+
 test.describe('pagine non pubblicate', () => {
   const DRAFT = {
     k: 'regole-del-server',

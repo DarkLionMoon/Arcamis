@@ -1,3 +1,6 @@
+import fs from 'node:fs'
+import path from 'node:path'
+
 import { test, expect, type Page, type Route } from 'playwright/test'
 
 /* ════════════════════════════════════════════════════════════════
@@ -44,7 +47,7 @@ interface Saved {
   savedMappins?: unknown
 }
 
-async function mockBackend(page: Page): Promise<Saved> {
+async function mockBackend(page: Page, mapData: unknown = MAP): Promise<Saved> {
   const state: Saved = {}
   await page.route('**/mappa.webp', (route) =>
     route.fulfill({ status: 200, contentType: 'image/png', body: PNG })
@@ -61,7 +64,7 @@ async function mockBackend(page: Page): Promise<Saved> {
     const body = route.request().postDataJSON() as { action: string; payload: Record<string, unknown> }
     const path = String(body.payload.path || '')
     if (body.action === 'get' && path === 'content/mappins.json') {
-      return json(route, { data: { content: b64(JSON.stringify(MAP)), sha: 'sha-map' } })
+      return json(route, { data: { content: b64(JSON.stringify(mapData)), sha: 'sha-map' } })
     }
     if (body.action === 'get' && path === 'images') return json(route, { data: [] })
     if (body.action === 'put' && path === 'content/mappins.json') {
@@ -109,12 +112,39 @@ test.describe('editor della mappa', () => {
     expect(draggedY).toBeLessThan(71)
     expect(await yField.inputValue()).not.toBe('0.00%')
 
+    /* Anche la descrizione è un campo dell’editor, non solo la posizione. */
+    await page.locator('.arc-map-edit textarea').fill('Descrizione aggiornata dall’editor')
+    await page.locator('.arc-map-edit').getByRole('button', { name: 'Salva' }).click()
+    await expect(page.locator('.arc-map-edit textarea')).toHaveValue('Descrizione aggiornata dall’editor')
+
     await page.locator('.arc-head-actions').getByRole('button', { name: 'Salva' }).click()
     await expect
       .poll(() => (state.savedMappins as { pins: Array<{ top: string }> })?.pins?.length)
       .toBe(2)
-    const pins = (state.savedMappins as { pins: Array<{ top: string; left: string }> }).pins
+    const pins = (state.savedMappins as { pins: Array<{ top: string; left: string; desc: string }> }).pins
     expect(pins[1].top).not.toBe('0.00%')
     expect(Number.parseFloat(pins[1].top)).toBeGreaterThan(60)
+    expect(pins[1].desc).toBe('Descrizione aggiornata dall’editor')
+  })
+
+  test('carica i 12 pin reali e modifica la descrizione senza perderne nessuno', async ({ page }) => {
+    const realMap = JSON.parse(
+      fs.readFileSync(path.resolve(process.cwd(), '../content/mappins.json'), 'utf8')
+    ) as { mapImage: string; pins: Array<Record<string, unknown>> }
+    const state = await mockBackend(page, realMap)
+
+    await page.goto('/admin/app.html#/mapa')
+    await expect(page.locator('.arc-pin')).toHaveCount(realMap.pins.length)
+    await page.locator('.arc-pin').first().click()
+
+    await page.locator('.arc-map-edit textarea').fill('Descrizione reale aggiornata')
+    await page.locator('.arc-map-edit').getByRole('button', { name: 'Salva' }).click()
+    await page.locator('.arc-head-actions').getByRole('button', { name: 'Salva' }).click()
+
+    await expect
+      .poll(() => (state.savedMappins as { pins: Array<{ desc: string }> })?.pins?.length)
+      .toBe(realMap.pins.length)
+    const pins = (state.savedMappins as { pins: Array<{ desc: string }> }).pins
+    expect(pins[0].desc).toBe('Descrizione reale aggiornata')
   })
 })

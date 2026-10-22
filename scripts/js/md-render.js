@@ -39,6 +39,21 @@
   function safeImg(u) {
     return /^(https?:|#|\/|data:image\/)/i.test(u);
   }
+  /* Le immagini esportate da Notion spesso hanno alt vuoto: un nome file
+     leggibile è meglio di un'immagine senza descrizione per screen reader. */
+  function imgAlt(src, provided) {
+    var alt = dec(provided || '').trim();
+    if (alt) return alt;
+    var name = String(src || '')
+      .split(/[?#]/)[0]
+      .split('/')
+      .pop()
+      .replace(/^[a-f0-9]{8,}-/i, '')
+      .replace(/\.[a-z0-9]+$/i, '')
+      .replace(/[-_]+/g, ' ')
+      .trim();
+    return name ? name.charAt(0).toUpperCase() + name.slice(1) : 'Immagine';
+  }
 
   /* ── INLINE ──────────────────────────────────────────────── */
   var _fnDefs = {}; /* id -> {num,text} */
@@ -80,7 +95,7 @@
     t = t.replace(/!\[([^\]]*)\]\(([^)]+?)(?:\s+"([^"]*)")?\)/g, function (m, alt, u, cap) {
       u = dec(u).trim();
       if (!safeImg(u)) return '';
-      var a = attr(dec(alt || cap || ''));
+      var a = attr(imgAlt(u, alt || cap || ''));
       var js = u.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
       var img =
         '<img src="' +

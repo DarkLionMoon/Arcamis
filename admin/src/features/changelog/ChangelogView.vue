@@ -3,6 +3,7 @@ import { onMounted, reactive, ref } from 'vue'
 
 import { ghApi } from '@/shared/api'
 import { confirmAction } from '@/shared/confirm'
+import { newChangelogId, parseChangelog, serializeChangelog } from './format'
 import { useUIStore } from '@/app/store'
 import type { ChangelogEntry } from '@/types'
 
@@ -25,8 +26,7 @@ async function load() {
   loading.value = true
   try {
     const data = await ghApi.get('content/changelog.json')
-    const parsed = JSON.parse(b64decode(data.content))
-    entries.value = Array.isArray(parsed.entries) ? parsed.entries : []
+    entries.value = parseChangelog(JSON.parse(b64decode(data.content)))
   } catch {
     entries.value = []
   } finally {
@@ -73,8 +73,7 @@ async function remove(idx: number) {
 async function save() {
   saving.value = true
   try {
-    const payload = JSON.stringify({ entries: entries.value }, null, 2) + '\n'
-    await ghApi.put('content/changelog.json', 'admin: update changelog', payload)
+    await ghApi.put('content/changelog.json', 'admin: update changelog', serializeChangelog(entries.value))
     ui.toast('Changelog salvato — deploy in corso (~30s)', 'success')
   } catch (e) {
     ui.toast('Errore salvataggio: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -85,6 +84,7 @@ async function save() {
 
 function applyForm() {
   const cleaned: ChangelogEntry = {
+    id: editingIdx.value !== null ? entries.value[editingIdx.value]?.id || newChangelogId() : newChangelogId(),
     versione: form.versione.trim(),
     sottoversione: form.sottoversione.trim(),
     patch: form.patch.trim(),

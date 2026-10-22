@@ -79,6 +79,39 @@ export interface RegistryData {
 // ──────────────────────────────────────────────
 // Page Content
 // ──────────────────────────────────────────────
+export type ExploreMode = 'master-detail' | 'tabs' | 'drawer' | 'accordion'
+
+export interface ExploreFilter {
+  id: string
+  label: string
+  field?: string
+}
+
+export interface ExploreGroup {
+  id: string
+  label: string
+  sections: string[]
+}
+
+export interface ExploreConfig {
+  mode: ExploreMode
+  entryLevel?: 1 | 2 | 3
+  skipFirst?: boolean
+  search?: boolean
+  label?: string
+  plural?: string
+  hash?: string
+  groupBy?: string
+  detailStyle?: 'markdown' | 'lavoro'
+  source?: 'headings' | 'table'
+  entityHeading?: string
+  showHero?: boolean
+  unassigned?: boolean
+  filters?: ExploreFilter[]
+  tabs?: ExploreGroup[]
+  groups?: ExploreGroup[]
+}
+
 export interface PageContent extends PageWorkflowFields {
   k: string
   title: string
@@ -98,6 +131,9 @@ export interface PageContent extends PageWorkflowFields {
   template?: string
   templateData?: TemplateData
   draftFields?: string[]
+  /* Pattern di esplorazione scelto dall'Admin. Il sito lo legge in
+     scripts/js/explorer.js; il markdown resta la fonte delle voci. */
+  explore?: ExploreConfig
 }
 
 // ──────────────────────────────────────────────
@@ -148,26 +184,6 @@ export interface MapPin {
 export interface MapData {
   mapImage: string
   pins: MapPin[]
-}
-
-// ──────────────────────────────────────────────
-// Bacheca Missioni
-// ──────────────────────────────────────────────
-export type QuestStatus = 'aperta' | 'attiva' | 'completata'
-
-export interface Quest {
-  id: string
-  titolo: string
-  descrizione: string
-  ricompensa?: string
-  livello?: string
-  stato: QuestStatus
-  master?: string
-  tag?: string[]
-}
-
-export interface QuestsDoc {
-  quests: Quest[]
 }
 
 // ──────────────────────────────────────────────
@@ -352,6 +368,8 @@ export interface OrphanMediaItem {
 // Changelog
 // ──────────────────────────────────────────────
 export interface ChangelogEntry {
+  /** Id stabile usato dal changelog pubblico per aprire/chiudere una entry. */
+  id?: string
   versione: string
   sottoversione: string
   patch: string
