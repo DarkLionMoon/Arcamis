@@ -497,7 +497,7 @@ async function _gpRender(id, label, icon) {
           _siteEsc(_deity.n) +
           '</div></div>';
         _pbody.innerHTML =
-          '<div class="nc" style="animation:fi .22s ease forwards">' +
+          '<div class="nc" style="animation:fi .22s ease">' +
           _scrubHtmlString(_renderDeityPage(_deity, _collKey)) +
           _deityFooter +
           '</div>';
@@ -658,7 +658,7 @@ async function _gpRender(id, label, icon) {
             ptitle +
             '</div></div>';
           pbody.innerHTML =
-            '<div class="nc" style="animation:fi .22s ease forwards">' +
+            '<div class="nc" style="animation:fi .22s ease">' +
             (_scrubHtmlString(_localHtml || '') || _emptyHtml) +
             _footer +
             '</div>';
@@ -718,7 +718,7 @@ async function _gpRender(id, label, icon) {
     '<div class="n-page-footer"><div class="n-page-footer-gems">✦ &nbsp; ✦ &nbsp; ✦</div>' +
     '<div class="n-page-footer-text">Archivi di Arcamis</div></div>';
   pbody.innerHTML =
-    '<div class="nc" style="animation:fi .22s ease forwards">' + unavailableHtml + unavailableFooter + '</div>';
+    '<div class="nc" style="animation:fi .22s ease">' + unavailableHtml + unavailableFooter + '</div>';
   if (typeof afterPageRender === 'function') afterPageRender();
   return;
 }
@@ -1719,7 +1719,7 @@ function _wfNoindex() {
 /* Etichetta di stato + nota: al posto del contenuto, mai insieme. */
 function _wfNoticeHtml(title, state) {
   return (
-    '<div class="nc" style="animation:fi .22s ease forwards">' +
+    '<div class="nc" style="animation:fi .22s ease">' +
     '<div class="n-empty"><div class="n-empty-icon">✎</div>' +
     '<div class="n-empty-title">' +
     _siteEsc(state.title) +

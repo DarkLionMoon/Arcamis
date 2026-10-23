@@ -705,12 +705,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
         />
 
         <div class="arc-pane-scroll">
-          <ExplorerEditor
-            v-if="exploreOpen && page"
-            :page="page"
-            :content="page.content"
-            @update="onExploreUpdate"
-          />
+          <ExplorerEditor v-if="exploreOpen && page" :page="page" :content="page.content" @update="onExploreUpdate" />
 
           <PantheonEditor
             v-else-if="pantheonOpen && pantheonMode"

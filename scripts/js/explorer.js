@@ -349,11 +349,24 @@
 
   /* ── Markup ───────────────────────────────────────────────── */
 
+  /* Tinta del badge derivata dall'etichetta: gli stessi campi (Fonte,
+     Livello, Allineamento…) restano dello stesso colore anche quando
+     l'Admin li rinomina. */
+  var BADGE_TONES = ['', 'is-copper', 'is-teal', 'is-violet'];
+
+  function badgeTone(label) {
+    var text = String(label || '').toLowerCase();
+    var hash = 0;
+    for (var i = 0; i < text.length; i++) hash = (hash * 31 + text.charCodeAt(i)) % 9973;
+    return BADGE_TONES[hash % BADGE_TONES.length];
+  }
+
   function metaBadges(entry) {
     return entry.meta
       .slice(0, 4)
       .map(function (meta) {
-        return '<span class="exp-badge"><b>' + esc(meta.label) + '</b> ' + esc(cleanMetaValue(meta.value)) + '</span>';
+        var tone = badgeTone(meta.label);
+        return '<span class="exp-badge' + (tone ? ' ' + tone : '') + '"><b>' + esc(meta.label) + '</b> ' + esc(cleanMetaValue(meta.value)) + '</span>';
       })
       .join('');
   }
@@ -839,11 +852,43 @@
     var backdrop = root.querySelector('.exp-drawer-backdrop');
     var content = root.querySelector('[data-exp-drawer-content]');
     var lastFocus = null;
+    var closeTimer = null;
+    var mount = null;
+
+    /* Il cassetto esce dal contenuto della pagina: #main è uno stacking
+       context e un ancestor animato può ritagliare i fixed. Portandolo
+       nel body copre davvero la viewport (topbar e bottom nav comprese). */
+    if (drawer && backdrop) {
+      Array.prototype.forEach.call(
+        document.querySelectorAll('body > .exp-drawer-mount'),
+        function (stale) { stale.remove(); }
+      );
+      mount = document.createElement('div');
+      mount.className = 'exp-drawer-mount';
+      document.body.appendChild(mount);
+      mount.appendChild(backdrop);
+      mount.appendChild(drawer);
+    }
 
     function paintGrid() {
       var shown = filterEntries(entries, state, built.filters);
       if (grid) grid.innerHTML = shown.map(tileHtml).join('');
       if (empty) empty.hidden = shown.length > 0;
+    }
+
+    /* Il cassetto resta nel DOM per la durata dell'animazione di uscita
+       (200ms, la stessa del CSS) e solo dopo riceve [hidden]. */
+    function finishClose() {
+      closeTimer = null;
+      if (drawer) {
+        drawer.hidden = true;
+        drawer.classList.remove('is-closing');
+        drawer.setAttribute('aria-hidden', 'true');
+      }
+      if (backdrop) {
+        backdrop.hidden = true;
+        backdrop.classList.remove('is-closing');
+      }
     }
 
     function open(slug, updateHash) {
@@ -852,29 +897,52 @@
       state.active = entry.slug;
       lastFocus = document.activeElement;
       if (content) content.innerHTML = detailHtml(entry, built.config).replace(' data-exp-action="back"', '');
+      if (closeTimer) {
+        clearTimeout(closeTimer);
+        closeTimer = null;
+      }
       if (drawer) {
+        drawer.classList.remove('is-closing');
         drawer.hidden = false;
         drawer.classList.add('is-open');
         drawer.setAttribute('aria-hidden', 'false');
         var close = drawer.querySelector('[data-exp-close]');
         if (close) close.focus();
       }
-      if (backdrop) backdrop.hidden = false;
+      if (backdrop) {
+        backdrop.classList.remove('is-closing');
+        backdrop.hidden = false;
+      }
       root.classList.add('exp-drawer-open');
       if (updateHash) writeHash(built.prefix, [entry.slug]);
     }
 
     function close(updateHash) {
       state.active = '';
-      if (drawer) {
+      if (drawer && !drawer.hidden) {
         drawer.classList.remove('is-open');
-        drawer.hidden = true;
-        drawer.setAttribute('aria-hidden', 'true');
+        drawer.classList.add('is-closing');
+        if (backdrop) {
+          backdrop.hidden = false;
+          backdrop.classList.add('is-closing');
+        }
+        if (closeTimer) clearTimeout(closeTimer);
+        closeTimer = setTimeout(finishClose, 200);
+      } else {
+        finishClose();
       }
-      if (backdrop) backdrop.hidden = true;
       root.classList.remove('exp-drawer-open');
       if (lastFocus && lastFocus.focus) lastFocus.focus();
       if (updateHash) clearHash();
+    }
+
+    /* Sfondo e × vivono fuori da root: listener diretti. */
+    if (backdrop) {
+      backdrop.addEventListener('click', function () { close(true); });
+    }
+    if (drawer) {
+      var closeBtn = drawer.querySelector('[data-exp-close]');
+      if (closeBtn) closeBtn.addEventListener('click', function () { close(true); });
     }
 
     root.addEventListener('click', function (event) {
@@ -906,9 +974,31 @@
       });
     }
 
-    document.addEventListener('keydown', function (event) {
+    var onKeyDown = function (event) {
       if (event.key === 'Escape' && drawer && !drawer.hidden) close(true);
-    });
+    };
+    document.addEventListener('keydown', onKeyDown);
+
+    /* Il cassetto vive nel body: quando la pagina viene sostituita o
+       nascosta (torna alla home) va rimosso, altrimenti resterebbe
+       sopra la pagina nuova. L'IntersectionObserver scatta sia per un
+       nodo staccato sia per un ancestor con display:none. */
+    function detach() {
+      document.removeEventListener('keydown', onKeyDown);
+      if (closeTimer) clearTimeout(closeTimer);
+      if (mount) mount.remove();
+      mount = null;
+    }
+
+    if (mount && typeof IntersectionObserver !== 'undefined') {
+      var watcher = new IntersectionObserver(function (entries) {
+        var last = entries[entries.length - 1];
+        if (!last || last.isIntersecting) return;
+        watcher.disconnect();
+        detach();
+      });
+      watcher.observe(root);
+    }
 
     var onHash = function () {
       if (!root.isConnected) {

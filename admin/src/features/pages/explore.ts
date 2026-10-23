@@ -84,7 +84,10 @@ export function createExplore(mode: ExploreMode): ExploreConfig {
   }
 }
 
-export function normalizeExplore(config: ExploreConfig | undefined, fallback: ExploreMode = 'master-detail'): ExploreConfig {
+export function normalizeExplore(
+  config: ExploreConfig | undefined,
+  fallback: ExploreMode = 'master-detail'
+): ExploreConfig {
   const mode = config?.mode && EXPLORE_MODES.some((option) => option.value === config.mode) ? config.mode : fallback
   return {
     ...MODE_DEFAULTS[mode],

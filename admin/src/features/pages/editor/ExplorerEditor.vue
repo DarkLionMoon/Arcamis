@@ -154,30 +154,57 @@ function reset(): void {
       </label>
       <label class="arc-field">
         <span class="arc-label">Nome della voce</span>
-        <input class="in" :value="cfg.label" placeholder="Scheda, Regola, Divinità…" @input="patch({ label: ($event.target as HTMLInputElement).value })" />
+        <input
+          class="in"
+          :value="cfg.label"
+          placeholder="Scheda, Regola, Divinità…"
+          @input="patch({ label: ($event.target as HTMLInputElement).value })"
+        />
       </label>
       <label class="arc-field">
         <span class="arc-label">Plurale (conteggi)</span>
-        <input class="in" :value="cfg.plural" placeholder="schede, regole, voci…" @input="patch({ plural: ($event.target as HTMLInputElement).value })" />
+        <input
+          class="in"
+          :value="cfg.plural"
+          placeholder="schede, regole, voci…"
+          @input="patch({ plural: ($event.target as HTMLInputElement).value })"
+        />
       </label>
       <label class="arc-field">
         <span class="arc-label">Prefisso URL (hash)</span>
-        <input class="in" :value="cfg.hash" :placeholder="page.k" @input="patch({ hash: ($event.target as HTMLInputElement).value })" />
+        <input
+          class="in"
+          :value="cfg.hash"
+          :placeholder="page.k"
+          @input="patch({ hash: ($event.target as HTMLInputElement).value })"
+        />
         <small class="arc-field-help">Es. <code>specie</code> → /lore/specie-homebrew#specie/ascesi</small>
       </label>
     </div>
 
     <div class="arc-explorer-options">
       <label class="arc-check">
-        <input type="checkbox" :checked="cfg.search !== false" @change="patch({ search: ($event.target as HTMLInputElement).checked })" />
+        <input
+          type="checkbox"
+          :checked="cfg.search !== false"
+          @change="patch({ search: ($event.target as HTMLInputElement).checked })"
+        />
         <span>Mostra la ricerca</span>
       </label>
       <label v-if="cfg.mode === 'master-detail' || cfg.mode === 'drawer'" class="arc-check">
-        <input type="checkbox" :checked="cfg.showHero !== false" @change="patch({ showHero: ($event.target as HTMLInputElement).checked })" />
+        <input
+          type="checkbox"
+          :checked="cfg.showHero !== false"
+          @change="patch({ showHero: ($event.target as HTMLInputElement).checked })"
+        />
         <span>Immagine in testa alla scheda</span>
       </label>
       <label class="arc-check">
-        <input type="checkbox" :checked="cfg.unassigned !== false" @change="patch({ unassigned: ($event.target as HTMLInputElement).checked })" />
+        <input
+          type="checkbox"
+          :checked="cfg.unassigned !== false"
+          @change="patch({ unassigned: ($event.target as HTMLInputElement).checked })"
+        />
         <span>Raccogli le sezioni non assegnate</span>
       </label>
     </div>
@@ -210,7 +237,13 @@ function reset(): void {
             :aria-label="'Nome del gruppo ' + (index + 1)"
             @input="updateGroup(index, { label: ($event.target as HTMLInputElement).value })"
           />
-          <button class="arc-icon-btn" type="button" title="Sposta su" :disabled="index === 0" @click="moveGroup(index, -1)">
+          <button
+            class="arc-icon-btn"
+            type="button"
+            title="Sposta su"
+            :disabled="index === 0"
+            @click="moveGroup(index, -1)"
+          >
             ↑
           </button>
           <button
@@ -259,10 +292,36 @@ function reset(): void {
         </button>
       </div>
       <div v-for="(filter, index) in cfg.filters" :key="filter.id" class="arc-explorer-filter">
-        <input class="in" :value="filter.label" placeholder="Etichetta visibile" @input="updateFilter(index, { label: ($event.target as HTMLInputElement).value })" />
-        <input class="in" :value="filter.field" placeholder="Campo nel markdown (es. Tipologia)" @input="updateFilter(index, { field: ($event.target as HTMLInputElement).value })" />
-        <button class="arc-icon-btn" type="button" title="Sposta su" :disabled="index === 0" @click="moveFilter(index, -1)">↑</button>
-        <button class="arc-icon-btn" type="button" title="Sposta giù" :disabled="index === cfg.filters.length - 1" @click="moveFilter(index, 1)">↓</button>
+        <input
+          class="in"
+          :value="filter.label"
+          placeholder="Etichetta visibile"
+          @input="updateFilter(index, { label: ($event.target as HTMLInputElement).value })"
+        />
+        <input
+          class="in"
+          :value="filter.field"
+          placeholder="Campo nel markdown (es. Tipologia)"
+          @input="updateFilter(index, { field: ($event.target as HTMLInputElement).value })"
+        />
+        <button
+          class="arc-icon-btn"
+          type="button"
+          title="Sposta su"
+          :disabled="index === 0"
+          @click="moveFilter(index, -1)"
+        >
+          ↑
+        </button>
+        <button
+          class="arc-icon-btn"
+          type="button"
+          title="Sposta giù"
+          :disabled="index === cfg.filters.length - 1"
+          @click="moveFilter(index, 1)"
+        >
+          ↓
+        </button>
         <button class="arc-icon-btn is-danger" type="button" title="Elimina filtro" @click="removeFilter(index)">
           <VIcon name="trash" :size="13" />
         </button>

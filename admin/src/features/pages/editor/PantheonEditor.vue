@@ -107,8 +107,7 @@ function setIntro(event: Event): void {
   commit()
 }
 
-const entityCount = () =>
-  doc.value.parts.filter((part) => part.kind === 'entity').length
+const entityCount = () => doc.value.parts.filter((part) => part.kind === 'entity').length
 </script>
 
 <template>
@@ -142,7 +141,12 @@ const entityCount = () =>
           <strong>{{ identityValue(part, 'Nome') || part.name || 'Senza nome' }}</strong>
           <span class="arc-pantheon-epithet">{{ identityValue(part, 'Epiteto') }}</span>
           <span class="arc-pantheon-tools">
-            <button class="arc-icon-btn is-danger" type="button" title="Elimina divinità" @click.stop="removeEntity(index)">
+            <button
+              class="arc-icon-btn is-danger"
+              type="button"
+              title="Elimina divinità"
+              @click.stop="removeEntity(index)"
+            >
               <VIcon name="trash" :size="14" />
             </button>
             <button class="arc-icon-btn" type="button" :aria-expanded="open.has(part.id)" @click.stop="toggle(part.id)">
@@ -159,7 +163,11 @@ const entityCount = () =>
             </label>
             <label class="arc-field">
               <span class="arc-label">Epiteto</span>
-              <input class="in" :value="identityValue(part, 'Epiteto')" @input="setIdentity(index, part, 'Epiteto', $event)" />
+              <input
+                class="in"
+                :value="identityValue(part, 'Epiteto')"
+                @input="setIdentity(index, part, 'Epiteto', $event)"
+              />
             </label>
             <label class="arc-field">
               <span class="arc-label">Allineamento</span>
@@ -171,7 +179,11 @@ const entityCount = () =>
             </label>
             <label class="arc-field">
               <span class="arc-label">Sfere</span>
-              <input class="in" :value="identityValue(part, 'Sfere')" @input="setIdentity(index, part, 'Sfere', $event)" />
+              <input
+                class="in"
+                :value="identityValue(part, 'Sfere')"
+                @input="setIdentity(index, part, 'Sfere', $event)"
+              />
             </label>
             <label class="arc-field">
               <span class="arc-label">Simbolo</span>

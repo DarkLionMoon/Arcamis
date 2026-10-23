@@ -10,8 +10,9 @@
 import type { ChangelogEntry } from '@/types'
 
 export function parseChangelog(raw: unknown): ChangelogEntry[] {
-  const candidate =
-    Array.isArray(raw) ? raw : raw && typeof raw === 'object' && Array.isArray((raw as { entries?: unknown }).entries)
+  const candidate = Array.isArray(raw)
+    ? raw
+    : raw && typeof raw === 'object' && Array.isArray((raw as { entries?: unknown }).entries)
       ? (raw as { entries: unknown[] }).entries
       : []
   return candidate.filter(

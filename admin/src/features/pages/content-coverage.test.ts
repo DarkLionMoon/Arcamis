@@ -40,8 +40,7 @@ const headings = (markdown: string) =>
     .filter((line) => /^#{1,3}\s+/.test(line))
     .map((line) => line.trim())
 
-const images = (markdown: string) =>
-  [...markdown.matchAll(/!\[[^\]]*\]\(([^)\s]+)/g)].map((match) => match[1]).sort()
+const images = (markdown: string) => [...markdown.matchAll(/!\[[^\]]*\]\(([^)\s]+)/g)].map((match) => match[1]).sort()
 
 const links = (markdown: string) =>
   [...markdown.matchAll(/(?<!!)\[[^\]]*\]\(([^)\s]+)/g)].map((match) => match[1]).sort()
@@ -73,9 +72,7 @@ describe('copertura Admin dei contenuti migrati', () => {
       ['sottoclassi-homebrew', 18]
     ] as const) {
       const page = pages.get(key)!
-      const cards = parseBlocks(page.content).filter(
-        (block) => block.type === 'heading' && block.level === 1
-      )
+      const cards = parseBlocks(page.content).filter((block) => block.type === 'heading' && block.level === 1)
       expect(cards.length, `${key}: schede non rilevate`).toBe(count)
     }
   })

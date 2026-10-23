@@ -116,6 +116,10 @@ admin — vedi Parte 2.)
   `scripts/js/explorer.js`, stili in `style-explorer.css`; su mobile il
   master-detail diventa lista → dettaglio con "Torna alla lista".
 - **Changelog e Novità**: widget e pagina dedicata dai JSON locali.
+- **Missioni (rimossa)**: la sezione missioni non fa più parte della wiki.
+  Nessuna rotta, voce di menu, sitemap o vista Admin la espone: il registro
+  pagine e `scripts/lib/routes.mjs` non la conoscono, quindi un vecchio link
+  finisce nella 404 vera.
 
 ### Layout disponibili
 
@@ -311,8 +315,26 @@ npm run verify:deploy https://arcamis.pages.dev
 ```
 
 ```bash
-cd admin && npm test   # unit test pannello (workflow, modelli, diff, comandi…)
+cd admin && npm test           # unit test pannello (workflow, modelli, diff, comandi…)
+cd admin && npm run test:e2e   # Playwright: build + preview automatici
 ```
+
+Formattazione e lint sono un gate della CI (`npm run lint` e
+`npm run format:check` in root e in `admin/`): in locale gli stessi comandi
+controllano, e `format` scrive le correzioni.
+
+```bash
+npm run lint                   # ESLint del sito
+npm run format:check           # Prettier in sola verifica
+npm run format                 # Prettier che riscrive
+npm --prefix admin run lint
+npm --prefix admin run format:check
+npm --prefix admin run format
+npm --prefix admin run typecheck
+```
+
+La suite E2E gira sull'artefatto pubblicato (`npm run build`) e, se non
+trova un server su `:4173`, avvia da sé build e `vite preview`.
 
 Dopo aver aggiunto pagine/rotte ai contenuti, rigenera gli artefatti
 prima di committare (la CI li verifica con `--check`):

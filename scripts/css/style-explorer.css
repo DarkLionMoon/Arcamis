@@ -5,6 +5,10 @@
    ════════════════════════════════════════════════════════════════ */
 
 .exp {
+  --exp-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --exp-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --exp-lift: -4px;
+  --exp-glow: 0 8px 20px rgba(212, 175, 55, 0.15);
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
@@ -96,7 +100,7 @@
   font-family: inherit;
   font-size: 11.5px;
   padding: 4px 10px;
-  transition: background 0.16s, border-color 0.16s, color 0.16s;
+  transition: background 0.16s, border-color 0.16s, color 0.16s, transform 0.12s var(--exp-ease);
 }
 
 .exp-pill:hover {
@@ -104,11 +108,17 @@
   color: var(--parch);
 }
 
+/* Filtro attivo = CTA solida: l'accento oro resta riservato agli stati
+   selezionati, mai un ghost button. */
 .exp-pill.is-active {
-  background: rgba(var(--gold-rgb), 0.16);
-  border-color: rgba(var(--gold-rgb), 0.55);
-  color: var(--gold3);
+  background: linear-gradient(180deg, var(--gold3), var(--gold));
+  border-color: var(--gold3);
+  color: #14100a;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(var(--gold-rgb), 0.22);
 }
+
+.exp-pill.is-active:hover { color: #14100a; }
 
 /* ── Master-detail ── */
 .exp-master-grid {
@@ -146,6 +156,8 @@
   overflow: auto;
   min-height: 0;
   padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--gold-rgb), 0.55) transparent;
 }
 
 .exp-group {
@@ -183,7 +195,7 @@
   font-family: inherit;
   font-size: 13px;
   text-align: left;
-  transition: background 0.14s, border-color 0.14s, color 0.14s;
+  transition: background 0.14s, border-color 0.14s, color 0.14s, transform 0.12s var(--exp-ease);
 }
 
 .exp-item:hover {
@@ -225,8 +237,43 @@
   padding: 4px 0 0;
 }
 
+/* Pannello scheda: pasta scura "pergamena notturna" con angoli dorati
+   in alto a sinistra e in basso a destra (metallo runico leggero). */
 .exp-detail-inner {
-  animation: exp-fade 0.18s ease;
+  position: relative;
+  padding: 20px 22px 22px;
+  border: 1px solid rgba(var(--gold-rgb), 0.14);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(var(--gold-rgb), 0.035), rgba(0, 0, 0, 0.16) 65%),
+    var(--panel);
+  animation: exp-fade 0.2s ease;
+}
+
+.exp-detail-inner::before,
+.exp-detail-inner::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.exp-detail-inner::before {
+  top: 6px;
+  left: 6px;
+  border-top: 1px solid var(--gold);
+  border-left: 1px solid var(--gold);
+  border-top-left-radius: 3px;
+}
+
+.exp-detail-inner::after {
+  right: 6px;
+  bottom: 6px;
+  border-right: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+  border-bottom-right-radius: 3px;
 }
 
 @keyframes exp-fade {
@@ -234,17 +281,26 @@
   to { opacity: 1; transform: none; }
 }
 
+/* CTA solida: l'unico modo di tornare alla lista su mobile non è un
+   ghost button. Oro pieno, testo scuro, contrasto alto. */
 .exp-back {
   display: none;
   margin-bottom: 12px;
-  padding: 6px 10px;
-  border: 1px solid rgba(var(--gold-rgb), 0.25);
+  padding: 8px 14px;
+  border: 1px solid var(--gold);
   border-radius: 6px;
-  background: transparent;
-  color: var(--gold3);
+  background: var(--gold);
+  color: #14100a;
   cursor: pointer;
   font-family: inherit;
   font-size: 12px;
+  font-weight: 700;
+}
+
+.exp-back:hover,
+.exp-back:focus-visible {
+  background: var(--gold2);
+  border-color: var(--gold2);
 }
 
 .exp-detail-head {
@@ -285,18 +341,47 @@
 
 .exp-badge {
   display: inline-flex;
-  gap: 4px;
-  padding: 2px 8px;
-  border: 1px solid rgba(var(--gold-rgb), 0.2);
-  border-radius: 999px;
-  color: var(--text2);
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid rgba(var(--gold-rgb), 0.28);
+  border-radius: 5px;
+  background: rgba(4, 6, 12, 0.55);
+  color: var(--text);
   font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 }
 
 .exp-badge b {
-  color: var(--text3);
-  font-weight: 400;
+  color: var(--gold2);
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
+
+/* Tinte per fonte/categoria: fondo scuro comune, bordo e etichetta
+   derivati dai token del tema (color-mix per l'alpha, fallback rgba). */
+.exp-badge.is-copper {
+  border-color: rgba(168, 116, 44, 0.52);
+  border-color: color-mix(in srgb, var(--copper) 52%, transparent);
+}
+.exp-badge.is-copper b { color: var(--copper); }
+
+.exp-badge.is-teal {
+  border-color: rgba(102, 187, 221, 0.38);
+  border-color: color-mix(in srgb, var(--teal3) 42%, transparent);
+}
+.exp-badge.is-teal b { color: var(--teal3); }
+
+.exp-badge.is-violet {
+  border-color: rgba(170, 136, 238, 0.38);
+  border-color: color-mix(in srgb, var(--violet3) 42%, transparent);
+}
+.exp-badge.is-violet b { color: var(--violet3); }
 
 .exp-hero {
   margin: 0 0 18px;
@@ -334,6 +419,17 @@
 .exp-rich li { margin: 0.28em 0; }
 .exp-rich strong { color: var(--gold3); }
 .exp-rich a { color: var(--gold3); }
+/* Separatori: linea dorata che si dissolve ai lati con gemma centrale. */
+.exp-rich hr:not(.n-divider) {
+  height: 16px;
+  margin: 24px 0;
+  border: 0;
+  opacity: 0.85;
+  background:
+    radial-gradient(circle at center, var(--gold) 0 2.4px, transparent 3px) center / 100% 100% no-repeat,
+    linear-gradient(90deg, transparent, rgba(var(--gold-rgb), 0.32) 22%, rgba(var(--gold-rgb), 0.32) 78%, transparent) center / 100% 1px no-repeat;
+}
+
 .exp-rich blockquote {
   margin: 1em 0;
   padding: 10px 16px;
@@ -439,7 +535,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
-  transition: color 0.16s, background 0.16s, border-color 0.16s;
+  transition: color 0.16s, background 0.16s, border-color 0.16s, transform 0.12s var(--exp-ease);
 }
 
 .exp-tab:hover {
@@ -463,6 +559,20 @@
 
 .exp-tab-body { min-width: 0; }
 
+/* Cambio scheda: fade + risalita di 12px, senza scatti. */
+.exp-tab-body > * {
+  animation: exp-swap 0.32s var(--exp-ease-out) both;
+}
+
+.exp-tab-body > *:nth-child(2) { animation-delay: 0.035s; }
+.exp-tab-body > *:nth-child(3) { animation-delay: 0.07s; }
+.exp-tab-body > *:nth-child(n + 4) { animation-delay: 0.1s; }
+
+@keyframes exp-swap {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
 .exp-tab-section {
   scroll-margin-top: 86px;
   margin-bottom: 30px;
@@ -483,6 +593,8 @@
   top: 78px;
   max-height: calc(100vh - 110px);
   overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--gold-rgb), 0.55) transparent;
 }
 
 .exp-toc {
@@ -531,21 +643,51 @@
   flex-direction: column;
   min-height: 170px;
   padding: 0;
-  border: 1px solid rgba(var(--gold-rgb), 0.16);
+  border: 1px solid transparent;
   border-radius: 8px;
-  background: linear-gradient(170deg, rgba(var(--gold-rgb), 0.055), rgba(0, 0, 0, 0.26));
+  /* Doppio fondo: superficie in padding-box, bordo in gradiente oro nel border-box. */
+  background:
+    linear-gradient(170deg, rgba(var(--gold-rgb), 0.055), rgba(0, 0, 0, 0.26)) padding-box,
+    linear-gradient(160deg, rgba(var(--gold-rgb), 0.36), rgba(var(--gold-rgb), 0.1) 45%, rgba(var(--gold-rgb), 0.26)) border-box;
   color: var(--white);
   cursor: pointer;
   font-family: inherit;
   overflow: hidden;
   text-align: left;
-  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s var(--exp-ease), box-shadow 0.3s var(--exp-ease);
+}
+
+/* Shimmer diagonale: solo transform (nessun repaint del layout). */
+.exp-tile::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 60%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 25%, rgba(245, 228, 168, 0.13) 50%, transparent 75%);
+  transform: translateX(-130%) skewX(-14deg);
+  transition: transform 0.6s var(--exp-ease);
 }
 
 .exp-tile:hover {
-  transform: translateY(-3px);
-  border-color: rgba(var(--gold-rgb), 0.45);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
+  transform: translateY(var(--exp-lift));
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--gold-rgb), 0.32),
+    var(--exp-glow),
+    0 16px 34px rgba(0, 0, 0, 0.45);
+}
+
+.exp-tile:hover::after,
+.exp-tile:focus-visible::after {
+  transform: translateX(230%) skewX(-14deg);
+}
+
+.exp-tile:active {
+  transform: translateY(-1px) scale(0.985);
+  box-shadow: inset 0 0 0 1px rgba(var(--gold-rgb), 0.32), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .exp-tile-media {
@@ -626,6 +768,21 @@
   z-index: 9500;
   background: rgba(2, 3, 8, 0.72);
   backdrop-filter: blur(3px);
+  animation: exp-backdrop-in 0.26s ease both;
+}
+
+.exp-drawer-backdrop.is-closing {
+  animation: exp-backdrop-out 0.2s ease both;
+}
+
+@keyframes exp-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes exp-backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 .exp-drawer {
@@ -640,14 +797,28 @@
   background: linear-gradient(180deg, #0c1018, #07090e 70%);
   border-left: 1px solid rgba(var(--gold-rgb), 0.3);
   box-shadow: -20px 0 60px rgba(0, 0, 0, 0.6);
-  animation: exp-drawer-in 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--gold-rgb), 0.55) transparent;
 }
 
 .exp-drawer[hidden] { display: none; }
 
+.exp-drawer.is-open {
+  animation: exp-drawer-in 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.exp-drawer.is-closing {
+  animation: exp-drawer-out 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
 @keyframes exp-drawer-in {
-  from { transform: translateX(28px); opacity: 0; }
+  from { transform: translateX(48px); opacity: 0; }
   to { transform: none; opacity: 1; }
+}
+
+@keyframes exp-drawer-out {
+  from { transform: none; opacity: 1; }
+  to { transform: translateX(40px); opacity: 0; }
 }
 
 .exp-drawer-close {
@@ -664,10 +835,33 @@
   cursor: pointer;
   font-size: 20px;
   line-height: 1;
+  z-index: 3;
+  transition: transform 0.2s var(--exp-ease), border-color 0.2s, background 0.2s;
+}
+
+.exp-drawer-close:hover {
+  border-color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.14);
+  transform: rotate(90deg);
 }
 
 .exp-drawer .exp-title { font-size: 28px; }
 .exp-drawer .exp-detail-head { padding-right: 8px; }
+
+/* Nel cassetto "Torna alla lista" non ha senso: si chiude con ×, Esc o
+   toccando lo sfondo. Niente CTA senza effetto. */
+.exp-drawer .exp-back { display: none; }
+
+/* Nel cassetto il pannello non si duplica: il cassetto è già la cornice. */
+.exp-drawer .exp-detail-inner {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.exp-drawer .exp-detail-inner::before,
+.exp-drawer .exp-detail-inner::after { display: none; }
 
 /* ── Accordion ── */
 .exp-acc {
@@ -760,7 +954,29 @@
 
 .exp-acc-body strong { color: var(--gold3); }
 
+/* ── Feedback tattile: pressione senza spostare il layout ── */
+.exp-tab:active,
+.exp-item:active,
+.exp-pill:active,
+.exp-back:active,
+.exp-drawer-close:active,
+.exp-acc-group > summary:active {
+  transform: scale(0.97);
+}
+
+.exp-tab:focus-visible,
+.exp-pill:focus-visible,
+.exp-item:focus-visible,
+.exp-tile:focus-visible,
+.exp-acc-group > summary:focus-visible {
+  outline: 2px solid var(--gold2);
+  outline-offset: 2px;
+}
+
 @media (max-width: 900px) {
+  .exp-detail-inner {
+    padding: 16px 15px 18px;
+  }
   .exp { padding-bottom: 28px; }
   .exp-master-grid { display: block; }
   .exp-sidebar {
@@ -819,5 +1035,29 @@
   .exp *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+  }
+  /* Nessun movimento: il feedback resta affidato a colore e bordo. */
+  .exp-tile:hover,
+  .exp-tile:active,
+  .exp-tab:active,
+  .exp-item:active,
+  .exp-pill:active,
+  .exp-back:active,
+  .exp-drawer-close:active,
+  .exp-drawer-close:hover,
+  .exp-acc-group > summary:active {
+    transform: none !important;
+  }
+  .exp-tile::after,
+  .exp-tab-body > * {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+  .exp-drawer.is-open,
+  .exp-drawer.is-closing,
+  .exp-drawer-backdrop,
+  .exp-drawer-backdrop.is-closing {
+    animation: none !important;
   }
 }

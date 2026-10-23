@@ -46,10 +46,17 @@ body::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.045;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:var(--bg2)}
-::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px;transition:background .2s}
-::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+/* Scrollbar brunita: guida scura sottile, cursore oro con angoli tondi.
+   `scrollbar-color` copre Firefox; i token restano quelli del tema. */
+html{scrollbar-width:thin;scrollbar-color:rgba(var(--gold-rgb),.55) var(--bg2)}
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:linear-gradient(180deg,var(--bg2),var(--bg));border-left:1px solid rgba(0,0,0,.35)}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,var(--copper),rgba(var(--gold-rgb),.7));
+  border-radius:999px;border:1px solid rgba(0,0,0,.45);
+}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--gold3),var(--gold))}
+::-webkit-scrollbar-corner{background:var(--bg2)}
 
 /* ════════════════════════════════════
    ACCESSIBILITÀ — Skip link + Focus
@@ -235,8 +242,11 @@ nav#tnav{display:flex;align-items:stretch}
 /* ── Cross-fade transitions ── */
 .vp{transition:opacity .17s ease,transform .17s ease}
 .vp.fo{opacity:0;transform:translateY(5px);pointer-events:none}
-@keyframes fi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
-.vp.fi{animation:fi .22s ease forwards}
+/* Niente fill "forwards": un'animazione conclusa che trattiene il
+   transform renderebbe .vp/.nc un blocco contenitore, e i drawer fixed
+   si ancorerebbero alla pagina invece che alla viewport. */
+@keyframes fi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.vp.fi{animation:fi .22s ease}
 
 /* ════════════════════════════════════
    HERO CAROUSEL — CINEMATICO

@@ -179,7 +179,9 @@ function indexOf(card: CompendioCard): number {
       <aside class="arc-compendio-nav" aria-label="Catalogo delle schede">
         <input v-model="query" class="in" type="search" placeholder="Cerca specie, classe, tratto…" />
         <div v-for="[group, entries] in groups" :key="group" class="arc-compendio-group">
-          <div class="arc-compendio-group-title">{{ group }} <span>{{ entries.length }}</span></div>
+          <div class="arc-compendio-group-title">
+            {{ group }} <span>{{ entries.length }}</span>
+          </div>
           <button
             v-for="card in entries"
             :key="card.id"
@@ -269,9 +271,7 @@ function indexOf(card: CompendioCard): number {
             </div>
 
             <label class="arc-field">
-              <span class="arc-label">
-                Tratti, descrizione e privilegi (markdown della scheda)
-              </span>
+              <span class="arc-label"> Tratti, descrizione e privilegi (markdown della scheda) </span>
               <textarea
                 class="in arc-compendio-body"
                 :rows="Math.min(20, Math.max(8, card.body.split('\n').length))"
