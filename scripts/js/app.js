@@ -103,7 +103,7 @@ var _pathMap = {
   'lore/fumofosco': 'pag-fumofosco',
   'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur',
   'changelog': 'pag-changelog',
-  'credits': 'pag-credits',
+  'credits': 'pag-credits'
 };
 
 /* ════ DEEP LINK ════ */
