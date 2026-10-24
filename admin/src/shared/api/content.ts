@@ -52,9 +52,11 @@ export const pagesApi = {
   },
 
   async save(page: PageContent, message: string): Promise<{ sha: string }> {
-    /* `sha` è un dato di trasporto di GitHub, non del documento: va usato
-       per l'aggiornamento ma non riscritto dentro il JSON della pagina. */
-    const { sha, ...document } = page
+    /* `sha` è un dato di trasporto di GitHub, non del documento. Se la
+       pagina è esistente ma lo SHA è andato perso nello stato locale, lo
+       rilegge prima del PUT: GitHub rifiuta un aggiornamento senza sha (422). */
+    const { sha: pageSha, ...document } = page
+    const sha = pageSha || (await ghApi.get(`${CONTENT_PATH}/${page.k}.json`)).sha
     const result = await ghApi.put(`${CONTENT_PATH}/${page.k}.json`, message, JSON.stringify(document, null, 2), sha)
     return { sha: result.content.sha }
   },

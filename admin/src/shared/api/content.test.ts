@@ -43,6 +43,21 @@ describe('pagesApi · salvataggio di una pagina esistente', () => {
     expect(document).not.toContain('"sha"')
   })
 
+  it('recupera lo SHA prima del PUT se manca nello stato di una pagina esistente', async () => {
+    const get = vi.spyOn(ghApi, 'get').mockResolvedValue({ content: '', sha: 'sha-current' })
+    const put = vi.spyOn(ghApi, 'put').mockResolvedValue({ content: { sha: 'sha-new' } })
+
+    await pagesApi.save(PAGE, 'admin: update page pantheon')
+
+    expect(get).toHaveBeenCalledWith('content/pages/pantheon.json')
+    expect(put).toHaveBeenCalledWith(
+      'content/pages/pantheon.json',
+      'admin: update page pantheon',
+      expect.stringContaining('"k": "pantheon"'),
+      'sha-current'
+    )
+  })
+
   it('omette completamente sha nelle richieste di creazione', async () => {
     setActivePinia(createPinia())
     const put = vi.spyOn(ghApi, 'put').mockResolvedValue({ content: { sha: 'sha-new' } })

@@ -58,7 +58,7 @@ test.describe('navigazione per ruolo', () => {
     /* Elenco completo delle voci `minRole: 'editor'` (o senza requisito) in
        AdminLayout.vue, nello stesso ordine dei gruppi della sidebar. Un item
        in più o in meno qui è una regressione di permessi. */
-    expect(labels).toEqual(['Dashboard', 'Pagine', 'Copertine', 'Media', 'Mappa', 'Carousel', 'Changelog'])
+    expect(labels).toEqual(['Dashboard', 'Pagine', 'Copertine', 'Media', 'Mappa', 'Carousel', 'Changelog', 'Glossario'])
     for (const forbidden of ['Utenti', 'Cestino', 'Impostazioni', 'Audit', 'Backup']) {
       expect(labels, `l’editor non deve vedere ${forbidden}`).not.toContain(forbidden)
     }
