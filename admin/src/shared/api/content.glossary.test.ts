@@ -10,7 +10,15 @@ afterEach(() => {
 describe('glossaryApi', () => {
   it('legge e normalizza il glossario dal file content', async () => {
     vi.spyOn(ghApi, 'get').mockResolvedValue({
-      content: btoa(unescape(encodeURIComponent(JSON.stringify({ terms: [{ key: 'gp', title: 'GP', excerpt: 'Moneta', pageLink: '/regole', iconId: 'coin' }] })))),
+      content: btoa(
+        unescape(
+          encodeURIComponent(
+            JSON.stringify({
+              terms: [{ key: 'gp', title: 'GP', excerpt: 'Moneta', pageLink: '/regole', iconId: 'coin' }]
+            })
+          )
+        )
+      ),
       sha: 'glossary-sha'
     })
     await expect(glossaryApi.get()).resolves.toMatchObject({ sha: 'glossary-sha', terms: [{ key: 'gp', title: 'GP' }] })

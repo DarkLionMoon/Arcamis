@@ -63,11 +63,7 @@ export const pagesApi = {
 
   async create(page: PageContent, message: string): Promise<{ sha: string }> {
     const { sha: _sha, ...document } = page
-    const result = await ghApi.put(
-      `${CONTENT_PATH}/${page.k}.json`,
-      message,
-      JSON.stringify(document, null, 2)
-    )
+    const result = await ghApi.put(`${CONTENT_PATH}/${page.k}.json`, message, JSON.stringify(document, null, 2))
     return { sha: result.content.sha }
   },
 

@@ -586,7 +586,7 @@ async function _gpRender(id, label, icon) {
               title: ptitle
             });
             _localHtml = _exploreBuilt.html;
-          }          else if (_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
+          } else if (_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
           else if (_layout === 'regole' || _layout === 'contenuto') _localHtml = _renderRegole(_localJson.content);
           else if (_layout === 'lavoro') _localHtml = _renderLavoro(_localJson.content);
           else if (_layout === 'personaggio') _localHtml = _renderPersonaggio(_localJson.content);
@@ -607,7 +607,6 @@ async function _gpRender(id, label, icon) {
           }
           else if (_layout === 'timeline' || _layout === 'cronache') _localHtml = _renderTimeline(_localJson.content);
           else if (_layout === 'glossario') _localHtml = _renderGlossario(_localJson.content);
-          else if (_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
           else if (_layout === 'galleria') _localHtml = _renderGalleria(_localJson.content);
           else if (_layout === 'tabelle') _localHtml = _renderTabelle(_localJson.content);
           /* Layout a schede scelto dall'editor: ogni `##` diventa una card
