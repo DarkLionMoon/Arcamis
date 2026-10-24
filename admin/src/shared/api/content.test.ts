@@ -1,7 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { pagesApi } from './content'
+import { pagesApi, registryApi } from './content'
 import { ghApi } from './github'
 import type { PageContent } from '@/types'
 
@@ -16,6 +16,38 @@ const PAGE: PageContent = {
 
 afterEach(() => {
   vi.restoreAllMocks()
+})
+
+describe('registryApi · sezioni della topbar', () => {
+  it('scrive le sezioni nell’ordine scelto, non quelle del file', async () => {
+    const current = {
+      root: 'root',
+      guild: 'guild',
+      pages: [],
+      sections: [{ v: 'regole', l: 'Regole' }],
+      lavori: [],
+      ui: { bottomNav: [], drawerSearch: true }
+    }
+    vi.spyOn(ghApi, 'get').mockResolvedValue({
+      content: Buffer.from(JSON.stringify(current), 'utf8').toString('base64'),
+      sha: 'sha-registry'
+    })
+    const put = vi.spyOn(ghApi, 'put').mockResolvedValue({ content: { sha: 'sha-next' } })
+
+    await registryApi.save(
+      [],
+      [
+        { v: 'lore', l: 'Lore' },
+        { v: 'regole', l: 'Regole' }
+      ]
+    )
+
+    const document = JSON.parse(String(put.mock.calls[0][2])) as { sections: unknown }
+    expect(document.sections).toEqual([
+      { v: 'lore', l: 'Lore' },
+      { v: 'regole', l: 'Regole' }
+    ])
+  })
 })
 
 describe('pagesApi · salvataggio di una pagina esistente', () => {

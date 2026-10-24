@@ -146,7 +146,7 @@ async function removeSection(v: string) {
 async function saveSections() {
   saving.value = true
   try {
-    await registryApi.save(registry.pages, registry.uiConfig, 'admin: update sections')
+    await registryApi.save(registry.pages, registry.sections, registry.uiConfig, 'admin: update sections')
     registry.clearDirty()
     ui.toast('Sezioni salvate', 'success')
   } catch (e) {

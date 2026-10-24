@@ -66,6 +66,13 @@
       "sec": "lavori"
     },
     {
+      "k": "mestieri",
+      "l": "Mestieri",
+      "i": "💼",
+      "id": "pag-mestieri",
+      "sec": "lavori"
+    },
+    {
       "k": "come-si-inizia",
       "l": "Creazione",
       "i": "🌟",

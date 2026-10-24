@@ -80,6 +80,7 @@ var _pathMap = {
   'personaggio/materiale-approvato': 'pag-materiale-approvato',
   'lore/pantheon': 'pag-pantheon',
   'personaggio/lavori': 'pag-lavori',
+  'personaggio/mestieri': 'pag-mestieri',
   'personaggio/come-si-inizia': 'pag-come-si-inizia',
   'in-game/casate-e-compagnie': 'pag-casate-e-compagnie',
   'lore/storia-del-mondo': 'pag-storia-del-mondo',

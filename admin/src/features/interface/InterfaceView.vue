@@ -56,7 +56,7 @@ async function save() {
   saving.value = true
   try {
     registry.setUIConfig({ bottomNav: items.value, drawerSearch: drawerSearch.value })
-    await registryApi.save(registry.pages, registry.uiConfig, 'admin: update ui config')
+    await registryApi.save(registry.pages, registry.sections, registry.uiConfig, 'admin: update ui config')
     registry.clearDirty()
     ui.toast('Interfaccia salvata — deploy in corso (~30s)', 'success')
   } catch (e) {

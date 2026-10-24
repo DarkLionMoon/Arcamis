@@ -735,6 +735,30 @@
   line-height: 1.35;
 }
 
+/* Etichette compatte sulla tessera: stesso linguaggio dei badge nel cassetto. */
+.exp-tile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.exp-tile-tag {
+  padding: 1px 6px;
+  border: 1px solid rgba(var(--gold-rgb), 0.22);
+  border-radius: 4px;
+  background: rgba(4, 6, 12, 0.5);
+  color: var(--text3);
+  font-size: 9.5px;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+
+.exp-tile:hover .exp-tile-tag {
+  border-color: rgba(var(--gold-rgb), 0.34);
+  color: var(--text2);
+}
+
 .exp-chapters {
   display: grid;
   gap: 8px;

@@ -82,6 +82,8 @@ const groups: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { label: 'Pagine', to: '/pagine', icon: 'pages' },
       { label: 'Copertine', to: '/copertine', icon: 'covers', minRole: 'editor' },
+      { label: 'Imprese', to: '/imprese', icon: 'sparkle', minRole: 'editor' },
+      { label: 'Mestieri', to: '/mestieri', icon: 'table', minRole: 'editor' },
       { label: 'Media', to: '/media', icon: 'media' },
       { label: 'Cestino', to: '/cestino', icon: 'trash', minRole: 'admin' }
     ]

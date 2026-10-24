@@ -680,9 +680,11 @@ async function _gpRender(id, label, icon) {
             else _nc.appendChild(_clWrap);
             window.loadChangelog(_clWrap);
           }
-          /* Monta l'app Imprese & Licenze nel contenitore integrato. */
+          /* Monta l'app Imprese & Licenze nel contenitore integrato.
+             I dati di gioco vivono nel JSON della pagina, non nel JS. */
           if (_layout === 'imprese' && window._impreseInit) {
             var _impRoot = document.getElementById('imprese-app-root');
+            window._impresePage = _localJson;
             if (_impRoot) window._impreseInit(_impRoot);
           }
           /* Attiva ricerca live e filtri del browser del materiale. */

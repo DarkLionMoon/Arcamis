@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   assignSection,
   countEntries,
+  countTableRows,
   createExplore,
   normalizeExplore,
   sectionTitles,
@@ -52,6 +53,12 @@ describe('configurazione esplorazione', () => {
   it('conta le voci del livello configurato', () => {
     expect(countEntries(MARKDOWN, createExplore('master-detail'))).toBe(2)
     expect(countEntries(MARKDOWN, createExplore('tabs'))).toBe(3)
+  })
+
+  it('conta le righe della tabella quando la sorgente è la tabella', () => {
+    const table = ['Intro', '', '| Voce | Fonte |', '| --- | --- |', '| Alfa | X |', '| Beta | Y |'].join('\n')
+    expect(countTableRows(table)).toBe(2)
+    expect(countTableRows(MARKDOWN)).toBe(0)
   })
 
   it('assegna una sezione a un solo gruppo', () => {

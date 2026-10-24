@@ -18,6 +18,8 @@ import InterfaceView from '@/features/interface/InterfaceView.vue'
 import SettingsView from '@/features/settings/SettingsView.vue'
 import ChangelogView from '@/features/changelog/ChangelogView.vue'
 import GlossaryView from '@/features/glossary/GlossaryView.vue'
+import ImpreseView from '@/features/imprese/ImpreseView.vue'
+import MestieriView from '@/features/mestieri/MestieriView.vue'
 import MediaView from '@/features/media/MediaView.vue'
 import TrashView from '@/features/trash/TrashView.vue'
 import LinkScannerView from '@/features/scanner/LinkScannerView.vue'
@@ -39,6 +41,8 @@ const routes: RouteRecordRaw[] = [
       { path: 'mapa', name: 'map', component: MapEditorView, meta: { minRole: 'editor' } },
       { path: 'carousel', name: 'carousel', component: CarouselView, meta: { minRole: 'editor' } },
       { path: 'copertine', name: 'covers', component: CoversView, meta: { minRole: 'editor' } },
+      { path: 'imprese', name: 'imprese', component: ImpreseView, meta: { minRole: 'editor' } },
+      { path: 'mestieri', name: 'mestieri', component: MestieriView, meta: { minRole: 'editor' } },
       { path: 'navigazione', name: 'navigation', component: NavigationView, meta: { minRole: 'admin' } },
       { path: 'interfaccia', name: 'interface', component: InterfaceView, meta: { minRole: 'admin' } },
       { path: 'impostazioni', name: 'settings', component: SettingsView, meta: { minRole: 'admin' } },

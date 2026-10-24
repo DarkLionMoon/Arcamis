@@ -94,10 +94,18 @@ export const registryApi = {
     return { ...parsed, sha: data.sha }
   },
 
-  async save(pages: PageRegistryEntry[], ui?: UIConfig, message = 'admin: update registry'): Promise<{ sha: string }> {
+  /** Salva il registro: pagine, sezioni della topbar e configurazione UI.
+   *  `sections` e `ui` sono opzionali: chi tocca solo le pagine non deve
+   *  sovrascrivere una modifica concorrente alla navigazione. */
+  async save(
+    pages: PageRegistryEntry[],
+    sections?: SectionRegistryEntry[],
+    ui?: UIConfig,
+    message = 'admin: update registry'
+  ): Promise<{ sha: string }> {
     const current = await this.get()
     const { sha: _sha, ...rest } = current
-    const payload = { ...rest, pages, ui: ui || rest.ui }
+    const payload = { ...rest, pages, sections: sections || rest.sections, ui: ui || rest.ui }
     const result = await ghApi.put(
       'content/pages/registry.json',
       message,

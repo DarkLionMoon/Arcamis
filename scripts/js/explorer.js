@@ -1064,11 +1064,19 @@
             })
           : '<img src="' + attr(entry.image.src) + '" alt="" loading="lazy" decoding="async"' + position + '>')
       : '<span class="exp-tile-glyph" aria-hidden="true">' + esc((entry.title || '?').charAt(0)) + '</span>';
+    /* Le tessere mostrano le stesse etichette (tipo, fonte, classe) che
+       il cassetto ripete come badge: si riconosce la voce già dalla griglia. */
+    var tags = (entry.meta || [])
+      .slice(0, 2)
+      .map(function (meta) {
+        return '<span class="exp-tile-tag">' + esc(cleanMetaValue(meta.value)) + '</span>';
+      })
+      .join('');
     return (
       '<button class="exp-tile" type="button" data-entry="' + attr(entry.slug) + '" aria-label="Apri ' + attr(entry.title) + '">' +
       '<span class="exp-tile-media' + (entry.image && entry.image.src ? '' : ' is-empty') + '">' + image + '</span>' +
       '<span class="exp-tile-body"><span class="exp-tile-title">' + esc(entry.title) + '</span>' +
-      (entry.meta[0] ? '<span class="exp-tile-sub">' + esc(cleanMetaValue(entry.meta[0].value)) + '</span>' : '') +
+      (tags ? '<span class="exp-tile-tags">' + tags + '</span>' : '') +
       '</span></button>'
     );
   }

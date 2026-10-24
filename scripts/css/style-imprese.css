@@ -27,9 +27,11 @@
 .imprese-app {
   --imp-font: 'Crimson Pro', serif;
   --imp-font-heading: 'Cinzel', serif;
-  --imp-gold: #c9a84c;
-  --imp-gold2: #e0b860;
-  --imp-gold3: #f0d080;
+  --imp-gold: #c8aa6e;
+  --imp-gold2: #e0c88a;
+  --imp-gold3: #f0dfae;
+  --imp-cyan: #5fd6e8;
+  --imp-cyan-dim: rgba(95,214,232,.16);
   --imp-copper: #b87840;
   --imp-parch: #f5e6bd;
   --imp-amber: #d4954a;
@@ -42,12 +44,12 @@
   --imp-text: #e0dcd4;
   --imp-text2: #b0a088;
   --imp-text3: #706050;
-  --imp-bg: #0c0c14;
-  --imp-bg2: #10101c;
-  --imp-bg3: #14141f;
+  --imp-bg: #0a0e17;
+  --imp-bg2: #0e1420;
+  --imp-bg3: #121a28;
   --imp-border: rgba(var(--gold-rgb),.12);
   --imp-border2: rgba(var(--gold-rgb),.25);
-  --imp-glow: 0 0 12px rgba(var(--gold-rgb),.1);
+  --imp-glow: 0 0 18px rgba(95,214,232,.1);
 }
 
 .imprese-app { background: var(--imp-bg); color: var(--imp-text); font-family: var(--imp-font); line-height: 1.6; }
@@ -55,9 +57,13 @@
 
 /* ── TITOLO SEZIONE ── */
 .imprese-app .imp-section-hero {
-  background: linear-gradient(135deg, rgba(var(--gold-rgb),.04) 0%, var(--imp-bg2) 100%);
+  background:
+    radial-gradient(120% 140% at 0% 0%, var(--imp-cyan-dim) 0%, transparent 46%),
+    linear-gradient(135deg, rgba(var(--gold-rgb),.05) 0%, var(--imp-bg2) 100%);
   border: 1px solid var(--imp-border2);
+  border-left: 2px solid var(--imp-cyan);
   border-radius: 6px;
+  box-shadow: var(--imp-glow);
   padding: 28px 32px;
   margin-bottom: 24px;
   position: relative;
@@ -134,10 +140,11 @@
   color: var(--imp-gold2);
 }
 .imprese-app .imp-tab-btn.active {
-  background: rgba(var(--gold-rgb),.1);
+  background: linear-gradient(180deg, var(--imp-cyan-dim), rgba(var(--gold-rgb),.1));
   color: var(--imp-gold2);
   border-color: var(--imp-border2);
   border-bottom-color: transparent;
+  box-shadow: inset 0 2px 0 var(--imp-cyan);
   position: relative;
   bottom: -1px;
 }
@@ -371,11 +378,12 @@
   border: 1px solid var(--imp-border);
   border-radius: 6px;
   padding: 16px 18px;
-  transition: border-color .2s, box-shadow .2s;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
 }
 .imprese-app .imp-card:hover {
-  border-color: var(--imp-border2);
-  box-shadow: var(--imp-glow);
+  border-color: var(--imp-cyan);
+  box-shadow: 0 0 0 1px var(--imp-cyan-dim), 0 10px 24px rgba(0,0,0,.35);
+  transform: translateY(-2px);
 }
 .imprese-app .imp-card h4 {
   font-family: var(--imp-font-heading);
@@ -471,7 +479,7 @@
   line-height: 1.5;
 }
 .imprese-app .imp-tbl thead {
-  background: rgba(0,0,0,.4);
+  background: linear-gradient(180deg, rgba(95,214,232,.07), rgba(0,0,0,.4));
 }
 .imprese-app .imp-tbl th {
   font-family: var(--imp-font-heading);

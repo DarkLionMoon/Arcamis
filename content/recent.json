@@ -7,6 +7,12 @@
    "lastEdited": "2026-10-24T13:33:08.450Z"
   },
   {
+   "id": "pag-mestieri",
+   "title": "Mestieri",
+   "icon": "💼",
+   "lastEdited": "2026-10-24T09:22:54.228Z"
+  },
+  {
    "id": "pag-come-si-inizia",
    "title": "Creazione",
    "icon": "🌟",
@@ -41,12 +47,6 @@
    "title": "Selva Fogliabruna",
    "icon": "🌲",
    "lastEdited": "2026-10-22T13:25:32.475Z"
-  },
-  {
-   "id": "pag-rovine-di-kaldur",
-   "title": "Rovine di Kaldur",
-   "icon": "🗿",
-   "lastEdited": "2026-10-22T13:25:32.473Z"
   }
  ]
 }

@@ -7,6 +7,7 @@ import {
   EXPLORE_MODES,
   assignSection,
   countEntries,
+  countTableRows,
   createExplore,
   moveItem,
   newFilter,
@@ -22,7 +23,9 @@ const emit = defineEmits<{ (e: 'update', value: ExploreConfig): void }>()
 
 const cfg = computed(() => normalizeExplore(props.page.explore, suggestedMode(props.page.layout)))
 const headings = computed(() => sectionTitles(props.content))
-const count = computed(() => countEntries(props.content, cfg.value))
+const count = computed(() =>
+  cfg.value.source === 'table' ? countTableRows(props.content) : countEntries(props.content, cfg.value)
+)
 const groupKey = computed<'tabs' | 'groups'>(() => (cfg.value.mode === 'tabs' ? 'tabs' : 'groups'))
 const groups = computed<ExploreGroup[]>(() => (groupKey.value === 'tabs' ? cfg.value.tabs : cfg.value.groups))
 const canGroup = computed(() => cfg.value.mode === 'tabs' || cfg.value.mode === 'accordion')
@@ -47,6 +50,7 @@ function setMode(mode: ExploreMode): void {
     label: previous.label || next.label,
     plural: previous.plural || next.plural,
     hash: previous.hash || next.hash,
+    source: previous.source,
     filters: previous.filters || [],
     tabs: previous.tabs || [],
     groups: previous.groups || []
@@ -56,6 +60,12 @@ function setMode(mode: ExploreMode): void {
 function setEntryLevel(event: Event): void {
   const level = Number((event.target as HTMLSelectElement).value)
   patch({ entryLevel: level === 2 ? 2 : level === 3 ? 3 : 1 })
+}
+
+/* Le voci possono venire dai titoli markdown oppure dalle righe di una
+   tabella (es. Materiale Approvato). */
+function setSource(event: Event): void {
+  patch({ source: (event.target as HTMLSelectElement).value === 'table' ? 'table' : 'headings' })
 }
 
 function setTargetGroups(next: ExploreGroup[]): void {
@@ -145,6 +155,13 @@ function reset(): void {
 
     <div class="arc-explorer-grid">
       <label class="arc-field">
+        <span class="arc-label">Sorgente delle voci</span>
+        <select class="in" :value="cfg.source === 'table' ? 'table' : 'headings'" @change="setSource">
+          <option value="headings">Titoli del markdown</option>
+          <option value="table">Righe di una tabella</option>
+        </select>
+      </label>
+      <label v-if="cfg.source !== 'table'" class="arc-field">
         <span class="arc-label">Voci lette da</span>
         <select class="in" :value="String(cfg.entryLevel || 1)" @change="setEntryLevel">
           <option value="1">Titoli H1 (#)</option>

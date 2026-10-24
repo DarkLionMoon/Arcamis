@@ -186,6 +186,15 @@ export const useRegistryStore = defineStore('registry', () => {
     dirty.value = true
   }
 
+  /* L'ordine di `sections` è l'ordine dei dropdown nella topbar: si
+     sposta la voce, non la pagina, così i riferimenti `sec` restano validi. */
+  function reorderSections(fromIndex: number, toIndex: number) {
+    if (fromIndex < 0 || toIndex < 0 || fromIndex >= sections.value.length || toIndex >= sections.value.length) return
+    const [moved] = sections.value.splice(fromIndex, 1)
+    sections.value.splice(toIndex, 0, moved)
+    dirty.value = true
+  }
+
   function setUIConfig(config: UIConfig) {
     uiConfig.value = config
     dirty.value = true
@@ -211,6 +220,7 @@ export const useRegistryStore = defineStore('registry', () => {
     updateSection,
     addSection,
     removeSection,
+    reorderSections,
     setUIConfig
   }
 })

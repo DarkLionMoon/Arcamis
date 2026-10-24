@@ -36,6 +36,7 @@ var pages = [
   {k:'materiale-approvato',l:'Materiale Approvato',i:'📖',id:'pag-materiale-approvato',sec:'regole'},
   {k:'pantheon',l:'Pantheon',i:'🛐',id:'pag-pantheon',sec:'lore'},
   {k:'lavori',l:'Lavori',i:'💼',id:'pag-lavori',sec:'lavori'},
+  {k:'mestieri',l:'Mestieri',i:'💼',id:'pag-mestieri',sec:'lavori'},
   {k:'come-si-inizia',l:'Creazione',i:'🌟',id:'pag-come-si-inizia',sec:'personaggio'},
   {k:'casate-e-compagnie',l:'Casate e Compagnie',i:'🏰',id:'pag-casate-e-compagnie'},
   {k:'storia-del-mondo',l:'Storia del Mondo',i:'📖',id:'pag-storia-del-mondo'},

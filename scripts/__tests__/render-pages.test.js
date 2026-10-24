@@ -73,71 +73,32 @@ describe('renderer delle regole', () => {
   })
 })
 
-describe('renderer del materiale approvato', () => {
-  const html = renderers.materiale(readPage('materiale-approvato').content)
+describe('materiale approvato (motore explore, sorgente tabella)', () => {
+  const page = readPage('materiale-approvato')
+  const rows = page.content.split('\n').filter((line) => /^\| /.test(line))
 
-  it('rende ogni classe come accordion con le sottoclassi', () => {
-    expect(count(html, /class="mat-class-group"/g)).toBe(13)
-    expect(count(html, /class="mat-sub-card"/g)).toBeGreaterThan(150)
-    expect(html).toContain('<summary class="mat-class-base">')
-    expect(html).toContain('<details class="mat-class-group"')
+  it('usa il cassetto dell\'explore con la tabella come catalogo', () => {
+    expect(page.explore).toMatchObject({ mode: 'drawer', source: 'table' })
+    expect(page.explore.filters.map((f) => f.field)).toEqual(['Categoria', 'Classe'])
+    expect(page.layout).toBe('')
   })
 
-  it('pulisce i titoli: niente asterischi e fonte leggibile', () => {
-    const summaries = [...html.matchAll(/<summary class="mat-class-base">([\s\S]*?)<\/summary>/g)]
-      .map((m) => m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim())
-    expect(summaries).toContain("Barbarian (PHB '24) 14 sottoclassi ▾")
-    expect(summaries.join(' ')).not.toContain('*')
+  it('elenca specie, manuali e sottoclassi con la fonte', () => {
+    expect(rows.length).toBeGreaterThan(240)
+    expect(page.content).toContain('| Khoravar | Specie |  | EFA | Half-Elf nel server |')
+    expect(page.content).toContain('| Chetechnician | Sottoclasse | Artificer | Homebrew |')
+    expect(page.content).toContain("| Player's Handbook 2024 | Talenti · manuale |  | PHB'24 |")
   })
 
-  it('rende le fonti come badge colorati con tooltip e non come testo markdown', () => {
-    expect(html).toContain('>MPMM</span>')
-    expect(html).toContain('>PHB \'24</span>')
-    expect(html).toContain('mat-badge mat-src-mpmm')
-    expect(html).toContain('mat-badge mat-src-phb')
-    expect(html).toContain('mat-badge mat-src-homebrew')
-    expect(html).toContain('data-tip="Fonte: MPMM"')
-    expect(html).not.toContain('*')
+  it('conserva le note ai manuali fuori dalla tabella', () => {
+    expect(page.content).toContain('**Note ai manuali**')
+    expect(page.content).toContain('Origin Feat')
+    expect(page.content).toContain('Silvery Barbs')
   })
 
-  it('interpreta il markdown dei callout', () => {
-    expect(html).toContain('<strong>"5.5"</strong>')
-  })
-})
-
-describe('browser del materiale (indice + dettaglio)', () => {
-  const html = renderers.materiale(readPage('materiale-approvato').content)
-  const hrefs = [...html.matchAll(/href="#(mat-[a-z0-9-]+)"/g)].map((m) => m[1])
-  const ids = new Set([...html.matchAll(/id="(mat-[a-z0-9-]+)"/g)].map((m) => m[1]))
-
-  it('avvolge il contenuto in sidebar + vista dettaglio con ricerca', () => {
-    expect(html).toContain('class="mat-browser"')
-    expect(html).toContain('class="mat-index-search"')
-    expect(html).toContain('class="mat-index-list"')
-    expect(html).toContain('class="mat-detail"')
-    expect(html).toContain('class="mat-page"')
-  })
-
-  it('offre un chip di filtro per ogni fonte con Tutte attivo', () => {
-    expect(html).toContain('<button type="button" class="mat-chip is-on" data-src="">Tutte</button>')
-    expect(html).toContain('data-src="Homebrew"')
-    expect(html).toContain('data-src="PHB \'24"')
-  })
-
-  it('ogni riga dell\'indice punta a un dettaglio esistente', () => {
-    expect(hrefs.length).toBeGreaterThan(200)
-    expect(hrefs.filter((h) => !ids.has(h))).toEqual([])
-  })
-
-  it('le righe portano fonte, contesto e tooltip per la consultazione', () => {
-    expect(html).toContain('mat-index-item mat-idx-class')
-    expect(html).toContain('mat-index-item mat-idx-sub')
-    expect(html).toContain('mat-index-sec')
-    expect(html).toMatch(/<li class="mat-index-item mat-idx-sub" data-src="[^"]+" data-name="[^"]+"/)
-  })
-
-  it('il sito attiva la ricerca live dopo il render', () => {
-    expect(renderers.source).toContain('window.matBrowserInit(pbody)')
+  it('il sito dà la precedenza al motore explore dichiarato dalla pagina', () => {
+    expect(renderers.source).toContain('if (_localJson.explore && window.ArcExplorer)')
+    expect(renderers.source).toContain('window.ArcExplorer.mount(pbody, _exploreBuilt)')
   })
 })
 

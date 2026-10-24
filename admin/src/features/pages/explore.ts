@@ -195,3 +195,15 @@ export function countEntries(markdown: string, config: ExploreConfig): number {
   const level = config.entryLevel || (config.mode === 'tabs' || config.mode === 'accordion' ? 2 : 1)
   return titles.filter((heading) => heading.level === level).length
 }
+
+/** Righe della prima tabella: le voci lette con `source: 'table'`. */
+export function countTableRows(markdown: string): number {
+  const lines = String(markdown || '')
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+  const start = lines.findIndex((line) => /^\s*\|/.test(line))
+  if (start < 0) return 0
+  let end = start
+  while (end + 1 < lines.length && /^\s*\|/.test(lines[end + 1])) end++
+  return Math.max(0, end - start - 1)
+}

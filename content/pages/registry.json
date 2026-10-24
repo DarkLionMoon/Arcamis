@@ -75,6 +75,18 @@
       "sub": ""
     },
     {
+      "k": "mestieri",
+      "l": "Mestieri",
+      "i": "💼",
+      "id": "pag-mestieri",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "sec": "lavori",
+      "path": "personaggio/mestieri",
+      "sub": ""
+    },
+    {
       "k": "come-si-inizia",
       "l": "Creazione",
       "i": "🌟",

@@ -115,8 +115,11 @@ function loadApp() {
     }
   }
   const store = {}
+  /* L'app non contiene più i dati: arrivano dal JSON della pagina,
+     esattamente come fa notion-nav al montaggio. */
+  const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/imprese.json'), 'utf8'))
   const sandbox = {
-    window: {},
+    window: { _impresePage: page },
     document: doc,
     localStorage: {
       getItem: (k) => (k in store ? store[k] : null),
@@ -181,10 +184,21 @@ describe('app Imprese integrata', () => {
     expect(doc._byId['imp-content'].innerHTML).toContain('Sezione non trovata')
   })
 
-  it('il gestore rende senza esplodere anche senza i suoi nodi (guard gInit)', () => {
+  it('non espone più il gestore società né gli strumenti patenti', () => {
     const { sandbox, doc } = boot()
-    sandbox.window._impHandle('setSection', stubEl({ 'data-imp-setsection': 'gestore' }))
-    expect(doc._byId['imp-content'].innerHTML.length).toBeGreaterThan(100)
+    expect(doc._byId['imp-sidenav'].innerHTML).not.toContain('Gestore')
+    expect(doc._byId['imp-sidenav'].innerHTML).not.toContain('strumenti')
+    sandbox.window._impHandle('setPage', stubEl({ 'data-imp-setpage': 'licenze' }))
+    expect(doc._byId['imp-sidenav'].innerHTML).not.toContain('Strumenti Patenti')
+    expect(doc._byId['imp-content'].innerHTML).toContain('Codice Patenti')
+  })
+
+  it('usa i dati di gioco della pagina, non quelli del JS', () => {
+    const source = fs.readFileSync(path.join(root, 'scripts/js/imprese.js'), 'utf8')
+    const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/imprese.json'), 'utf8'))
+    expect(source).toContain('window._impresePage')
+    expect(page.data.patenti.map((p) => p.sigla)).toEqual(['P.M.C.', 'P.M.T.', 'P.A.S.V.', 'P.O.E.'])
+    expect(source).not.toContain("sigla:'P.M.C.'")
   })
 
   it('stacca i listener allo smontaggio e il remount riparte pulito', () => {
