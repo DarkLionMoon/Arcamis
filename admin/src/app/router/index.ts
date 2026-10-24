@@ -17,6 +17,7 @@ import NavigationView from '@/features/navigation/NavigationView.vue'
 import InterfaceView from '@/features/interface/InterfaceView.vue'
 import SettingsView from '@/features/settings/SettingsView.vue'
 import ChangelogView from '@/features/changelog/ChangelogView.vue'
+import GlossaryView from '@/features/glossary/GlossaryView.vue'
 import MediaView from '@/features/media/MediaView.vue'
 import TrashView from '@/features/trash/TrashView.vue'
 import LinkScannerView from '@/features/scanner/LinkScannerView.vue'
@@ -44,6 +45,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'media', name: 'media', component: MediaView },
       { path: 'cestino', name: 'trash', component: TrashView, meta: { minRole: 'admin' } },
       { path: 'changelog', name: 'changelog', component: ChangelogView, meta: { minRole: 'editor' } },
+      { path: 'glossario', name: 'glossary', component: GlossaryView, meta: { minRole: 'editor' } },
       { path: 'audit', name: 'audit', component: AuditView, meta: { minRole: 'admin' } },
       { path: 'link-scanner', name: 'link-scanner', component: LinkScannerView, meta: { minRole: 'admin' } },
       { path: 'trova-sostituisci', name: 'global-replace', component: GlobalReplaceView, meta: { minRole: 'admin' } },

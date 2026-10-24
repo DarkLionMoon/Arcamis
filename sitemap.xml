@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- ultimo aggiornamento contenuti: 2026-10-22 -->
+  <!-- ultimo aggiornamento contenuti: 2026-10-23 -->
   <url>
     <loc>https://arcamis.pages.dev/</loc>
     <changefreq>weekly</changefreq>
@@ -44,7 +44,7 @@
   </url>
   <url>
     <loc>https://arcamis.pages.dev/personaggio/come-si-inizia</loc>
-    <lastmod>2026-08-26</lastmod>
+    <lastmod>2026-10-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

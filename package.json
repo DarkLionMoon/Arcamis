@@ -7,12 +7,15 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/build-all.mjs",
+    "prebuild:site": "node scripts/optimize-images.mjs --quiet",
     "build:site": "vite build && node scripts/build-post.mjs",
     "build:admin": "npm --prefix admin run build",
     "seo": "node scripts/gen-seo-static.mjs",
     "build:summary": "node scripts/build-summary.mjs",
     "verify:deploy": "node scripts/verify-deploy.mjs",
     "icons": "node scripts/make-icons.mjs",
+    "images:opt": "node scripts/optimize-images.mjs",
+    "images:check": "node scripts/optimize-images.mjs --check",
     "fonts": "node scripts/fetch-fonts.mjs",
     "deploy": "npm run build && wrangler pages deploy dist --project-name arcamis",
     "preview": "vite preview",
@@ -34,6 +37,7 @@
     "esbuild": "^0.25.0",
     "eslint": "^9.0.0",
     "prettier": "^3.4.0",
+    "sharp": "^0.35.5",
     "vite": "^6.0.0",
     "vitest": "^2.0.0",
     "wrangler": "4.151.1"

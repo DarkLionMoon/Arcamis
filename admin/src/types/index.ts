@@ -79,7 +79,7 @@ export interface RegistryData {
 // ──────────────────────────────────────────────
 // Page Content
 // ──────────────────────────────────────────────
-export type ExploreMode = 'master-detail' | 'tabs' | 'drawer' | 'accordion'
+export type ExploreMode = 'master-detail' | 'group-tabs' | 'tabs' | 'drawer' | 'accordion'
 
 export interface ExploreFilter {
   id: string
@@ -102,6 +102,7 @@ export interface ExploreConfig {
   plural?: string
   hash?: string
   groupBy?: string
+  groupPlural?: string
   detailStyle?: 'markdown' | 'lavoro'
   source?: 'headings' | 'table'
   entityHeading?: string

@@ -27,6 +27,19 @@ function loadRenderer() {
 
 const { render, toc } = loadRenderer()
 
+describe('termini glossario ([[termine]])', () => {
+  it('trasforma solo i termini presenti nei dati admin e lascia gli altri come testo', () => {
+    const sandbox = { window: { ARC_GLOSSARY: { 'classe armatura': { title: 'Classe Armatura' } } }, console }
+    vm.createContext(sandbox)
+    vm.runInContext(fs.readFileSync(path.join(root, 'scripts/js/md-render.js'), 'utf8'), sandbox)
+    const html = vm.runInContext('window.mdRender', sandbox)('Leggi [[Classe Armatura]] e [[<script>]].')
+    expect(html).toContain('class="arc-glossary-term"')
+    expect(html).toContain('data-glossary="Classe Armatura"')
+    expect(html).toContain('&lt;script&gt;')
+    expect(html).not.toContain('<script>')
+  })
+})
+
 describe('griglia di carte (:::cards)', () => {
   const markdown = [
     ':::cards',

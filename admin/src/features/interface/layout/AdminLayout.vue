@@ -91,7 +91,8 @@ const groups: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { label: 'Mappa', to: '/mapa', icon: 'map', minRole: 'editor' },
       { label: 'Carousel', to: '/carousel', icon: 'carousel', minRole: 'editor' },
-      { label: 'Changelog', to: '/changelog', icon: 'changelog', minRole: 'editor' }
+      { label: 'Changelog', to: '/changelog', icon: 'changelog', minRole: 'editor' },
+      { label: 'Glossario', to: '/glossario', icon: 'pages', minRole: 'editor' }
     ]
   },
   {
@@ -132,6 +133,7 @@ const pageTitle = computed(() => {
     if (hit) return hit.label
   }
   if (route.name === 'editor') return 'Editor pagina'
+  if (route.name === 'glossary') return 'Glossario'
   return 'Pannello'
 })
 </script>

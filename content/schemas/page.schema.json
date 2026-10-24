@@ -72,7 +72,7 @@
     },
     "explore": {
       "type": "object",
-      "description": "Pattern di esplorazione della pagina (master-detail, tabs, drawer, accordion).",
+      "description": "Pattern di esplorazione della pagina (master-detail, group-tabs, tabs, drawer, accordion).",
       "required": [
         "mode"
       ],
@@ -81,6 +81,7 @@
           "type": "string",
           "enum": [
             "master-detail",
+            "group-tabs",
             "tabs",
             "drawer",
             "accordion"
@@ -110,6 +111,9 @@
           "type": "string"
         },
         "groupBy": {
+          "type": "string"
+        },
+        "groupPlural": {
           "type": "string"
         },
         "detailStyle": {

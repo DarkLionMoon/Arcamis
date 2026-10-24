@@ -7,6 +7,7 @@
    pagina JSON (`explore.mode`):
 
      master-detail  catalogo ricercabile + dettaglio unico
+     group-tabs     gruppi a sinistra, voci del gruppo a schede
      tabs           schede orizzontali + indice sticky
      drawer         griglia di tessere + cassetto laterale
      accordion      macro-categorie richiudibili
@@ -17,7 +18,7 @@
 (function (global) {
   'use strict';
 
-  var MODES = ['master-detail', 'tabs', 'drawer', 'accordion'];
+  var MODES = ['master-detail', 'group-tabs', 'tabs', 'drawer', 'accordion'];
 
   function esc(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
@@ -78,6 +79,7 @@
       plural: cfg.plural || 'schede',
       hash: cfg.hash || '',
       groupBy: cfg.groupBy || '',
+      groupPlural: cfg.groupPlural || '',
       detailStyle: cfg.detailStyle || 'markdown',
       source: cfg.source === 'table' ? 'table' : 'headings',
       entityHeading: cfg.entityHeading || '',
@@ -169,15 +171,18 @@
       .split('\n')
       .forEach(function (line) {
         var m =
-          line.match(/^\s*[-*+]\s+\*\*(.+?):?\*\*\s*:?\s*(.*)$/) ||
+          line.match(/^\s*[-*+]\s+\*\*(.+?):\*\*\s*(.*)$/) ||
+          line.match(/^\s*[-*+]\s+\*\*(.+?)\*\*\s*:\s*(.*)$/) ||
           line.match(/^\s*[-*+]\s+\*(.+?):\*\s*(.*)$/) ||
           line.match(/^\s*\*\*(.+?):\*\*\s*(.*)$/) ||
-          line.match(/^\s*(?!\*)\*(.+?):\*\s*(.*)$/) ||
+          line.match(/^\s*(?!\*\*)\*(.+?):\*\s*(.*)$/) ||
           line.match(/^\s*([A-ZÀ-Ü][\wÀ-ÿ /'’-]{1,42}):\s*(.+)$/);
         if (!m) return;
         var label = m[1].replace(/:$/, '').trim();
         var value = String(m[2] || '').trim();
-        if (!label || !value) return;
+        /* Un valore che finisce coi due punti è un’etichetta di elenco
+           ("**Tentacolo** del Terrore:"), non un metadato. */
+        if (!label || !value || /:$/.test(value)) return;
         out.push({ label: label, value: value });
       });
     return out;
@@ -361,8 +366,11 @@
     return BADGE_TONES[hash % BADGE_TONES.length];
   }
 
-  function metaBadges(entry) {
+  function metaBadges(entry, skip) {
     return entry.meta
+      .filter(function (meta) {
+        return !skip || meta.label.toLowerCase() !== String(skip).toLowerCase();
+      })
       .slice(0, 4)
       .map(function (meta) {
         var tone = badgeTone(meta.label);
@@ -373,12 +381,16 @@
 
   function heroHtml(entry, cfg, className) {
     if (!cfg.showHero || !entry.image || !entry.image.src) return '';
-    return (
-      '<figure class="' + className + '">' +
-      '<img src="' + attr(entry.image.src) + '" alt="' + attr(entry.title) + '" loading="lazy" decoding="async"' +
-      (entry.image.position ? ' style="object-position:' + attr(entry.image.position) + '"' : '') +
-      '></figure>'
-    );
+    var position = entry.image.position ? ' style="object-position:' + attr(entry.image.position) + '"' : '';
+    var img = global.arcPicture
+      ? global.arcPicture(entry.image.src, {
+          alt: entry.title,
+          className: 'exp-hero-img',
+          sizes: '(max-width: 900px) 100vw, 1280px',
+          attrs: position.trim()
+        })
+      : '<img src="' + attr(entry.image.src) + '" alt="' + attr(entry.title) + '" loading="lazy" decoding="async"' + position + '>';
+    return '<figure class="' + className + '">' + img + '</figure>';
   }
 
   function detailBody(entry, cfg) {
@@ -400,15 +412,17 @@
     return '<div class="exp-rich">' + renderMd(body) + '</div>';
   }
 
-  function detailHtml(entry, cfg) {
+  function detailHtml(entry, cfg, options) {
+    var opts = options || {};
     if (!entry) return '<div class="exp-empty">Nessuna scheda disponibile.</div>';
+    var badges = opts.badges === false ? '' : metaBadges(entry, opts.hideMeta);
     return (
       '<article class="exp-detail-inner" aria-live="polite">' +
-      '<button class="exp-back" type="button" data-exp-action="back">← Torna alla lista</button>' +
+      (opts.back === false ? '' : '<button class="exp-back" type="button" data-exp-action="back">← Torna alla lista</button>') +
       '<header class="exp-detail-head">' +
       '<div><span class="exp-eyebrow">' + esc(cfg.label || 'Scheda') + '</span>' +
       '<h2 class="exp-title">' + esc(entry.title) + '</h2>' +
-      (entry.meta.length ? '<div class="exp-badges">' + metaBadges(entry) + '</div>' : '') +
+      (badges ? '<div class="exp-badges">' + badges + '</div>' : '') +
       '</div></header>' +
       heroHtml(entry, cfg, 'exp-hero') +
       detailBody(entry, cfg) +
@@ -633,6 +647,245 @@
     paintAll();
   }
 
+  /* ── Gruppi + schede (classi → sottoclassi) ───────────────── */
+
+  /* Campo su cui raggruppare: è il `groupBy` della pagina, che di solito
+     è anche il nome di un filtro (es. “Classe”). */
+  function groupField(cfg, filters) {
+    if (!cfg.groupBy) return '';
+    for (var i = 0; i < filters.length; i++) {
+      var filter = filters[i];
+      if (filter.id === cfg.groupBy || filter.field === cfg.groupBy || filter.label === cfg.groupBy) return filter.field;
+    }
+    return cfg.groupBy;
+  }
+
+  function groupEntries(entries, cfg, filters) {
+    var field = groupField(cfg, filters);
+    var fallback = cfg.groupPlural ? 'Altre ' + cfg.groupPlural : 'Altre schede';
+    var map = new Map();
+    entries.forEach(function (entry) {
+      var label = (field && metaValue(entry, field)) || fallback;
+      if (!map.has(label)) map.set(label, []);
+      map.get(label).push(entry);
+    });
+    return Array.from(map.keys())
+      .sort(function (a, b) { return a.localeCompare(b, 'it'); })
+      .map(function (label) {
+        return { key: slugify(label), label: label, entries: map.get(label) };
+      });
+  }
+
+  function buildGroupTabs(md, cfg, ctx) {
+    var parsed = parseEntries(md, cfg);
+    var filters = buildFilters(parsed.entries, cfg);
+    var field = groupField(cfg, filters);
+    var groups = groupEntries(parsed.entries, cfg, filters);
+    var initial = findEntry(parsed.entries, parseHash(ctx.prefix).entry);
+    var startGroup = groups[0] ? groups[0].key : '';
+    if (initial) {
+      groups.forEach(function (group) {
+        if (findEntry(group.entries, initial.slug)) startGroup = group.key;
+      });
+    }
+    var state = {
+      q: '',
+      filters: {},
+      group: startGroup,
+      active: initial ? initial.slug : (groups[0] && groups[0].entries[0] ? groups[0].entries[0].slug : '')
+    };
+    /* Il filtro che coincide col raggruppamento è già la colonna di
+       sinistra: ripeterlo come pillola sarebbe solo rumore. */
+    var pills = filters.filter(function (filter) {
+      return filter.field !== field && filter.label !== cfg.groupBy;
+    });
+    var plural = cfg.plural || 'schede';
+    var groupPlural = cfg.groupPlural || 'gruppi';
+    var html =
+      '<div class="exp exp-group-tabs" data-mode="group-tabs">' +
+      (parsed.intro ? '<div class="exp-intro">' + renderMd(stripLeadingH1(parsed.intro)) + '</div>' : '') +
+      (pills.length ? '<div class="exp-toolbar">' + filterBar(pills, state) + '</div>' : '') +
+      '<div class="exp-gt-grid">' +
+      '<aside class="exp-gt-side">' +
+      '<label class="exp-search exp-gt-search"><span class="exp-search-icon" aria-hidden="true">⌕</span>' +
+      '<input type="search" value="" placeholder="Cerca ' + attr(plural) + '…" aria-label="Cerca" data-exp-search></label>' +
+      '<div class="exp-sidebar-count" data-exp-count>' +
+      groups.length + ' ' + groupPlural + ' · ' + parsed.entries.length + ' ' + plural +
+      '</div>' +
+      '<div class="exp-gt-classes" role="listbox" aria-label="' + attr(groupPlural) + '" data-exp-groups></div>' +
+      '<div class="exp-empty" data-exp-empty hidden>Nessuna scheda corrisponde alla ricerca.</div>' +
+      '</aside>' +
+      '<section class="exp-gt-main">' +
+      '<header class="exp-gt-head">' +
+      '<div><span class="exp-eyebrow">' + esc(cfg.groupBy || 'Gruppo') + '</span>' +
+      '<h2 class="exp-gt-title" data-exp-group-title></h2></div>' +
+      '<span class="exp-gt-meta" data-exp-group-meta></span>' +
+      '</header>' +
+      '<div class="exp-gt-tabs" role="tablist" data-exp-tabs></div>' +
+      '<div class="exp-gt-body" data-exp-detail></div>' +
+      '</section></div></div>';
+    return {
+      mode: 'group-tabs',
+      config: cfg,
+      prefix: ctx.prefix,
+      html: html,
+      data: parsed,
+      filters: filters,
+      state: state
+    };
+  }
+
+  function mountGroupTabs(root, built) {
+    var cfg = built.config;
+    var filters = built.filters;
+    var entries = built.data.entries;
+    var field = groupField(cfg, filters);
+    var state = built.state;
+    var plural = cfg.plural || 'schede';
+    var groupPlural = cfg.groupPlural || 'gruppi';
+    var listEl = root.querySelector('[data-exp-groups]');
+    var countEl = root.querySelector('[data-exp-count]');
+    var empty = root.querySelector('[data-exp-empty]');
+    var titleEl = root.querySelector('[data-exp-group-title]');
+    var metaEl = root.querySelector('[data-exp-group-meta]');
+    var tabsEl = root.querySelector('[data-exp-tabs]');
+    var detail = root.querySelector('[data-exp-detail]');
+    var search = root.querySelector('[data-exp-search]');
+
+    function visible() {
+      return filterEntries(entries, state, filters);
+    }
+
+    function currentGroup(groups) {
+      var current = null;
+      groups.forEach(function (group) {
+        if (group.key === state.group) current = group;
+      });
+      return current;
+    }
+
+    function paint() {
+      var shown = visible();
+      var groups = groupEntries(shown, cfg, filters);
+      if (!currentGroup(groups)) state.group = groups[0] ? groups[0].key : '';
+      var current = currentGroup(groups);
+      var listed = current ? current.entries : [];
+      if (!findEntry(listed, state.active)) state.active = listed[0] ? listed[0].slug : '';
+
+      if (listEl) {
+        listEl.innerHTML = groups
+          .map(function (group) {
+            var isActive = group.key === state.group;
+            return (
+              '<button class="exp-gt-class' + (isActive ? ' is-active' : '') + '" type="button" role="option"' +
+              ' aria-selected="' + isActive + '" data-group="' + attr(group.key) + '">' +
+              '<span class="exp-gt-class-name">' + esc(group.label) + '</span>' +
+              '<span class="exp-gt-class-count">' + group.entries.length + '</span>' +
+              '</button>'
+            );
+          })
+          .join('');
+      }
+      if (countEl) {
+        countEl.textContent =
+          groups.length + ' ' + (groups.length === 1 ? String(cfg.groupBy || 'gruppo').toLowerCase() : groupPlural) +
+          ' · ' +
+          shown.length + ' ' + (shown.length === 1 ? String(cfg.label || 'scheda').toLowerCase() : plural);
+      }
+      if (empty) empty.hidden = groups.length > 0;
+      if (titleEl) titleEl.textContent = current ? current.label : '';
+      if (metaEl) {
+        metaEl.textContent = current
+          ? listed.length + ' ' + (listed.length === 1 ? cfg.label || 'scheda' : plural)
+          : '';
+      }
+      if (tabsEl) {
+        tabsEl.innerHTML = listed
+          .map(function (entry) {
+            var isActive = entry.slug === state.active;
+            return (
+              '<button class="exp-gt-tab' + (isActive ? ' is-active' : '') + '" type="button" role="tab"' +
+              ' aria-selected="' + isActive + '" data-entry="' + attr(entry.slug) + '">' +
+              esc(entry.title) +
+              '</button>'
+            );
+          })
+          .join('');
+      }
+      if (detail) {
+        /* La classe è già il titolo della colonna: i badge qui
+           ripeterebbero il contesto (o pescherebbero voci di elenco). */
+        detail.innerHTML = detailHtml(findEntry(listed, state.active), cfg, { back: false, badges: false });
+      }
+    }
+
+    function selectEntry(slug) {
+      var entry = findEntry(entries, slug);
+      if (!entry) return;
+      state.active = entry.slug;
+      if (field) {
+        var label = metaValue(entry, field);
+        if (label) state.group = slugify(label);
+      }
+      paint();
+      writeHash(built.prefix, [entry.slug]);
+    }
+
+    function selectGroup(key) {
+      var groups = groupEntries(visible(), cfg, filters);
+      var group = null;
+      groups.forEach(function (item) {
+        if (item.key === key) group = item;
+      });
+      if (!group) return;
+      state.group = group.key;
+      state.active = group.entries[0] ? group.entries[0].slug : '';
+      paint();
+      if (state.active) writeHash(built.prefix, [state.active]);
+      else clearHash();
+    }
+
+    root.addEventListener('click', function (event) {
+      var filter = event.target.closest('[data-filter]');
+      if (filter) {
+        var id = filter.getAttribute('data-filter');
+        var value = filter.getAttribute('data-value') || '';
+        state.filters[id] = value;
+        Array.prototype.forEach.call(root.querySelectorAll('[data-filter="' + id + '"]'), function (button) {
+          button.classList.toggle('is-active', (button.getAttribute('data-value') || '') === value);
+        });
+        paint();
+        return;
+      }
+      var group = event.target.closest('[data-group]');
+      if (group) {
+        selectGroup(group.getAttribute('data-group'));
+        return;
+      }
+      var tab = event.target.closest('[data-entry]');
+      if (tab) selectEntry(tab.getAttribute('data-entry'));
+    });
+
+    if (search) {
+      search.addEventListener('input', function () {
+        state.q = search.value;
+        paint();
+      });
+    }
+
+    var onHash = function () {
+      if (!root.isConnected) {
+        global.removeEventListener('hashchange', onHash);
+        return;
+      }
+      var entry = findEntry(entries, parseHash(built.prefix).entry);
+      if (entry) selectEntry(entry.slug);
+    };
+    global.addEventListener('hashchange', onHash);
+
+    paint();
+  }
+
   /* ── Tabs + ToC sticky ────────────────────────────────────── */
 
   function tabDefinitions(sections, cfg) {
@@ -800,9 +1053,16 @@
   /* ── Drawer ───────────────────────────────────────────────── */
 
   function tileHtml(entry) {
+    var position = entry.image && entry.image.position ? ' style="object-position:' + attr(entry.image.position) + '"' : '';
     var image = entry.image && entry.image.src
-      ? '<img src="' + attr(entry.image.src) + '" alt="" loading="lazy" decoding="async"' +
-        (entry.image.position ? ' style="object-position:' + attr(entry.image.position) + '"' : '') + '>'
+      ? (global.arcPicture
+          ? global.arcPicture(entry.image.src, {
+              alt: '',
+              className: 'exp-tile-img',
+              sizes: '(max-width: 900px) 45vw, 300px',
+              attrs: position.trim()
+            })
+          : '<img src="' + attr(entry.image.src) + '" alt="" loading="lazy" decoding="async"' + position + '>')
       : '<span class="exp-tile-glyph" aria-hidden="true">' + esc((entry.title || '?').charAt(0)) + '</span>';
     return (
       '<button class="exp-tile" type="button" data-entry="' + attr(entry.slug) + '" aria-label="Apri ' + attr(entry.title) + '">' +
@@ -1154,6 +1414,7 @@
     var prefix = cfg.hash || defaultPrefix(ctx.pageKey || '');
     ctx.prefix = prefix;
     if (cfg.mode === 'tabs') return buildTabs(md, cfg, ctx);
+    if (cfg.mode === 'group-tabs') return buildGroupTabs(md, cfg, ctx);
     if (cfg.mode === 'drawer') return buildDrawer(md, cfg, ctx);
     if (cfg.mode === 'accordion') return buildAccordion(md, cfg, ctx);
     return buildMasterDetail(md, cfg, ctx);
@@ -1164,6 +1425,7 @@
     var node = root.classList && root.classList.contains('exp') ? root : root.querySelector('.exp');
     if (!node) return;
     if (built.mode === 'tabs') mountTabs(node, built);
+    else if (built.mode === 'group-tabs') mountGroupTabs(node, built);
     else if (built.mode === 'drawer') mountDrawer(node, built);
     else if (built.mode === 'accordion') mountAccordion(node, built);
     else mountMasterDetail(node, built);
@@ -1178,6 +1440,7 @@
     parseAccordion: parseAccordion,
     splitSections: splitSections,
     buildFilters: buildFilters,
+    groupEntries: groupEntries,
     filterEntries: filterEntries,
     metaValue: metaValue,
     slugify: slugify,

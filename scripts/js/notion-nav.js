@@ -168,6 +168,20 @@ function _mdToHtml(md) {
       .replace(/>/g, '&gt;');
     if (!/^(https?:|#|\/|data:image\/)/i.test(u)) return '';
     var jsUrl = u.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    /* Alt grezzo: l'helper lo riscappa una sola volta. */
+    var rawAlt = safeAlt
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&');
+    if (window.arcPicture) {
+      return window.arcPicture(u, {
+        alt: rawAlt,
+        className: 'n-image n-zoomable',
+        attrs: 'onclick="arcZoom(\'' + jsUrl + '\')"',
+      });
+    }
     return (
       '<img src="' +
       u.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') +
@@ -502,6 +516,7 @@ async function _gpRender(id, label, icon) {
           _deityFooter +
           '</div>';
         applyGlossary(_pbody);
+        if (window.ArcEntity) window.ArcEntity.mount(_pbody);
         _maybeBuildToc(_pbody, false);
         if (typeof afterPageRender === 'function') afterPageRender();
         return;
@@ -571,7 +586,7 @@ async function _gpRender(id, label, icon) {
               title: ptitle
             });
             _localHtml = _exploreBuilt.html;
-          } else if (_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
+          }          else if (_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
           else if (_layout === 'regole' || _layout === 'contenuto') _localHtml = _renderRegole(_localJson.content);
           else if (_layout === 'lavoro') _localHtml = _renderLavoro(_localJson.content);
           else if (_layout === 'personaggio') _localHtml = _renderPersonaggio(_localJson.content);
@@ -583,26 +598,21 @@ async function _gpRender(id, label, icon) {
             _localHtml = _renderPantheon(_localJson.content, (_localPage && _localPage.k) || 'pantheon');
           else if (_layout === 'compendio')
             _localHtml = _renderCompendio(_localJson.content, (_localPage && _localPage.k) || '');
-          else if (_layout === 'bestiario') _localHtml = _renderBestiario(_localJson.content);
+          else if (['bestiario', 'fazioni', 'oggetti', 'npc', 'spell', 'specie', 'citta', 'evento', 'sessione', 'quest'].indexOf(_layout) !== -1) {
+            var _canonicalMode = /^(bestiario|oggetti|npc)$/.test(_layout) ? 'drawer' : /^(fazioni|citta)$/.test(_layout) ? 'master-detail' : 'master-detail';
+            if (window.ArcExplorer) {
+              _exploreBuilt = window.ArcExplorer.build(_localJson.content, { mode: _canonicalMode, entryLevel: 2, label: _layout, plural: 'schede', search: true }, { pageKey: (_localPage && _localPage.k) || '', title: ptitle });
+              _localHtml = _exploreBuilt.html;
+            } else _localHtml = _renderSchede(_localJson.content);
+          }
           else if (_layout === 'timeline' || _layout === 'cronache') _localHtml = _renderTimeline(_localJson.content);
-          else if (_layout === 'fazioni') _localHtml = _renderFazioni(_localJson.content);
-          else if (_layout === 'oggetti') _localHtml = _renderOggetti(_localJson.content);
           else if (_layout === 'glossario') _localHtml = _renderGlossario(_localJson.content);
+          else if (_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
           else if (_layout === 'galleria') _localHtml = _renderGalleria(_localJson.content);
           else if (_layout === 'tabelle') _localHtml = _renderTabelle(_localJson.content);
           /* Layout a schede scelto dall'editor: ogni `##` diventa una card
              della griglia (lo stesso renderer delle pagine sessione). */
           else if (_layout === 'schede') _localHtml = _renderSchede(_localJson.content);
-          else if (
-            _layout === 'sessione' ||
-            _layout === 'quest' ||
-            _layout === 'npc' ||
-            _layout === 'spell' ||
-            _layout === 'specie' ||
-            _layout === 'citta' ||
-            _layout === 'evento'
-          )
-            _localHtml = _renderSchede(_localJson.content);
           else if (_layout === 'wide') {
             _localHtml = _mdToHtml(_localJson.content);
           } else if (_layout === 'imprese') {
@@ -1480,12 +1490,17 @@ function _renderLavoro(md) {
     sections.forEach(function (sec, i) {
       html += '<a class="lv-tile" href="#lv-sec-' + i + '">';
       if (sec.image) {
-        html +=
-          '<img class="lv-tile-img" src="' +
-          esc(sec.image) +
-          '" alt="' +
-          esc(sec.title) +
-          '" loading="lazy" decoding="async"/>';
+        html += window.arcPicture
+          ? window.arcPicture(sec.image, {
+              alt: sec.title,
+              className: 'lv-tile-img',
+              sizes: '(max-width: 900px) 45vw, 320px',
+            })
+          : '<img class="lv-tile-img" src="' +
+            esc(sec.image) +
+            '" alt="' +
+            esc(sec.title) +
+            '" loading="lazy" decoding="async"/>';
       } else {
         html += '<div class="lv-tile-none"></div>';
       }
@@ -1737,16 +1752,46 @@ function _wfNoticeHtml(title, state) {
 function _renderDeityPage(d, coll) {
   var ic = _panIcon(d, coll);
   var isDraft = _isDraftMd(d.md);
+  /* Pagina entità v2 (Fase 1): hero + rail + tab.
+     Pilotata sulle schede che il parser riconosce davvero (metadati +
+     sezioni): i lavori hanno il testo dentro un blocco di codice e
+     restano al renderer storico finché non vengono ristrutturati. */
+  var _arcParsed = window.ArcEntity ? window.ArcEntity.parse(d.md) : null;
+  if (_arcParsed && _arcParsed.meta.length && _arcParsed.sections.length) {
+    var draftNote =
+      '<div class="pan-draft-note"><span aria-hidden="true">✎</span><span><strong>Scheda in lavorazione.</strong> ' +
+      'Alcune sezioni sono ancora da completare: i contenuti mancanti sono volutamente in sospeso, non un errore di caricamento.</span></div>';
+    return (
+      '<div class="pan-deity arc-entity-shell">' +
+      window.ArcEntity.render(d, {
+        icon: window.arcIconFor ? window.arcIconFor(ic) : ic,
+        eyebrow: coll === 'lavori' ? 'Lavori ad Arcamis' : 'Pantheon di Arcamis',
+        renderMd: _mdToHtml,
+        draft: isDraft ? draftNote : '',
+        backHref: coll === 'lavori' ? '/lavori' : '/lore/pantheon',
+        backLabel: coll === 'lavori' ? 'Tutti i lavori' : 'Il Pantheon',
+      }) +
+      '</div>'
+    );
+  }
   var hero =
     '<div class="pan-deity-hero">' +
     (d.img
-      ? '<img src="' +
-        _siteAttr(d.img) +
-        '" alt="' +
-        _siteAttr(d.n) +
-        '" loading="lazy" decoding="async"' +
-        (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '') +
-        " onerror=\"this.onerror=null;this.style.display='none';this.parentNode.classList.add('hero-broken');\">"
+      ? window.arcPicture
+        ? window.arcPicture(d.img, {
+            alt: d.n,
+            sizes: '(max-width: 900px) 100vw, 860px',
+            attrs:
+              (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '') +
+              " onerror=\"this.onerror=null;this.style.display='none';this.parentNode.classList.add('hero-broken');\"",
+          })
+        : '<img src="' +
+          _siteAttr(d.img) +
+          '" alt="' +
+          _siteAttr(d.n) +
+          '" loading="lazy" decoding="async"' +
+          (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '') +
+          " onerror=\"this.onerror=null;this.style.display='none';this.parentNode.classList.add('hero-broken');\">"
       : '<div class="pan-deity-hero-none">' + ic + '</div>') +
     '<div class="pan-deity-caption"><span class="pd-name">' +
     _siteEsc(d.n) +
@@ -1802,15 +1847,26 @@ function _renderPantheon(md, pageKey) {
       go +
       '">' +
       (d.img
-        ? '<img class="pan-tile-img" src="' +
-          _siteAttr(d.img) +
-          '" alt="' +
-          _siteAttr(d.n) +
-          '" loading="lazy" decoding="async"' +
-          (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '') +
-          ' onerror="' +
-          _cfb +
-          '">'
+        ? window.arcPicture
+          ? window.arcPicture(d.img, {
+              alt: d.n,
+              className: 'pan-tile-img',
+              sizes: '(max-width: 900px) 45vw, 320px',
+              attrs:
+                (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '') +
+                ' onerror="' +
+                _cfb +
+                '"',
+            })
+          : '<img class="pan-tile-img" src="' +
+            _siteAttr(d.img) +
+            '" alt="' +
+            _siteAttr(d.n) +
+            '" loading="lazy" decoding="async"' +
+            (d.pos ? ' style="object-position:' + d.pos[0] + '% ' + d.pos[1] + '%"' : '') +
+            ' onerror="' +
+            _cfb +
+            '">'
         : '') +
       (_isDraftMd(d.md) ? _draftBadge() : '') +
       '<div class="pan-tile-caption"><span class="pan-tile-name">' +
@@ -2148,11 +2204,10 @@ function _renderGalleria(md) {
       categories[cat].forEach(function (img) {
         if (img.src) {
           html +=
-            '<div class="gal-item"><img src="' +
-            img.src +
-            '" alt="' +
-            img.alt +
-            '" loading="lazy" decoding="async">' +
+            '<div class="gal-item">' +
+            (window.arcPicture
+              ? window.arcPicture(img.src, { alt: img.alt, sizes: '(max-width: 900px) 45vw, 360px' })
+              : '<img src="' + img.src + '" alt="' + img.alt + '" loading="lazy" decoding="async">') +
             (img.alt ? '<div class="gal-caption">' + img.alt + '</div>' : '') +
             '</div>';
         } else if (img.caption) {

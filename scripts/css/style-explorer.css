@@ -973,6 +973,171 @@
   outline-offset: 2px;
 }
 
+/* ── Gruppi + schede (classi → sottoclassi) ─────────────────
+   Struttura da indice di manuale: colonna dei gruppi compatta a
+   sinistra, titolo del gruppo e linguette delle voci a destra. */
+.exp-gt-grid {
+  display: grid;
+  grid-template-columns: minmax(216px, 264px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.exp-gt-side {
+  position: sticky;
+  top: 74px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: calc(100vh - 100px);
+  padding: 10px;
+  border: 1px solid rgba(var(--gold-rgb), 0.15);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(var(--gold-rgb), 0.035), rgba(0, 0, 0, 0.18));
+  backdrop-filter: blur(6px);
+}
+
+.exp-gt-search {
+  max-width: none;
+  margin-bottom: 6px;
+}
+
+.exp-gt-search input {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 13px;
+}
+
+.exp-gt-classes {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--gold-rgb), 0.55) transparent;
+}
+
+.exp-gt-class {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-left: 2px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-align: left;
+  transition: background 0.14s, border-color 0.14s, color 0.14s;
+}
+
+.exp-gt-class:hover {
+  background: rgba(var(--gold-rgb), 0.06);
+  color: var(--white);
+}
+
+.exp-gt-class.is-active {
+  background: rgba(var(--gold-rgb), 0.12);
+  border-color: rgba(var(--gold-rgb), 0.22);
+  border-left-color: var(--gold);
+  color: var(--gold3);
+}
+
+.exp-gt-class-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exp-gt-class-count {
+  flex: none;
+  color: var(--text3);
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.exp-gt-class.is-active .exp-gt-class-count {
+  color: var(--gold2);
+}
+
+.exp-gt-main {
+  min-width: 0;
+}
+
+.exp-gt-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 2px 10px;
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.16);
+}
+
+.exp-gt-title {
+  margin: 0;
+  color: var(--gold3);
+  font-family: 'Cinzel', serif;
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+}
+
+.exp-gt-meta {
+  flex: none;
+  padding-bottom: 3px;
+  color: var(--text3);
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.exp-gt-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 12px 0 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.12);
+}
+
+.exp-gt-tab {
+  padding: 6px 12px;
+  border: 1px solid rgba(var(--gold-rgb), 0.18);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.24);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  transition: background 0.16s, border-color 0.16s, color 0.16s;
+}
+
+.exp-gt-tab:hover {
+  border-color: rgba(var(--gold-rgb), 0.45);
+  color: var(--parch);
+}
+
+.exp-gt-tab.is-active {
+  background: linear-gradient(180deg, var(--gold3), var(--gold));
+  border-color: var(--gold3);
+  color: #14100a;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(var(--gold-rgb), 0.22);
+}
+
 @media (max-width: 900px) {
   .exp-detail-inner {
     padding: 16px 15px 18px;
@@ -1027,6 +1192,40 @@
     border-left: none;
   }
   .exp-fields { grid-template-columns: 1fr; }
+
+  /* Gruppi + schede: colonna dei gruppi in striscia orizzontale,
+     così il titolo e le linguette restano subito sotto. */
+  .exp-gt-grid { display: block; }
+  .exp-gt-side {
+    position: static;
+    max-height: none;
+    margin-bottom: 18px;
+    padding: 10px;
+  }
+  .exp-gt-classes {
+    flex-direction: row;
+    gap: 6px;
+    padding-bottom: 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Striscia a scorrimento: la barra resta fuori, si scorre col dito. */
+    scrollbar-width: none;
+  }
+  .exp-gt-classes::-webkit-scrollbar { display: none; }
+  .exp-gt-class {
+    flex: none;
+    width: auto;
+    padding: 7px 12px;
+    border-left-width: 1px;
+    border-radius: 999px;
+  }
+  .exp-gt-class.is-active { border-left-color: var(--gold); }
+  .exp-gt-head { flex-wrap: wrap; }
+  .exp-gt-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .exp-gt-tab { flex: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

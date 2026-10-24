@@ -73,6 +73,16 @@
   }
   function inline(t) {
     t = esc(t);
+    /* [[chiave]] resta un hook solo se il termine esiste nei dati admin.
+       In assenza del glossario (preview isolata o errore di rete) è testo. */
+    t = t.replace(/\[\[([^\]]{1,100})\]\]/g, function (_m, term) {
+      var key = String(term).trim();
+      if (!key) return _m;
+      var glossary = window.ARC_GLOSSARY || {};
+      var record = glossary[key] || glossary[key.toLowerCase()];
+      if (!record) return '<span class="arc-glossary-raw">' + key + '</span>';
+      return '<span class="arc-glossary-term" tabindex="0" role="button" data-glossary="' + attr(key) + '">' + attr(record.title || key) + '</span>';
+    });
     /* codice inline */
     t = t.replace(/`([^`]+)`/g, '<code class="rc">$1</code>');
     /* grassetto + corsivo */
@@ -95,16 +105,25 @@
     t = t.replace(/!\[([^\]]*)\]\(([^)]+?)(?:\s+"([^"]*)")?\)/g, function (m, alt, u, cap) {
       u = dec(u).trim();
       if (!safeImg(u)) return '';
-      var a = attr(imgAlt(u, alt || cap || ''));
-      var js = u.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-      var img =
-        '<img src="' +
-        attr(u) +
-        '" alt="' +
-        a +
-        '" loading="lazy" decoding="async" class="n-image n-zoomable"' +
-        (window.arcZoom ? ' onclick="arcZoom(\'' + js + '\')"' : '') +
-        '>';
+      var altText = imgAlt(u, alt || cap || '');
+      var full = window.arcImageFull ? window.arcImageFull(u) : u;
+      var js = full.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      var zoom = window.arcZoom ? ' onclick="arcZoom(\'' + js + '\')"' : '';
+      /* Con la pipeline attiva l'immagine arriva come <picture> con
+         AVIF/WebP e srcset; senza manifest resta l'<img> di sempre. */
+      var img = window.arcPicture
+        ? window.arcPicture(u, {
+            alt: altText,
+            className: 'n-image n-zoomable',
+            attrs: zoom,
+          })
+        : '<img src="' +
+          attr(u) +
+          '" alt="' +
+          attr(altText) +
+          '" loading="lazy" decoding="async" class="n-image n-zoomable"' +
+          zoom +
+          '>';
       if (cap || alt)
         return '<figure class="n-image">' + img + '<figcaption>' + inline(dec(cap || alt)) + '</figcaption></figure>';
       return '<figure class="n-image">' + img + '</figure>';

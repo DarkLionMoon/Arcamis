@@ -127,11 +127,42 @@ describe('explorer · configurazione', () => {
     expect(E.slugify('Regola 1 — Arena')).toBe('regola-1-arena')
   })
 
-  it('genera il markup delle quattro modalità', () => {
+  it('genera il markup delle cinque modalità', () => {
     const ctx = { pageKey: 'specie-homebrew' }
     expect(E.build(SPECIES, { mode: 'master-detail', hash: 'specie' }, ctx).html).toContain('data-mode="master-detail"')
+    expect(E.build(SPECIES, { mode: 'group-tabs', hash: 'specie' }, ctx).html).toContain('data-mode="group-tabs"')
     expect(E.build(SPECIES, { mode: 'drawer', hash: 'specie' }, ctx).html).toContain('data-mode="drawer"')
     expect(E.build(REGOLE, { mode: 'accordion', hash: 'regole' }, ctx).html).toContain('data-mode="accordion"')
     expect(E.build(SPECIES, { mode: 'tabs', hash: 'specie' }, ctx).html).toContain('data-mode="tabs"')
+  })
+})
+
+describe('explorer · gruppi + schede', () => {
+  const E = loadExplorer()
+  const CFG = {
+    mode: 'group-tabs',
+    entryLevel: 1,
+    groupBy: 'Tipologia',
+    groupPlural: 'tipologie',
+    label: 'Specie',
+    plural: 'specie',
+    filters: [{ id: 't', label: 'Tipologia' }]
+  }
+
+  it('raggruppa le voci per il campo scelto', () => {
+    const cfg = E.normalizeConfig(CFG)
+    const parsed = E.parseEntries(SPECIES, cfg)
+    const filters = E.buildFilters(parsed.entries, cfg)
+    const groups = E.groupEntries(parsed.entries, cfg, filters)
+    expect(groups.map((group) => group.label)).toEqual(['Bestiale', 'Costrutto', 'Umanoide'])
+    expect(groups[2].entries.map((entry) => entry.title)).toEqual(['Ascesi'])
+  })
+
+  it('disegna colonna dei gruppi e linguette, senza ripetere il filtro', () => {
+    const html = E.build(SPECIES, CFG, { pageKey: 'specie-homebrew' }).html
+    expect(html).toContain('data-exp-groups')
+    expect(html).toContain('data-exp-tabs')
+    expect(html).toContain('3 tipologie · 3 specie')
+    expect(html).not.toContain('data-filter="t"')
   })
 })

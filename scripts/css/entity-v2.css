@@ -1,0 +1,459 @@
+/* ════════════════════════════════════════════════════════════════
+   ARCAMIS — entity-v2.css  (Fase 1: pagina entità pilota)
+   Hero Hextech, rail dei metadati, tab delle sezioni.
+   Il markup viene da entity-page.js; il testo resta markdown
+   renderizzato, quindi qui si veste solo la struttura.
+   ════════════════════════════════════════════════════════════════ */
+
+/* La scheda con rail ha bisogno di più larghezza della colonna
+   di lettura standard (860px). */
+#pbody:has(.arc-entity) {
+  max-width: 1160px;
+}
+#pbody:has(.arc-entity) .pan-deity {
+  gap: 0;
+}
+
+/* La vecchia testata di pagina ripeterebbe titolo ed epiteto già
+   nell'hero: sulla scheda entità resta solo l'hero nuovo. Il ritorno
+   alla collezione è nel rail. */
+#pv:has(.arc-entity) #page-hero {
+  display: none;
+}
+#pv:has(.arc-entity) #pbody {
+  padding-top: 30px;
+}
+
+/* ── HERO ──────────────────────────────────────────────────── */
+.arc-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(300px, 42vh, 440px);
+  overflow: hidden;
+  background: #070a10;
+  border: 1px solid rgba(var(--gold-rgb), 0.16);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--bevel-lg)) 0,
+    100% var(--bevel-lg),
+    100% 100%,
+    0 100%
+  );
+}
+.arc-hero-media {
+  position: absolute;
+  inset: 0;
+}
+.arc-hero-media img {
+  min-height: 100%;
+}
+.arc-hero-media .arc-pic {
+  position: absolute;
+  inset: 0;
+}
+.arc-hero-media img,
+.arc-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.arc-hero-media.is-broken::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(var(--accent-rgb), 0.18), transparent 60%),
+    linear-gradient(145deg, #131b2a, #070a10 70%);
+}
+.arc-hero-media.is-broken::after {
+  content: '✦';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 72px;
+  color: rgba(var(--gold-rgb), 0.38);
+}
+.arc-hero-none {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 260px;
+  font-size: 96px;
+  color: rgba(var(--gold-rgb), 0.35);
+  background: radial-gradient(ellipse at 50% 40%, rgba(var(--accent-rgb), 0.14), transparent 65%);
+}
+.arc-hero-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(10, 14, 23, 0.1) 0%, rgba(10, 14, 23, 0.3) 42%, rgba(10, 14, 23, 0.94) 100%),
+    linear-gradient(90deg, rgba(10, 14, 23, 0.86) 0%, rgba(10, 14, 23, 0.25) 52%, transparent 78%);
+  pointer-events: none;
+}
+.arc-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.08);
+  pointer-events: none;
+}
+.arc-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: clamp(20px, 4vw, 40px);
+}
+.arc-hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(var(--accent-rgb), 0.92);
+}
+.arc-rule {
+  display: block;
+  width: 30px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+}
+.arc-hero-title {
+  margin: 0;
+  font-family: 'Cinzel', serif;
+  font-size: clamp(32px, 5vw, 58px);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: 0.015em;
+  color: #fff;
+  text-shadow: 0 2px 26px rgba(0, 0, 0, 0.72);
+}
+.arc-hero-epi {
+  margin: 10px 0 0;
+  max-width: 46ch;
+  font-family: 'Crimson Pro', serif;
+  font-size: clamp(14px, 1.6vw, 17px);
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: rgba(var(--gold-rgb), 0.9);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);
+}
+
+/* ── GRIGLIA: contenuto + rail ─────────────────────────────── */
+.arc-entity-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 286px;
+  align-items: start;
+  gap: clamp(20px, 3vw, 40px);
+  margin-top: 28px;
+}
+.arc-entity-main {
+  min-width: 0;
+}
+
+/* Epigrafe della scheda */
+.arc-intro {
+  margin-bottom: 24px;
+}
+.arc-intro img {
+  display: none; /* l'immagine è già nell'hero */
+}
+.arc-intro blockquote,
+.arc-intro .n-quote {
+  position: relative;
+  margin: 0;
+  padding: 14px 20px 14px 22px;
+  font-family: 'Crimson Pro', serif;
+  font-size: clamp(15px, 1.7vw, 18px);
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--gold3);
+  background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.07), transparent 70%);
+  border-left: 2px solid var(--accent);
+}
+.arc-intro p {
+  margin: 0;
+}
+.arc-intro p + p {
+  margin-top: 10px;
+}
+
+/* ── TAB ───────────────────────────────────────────────────── */
+.arc-tabs-block {
+  min-width: 0;
+}
+.arc-tabs {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--bdr2);
+  scrollbar-width: none;
+}
+.arc-tabs::-webkit-scrollbar {
+  display: none;
+}
+.arc-tab {
+  position: relative;
+  flex: none;
+  appearance: none;
+  padding: 12px 14px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(240, 230, 210, 0.52);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.arc-tab::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  background: transparent;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.arc-tab:hover {
+  color: var(--gold2);
+  background: rgba(var(--gold-rgb), 0.04);
+}
+.arc-tab[aria-selected='true'] {
+  color: var(--accent);
+}
+.arc-tab[aria-selected='true']::after {
+  background: var(--accent);
+  box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.5);
+}
+.arc-panels {
+  padding-top: 22px;
+}
+.arc-panel {
+  font-size: 14.5px;
+  line-height: 1.8;
+  color: rgba(240, 230, 210, 0.84);
+  animation: arcFade 0.22s var(--ease-out);
+}
+.arc-panel[hidden] {
+  display: none;
+}
+@keyframes arcFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.arc-panel > :first-child {
+  margin-top: 0;
+}
+.arc-panel h3,
+.arc-panel .n-h3 {
+  margin: 26px 0 10px;
+  padding-bottom: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: rgba(var(--gold-rgb), 0.92);
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.1);
+}
+.arc-panel h4 {
+  margin: 20px 0 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold2);
+}
+.arc-panel strong {
+  color: var(--gold3);
+}
+.arc-panel a {
+  color: var(--accent);
+  text-decoration-color: rgba(var(--accent-rgb), 0.35);
+  text-underline-offset: 3px;
+}
+.arc-panel a:hover {
+  color: var(--gold3);
+}
+.arc-panel ul,
+.arc-panel ol {
+  padding-left: 1.25em;
+}
+.arc-panel li {
+  margin: 5px 0;
+}
+.arc-panel li::marker {
+  color: rgba(var(--accent-rgb), 0.75);
+}
+.arc-panel img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--gold-rgb), 0.12);
+}
+.arc-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0 20px;
+  font-size: 13px;
+}
+.arc-panel th {
+  padding: 8px 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: left;
+  color: rgba(var(--gold-rgb), 0.85);
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.28);
+}
+.arc-panel td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.08);
+  vertical-align: top;
+}
+.arc-panel tr:hover td {
+  background: rgba(var(--accent-rgb), 0.04);
+}
+
+/* ── RAIL METADATI ─────────────────────────────────────────── */
+.arc-rail {
+  min-width: 0;
+}
+.arc-rail-inner {
+  position: sticky;
+  top: calc(var(--topbar-h) + 18px);
+  padding: 2px 18px 16px;
+  background: linear-gradient(180deg, rgba(18, 24, 38, 0.92), rgba(10, 14, 23, 0.92));
+  border: 1px solid var(--bdr2);
+  border-top: 2px solid rgba(var(--gold-rgb), 0.55);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--bevel)), calc(100% - var(--bevel)) 100%, 0 100%);
+}
+.arc-rail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(var(--gold-rgb), 0.78);
+}
+.arc-rail-glyph {
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 0;
+  opacity: 0.8;
+}
+.arc-meta-list {
+  margin: 0;
+}
+.arc-meta {
+  display: grid;
+  gap: 3px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(var(--gold-rgb), 0.12);
+}
+.arc-meta:last-child {
+  border-bottom: 0;
+}
+.arc-meta dt {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(var(--gold-rgb), 0.6);
+}
+.arc-meta dd {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: rgba(240, 230, 210, 0.92);
+}
+.arc-rail-back {
+  display: inline-block;
+  margin-top: 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(var(--accent-rgb), 0.9);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.arc-rail-back:hover {
+  color: var(--gold3);
+  border-bottom-color: rgba(var(--gold-rgb), 0.4);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  #pbody:has(.arc-entity) .pan-deity {
+    gap: 0;
+  }
+  .arc-entity-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .arc-rail {
+    order: -1;
+  }
+  .arc-rail-inner {
+    position: static;
+    clip-path: none;
+  }
+  .arc-meta-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 18px;
+  }
+  .arc-hero {
+    min-height: 260px;
+    clip-path: polygon(0 0, calc(100% - var(--bevel)) 0, 100% var(--bevel), 100% 100%, 0 100%);
+  }
+  .arc-hero-title {
+    font-size: clamp(26px, 8vw, 38px);
+  }
+  .arc-panel {
+    font-size: 14px;
+  }
+}
+@media (max-width: 520px) {
+  .arc-meta-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .arc-tab {
+    padding: 11px 10px;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc-panel {
+    animation: none;
+  }
+}

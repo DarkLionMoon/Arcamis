@@ -46,11 +46,28 @@ test.describe('contenuti migrati sul sito', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1)
   })
 
-  test('le sottoclassi mostrano 18 schede con la classe di appartenenza', async ({ page }) => {
+  test('le sottoclassi sono un catalogo per classe: colonna classi, linguette e scheda', async ({ page }) => {
     await page.goto('/lore/sottoclassi-homebrew')
-    await expect(page.locator('.exp-item')).toHaveCount(18)
-    await page.locator('.exp-item').filter({ hasText: 'Chemtecnico' }).click()
-    await expect(page.locator('.exp-detail')).toContainText('Artefice')
+    const classi = page.locator('.exp-gt-class')
+    await expect(classi).toHaveCount(12)
+    await expect(page.locator('.exp-sidebar-count')).toHaveText('12 classi · 18 sottoclassi')
+
+    /* Barbaro ha tre sottoclassi: linguette a destra, la prima attiva. */
+    await classi.filter({ hasText: 'Barbaro' }).click()
+    await expect(page.locator('.exp-gt-title')).toHaveText('Barbaro')
+    await expect(page.locator('.exp-gt-tab')).toHaveCount(3)
+    await expect(page.locator('.exp-gt-tab').first()).toHaveClass(/is-active/)
+    await expect(page.locator('.exp-gt-body')).toContainText('Dono degli Annegati')
+
+    await page.locator('.exp-gt-tab', { hasText: 'Sentiero del gelo' }).click()
+    await expect(page.locator('.exp-gt-body')).toContainText('Vene di ghiaccio')
+    expect(page.url()).toContain('#sottoclassi/sentiero-del-gelo')
+
+    /* La ricerca filtra sia i gruppi sia le linguette. */
+    await page.locator('[data-exp-search]').fill('Bandle')
+    await expect(classi).toHaveCount(1)
+    await expect(classi).toContainText('Stregone')
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1)
   })
 
   test('il pantheon è una griglia con drawer laterale, inclusa l’entità senza immagine', async ({ page }) => {
@@ -90,6 +107,114 @@ test.describe('contenuti migrati sul sito', () => {
       }).length
     )
     expect(invalid).toBe(0)
+  })
+})
+
+/* Il menu mobile è montato da custom-nav.js, che può girare più di una volta
+   in attesa dei dati: le sezioni non devono comparire due volte. */
+test('il menu mobile non duplica sezioni e voci', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await page.locator('#hamburger').click()
+  const nav = page.locator('#mobile-nav')
+  await expect(nav).toBeVisible()
+  await expect(nav.locator('.mn-item').first()).toBeVisible()
+
+  const ids = await nav.locator('.mn-section[id]').evaluateAll((nodes) => nodes.map((n) => n.id))
+  expect(new Set(ids).size).toBe(ids.length)
+  const items = await nav.locator('.mn-item').evaluateAll((nodes) => nodes.map((n) => (n.textContent || '').trim()))
+  expect(new Set(items).size).toBe(items.length)
+})
+
+/* ── Pagina entità (Fase 1) ────────────────────────────────── */
+test.describe('scheda entità pilota', () => {
+  test('hero, rail dei metadati e tab su una divinità', async ({ page }) => {
+    await page.goto('/lore/pantheon/anivia')
+
+    await expect(page.locator('.arc-entity')).toBeVisible()
+    await expect(page.locator('.arc-hero-title')).toHaveText('Anivia')
+    await expect(page.locator('.arc-hero-img')).toHaveAttribute('src', /pantheon/)
+    await expect
+      .poll(() => page.locator('.arc-hero-img').evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0))
+      .toBe(true)
+
+    /* La vecchia testata di pagina non si sovrappone all'hero nuovo. */
+    await expect(page.locator('#page-hero')).toBeHidden()
+
+    await expect(page.locator('.arc-meta dt')).toHaveText(['Epiteto', 'Allineamento', 'Sfere', 'Simbolo'])
+    await expect(page.locator('.arc-meta dd').first()).toHaveText('La Criofenice')
+
+    const tabs = page.locator('.arc-tab')
+    await expect(tabs).toHaveCount(2)
+    await expect(page.locator('.arc-tab[aria-selected="true"]')).toHaveText('Personalità')
+    await expect(page.locator('#arc-panel-0')).toBeVisible()
+    await expect(page.locator('#arc-panel-1')).toBeHidden()
+
+    await tabs.filter({ hasText: 'Culto' }).click()
+    await expect(page.locator('#arc-panel-1')).toBeVisible()
+    await expect(page.locator('#arc-panel-0')).toBeHidden()
+    await expect(page.locator('#arc-panel-1')).toContainText('Tempio')
+
+    /* Frecce: il tab selezionato si sposta e riceve il focus. */
+    await page.locator('.arc-tab[aria-selected="true"]').press('ArrowLeft')
+    await expect(page.locator('.arc-tab[aria-selected="true"]')).toHaveText('Personalità')
+    await expect(page.locator('#arc-panel-0')).toBeVisible()
+
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1)
+  })
+
+  test('su mobile il rail precede il testo e le tab restano usabili', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/lore/pantheon/anivia')
+
+    const rail = await page.locator('.arc-rail').boundingBox()
+    const tabs = await page.locator('.arc-tabs').boundingBox()
+    expect(rail!.y).toBeLessThan(tabs!.y)
+
+    await page.locator('.arc-tab').filter({ hasText: 'Culto' }).click()
+    await expect(page.locator('#arc-panel-1')).toBeVisible()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1)
+  })
+})
+
+/* ── Topbar con mega-menu ─────────────────────────────────── */
+test.describe('mega-menu della topbar', () => {
+  test('si apre al passaggio del mouse, resta nella finestra e naviga', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.goto('/lore/pantheon')
+
+    const lore = page.locator('#dd-lore')
+    await lore.hover()
+    const menu = lore.locator('.tn-menu')
+    await expect(menu).toBeVisible()
+    await expect(lore.locator('.tn-mega-links .tn-item')).toHaveCount(2)
+    await expect(lore.locator('.tn-mega-count')).toHaveText('2 voci')
+    await expect(lore.locator('.tn-mega-feature-title')).toHaveText('La Storia di Gandora')
+
+    const box = (await menu.boundingBox())!
+    expect(box.x).toBeGreaterThanOrEqual(0)
+    expect(box.x + box.width).toBeLessThanOrEqual(1280)
+
+    await menu.locator('.tn-item', { hasText: 'Pantheon' }).click()
+    await expect(page.locator('.exp-tile').first()).toBeVisible()
+    await expect(menu).toBeHidden()
+  })
+
+  test('nelle sezioni con una sola voce il pannello resta compatto', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.goto('/')
+
+    const pg = page.locator('#dd-pg')
+    await pg.hover()
+    const menu = pg.locator('.tn-menu')
+    await expect(menu).toBeVisible()
+    await expect(pg.locator('.tn-mega-count')).toHaveText('1 voce')
+    await expect(pg.locator('.tn-mega-feature')).toBeHidden()
+    expect((await menu.boundingBox())!.width).toBeLessThanOrEqual(440)
+
+    /* Escape chiude il pannello. */
+    await page.keyboard.press('Escape')
+    await expect(menu).toBeHidden()
   })
 })
 

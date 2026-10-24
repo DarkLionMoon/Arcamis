@@ -379,7 +379,11 @@ export function usePageEditor() {
       return true
     } catch (e) {
       saveState.value = 'error'
-      ui.toast('Errore salvataggio: ' + errorText(e), 'error')
+      const message = errorText(e)
+      ui.toast(
+        'Errore salvataggio: ' + message + (e instanceof ApiError && e.status === 422 ? ' (422)' : ''),
+        'error'
+      )
       return false
     } finally {
       editor.saving = false

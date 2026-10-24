@@ -47,7 +47,7 @@ export const ghApi = {
       path,
       message,
       content: b64encode(content),
-      sha: sha || null
+      ...(sha ? { sha } : {})
     })
   },
 

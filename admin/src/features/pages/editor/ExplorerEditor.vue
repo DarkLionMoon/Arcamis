@@ -180,6 +180,25 @@ function reset(): void {
         />
         <small class="arc-field-help">Es. <code>specie</code> → /lore/specie-homebrew#specie/ascesi</small>
       </label>
+      <label v-if="cfg.mode === 'group-tabs'" class="arc-field">
+        <span class="arc-label">Raggruppa per campo</span>
+        <input
+          class="in"
+          :value="cfg.groupBy"
+          placeholder="Classe"
+          @input="patch({ groupBy: ($event.target as HTMLInputElement).value })"
+        />
+        <small class="arc-field-help">Etichetta già presente nella scheda, es. <code>Classe:</code></small>
+      </label>
+      <label v-if="cfg.mode === 'group-tabs'" class="arc-field">
+        <span class="arc-label">Nome dei gruppi (plurale)</span>
+        <input
+          class="in"
+          :value="cfg.groupPlural"
+          placeholder="classi"
+          @input="patch({ groupPlural: ($event.target as HTMLInputElement).value })"
+        />
+      </label>
     </div>
 
     <div class="arc-explorer-options">
@@ -191,7 +210,10 @@ function reset(): void {
         />
         <span>Mostra la ricerca</span>
       </label>
-      <label v-if="cfg.mode === 'master-detail' || cfg.mode === 'drawer'" class="arc-check">
+      <label
+        v-if="cfg.mode === 'master-detail' || cfg.mode === 'drawer' || cfg.mode === 'group-tabs'"
+        class="arc-check"
+      >
         <input
           type="checkbox"
           :checked="cfg.showHero !== false"

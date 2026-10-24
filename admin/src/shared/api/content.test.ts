@@ -1,3 +1,4 @@
+import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { pagesApi } from './content'
@@ -40,5 +41,18 @@ describe('pagesApi · salvataggio di una pagina esistente', () => {
     )
     const document = String(put.mock.calls[0][2])
     expect(document).not.toContain('"sha"')
+  })
+
+  it('omette completamente sha nelle richieste di creazione', async () => {
+    setActivePinia(createPinia())
+    const put = vi.spyOn(ghApi, 'put').mockResolvedValue({ content: { sha: 'sha-new' } })
+    await pagesApi.create({ ...PAGE, k: 'nuova', sha: undefined }, 'admin: create page nuova')
+    expect(put).toHaveBeenCalledWith(
+      'content/pages/nuova.json',
+      'admin: create page nuova',
+      expect.stringContaining('"k": "nuova"')
+    )
+    expect(put.mock.calls[0]).toHaveLength(3)
+    expect(put.mock.calls[0][2]).not.toContain('"sha"')
   })
 })

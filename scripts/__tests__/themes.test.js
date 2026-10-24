@@ -17,6 +17,9 @@ import { describe, expect, it } from 'vitest';
 
 const root = process.cwd();
 const baseCss = fs.readFileSync(path.join(root, 'scripts/css/style-base.css'), 'utf8');
+/* theme-v2.css si carica dopo lo base e rimappa i token sulla palette
+   Dark Hextech: è il valore effettivo, quindi il test deve leggerlo. */
+const v2Css = fs.readFileSync(path.join(root, 'scripts/css/theme-v2.css'), 'utf8');
 const uiCss = fs.readFileSync(path.join(root, 'scripts/css/style-ui.css'), 'utf8');
 
 /* Token che ogni tema deve ridefinire per essere "completo". */
@@ -52,6 +55,9 @@ const REQUIRED_TOKENS = [
   '--vglow',
   '--surface-rgb',
   '--panel-rgb',
+  '--accent',
+  '--accent-deep',
+  '--accent-rgb',
 ];
 
 /* Ruoli tipografici: devono passare AA su sfondo e pannello. */
@@ -119,7 +125,10 @@ function contrast(foreground, background) {
   return (high + 0.05) / (low + 0.05);
 }
 
-const baseTokens = parseTokens(extractBlock(baseCss, ':root'));
+const baseTokens = {
+  ...parseTokens(extractBlock(baseCss, ':root')),
+  ...parseTokens(extractBlock(v2Css, ':root'))
+};
 const themes = {
   dark: baseTokens,
   light: { ...baseTokens, ...parseTokens(extractBlock(uiCss, 'body.light')) },
@@ -130,6 +139,16 @@ const themes = {
 };
 
 describe('parità dei temi', () => {
+  it('definisce i token della palette v2', () => {
+    const v2 = parseTokens(extractBlock(v2Css, ':root'));
+    for (const token of ['--void', '--navy', '--bevel', '--accent', '--accent-rgb', '--glow-teal', '--ring']) {
+      expect(v2[token], `theme-v2: manca ${token}`).toBeTruthy();
+    }
+    const accent = parseColor(v2['--accent']);
+    const background = parseColor(v2['--bg']);
+    expect(contrast(accent, background), 'accento ciano su sfondo').toBeGreaterThanOrEqual(3);
+  });
+
   it('definisce tutti i token in ogni tema', () => {
     for (const [name, tokens] of Object.entries(themes)) {
       const missing = REQUIRED_TOKENS.filter((token) => !(token in tokens));

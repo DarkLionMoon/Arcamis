@@ -1,7 +1,7 @@
 /* ════════════════════════════════════════════════════════════════
    ARCAMIS ADMIN — Configurazione dell'esplorazione
 
-   Un solo modello per i quattro pattern pubblici. Il markdown della
+   Un solo modello per i cinque pattern pubblici. Il markdown della
    pagina resta la fonte delle voci; qui si decide come leggerlo e
    disporlo (sezioni, tab, gruppi, filtri) senza toccare il codice.
    ════════════════════════════════════════════════════════════════ */
@@ -21,6 +21,12 @@ export const EXPLORE_MODES: ExploreModeOption[] = [
     label: 'Master-detail',
     description: 'Elenco ricercabile a sinistra, scheda unica a destra.',
     icon: '▥'
+  },
+  {
+    value: 'group-tabs',
+    label: 'Gruppi + schede',
+    description: 'Gruppi a sinistra, voci del gruppo come schede orizzontali.',
+    icon: '⊞'
   },
   {
     value: 'tabs',
@@ -44,6 +50,14 @@ export const EXPLORE_MODES: ExploreModeOption[] = [
 
 const MODE_DEFAULTS: Record<ExploreMode, Partial<ExploreConfig>> = {
   'master-detail': {
+    entryLevel: 1,
+    label: 'Scheda',
+    plural: 'schede',
+    search: true,
+    detailStyle: 'markdown',
+    showHero: true
+  },
+  'group-tabs': {
     entryLevel: 1,
     label: 'Scheda',
     plural: 'schede',

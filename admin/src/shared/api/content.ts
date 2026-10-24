@@ -60,7 +60,12 @@ export const pagesApi = {
   },
 
   async create(page: PageContent, message: string): Promise<{ sha: string }> {
-    const result = await ghApi.put(`${CONTENT_PATH}/${page.k}.json`, message, JSON.stringify(page, null, 2), null)
+    const { sha: _sha, ...document } = page
+    const result = await ghApi.put(
+      `${CONTENT_PATH}/${page.k}.json`,
+      message,
+      JSON.stringify(document, null, 2)
+    )
     return { sha: result.content.sha }
   },
 
@@ -201,6 +206,36 @@ export const layoutsApi = {
       JSON.stringify(registry, null, 2) + '\n',
       sha
     )
+    return { sha: result.content.sha }
+  }
+}
+
+export interface GlossaryTerm {
+  key: string
+  title: string
+  excerpt: string
+  pageLink: string
+  iconId: string
+}
+
+export interface GlossaryDoc {
+  terms: GlossaryTerm[]
+  sha?: string
+}
+
+export const glossaryApi = {
+  async get(): Promise<GlossaryDoc> {
+    try {
+      const data = await ghApi.get('content/glossary.json')
+      const parsed = JSON.parse(decodeBase64Utf8(data.content)) as GlossaryDoc
+      return { terms: Array.isArray(parsed.terms) ? parsed.terms : [], sha: data.sha }
+    } catch (error) {
+      if (error instanceof Error && /404|not found/i.test(error.message)) return { terms: [] }
+      throw error
+    }
+  },
+  async save(terms: GlossaryTerm[], sha?: string, message = 'admin: update glossary'): Promise<{ sha: string }> {
+    const result = await ghApi.put('content/glossary.json', message, JSON.stringify({ terms }, null, 2) + '\n', sha)
     return { sha: result.content.sha }
   }
 }

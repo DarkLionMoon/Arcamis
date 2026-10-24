@@ -96,6 +96,9 @@ admin — vedi Parte 2.)
   del sito; full-width su desktop, drawer su mobile.
 - **Pantheon / Collezione**: griglie di tile con immagini e schede dedicate
   (`<chiave>-<slug>`); `collezione` è la versione generica riutilizzabile.
+  Le schede del Pantheon usano la **pagina entità v2** (vedi 1.7): hero,
+  rail dei metadati e tab. Le altre collezioni restano sul renderer storico
+  finché i loro markdown non hanno la stessa struttura (metadati + `##`).
 - **Bestiario, Fazioni, Oggetti, Timeline/Cronache, Glossario, Tabelle,
   Galleria, Lore, Lavoro, Personaggio**: renderer dedicati in `notion-nav.js`.
 - **Layout `schede`** (anche `sessione`, `quest`, `npc`, `spell`, `specie`,
@@ -110,11 +113,14 @@ admin — vedi Parte 2.)
 - **Esplorazione delle pagine** (`explore` nel JSON pagina): le pagine lunghe
   non sono più un unico listone. Il markdown resta la fonte delle voci; il
   pattern scelto decide come leggerlo e disporlo — **master-detail** (elenco
-  ricercabile + scheda unica, deep link `#specie/ascesi`), **tabs** (schede
-  orizzontali + indice sticky con highlight), **drawer** (griglia di tessere +
-  cassetto laterale) e **accordion** (macro-categorie richiudibili). Logica in
-  `scripts/js/explorer.js`, stili in `style-explorer.css`; su mobile il
-  master-detail diventa lista → dettaglio con "Torna alla lista".
+  ricercabile + scheda unica, deep link `#specie/ascesi`), **group-tabs**
+  (colonna dei gruppi + linguette delle voci, es. classi → sottoclassi),
+  **tabs** (schede orizzontali + indice sticky con highlight), **drawer**
+  (griglia di tessere + cassetto laterale) e **accordion** (macro-categorie
+  richiudibili). Logica in `scripts/js/explorer.js`, stili in
+  `style-explorer.css`; su mobile il master-detail diventa lista → dettaglio
+  con "Torna alla lista", mentre group-tabs tiene i gruppi in una striscia
+  orizzontale sopra le linguette.
 - **Changelog e Novità**: widget e pagina dedicata dai JSON locali.
 - **Missioni (rimossa)**: la sezione missioni non fa più parte della wiki.
   Nessuna rotta, voce di menu, sitemap o vista Admin la espone: il registro
@@ -152,6 +158,55 @@ tra tre preset — **Wiki standard**, **Immersivo / full width** (`wide`),
 - **Pagina crediti** (`/credits`): disclaimer e attribuzioni, informativa sul
   conteggio visite (`track_view`: nessun IP, nessun cookie, solo aggregati) e
   contatti. Linkata dal footer e dal menu mobile.
+
+## 1.6 Design system v2 (Dark Hextech)
+
+- **Token**: `scripts/css/theme-v2.css` si carica subito dopo `style-base.css`
+  e rimappa i token storici sulla palette Deep Void / Runeterra Gold /
+  Hextech Teal. Aggiunge i token nuovi (`--accent`, `--bevel`, `--ring`,
+  `--radius-*`, `--glow-teal`). I temi alternativi restano invariati finché
+  non vengono rifatti. `themes.test.js` legge anche questo file: se un colore
+  di testo scende sotto AA, la CI lo segnala.
+- **Icone**: `images/icons-lore.svg` è lo sprite (tratto 1.7, `currentColor`);
+  `scripts/js/icons.js` espone `arcIcon(name)` e `arcIconFor(emoji)`. Il menu
+  usa le icone nuove e ricade sull'emoji del registro per le voci non ancora
+  mappate, così la migrazione può procedere pagina per pagina.
+- **Immagini responsive**: `scripts/optimize-images.mjs` (sharp) genera AVIF e
+  WebP a 640/1280/1920px in `images/opt/`, senza mai ingrandire i sorgenti, e
+  scrive `images/opt/manifest.json` + `scripts/js/image-manifest.js` (misure
+  reali, nessuna fetch). `scripts/js/images.js` produce il markup `<picture>`
+  con `srcset`, `sizes` e `width/height`; se un'immagine non è in pipeline
+  resta un normale `<img>`. Budget per variante: 80 KB (640), 180 KB (1280),
+  400 KB (1920) — il build segnala le violazioni.
+
+```bash
+npm run images:opt     # genera/aggiorna le varianti (≈75s a freddo)
+npm run images:check   # solo verifica: esce con errore se mancano varianti
+```
+
+  Le varianti in `images/opt/` vanno **committate**: la build le copia così
+  come sono (e `prebuild:site` le rigenera solo se serve). I sorgenti
+  originali restano in `images/` per lo zoom e come archivio.
+
+## 1.7 Pagina entità e mega-menu
+
+- **Pagina entità** (`scripts/js/entity-page.js`, stili in `entity-v2.css`):
+  il markdown resta la fonte di verità. Il parser legge la sezione
+  `## Identità` (elenco `- **Chiave:** valore`) e la trasforma nel **rail dei
+  metadati**; le altre `##` diventano **tab** accessibili (frecce, Home/End,
+  `aria-selected`). L'immagine di apertura va nell'**hero**, l'eventuale
+  citazione resta come epigrafe; nessun contenuto viene duplicato. La vecchia
+  testata `#page-hero` è nascosta quando la scheda è in questo formato.
+  È attiva sulle 20 divinità del Pantheon; se una scheda non ha metadati e
+  sezioni (es. i lavori, con il testo dentro un blocco di codice) il renderer
+  storico resta in uso, senza regressioni.
+- **Mega-menu** (`scripts/js/custom-nav.js`, stili in `shell-v2.css`): i
+  dropdown della topbar si aprono anche al passaggio del mouse, hanno una
+  testata con il conteggio delle voci e una scheda in evidenza con cover
+  (`/api/cover/<id>`) e fallback sul glifo di lore. Il pannello si aggancia al
+  bordo destro se uscirebbe dalla finestra; con meno di 4 voci passa a una
+  colonna e la scheda diventa una riga compatta (con una sola voce resta
+  nascosta, perché sarebbe un doppione). Sotto i 1025px resta il drawer mobile.
 
 ---
 
@@ -222,7 +277,7 @@ repo); recuperi dal **Cestino** con **♻️ Ripristina**.
 5. Il selettore **Layout** cambia il rendering e può applicare il template
    del layout (conferma richiesta se c'è contenuto).
 6. La scheda **🧭 Esplorazione** sceglie il pattern della pagina
-   (master-detail, schede, griglia + cassetto, accordion), da quali titoli
+   (master-detail, gruppi + schede, schede, griglia + cassetto, accordion), da quali titoli
    leggere le voci, le etichette, il prefisso del deep link, i gruppi di tab e
    i filtri rapidi ricavati dalle etichette del markdown. Nessuna modifica al
    codice; il sito applica la configurazione alla build successiva.

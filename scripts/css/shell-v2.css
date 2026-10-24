@@ -1,0 +1,308 @@
+/* ════════════════════════════════════════════════════════════════
+   ARCAMIS — shell-v2.css  (Fase 1: topbar)
+   Mega-menu della navigazione desktop: pannello a due colonne di
+   voci + scheda in evidenza. Il markup viene da custom-nav.js
+   (.tn-mega), qui solo la forma. Sotto i 1025px la navbar desktop
+   è nascosta e resta il drawer mobile, quindi queste regole non
+   riguardano il touch.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Home editoriale: rail e schede Hextech ────────────────── */
+.arc-home-rails { padding:28px clamp(20px,5vw,76px) 52px; background:linear-gradient(180deg,rgba(10,14,23,.92),rgba(10,14,23,.98)); }
+.arc-home-section { max-width:1440px; margin:auto; }
+.arc-card-rail { display:flex; gap:14px; overflow-x:auto; overscroll-behavior-inline:contain; scroll-snap-type:x mandatory; padding:8px 2px 18px; }
+.arc-home-card { position:relative; display:flex; flex:0 0 clamp(170px,20vw,230px); min-height:136px; flex-direction:column; justify-content:flex-end; align-items:flex-start; gap:8px; padding:18px; text-align:left; color:var(--gold3); background:linear-gradient(145deg,#172337,#0b111d 72%); border:1px solid rgba(var(--gold-rgb),.24); clip-path:polygon(0 0,calc(100% - 13px) 0,100% 13px,100% 100%,0 100%); cursor:pointer; scroll-snap-align:start; transition:transform .2s var(--ease-out),box-shadow .2s,border-color .2s; }
+.arc-home-card:hover,.arc-home-card:focus-visible { transform:translateY(-4px); border-color:var(--accent); box-shadow:var(--glow-teal); }
+.arc-home-card-icon { font-size:26px; color:var(--gold2); }
+.arc-home-card strong { font:600 14px 'Cinzel',serif; }
+.arc-home-card small { color:var(--accent); font-size:11px; }
+
+/* ── Ricerca pubblica e tooltip glossario ─────────────────── */
+#arc-search-trigger {
+  border: 1px solid rgba(var(--gold-rgb), .28); background: rgba(10,14,23,.76); color: var(--gold3);
+  width: 34px; height: 34px; cursor: pointer; font-size: 22px; line-height: 1;
+  clip-path: polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,0 100%);
+}
+.arc-palette[hidden] { display:none; }
+.arc-palette { position:fixed; z-index:10050; inset:0; display:grid; place-items:start center; padding:12vh 16px 24px; background:rgba(0,0,0,.72); backdrop-filter:blur(8px); }
+.arc-palette-dialog { width:min(640px,100%); max-height:76vh; overflow:auto; border:1px solid rgba(var(--accent-rgb),.45); background:var(--navy); box-shadow:0 24px 80px #000,0 0 28px rgba(var(--accent-rgb),.16); padding:18px; }
+.arc-palette-dialog label,.arc-palette-results h3 { color:var(--gold2); font:600 11px 'Cinzel',serif; letter-spacing:.12em; text-transform:uppercase; }
+.arc-palette-dialog input { width:100%; margin:10px 0; padding:13px; color:var(--gold3); background:var(--bg); border:1px solid var(--bdr3); }
+.arc-palette-results section { margin-top:10px; }
+.arc-palette-results h3 { margin:10px 0 5px; }
+.arc-palette-results button { display:block; width:100%; text-align:left; padding:9px 12px; border:0; color:var(--gold3); background:transparent; cursor:pointer; }
+.arc-palette-results button[aria-selected=true],.arc-palette-results button:hover { background:rgba(var(--accent-rgb),.12); color:#fff; }
+.arc-palette-dialog > p,.arc-palette-empty { color:var(--gold2); font-size:12px; }
+.arc-glossary-term { border-bottom:1px dotted var(--accent); cursor:help; }
+.arc-glossary-term:focus-visible { outline:2px solid var(--accent); }
+.arc-tooltip { display:none; position:fixed; z-index:10060; width:min(300px,calc(100vw - 24px)); padding:10px 12px; color:var(--gold3); background:#101827; border:1px solid rgba(var(--accent-rgb),.55); box-shadow:0 8px 28px #000; font-size:13px; line-height:1.45; pointer-events:none; }
+.arc-tooltip.is-open { display:block; }
+
+/* ── Barra ──────────────────────────────────────────────────
+   Vetro più profondo e filo ciano-oro: la barra resta discreta
+   sopra la hero, ma legge come parte del tema Hextech. */
+#topbar {
+  background: rgba(8, 11, 19, 0.62);
+}
+#topbar.solid {
+  background: rgba(8, 11, 19, 0.97);
+  border-bottom-color: rgba(var(--accent-rgb), 0.14);
+}
+#topbar::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--accent-rgb), 0.28) 12%,
+    rgba(var(--gold-rgb), 0.5) 36%,
+    rgba(240, 230, 210, 0.6) 50%,
+    rgba(var(--gold-rgb), 0.5) 64%,
+    rgba(var(--accent-rgb), 0.28) 88%,
+    transparent
+  );
+}
+
+/* Ancora al centro della voce: il pannello resta agganciato alla
+   topbar anche quando la voce è l'ultima a destra. */
+.tn-mega {
+  width: min(728px, calc(100vw - 48px));
+  min-width: 0;
+  padding: 0;
+  border: 1px solid rgba(var(--gold-rgb), 0.18);
+  border-top: 2px solid var(--gold);
+  background:
+    linear-gradient(180deg, rgba(var(--accent-rgb), 0.04), transparent 38%),
+    rgba(8, 11, 19, 0.97);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(var(--accent-rgb), 0.06),
+    0 1px 0 rgba(var(--gold-rgb), 0.1) inset;
+}
+.tn-mega.align-right {
+  left: auto;
+  right: 0;
+}
+
+/* Sezioni con poche voci: pannello stretto e una sola colonna,
+   altrimenti resta un rettangolo vuoto. */
+.tn-mega.is-sparse {
+  width: min(430px, calc(100vw - 48px));
+}
+.tn-mega.is-sparse .tn-mega-links {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 8px;
+}
+/* In evidenza diventa una riga orizzontale: niente colonna alta e
+   vuota accanto a una o due voci. */
+.tn-mega.is-sparse .tn-mega-body {
+  grid-template-columns: minmax(0, 1fr);
+}
+.tn-mega.is-sparse .tn-mega-feature {
+  flex-direction: row;
+  align-items: stretch;
+  border-left: 0;
+  border-top: 1px solid rgba(var(--gold-rgb), 0.12);
+}
+.tn-mega.is-sparse .tn-mega-feature-media {
+  flex: none;
+  width: 98px;
+  min-height: 86px;
+  aspect-ratio: auto;
+  border-bottom: 0;
+  border-right: 1px solid rgba(var(--gold-rgb), 0.12);
+}
+.tn-mega.is-sparse .tn-mega-feature-media::after {
+  background: linear-gradient(90deg, transparent 60%, rgba(8, 11, 19, 0.75));
+}
+.tn-mega.is-sparse .tn-mega-feature-glyph {
+  font-size: 26px;
+}
+.tn-mega.is-sparse .tn-mega-feature-body {
+  justify-content: center;
+  padding: 10px 14px;
+}
+.tn-mega.is-sparse .tn-mega-feature-title {
+  font-size: 13px;
+}
+
+/* ── Testata ── */
+.tn-mega-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 18px 10px;
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.1);
+}
+.tn-mega-head .tn-menu-label {
+  padding: 0;
+  opacity: 0.85;
+}
+.tn-mega-count {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(var(--accent-rgb), 0.72);
+  white-space: nowrap;
+}
+
+/* ── Corpo: voci a sinistra, scheda in evidenza a destra ── */
+.tn-mega-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 232px;
+  align-items: stretch;
+}
+.tn-mega-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 1px 6px;
+  padding: 10px;
+}
+.tn-mega-links > .tn-sub,
+.tn-mega-links > .tn-div {
+  grid-column: 1 / -1;
+}
+.tn-mega-links .tn-sub {
+  padding: 9px 10px 4px;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: rgba(var(--gold-rgb), 0.7);
+}
+.tn-mega-links .tn-div {
+  margin: 6px 4px 4px;
+}
+.tn-mega-links .tn-item {
+  position: relative;
+  min-height: 38px;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: rgba(240, 230, 210, 0.82);
+  font-size: 12.5px;
+  line-height: 1.35;
+  transition:
+    background 0.14s,
+    border-color 0.14s,
+    color 0.14s,
+    transform 0.14s var(--ease-out);
+}
+.tn-mega-links .tn-item::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transform: scaleY(0.4);
+  transition: opacity 0.14s, transform 0.14s var(--ease-out);
+}
+.tn-mega-links .tn-item:hover {
+  color: var(--gold3);
+  background: rgba(var(--accent-rgb), 0.06);
+  border-color: rgba(var(--accent-rgb), 0.16);
+}
+.tn-mega-links .tn-item:hover::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+.tn-mega-links .tn-item .tn-ii {
+  color: rgba(var(--gold-rgb), 0.78);
+  display: inline-flex;
+  align-items: center;
+}
+.tn-mega-links .tn-item:hover .tn-ii {
+  color: var(--accent);
+}
+
+/* ── Scheda in evidenza ── */
+.tn-mega-feature {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(var(--gold-rgb), 0.12);
+  color: inherit;
+  text-decoration: none;
+  background: linear-gradient(180deg, rgba(var(--gold-rgb), 0.03), transparent 60%);
+  transition: background 0.16s;
+}
+.tn-mega-feature[hidden] {
+  display: none;
+}
+.tn-mega-feature:hover {
+  background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.08), transparent 70%);
+}
+.tn-mega-feature-media {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(var(--accent-rgb), 0.16), transparent 62%),
+    linear-gradient(160deg, #101827, #080b12);
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.12);
+}
+.tn-mega-feature-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(8, 11, 19, 0.9));
+  pointer-events: none;
+}
+.tn-mega-feature-glyph {
+  font-size: 44px;
+  line-height: 1;
+  opacity: 0.55;
+  filter: drop-shadow(0 0 18px rgba(var(--accent-rgb), 0.35));
+}
+.tn-mega-feature-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+.tn-mega-feature-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px 14px;
+}
+.tn-mega-feature-kicker {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(var(--accent-rgb), 0.8);
+}
+.tn-mega-feature-title {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  color: var(--gold3);
+}
+.tn-mega-feature-cta {
+  margin-top: 2px;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(var(--gold-rgb), 0.72);
+}
+.tn-mega-feature:hover .tn-mega-feature-cta {
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn-mega-links .tn-item,
+  .tn-mega-links .tn-item::before,
+  .tn-mega-feature {
+    transition: none;
+  }
+}
