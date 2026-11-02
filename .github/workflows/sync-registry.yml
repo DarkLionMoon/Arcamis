@@ -27,11 +27,20 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Validate (sync-registry --check)
-        run: python3 scripts/sync-registry.py --check
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Generate artifacts
-        run: python3 scripts/sync-registry.py
+        run: |
+          python3 scripts/sync-registry.py
+          node scripts/gen-seo-static.mjs
+
+      - name: Validate generated artifacts
+        run: |
+          python3 scripts/sync-registry.py --check
+          node scripts/gen-seo-static.mjs --check
 
       - name: Commit generated artifacts
         run: |
