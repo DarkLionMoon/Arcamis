@@ -3,7 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import vm from 'node:vm'
 
-import { describe, expect, it, beforeAll } from 'vitest'
+import { describe, expect, it, beforeAll, beforeEach, afterEach, vi } from 'vitest'
 
 import {
   applyAction,
@@ -143,6 +143,15 @@ describe('revisione e ruoli', () => {
 })
 
 describe('azioni', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(NOW)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   const AT = '2026-10-17T12:00:00.000Z'
 
   it('inviare in revisione traccia chi e quando', () => {
