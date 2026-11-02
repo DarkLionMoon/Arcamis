@@ -608,7 +608,7 @@
      unità che non contengono la query e le sezioni rimaste vuote,
      mostrando il conteggio nel pill di filtro. Soglia: 2 caratteri.
      ══════════════════════════════════ */
-  var SEARCH_SEL = '.imp-rule-box, .imp-note-box, .imp-tbl tbody tr, .imp-hero-links a, .imp-stat-card';
+  var SEARCH_SEL = '.imp-rule-box, .imp-note-box, .imp-tbl tbody tr, .imp-hero-links a, .imp-stat-card, .imp-doc-section > p, .imp-doc-section > ul, .imp-doc-section > ol, .imp-doc-section > h3, .imp-doc-section > h4';
   function applySearch(raw) {
     var content = $('content');
     var f = $('activeFilters');
@@ -635,7 +635,7 @@
       var sec = sections[i];
       var titleEl = sec.querySelector('.imp-doc-section-title');
       var titleHit = titleEl && (titleEl.textContent || '').toLowerCase().indexOf(q) !== -1;
-      var kids = sec.querySelectorAll('.imp-rule-box, .imp-note-box, .imp-tbl tbody tr');
+      var kids = sec.querySelectorAll(SEARCH_SEL);
       var vis = 0;
       for (k = 0; k < kids.length; k++) { if (!kids[k].classList.contains('imp-hide')) vis++; }
       sec.classList.toggle('imp-hide', !titleHit && kids.length > 0 && vis === 0);
