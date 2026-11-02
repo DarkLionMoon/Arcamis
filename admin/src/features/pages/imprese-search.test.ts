@@ -20,6 +20,7 @@ describe('ricerca nel nuovo testo con la grafica originale di Imprese', () => {
     const host = document.createElement('div')
     document.body.appendChild(host)
     sandbox.window._impreseInit(host)
+    expect(host.querySelector('.imp-rule-box li')?.firstElementChild?.tagName).toBe('SPAN')
     for (const [section, query] of [
       ['entrate', 'accordi'],
       ['riferimenti', '100 MO']

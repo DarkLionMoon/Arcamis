@@ -482,7 +482,7 @@
 
   function documentHtml(markdown) {
     var html = window._mdToHtml ? window._mdToHtml(markdown) : '<p>' + escH(markdown) + '</p>';
-    return html.replace(/class="([^"]*)"/g, function (_, names) {
+    html = html.replace(/class="([^"]*)"/g, function (_, names) {
       var mapped = names.split(/\s+/).map(function (name) {
         if (name === 'n-twrap') return 'imp-table-wrap';
         if (name === 'n-tbl') return 'imp-tbl';
@@ -491,6 +491,9 @@
       }).filter(Boolean).join(' ');
       return mapped ? 'class="' + mapped + '"' : '';
     });
+    // The existing list style uses flex: keep each sentence in one inline
+    // container so bold words do not become separate, overlapping columns.
+    return html.replace(/<li([^>]*)>((?:(?!<\/?(?:li|ul|ol)\b)[\s\S])*?)<\/li>/g, '<li$1><span>$2</span></li>');
   }
 
   function documentHero(title, body, extra) {
