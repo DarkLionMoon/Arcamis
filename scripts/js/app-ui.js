@@ -778,8 +778,8 @@ function dismissMaintBanner() {
     banner.style.transform = 'translateY(-100%)';
     banner.style.transition = 'opacity .25s, transform .25s';
     setTimeout(function () {
-      banner.style.display = 'none';
       banner.removeAttribute('style');
+      banner.style.display = 'none';
     }, 260);
   }
   document.body.classList.remove('maint-shift');
