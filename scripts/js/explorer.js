@@ -366,12 +366,20 @@
     return BADGE_TONES[hash % BADGE_TONES.length];
   }
 
-  function metaBadges(entry, skip) {
+  function summaryMetadata(entry, skip) {
+    var seen = {};
     return entry.meta
       .filter(function (meta) {
-        return !skip || meta.label.toLowerCase() !== String(skip).toLowerCase();
+        var key = meta.label + ':' + meta.value;
+        if (seen[key] || (skip && meta.label.toLowerCase() === String(skip).toLowerCase())) return false;
+        seen[key] = true;
+        return true;
       })
-      .slice(0, 4)
+      .slice(0, 4);
+  }
+
+  function metaBadges(entry, skip) {
+    return summaryMetadata(entry, skip)
       .map(function (meta) {
         var tone = badgeTone(meta.label);
         return '<span class="exp-badge' + (tone ? ' ' + tone : '') + '"><b>' + esc(meta.label) + '</b> ' + esc(cleanMetaValue(meta.value)) + '</span>';
@@ -393,11 +401,18 @@
     return '<figure class="' + className + '">' + img + '</figure>';
   }
 
-  function detailBody(entry, cfg) {
+  function detailBody(entry, cfg, shownMeta) {
+    function represented(field) {
+      var fullValue = field.value.replace(/\*/g, '').replace(/\s+/g, ' ').trim().replace(/[.;:]$/, '');
+      return (shownMeta || []).some(function (shown) {
+        return shown.label === field.label && cleanMetaValue(shown.value) === fullValue;
+      });
+    }
     if (entry.fields && entry.fields.length) {
       return (
         '<dl class="exp-fields">' +
         entry.fields
+          .filter(function (field) { return !represented(field); })
           .map(function (field) {
             return '<div><dt>' + esc(field.label) + '</dt><dd>' + renderMd(field.value) + '</dd></div>';
           })
@@ -406,6 +421,15 @@
       );
     }
     var body = cfg.showHero && entry.image && entry.image.src ? stripFirstImage(entry.body) : entry.body;
+    // Only suppress the leading metadata already visible in the summary badges.
+    // Later sections and fields omitted from the summary keep their original text.
+    var leading = true;
+    body = body.split('\n').filter(function (line) {
+      if (!leading || !line.trim()) return true;
+      var meta = parseMeta(line)[0];
+      if (!meta) { leading = false; return true; }
+      return !represented(meta);
+    }).join('\n').trim();
     if (cfg.detailStyle === 'lavoro') {
       body = body.replace(/^\s*```[a-z]*\s*$/gim, '').replace(/^\s*```\s*$/gim, '');
     }
@@ -416,6 +440,10 @@
     var opts = options || {};
     if (!entry) return '<div class="exp-empty">Nessuna scheda disponibile.</div>';
     var badges = opts.badges === false ? '' : metaBadges(entry, opts.hideMeta);
+    var salaryFirst = cfg.detailStyle === 'lavoro' && /^#{1,6}\s+Stipendio\b/im.test(entry.body);
+    var hero = heroHtml(entry, cfg, 'exp-hero');
+    var shownMeta = opts.badges === false ? [] : summaryMetadata(entry, opts.hideMeta);
+    var body = detailBody(entry, cfg, shownMeta);
     return (
       '<article class="exp-detail-inner" aria-live="polite">' +
       (opts.back === false ? '' : '<button class="exp-back" type="button" data-exp-action="back">← Torna alla lista</button>') +
@@ -424,8 +452,7 @@
       '<h2 class="exp-title">' + esc(entry.title) + '</h2>' +
       (badges ? '<div class="exp-badges">' + badges + '</div>' : '') +
       '</div></header>' +
-      heroHtml(entry, cfg, 'exp-hero') +
-      detailBody(entry, cfg) +
+      (salaryFirst ? body + hero : hero + body) +
       '</article>'
     );
   }
@@ -1081,6 +1108,16 @@
     );
   }
 
+  function drawerIntro(md, pageKey) {
+    var source = stripLeadingH1(md);
+    if (pageKey !== 'materiale-approvato') return renderMd(source);
+    var marker = /^\*\*Note ai manuali\*\*\s*$/m.exec(source);
+    if (!marker) return renderMd(source);
+    return renderMd(source.slice(0, marker.index)) +
+      '<details class="exp-notes"><summary>Note ai manuali</summary>' +
+      renderMd(source.slice(marker.index + marker[0].length)) + '</details>';
+  }
+
   function buildDrawer(md, cfg, ctx) {
     var parsed = cfg.source === 'table' ? parseTableEntries(md) : parseEntries(md, cfg);
     var entries = parsed.entries;
@@ -1094,7 +1131,7 @@
     var state = { q: '', filters: {}, active: initial ? initial.slug : '' };
     var html =
       '<div class="exp exp-drawer-mode" data-mode="drawer">' +
-      (parsed.intro ? '<div class="exp-intro">' + renderMd(stripLeadingH1(parsed.intro)) + '</div>' : '') +
+      (parsed.intro ? '<div class="exp-intro">' + drawerIntro(parsed.intro, ctx.pageKey) + '</div>' : '') +
       (chapters.length
         ? '<div class="exp-chapters">' + chapters.map(function (chapter) {
             return '<details class="exp-chapter"><summary>' + esc(chapter.title) + '</summary><div class="exp-rich">' + renderMd(chapter.body) + '</div></details>';

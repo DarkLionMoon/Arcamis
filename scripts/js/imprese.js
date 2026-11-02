@@ -104,7 +104,23 @@
   function sectionTitle(icon, label) {
     return '<div class="imp-doc-section-title">' + icon + ' ' + label + '</div>';
   }
-  function tableWrap(inner) { return '<div class="imp-table-wrap">' + inner + '</div>'; }
+  function tableWrap(inner) {
+    var headers = [];
+    inner.replace(/<th\b[^>]*>([\s\S]*?)<\/th>/g, function (_, text) {
+      headers.push(text.replace(/<[^>]*>/g, ''));
+      return _;
+    });
+    inner = inner.replace('<table ', '<table data-columns="' + headers.length + '" ');
+    inner = inner.replace(/<tbody>([\s\S]*?)<\/tbody>/, function (_, rows) {
+      return '<tbody>' + rows.replace(/<tr\b[^>]*>[\s\S]*?<\/tr>/g, function (row) {
+        var column = 0;
+        return row.replace(/<td([^>]*)>([\s\S]*?)<\/td>/g, function (_, attrs, value) {
+          return '<td data-label="' + escA(headers[column++] || '') + '"' + attrs + '><span class="arc-cell-value">' + value + '</span></td>';
+        });
+      }) + '</tbody>';
+    });
+    return '<div class="imp-table-wrap">' + inner + '</div>';
+  }
 
   /* ── NAVIGATION ── */
   function gotoImp(pg, sec) {

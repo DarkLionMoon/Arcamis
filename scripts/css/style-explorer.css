@@ -20,6 +20,7 @@
   max-width: 78ch;
   margin: 0 auto 26px;
   color: var(--text2);
+  font-size: calc(16px * var(--font-scale, 1));
 }
 
 .exp-intro p {
@@ -193,7 +194,7 @@
   color: var(--text2);
   cursor: pointer;
   font-family: inherit;
-  font-size: 13px;
+  font-size: calc(15px * var(--font-scale, 1));
   text-align: left;
   transition: background 0.14s, border-color 0.14s, color 0.14s, transform 0.12s var(--exp-ease);
 }
@@ -400,6 +401,7 @@
 
 .exp-rich {
   line-height: 1.78;
+  font-size: calc(16px * var(--font-scale, 1));
 }
 
 .exp-rich p { margin: 0 0 0.9em; }
@@ -977,6 +979,15 @@
 }
 
 .exp-acc-body strong { color: var(--gold3); }
+
+/* Reading controls retain the archive typography at a comfortable size. */
+.exp-acc-item > summary { font-size: calc(15px * var(--font-scale, 1)); color: var(--text); }
+.exp-acc-body { font-size: calc(16px * var(--font-scale, 1)); }
+.exp-filter-label, .exp-eyebrow { color: var(--text3); }
+.exp-notes { margin: 16px 0; border: 1px solid var(--bdr3); padding: 12px 14px; }
+.exp-notes > summary { cursor: pointer; color: var(--gold3); font-weight: 600; }
+.exp-notes[open] > summary { margin-bottom: 12px; }
+.exp-notes > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
 /* ── Feedback tattile: pressione senza spostare il layout ── */
 .exp-tab:active,

@@ -50,7 +50,7 @@ function _carPrefersReducedMotion() {
   return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
 var _carPaused = (function () {
-  var saved = null;
+  var saved;
   try {
     saved = localStorage.getItem('arc-car-paused');
   } catch (_e) {

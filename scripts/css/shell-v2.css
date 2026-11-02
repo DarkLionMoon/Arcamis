@@ -15,7 +15,7 @@
 .arc-home-card:hover,.arc-home-card:focus-visible { transform:translateY(-4px); border-color:var(--accent); box-shadow:var(--glow-teal); }
 .arc-home-card-icon { font-size:26px; color:var(--gold2); }
 .arc-home-card strong { font:600 14px 'Cinzel',serif; }
-.arc-home-card small { color:var(--accent); font-size:11px; }
+.arc-home-card small { color:var(--text2); font-size:14px; line-height:1.5; }
 
 /* ── Ricerca pubblica e tooltip glossario ─────────────────── */
 #arc-search-trigger {
@@ -32,6 +32,8 @@
 .arc-palette-results h3 { margin:10px 0 5px; }
 .arc-palette-results button { display:block; width:100%; text-align:left; padding:9px 12px; border:0; color:var(--gold3); background:transparent; cursor:pointer; }
 .arc-palette-results button[aria-selected=true],.arc-palette-results button:hover { background:rgba(var(--accent-rgb),.12); color:#fff; }
+.arc-palette-results button { min-height:44px; font-size:15px; }
+.arc-palette-results button small { color:var(--text3); font-size:13px; }
 .arc-palette-dialog > p,.arc-palette-empty { color:var(--gold2); font-size:12px; }
 .arc-glossary-term { border-bottom:1px dotted var(--accent); cursor:help; }
 .arc-glossary-term:focus-visible { outline:2px solid var(--accent); }
@@ -180,7 +182,7 @@
   border: 1px solid transparent;
   border-radius: 2px;
   color: rgba(240, 230, 210, 0.82);
-  font-size: 12.5px;
+  font-size: 14px;
   line-height: 1.35;
   transition:
     background 0.14s,

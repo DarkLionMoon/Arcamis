@@ -365,7 +365,8 @@
   function _reorder() {
     var nav = document.getElementById('tnav');
     if (nav) {
-      var home = nav.querySelector('.tn.ta[data-v="home"]');
+      var home = nav.querySelector('.tn[data-v="home"]');
+      if (home) nav.insertBefore(home, nav.firstChild);
       var anchor = home || nav.firstChild;
       _sections().forEach(function (s) {
         if (!s || !s.v) return;

@@ -293,6 +293,7 @@ function _stripMd(s) {
     .trim();
 }
 function hsearch(val) {
+  if (val && window.arcOpenSearch) { window.arcOpenSearch(val); return; }
   var sr = document.getElementById('sr');
   if (!val || val.length < 2) {
     if (sr) sr.innerHTML = '';
@@ -424,6 +425,7 @@ function csearch() {
 
 /* ════ SEARCH MOBILE (drawer) ════ */
 function msearch(val) {
+  if (val && window.arcOpenSearch) { closeMobileNav(); window.arcOpenSearch(val); return; }
   var sr = document.getElementById('m-sr');
   if (!sr) return;
   if (!val || val.length < 2) {

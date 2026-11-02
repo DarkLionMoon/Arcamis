@@ -29,7 +29,7 @@ describe('schema mappa', () => {
   })
 
   it('rifiuta tipi e campi sconosciuti', () => {
-    expect(mapDataError({ ...realMap, pins: [{ ...realMap.pins[0], type: 'castle' }] })).toContain('Invalid enum value')
+    expect(mapDataError({ ...realMap, pins: [{ ...realMap.pins[0], type: 'castle' }] })).toContain('Invalid option')
     expect(mapDataError({ ...realMap, pins: [{ ...realMap.pins[0], extra: true }] })).toContain('Unrecognized key')
   })
 
