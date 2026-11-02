@@ -39,6 +39,11 @@
   --copper: #a8742c;
   --parch: #c4a862;
 
+  /* Testi di lettura chiari; l'oro resta su titoli e accenti. */
+  --text: #e5ded0;
+  --text2: #c9c3b6;
+  --text3: #b3ad9f;
+
   /* ── Ciano Hextech ── */
   --accent: #0ac8b9;
   --accent-deep: #005a82;
