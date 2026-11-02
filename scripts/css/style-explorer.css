@@ -989,13 +989,6 @@
 .exp-notes[open] > summary { margin-bottom: 12px; }
 .exp-notes > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
-@media (max-width: 600px) {
-  /* Foundation examples need room for the expense name, with costs beside it. */
-  .page-pag-imprese [data-exp-section^="esempio-di-calcolo"] table.n-tbl[data-columns="2"] :is(th,td):first-child {
-    width: 70%;
-  }
-}
-
 /* ── Feedback tattile: pressione senza spostare il layout ── */
 .exp-tab:active,
 .exp-item:active,

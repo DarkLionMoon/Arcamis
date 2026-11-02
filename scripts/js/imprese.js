@@ -452,7 +452,8 @@
     var nav = NAV[currentPage];
     var h = '<div class="imp-sidenav-title">Sezioni</div>';
     nav.forEach(function(n){
-      h += '<button class="imp-sidenav-btn '+(currentSection===n.id?'active':'')+'" data-imp-setsection="'+n.id+'">'+n.label+'</button>';
+      var navLabel = DATA.documentEdition && n.id === 'livelli' ? n.label.replace('3 Livelli', '4 Livelli') : n.label;
+      h += '<button class="imp-sidenav-btn '+(currentSection===n.id?'active':'')+'" data-imp-setsection="'+n.id+'">'+navLabel+'</button>';
     });
     el.innerHTML = h;
   }
@@ -462,7 +463,91 @@
     if (!el) return;
     var map = currentPage === 'gilde' ? RENDER_GILDE : RENDER_LICENZE;
     var fn = map[currentSection];
-    el.innerHTML = fn ? fn() : '<div style="color:var(--imp-text3);padding:40px;text-align:center">Sezione non trovata.</div>';
+    var documentHtml = DATA.documentEdition ? renderDocumentSection(currentPage, currentSection) : null;
+    el.innerHTML = documentHtml !== null ? documentHtml : fn ? fn() : '<div style="color:var(--imp-text3);padding:40px;text-align:center">Sezione non trovata.</div>';
+  }
+
+  /* The supplied rules replace text inside the original Imprese components.
+     Shell, tabs, sidebar, cards, tables and mobile drawer remain unchanged. */
+  function documentPart(prefix) {
+    var source = (window._impresePage && window._impresePage.content) || '';
+    var blocks = source.split(/^##\s+/m).slice(1);
+    for (var i = 0; i < blocks.length; i++) {
+      var newline = blocks[i].indexOf('\n');
+      var title = blocks[i].slice(0, newline).trim();
+      if (title.toLowerCase().indexOf(prefix.toLowerCase()) === 0) return blocks[i].slice(newline + 1).trim();
+    }
+    return '';
+  }
+
+  function documentHtml(markdown) {
+    var html = window._mdToHtml ? window._mdToHtml(markdown) : '<p>' + escH(markdown) + '</p>';
+    return html.replace(/class="([^"]*)"/g, function (_, names) {
+      var mapped = names.split(/\s+/).map(function (name) {
+        if (name === 'n-twrap') return 'imp-table-wrap';
+        if (name === 'n-tbl') return 'imp-tbl';
+        if (name === 'n-quote') return 'imp-note-box';
+        return name.indexOf('n-') === 0 ? '' : name;
+      }).filter(Boolean).join(' ');
+      return mapped ? 'class="' + mapped + '"' : '';
+    });
+  }
+
+  function documentHero(title, body, extra) {
+    return '<div class="imp-section-hero"><h2>' + title + '</h2>' + documentHtml(body) + (extra || '') + '</div>';
+  }
+
+  function documentSection(title, body) {
+    return '<div class="imp-doc-section">' + sectionTitle('', title) + documentHtml(body) + '</div>';
+  }
+
+  function renderDocumentSection(page, section) {
+    if (page === 'gilde') {
+      if (section === 'panoramica') {
+        var requirements = documentPart('Come si fonda');
+        var obtaining = documentPart('Come si ottengono').split(/\n\s*\n/).filter(Boolean);
+        var links = '<div class="imp-hero-links">' + DATA.patenti.map(function (p) { return '<button class="imp-hero-link-btn" data-imp-goto="licenze,' + p.sezione + '">' + p.sigla + ' · ' + p.nome + '</button>'; }).join('') + '</div>';
+        return documentHero('Le Imprese di Arcadia<small>Camera del Commercio e dei Mestieri — Regno di Arcadia</small>', documentPart('Cos’è'), links) +
+          '<div class="imp-doc-section">' + sectionTitle('📋', 'Come Creare un’Impresa') +
+          '<div class="imp-rules-grid">' + [requirements].concat(obtaining).map(function (body, i) {
+            return '<div class="imp-rule-box"><h4>' + ['👥 Requisiti', '📝 I Soci', '⚖️ La Patente e il Permesso', '🏦 Il Locale'][i] + '</h4>' + documentHtml(body) + '</div>';
+          }).join('') + '</div></div>' +
+          '<div class="imp-doc-section">' + sectionTitle('⚖️', 'I 4 Livelli in Sintesi') +
+          tableWrap('<table class="imp-tbl"><thead><tr><th>Livello</th><th>Nome</th><th>Requisiti</th><th>Costo</th></tr></thead><tbody>' + DATA.livelli.map(function (l) {
+            return '<tr><td>' + l.id + '</td><td>' + escH(l.name) + '</td><td>' + escH(l.soci + ' · ' + l.structReqs) + '</td><td>' + l.fee + ' MO</td></tr>';
+          }).join('') + '</tbody></table>') + '</div>' +
+          documentSection('Compagnie di Servizio', documentPart('Compagnie di Servizio'));
+      }
+      if (section === 'livelli') {
+        var allLevels = documentPart('Permessi e Livelli');
+        var intro = allLevels.split(/^### Livello /m)[0];
+        var levelBodies = allLevels.split(/^### Livello \d+ — .*\n/m).slice(1);
+        var html = documentHero('I 4 Livelli dell’Impresa', intro);
+        DATA.livelli.forEach(function (l, i) {
+          var body = (levelBodies[i] || '').split(/^### Benefici:/m)[0];
+          var columns = body.split(/\n- Benefici[^\n]*\n/);
+          html += '<div class="imp-card-type"><div class="imp-card-type-header"><h3>Livello ' + l.id + ' — ' + escH(l.name) + '</h3>' + (l.patente ? patBtn(l.patente) : '') + '</div>' +
+            '<div class="imp-card-type-body"><div class="info-block"><p><strong>Costo del Permesso:</strong> ' + l.fee + ' MO</p>' + documentHtml(columns[0]) + '</div>' +
+            '<div class="info-block"><h5>Benefici</h5>' + documentHtml(columns[1] || '') + '</div></div></div>';
+        });
+        var benefits = allLevels.split(/^### Benefici:.*\n/m)[1] || '';
+        return html + documentSection('Dipendenti NPC e Società Satelliti', benefits);
+      }
+      if (section === 'procedura') return documentHero('Come si fonda e si gestisce', 'Vediamo quanto bisogna spendere concretamente per aprire un’attività.') + documentSection('Esempi di fondazione', documentPart('Esempio di Calcolo'));
+      if (section === 'entrate') return documentHero('Entrate dell’Impresa', 'Guadagni personali, Fondo Cassa e accordi commerciali.') + documentSection('Guadagni e Fondo Cassa', documentPart('Guadagni e Fondo Cassa'));
+      if (section === 'riferimenti') return documentHero('Riferimenti Avanzati', 'Premi di RolePlay, eventi e Spedizioni Commerciali.') + documentSection('Premi di RolePlay', documentPart('Premi di RolePlay'));
+    }
+    if (page === 'licenze') {
+      var patents = documentPart('Patenti');
+      var introduction = patents.split(/^- P\.M\.C\./m)[0];
+      var example = patents.slice(patents.indexOf('*“Okay'));
+      if (section === 'panoramica') return documentHero('Codice Patenti di Arcadia<small>Regno di Arcadia</small>', introduction) + documentSection('Scegliere la propria Patente', example);
+      if (section === 'vantaggi') return '<div class="imp-doc-section">' + sectionTitle('✦', 'Patenti e attività commerciali') + '<div class="imp-card-grid">' + introduction.split(/\n\s*\n/).filter(Boolean).map(function (paragraph) { return '<div class="imp-card">' + documentHtml(paragraph) + '</div>'; }).join('') + '</div></div>';
+      if (section === 'quadro') return '<div class="imp-doc-section">' + sectionTitle('📋', 'Quadro Generale delle Patenti') + tableWrap('<table class="imp-tbl"><thead><tr><th>Sigla</th><th>Denominazione</th><th>Costo</th><th>Destinatari</th></tr></thead><tbody>' + DATA.patenti.map(function (p) { return '<tr class="' + p.cls + '"><td>' + abbr(p.sigla) + '</td><td>' + escH(p.nome) + '</td><td>' + p.totale + ' MO</td><td>' + escH(p.destinatari) + '</td></tr>'; }).join('') + '</tbody></table>') + '</div>';
+      var patent = DATA.patenti.filter(function (p) { return p.sezione === section; })[0];
+      if (patent) return '<div class="imp-licenza-card" style="border-color:' + patent.col + '"><div class="imp-licenza-header"><h3 style="color:' + patent.col + '">' + patent.sigla + ' — ' + escH(patent.nome) + '</h3><p class="imp-lh-meta">Costo: ' + patent.totale + ' MO</p><p class="imp-lh-meta" style="margin-top:4px">Ideale per: ' + escH(patent.destinatari) + '.</p></div><div class="imp-licenza-body"><div class="imp-licenza-block"><h5>Attività autorizzate</h5>' + documentHtml(introduction) + '</div></div></div>';
+    }
+    return null;
   }
 
   function render() {
