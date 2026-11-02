@@ -16,6 +16,9 @@ describe('Imprese: rules from the supplied document', () => {
     expect(doc.content).toContain('Premi di RolePlay')
     expect(doc.content).toContain('680 MO')
     expect(doc.content).toContain('COMPAGNIE DI SERVIZIO')
+    for (let level = 1; level <= 4; level++) {
+      expect(doc.content).toContain('### Livello ' + level + ' — ')
+    }
   })
 
   it('assigns every section to an accessible tab without dropping the source text', () => {
