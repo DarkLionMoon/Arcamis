@@ -36,6 +36,7 @@ const editing = ref<number | null>(null)
 const adding = ref(false)
 const draft = ref<Row>({})
 const saved = ref('')
+const narrativeEdition = computed(() => page.value?.layout !== 'imprese' && !!page.value?.content?.trim())
 
 const rows = computed<Row[]>(() => (Array.isArray(data.value[tab.value]) ? data.value[tab.value] : []))
 const currentList = computed(() => LISTS.find((list) => list.key === tab.value)!)
@@ -121,7 +122,7 @@ async function remove(index: number) {
 }
 
 async function save() {
-  if (!page.value || saving.value || !dirty.value) return
+  if (!page.value || narrativeEdition.value || saving.value || !dirty.value) return
   saving.value = true
   try {
     page.value = { ...page.value, data: data.value, lastModified: new Date().toISOString() }
@@ -144,7 +145,18 @@ onMounted(load)
 </script>
 
 <template>
-  <section class="arc-dashboard">
+  <section v-if="narrativeEdition" class="arc-dashboard">
+    <h1 class="arc-page-title">Imprese &amp; Licenze</h1>
+    <div class="arc-panel">
+      <h2 class="arc-panel-title">Modifica le regole di Imprese</h2>
+      <p class="arc-hint">
+        Le regole sono organizzate per argomento nella pagina Imprese e Licenze. Usa l'editor della pagina per
+        aggiornare testi, costi, requisiti ed esempi.
+      </p>
+      <a class="btn btn-p" href="#/editor/imprese">Apri l'editor di Imprese</a>
+    </div>
+  </section>
+  <section v-else class="arc-dashboard">
     <div class="arc-head-row">
       <h1 class="arc-page-title">Imprese &amp; Licenze</h1>
       <div class="arc-head-actions">
