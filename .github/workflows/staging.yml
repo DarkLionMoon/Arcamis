@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Check secrets
         id: check
@@ -25,6 +27,7 @@ jobs:
           if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
             echo "⚠️  Secrets mancanti (CF_API_TOKEN, CF_ACCOUNT_ID): deploy GitHub saltato. Il sito si aggiorna tramite l'integrazione Git di Cloudflare Pages."
             echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo 'Deploy Actions saltato: credenziali Cloudflare mancanti. Consultare il check Cloudflare Pages per il deploy tramite integrazione Git.' >> "$GITHUB_STEP_SUMMARY"
           else
             echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
@@ -73,24 +76,28 @@ jobs:
           # I flag sono quelli verificati con `wrangler pages deploy --help`:
           # `--project-name` e `--branch`. Il valore è fra apici singoli YAML,
           # quindi l'apice interno di 'arcamis' è raddoppiato.
-          command: 'pages deploy dist --project-name=${{ secrets.CF_PAGES_PROJECT || ''arcamis'' }} --branch=${{ github.ref_name }}'
+          command: 'pages deploy dist --project-name=${{ secrets.CF_PAGES_PROJECT || ''arcamis'' }} --branch=${{ github.head_ref || github.ref_name }}'
           gitHubToken: ${{ github.token }}
-          # preview deployments get unique URLs like: https://<branch>.<project>.pages.dev
 
       # Prima di annunciare la preview: se il digest pubblicato non è quello
       # costruito (e quindi testato), la preview non va considerata pronta.
       - name: Verifica che il deploy corrisponda all'artefatto costruito
         if: steps.check.outputs.configured == 'true'
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+          DEPLOYMENT_ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
         run: |
           node scripts/verify-deploy.mjs \
-            "${{ steps.deploy.outputs.deployment-url }}" \
-            "${{ steps.deploy.outputs.pages-deployment-alias-url }}" \            "https://${{ github.head_ref || github.ref_name }}.${{ secrets.CF_PAGES_PROJECT || 'arcamis' }}.pages.dev"
+            "$DEPLOYMENT_URL" \
+            "$DEPLOYMENT_ALIAS_URL"
 
-      - name: Post preview URL
-        if: github.event_name == 'pull_request'
-        run: |
-          PREVIEW_URL="https://${{ github.head_ref }}.${{ secrets.CF_PAGES_PROJECT || 'arcamis' }}.pages.dev"
-          echo "Preview deploy ready at: $PREVIEW_URL"
-          gh pr comment ${{ github.event.pull_request.number }} --body "🚀 **Preview deploy ready!**\n\n🔗 **URL:** $PREVIEW_URL\n\n*Questo deploy viene aggiornato automaticamente ad ogni push su questo branch.*"
+      - name: Preview verificata nel riepilogo
+        if: steps.check.outputs.configured == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+          DEPLOYMENT_ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+        run: |
+          printf '### Preview verificata\n\n[Apri il deploy](%s)\n' "$DEPLOYMENT_URL" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$DEPLOYMENT_ALIAS_URL" ]; then
+            printf '\n[Alias del branch](%s)\n' "$DEPLOYMENT_ALIAS_URL" >> "$GITHUB_STEP_SUMMARY"
+          fi
