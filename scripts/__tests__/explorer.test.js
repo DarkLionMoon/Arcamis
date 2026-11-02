@@ -137,6 +137,25 @@ describe('explorer · configurazione', () => {
   })
 })
 
+describe('explorer · ordine delle schede lavoro', () => {
+  const E = loadExplorer()
+  const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/lavori.json'), 'utf8'))
+
+  it('mostra lo stipendio prima della copertina in tutte le schede che lo prevedono', () => {
+    const entries = E.parseEntries(page.content, E.normalizeConfig(page.explore)).entries
+      .filter((entry) => /^#{1,6}\s+Stipendio\b/im.test(entry.body))
+    expect(entries).toHaveLength(9)
+    for (const entry of entries) {
+      const { html } = E.build('# ' + entry.title + '\n\n' + entry.body,
+        { ...page.explore, skipFirst: false }, { pageKey: 'lavori' })
+      const body = html.indexOf('class="exp-rich"')
+      const image = html.indexOf('class="exp-hero"')
+      expect(body, entry.title).toBeGreaterThan(-1)
+      expect(image, entry.title).toBeGreaterThan(body)
+    }
+  })
+})
+
 describe('explorer · gruppi + schede', () => {
   const E = loadExplorer()
   const CFG = {

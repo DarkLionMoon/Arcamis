@@ -416,6 +416,9 @@
     var opts = options || {};
     if (!entry) return '<div class="exp-empty">Nessuna scheda disponibile.</div>';
     var badges = opts.badges === false ? '' : metaBadges(entry, opts.hideMeta);
+    var salaryFirst = cfg.detailStyle === 'lavoro' && /^#{1,6}\s+Stipendio\b/im.test(entry.body);
+    var hero = heroHtml(entry, cfg, 'exp-hero');
+    var body = detailBody(entry, cfg);
     return (
       '<article class="exp-detail-inner" aria-live="polite">' +
       (opts.back === false ? '' : '<button class="exp-back" type="button" data-exp-action="back">← Torna alla lista</button>') +
@@ -424,8 +427,7 @@
       '<h2 class="exp-title">' + esc(entry.title) + '</h2>' +
       (badges ? '<div class="exp-badges">' + badges + '</div>' : '') +
       '</div></header>' +
-      heroHtml(entry, cfg, 'exp-hero') +
-      detailBody(entry, cfg) +
+      (salaryFirst ? body + hero : hero + body) +
       '</article>'
     );
   }
