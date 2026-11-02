@@ -118,9 +118,11 @@
 @media(max-width:768px){
   #page-hero{min-height:160px}
   .ph-inner{padding:calc(var(--topbar-h) + 12px) 16px 14px;column-gap:12px}
+  .ph-inner > .ph-copy-btn{grid-row:2}
+  .ph-inner > .ph-title,.ph-inner > .ph-sub,.ph-inner > .ph-divider{grid-column:1 / -1}
   .ph-icon{right:12px;font-size:54px;opacity:.05}
   .ph-sub{font-size:14px}
-  .ph-title{font-size:clamp(22px,6vw,40px)}
+  .ph-title{font-size:clamp(22px,6vw,40px);overflow-wrap:anywhere}
   #pbody{padding:26px 16px 48px}
   .nc{padding:0}
 }
