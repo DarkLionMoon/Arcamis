@@ -167,6 +167,8 @@ describe('app Imprese integrata', () => {
     expect(doc._byId['imp-tabsRow'].innerHTML).toContain('Licenze')
     expect(doc._byId['imp-sidenav'].innerHTML).toContain('Panoramica')
     expect(doc._byId['imp-content'].innerHTML).toContain('Bottega')
+    expect(doc._byId['imp-content'].innerHTML).toContain('data-columns="4"')
+    expect(doc._byId['imp-content'].innerHTML).toContain('data-label="Patente legata"')
   })
 
   it('naviga tra sezioni e pagine via dispatcher (come i click delegati)', () => {

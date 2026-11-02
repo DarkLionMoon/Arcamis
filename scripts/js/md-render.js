@@ -152,15 +152,17 @@
     function al(i) {
       return aligns[i] ? ' style="text-align:' + aligns[i] + '"' : '';
     }
-    var out = '<div class="n-twrap"><table class="n-tbl"><thead><tr>';
-    splitCells(tbl[0]).forEach(function (c, i) {
+    var headers = splitCells(tbl[0]);
+    var out = '<div class="n-twrap"><table class="n-tbl" data-columns="' + headers.length + '"><thead><tr>';
+    headers.forEach(function (c, i) {
       out += '<th' + al(i) + '>' + inline(c.trim()) + '</th>';
     });
     out += '</tr></thead><tbody>';
     tbl.slice(2).forEach(function (r) {
       out += '<tr>';
       splitCells(r).forEach(function (c, i) {
-        out += '<td' + al(i) + '>' + inline(c.trim()) + '</td>';
+        var label = (headers[i] || '').trim().replace(/[*_`]/g, '');
+        out += '<td data-label="' + attr(label) + '"' + al(i) + '><span class="arc-cell-value">' + inline(c.trim()) + '</span></td>';
       });
       out += '</tr>';
     });

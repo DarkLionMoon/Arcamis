@@ -24,7 +24,7 @@
 .ph-bc{cursor:pointer;transition:.15s}
 .ph-bc:hover{color:var(--gold)}
 .ph-sep{opacity:.3;padding:0 2px}
-.ph-cur{color:rgba(var(--gold-rgb),.55);cursor:default}
+.ph-cur{color:var(--text3);cursor:default}
 .ph-eyebrow{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.35em;color:var(--gold);opacity:.7;text-transform:uppercase;margin-bottom:8px}
 .ph-title{font-family:'Cinzel',serif;font-size:34px;font-weight:700;color:var(--white);letter-spacing:.04em;text-shadow:0 2px 20px rgba(0,0,0,.95),0 0 60px rgba(var(--gold-rgb),.12);line-height:1.15}
 .ph-sub{font-family:'Crimson Pro',serif;font-size:15px;color:rgba(196,168,98,.7);font-style:italic;margin-top:8px;letter-spacing:.02em}
@@ -99,7 +99,7 @@
 .ph-copy-btn{
   margin-top:14px;padding:5px 14px;
   background:rgba(var(--gold-rgb),.06);border:1px solid rgba(var(--gold-rgb),.2);
-  color:rgba(var(--gold-rgb),.6);font-family:'Cinzel',serif;font-size:12px;
+    color:var(--text2);font-family:'Cinzel',serif;font-size:12px;
   letter-spacing:.15em;cursor:pointer;transition:.15s;
 }
 .ph-copy-btn:hover{background:rgba(var(--gold-rgb),.12);color:var(--gold2);border-color:rgba(var(--gold-rgb),.4)}

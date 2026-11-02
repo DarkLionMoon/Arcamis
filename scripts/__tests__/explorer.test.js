@@ -73,6 +73,23 @@ Testo.
 `
 
 describe('explorer · parsing', () => {
+  it('shows leading metadata once and preserves metadata in later sections', () => {
+    const E = loadExplorer()
+    const md = '# Oste\n\n**Patente:** P.M.C.\n**Categoria:** Cucina\n\n## Requisiti\n\n**Patente:** P.M.C.\n'
+    const result = E.build(md, { mode: 'master-detail', entryLevel: 1 }, { pageKey: 'mestieri' })
+    expect((result.html.match(/\*\*Patente:/g) || []).length).toBe(1)
+    expect(result.html).toContain('<b>Patente</b> P.M.C')
+    expect(result.html).not.toContain('**Categoria:**')
+  })
+
+  it('keeps Materiale notes available in a closed disclosure before its filters', () => {
+    const E = loadExplorer()
+    const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/materiale-approvato.json'), 'utf8'))
+    const result = E.build(page.content, page.explore, { pageKey: 'materiale-approvato' })
+    expect(result.html).toContain('<summary>Note ai manuali</summary>')
+    expect(result.html).not.toContain('class="exp-notes" open')
+    expect(result.html).toContain('Lessons of the First Ones')
+  })
   const E = loadExplorer()
 
   it('legge le schede H1 e i metadati', () => {

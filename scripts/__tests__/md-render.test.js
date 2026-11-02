@@ -27,6 +27,16 @@ function loadRenderer() {
 
 const { render, toc } = loadRenderer()
 
+describe('responsive tables', () => {
+  it('preserves headings as safe labels for mobile rows', () => {
+    const html = render('| Patente | Nome | Costo |\n| --- | --- | --- |\n| P.M.C. | Comune | 50 Mo |')
+    expect(html).toContain('data-columns="3"')
+    expect(html).toContain('data-label="Patente"')
+    expect(html).toContain('data-label="Costo"')
+    expect(html).toContain('<thead>')
+  })
+})
+
 describe('termini glossario ([[termine]])', () => {
   it('trasforma solo i termini presenti nei dati admin e lascia gli altri come testo', () => {
     const sandbox = { window: { ARC_GLOSSARY: { 'classe armatura': { title: 'Classe Armatura' } } }, console }
@@ -106,7 +116,7 @@ describe('anteprima dei blocchi canonici', () => {
     )
     expect(html).toContain('class="n-callout"')
     expect(html).toContain('Attenzione')
-    expect(html).toContain('<table class="n-tbl">')
+    expect(html).toContain('<table class="n-tbl"')
     expect(html).toContain('src="/mappa.webp"')
   })
 })
