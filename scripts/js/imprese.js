@@ -541,15 +541,9 @@
       if (section === 'riferimenti') return documentHero('Riferimenti Avanzati', 'Premi di RolePlay, eventi e Spedizioni Commerciali.') + documentSection('Premi di RolePlay', documentPart('Premi di RolePlay'));
     }
     if (page === 'licenze') {
-      var patents = documentPart('Patenti');
-      var introduction = patents.split(/^- P\.M\.C\./m)[0];
-      var example = patents.slice(patents.indexOf('*“Okay'));
-      if (section === 'panoramica') return documentHero('Codice Patenti di Arcadia<small>Regno di Arcadia</small>', introduction) + documentSection('Scegliere la propria Patente', example);
-      if (section === 'vantaggi') return '<div class="imp-doc-section">' + sectionTitle('✦', 'Patenti e attività commerciali') + '<div class="imp-card-grid">' + introduction.split(/\n\s*\n/).filter(Boolean).map(function (paragraph) { return '<div class="imp-card">' + documentHtml(paragraph) + '</div>'; }).join('') + '</div></div>';
+      // The six requested license sections use their original renderers.
       if (section === 'quadro') return '<div class="imp-doc-section">' + sectionTitle('📋', 'Quadro Generale delle Patenti') + tableWrap('<table class="imp-tbl"><thead><tr><th>Sigla</th><th>Denominazione</th><th>Costo</th><th>Destinatari</th></tr></thead><tbody>' + DATA.patenti.map(function (p) { return '<tr class="' + p.cls + '"><td>' + abbr(p.sigla) + '</td><td>' + escH(p.nome) + '</td><td>' + p.totale + ' MO</td><td>' + escH(p.destinatari) + '</td></tr>'; }).join('') + '</tbody></table>') + '</div>';
-      var patent = DATA.patenti.filter(function (p) { return p.sezione === section; })[0];
-      var patentBackground = { pmc: 'rgba(96,184,64,.07)', pmt: 'rgba(90,138,216,.07)', pasv: 'rgba(212,149,74,.07)', poe: 'rgba(216,176,32,.07)' };
-      if (patent) return '<div class="imp-licenza-card" style="border-color:' + patent.col + '"><div class="imp-licenza-header" style="background:' + patentBackground[section] + '"><h3 style="color:' + patent.col + '">' + patent.sigla + ' — ' + escH(patent.nome) + '</h3><p class="imp-lh-meta">Costo: ' + patent.totale + ' MO</p><p class="imp-lh-meta" style="margin-top:4px">Ideale per: ' + escH(patent.destinatari) + '.</p></div><div class="imp-licenza-body">' + [introduction.split(/\n\s*\n/)[0], introduction.split(/\n\s*\n/)[1], introduction.split(/\n\s*\n/).slice(2).join('\n\n')].map(function (text, i) { return '<div class="imp-licenza-block"><h5>' + ['Attività autorizzate', 'Progressione', 'Limiti'][i] + '</h5>' + documentHtml(text) + '</div>'; }).join('') + '</div><div class="imp-note-box" style="margin:0 24px 20px">Le Patenti non limitano la progressione del personaggio nel proprio Mestiere, ma stabiliscono quali attività commerciali può esercitare.</div></div>';
+
     }
     return null;
   }

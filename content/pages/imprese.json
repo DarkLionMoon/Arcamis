@@ -98,7 +98,7 @@
       },
       {
         "sigla": "P.A.S.V.",
-        "nome": "Manifattura Alchemica e di Sostanze Vincolate",
+        "nome": "Alchimia e Sostanze Vincolate",
         "costo": 140,
         "cauzione": 40,
         "totale": 180,
@@ -106,7 +106,7 @@
         "cls": "imp-row-pasv",
         "col": "var(--imp-amber)",
         "sezione": "pasv",
-        "destinatari": "Alchimisti, Venditori di Oggetti Magici oltre la categoria Comune"
+        "destinatari": "Alchimisti e Artigiani Hextech"
       },
       {
         "sigla": "P.O.E.",
@@ -118,7 +118,7 @@
         "cls": "imp-row-poe",
         "col": "var(--imp-legendary)",
         "sezione": "poe",
-        "destinatari": "Chiunque sia di Livello 4 o superiore del proprio Mestiere"
+        "destinatari": "Maestri Artigiani (LV4+)"
       }
     ],
     "strutture": [
