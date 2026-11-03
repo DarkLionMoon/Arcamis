@@ -720,6 +720,12 @@ document.addEventListener('click', function (e) {
 });
 
 /* ════════ SITE SETTINGS (banner + disclaimer) ════════ */
+function syncMaintenanceLayout() {
+  var banner = document.getElementById('maint-banner');
+  var height = banner && banner.style.display !== 'none' ? banner.offsetHeight : 0;
+  document.documentElement.style.setProperty('--maint-banner-h', height + 'px');
+  document.body.classList.toggle('maint-shift', height > 0);
+}
 (function () {
   var BANNER_KEY = 'arc_maint_dismissed';
   var DISCLAIMER_KEY = 'arc_disclaimer_accepted';
@@ -732,6 +738,7 @@ document.addEventListener('click', function (e) {
     if (!banner) return;
     if (!s.banner_enabled) {
       banner.style.display = 'none';
+      syncMaintenanceLayout();
       return;
     }
     var txt = banner.querySelector('.maint-text');
@@ -739,10 +746,8 @@ document.addEventListener('click', function (e) {
     if (!bannerDismissed) {
       banner.removeAttribute('style');
       banner.style.display = '';
-      if (!s.disclaimer_enabled || disclaimerAccepted) {
-        document.body.classList.add('maint-shift');
-      }
     }
+    syncMaintenanceLayout();
   }
   function _showDisclaimer(s) {
     if (!overlay) return;
@@ -756,15 +761,17 @@ document.addEventListener('click', function (e) {
     var btn = document.getElementById('disclaimer-btn');
     if (btn && !btn._bound) {
       btn._bound = true;
-      btn.addEventListener('click', function () {
-        localStorage.setItem(DISCLAIMER_KEY, '1');
-        overlay.style.display = 'none';
-      });
+      btn.addEventListener('click', acceptDisclaimer);
       overlay.addEventListener('click', function (e) {
         if (e.target === overlay) overlay.style.display = 'none';
       });
     }
   }
+
+  if (banner && typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncMaintenanceLayout).observe(banner);
+  }
+  window.addEventListener('resize', syncMaintenanceLayout);
 
   fetch('/api/admin?action=get_site_settings')
     .then(function (r) {
@@ -778,6 +785,7 @@ document.addEventListener('click', function (e) {
     .catch(function () {
       if (banner) banner.style.display = 'none';
       if (overlay) overlay.style.display = 'none';
+      syncMaintenanceLayout();
     });
 })();
 function dismissMaintBanner() {
@@ -789,9 +797,9 @@ function dismissMaintBanner() {
     setTimeout(function () {
       banner.removeAttribute('style');
       banner.style.display = 'none';
+      syncMaintenanceLayout();
     }, 260);
   }
-  document.body.classList.remove('maint-shift');
   localStorage.setItem('arc_maint_dismissed', '1');
 }
 
@@ -806,8 +814,5 @@ function acceptDisclaimer() {
     }, 310);
   }
   localStorage.setItem('arc_disclaimer_accepted', '1');
-  var banner = document.getElementById('maint-banner');
-  if (banner && banner.style.display !== 'none') {
-    document.body.classList.add('maint-shift');
-  }
+  syncMaintenanceLayout();
 }

@@ -283,7 +283,7 @@ describe('integrità · pantheon e compendi', () => {
 
   it('specie e sottoclassi usano il compendio, senza schede vuote', () => {
     for (const [key, count] of [
-      ['specie-homebrew', 33],
+      ['specie-homebrew', 32],
       ['sottoclassi-homebrew', 18]
     ]) {
       const page = pageEntries.find(([candidate]) => candidate === key)?.[1];

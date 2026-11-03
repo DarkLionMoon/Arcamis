@@ -23,7 +23,7 @@ const normalize = (markdown: string) => markdown.replace(/\s+/g, ' ').trim()
 
 describe('compendio strutturato', () => {
   for (const [key, kind, count] of [
-    ['specie-homebrew', 'specie', 33],
+    ['specie-homebrew', 'specie', 32],
     ['sottoclassi-homebrew', 'sottoclassi', 18]
   ] as const) {
     const source = contentOf(key)

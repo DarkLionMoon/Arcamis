@@ -531,18 +531,18 @@ test.describe('contenuti importati da Notion', () => {
     expect(saved.content.length).toBeLessThan(before.length + 300)
   })
 
-  test('il catalogo Schede apre tutte le 33 specie e salva una scheda senza perderne nessuna', async ({ page }) => {
+  test('il catalogo Schede apre le 32 specie e salva senza perdere schede o nota introduttiva', async ({ page }) => {
     const calls = await mockSpeciesContent(page)
 
     await page.goto('/admin/app.html#/editor/specie-homebrew')
     await expect(page.locator('.arc-ws-title')).toHaveValue('Specie Homebrew')
     await page.getByRole('tab', { name: /Schede/ }).click()
-    await expect(page.locator('.arc-compendio-card:not(.is-raw)')).toHaveCount(33)
+    await expect(page.locator('.arc-compendio-card:not(.is-raw)')).toHaveCount(32)
     await expect(page.locator('.arc-compendio-group-title').first()).toBeVisible()
 
-    const first = page.locator('.arc-compendio-card').filter({ hasText: 'Ascesi' }).first()
+    const first = page.locator('.arc-compendio-card:not(.is-raw)').filter({ hasText: 'Asceso di Shurima' }).first()
     await first.locator('.arc-compendio-card-title').click()
-    await first.locator('.arc-compendio-fields input').first().fill('Ascesi — prova catalogo')
+    await first.locator('.arc-compendio-fields input').first().fill('Asceso di Shurima — prova catalogo')
     const body = first.locator('textarea.arc-compendio-body')
     await body.fill((await body.inputValue()) + '\n\nTratto aggiornato dall’Admin.')
     await page.keyboard.press('Control+s')
@@ -552,9 +552,11 @@ test.describe('contenuti importati da Notion', () => {
     expect(put?.payload.sha).toBe('sha-species')
     const saved = JSON.parse(decode(put?.payload.content)) as { content: string; layout: string; sha?: string }
     expect(saved.layout).toBe('compendio')
-    expect(saved.content).toContain('# Ascesi — prova catalogo')
+    expect(saved.content).toContain('# Asceso di Shurima — prova catalogo')
+    expect(saved.content).toContain('**Nota sugli Ascesi**')
+    expect(saved.content).toContain('Estremamente rari')
     expect(saved.content).toContain('Tratto aggiornato dall’Admin.')
-    expect(saved.content.split('\n').filter((line) => /^#\s+/.test(line))).toHaveLength(33)
+    expect(saved.content.split('\n').filter((line) => /^#\s+/.test(line))).toHaveLength(32)
     expect(saved.sha).toBeUndefined()
   })
 
