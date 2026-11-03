@@ -85,6 +85,7 @@ export interface ExploreFilter {
   id: string
   label: string
   field?: string
+  valuesByEntry?: Record<string, string>
 }
 
 export interface ExploreGroup {

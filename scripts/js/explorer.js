@@ -298,18 +298,24 @@
 
   /* ── Filtri ───────────────────────────────────────────────── */
 
+  function filterValue(entry, filter) {
+    var values = filter.valuesByEntry;
+    if (values && Object.prototype.hasOwnProperty.call(values, entry.slug)) return String(values[entry.slug]);
+    return metaValue(entry, filter.field || filter.label);
+  }
+
   function buildFilters(entries, cfg) {
     return cfg.filters.map(function (def) {
       var seen = {};
       var values = [];
       entries.forEach(function (entry) {
-        var value = metaValue(entry, def.field || def.label);
+        var value = filterValue(entry, def);
         if (!value || seen[value]) return;
         seen[value] = true;
         values.push(value);
       });
       values.sort(function (a, b) { return a.localeCompare(b, 'it'); });
-      return { id: def.id || slugify(def.label), label: def.label, field: def.field || def.label, values: values };
+      return { id: def.id || slugify(def.label), label: def.label, field: def.field || def.label, values: values, valuesByEntry: def.valuesByEntry };
     }).filter(function (filter) { return filter.values.length > 0; });
   }
 
@@ -321,7 +327,7 @@
       for (var i = 0; i < filters.length; i++) {
         var wanted = active[filters[i].id];
         if (!wanted) continue;
-        if (metaValue(entry, filters[i].field) !== wanted) return false;
+        if (filterValue(entry, filters[i]) !== wanted) return false;
       }
       return true;
     });
@@ -510,7 +516,7 @@
       }
       var map = new Map();
       entries.forEach(function (entry) {
-        var key = filter ? metaValue(entry, filter.field) : '';
+        var key = filter ? filterValue(entry, filter) : '';
         key = key || 'Altre schede';
         if (!map.has(key)) map.set(key, []);
         map.get(key).push(entry);
@@ -689,10 +695,11 @@
 
   function groupEntries(entries, cfg, filters) {
     var field = groupField(cfg, filters);
+    var filter = filters.filter(function (item) { return item.field === field; })[0];
     var fallback = cfg.groupPlural ? 'Altre ' + cfg.groupPlural : 'Altre schede';
     var map = new Map();
     entries.forEach(function (entry) {
-      var label = (field && metaValue(entry, field)) || fallback;
+      var label = (filter ? filterValue(entry, filter) : field && metaValue(entry, field)) || fallback;
       if (!map.has(label)) map.set(label, []);
       map.get(label).push(entry);
     });
