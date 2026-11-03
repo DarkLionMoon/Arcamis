@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- ultimo aggiornamento contenuti: 2026-11-02 -->
+  <!-- ultimo aggiornamento contenuti: 2026-11-03 -->
   <url>
     <loc>https://arcamis.pages.dev/</loc>
     <changefreq>weekly</changefreq>
@@ -8,7 +8,7 @@
   </url>
   <url>
     <loc>https://arcamis.pages.dev/imprese</loc>
-    <lastmod>2026-09-09</lastmod>
+    <lastmod>2026-11-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

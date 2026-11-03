@@ -1,6 +1,12 @@
 {
  "pages": [
   {
+   "id": "pag-imprese",
+   "title": "Imprese e Licenze",
+   "icon": "⚖️",
+   "lastEdited": "2026-11-03T10:07:12.611Z"
+  },
+  {
    "id": "pag-lavori",
    "title": "Lavori",
    "icon": "💼",
@@ -41,12 +47,6 @@
    "title": "Foresta dello Smarrimento",
    "icon": "🌑",
    "lastEdited": "2026-10-22T13:25:32.477Z"
-  },
-  {
-   "id": "pag-selva-fogliabruna",
-   "title": "Selva Fogliabruna",
-   "icon": "🌲",
-   "lastEdited": "2026-10-22T13:25:32.475Z"
   }
  ]
 }

@@ -40,6 +40,9 @@
 .ph-bc-mid:hover{opacity:.9;color:var(--gold3)}
 
 /* Page body */
+/* Reserve the initial viewport while route data loads, keeping the footer
+   below the fold without changing the completed page's content layout. */
+#pv{min-height:100%}
 #pbody{padding:36px clamp(20px,5vw,44px) 60px;max-width:860px;margin:0 auto;width:100%}
 #pbody:has(.toc-active){max-width:1120px}
 
