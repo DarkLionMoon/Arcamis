@@ -107,6 +107,21 @@ describe('explorer · parsing', () => {
     expect(E.filterEntries(parsed.entries, { q: '', filters: { t: 'Costrutto' } }, filters)).toHaveLength(1)
   })
 
+  it('groups and filters entries independently of the metadata shown in their cards', () => {
+    const md = '# Anfibio\n\nTipologia: Folletto\n\n# Foreste\n\nTipologia: Folletto\n\n# Celestiale\n\nTipologia: Celestiale\n'
+    const cfg = E.normalizeConfig({ mode: 'master-detail', groupBy: 'gruppo', filters: [{ id: 'gruppo', label: 'Gruppo', field: 'Tipologia', valuesByEntry: { anfibio: 'Yordle', foreste: 'Yordle' } }] })
+    const built = E.build(md, cfg, { pageKey: 'specie-homebrew' })
+    expect(built.filters[0].values).toEqual(['Celestiale', 'Yordle'])
+    const shown = E.filterEntries(built.data.entries, { filters: { gruppo: 'Yordle' } }, built.filters)
+    expect(shown.map(entry => entry.slug)).toEqual(['anfibio', 'foreste'])
+    expect(E.metaValue(shown[0], 'Tipologia')).toBe('Folletto')
+    expect(built.html).toContain('exp-group-title">Yordle')
+    expect(built.html).not.toContain('exp-group-title">Folletto')
+    expect(built.html).toContain('Tipologia</b> Folletto')
+    const groups = E.groupEntries(built.data.entries, cfg, built.filters)
+    expect(groups.find(group => group.label === 'Yordle').entries).toHaveLength(2)
+  })
+
   it('salta il primo blocco quando è il titolo della pagina', () => {
     const parsed = E.parseEntries('# Lavori ad Arcamis\n\nIntro\n\n---\n\n# Forgia\n\nTesto', {
       mode: 'master-detail',

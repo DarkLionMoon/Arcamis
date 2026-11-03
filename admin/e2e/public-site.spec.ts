@@ -28,21 +28,26 @@ test('la homepage mostra un carosello', async ({ page }) => {
    lunghe non usano più i vecchi listoni: il pattern è quello configurato
    in `explore` e reso da `explorer.js`. */
 test.describe('contenuti migrati sul sito', () => {
-  test('le specie sono un master-detail: 33 schede, filtro per tipologia e deep link', async ({ page }) => {
+  test('le specie sono un master-detail: 33 schede, gruppi separati dalla tipologia e deep link', async ({ page }) => {
     await page.goto('/lore/specie-homebrew')
+    await expect(page.locator('#site-loader')).toBeHidden()
+    const acknowledge = page.getByRole('button', { name: 'HO CAPITO', exact: true })
+    if (await acknowledge.isVisible()) await acknowledge.click()
     await expect(page.locator('.exp-item')).toHaveCount(33)
     await expect(page.locator('.exp-sidebar-count')).toHaveText('33 specie')
-    await expect(page.locator('.exp-pill', { hasText: 'Umanoide' })).toBeVisible()
+    for (const group of ['Yordle', 'Asceso', 'Potenziato', 'Vastaya', 'Ludofatto']) {
+      await expect(page.getByRole('button', { name: group, exact: true })).toBeVisible()
+    }
     await expect(page.locator('.exp-title')).not.toBeEmpty()
 
     await page.locator('.exp-item').filter({ hasText: 'Besheb' }).click()
     await expect(page.locator('.exp-title')).toHaveText('Besheb')
+    await expect(page.locator('.exp-detail')).toContainText('Umanoide')
     expect(page.url()).toContain('#specie/besheb')
 
-    await page.locator('.exp-pill', { hasText: 'Umanoide' }).click()
+    await page.getByRole('button', { name: 'Vastaya', exact: true }).click()
     const filtered = await page.locator('.exp-item').count()
-    expect(filtered).toBeGreaterThan(0)
-    expect(filtered).toBeLessThan(33)
+    expect(filtered).toBe(9)
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1)
   })
 

@@ -6,7 +6,7 @@
   "layout": "compendio",
   "toc": false,
   "description": "",
-  "lastModified": "2026-10-22T14:22:08.234Z",
+  "lastModified": "2026-11-03T11:01:03.212Z",
   "explore": {
     "mode": "master-detail",
     "entryLevel": 1,
@@ -14,13 +14,36 @@
     "label": "Specie",
     "plural": "specie",
     "hash": "specie",
-    "groupBy": "Tipologia",
+    "groupBy": "gruppo",
     "showHero": true,
     "filters": [
       {
-        "id": "tipologia",
-        "label": "Tipologia",
-        "field": "Tipologia"
+        "id": "gruppo",
+        "label": "Gruppo",
+        "field": "Tipologia",
+        "valuesByEntry": {
+          "anfibio": "Yordle",
+          "foreste": "Yordle",
+          "inventore": "Yordle",
+          "asceso-di-targon": "Asceso",
+          "asceso-di-shurima": "Asceso",
+          "darkin": "Asceso",
+          "chemtech": "Potenziato",
+          "hextech": "Potenziato",
+          "besheb": "Vastaya",
+          "briny": "Vastaya",
+          "killash": "Vastaya",
+          "liotlan": "Vastaya",
+          "marai": "Vastaya",
+          "oovi-kat": "Vastaya",
+          "ottrani": "Vastaya",
+          "shimon": "Vastaya",
+          "vesani": "Vastaya",
+          "burattino": "Ludofatto",
+          "ceramico": "Ludofatto",
+          "metallici": "Ludofatto",
+          "peluche": "Ludofatto"
+        }
       }
     ]
   }
