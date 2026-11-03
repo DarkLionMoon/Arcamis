@@ -1,6 +1,24 @@
 {
  "pages": [
   {
+   "id": "pag-bibliografia-scoperta",
+   "title": "Bibliografia scoperta",
+   "icon": "📄",
+   "lastEdited": "2026-11-03T12:31:14.450Z"
+  },
+  {
+   "id": "pag-come-si-inizia",
+   "title": "Creazione",
+   "icon": "🌟",
+   "lastEdited": "2026-11-03T12:31:14.449Z"
+  },
+  {
+   "id": "pag-mestieri",
+   "title": "Mestieri",
+   "icon": "💼",
+   "lastEdited": "2026-11-03T12:31:14.447Z"
+  },
+  {
    "id": "pag-specie-homebrew",
    "title": "Specie Homebrew",
    "icon": "🧬",
@@ -19,18 +37,6 @@
    "lastEdited": "2026-11-02T16:39:35.900Z"
   },
   {
-   "id": "pag-mestieri",
-   "title": "Mestieri",
-   "icon": "💼",
-   "lastEdited": "2026-10-24T09:22:54.228Z"
-  },
-  {
-   "id": "pag-come-si-inizia",
-   "title": "Creazione",
-   "icon": "🌟",
-   "lastEdited": "2026-10-23T18:20:06.865Z"
-  },
-  {
    "id": "pag-introduzione",
    "title": "Introduzione",
    "icon": "📄",
@@ -41,12 +47,6 @@
    "title": "Pantheon",
    "icon": "🛐",
    "lastEdited": "2026-10-22T13:25:32.481Z"
-  },
-  {
-   "id": "pag-foresta-dello-smarrimento",
-   "title": "Foresta dello Smarrimento",
-   "icon": "🌑",
-   "lastEdited": "2026-10-22T13:25:32.477Z"
   }
  ]
 }
