@@ -108,6 +108,7 @@ export interface ExploreConfig {
   source?: 'headings' | 'table'
   entityHeading?: string
   showHero?: boolean
+  summaryFields?: string[]
   unassigned?: boolean
   filters?: ExploreFilter[]
   tabs?: ExploreGroup[]

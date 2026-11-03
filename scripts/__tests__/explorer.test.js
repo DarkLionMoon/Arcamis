@@ -73,6 +73,26 @@ Testo.
 `
 
 describe('explorer · parsing', () => {
+  it('keeps the Ascesi introduction in a note outside the species catalogue', () => {
+    const E = loadExplorer()
+    const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/specie-homebrew.json'), 'utf8'))
+    const built = E.build(page.content, page.explore, { pageKey: 'specie-homebrew' })
+    expect(built.data.entries).toHaveLength(32)
+    expect(built.data.entries.some(entry => entry.slug === 'ascesi')).toBe(false)
+    expect(built.html).toContain('<summary>Nota sugli Ascesi</summary>')
+    expect(built.html).toContain('Estremamente rari')
+  })
+
+  it('shows compact species badges while retaining the full age text in the body', () => {
+    const E = loadExplorer()
+    const md = '# Besheb\n\n**Tipologia:** Umanoide\n**Taglia:** Media\n**Velocità:** 30 piedi (9 metri)\n**Età:** I vastaya possono vivere fino ai 500 anni grazie al loro lignaggio Spiritico.\n'
+    const built = E.build(md, { mode: 'master-detail', summaryFields: ['Tipologia', 'Taglia', 'Velocità', 'Scurovisione'] }, { pageKey: 'specie-homebrew' })
+    const badges = built.html.match(/<div class="exp-badges">([\s\S]*?)<\/div>/)[1]
+    expect(badges).not.toContain('500 anni')
+    expect(built.html).toContain('500 anni')
+    expect(badges).toContain('Umanoide')
+  })
+
   it('shows leading metadata once and preserves metadata in later sections', () => {
     const E = loadExplorer()
     const md = '# Oste\n\n**Patente:** P.M.C.\n**Categoria:** Cucina\n\n## Requisiti\n\n**Patente:** P.M.C.\n'

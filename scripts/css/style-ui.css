@@ -1390,19 +1390,13 @@ body.light .ahp-send-btn{color:var(--gold)!important}
   from { transform: translateY(-100%); }
   to { transform: translateY(0); }
 }
-body.maint-shift #topbar,
-body.maint-shift #progress-bar {
-  top: 40px;
-}
-body.maint-shift #main {
-  padding-top: 40px;
-}
+/* The topbar overlaps the scrolling main by design. Reserve the banner's
+   measured height once, before both, including wrapped mobile text. */
+body.maint-shift { padding-top: var(--maint-banner-h, 0px); }
+body.maint-shift #progress-bar { top: var(--maint-banner-h, 0px); }
 @media (max-width: 700px) {
   .maint-text { font-size: 12px; }
   #maint-banner-inner { padding: 8px 12px; }
-  body.maint-shift #topbar,
-  body.maint-shift #progress-bar { top: 36px; }
-  body.maint-shift #main { padding-top: 36px; }
 }
 
 /* ════════ DISCLAIMER OVERLAY ════════ */

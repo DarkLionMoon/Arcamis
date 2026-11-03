@@ -136,6 +136,12 @@
         "showHero": {
           "type": "boolean"
         },
+        "summaryFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "unassigned": {
           "type": "boolean"
         },

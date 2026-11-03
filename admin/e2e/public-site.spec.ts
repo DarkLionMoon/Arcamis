@@ -28,13 +28,19 @@ test('la homepage mostra un carosello', async ({ page }) => {
    lunghe non usano più i vecchi listoni: il pattern è quello configurato
    in `explore` e reso da `explorer.js`. */
 test.describe('contenuti migrati sul sito', () => {
-  test('le specie sono un master-detail: 33 schede, gruppi separati dalla tipologia e deep link', async ({ page }) => {
+  test('le specie sono un master-detail: 32 schede, nota introduttiva e gruppi separati dalla tipologia', async ({ page }) => {
     await page.goto('/lore/specie-homebrew')
     await expect(page.locator('#site-loader')).toBeHidden()
     const acknowledge = page.getByRole('button', { name: 'HO CAPITO', exact: true })
     if (await acknowledge.isVisible()) await acknowledge.click()
-    await expect(page.locator('.exp-item')).toHaveCount(33)
-    await expect(page.locator('.exp-sidebar-count')).toHaveText('33 specie')
+    await expect(page.locator('.exp-item')).toHaveCount(32)
+    await expect(page.locator('.exp-sidebar-count')).toHaveText('32 specie')
+    const note = page.locator('.exp-notes')
+    await expect(note.locator('summary')).toHaveText('Nota sugli Ascesi')
+    await expect(note).not.toHaveAttribute('open', '')
+    await note.locator('summary').click()
+    await expect(note).toContainText('Estremamente rari')
+    await note.locator('summary').click()
     for (const group of ['Yordle', 'Asceso', 'Potenziato', 'Vastaya', 'Ludofatto']) {
       await expect(page.getByRole('button', { name: group, exact: true })).toBeVisible()
     }
@@ -43,12 +49,55 @@ test.describe('contenuti migrati sul sito', () => {
     await page.locator('.exp-item').filter({ hasText: 'Besheb' }).click()
     await expect(page.locator('.exp-title')).toHaveText('Besheb')
     await expect(page.locator('.exp-detail')).toContainText('Umanoide')
+    await expect(page.locator('.exp-badges')).not.toContainText('500 anni')
+    await expect(page.locator('.exp-rich')).toContainText('500 anni')
+    await expect(page.locator('.exp-detail')).not.toContainText('****')
     expect(page.url()).toContain('#specie/besheb')
 
     await page.getByRole('button', { name: 'Vastaya', exact: true }).click()
     const filtered = await page.locator('.exp-item').count()
     expect(filtered).toBe(9)
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1)
+  })
+
+  test('il banner riserva la sua altezza anche alla prima visita e quando il testo va a capo', async ({ page }) => {
+    await page.addInitScript(() => {
+      if (!sessionStorage.getItem('maintenance-test-started')) {
+        localStorage.removeItem('arc_maint_dismissed')
+        localStorage.removeItem('arc_disclaimer_accepted')
+        sessionStorage.setItem('maintenance-test-started', '1')
+      }
+    })
+    await page.route('**/api/admin**', async route => {
+      if (new URL(route.request().url()).searchParams.get('action') !== 'get_site_settings') return route.continue()
+      return route.fulfill({ json: { settings: {
+        banner_enabled: true,
+        banner_text: 'Sito in manutenzione: alcune funzionalità potrebbero non essere disponibili. Stiamo aggiornando le pagine e i contenuti della wiki.',
+        disclaimer_enabled: true,
+        disclaimer_text: 'Avviso di prova per verificare la prima visita.'
+      } } })
+    })
+    await page.goto('/lore/specie-homebrew')
+    await page.getByRole('button', { name: 'HO CAPITO', exact: true }).click()
+    await expect(page.locator('#disclaimer-overlay')).toBeHidden()
+    for (const width of [1280, 390, 320]) {
+      await page.setViewportSize({ width, height: 900 })
+      await expect.poll(() => page.evaluate(() => {
+        const banner = document.getElementById('maint-banner')!.getBoundingClientRect()
+        const topbar = document.getElementById('topbar')!.getBoundingClientRect()
+        return Math.abs(topbar.top - banner.bottom)
+      })).toBeLessThanOrEqual(1)
+      if (width <= 390) {
+        const targets = await page.locator('.exp-pill').evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().height))
+        expect(targets.every(height => height >= 44)).toBe(true)
+      }
+    }
+    await page.locator('#maint-close').click()
+    await expect(page.locator('#maint-banner')).toBeHidden()
+    await expect.poll(() => page.locator('#topbar').evaluate(node => Math.abs(node.getBoundingClientRect().top))).toBeLessThanOrEqual(1)
+    await page.reload()
+    await expect(page.locator('#disclaimer-overlay')).toBeHidden()
+    await expect(page.locator('#maint-banner')).toBeHidden()
   })
 
   test('le sottoclassi sono un catalogo per classe: colonna classi, linguette e scheda', async ({ page }) => {

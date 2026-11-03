@@ -84,6 +84,7 @@
       source: cfg.source === 'table' ? 'table' : 'headings',
       entityHeading: cfg.entityHeading || '',
       showHero: cfg.showHero !== false,
+      summaryFields: Array.isArray(cfg.summaryFields) ? cfg.summaryFields : null,
       filters: Array.isArray(cfg.filters) ? cfg.filters.filter(function (f) { return f && f.label; }) : [],
       tabs: Array.isArray(cfg.tabs) ? cfg.tabs.filter(function (t) { return t && t.label; }) : [],
       groups: Array.isArray(cfg.groups) ? cfg.groups.filter(function (g) { return g && g.label; }) : [],
@@ -372,11 +373,12 @@
     return BADGE_TONES[hash % BADGE_TONES.length];
   }
 
-  function summaryMetadata(entry, skip) {
+  function summaryMetadata(entry, skip, fields) {
     var seen = {};
     return entry.meta
       .filter(function (meta) {
         var key = meta.label + ':' + meta.value;
+        if (fields && fields.indexOf(meta.label) < 0) return false;
         if (seen[key] || (skip && meta.label.toLowerCase() === String(skip).toLowerCase())) return false;
         seen[key] = true;
         return true;
@@ -384,8 +386,8 @@
       .slice(0, 4);
   }
 
-  function metaBadges(entry, skip) {
-    return summaryMetadata(entry, skip)
+  function metaBadges(entry, skip, fields) {
+    return summaryMetadata(entry, skip, fields)
       .map(function (meta) {
         var tone = badgeTone(meta.label);
         return '<span class="exp-badge' + (tone ? ' ' + tone : '') + '"><b>' + esc(meta.label) + '</b> ' + esc(cleanMetaValue(meta.value)) + '</span>';
@@ -445,10 +447,10 @@
   function detailHtml(entry, cfg, options) {
     var opts = options || {};
     if (!entry) return '<div class="exp-empty">Nessuna scheda disponibile.</div>';
-    var badges = opts.badges === false ? '' : metaBadges(entry, opts.hideMeta);
+    var badges = opts.badges === false ? '' : metaBadges(entry, opts.hideMeta, cfg.summaryFields);
     var salaryFirst = cfg.detailStyle === 'lavoro' && /^#{1,6}\s+Stipendio\b/im.test(entry.body);
     var hero = heroHtml(entry, cfg, 'exp-hero');
-    var shownMeta = opts.badges === false ? [] : summaryMetadata(entry, opts.hideMeta);
+    var shownMeta = opts.badges === false ? [] : summaryMetadata(entry, opts.hideMeta, cfg.summaryFields);
     var body = detailBody(entry, cfg, shownMeta);
     return (
       '<article class="exp-detail-inner" aria-live="polite">' +
@@ -554,8 +556,8 @@
       view: initial ? 'detail' : 'list'
     };
     var html =
-      '<div class="exp exp-master" data-mode="master-detail" data-view="' + state.view + '">' +
-      (parsed.intro ? '<div class="exp-intro">' + renderMd(stripLeadingH1(parsed.intro)) + '</div>' : '') +
+      '<div class="exp exp-master" data-page-key="' + attr(ctx.pageKey || '') + '" data-mode="master-detail" data-view="' + state.view + '">' +
+      (parsed.intro ? '<div class="exp-intro">' + explorerIntro(parsed.intro, ctx.pageKey) + '</div>' : '') +
       toolbar(cfg, filters, state, 'Cerca ' + (cfg.plural || 'schede') + '…') +
       '<div class="exp-master-grid">' +
       '<aside class="exp-sidebar" aria-label="Elenco delle schede">' +
@@ -1115,13 +1117,14 @@
     );
   }
 
-  function drawerIntro(md, pageKey) {
+  function explorerIntro(md, pageKey) {
     var source = stripLeadingH1(md);
-    if (pageKey !== 'materiale-approvato') return renderMd(source);
-    var marker = /^\*\*Note ai manuali\*\*\s*$/m.exec(source);
+    var label = pageKey === 'materiale-approvato' ? 'Note ai manuali' : pageKey === 'specie-homebrew' ? 'Nota sugli Ascesi' : '';
+    if (!label) return renderMd(source);
+    var marker = new RegExp('^\\*\\*' + label + '\\*\\*\\s*$', 'm').exec(source);
     if (!marker) return renderMd(source);
     return renderMd(source.slice(0, marker.index)) +
-      '<details class="exp-notes"><summary>Note ai manuali</summary>' +
+      '<details class="exp-notes"><summary>' + esc(label) + '</summary>' +
       renderMd(source.slice(marker.index + marker[0].length)) + '</details>';
   }
 
@@ -1138,7 +1141,7 @@
     var state = { q: '', filters: {}, active: initial ? initial.slug : '' };
     var html =
       '<div class="exp exp-drawer-mode" data-mode="drawer">' +
-      (parsed.intro ? '<div class="exp-intro">' + drawerIntro(parsed.intro, ctx.pageKey) + '</div>' : '') +
+      (parsed.intro ? '<div class="exp-intro">' + explorerIntro(parsed.intro, ctx.pageKey) + '</div>' : '') +
       (chapters.length
         ? '<div class="exp-chapters">' + chapters.map(function (chapter) {
             return '<details class="exp-chapter"><summary>' + esc(chapter.title) + '</summary><div class="exp-rich">' + renderMd(chapter.body) + '</div></details>';

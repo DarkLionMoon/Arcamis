@@ -68,7 +68,7 @@ describe('copertura Admin dei contenuti migrati', () => {
 
   it('specie e sottoclassi hanno schede riconoscibili dal block editor', () => {
     for (const [key, count] of [
-      ['specie-homebrew', 33],
+      ['specie-homebrew', 32],
       ['sottoclassi-homebrew', 18]
     ] as const) {
       const page = pages.get(key)!

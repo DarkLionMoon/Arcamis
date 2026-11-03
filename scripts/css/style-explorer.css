@@ -121,6 +121,15 @@
 
 .exp-pill.is-active:hover { color: #14100a; }
 
+@media (max-width: 700px), (pointer: coarse) {
+  .exp[data-page-key='specie-homebrew'] .exp-filter-group { gap: 8px; }
+  .exp[data-page-key='specie-homebrew'] .exp-pill {
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+
 /* ── Master-detail ── */
 .exp-master-grid {
   display: grid;
