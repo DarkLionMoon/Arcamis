@@ -463,6 +463,15 @@ export function renderHead(route) {
  */
 export function injectHead(shell, route) {
   let html = shell;
+  if (route.path) {
+    html = html.replace(
+      /<link\b(?=[^>]*\brel="preload")(?=[^>]*\bas="image")(?=[^>]*\bhref="\/cover\.webp")[^>]*>\s*/gi,
+      ''
+    );
+    // Start directly on the requested view instead of briefly painting home.
+    html = html.replace('id="hv" class="vp" style="display:block"', 'id="hv" class="vp" style="display:none"');
+    html = html.replace('id="pv" class="vp" style="display:none"', 'id="pv" class="vp" style="display:block"');
+  }
   html = html.replace(/<title>[\s\S]*?<\/title>\s*/i, '');
   html = html.replace(/<meta\s+name="description"[^>]*>\s*/gi, '');
   html = html.replace(/<link\s+rel="canonical"[^>]*>\s*/gi, '');

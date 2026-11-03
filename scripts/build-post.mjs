@@ -93,6 +93,11 @@ for (const name of fs.readdirSync(jsDir).filter((n) => n.endsWith('.js'))) {
 
 /* ── 2. index.html: riferimenti hashati ───────────────────── */
 let html = readDist('index.html');
+/* Vite rewrites static references to /assets/, while runtime overrides use
+   root URLs. Keep one address per image to avoid downloading both copies. */
+for (const image of ['cover.webp', 'mappa.webp']) {
+  html = html.split(`/assets/${image}`).join(`/${image}`);
+}
 for (const [from, to] of jsMap) {
   html = html.split(`"${from}"`).join(`"${to}"`);
 }
@@ -129,6 +134,13 @@ for (const file of ['_headers', '_routes.json']) {
   const source = path.join(root, file);
   if (fs.existsSync(source)) fs.copyFileSync(source, distPath(file));
 }
+/* Pages joins every matching rule. Exact paths avoid conflicting wildcard
+   policies and only give immutable caching to content-fingerprinted files. */
+const assetHeaders = [...jsMap.values(), cssHref]
+  .map((url) => `${url}\n  Cache-Control: public, max-age=31536000, immutable`)
+  .join('\n\n');
+const baseHeaders = fs.existsSync(distPath('_headers')) ? readDist('_headers') : '';
+writeDist('_headers', baseHeaders.trimEnd() + '\n\n' + assetHeaders + '\n');
 
 /* Redirect specifici per il deploy da dist (admin compilato).
    NIENTE catch-all su /index.html: ogni rotta pubblica è prerenderizzata

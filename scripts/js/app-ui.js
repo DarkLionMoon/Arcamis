@@ -21,12 +21,18 @@
   }
 })();
 
-window.addEventListener('load', function () {
-  setTimeout(function () {
-    var l = document.getElementById('site-loader');
-    if (l) l.classList.add('hidden');
-  }, 500);
-});
+function hideSiteLoader() {
+  var loader = document.getElementById('site-loader');
+  if (loader) loader.classList.add('hidden');
+}
+function revealHomeWhenReady() {
+  var path = location.pathname.replace(/^\/+|\/+$/g, '');
+  if ((!path || path === 'index.html') && !new URLSearchParams(location.search).get('p')) hideSiteLoader();
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', revealHomeWhenReady, { once: true });
+else revealHomeWhenReady();
+// Fallback for failed or legacy routes; never wait an extra 500 ms.
+window.addEventListener('load', hideSiteLoader, { once: true });
 
 /* ════ FONT SIZE ════ */
 var _fs = parseFloat(localStorage.getItem('arc_font') || '1');
@@ -175,6 +181,7 @@ window.afterPageRender = function () {
   document.getElementById('hv').style.display = 'none';
   document.getElementById('pv').style.display = 'block';
   document.body.classList.add('page-open');
+  hideSiteLoader();
   var ts = document.getElementById('ts');
   if (ts) ts.value = '';
   csearch();
