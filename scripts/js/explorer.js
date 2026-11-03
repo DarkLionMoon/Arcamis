@@ -311,14 +311,20 @@
       var seen = {};
       var values = [];
       entries.forEach(function (entry) {
-        var value = filterValue(entry, def);
-        if (!value || seen[value]) return;
-        seen[value] = true;
-        values.push(value);
+        filterValues(entry, def).forEach(function (value) {
+          if (!value || seen[value]) return;
+          seen[value] = true;
+          values.push(value);
+        });
       });
       values.sort(function (a, b) { return a.localeCompare(b, 'it'); });
-      return { id: def.id || slugify(def.label), label: def.label, field: def.field || def.label, values: values, valuesByEntry: def.valuesByEntry };
+      return { id: def.id || slugify(def.label), label: def.label, field: def.field || def.label, values: values, valuesByEntry: def.valuesByEntry, separator: def.separator };
     }).filter(function (filter) { return filter.values.length > 0; });
+  }
+
+  function filterValues(entry, filter) {
+    var value = filterValue(entry, filter);
+    return (filter.separator ? value.split(filter.separator) : [value]).map(function (item) { return item.trim(); });
   }
 
   function filterEntries(entries, state, filters) {
@@ -329,7 +335,7 @@
       for (var i = 0; i < filters.length; i++) {
         var wanted = active[filters[i].id];
         if (!wanted) continue;
-        if (filterValue(entry, filters[i]) !== wanted) return false;
+        if (filterValues(entry, filters[i]).indexOf(wanted) < 0) return false;
       }
       return true;
     });

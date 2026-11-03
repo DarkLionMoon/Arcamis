@@ -104,6 +104,23 @@ describe('explorer · parsing', () => {
     expect(filtered[0].fields[1].value).toContain('Theren')
   })
 
+  it('filters bibliography by every original Notion tag, together with search', () => {
+    const E = loadExplorer()
+    const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/bibliografia-scoperta.json'), 'utf8'))
+    const built = E.build(page.content, page.explore, { pageKey: 'bibliografia-scoperta' })
+    expect(built.filters).toHaveLength(1)
+    expect(built.filters[0].values).toContain('PERICOLOSO')
+    expect(built.filters[0].values).not.toContain('Void · PERICOLOSO')
+    const select = (tag, q = '') => E.filterEntries(built.data.entries, { q, filters: { argomento: tag } }, built.filters)
+    expect(select('Void')).toHaveLength(5)
+    expect(select('PERICOLOSO')).toHaveLength(5)
+    expect(select('Shurima')).toHaveLength(3)
+    expect(select('Armi')).toHaveLength(2)
+    expect(select('Botanica', 'Theren')).toHaveLength(1)
+    expect(select('Void', 'Theren')).toHaveLength(0)
+    expect(built.data.entries.every(entry => E.metaValue(entry, 'Macro-argomento'))).toBe(true)
+  })
+
   it('keeps the Ascesi introduction in a note outside the species catalogue', () => {
     const E = loadExplorer()
     const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/specie-homebrew.json'), 'utf8'))
