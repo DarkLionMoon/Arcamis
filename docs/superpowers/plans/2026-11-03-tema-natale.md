@@ -1,6 +1,6 @@
 # Tema natalizio annuale — piano di implementazione
 
-Specifica approvata: anteprima v3, con lucine statiche, neve sui bordi, rametti e stelline. Nessun albero, pupazzo o suono. Stile e contenuti esistenti conservati. Attivazione annuale dal 1 dicembre al 6 gennaio compreso, fuso Europe/Rome.
+Specifica approvata: anteprima v3, con lucine statiche, neve sui bordi, rametti e stelline. Nessun albero, pupazzo o suono. Stile e contenuti esistenti conservati. Attivazione annuale dal 2 novembre al 6 gennaio compreso, fuso Europe/Rome.
 
 Architettura: un piccolo script classico autonomo, identico nei due siti, con CSS incluso e SVG statici. Nessuna libreria, animazione o richiesta aggiuntiva per immagini. Un controllo al caricamento, al ritorno sulla scheda e alla successiva mezzanotte italiana. Parametro natale=anteprima per vedere la versione fuori stagione.
 
