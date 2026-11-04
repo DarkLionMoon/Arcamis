@@ -73,6 +73,54 @@ Testo.
 `
 
 describe('explorer · parsing', () => {
+  it('keeps the Mestieri patent reference in a closed note before its catalogue', () => {
+    const E = loadExplorer()
+    const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/mestieri.json'), 'utf8'))
+    const built = E.build(page.content, page.explore, { pageKey: 'mestieri' })
+    expect(built.html).toContain('<summary>Riepilogo patenti</summary>')
+    expect(built.html).not.toContain('class="exp-notes" open')
+    expect(built.data.entries).toHaveLength(11)
+    expect(built.html.indexOf('Riepilogo patenti')).toBeLessThan(built.html.indexOf('exp-toolbar'))
+    const levels = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/imprese.json'), 'utf8')).data.livelli
+    for (const entry of built.data.entries) {
+      for (const level of levels) expect(entry.body).toContain('| ' + level.fee + ' Mo |')
+      expect(entry.body).not.toContain('12500 Mo')
+      expect(entry.body).not.toContain('3000 Mo')
+    }
+  })
+
+  it('renders the complete bibliography as searchable books without changing its drawer entries', () => {
+    const E = loadExplorer()
+    const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/bibliografia-scoperta.json'), 'utf8'))
+    const built = E.build(page.content, page.explore, { pageKey: 'bibliografia-scoperta' })
+    expect(built.data.entries).toHaveLength(29)
+    expect(built.html).toContain('exp-bookshelf')
+    expect((built.html.match(/class="exp-tile exp-book /g) || [])).toHaveLength(29)
+    expect(built.html).not.toContain('exp-tile-glyph')
+    expect(built.html).toContain('29 opere')
+    expect(built.html).toContain('aria-label="Apri Cocktail All in the World"')
+    const filtered = E.filterEntries(built.data.entries, { q: 'Theren' }, built.filters)
+    expect(filtered.map(entry => entry.title)).toEqual(['L`Eredità Verde: Cronache della Linfa e del Sangue'])
+    expect(filtered[0].fields[1].value).toContain('Theren')
+  })
+
+  it('filters bibliography by every original Notion tag, together with search', () => {
+    const E = loadExplorer()
+    const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/bibliografia-scoperta.json'), 'utf8'))
+    const built = E.build(page.content, page.explore, { pageKey: 'bibliografia-scoperta' })
+    expect(built.filters).toHaveLength(1)
+    expect(built.filters[0].values).toContain('PERICOLOSO')
+    expect(built.filters[0].values).not.toContain('Void · PERICOLOSO')
+    const select = (tag, q = '') => E.filterEntries(built.data.entries, { q, filters: { argomento: tag } }, built.filters)
+    expect(select('Void')).toHaveLength(5)
+    expect(select('PERICOLOSO')).toHaveLength(5)
+    expect(select('Shurima')).toHaveLength(3)
+    expect(select('Armi')).toHaveLength(2)
+    expect(select('Botanica', 'Theren')).toHaveLength(1)
+    expect(select('Void', 'Theren')).toHaveLength(0)
+    expect(built.data.entries.every(entry => E.metaValue(entry, 'Macro-argomento'))).toBe(true)
+  })
+
   it('keeps the Ascesi introduction in a note outside the species catalogue', () => {
     const E = loadExplorer()
     const page = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/specie-homebrew.json'), 'utf8'))

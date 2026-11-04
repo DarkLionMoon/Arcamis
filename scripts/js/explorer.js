@@ -85,6 +85,7 @@
       entityHeading: cfg.entityHeading || '',
       showHero: cfg.showHero !== false,
       summaryFields: Array.isArray(cfg.summaryFields) ? cfg.summaryFields : null,
+      tileStyle: cfg.tileStyle === 'bookshelf' ? 'bookshelf' : '',
       filters: Array.isArray(cfg.filters) ? cfg.filters.filter(function (f) { return f && f.label; }) : [],
       tabs: Array.isArray(cfg.tabs) ? cfg.tabs.filter(function (t) { return t && t.label; }) : [],
       groups: Array.isArray(cfg.groups) ? cfg.groups.filter(function (g) { return g && g.label; }) : [],
@@ -310,14 +311,20 @@
       var seen = {};
       var values = [];
       entries.forEach(function (entry) {
-        var value = filterValue(entry, def);
-        if (!value || seen[value]) return;
-        seen[value] = true;
-        values.push(value);
+        filterValues(entry, def).forEach(function (value) {
+          if (!value || seen[value]) return;
+          seen[value] = true;
+          values.push(value);
+        });
       });
       values.sort(function (a, b) { return a.localeCompare(b, 'it'); });
-      return { id: def.id || slugify(def.label), label: def.label, field: def.field || def.label, values: values, valuesByEntry: def.valuesByEntry };
+      return { id: def.id || slugify(def.label), label: def.label, field: def.field || def.label, values: values, valuesByEntry: def.valuesByEntry, separator: def.separator };
     }).filter(function (filter) { return filter.values.length > 0; });
+  }
+
+  function filterValues(entry, filter) {
+    var value = filterValue(entry, filter);
+    return (filter.separator ? value.split(filter.separator) : [value]).map(function (item) { return item.trim(); });
   }
 
   function filterEntries(entries, state, filters) {
@@ -328,7 +335,7 @@
       for (var i = 0; i < filters.length; i++) {
         var wanted = active[filters[i].id];
         if (!wanted) continue;
-        if (filterValue(entry, filters[i]) !== wanted) return false;
+        if (filterValues(entry, filters[i]).indexOf(wanted) < 0) return false;
       }
       return true;
     });
@@ -1088,7 +1095,19 @@
 
   /* ── Drawer ───────────────────────────────────────────────── */
 
-  function tileHtml(entry) {
+  function bookTileHtml(entry) {
+    var note = metaValue(entry, 'Autore / nota');
+    if (note === '—' || note === '-') note = '';
+    var tone = 0;
+    for (var i = 0; i < entry.slug.length; i++) tone = (tone + entry.slug.charCodeAt(i)) % 4;
+    return '<button class="exp-tile exp-book exp-book--' + tone + '" type="button" data-entry="' + attr(entry.slug) + '" aria-label="Apri ' + attr(entry.title) + '" title="' + attr(entry.title) + '">' +
+      '<span class="exp-book-cover"><span class="exp-book-rule" aria-hidden="true"></span><span class="exp-book-title">' + esc(entry.title) + '</span>' +
+      (note ? '<span class="exp-book-author">' + esc(note) + '</span>' : '') +
+      '<span class="exp-book-rule" aria-hidden="true"></span></span></button>';
+  }
+
+  function tileHtml(entry, tileStyle) {
+    if (tileStyle === 'bookshelf') return bookTileHtml(entry);
     var position = entry.image && entry.image.position ? ' style="object-position:' + attr(entry.image.position) + '"' : '';
     var image = entry.image && entry.image.src
       ? (global.arcPicture
@@ -1119,7 +1138,7 @@
 
   function explorerIntro(md, pageKey) {
     var source = stripLeadingH1(md);
-    var label = pageKey === 'materiale-approvato' ? 'Note ai manuali' : pageKey === 'specie-homebrew' ? 'Nota sugli Ascesi' : '';
+    var label = pageKey === 'materiale-approvato' ? 'Note ai manuali' : pageKey === 'specie-homebrew' ? 'Nota sugli Ascesi' : pageKey === 'mestieri' ? 'Riepilogo patenti' : '';
     if (!label) return renderMd(source);
     var marker = new RegExp('^\\*\\*' + label + '\\*\\*\\s*$', 'm').exec(source);
     if (!marker) return renderMd(source);
@@ -1148,7 +1167,8 @@
           }).join('') + '</div>'
         : '') +
       toolbar(cfg, filters, state, 'Cerca nel catalogo…') +
-      '<div class="exp-grid" data-exp-grid>' + entries.map(tileHtml).join('') + '</div>' +
+      (cfg.tileStyle === 'bookshelf' ? '<p class="exp-shelf-count" data-exp-shelf-count>' + entries.length + ' opere</p>' : '') +
+      '<div class="exp-grid' + (cfg.tileStyle === 'bookshelf' ? ' exp-bookshelf' : '') + '" data-exp-grid>' + entries.map(function (entry) { return tileHtml(entry, cfg.tileStyle); }).join('') + '</div>' +
       '<div class="exp-empty" data-exp-empty hidden>Nessuna voce corrisponde alla ricerca.</div>' +
       '<div class="exp-drawer-backdrop" data-exp-close hidden></div>' +
       '<aside class="exp-drawer" role="dialog" aria-modal="true" aria-label="Dettaglio" hidden>' +
@@ -1187,7 +1207,9 @@
 
     function paintGrid() {
       var shown = filterEntries(entries, state, built.filters);
-      if (grid) grid.innerHTML = shown.map(tileHtml).join('');
+      if (grid) grid.innerHTML = shown.map(function (entry) { return tileHtml(entry, built.config.tileStyle); }).join('');
+      var shelfCount = root.querySelector('[data-exp-shelf-count]');
+      if (shelfCount) shelfCount.textContent = shown.length + (shown.length === 1 ? ' opera' : ' opere');
       if (empty) empty.hidden = shown.length > 0;
     }
 

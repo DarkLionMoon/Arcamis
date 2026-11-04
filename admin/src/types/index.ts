@@ -109,6 +109,7 @@ export interface ExploreConfig {
   entityHeading?: string
   showHero?: boolean
   summaryFields?: string[]
+  tileStyle?: 'bookshelf'
   unassigned?: boolean
   filters?: ExploreFilter[]
   tabs?: ExploreGroup[]

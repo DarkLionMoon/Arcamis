@@ -28,6 +28,49 @@ test('la homepage mostra un carosello', async ({ page }) => {
    lunghe non usano più i vecchi listoni: il pattern è quello configurato
    in `explore` e reso da `explorer.js`. */
 test.describe('contenuti migrati sul sito', () => {
+  test('la bibliografia mostra 29 libri sugli scaffali e mantiene ricerca e dettagli', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('arc_disclaimer_accepted', '1'))
+    await page.goto('/lore/bibliografia-scoperta')
+    await expect(page.locator('.exp-book')).toHaveCount(29)
+    await expect(page.locator('[data-exp-shelf-count]')).toHaveText('29 opere')
+    await page.locator('[data-exp-search]').fill('Theren')
+    await expect(page.locator('.exp-book')).toHaveCount(1)
+    await expect(page.locator('[data-exp-shelf-count]')).toHaveText('1 opera')
+    await page.locator('.exp-book').click()
+    await expect(page.locator('.exp-drawer')).toBeVisible()
+    await expect(page.locator('.exp-drawer')).toContainText('Theren')
+    expect(page.url()).toContain('#bibliografia/')
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.exp-drawer')).toBeHidden()
+    await page.locator('[data-exp-search]').fill('nessun-libro-corrispondente')
+    await expect(page.locator('.exp-book')).toHaveCount(0)
+    await expect(page.locator('[data-exp-empty]')).toBeVisible()
+    await page.locator('[data-exp-search]').clear()
+    await expect(page.locator('.exp-book')).toHaveCount(29)
+    for (const width of [390, 320]) {
+      await page.setViewportSize({ width, height: 900 })
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1)
+    }
+  })
+
+  test('Mestieri tiene il riepilogo delle patenti chiuso e mostra i permessi correnti', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('arc_disclaimer_accepted', '1'))
+    await page.setViewportSize({ width: 390, height: 900 })
+    await page.goto('/personaggio/mestieri')
+    const note = page.locator('.exp-notes')
+    await expect(note.locator('summary')).toHaveText('Riepilogo patenti')
+    await expect(note).not.toHaveAttribute('open', '')
+    await expect(page.locator('.exp-tile')).toHaveCount(11)
+    await note.locator('summary').click()
+    await expect(note).toContainText('Manifattura Comune')
+    await note.locator('summary').click()
+    await page.locator('.exp-tile').filter({ hasText: 'Oste' }).click()
+    const drawer = page.locator('.exp-drawer')
+    for (const fee of ['480 Mo', '650 Mo', '2000 Mo', '10000 Mo']) await expect(drawer).toContainText(fee)
+    await expect(drawer).not.toContainText('12500 Mo')
+    await expect(drawer).not.toContainText('3000 Mo')
+  })
+
   test('le specie sono un master-detail: 32 schede, nota introduttiva e gruppi separati dalla tipologia', async ({ page }) => {
     await page.goto('/lore/specie-homebrew')
     await expect(page.locator('#site-loader')).toBeHidden()

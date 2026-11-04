@@ -136,6 +136,10 @@
         "showHero": {
           "type": "boolean"
         },
+        "tileStyle": {
+          "type": "string",
+          "enum": ["bookshelf"]
+        },
         "summaryFields": {
           "type": "array",
           "items": {
