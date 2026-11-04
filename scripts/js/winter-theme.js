@@ -14,7 +14,7 @@
   }
   function isSeason(date) {
     var p = parts(date);
-    return p.month === 12 || (p.month === 1 && p.day <= 6);
+    return (p.month === 11 && p.day >= 2) || p.month === 12 || (p.month === 1 && p.day <= 6);
   }
   function nextMidnightDelay(date) {
     var p = parts(date);
