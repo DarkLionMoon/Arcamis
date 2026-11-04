@@ -7,7 +7,9 @@ vm.runInNewContext(fs.readFileSync(new URL('../js/winter-theme.js', import.meta.
 const winter = win.ArcWinter;
 test('annual season follows Italian date including all of January 6', () => {
   for (const [instant,expected] of [
-    ['2026-11-30T22:59:59Z',false],['2026-11-30T23:00:00Z',true],
+    ['2026-11-01T22:59:59Z',false],['2026-11-01T23:00:00Z',true],
+    ['2026-11-02T12:00:00Z',true],['2026-11-30T12:00:00Z',true],
+    ['2027-11-01T22:59:59Z',false],['2027-11-01T23:00:00Z',true],
     ['2026-12-25T12:00:00Z',true],['2027-01-06T22:59:59Z',true],
     ['2027-01-06T23:00:00Z',false],['2027-12-01T00:00:00Z',true],
     ['2028-01-06T23:00:00Z',false],['2026-07-01T12:00:00Z',false]
