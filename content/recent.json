@@ -1,52 +1,52 @@
 {
  "pages": [
   {
-   "id": "pag-specie-homebrew",
-   "title": "Specie Homebrew",
-   "icon": "🧬",
-   "lastEdited": "2026-11-03T11:31:10.271Z"
+   "id": "pag-arena",
+   "title": "Arena",
+   "icon": "⚔️",
+   "lastEdited": "2026-11-06T00:00:00.000Z"
   },
   {
-   "id": "pag-imprese",
-   "title": "Imprese e Licenze",
-   "icon": "⚖️",
-   "lastEdited": "2026-11-03T10:07:12.611Z"
+   "id": "pag-biblioteca",
+   "title": "Biblioteca",
+   "icon": "📚",
+   "lastEdited": "2026-11-06T00:00:00.000Z"
   },
   {
-   "id": "pag-lavori",
-   "title": "Lavori",
-   "icon": "💼",
-   "lastEdited": "2026-11-02T16:39:35.900Z"
+   "id": "pag-bottega-farmaceutica",
+   "title": "Bottega farmaceutica",
+   "icon": "🧪",
+   "lastEdited": "2026-11-06T00:00:00.000Z"
   },
   {
-   "id": "pag-mestieri",
-   "title": "Mestieri",
-   "icon": "💼",
-   "lastEdited": "2026-10-24T09:22:54.228Z"
+   "id": "pag-caserma",
+   "title": "Caserma",
+   "icon": "🛡️",
+   "lastEdited": "2026-11-06T00:00:00.000Z"
   },
   {
-   "id": "pag-come-si-inizia",
-   "title": "Creazione",
-   "icon": "🌟",
-   "lastEdited": "2026-10-23T18:20:06.865Z"
+   "id": "pag-corporazione-costruttori",
+   "title": "Corporazione dei costruttori",
+   "icon": "🏗️",
+   "lastEdited": "2026-11-06T00:00:00.000Z"
   },
   {
-   "id": "pag-introduzione",
-   "title": "Introduzione",
-   "icon": "📄",
-   "lastEdited": "2026-10-22T14:07:39.921Z"
+   "id": "pag-forgia",
+   "title": "Forgia",
+   "icon": "🔨",
+   "lastEdited": "2026-11-06T00:00:00.000Z"
   },
   {
-   "id": "pag-pantheon",
-   "title": "Pantheon",
-   "icon": "🛐",
-   "lastEdited": "2026-10-22T13:25:32.481Z"
+   "id": "pag-polpo-verde",
+   "title": "Il Polpo Verde",
+   "icon": "🐙",
+   "lastEdited": "2026-11-06T00:00:00.000Z"
   },
   {
-   "id": "pag-foresta-dello-smarrimento",
-   "title": "Foresta dello Smarrimento",
-   "icon": "🌑",
-   "lastEdited": "2026-10-22T13:25:32.477Z"
+   "id": "pag-locanda",
+   "title": "Locanda",
+   "icon": "🛏️",
+   "lastEdited": "2026-11-06T00:00:00.000Z"
   }
  ]
 }
