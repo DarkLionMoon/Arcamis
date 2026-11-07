@@ -39,7 +39,15 @@
     '⚓': 'anchor',
     '🌫': 'fog',
     '🗿': 'monolith',
-    '🏠': 'hearth'
+    '🏠': 'hearth',
+    '🧪': 'helix', /* bottega farmaceutica / alchimia */
+    '🛡': 'castle', /* caserma / guardie */
+    '🏗': 'ruler', /* corporazione dei costruttori / cantieri */
+    '🔨': 'swords', /* forgia */
+    '🛏': 'hearth', /* locanda / alloggio */
+    '⚕': 'temple', /* ospedale */
+    '🧵': 'ruler', /* sartoria / misure */
+    '🐙': 'wave', /* il polpo verde / mare */
   };
 
   function clean(value) {
