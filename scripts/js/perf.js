@@ -273,7 +273,7 @@
               'pag-bottega-farmaceutica',
               'pag-caserma',
               'pag-forgia',
-              'pag-gilda-avventurieri',
+              'pag-gilda-degli-avventurieri',
               'pag-locanda',
               'pag-ospedale',
               'pag-sartoria',
