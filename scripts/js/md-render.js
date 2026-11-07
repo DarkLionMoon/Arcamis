@@ -132,7 +132,13 @@
     t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (m, label, u) {
       u = dec(u).trim();
       if (!safeLink(u)) return label;
-      return '<a href="' + attr(u) + '" target="_blank" rel="noopener" class="n-link">' + inline(dec(label)) + '</a>';
+      /* Link interni: stessa scheda. Con target="_blank" ogni rimando a una
+         pagina del sito (schede dei luoghi, homebrew, mappa) apriva una nuova
+         finestra invece di navigare. I link esterni restano su una scheda
+         nuova, perché interrompono la lettura. */
+      var internal = u.charAt(0) === '/' && u.charAt(1) !== '/';
+      var linkAttrs = internal ? '' : ' target="_blank" rel="noopener"';
+      return '<a href="' + attr(u) + '"' + linkAttrs + ' class="n-link">' + inline(dec(label)) + '</a>';
     });
     return t;
   }
