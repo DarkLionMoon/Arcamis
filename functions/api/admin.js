@@ -670,6 +670,70 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
 
+  /* ════ FEEDBACK PUBBLICO (solo admin) ════ */
+  if (action === 'get_feedback') {
+    if (!(await sessionRole())) {
+      return new Response(JSON.stringify({ error: 'Non autenticato' }), {
+        status: 401,
+        headers: cors,
+      });
+    }
+    if ((await sessionRole()) !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Solo gli admin possono leggere i feedback' }), {
+        status: 403,
+        headers: cors,
+      });
+    }
+
+    const category = (url.searchParams.get('category') || '').trim();
+    const rawLimit = parseInt(url.searchParams.get('limit') || '50', 10);
+    const limit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 50, 1), 200);
+    const cursor = url.searchParams.get('cursor') || undefined;
+
+    let list;
+    try {
+      list = await KV.list({ prefix: 'feedback:', cursor, limit });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: 'Lettura feedback non riuscita' }), {
+        status: 500,
+        headers: cors,
+      });
+    }
+
+    const raws = await Promise.all(list.keys.map((k) => KV.get(k.name).catch(() => null)));
+    let items = raws
+      .map((raw) => {
+        if (!raw) return null;
+        if (typeof raw === 'object') return raw;
+        try {
+          return JSON.parse(raw);
+        } catch (e) {
+          return null;
+        }
+      })
+      .filter(Boolean);
+
+    if (category) items = items.filter((item) => item.category === category);
+    items.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+
+    const counts = {};
+    for (const item of items) {
+      const key = item.category || 'general';
+      counts[key] = (counts[key] || 0) + 1;
+    }
+
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        items,
+        counts,
+        cursor: list.cursor || null,
+        listComplete: !!list.list_complete,
+      }),
+      { headers: cors }
+    );
+  }
+
   /* ════ GET LOG ════ */
   if (action === 'get_log') {
     if (!(await sessionRole())) {

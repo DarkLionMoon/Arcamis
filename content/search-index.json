@@ -111,7 +111,85 @@
   "id": "pag-arcamis",
   "title": "Arcamis",
   "icon": "📍",
-  "text": "Arcamis è la città portuale delle Marche: un crocevia di merci, giuramenti e storie che non sempre tornano. Qui si trovano i luoghi che ogni avventuriero impara presto a conoscere. Arena Il cerchio di pietra dove si misurano le lame e si mettono alla prova i nuovi arrivati. Le rune dell’arena chiudono gli scontri prima che diventino funerali. Biblioteca Un silenzio rispettoso avvolge la biblioteca: chi alza troppo la voce scopre presto che il capo dello staff non ha pazienza per i curiosi. Bottega farmaceutica Ampolle, erbe secche e odori che restano addosso per giorni. Qui si comprano rimedi, veleni e qualche risposta che non si trova altrove. Caserma Il cuore armato di Arcamis: armeria, celle e corridoi dove le guardie parlano più volentieri con chi porta ordini scritti. Interni Una delle ale laterali Armeria C Sotterranei Celle Corporazione dei costruttori Imprese, cantieri e contratti. Chi vuole costruire qualcosa ad Arcamis passa prima da questi banchi. Forgia Il fuoco non si spegne mai. La forgia lavora per la città, per le guardie e per chi paga abbastanza da non fare domande. Il Polpo Verde Una locanda dal proprietario molto particolare, dove le voci corrono più veloci del vino. Il proprietario. Una figura “molto particolare” Locanda Il primo posto in cui un forestiero trova un letto, una birra e qualcuno disposto a raccontare ciò che non dovrebbe. Ospedale Bende, preghiere e qualche miracolo minore. Le porte restano aperte anche quando le casse della città sono vuote. Piazza Il centro di Arcamis, dove i banditori leggono gli editti e le notizie cambiano padrone prima di sera. Porto Moli, cordami e navi che arrivano da mezzo mondo. Al porto si trova lavoro, merce proibita e gente che non vuole essere ricordata. Sartoria Aghi, stoffe e abiti su misura. Un buon sarto vale quanto una lama, soprattutto quando bisogna sembrare qualcun altro."
+  "text": "Arcamis è la città portuale delle Marche: un crocevia di merci, giuramenti e storie che non sempre tornano. Qui si trovano i luoghi che ogni avventuriero impara presto a conoscere. Arena Scheda completa → Il cerchio di pietra dove si misurano le lame e si mettono alla prova i nuovi arrivati. Le rune dell’arena chiudono gli scontri prima che diventino funerali. Biblioteca Scheda completa → Un silenzio rispettoso avvolge la biblioteca: chi alza troppo la voce scopre presto che il capo dello staff non ha pazienza per i curiosi. Bottega farmaceutica Scheda completa → Ampolle, erbe secche e odori che restano addosso per giorni. Qui si comprano rimedi, veleni e qualche risposta che non si trova altrove. Caserma Scheda completa → Il cuore armato di Arcamis: armeria, celle e corridoi dove le guardie parlano più volentieri con chi porta ordini scritti. Interni Una delle ale laterali Armeria C Sotterranei Celle Corporazione dei costruttori Scheda completa → Imprese, cantieri e contratti. Chi vuole costruire qualcosa ad Arcamis passa prima da questi banchi. Forgia Scheda completa → Il fuoco non si spegne mai. La forgia lavora per la città, per le guardie e per chi paga abbastanza da non fare domande. Il Polpo Verde Scheda completa → Una locanda dal proprietario molto particolare, dove le voci corrono più veloci del vino. Il proprietario. Una figura “molto particolare” Locanda Scheda completa → Il primo posto in cui un forestiero trova un letto, una birra e qualcuno disposto a raccontare ciò che non dovrebbe. Ospedale Scheda completa → Bende, preghiere e qualche miracolo minore. Le porte restano aperte anche quando le casse della città sono vuote. Piazza Scheda completa → Il centro di Arcamis, dove i banditori leggono gli editti e le notizie cambiano padrone prima di sera. Porto Scheda completa → Moli, cordami e navi che arrivano da mezzo mondo. Al porto si trova lavoro, merce proibita e gente che non vuole essere ricordata. Sartoria Scheda completa → Aghi, stoffe e abiti su misura. Un buon sarto vale quanto una lama, soprattutto quando bisogna sembrare qualcun altro."
+ },
+ {
+  "id": "pag-arena",
+  "title": "Arena",
+  "icon": "⚔️",
+  "text": "Arena Il cerchio di pietra dove si misurano le lame e si mettono alla prova i nuovi arrivati. Le rune dell'arena chiudono gli scontri prima che diventino funerali. Scontri e regole Gli scontri in arena seguono le regole di PvP e PK del server: motivazioni, consenso e conseguenze sono descritte in Regole del Server. Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Arcamis — la città Piazza"
+ },
+ {
+  "id": "pag-biblioteca",
+  "title": "Biblioteca",
+  "icon": "📚",
+  "text": "Biblioteca Un silenzio rispettoso avvolge la biblioteca: chi alza troppo la voce scopre presto che il capo dello staff non ha pazienza per i curiosi. Lavorare qui La biblioteca è uno dei mestieri riconosciuti in città. Il turno è di 8 ore al giorno, sette giorni su sette. Livello Stipendio base Principiante (1 5) 15 mo Professionista (6 12) 25 mo Mastro (13 20) 35 mo Al totale si aggiunge il bonus di competenza. Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Arcamis — la città Lavori ad Arcamis"
+ },
+ {
+  "id": "pag-bottega-farmaceutica",
+  "title": "Bottega farmaceutica",
+  "icon": "🧪",
+  "text": "Bottega farmaceutica Ampolle, erbe secche e odori che restano addosso per giorni. Qui si comprano rimedi, veleni e qualche risposta che non si trova altrove. Lavorare qui La bottega è uno dei mestieri riconosciuti in città. Il turno è di 8 ore al giorno, sette giorni su sette. Livello Stipendio base Principiante (1 5) 15 mo Professionista (6 12) 25 mo Mastro (13 20) 35 mo Al totale si aggiunge il bonus di competenza. Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Arcamis — la città Lavori ad Arcamis"
+ },
+ {
+  "id": "pag-caserma",
+  "title": "Caserma",
+  "icon": "🛡️",
+  "text": "Caserma Il cuore armato di Arcamis: armeria, celle e corridoi dove le guardie parlano più volentieri con chi porta ordini scritti. Lavorare qui Per entrare ufficialmente nelle Guardie servono almeno 3 mesi di apprendistato come recluta. Il turno di servizio è di 8 ore al giorno, sette giorni su sette. Livello Stipendio base Principiante (1 5) 15 mo Professionista (6 12) 25 mo Mastro (13 20) 35 mo Al totale si aggiunge il bonus di competenza. Dentro la caserma Un'ala laterale Le celle Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Arcamis — la città Lavori ad Arcamis"
+ },
+ {
+  "id": "pag-corporazione-costruttori",
+  "title": "Corporazione dei costruttori",
+  "icon": "🏗️",
+  "text": "Corporazione dei costruttori Imprese, cantieri e contratti. Chi vuole costruire qualcosa ad Arcamis passa prima da questi banchi. Lavorare qui La corporazione è uno dei mestieri riconosciuti in città. Il turno è di 8 ore al giorno, sette giorni su sette. Livello Stipendio base Principiante (1 5) 15 mo Professionista (6 12) 25 mo Mastro (13 20) 35 mo Al totale si aggiunge il bonus di competenza. Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Arcamis — la città Lavori ad Arcamis"
+ },
+ {
+  "id": "pag-forgia",
+  "title": "Forgia",
+  "icon": "🔨",
+  "text": "Forgia Il fuoco non si spegne mai. La forgia lavora per la città, per le guardie e per chi paga abbastanza da non fare domande. Lavorare qui La forgia è uno dei mestieri riconosciuti in città. Il turno è di 8 ore al giorno, sette giorni su sette. Livello Stipendio base Principiante (1 5) 15 mo Professionista (6 12) 25 mo Mastro (13 20) 35 mo Al totale si aggiunge il bonus di competenza. Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Arcamis — la città Lavori ad Arcamis"
+ },
+ {
+  "id": "pag-polpo-verde",
+  "title": "Il Polpo Verde",
+  "icon": "🐙",
+  "text": "Il Polpo Verde Una locanda dal proprietario molto particolare, dove le voci corrono più veloci del vino. Il proprietario. Una figura “molto particolare”. Cosa sapere È una locanda: ci si siede, si beve e si ascolta. Le storie che circolano qui non hanno garanzia, ma arrivano prima delle notizie ufficiali. Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Locanda Arcamis — la città"
+ },
+ {
+  "id": "pag-locanda",
+  "title": "Locanda",
+  "icon": "🛏️",
+  "text": "Locanda Il primo posto in cui un forestiero trova un letto, una birra e qualcuno disposto a raccontare ciò che non dovrebbe. Lavorare qui La locanda è uno dei mestieri riconosciuti in città. Il turno è di 8 ore al giorno, sette giorni su sette. Livello Stipendio base Principiante (1 5) 15 mo Professionista (6 12) 25 mo Mastro (13 20) 35 mo Al totale si aggiunge il bonus di competenza. La locanda condivide l'edificio con la Gilda degli avventurieri: quando i tavoli sono pieni, si può mangiare anche lì. Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Il Polpo Verde Arcamis — la città"
+ },
+ {
+  "id": "pag-ospedale",
+  "title": "Ospedale",
+  "icon": "⚕️",
+  "text": "Ospedale Bende, preghiere e qualche miracolo minore. Le porte restano aperte anche quando le casse della città sono vuote. Lavorare qui L'ospedale è uno dei mestieri riconosciuti in città. Il turno è di 8 ore al giorno, sette giorni su sette. Livello Stipendio base Principiante (1 5) 15 mo Professionista (6 12) 25 mo Mastro (13 20) 35 mo Al totale si aggiunge il bonus di competenza. Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Arcamis — la città Lavori ad Arcamis"
+ },
+ {
+  "id": "pag-piazza",
+  "title": "Piazza",
+  "icon": "🏛️",
+  "text": "Piazza Il centro di Arcamis, dove i banditori leggono gli editti e le notizie cambiano padrone prima di sera. A cosa serve È il punto da cui passano gli avvisi della città: gli editti letti qui valgono per tutto il territorio delle Marche, comprese le regole di convivenza raccolte in Regole del Server. Dove si trova Al centro di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Arcamis — la città Arena"
+ },
+ {
+  "id": "pag-porto",
+  "title": "Porto",
+  "icon": "⚓",
+  "text": "Porto Moli, cordami e navi che arrivano da mezzo mondo. Al porto si trova lavoro, merce proibita e gente che non vuole essere ricordata. Cosa si trova È l'ingresso della città: da qui passano le merci e chi cerca un impiego tra i mestieri riconosciuti ad Arcamis. Dove si trova Sul mare, ai margini di Arcamis: la posizione è segnata nella mappa della città. Vedi anche Arcamis — la città Mestieri"
+ },
+ {
+  "id": "pag-sartoria",
+  "title": "Sartoria",
+  "icon": "🧵",
+  "text": "Sartoria Aghi, stoffe e abiti su misura. Un buon sarto vale quanto una lama, soprattutto quando bisogna sembrare qualcun altro. Lavorare qui La sartoria è uno dei mestieri riconosciuti in città. Il turno è di 8 ore al giorno, sette giorni su sette. Livello Stipendio base Principiante (1 5) 15 mo Professionista (6 12) 25 mo Mastro (13 20) 35 mo Al totale si aggiunge il bonus di competenza. Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Arcamis — la città Lavori ad Arcamis"
+ },
+ {
+  "id": "pag-gilda-degli-avventurieri",
+  "title": "Gilda degli avventurieri",
+  "icon": "🗺️",
+  "text": "Gilda degli avventurieri Tutti i prodi avventurieri devono passare da questo posto per ottenere le loro missioni. Le regole della Gilda Sul banco principale è affisso un messaggio del capo del Corpo degli Avventurieri: \"Al fine di garantire un'esperienza equa per tutti, chiunque lavori come Avventuriero non può lavorare come membro del nostro staff e viceversa. Vi ringraziamo per la pazienza. Kerios\" Dentro la Gilda La Gilda condivide l'edificio con la Locanda: se i posti a sedere sono pieni, i tavoli della Gilda si possono usare per mangiare. Dove si trova Dentro le mura di Arcamis, tra i luoghi raccolti nella mappa della città. Vedi anche Arcamis — la città Lavori ad Arcamis"
  },
  {
   "id": "pag-selva-fogliabruna",

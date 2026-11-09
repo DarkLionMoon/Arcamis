@@ -154,6 +154,8 @@ function ovo() {
 function showToast(txt, icon, dur) {
   var t = document.createElement('div');
   t.className = 'toast';
+  t.setAttribute('role', 'status');
+  t.setAttribute('aria-live', 'polite');
   t.innerHTML = '<span>' + _escHtml(icon) + '</span>' + _escHtml(txt);
   document.body.appendChild(t);
   setTimeout(function () {
@@ -167,11 +169,52 @@ function showToast(txt, icon, dur) {
   }, dur || 3000);
 }
 
+/* ════ META SEO PER PAGINA ════
+   Titolo, description, Open Graph e canonical seguono la vista corrente
+   invece di restare quelli statici di index.html. */
+window.arcSetPageMeta = function (title, desc) {
+  var t = String(title || document.title || '').trim();
+  if (!t) return;
+  if (!desc) {
+    var sub = document.getElementById('ph-sub');
+    if (sub && sub.textContent.trim()) desc = sub.textContent;
+  }
+  if (!desc) {
+    var body = document.getElementById('pbody');
+    var p = body && body.querySelector('p');
+    if (p) desc = p.textContent;
+  }
+  desc = String(desc || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (desc.length > 158) desc = desc.slice(0, 155).replace(/[\s,;:.\-]+$/, '') + '…';
+  var canonical = location.origin + location.pathname;
+  function _set(sel, attr, value) {
+    var el = document.querySelector(sel);
+    if (el) el.setAttribute(attr, value);
+  }
+  if (desc) {
+    _set('meta[name="description"]', 'content', desc);
+    _set('meta[property="og:description"]', 'content', desc);
+    _set('meta[name="twitter:description"]', 'content', desc);
+  }
+  _set('meta[property="og:title"]', 'content', t);
+  _set('meta[name="twitter:title"]', 'content', t);
+  _set('meta[property="og:url"]', 'content', canonical);
+  var link = document.querySelector('link[rel="canonical"]');
+  if (link) link.setAttribute('href', canonical);
+};
+
 /* ════ HOOKS — event bus ════ */
 window._afterPageRenderCbs = [];
 window.onAfterPageRender = function (cb) {
   window._afterPageRenderCbs.push(cb);
 };
+
+/* Mantiene i meta allineati alla pagina appena renderizzata */
+window.onAfterPageRender(function () {
+  window.arcSetPageMeta();
+});
 window.afterPageRender = function () {
   window._afterPageRenderCbs.forEach(function (cb) {
     try {
@@ -190,10 +233,32 @@ window.afterPageRender = function () {
 /* ════ COPY LINK ════ */
 window.copyPageLink = function () {
   var url = location.href;
+  function _fallbackCopy() {
+    var ta = document.createElement('textarea');
+    ta.value = url;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try {
+      ok = document.execCommand('copy');
+    } catch (_err) {
+      /* execCommand non disponibile: ok resta false */
+    }
+    ta.remove();
+    showToast(ok ? 'Link copiato' : 'Impossibile copiare il link', ok ? '🔗' : '⚠️', 2400);
+  }
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(url).then(function () {
-      showToast('Link copiato', '🔗', 2400);
-    });
+    navigator.clipboard
+      .writeText(url)
+      .then(function () {
+        showToast('Link copiato', '🔗', 2400);
+      })
+      .catch(_fallbackCopy);
+  } else {
+    _fallbackCopy();
   }
 };
 
@@ -238,22 +303,94 @@ document.addEventListener('keydown', function (e) {
     closeMobileNav();
     _closeOptionsPanel();
   }
+  /* Trap del focus: con il drawer mobile aperto il Tab non esce dal menu. */
+  if (e.key === 'Tab') {
+    var _nav = document.getElementById('mobile-nav');
+    if (_nav && _nav.classList.contains('open')) {
+      var _focusables = _nav.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (_focusables.length) {
+        var _first = _focusables[0];
+        var _last = _focusables[_focusables.length - 1];
+        if (!e.shiftKey && document.activeElement === _last) {
+          e.preventDefault();
+          _first.focus();
+        } else if (e.shiftKey && document.activeElement === _first) {
+          e.preventDefault();
+          _last.focus();
+        }
+      }
+    }
+  }
 });
 
 /* ════ MOBILE NAV ════ */
+var _mobileNavOpener = null;
+function _mobileNavRefs() {
+  return {
+    nav: document.getElementById('mobile-nav'),
+    btn: document.getElementById('hamburger')
+  };
+}
+function openMobileNav() {
+  var refs = _mobileNavRefs();
+  var el = refs.nav;
+  if (!el) return;
+  _mobileNavOpener = document.activeElement;
+  el.classList.remove('closing');
+  el.classList.add('open');
+  el.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('nav-open');
+  if (refs.btn) {
+    refs.btn.setAttribute('aria-expanded', 'true');
+    refs.btn.setAttribute('aria-label', 'Chiudi menu di navigazione');
+  }
+  var first = el.querySelector('input, button, a[href], [tabindex]:not([tabindex="-1"])');
+  if (first) {
+    setTimeout(function () {
+      try {
+        first.focus({ preventScroll: true });
+      } catch (err) {
+        /* browser senza focus options */
+      }
+    }, 60);
+  }
+}
 function toggleMobileNav() {
-  var el = document.getElementById('mobile-nav');
-  var isOpen = el.classList.toggle('open');
-  document.body.classList.toggle('nav-open');
-  if (el) el.setAttribute('aria-hidden', String(!isOpen));
+  var el = _mobileNavRefs().nav;
+  if (!el) return;
+  if (el.classList.contains('open')) closeMobileNav();
+  else openMobileNav();
 }
 function closeMobileNav() {
-  var el = document.getElementById('mobile-nav');
+  var refs = _mobileNavRefs();
+  var el = refs.nav;
   if (el) {
+    var wasOpen = el.classList.contains('open');
     el.classList.remove('open');
     el.setAttribute('aria-hidden', 'true');
+    if (wasOpen) {
+      el.classList.add('closing');
+      clearTimeout(el._mnCloseTimer);
+      el._mnCloseTimer = setTimeout(function () {
+        el.classList.remove('closing');
+      }, 180);
+    }
+    if (wasOpen && _mobileNavOpener && document.contains(_mobileNavOpener)) {
+      try {
+        _mobileNavOpener.focus({ preventScroll: true });
+      } catch (err) {
+        /* focus non disponibile */
+      }
+    }
+    _mobileNavOpener = null;
   }
   document.body.classList.remove('nav-open');
+  if (refs.btn) {
+    refs.btn.setAttribute('aria-expanded', 'false');
+    refs.btn.setAttribute('aria-label', 'Apri menu di navigazione');
+  }
   var msr = document.getElementById('m-sr');
   if (msr) {
     msr.innerHTML = '';

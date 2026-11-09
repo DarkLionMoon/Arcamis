@@ -1,0 +1,393 @@
+/* ════════════════════════════════════════════════════════
+   ARCAMIS — scripts/css/feedback.css
+   Widget di feedback: trigger flottante, pannello modale
+   (bottom sheet su mobile), stati di invio e messaggi.
+   I colori usano i token del tema, con fallback locali.
+   ════════════════════════════════════════════════════════════ */
+
+.arc-fb-lock {
+  overflow: hidden;
+}
+
+/* ── Trigger ─────────────────────────────────────────────── */
+.arc-fb-trigger {
+  position: fixed;
+  right: 16px;
+  bottom: calc(124px + env(safe-area-inset-bottom));
+  z-index: 9300;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  background: linear-gradient(180deg, rgba(26, 22, 10, 0.97), rgba(8, 8, 6, 0.97));
+  color: var(--gold3, #e8c86a);
+  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.42);
+  border-radius: 999px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+.arc-fb-trigger:hover,
+.arc-fb-trigger:focus-visible {
+  background: linear-gradient(180deg, rgba(44, 36, 16, 0.98), rgba(14, 12, 8, 0.98));
+  border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.75);
+  transform: translateY(-1px);
+}
+.arc-fb-trigger[aria-expanded='true'] {
+  border-color: var(--gold, #c89b3c);
+  box-shadow: 0 0 0 2px rgba(var(--gold-rgb, 200, 155, 60), 0.18);
+}
+.arc-fb-trigger-icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* ── Backdrop e pannello ────────────────────────────────── */
+.arc-fb-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9400;
+  background: rgba(2, 3, 6, 0.62);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.arc-fb-backdrop.is-open {
+  opacity: 1;
+}
+
+.arc-fb-panel {
+  position: fixed;
+  right: 16px;
+  bottom: calc(124px + env(safe-area-inset-bottom));
+  z-index: 9500;
+  width: min(420px, calc(100vw - 24px));
+  max-height: calc(100dvh - 110px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 20px calc(18px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(13, 16, 23, 0.99), rgba(6, 7, 12, 0.99));
+  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.32);
+  border-radius: 10px;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.66),
+    0 0 0 1px rgba(var(--gold-rgb, 200, 155, 60), 0.06);
+  color: var(--white, #f0e6d2);
+  opacity: 0;
+  transform: translateY(10px) scale(0.985);
+  transition:
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.18s ease;
+}
+.arc-fb-panel.is-open {
+  opacity: 1;
+  transform: none;
+}
+
+.arc-fb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.arc-fb-title {
+  margin: 0;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  color: var(--gold3, #e8c86a);
+}
+.arc-fb-close {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.18);
+  border-radius: 4px;
+  color: var(--text2, #94804d);
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.arc-fb-close:hover {
+  color: var(--gold3, #e8c86a);
+  border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.5);
+}
+.arc-fb-desc {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text2, #94804d);
+}
+
+/* ── Campi ──────────────────────────────────────────────── */
+.arc-fb-field {
+  margin-bottom: 14px;
+}
+.arc-fb-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(var(--gold-rgb, 200, 155, 60), 0.75);
+}
+.arc-fb-opt {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text3, #8f7b4b);
+}
+.arc-fb-panel select,
+.arc-fb-panel textarea,
+.arc-fb-panel input[type='email'],
+.arc-fb-panel input[type='text'] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.2);
+  border-radius: 5px;
+  color: var(--white, #f0e6d2);
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.5;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.arc-fb-panel textarea {
+  resize: vertical;
+  min-height: 112px;
+}
+.arc-fb-panel select:focus,
+.arc-fb-panel textarea:focus,
+.arc-fb-panel input:focus {
+  outline: none;
+  border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.65);
+  box-shadow: 0 0 0 3px rgba(var(--gold-rgb, 200, 155, 60), 0.12);
+}
+.arc-fb-panel textarea[aria-invalid='true'],
+.arc-fb-panel input[aria-invalid='true'] {
+  border-color: rgba(210, 90, 80, 0.75);
+  box-shadow: 0 0 0 3px rgba(210, 90, 80, 0.12);
+}
+.arc-fb-panel ::placeholder {
+  color: rgba(143, 123, 75, 0.75);
+}
+.arc-fb-meta {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.arc-fb-count {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--text3, #8f7b4b);
+}
+.arc-fb-count.is-near {
+  color: #d8a85a;
+}
+.arc-fb-hint {
+  margin: 5px 0 0;
+  font-size: 11px;
+  color: var(--text3, #8f7b4b);
+}
+
+/* Honeypot: fuori schermo ma compilabile dai bot, invisibile agli utenti. */
+.arc-fb-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ── Azioni e stati ────────────────────────────────────── */
+.arc-fb-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.arc-fb-submit,
+.arc-fb-again {
+  flex: 1 1 auto;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: linear-gradient(180deg, rgba(var(--gold-rgb, 200, 155, 60), 0.95), rgba(150, 112, 34, 0.95));
+  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.7);
+  border-radius: 4px;
+  color: #14100a;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    opacity 0.15s ease;
+}
+.arc-fb-submit:hover:not([disabled]),
+.arc-fb-again:hover {
+  filter: brightness(1.08);
+}
+.arc-fb-submit[disabled] {
+  opacity: 0.7;
+  cursor: progress;
+}
+.arc-fb-cancel,
+.arc-fb-retry {
+  min-height: 44px;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.18);
+  border-radius: 4px;
+  color: var(--text2, #94804d);
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.arc-fb-cancel:hover,
+.arc-fb-retry:hover {
+  color: var(--gold3, #e8c86a);
+  border-color: rgba(var(--gold-rgb, 200, 155, 60), 0.45);
+}
+.arc-fb-retry {
+  margin-top: 10px;
+  width: 100%;
+  border-color: rgba(210, 90, 80, 0.35);
+  color: #e3a09a;
+}
+.arc-fb-error {
+  margin: 4px 0 0;
+  padding: 9px 12px;
+  border-left: 2px solid rgba(210, 90, 80, 0.7);
+  background: rgba(120, 30, 26, 0.16);
+  color: #eab5b0;
+  font-size: 13px;
+  line-height: 1.5;
+  border-radius: 0 4px 4px 0;
+}
+.arc-fb-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(20, 16, 10, 0.3);
+  border-top-color: #14100a;
+  animation: arc-fb-spin 0.7s linear infinite;
+}
+@keyframes arc-fb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.arc-fb-success {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+.arc-fb-success-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(var(--gold-rgb, 200, 155, 60), 0.5);
+  border-radius: 50%;
+  color: var(--gold3, #e8c86a);
+  font-size: 20px;
+}
+.arc-fb-success-msg {
+  margin: 0 0 6px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 15px;
+  color: var(--gold3, #e8c86a);
+}
+.arc-fb-success-msg:focus {
+  outline: none;
+}
+.arc-fb-success-sub {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text2, #94804d);
+}
+
+/* ── Mobile: bottom sheet ───────────────────────────────── */
+@media (max-width: 560px) {
+  .arc-fb-trigger {
+    right: 12px;
+    bottom: calc(124px + env(safe-area-inset-bottom));
+    padding: 0;
+    width: 48px;
+    height: 48px;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .arc-fb-trigger-label {
+    display: none;
+  }
+  .arc-fb-panel {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-height: 90dvh;
+    border-radius: 14px 14px 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 18px 16px calc(20px + env(safe-area-inset-bottom));
+    transform: translateY(24px);
+  }
+  .arc-fb-actions {
+    gap: 8px;
+  }
+  .arc-fb-submit,
+  .arc-fb-again {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc-fb-trigger,
+  .arc-fb-panel,
+  .arc-fb-backdrop,
+  .arc-fb-spinner {
+    transition: none;
+    animation: none;
+  }
+}
+
+@media print {
+  .arc-fb-trigger,
+  .arc-fb-panel,
+  .arc-fb-backdrop {
+    display: none !important;
+  }
+}

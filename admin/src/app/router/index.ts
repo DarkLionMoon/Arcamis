@@ -13,6 +13,7 @@ import PageListView from '@/features/pages/PageListView.vue'
 import PageEditorView from '@/features/pages/PageEditorView.vue'
 import CoversView from '@/features/covers/CoversView.vue'
 import AuditView from '@/features/audit/AuditView.vue'
+import FeedbackView from '@/features/feedback/FeedbackView.vue'
 import NavigationView from '@/features/navigation/NavigationView.vue'
 import InterfaceView from '@/features/interface/InterfaceView.vue'
 import SettingsView from '@/features/settings/SettingsView.vue'
@@ -51,6 +52,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'changelog', name: 'changelog', component: ChangelogView, meta: { minRole: 'editor' } },
       { path: 'glossario', name: 'glossary', component: GlossaryView, meta: { minRole: 'editor' } },
       { path: 'audit', name: 'audit', component: AuditView, meta: { minRole: 'admin' } },
+      { path: 'feedback', name: 'feedback', component: FeedbackView, meta: { minRole: 'admin' } },
       { path: 'link-scanner', name: 'link-scanner', component: LinkScannerView, meta: { minRole: 'admin' } },
       { path: 'trova-sostituisci', name: 'global-replace', component: GlobalReplaceView, meta: { minRole: 'admin' } },
       { path: 'media-orfani', name: 'orphan-media', component: OrphanMediaView, meta: { minRole: 'admin' } },

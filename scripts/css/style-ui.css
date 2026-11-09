@@ -115,7 +115,10 @@
   max-height:calc(100vh - var(--topbar-h));max-height:calc(100dvh - var(--topbar-h));padding-bottom:env(safe-area-inset-bottom);overflow-y:auto;
 }
 #mobile-nav.open{display:block;animation:mnopen .22s ease forwards}
+#mobile-nav.closing{display:block;animation:mnclose .18s ease forwards}
 @keyframes mnopen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes mnclose{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
+@media(prefers-reduced-motion:reduce){#mobile-nav.open,#mobile-nav.closing{animation:none}}
 .mn-section{padding:6px 0}
 .mn-search{position:relative;padding:12px 16px 4px}
 .mn-search-icon{position:absolute;left:28px;top:50%;transform:translateY(-8px);color:var(--gold3);font-size:14px;pointer-events:none}

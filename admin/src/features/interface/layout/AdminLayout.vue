@@ -108,6 +108,7 @@ const groups: Array<{ title: string; items: NavItem[] }> = [
   {
     title: 'Sicurezza',
     items: [
+      { label: 'Feedback', to: '/feedback', icon: 'audit', minRole: 'admin' },
       { label: 'Audit', to: '/audit', icon: 'audit', minRole: 'admin' },
       { label: 'Link Scanner', to: '/link-scanner', icon: 'links', minRole: 'admin' },
       { label: 'Trova & Sostituisci', to: '/trova-sostituisci', icon: 'replace', minRole: 'admin' },

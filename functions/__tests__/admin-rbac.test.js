@@ -46,6 +46,7 @@ const ALL_ACTIONS = [
   'gh_token_status',
   'set_gh_token',
   'get_log',
+  'get_feedback',
   'audit',
   'set_cover',
   'get_carousel',

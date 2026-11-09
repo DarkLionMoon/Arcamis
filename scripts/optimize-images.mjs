@@ -114,10 +114,24 @@ async function processImage(file, report) {
             format.ext === 'webp' && width <= 640
               ? { ...format.options, quality: 72 }
               : format.options;
-          await sharp(file)
-            .resize({ width, withoutEnlargement: true })
-            .toFormat(format.ext, options)
-            .toFile(target);
+          const writeVariant = (opts) =>
+            sharp(file)
+              .resize({ width, withoutEnlargement: true })
+              .toFormat(format.ext, opts)
+              .toFile(target);
+          await writeVariant(options);
+          /* Se una variante sfora il budget, riprova a qualità più bassa
+             invece di pubblicarla fuori standard. */
+          const maxBytes = BUDGETS[width];
+          if (maxBytes && format.ext !== 'png') {
+            let size = (await fs.stat(target)).size;
+            let quality = typeof options.quality === 'number' ? options.quality : 80;
+            while (size > maxBytes && quality > 45) {
+              quality -= 8;
+              await writeVariant({ ...options, quality });
+              size = (await fs.stat(target)).size;
+            }
+          }
           written += 1;
         }
       }

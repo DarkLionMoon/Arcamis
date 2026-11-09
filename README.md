@@ -318,6 +318,9 @@ controllare se una pagina "sparisce".
 - **Cestino** (admin): ripristino o distruzione definitiva (conferma con
   chiave; "Svuota" chiede `SVUOTA`).
 - **Backup** (admin): JSON scaricabile con tutte le pagine.
+- **Feedback** (admin): i messaggi del widget pubblico, con filtro per
+  categoria e caricamento a pagine; restano in KV 180 giorni. Specifica
+  dell'endpoint, rate limit e webhook in [`docs/feedback.md`](docs/feedback.md).
 - **Utenti** (admin): crea/cambia ruolo e password/elimina (mai `admin`);
   tutto parte con **💾 Salva**.
 - **Scanner link / Trova & Sostituisci / Media orfani** (admin): link rotti e

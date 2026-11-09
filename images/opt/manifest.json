@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-24T08:28:02.960Z",
+  "generated": "2026-11-09T11:02:32.605Z",
   "widths": [
     640,
     1280,
@@ -10,6 +10,54 @@
     "webp"
   ],
   "sources": {
+    "/images/826b2218-6456-4de7-bbc8-dc0bcd588313.png": {
+      "w": 1536,
+      "h": 1024,
+      "v": {
+        "640": {
+          "a": "/images/opt/826b2218-6456-4de7-bbc8-dc0bcd588313-640.avif",
+          "aB": 32961,
+          "w": "/images/opt/826b2218-6456-4de7-bbc8-dc0bcd588313-640.webp",
+          "wB": 56410
+        },
+        "1280": {
+          "a": "/images/opt/826b2218-6456-4de7-bbc8-dc0bcd588313-1280.avif",
+          "aB": 111154,
+          "w": "/images/opt/826b2218-6456-4de7-bbc8-dc0bcd588313-1280.webp",
+          "wB": 183204
+        },
+        "1536": {
+          "a": "/images/opt/826b2218-6456-4de7-bbc8-dc0bcd588313-1536.avif",
+          "aB": 148850,
+          "w": "/images/opt/826b2218-6456-4de7-bbc8-dc0bcd588313-1536.webp",
+          "wB": 243538
+        }
+      }
+    },
+    "/images/Grande_Sala_della_Gilda_Fantasy.png": {
+      "w": 1536,
+      "h": 1024,
+      "v": {
+        "640": {
+          "a": "/images/opt/Grande_Sala_della_Gilda_Fantasy-640.avif",
+          "aB": 31482,
+          "w": "/images/opt/Grande_Sala_della_Gilda_Fantasy-640.webp",
+          "wB": 55138
+        },
+        "1280": {
+          "a": "/images/opt/Grande_Sala_della_Gilda_Fantasy-1280.avif",
+          "aB": 106020,
+          "w": "/images/opt/Grande_Sala_della_Gilda_Fantasy-1280.webp",
+          "wB": 175306
+        },
+        "1536": {
+          "a": "/images/opt/Grande_Sala_della_Gilda_Fantasy-1536.avif",
+          "aB": 141647,
+          "w": "/images/opt/Grande_Sala_della_Gilda_Fantasy-1536.webp",
+          "wB": 228072
+        }
+      }
+    },
     "/images/biblioteca.jpg": {
       "w": 1280,
       "h": 760,
@@ -25,6 +73,30 @@
           "aB": 70601,
           "w": "/images/opt/biblioteca-1280.webp",
           "wB": 100012
+        }
+      }
+    },
+    "/images/c7ede88a-0f4d-400f-84c4-0eb06e99ff0a.jpg": {
+      "w": 1536,
+      "h": 1024,
+      "v": {
+        "640": {
+          "a": "/images/opt/c7ede88a-0f4d-400f-84c4-0eb06e99ff0a-640.avif",
+          "aB": 35848,
+          "w": "/images/opt/c7ede88a-0f4d-400f-84c4-0eb06e99ff0a-640.webp",
+          "wB": 65464
+        },
+        "1280": {
+          "a": "/images/opt/c7ede88a-0f4d-400f-84c4-0eb06e99ff0a-1280.avif",
+          "aB": 124165,
+          "w": "/images/opt/c7ede88a-0f4d-400f-84c4-0eb06e99ff0a-1280.webp",
+          "wB": 179770
+        },
+        "1536": {
+          "a": "/images/opt/c7ede88a-0f4d-400f-84c4-0eb06e99ff0a-1536.avif",
+          "aB": 165477,
+          "w": "/images/opt/c7ede88a-0f4d-400f-84c4-0eb06e99ff0a-1536.webp",
+          "wB": 284348
         }
       }
     },
