@@ -133,9 +133,25 @@ document.addEventListener('click', function (e) {
 });
 
 /* ════ UI NAVIGATION ════ */
+/* Una sola vista attiva per volta. Il contatore invalida anche i timer
+   della dissolvenza: una navigazione rapida non può più far riemergere
+   la vista precedente dopo che l'utente è già altrove. */
+var _viewEpoch = 0;
+function _setView(isPage) {
+  _viewEpoch++;
+  var hv = document.getElementById('hv');
+  var pv = document.getElementById('pv');
+  if (!hv || !pv) return;
+  [hv, pv].forEach(function (view) {
+    view.style.transition = '';
+    view.style.opacity = '';
+  });
+  hv.style.display = isPage ? 'none' : 'block';
+  pv.style.display = isPage ? 'block' : 'none';
+}
 function showHome() {
-  document.getElementById('hv').style.display = 'block';
-  document.getElementById('pv').style.display = 'none';
+  if (typeof _invalidatePageRender === 'function') _invalidatePageRender();
+  _setView(false);
   document.body.classList.remove('page-open');
   var cv = document.querySelector('.ph-covbg');
   if (cv) cv.style.opacity = '0';
@@ -173,13 +189,17 @@ window.onAfterPageRender = function (cb) {
   window._afterPageRenderCbs.push(cb);
 };
 window.afterPageRender = function () {
+  _setView(true);
+  var pbody = document.getElementById('pbody');
+  if (pbody) {
+    pbody.style.transition = '';
+    pbody.style.opacity = '1';
+  }
   window._afterPageRenderCbs.forEach(function (cb) {
     try {
       cb();
     } catch (e) {}
   });
-  document.getElementById('hv').style.display = 'none';
-  document.getElementById('pv').style.display = 'block';
   document.body.classList.add('page-open');
   hideSiteLoader();
   var ts = document.getElementById('ts');
@@ -512,9 +532,11 @@ function goToTop() {
 
 /* ════ XFADE ════ */
 function xfade(from, to) {
+  var epoch = ++_viewEpoch;
   from.style.transition = 'opacity .2s ease';
   from.style.opacity = '0';
   setTimeout(function () {
+    if (epoch !== _viewEpoch) return;
     from.style.display = 'none';
     from.style.opacity = '';
     from.style.transition = '';
@@ -522,8 +544,10 @@ function xfade(from, to) {
     to.style.opacity = '0';
     to.style.transition = 'opacity .2s ease';
     setTimeout(function () {
+      if (epoch !== _viewEpoch) return;
       to.style.opacity = '1';
       setTimeout(function () {
+        if (epoch !== _viewEpoch) return;
         to.style.transition = '';
         to.style.opacity = '';
       }, 200);
