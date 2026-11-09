@@ -66,14 +66,15 @@ describe('rotte pubbliche (sorgente)', () => {
     }
   });
 
-  it('genera una sitemap con tutte le rotte e la dichiara in robots.txt', () => {
+  it('genera una sitemap con tutte le rotte e chiude robots.txt', () => {
     const xml = renderSitemap(routes);
     expect((xml.match(/<loc>/g) || []).length).toBe(routes.length);
     expect(xml).toContain(`<loc>${SITE_URL}/</loc>`);
     for (const route of routes) {
       expect(xml).toContain(`<loc>${SITE_URL}/${route.path}</loc>`);
     }
-    expect(renderRobots()).toContain(`Sitemap: ${SITE_URL}/sitemap.xml`);
+    expect(renderRobots()).toContain('Disallow: /');
+    expect(renderRobots()).not.toContain('Sitemap:');
   });
 });
 
