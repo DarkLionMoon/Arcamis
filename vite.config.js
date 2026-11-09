@@ -15,6 +15,10 @@ function copyStaticAssets() {
 
     for (const entry of fs.readdirSync(absoluteDir, { withFileTypes: true })) {
       const relativePath = path.join(relativeDir, entry.name);
+      /* Il manifest delle varianti contiene il timestamp di generazione:
+         pubblicarlo renderebbe diverso il digest di ogni build. Il sito usa
+         scripts/js/image-manifest.js, non questo file (che serve ai test). */
+      if (relativePath === path.join('images', 'opt', 'manifest.json')) continue;
       if (entry.isDirectory()) emitTree(pluginContext, relativePath);
       else
         pluginContext.emitFile({

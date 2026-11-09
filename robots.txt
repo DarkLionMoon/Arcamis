@@ -1,2 +1,8 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+Disallow: /admin
+Disallow: /api/
+Disallow: /export/
+
+Sitemap: https://arcamis.pages.dev/sitemap.xml

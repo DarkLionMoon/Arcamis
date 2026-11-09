@@ -1,9 +1,10 @@
-# ⚠️  ATTENZIONE — QUESTO FILE È QUELLO ATTIVO IN PRODUZIONE.
+# ⚠️  COPIA NON USATA DAL DEPLOY — LE REGOLE ATTIVE SONO IN dist/_redirects.
 #
-# Cloudflare Pages pubblica la RADICE del repository (non dist/), quindi
-# queste sono le regole che governano arcamis.pages.dev. Il build di dist/
-# genera un _redirects diverso, senza catch-all, perché in dist/ ogni rotta
-# pubblica è prerenderizzata (vedi scripts/build-post.mjs).
+# Cloudflare Pages pubblica `dist/` (build command `npm ci --prefix admin &&
+# npm run build`, output `dist`), quindi le regole che governano
+# arcamis.pages.dev sono quelle generate da scripts/build-post.mjs in
+# dist/_redirects. Questo file nella root non viene copiato nel deploy:
+# resta solo come riferimento storico.
 #
 # Regola d'oro: MAI redirigere verso un URL *.html. Pages risponde 308 verso
 # l'URL senza estensione (/admin/app.html → /admin/app), quindi un redirect
@@ -11,7 +12,7 @@
 # in modo corretto").
 #
 # /admin è l'unico URL canonico del pannello; il build Vue compilato vive in
-# export/admin e viene servito sotto /admin/ (i suoi asset sono assoluti:
+# export/admin e viene servito in dist/admin (i suoi asset sono assoluti:
 # /admin/assets/…).
 
 /admin/app/     /admin               301
