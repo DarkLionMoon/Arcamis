@@ -368,8 +368,21 @@ export function renderSitemap(routes) {
 }
 
 export function renderRobots() {
-  /* Sito chiuso: nessuna pagina deve essere scansionata. */
-  return ['User-agent: *', 'Disallow: /', ''].join('\n');
+  /* Sito pubblico: i crawler possono scansionare tutto tranne le aree
+     riservate (pannello, API, copia non elaborata del pannello).
+     La sitemap è l'unica dichiarata e contiene solo le rotte pubbliche:
+     collectRoutes esclude bozze, pagine in revisione e programmate. */
+  return [
+    'User-agent: *',
+    'Allow: /',
+    '',
+    'Disallow: /admin',
+    'Disallow: /api/',
+    'Disallow: /export/',
+    '',
+    `Sitemap: ${SITE_URL}/sitemap.xml`,
+    '',
+  ].join('\n');
 }
 
 export function escapeXml(value) {

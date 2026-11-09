@@ -218,7 +218,16 @@ const precache = [
 ];
 for (const target of jsMap.values()) precache.push(target);
 const existing = precache.filter((url) => fs.existsSync(distPath(url.replace(/^\//, ''))));
-const buildVersion = shortHash(existing.join('|') + jsAfter);
+/* La versione del service worker è l'impronta dei file che finiscono davvero
+   in precache: ogni modifica a contenuti, CSS, immagini o JS cambia il nome
+   della cache e invalida quella precedente all'attivazione. Deterministico:
+   due build dello stesso commit producono lo stesso valore. */
+const versionHash = crypto.createHash('sha256');
+for (const url of existing) {
+  versionHash.update(url);
+  versionHash.update(fs.readFileSync(distPath(url.replace(/^\//, ''))));
+}
+const buildVersion = versionHash.digest('hex').slice(0, 12);
 
 const swTemplate = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 const sw = [

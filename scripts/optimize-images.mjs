@@ -109,15 +109,21 @@ async function processImage(file, report) {
         if (!CHECK_ONLY) {
           await fs.mkdir(targetDir, { recursive: true });
           /* Le thumbnail strette hanno meno pixel per byte utile: una
-             qualità leggermente più bassa tiene il budget dei 80 KB. */
-          const options =
-            format.ext === 'webp' && width <= 640
-              ? { ...format.options, quality: 72 }
-              : format.options;
-          await sharp(file)
-            .resize({ width, withoutEnlargement: true })
-            .toFormat(format.ext, options)
-            .toFile(target);
+             qualità leggermente più bassa tiene il budget dei 80 KB.
+             Le varianti grandi, però, possono sforarlo anche così: qui la
+             qualità scende a passi di 6 punti finché il file ci sta. Il
+             budget diventa quindi un vincolo applicato, non un avviso. */
+          let quality = format.ext === 'webp' && width <= 640 ? 72 : format.options.quality;
+          const budget = BUDGETS[width];
+          for (;;) {
+            await sharp(file)
+              .resize({ width, withoutEnlargement: true })
+              .toFormat(format.ext, { ...format.options, quality })
+              .toFile(target);
+            const size = (await fs.stat(target)).size;
+            if (!budget || size <= budget || quality <= 44) break;
+            quality = Math.max(44, quality - 6);
+          }
           written += 1;
         }
       }

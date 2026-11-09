@@ -66,15 +66,24 @@ describe('rotte pubbliche (sorgente)', () => {
     }
   });
 
-  it('genera una sitemap con tutte le rotte e chiude robots.txt', () => {
+  it('genera una sitemap con tutte le rotte e apre robots.txt', () => {
     const xml = renderSitemap(routes);
     expect((xml.match(/<loc>/g) || []).length).toBe(routes.length);
     expect(xml).toContain(`<loc>${SITE_URL}/</loc>`);
     for (const route of routes) {
       expect(xml).toContain(`<loc>${SITE_URL}/${route.path}</loc>`);
     }
-    expect(renderRobots()).toContain('Disallow: /');
-    expect(renderRobots()).not.toContain('Sitemap:');
+
+    /* Il sito è pubblico: robots.txt non deve bloccare le pagine, solo le
+       aree riservate, e deve dichiarare l'unica sitemap. */
+    const robots = renderRobots();
+    expect(robots).toContain('User-agent: *');
+    expect(robots).toContain('Allow: /');
+    expect(robots).not.toMatch(/^Disallow: \/$/m);
+    expect(robots).toContain('Disallow: /admin');
+    expect(robots).toContain('Disallow: /api/');
+    expect(robots).toContain('Disallow: /export/');
+    expect(robots).toContain(`Sitemap: ${SITE_URL}/sitemap.xml`);
   });
 });
 
