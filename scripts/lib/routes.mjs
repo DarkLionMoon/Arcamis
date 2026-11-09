@@ -368,15 +368,8 @@ export function renderSitemap(routes) {
 }
 
 export function renderRobots() {
-  return [
-    'User-agent: *',
-    'Allow: /',
-    'Disallow: /admin/',
-    'Disallow: /api/',
-    '',
-    `Sitemap: ${SITE_URL}/sitemap.xml`,
-    '',
-  ].join('\n');
+  /* Sito chiuso: nessuna pagina deve essere scansionata. */
+  return ['User-agent: *', 'Disallow: /', ''].join('\n');
 }
 
 export function escapeXml(value) {
