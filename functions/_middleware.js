@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   ARCAMIS — chiusura del sito
+   ARCAMIS — sito in lavorazione
 
    Questo middleware intercetta OGNI richiesta della wiki e
    risponde con la pagina di scuse, senza servire né le pagine
@@ -20,9 +20,9 @@ const PAGINA = `<!DOCTYPE html>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#080a0e">
-<title>Arcamis — la wiki è chiusa</title>
+<title>Arcamis — sito in lavorazione</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="La wiki di Arcamis non è più disponibile. Il materiale di riferimento continua su Notion.">
+<meta name="description" content="La wiki di Arcamis è in lavorazione. Nel frattempo il materiale di riferimento continua su Notion.">
 <style>
   :root{
     --bg:#080a0e;--gold:#d4af37;--gold3:#e8cf7a;
@@ -62,13 +62,13 @@ const PAGINA = `<!DOCTYPE html>
 <body>
 <main>
   <div class="sigil">Arcamis</div>
-  <h1>Ci scusiamo</h1>
-  <p>La wiki di Arcamis non è più online. Ci dispiace per chi cercava una scheda, un luogo o una regola e si è trovato davanti a un link che non porta più da nessuna parte.</p>
-  <p>Il materiale di riferimento continua su <strong>Notion</strong>: è lì che trovi la versione aggiornata di tutto.</p>
+  <h1>Sito in lavorazione</h1>
+  <p>La wiki di Arcamis è in lavorazione: stiamo rifacendo il sito e in questo momento le pagine non sono raggiungibili. Ci scusiamo con chi cercava una scheda, un luogo o una regola e ha trovato un link che non porta da nessuna parte.</p>
+  <p>Nel frattempo il materiale di riferimento continua su <strong>Notion</strong>: è lì che trovi la versione aggiornata di tutto.</p>
   <div class="actions">
     <a class="btn" href="${NOTION_URL}" target="_blank" rel="noopener">Vai al Notion →</a>
   </div>
-  <div class="hint">Questa pagina sostituisce tutte le altre: il sito resta chiuso.</div>
+  <div class="hint">Questa pagina sostituisce temporaneamente le altre: il sito tornerà online appena la lavorazione sarà conclusa.</div>
 </main>
 </body>
 </html>`;
