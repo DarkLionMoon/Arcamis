@@ -31,6 +31,9 @@ __pycache__/
 .netlify/
 .wrangler/
 
+# Artefatti e chiavi locali di lavoro
+artifacts/
+
 # Report e artefatti locali dei test
 admin/test-results/
 content/search-entries.json
