@@ -5,6 +5,17 @@
    history API.
 ════════════════════════════════════ */var navStack = [];
 
+/* Ogni render riceve un token. Se nel frattempo parte un'altra pagina (o
+   l'utente torna alla home), il fetch vecchio non può più scrivere nel DOM
+   né richiamare afterPageRender al posto della pagina corrente. */
+var _pageRenderEpoch = 0;
+function _invalidatePageRender() {
+  _pageRenderEpoch++;
+}
+function _isCurrentPageRender(epoch) {
+  return epoch === _pageRenderEpoch;
+}
+
 /* Stato condiviso fra le viste.
    Prima erano globali impliciti: leggere un identificatore mai dichiarato
    lancia ReferenceError anche in sloppy mode, quindi le funzioni che li
@@ -341,6 +352,7 @@ function _maybeBuildToc(pbody, showToc) {
 /* ════ OPEN PAGE — gp() ════ */
 async function gp(id, label, icon, _fromPop) {
   if (!id || id === 'undefined' || id === 'null') return;
+  var _epoch = ++_pageRenderEpoch;
   var ts = document.getElementById('ts');
   if (ts) ts.value = '';
   csearch();
@@ -356,6 +368,7 @@ async function gp(id, label, icon, _fromPop) {
       }
       document.getElementById('ph-title').textContent = label || 'Sottoclassi';
       if (window.cv) window.cv();
+      if (typeof afterPageRender === 'function') afterPageRender();
       return;
     }
   }
@@ -393,21 +406,22 @@ async function gp(id, label, icon, _fromPop) {
     var _curId = navStack.length > 1 ? navStack[navStack.length - 2].id : null;
     if (_curId) _scrollPositions[_curId] = document.getElementById('main').scrollTop;
     document.getElementById('main').scrollTo({ top: 0, behavior: 'smooth' });
-    await _gpRender(id, label, icon);
+    await _gpRender(id, label, icon, _epoch);
   } else {
     document.getElementById('main').scrollTo({ top: 0, behavior: 'smooth' });
     var _pb = document.getElementById('pbody');
     _pb.style.opacity = '0';
     _pb.style.transition = 'opacity .15s ease';
-    await _gpRender(id, label, icon);
-    _pb.style.opacity = '1';
+    await _gpRender(id, label, icon, _epoch);
+    if (_isCurrentPageRender(_epoch)) _pb.style.opacity = '1';
   }
 }
 
 /* ════ _gpRender — fetch + render pagina ════ */
-async function _gpRender(id, label, icon) {
+async function _gpRender(id, label, icon, _epoch) {
+  _epoch = _epoch || ++_pageRenderEpoch;
   if (!id || id === 'undefined' || id === 'null') {
-    if (typeof afterPageRender === 'function') afterPageRender();
+    if (_isCurrentPageRender(_epoch) && typeof afterPageRender === 'function') afterPageRender();
     return;
   }
 
@@ -460,6 +474,7 @@ async function _gpRender(id, label, icon) {
   if (_collKey) {
     try {
       var _pd = await _loadPantheonData(_collKey);
+      if (!_isCurrentPageRender(_epoch)) return;
       var _deity = _pd.deities.find(function (x) {
         return x.slug === _slug;
       });
@@ -522,6 +537,7 @@ async function _gpRender(id, label, icon) {
         return;
       }
     } catch (_pe) {
+      if (!_isCurrentPageRender(_epoch)) return;
       /* fall through al renderer standard */
     }
   }
@@ -535,8 +551,10 @@ async function _gpRender(id, label, icon) {
   if (_localPage && _localPage.k) {
     try {
       var _localResp = await fetch('/content/pages/' + _localPage.k + '.json');
+      if (!_isCurrentPageRender(_epoch)) return;
       if (_localResp.ok) {
         var _localJson = await _localResp.json();
+        if (!_isCurrentPageRender(_epoch)) return;
         /* Bozza, in revisione o programmata: nessun contenuto. */
         var _wfState = _wfGate(_localJson);
         if (_wfState) {
@@ -697,6 +715,7 @@ async function _gpRender(id, label, icon) {
         }
       }
     } catch (_e) {
+      if (!_isCurrentPageRender(_epoch)) return;
       /* Fall through to Notion API */
     }
   }
