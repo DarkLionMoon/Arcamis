@@ -1306,11 +1306,22 @@
     }
 
     if (mount && typeof IntersectionObserver !== 'undefined') {
+      var seenVisible = false;
       var watcher = new IntersectionObserver(function (entries) {
         var last = entries[entries.length - 1];
-        if (!last || last.isIntersecting) return;
-        watcher.disconnect();
-        detach();
+        if (!last) return;
+        if (last.isIntersecting) {
+          seenVisible = true;
+          return;
+        }
+        /* Un nodo staccato non tornerà: si smonta subito. Un contenuto
+           ancora nascosto durante il caricamento della pagina, invece, non
+           è "uscito": senza questa distinzione il cassetto veniva rimosso
+           prima di essere mostrato (drawer del Pantheon sempre assente). */
+        if (!root.isConnected || seenVisible) {
+          watcher.disconnect();
+          detach();
+        }
       });
       watcher.observe(root);
     }
