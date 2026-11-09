@@ -6,7 +6,7 @@ function call(path = '/', method = 'GET') {
   return onRequest({ request: new Request('https://arcamis.pages.dev' + path, { method }) });
 }
 
-describe('chiusura del sito', () => {
+describe('sito in lavorazione', () => {
   it.each(['/', '/lore/arcamis', '/admin', '/api/feedback', '/scripts/js/app.js', '/sitemap.xml'])(
     'risponde 503 su %s',
     async (path) => {
@@ -18,9 +18,9 @@ describe('chiusura del sito', () => {
     }
   );
 
-  it('mostra le scuse e il rimando a Notion', async () => {
+  it("mostra l'avviso di lavorazione e il rimando a Notion", async () => {
     const body = await (await call('/')).text();
-    expect(body).toContain('Ci scusiamo');
+    expect(body).toContain('in lavorazione');
     expect(body).toContain('Notion');
     expect(body).toContain(NOTION_URL);
     expect(body).toContain('noindex');
