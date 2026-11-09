@@ -8,12 +8,23 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
 <title>Arcamis Wiki — Il mondo di Arcamis</title>
 <meta name="cf-pages-sha" content="$CF_PAGES_COMMIT_SHA">
 <meta name="description" content="Wiki ufficiale del server D&D Arcamis — regole, lore, personaggi e mestieri del mondo.">
 <meta name="author" content="DarkLionMoon">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#080a0e">
+<style>
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto !important; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
 <!-- Open Graph -->
 <meta property="og:title" content="Arcamis Wiki — Il mondo di Arcamis">
 <meta property="og:description" content="Wiki ufficiale del server D&D Arcamis. Scopri la lore, le regole e i segreti del mondo.">
@@ -28,7 +39,7 @@
 <meta name="twitter:description" content="Wiki ufficiale del server D&D Arcamis.">
 <meta name="twitter:image" content="https://arcamis.pages.dev/Artboard_1.png">
 <link rel="canonical" href="https://arcamis.pages.dev">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Arcamis Wiki","url":"https://arcamis.pages.dev","description":"Wiki ufficiale del server D&D Arcamis","inLanguage":"it","publisher":{"@type":"Organization","name":"Arcamis"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Arcamis Wiki","url":"https://arcamis.pages.dev","description":"Wiki ufficiale del server D&D Arcamis","inLanguage":"it-IT"}</script>
 <link rel="stylesheet" href="/scripts/css/fonts.css">
 <link rel="stylesheet" href="/scripts/css/style-base.css">
 <link rel="stylesheet" href="/scripts/css/theme-v2.css">
@@ -53,10 +64,10 @@
 <a href="#main" class="skip-link" id="skip-link">Vai al contenuto principale</a>
 
 <!-- ═══ LOADER ═══ -->
-<div id="site-loader">
+<div id="site-loader" aria-live="polite" aria-busy="true">
   <img src="/Artboard_1.png" alt="Arcamis" style="width:280px;height:280px;object-fit:contain;opacity:.85">
   <div class="loader-sub">Arcamis</div>
-  <div class="loader-dots">
+  <div class="loader-dots" aria-hidden="true">
     <div class="loader-dot"></div>
     <div class="loader-dot"></div>
     <div class="loader-dot"></div>
@@ -64,18 +75,18 @@
 </div>
 
 <!-- ptr + scroll top -->
-<div id="ptr-indicator">↓ Rilascia per aggiornare</div>
-<div id="scroll-top-btn" onclick="goToTop()">▲</div>
+<div id="ptr-indicator" aria-live="polite">↓ Rilascia per aggiornare</div>
+<button type="button" id="scroll-top-btn" onclick="goToTop()" aria-label="Torna in cima">▲</button>
 
 
 <!-- ═══ TOPBAR ═══ -->
-<div id="progress-bar"></div>
-<div id="topbar">
+<div id="progress-bar" aria-hidden="true"></div>
+<header id="topbar" aria-label="Header principale">
   <a id="tlogo" href="/" aria-label="Arcamis — torna alla home" onclick="if(event)event.preventDefault();showHome()">
     <div id="liw"><img id="li" src="/Artboard_1.png" alt="Arcamis" style="display:block"/><span id="lf" style="display:none">⚔</span></div>
     <span id="tlt">ARCAMIS</span>
   </a>
-  <nav id="tnav">
+  <nav id="tnav" aria-label="Navigazione principale">
     <div class="tn ta" data-v="home" onclick="showHome();closeDd()">Home</div>
 
     <!-- Le sezioni (Regole, Personaggio, Lavori, Imprese, Lore, Homebrew)
@@ -89,29 +100,29 @@
         oninput="hsearch(this.value)" onblur="setTimeout(csearch,600)"/>
       <div id="sr"></div>
     </div>
-    <div id="font-controls">
-      <div class="font-btn" onclick="fontDown()" title="Testo più piccolo" role="button" aria-label="Riduci dimensione testo" tabindex="0">A−</div>
-      <div class="font-btn" onclick="fontUp()" title="Testo più grande" role="button" aria-label="Aumenta dimensione testo" tabindex="0">A+</div>
+    <div id="font-controls" aria-label="Controlli dimensione testo">
+      <button type="button" class="font-btn" onclick="fontDown()" title="Testo più piccolo" role="button" aria-label="Riduci dimensione testo" tabindex="0">A−</button>
+      <button type="button" class="font-btn" onclick="fontUp()" title="Testo più grande" role="button" aria-label="Aumenta dimensione testo" tabindex="0">A+</button>
     </div>
-    <button id="theme-toggle" onclick="toggleTheme()" aria-label="Impostazioni (tema, font e sonoro)">⚙️</button>
+    <button id="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Impostazioni (tema, font e sonoro)">⚙️</button>
     <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" id="dcbtn" aria-label="Server Discord">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 1.666c-.4.17-.8.38-1.17.63A18.95 18.95 0 0 0 3.7 4.49a.08.08 0 0 0-.04-.03A19.91 19.91 0 0 0 1.72 6.88a.08.08 0 0 0-.02.04c-.27.46-.48 1-.64 1.53-.19.72-.34 1.48-.44 2.27-.12.92-.17 1.87-.17 2.82 0 4.2 2.43 7.9 5.85 7.9 1.16 0 2.28-.39 3.2-1.06.38-.28.72-.62 1.02-.99.17-.2.33-.4.48-.6l.13-.17a.08.08 0 0 1 .13.02c.1.18.22.35.35.52.2.27.43.53.7.77a9.8 9.8 0 0 0 3.52 1.75 7.36 7.36 0 0 1-1.72-3.13.08.08 0 0 1 .03-.08c.18-.1.35-.22.51-.34.16-.13.3-.26.44-.4.11-.12.22-.24.32-.38.1-.14.2-.29.28-.44.12-.23.2-.45.29-.69a.08.08 0 0 0-.04-.09zm-7.79 9.06c-.76 0-1.37-.66-1.37-1.5s.61-1.5 1.37-1.5c.77 0 1.39.66 1.39 1.5s-.62 1.5-1.39 1.5zm6.12 0c-.77 0-1.39-.66-1.39-1.5s.62-1.5 1.39-1.5c.76 0 1.37.66 1.37 1.5s-.61 1.5-1.37 1.5z"/></svg>
       Discord
     </a>
-    <div id="hamburger" onclick="toggleMobileNav()" aria-label="Apri menu di navigazione" aria-controls="mobile-nav" aria-expanded="false" role="button" tabindex="0">
-      <div class="hbr-bar"></div>
-      <div class="hbr-bar"></div>
-      <div class="hbr-bar"></div>
-    </div>
+    <button type="button" id="hamburger" onclick="toggleMobileNav()" aria-label="Apri menu di navigazione" role="button" tabindex="0" aria-expanded="false" aria-controls="mobile-nav">
+      <span class="hbr-bar"></span>
+      <span class="hbr-bar"></span>
+      <span class="hbr-bar"></span>
+    </button>
   </div>
-</div>
+</header>
 
 <!-- ═══ MAINTENANCE BANNER ═══ -->
 <div id="maint-banner" style="display:none">
   <div id="maint-banner-inner">
     <span class="maint-icon">🔧</span>
     <span class="maint-text">Sito in manutenzione — alcune funzionalità potrebbero non essere disponibili</span>
-    <button id="maint-close" onclick="dismissMaintBanner()" aria-label="Chiudi">&times;</button>
+    <button id="maint-close" type="button" onclick="dismissMaintBanner()" aria-label="Chiudi">&times;</button>
   </div>
 </div>
 
@@ -124,21 +135,21 @@
   </div>
   <div class="mn-section" id="mn-recenti" style="display:none"></div>
   <div class="mn-section">
-    <div class="mn-item" onclick="closeMobileNav();showHome()"><span class="mn-ii"><svg class="arc-ic" aria-hidden="true" focusable="false"><use href="/images/icons-lore.svg#hearth"></use></svg></span>Home</div>
+    <div class="mn-item" onclick="closeMobileNav();showHome()"><span class="mn-ii"><svg class="arc-ic" aria-hidden="true" focusable="false"><use href="/images/icons-lore.svg#hearth"></use></svg></span><span>Home</span></div>
   </div>
   <div class="mn-section mn-section--lavori"></div>
   <!-- Le sezioni mobile vengono generate dinamicamente da custom-nav.js -->
   <div class="mn-section">
-    <div class="mn-item" onclick="closeMobileNav();gp('pag-credits','Crediti &amp; Legale','⚖️')"><span class="mn-ii"><svg class="arc-ic" aria-hidden="true" focusable="false"><use href="/images/icons-lore.svg#scales"></use></svg></span>Crediti &amp; Legale</div>
+    <div class="mn-item" onclick="closeMobileNav();gp('pag-credits','Crediti &amp; Legale','⚖️')"><span class="mn-ii"><svg class="arc-ic" aria-hidden="true" focusable="false"><use href="/images/icons-lore.svg#book-open"></use></svg></span><span>Crediti &amp; Legale</span></div>
   </div>
   <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="mn-discord">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 1.666c-.4.17-.8.38-1.17.63A18.95 18.95 0 0 0 3.7 4.49a.08.08 0 0 0-.04-.03A19.91 19.91 0 0 0 1.72 6.88a.08.08 0 0 0-.02.04c-.27.46-.48 1-.64 1.53-.19.72-.34 1.48-.44 2.27-.12.92-.17 1.87-.17 2.82 0 4.2 2.43 7.9 5.85 7.9 1.16 0 2.28-.39 3.2-1.06.38-.28.72-.62 1.02-.99.17-.2.33-.4.48-.6l.13-.17a.08.08 0 0 1 .13.02c.1.18.22.35.35.52.2.27.43.53.7.77a9.8 9.8 0 0 0 3.52 1.75 7.36 7.36 0 0 1-1.72-3.13.08.08 0 0 1 .03-.08c.18-.1.35-.22.51-.34.16-.13.3-.26.44-.4.11-.12.22-.24.32-.38.1-.14.2-.29.28-.44.12-.23.2-.45.29-.69a.08.08 0 0 0-.04-.09zm-7.79 9.06c-.76 0-1.37-.66-1.37-1.5s.61-1.5 1.37-1.5c.77 0 1.39.66 1.39 1.5s-.62 1.5-1.39 1.5zm6.12 0c-.77 0-1.39-.66-1.39-1.5s.62-1.5 1.39-1.5c.76 0 1.37.66 1.37 1.5s-.61 1.5-1.37 1.5z"/></svg>
     ENTRA NEL DISCORD
   </a>
 </div>
 
 <!-- ═══ MAIN ═══ -->
-<div id="main" role="main" aria-label="Contenuto principale">
+<main id="main" role="main" aria-label="Contenuto principale">
 
   <!-- HOME VIEW -->
   <div id="hv" class="vp" style="display:block">
@@ -148,9 +159,9 @@
     <h1 class="sr-only">Arcamis — wiki del server D&amp;D: regole, lore e personaggi</h1>
 
     <!-- ═══ HERO CAROUSEL ═══ -->
-    <div id="carousel-wrap">
-      <div class="cnav" id="cprev" role="button" tabindex="0" aria-label="Slide precedente" onclick="changeSlide(-1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();changeSlide(-1)}">&#10094;</div>
-      <div class="cnav" id="cnext" role="button" tabindex="0" aria-label="Slide successiva" onclick="changeSlide(1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();changeSlide(1)}">&#10095;</div>
+    <section id="carousel-wrap" aria-label="Hero principale">
+      <button type="button" class="cnav" id="cprev" role="button" tabindex="0" aria-label="Slide precedente" onclick="changeSlide(-1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();changeSlide(-1)}">◀</button>
+      <button type="button" class="cnav" id="cnext" role="button" tabindex="0" aria-label="Slide successiva" onclick="changeSlide(1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();changeSlide(1)}">▶</button>
       <div id="hero-particles" aria-hidden="true"></div>
       <div id="ctrack">
         <!-- SLIDE 1 -->
@@ -161,10 +172,10 @@
             <p class="sdesc">Città portuale delle Marche di Arcamis, porta d'ingresso al regno di Arcadia. Solo una piccola parte della regione è esplorata dai giocatori.</p>
             <div style="display:flex;gap:14px;flex-wrap:wrap">
               <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="sbtn">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 1.666c-.4.17-.8.38-1.17.63A18.95 18.95 0 0 0 3.7 4.49a.08.08 0 0 0-.04-.03A19.91 19.91 0 0 0 1.72 6.88a.08.08 0 0 0-.02.04c-.27.46-.48 1-.64 1.53-.19.72-.34 1.48-.44 2.27-.12.92-.17 1.87-.17 2.82 0 4.2 2.43 7.9 5.85 7.9 1.16 0 2.28-.39 3.2-1.06.38-.28.72-.62 1.02-.99.17-.2.33-.4.48-.6l.13-.17a.08.08 0 0 1 .13.02c.1.18.22.35.35.52.2.27.43.53.7.77a9.8 9.8 0 0 0 3.52 1.75 7.36 7.36 0 0 1-1.72-3.13.08.08 0 0 1 .03-.08c.18-.1.35-.22.51-.34.16-.13.3-.26.44-.4.11-.12.22-.24.32-.38.1-.14.2-.29.28-.44.12-.23.2-.45.29-.69a.08.08 0 0 0-.04-.09zm-7.79 9.06c-.76 0-1.37-.66-1.37-1.5s.61-1.5 1.37-1.5c.77 0 1.39.66 1.39 1.5s-.62 1.5-1.39 1.5zm6.12 0c-.77 0-1.39-.66-1.39-1.5s.62-1.5 1.39-1.5c.76 0 1.37.66 1.37 1.5s-.61 1.5-1.37 1.5z"/></svg>
                 Entra nel Discord
               </a>
-              <div class="sbtn" onclick="document.getElementById('main').scrollTo({top:window.innerHeight,behavior:'smooth'})" style="cursor:pointer">Scopri la città ↓</div>
+              <button type="button" class="sbtn" onclick="document.getElementById('main').scrollTo({top:window.innerHeight,behavior:'smooth'})" style="cursor:pointer">Scopri la città ↓</button>
             </div>
           </div>
         </div>
@@ -175,7 +186,7 @@
             <div class="stag">Pantheon di Arcamis</div>
             <div class="stit">LE DIVINITÀ<br>DI ARCAMIS</div>
             <p class="sdesc">Ogni dio ha lasciato il proprio segno sulla terra. Scopri il Pantheon e i culti che plasmano il mondo.</p>
-            <div class="sbtn" onclick="gp('pag-pantheon','Pantheon','🛐')" style="cursor:pointer">Scopri il Pantheon →</div>
+            <button type="button" class="sbtn" onclick="gp('pag-pantheon','Pantheon','🛐')" style="cursor:pointer">Scopri il Pantheon →</button>
           </div>
         </div>
         <!-- SLIDE 3 -->
@@ -184,35 +195,35 @@
             <div class="stag">Crea il tuo eroe</div>
             <div class="stit">CREA IL TUO<br>PERSONAGGIO</div>
             <p class="sdesc">Scegli la tua classe, forgia la tua storia. Il tuo personaggio esiste solo su Arcamis.</p>
-            <div class="sbtn" onclick="gp('pag-come-si-inizia','Come si inizia','🌟')" style="cursor:pointer">Come si inizia →</div>
+            <button type="button" class="sbtn" onclick="gp('pag-come-si-inizia','Come si inizia','🌟')" style="cursor:pointer">Come si inizia →</button>
           </div>
         </div>
       </div><!-- /ctrack -->
-      <div class="cdots">
-        <div class="cdot ca" role="button" tabindex="0" aria-label="Vai alla slide 1" onclick="jumpToSlide(0)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();jumpToSlide(0)}"></div>
-        <div class="cdot" role="button" tabindex="0" aria-label="Vai alla slide 2" onclick="jumpToSlide(1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();jumpToSlide(1)}"></div>
-        <div class="cdot" role="button" tabindex="0" aria-label="Vai alla slide 3" onclick="jumpToSlide(2)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();jumpToSlide(2)}"></div>
+      <div class="cdots" aria-label="Selezione slide">
+        <button type="button" class="cdot ca" role="button" tabindex="0" aria-label="Vai alla slide 1" onclick="jumpToSlide(0)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();jumpToSlide(0)}"></button>
+        <button type="button" class="cdot" role="button" tabindex="0" aria-label="Vai alla slide 2" onclick="jumpToSlide(1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();jumpToSlide(1)}"></button>
+        <button type="button" class="cdot" role="button" tabindex="0" aria-label="Vai alla slide 3" onclick="jumpToSlide(2)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();jumpToSlide(2)}"></button>
       </div>
       <button id="car-pause" type="button" aria-pressed="false" aria-label="Metti in pausa il carosello" onclick="toggleCarouselPause()">
         <span id="car-pause-icon" aria-hidden="true">❚❚</span>
         <span id="car-pause-label">Pausa</span>
       </button>
-      <div class="scroll-ind" onclick="document.getElementById('main').scrollTo({top:window.innerHeight,behavior:'smooth'})">
+      <button type="button" class="scroll-ind" onclick="document.getElementById('main').scrollTo({top:window.innerHeight,behavior:'smooth'})" aria-label="Scorri verso il contenuto della home">
         <span>SCORRI</span><span>↓</span>
-      </div>
+      </button>
       <div id="hero-wave" aria-hidden="true">
         <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M0,40 C180,70 360,10 540,42 C720,74 900,8 1080,40 C1260,72 1380,14 1440,38 L1440,80 L0,80 Z" fill="rgba(8,10,14,.9)"/>
           <path d="M720,38 C900,68 1080,12 1260,42 C1440,72 1620,6 1800,38 C1980,70 2160,12 2160,38 L2160,80 L720,80 Z" fill="rgba(8,10,14,.9)"/>
         </svg>
       </div>
-    </div><!-- /carousel -->
+    </section><!-- /carousel -->
 
     <!-- ═══ MARCHE DI ARCAMIS ═══ -->
-    <div class="gold-sep"></div>
-    <div class="hsec fade-in">
+    <section class="gold-sep" aria-hidden="true"></section>
+    <section class="hsec fade-in" aria-labelledby="regione-arcamis-title">
       <div class="sec-eyebrow">Regione Esplorabile</div>
-      <div class="sec-h">MARCHE DI ARCAMIS</div>
+      <h2 id="regione-arcamis-title" class="sec-h">MARCHE DI ARCAMIS</h2>
       <p class="sec-p">La città portuale di Arcamis e i territori circostanti. Un piccolo angolo di un regno molto più vasto, ancora in gran parte sconosciuto.</p>
       <div class="map-container" id="arcamis-map" style="border-radius:2px;position:relative;overflow:hidden;background:#030608;line-height:0">
         <img src="/mappa.webp" alt="Mappa delle Marche di Arcamis" loading="lazy" decoding="async" style="width:100%;display:block;pointer-events:none" draggable="false"/>
@@ -271,80 +282,80 @@
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- ═══ ARCADIA ═══ -->
     <div class="gold-sep"></div>
-    <div class="arcadia-sec fade-in">
+    <section class="arcadia-sec fade-in" aria-labelledby="arcadia-title">
       <div class="arc-deco arc-deco-l"><div class="arc-deco-line"></div><div class="arc-deco-runes">ᛟ<br>✦<br>ᚹ<br>◆<br>ᚷ<br>✦<br>ᛉ</div><div class="arc-deco-line"></div></div>
       <div class="arc-deco arc-deco-r"><div class="arc-deco-line"></div><div class="arc-deco-runes">ᛉ<br>✦<br>ᚷ<br>◆<br>ᚹ<br>✦<br>ᛟ</div><div class="arc-deco-line"></div></div>
       <div class="arcadia-inner">
         <div>
           <div class="sec-eyebrow">Il Regno</div>
-          <div class="sec-h">ARCADIA</div>
-          <p class="sec-p">Le Marche di Arcamis sono solo l'avamposto di un regno antico e misterioso. Gilde, fazioni e poteri si contendono l'influenza. Altri territori restano inesplorati, oltre i confini conosciuti.</p>
+          <h2 id="arcadia-title" class="sec-h">ARCADIA</h2>
+          <p class="sec-p">Le Marche di Arcamis sono solo l'avamposto di un regno antico e misterioso. Gilde, fazioni e poteri si contendono l'influenza. Altri territori restano inesplorati, oltre i confini delle Marche.</p>
           <div class="faction-grid">
             <div class="fpill" style="opacity:.5;cursor:default"><span class="fp-i">⚓</span><div><span class="fp-n">Marina</span><div class="fp-d">Flotta e commercio marittimo</div></div></div>
           </div>
           <div class="sec-eyebrow" style="margin-top:36px">Le Grandi Gilde</div>
           <div class="guild-grid">
-            <div class="guild-card" style="--gbar:rgba(200,155,60,.6)"><div class="guild-bar"></div><div class="guild-body"><div class="guild-head"><span class="guild-icon">🪙</span><div class="guild-name">Gilda dei Mercanti</div></div><div class="guild-desc">Il commercio è potere. Ogni rotta, ogni contratto, ogni segreto ha un prezzo — e loro lo conoscono.</div><div class="guild-divider"></div><div class="guild-subs"><div class="guild-sub"><span class="guild-sub-i">🛤️</span><span class="guild-sub-n">Commercianti Terrestri</span><span class="guild-sub-d">Rotte interne, carovane, mercati locali</span></div><div class="guild-sub"><span class="guild-sub-i">⚓</span><span class="guild-sub-n">Marinai & Portuali</span><span class="guild-sub-d">Traffici via mare, scarico merci, dogana</span></div><div class="guild-sub locked"><span class="guild-sub-i">🗝️</span><span class="guild-sub-n">Rotte Segrete</span><span class="guild-sub-d">Contrabbando, accordi nell'ombra</span></div></div></div></div>
-            <div class="guild-card" style="--gbar:rgba(180,110,40,.7)"><div class="guild-bar"></div><div class="guild-body"><div class="guild-head"><span class="guild-icon">⚒️</span><div class="guild-name">Gilda dei Lavoratori</div></div><div class="guild-desc">Ogni pietra posata, ogni lama forgiata, ogni tessuto porta il loro marchio. Senza di loro, Arcamis non esiste.</div><div class="guild-divider"></div><div class="guild-subs"><div class="guild-sub"><span class="guild-sub-i">🔨</span><span class="guild-sub-n">Fabbri & Forgiatori</span><span class="guild-sub-d">Metallo, armi, strumenti da lavoro</span></div><div class="guild-sub"><span class="guild-sub-i">🪚</span><span class="guild-sub-n">Falegnami & Costruttori</span><span class="guild-sub-d">Strutture, navi, infrastrutture</span></div><div class="guild-sub"><span class="guild-sub-i">🧵</span><span class="guild-sub-n">Tessitori & Artigiani</span><span class="guild-sub-d">Abbigliamento, manufatti, commercio</span></div></div></div></div>
-            <div class="guild-card" style="--gbar:rgba(160,60,60,.7)"><div class="guild-bar"></div><div class="guild-body"><div class="guild-head"><span class="guild-icon">⚔️</span><div class="guild-name">Gilda dei Guerrieri</div></div><div class="guild-desc">Ordine e protezione — o così dicono. Chi tiene davvero le redini della sicurezza è una domanda che pochi osano fare ad alta voce.</div><div class="guild-divider"></div><div class="guild-subs"><div class="guild-sub"><span class="guild-sub-i">🛡️</span><span class="guild-sub-n">Soldati & Guardie</span><span class="guild-sub-d">Pattuglie, ordine pubblico, difesa civile</span></div><div class="guild-sub"><span class="guild-sub-i">🐴</span><span class="guild-sub-n">Cavalieri</span><span class="guild-sub-d">Élite militare, scorte nobiliari, tornei</span></div><div class="guild-sub"><span class="guild-sub-i">⚓</span><span class="guild-sub-n">Milizia Portuale</span><span class="guild-sub-d">Sicurezza del porto, controllo navi</span></div></div></div></div>
+            <div class="guild-card" style="--gbar:rgba(200,155,60,.6)"><div class="guild-bar"></div><div class="guild-body"><div class="guild-head"><span class="guild-icon">🪙</span><div class="guild-meta"><span class="guild-name">Gilda del Commercio</span><span class="guild-role">Arti, traffici e finanze</span></div></div></div></div></div>
+            <div class="guild-card" style="--gbar:rgba(180,110,40,.7)"><div class="guild-bar"></div><div class="guild-body"><div class="guild-head"><span class="guild-icon">⚒️</span><div class="guild-meta"><span class="guild-name">Gilda dei Minatori</span><span class="guild-role">Estratti, fonderie e rocche</span></div></div></div></div></div>
+            <div class="guild-card" style="--gbar:rgba(160,60,60,.7)"><div class="guild-bar"></div><div class="guild-body"><div class="guild-head"><span class="guild-icon">⚔️</span><div class="guild-meta"><span class="guild-name">Gilda delle Armi</span><span class="guild-role">Potenze militari e guardie</span></div></div></div></div></div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- ═══ MISTERI ═══ -->
-    <div class="hsec fade-in">
+    <section class="hsec fade-in" aria-labelledby="misteri-regno-title">
       <div class="sec-eyebrow">Foreshadowing</div>
-      <div class="sec-h">MISTERI DEL REGNO</div>
+      <h2 id="misteri-regno-title" class="sec-h">MISTERI DEL REGNO</h2>
       <p class="sec-p">Vecchie leggende parlano di luoghi dimenticati e forze antiche, ben oltre i confini delle Marche. Il mondo è più grande di quanto sembri.</p>
       <div class="mys-cin-grid">
-        <div class="mys-cin" style="--mg:rgba(40,100,200,.12)"><div class="mys-cin-bg" style="background:radial-gradient(ellipse 110% 90% at 50% 80%,#0a1e3a 0%,#060f1e 40%,#020810 100%)"><svg style="position:absolute;bottom:0;left:0;width:100%;opacity:.25" viewBox="0 0 400 80" preserveAspectRatio="none"><path d="M0,40 Q50,20 100,40 Q150,60 200,40 Q250,20 300,40 Q350,60 400,40 L400,80 L0,80 Z" fill="rgba(40,100,200,0.6)"><animate attributeName="d" values="M0,40 Q50,20 100,40 Q150,60 200,40 Q250,20 300,40 Q350,60 400,40 L400,80 L0,80 Z;M0,48 Q50,28 100,48 Q150,68 200,48 Q250,28 300,48 Q350,68 400,48 L400,80 L0,80 Z;M0,40 Q50,20 100,40 Q150,60 200,40 Q250,20 300,40 Q350,60 400,40 L400,80 L0,80 Z" dur="3.5s" repeatCount="indefinite"/></path></svg></div><div class="mys-cin-overlay" style="background:linear-gradient(0deg,rgba(4,8,20,.97) 0%,rgba(4,8,20,.7) 45%,rgba(6,12,28,.2) 100%)"></div><div class="mys-cin-body"><span class="mys-cin-icon" style="--ci:rgba(80,150,240,.7)">🌊</span><div class="mys-cin-name">Le Acque del Porto</div><div class="mys-cin-txt">Le coste delle Marche respingono ogni nave che tenti di attraccare altrove. Solo il porto di Arcamis sembra consentirlo.</div></div></div>
-        <div class="mys-cin" style="--mg:rgba(180,100,40,.1)"><div class="mys-cin-bg" style="background:radial-gradient(ellipse 100% 80% at 30% 60%,#1a0c06 0%,#100806 35%,#060404 100%)"></div><div class="mys-cin-overlay" style="background:linear-gradient(0deg,rgba(10,5,3,.97) 0%,rgba(10,5,3,.75) 45%,rgba(14,8,4,.15) 100%)"></div><div class="mys-cin-body"><span class="mys-cin-icon" style="--ci:rgba(220,140,50,.7)">⚔️</span><div class="mys-cin-name">Leggende di un Conflitto</div><div class="mys-cin-txt">Vecchi racconti parlano di una guerra che ha cambiato Arcadia per sempre. I dettagli si sono persi col tempo.</div></div></div>
-        <div class="mys-cin" style="--mg:rgba(100,60,180,.1)"><div class="mys-cin-bg" style="background:radial-gradient(ellipse 100% 80% at 70% 40%,#0a0618 0%,#070412 40%,#030208 100%)"></div><div class="mys-cin-overlay" style="background:linear-gradient(0deg,rgba(6,3,16,.97) 0%,rgba(6,3,16,.75) 45%,rgba(8,4,20,.1) 100%)"></div><div class="mys-cin-body"><span class="mys-cin-icon" style="--ci:rgba(160,120,240,.7)">🌙</span><div class="mys-cin-name">Voci del Regno</div><div class="mys-cin-txt">Nelle notti senza luna, dicono, si odono canti provenire dall'acqua. I marinai più anziani giurano di averli sentiti.</div></div></div>
+        <div class="mys-cin" style="--mg:rgba(40,100,200,.12)"><div class="mys-cin-bg" style="background:radial-gradient(ellipse 110% 90% at 50% 80%,#0a1e3a 0%,#060f1e 40%,#020810 100%)"><svg style="position:absolute;inset:0" aria-hidden="true" viewBox="0 0 200 200"><circle cx="110" cy="130" r="65" fill="none" stroke="rgba(130,190,255,.3)" stroke-width="1"/><path d="M45 115 Q100 52 155 120" stroke="rgba(140,190,255,.25)" stroke-width="1" fill="none"/></svg></div><div class="mys-cin-copy"><span class="mys-cin-k">Oceani</span><strong>Vasti mari inesplorati</strong><p>Profondità che custodiscono civiltà perdute.</p></div></div>
+        <div class="mys-cin" style="--mg:rgba(180,100,40,.1)"><div class="mys-cin-bg" style="background:radial-gradient(ellipse 100% 80% at 30% 60%,#1a0c06 0%,#100806 35%,#060404 100%)"></div><div class="mys-cin-copy"><span class="mys-cin-k">Deserti</span><strong>Terre di cenere</strong><p>Riflessi di antiche guerre cosmiche.</p></div></div>
+        <div class="mys-cin" style="--mg:rgba(100,60,180,.1)"><div class="mys-cin-bg" style="background:radial-gradient(ellipse 100% 80% at 70% 40%,#0a0618 0%,#070412 40%,#030208 100%)"></div><div class="mys-cin-copy"><span class="mys-cin-k">Mondi</span><strong>Vette oltre il cielo</strong><p>Segnali di antichi passaggi e porte dimenticate.</p></div></div>
       </div>
-    </div>
+    </section>
 
     <!-- ═══ COME INIZIARE ═══ -->
     <div class="gold-sep"></div>
-    <div class="hsec start-sec fade-in">
+    <section class="hsec start-sec fade-in" aria-labelledby="come-iniziare-title">
       <div class="sec-eyebrow">Guida rapida</div>
-      <div class="sec-h">CREA IL TUO PERSONAGGIO<br>E PARTI ALL'AVVENTURA</div>
-      <p class="sec-p">Per iniziare ti servono tre cose: una <strong style="color:var(--gold2)">Specie</strong>, una <strong style="color:var(--gold2)">Classe</strong> e un <strong style="color:var(--gold2)">Background</strong>.</p>
+      <h2 id="come-iniziare-title" class="sec-h">CREA IL TUO PERSONAGGIO<br>E PARTI ALL'AVVENTURA</h2>
+      <p class="sec-p">Per iniziare ti servono tre cose: una <strong style="color:var(--gold2)">Specie</strong>, una <strong style="color:var(--gold2)">Classe</strong> e un <strong style="color:var(--gold2)">Background</strong>. Da lì trovi il tuo posto nelle Marche.</p>
       <div class="steps" style="grid-template-columns:repeat(3,1fr)">
-        <div class="step"><div class="step-n">1</div><div class="step-icon">💬</div><div class="step-title">Entra nel Discord</div><div class="step-desc">Il server è il cuore del gioco. Leggi le regole, presentati e inizia a respirare l'aria di Arcamis.</div></div>
-        <div class="step"><div class="step-n">2</div><div class="step-icon">🎭</div><div class="step-title">Crea il tuo PG</div><div class="step-desc">Scegli <em>specie</em>, <em>classe</em> e <em>background</em>. Segui la guida alla creazione e forgia la tua storia unica.</div></div>
-        <div class="step"><div class="step-n">3</div><div class="step-icon">🗡️</div><div class="step-title">Unisciti alla Gilda</div><div class="step-desc">Ogni avventuriero delle Marche si registra alla Gilda. Da lì inizia tutto: missioni, contratti, e la tua leggenda.</div></div>
+        <div class="step"><div class="step-n">1</div><div class="step-icon">💬</div><div class="step-title">Entra nel Discord</div><div class="step-desc">Il server è il cuore del gioco. Leggi le regole e partecipa ai primi passi.</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-icon">🎭</div><div class="step-title">Crea il tuo PG</div><div class="step-desc">Scegli <em>specie</em>, <em>classe</em> e <em>background</em> per costruire la storia.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-icon">🗡️</div><div class="step-title">Unisciti alla Gilda</div><div class="step-desc">Ogni avventuriero delle Marche si registra e inizia la propria avventura.</div></div>
       </div>
       <div class="cta-row" style="margin-top:32px">
-        <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="sbtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.128 18.12a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>Entra nel Discord — è gratis</a>
-        <div class="sbtn" onclick="gp('pag-come-si-inizia','Come si inizia','🌟')" style="cursor:pointer">Guida creazione PG →</div>
+        <a href="https://discord.gg/JZPnXZbXEJ" target="_blank" rel="noopener" class="sbtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 1.666c-.4.17-.8.38-1.17.63A18.95 18.95 0 0 0 3.7 4.49a.08.08 0 0 0-.04-.03A19.91 19.91 0 0 0 1.72 6.88a.08.08 0 0 0-.02.04c-.27.46-.48 1-.64 1.53-.19.72-.34 1.48-.44 2.27-.12.92-.17 1.87-.17 2.82 0 4.2 2.43 7.9 5.85 7.9 1.16 0 2.28-.39 3.2-1.06.38-.28.72-.62 1.02-.99.17-.2.33-.4.48-.6l.13-.17a.08.08 0 0 1 .13.02c.1.18.22.35.35.52.2.27.43.53.7.77a9.8 9.8 0 0 0 3.52 1.75 7.36 7.36 0 0 1-1.72-3.13.08.08 0 0 1 .03-.08c.18-.1.35-.22.51-.34.16-.13.3-.26.44-.4.11-.12.22-.24.32-.38.1-.14.2-.29.28-.44.12-.23.2-.45.29-.69a.08.08 0 0 0-.04-.09zm-7.79 9.06c-.76 0-1.37-.66-1.37-1.5s.61-1.5 1.37-1.5c.77 0 1.39.66 1.39 1.5s-.62 1.5-1.39 1.5zm6.12 0c-.77 0-1.39-.66-1.39-1.5s.62-1.5 1.39-1.5c.76 0 1.37.66 1.37 1.5s-.61 1.5-1.37 1.5z"/></svg>
+        Entra nel Discord</a>
+        <button type="button" class="sbtn" onclick="gp('pag-come-si-inizia','Come si inizia','🌟')" style="cursor:pointer">Guida creazione PG →</button>
       </div>
-    </div>
+    </section>
 
     <!-- ═══ WIKI COMPLETA ═══ -->
-    <div class="hsec wiki-sec fade-in" id="wiki-wrap" style="display:none">
-      <div class="wiki-toggle-btn" onclick="toggleWiki()">
+    <section class="hsec wiki-sec fade-in" id="wiki-wrap" style="display:none" aria-labelledby="wiki-completa-title">
+      <button type="button" class="wiki-toggle-btn" onclick="toggleWiki()" aria-expanded="false">
         <div class="shead-gem"></div>
         <span style="font-family:'Cinzel',serif;font-size:9.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2)">Wiki Completa</span>
         <span class="wiki-arrow" id="wiki-arrow">▶</span>
-      </div>
+      </button>
       <div class="wiki-content" id="wiki-content">
         <div class="shead"><div class="shead-gem"></div>Personaggio</div>
         <div class="cgrid">
-          <div class="lcard" onclick="gp('pag-come-si-inizia','Come si inizia','🌟')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#181200,#241c00)"><span>🌟</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Come si inizia</div><div class="csub">Creazione PG</div></div></div>
-          
+          <div class="lcard" onclick="gp('pag-come-si-inizia','Come si inizia','🌟')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#181200,#241c00)"><span>🌟</span></div><div class="cmeta"><div class="cname">Come si inizia</div><div class="cdesc">Crea il tuo personaggio e inizia il tuo viaggio.</div></div></div>
         </div>
         <div class="shead"><div class="shead-gem"></div>In-game</div>
         <div class="cgrid">
-          <div class="lcard" onclick="gp('pag-storia-del-mondo','Lore','📖')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#120800,#1c1008)"><span>📖</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Lore</div><div class="csub">Storia del mondo</div></div></div>
-          <div class="lcard" onclick="gp('pag-mappe','Mappe','🗺️')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#04100a,#081a10)"><span>🗺️</span></div><div class="cov">Apri →</div><div class="cinfo"><div class="ctit">Mappe</div><div class="csub">Cartografia di Arcamis</div></div></div>
+          <div class="lcard" onclick="gp('pag-storia-del-mondo','Lore','📖')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#120800,#1c1008)"><span>📖</span></div><div class="cmeta"><div class="cname">Lore</div><div class="cdesc">La storia del mondo e delle grandi civiltà.</div></div></div>
+          <div class="lcard" onclick="gp('pag-mappe','Mappe','🗺️')"><div class="shine"></div><div class="cthumb" style="background:linear-gradient(140deg,#04100a,#081a10)"><span>🗺️</span></div><div class="cmeta"><div class="cname">Mappe</div><div class="cdesc">Territori, luoghi e punti d'interesse.</div></div></div>
         </div>
       </div>
-    </div>
+    </section>
 
   </div><!-- /home view -->
 
@@ -363,7 +374,7 @@
         <h1 class="ph-title" id="ph-title"></h1>
         <div class="ph-sub" id="ph-sub"></div>
         <div class="ph-divider"><div class="ph-divider-line"></div><div class="ph-divider-gem">◆</div></div>
-        <button class="ph-copy-btn" onclick="copyPageLink()" title="Copia link pagina">⛓ Copia link</button>
+        <button class="ph-copy-btn" type="button" onclick="copyPageLink()" title="Copia link pagina">⛓ Copia link</button>
       </div>
     </div>
     <div id="pbody"></div>
@@ -385,32 +396,32 @@
     </div>
   </footer>
 
-</div><!-- /main -->
-  <div id="arc-options-panel" role="dialog" aria-label="Opzioni">
+</main><!-- /main -->
+  <div id="arc-options-panel" role="dialog" aria-label="Opzioni" aria-modal="false">
   <div class="aop-section">
     <div class="aop-label">Tema</div>
     <div class="aop-themes">
-      <button class="aop-theme-btn" data-theme="dark" onclick="applyTheme('dark')">
+      <button type="button" class="aop-theme-btn" data-theme="dark" onclick="applyTheme('dark')">
         <span class="aop-theme-icon">🌙</span>
         <span class="aop-theme-name">Dark</span>
       </button>
-      <button class="aop-theme-btn" data-theme="light" onclick="applyTheme('light')">
+      <button type="button" class="aop-theme-btn" data-theme="light" onclick="applyTheme('light')">
         <span class="aop-theme-icon">☀️</span>
         <span class="aop-theme-name">Light</span>
       </button>
-      <button class="aop-theme-btn" data-theme="blood" onclick="applyTheme('blood')">
+      <button type="button" class="aop-theme-btn" data-theme="blood" onclick="applyTheme('blood')">
         <span class="aop-theme-dot" style="background:#8b1a1a"></span>
         <span class="aop-theme-name">Sangue</span>
       </button>
-      <button class="aop-theme-btn" data-theme="forest" onclick="applyTheme('forest')">
+      <button type="button" class="aop-theme-btn" data-theme="forest" onclick="applyTheme('forest')">
         <span class="aop-theme-dot" style="background:#2d7a3a"></span>
         <span class="aop-theme-name">Foresta</span>
       </button>
-      <button class="aop-theme-btn" data-theme="abyss" onclick="applyTheme('abyss')">
+      <button type="button" class="aop-theme-btn" data-theme="abyss" onclick="applyTheme('abyss')">
         <span class="aop-theme-dot" style="background:#0d4f7a"></span>
         <span class="aop-theme-name">Abisso</span>
       </button>
-      <button class="aop-theme-btn" data-theme="alchemy" onclick="applyTheme('alchemy')">
+      <button type="button" class="aop-theme-btn" data-theme="alchemy" onclick="applyTheme('alchemy')">
         <span class="aop-theme-dot" style="background:#6b2fa0"></span>
         <span class="aop-theme-name">Alchimia</span>
       </button>
@@ -419,21 +430,21 @@
   <div class="aop-section">
     <div class="aop-label">Dimensione testo</div>
     <div class="aop-font-row">
-      <button class="aop-font-btn" onclick="fontDown()">−</button>
+      <button type="button" class="aop-font-btn" onclick="fontDown()">−</button>
       <span id="arc-opt-fontpct" class="aop-font-pct">100%</span>
-      <button class="aop-font-btn" onclick="fontUp()">+</button>
+      <button type="button" class="aop-font-btn" onclick="fontUp()">+</button>
     </div>
   </div>
   <div class="aop-section">
     <div class="aop-label">Ambiente</div>
     <div class="aop-env-row">
-      <button class="aop-env-btn" id="aop-candle-btn" onclick="toggleCandlelight(); _syncEnvBtns()" title="Lume di candela">
+      <button type="button" class="aop-env-btn" id="aop-candle-btn" onclick="toggleCandlelight(); _syncEnvBtns()" title="Lume di candela">
         <span>🕯</span><span>Candela</span>
       </button>
-      <button class="aop-env-btn" id="aop-audio-btn" onclick="toggleArcAudio(); _syncEnvBtns()" title="Audio ambientale">
+      <button type="button" class="aop-env-btn" id="aop-audio-btn" onclick="toggleArcAudio(); _syncEnvBtns()" title="Audio ambientale">
         <span>♪</span><span>Musica</span>
       </button>
-      <button class="aop-env-btn" id="aop-sfx-btn" onclick="toggleSfx(); _syncEnvBtns()" title="Sound effects">
+      <button type="button" class="aop-env-btn" id="aop-sfx-btn" onclick="toggleSfx(); _syncEnvBtns()" title="Sound effects">
         <span>🔊</span><span>SFX</span>
       </button>
     </div>
@@ -441,11 +452,11 @@
 </div>
 
 <!-- ═══ BOTTOM NAV mobile ═══ -->
-<nav id="bottom-nav">
-  <div class="bnav-item active" data-k="home" onclick="showHome();setBnavActive('home')" tabindex="0" role="button"><span>🏰</span><span class="bnav-label">Home</span></div>
-  <div class="bnav-item" data-k="esplora" onclick="toggleMobileNav();setBnavActive('esplora')" tabindex="0" role="button" aria-expanded="false" aria-controls="mobile-nav"><span>🧭</span><span class="bnav-label">Esplora</span></div>
-  <div class="bnav-item" data-k="lavori" onclick="gp('pag-lavori','Lavoro','💼');setBnavActive('lavori')" tabindex="0" role="button"><span>💼</span><span class="bnav-label">Lavori</span></div>
-  <div class="bnav-item" data-k="opzioni" onclick="_openOptionsPanel();setBnavActive('opzioni')" tabindex="0" role="button"><span>⚙️</span><span class="bnav-label">Opzioni</span><div class="bnav-badge changelog-badge"></div></div>
+<nav id="bottom-nav" aria-label="Navigazione mobile">
+  <button type="button" class="bnav-item active" data-k="home" onclick="showHome();setBnavActive('home')" tabindex="0" role="button"><span>🏰</span><span class="bnav-label">Home</span></button>
+  <button type="button" class="bnav-item" data-k="esplora" onclick="toggleMobileNav();setBnavActive('esplora')" tabindex="0" role="button" aria-expanded="false" aria-controls="mobile-nav"><span>🧭</span><span class="bnav-label">Esplora</span></button>
+  <button type="button" class="bnav-item" data-k="lavori" onclick="gp('pag-lavori','Lavoro','💼');setBnavActive('lavori')" tabindex="0" role="button"><span>💼</span><span class="bnav-label">Lavori</span></button>
+  <button type="button" class="bnav-item" data-k="opzioni" onclick="_openOptionsPanel();setBnavActive('opzioni')" tabindex="0" role="button"><span>⚙️</span><span class="bnav-label">Opzioni</span><div class="bnav-badge" aria-hidden="true"></div></button>
 </nav>
 
 <!-- ═══ ELEMENTI FISSI ═══ -->
@@ -462,7 +473,7 @@
     <div class="disclaimer-logo">⚔️</div>
     <h2 class="disclaimer-title">Arcamis</h2>
     <div class="disclaimer-body" id="disclaimer-text">Questo sito fa parte di una community di gioco di ruolo. Continuando dichiari di accedere ai contenuti della campagna.</div>
-    <button class="disclaimer-btn" id="disclaimer-btn">HO CAPITO</button>
+    <button class="disclaimer-btn" id="disclaimer-btn" type="button">HO CAPITO</button>
   </div>
 </div>
 
@@ -474,43 +485,43 @@
 <div id="arc-help-panel" role="dialog" aria-label="Aiuto">
   <div class="ahp-header">
     <span class="ahp-title">Oracolo di Arcamis</span>
-    <button class="ahp-close" onclick="toggleHelpPanel()">✕</button>
+    <button class="ahp-close" type="button" onclick="toggleHelpPanel()">✕</button>
   </div>
 
   <div class="ahp-tabs">
-    <button class="ahp-tab active" onclick="switchHelpTab('faq', this)">FAQ</button>
-    <button class="ahp-tab" onclick="switchHelpTab('dm', this)">Contatta il DM</button>
+    <button type="button" class="ahp-tab active" onclick="switchHelpTab('faq', this)">FAQ</button>
+    <button type="button" class="ahp-tab" onclick="switchHelpTab('dm', this)">Contatta il DM</button>
   </div>
 
   <div id="ahp-faq" class="ahp-body">
     <div class="ahp-faq-item">
-      <div class="ahp-faq-q" onclick="toggleFaq(this)">
+      <button type="button" class="ahp-faq-q" onclick="toggleFaq(this)">
         <span>Come creo il mio personaggio?</span><span class="ahp-faq-arr">▶</span>
-      </div>
+      </button>
       <div class="ahp-faq-a">Vai su <strong>Personaggio</strong> nel menu in alto e segui le istruzioni per la creazione guidata.</div>
     </div>
     <div class="ahp-faq-item">
-      <div class="ahp-faq-q" onclick="toggleFaq(this)">
+      <button type="button" class="ahp-faq-q" onclick="toggleFaq(this)">
         <span>Dove trovo le regole del server?</span><span class="ahp-faq-arr">▶</span>
-      </div>
+      </button>
       <div class="ahp-faq-a">Tutte le regole si trovano nella sezione <strong>Regole</strong> accessibile dalla topbar.</div>
     </div>
     <div class="ahp-faq-item">
-      <div class="ahp-faq-q" onclick="toggleFaq(this)">
+      <button type="button" class="ahp-faq-q" onclick="toggleFaq(this)">
         <span>Come segnalo un errore nella wiki?</span><span class="ahp-faq-arr">▶</span>
-      </div>
+      </button>
       <div class="ahp-faq-a">Usa il tab "Contatta il DM" qui accanto, oppure scrivi direttamente su Discord nel canale #segnalazioni.</div>
     </div>
     <div class="ahp-faq-item">
-      <div class="ahp-faq-q" onclick="toggleFaq(this)">
+      <button type="button" class="ahp-faq-q" onclick="toggleFaq(this)">
         <span>Come funziona il sistema dei mestieri?</span><span class="ahp-faq-arr">▶</span>
-      </div>
+      </button>
       <div class="ahp-faq-a">Vai su <strong>Lavori</strong> nel menu — ogni mestiere ha la propria pagina con tabelle, requisiti e progressioni.</div>
     </div>
     <div class="ahp-faq-item">
-      <div class="ahp-faq-q" onclick="toggleFaq(this)">
+      <button type="button" class="ahp-faq-q" onclick="toggleFaq(this)">
         <span>Posso cambiare il tema del sito?</span><span class="ahp-faq-arr">▶</span>
-      </div>
+      </button>
       <div class="ahp-faq-a">Sì — clicca l'icona ⚙️ in alto a destra per aprire le opzioni: trovi 6 temi e il controllo della dimensione del testo.</div>
     </div>
   </div>
@@ -520,10 +531,105 @@
     <input id="ahp-dm-name" class="ahp-input" type="text" placeholder="Il tuo nome (personaggio o giocatore)" maxlength="60" />
     <textarea id="ahp-dm-msg" class="ahp-input ahp-textarea" placeholder="Il tuo messaggio..." maxlength="500"></textarea>
     <div class="ahp-dm-counter"><span id="ahp-dm-count">0</span>/500</div>
-    <button class="ahp-send-btn" onclick="sendHelpMsg()">✦ Invia al DM</button>
+    <button type="button" class="ahp-send-btn" onclick="sendHelpMsg()">✦ Invia al DM</button>
     <div id="ahp-dm-status" class="ahp-dm-status"></div>
   </div>
 </div>
+
+<script>
+  (() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      document.documentElement.classList.add('reduce-motion');
+    }
+
+    const hideLoader = () => {
+      const loader = document.getElementById('site-loader');
+      if (!loader) return;
+      loader.setAttribute('aria-busy', 'false');
+      loader.style.display = 'none';
+    };
+
+    if (document.readyState === 'complete') {
+      setTimeout(hideLoader, 150);
+    } else {
+      window.addEventListener('load', () => setTimeout(hideLoader, 150), { once: true });
+    }
+    setTimeout(hideLoader, 2500);
+
+    const closeDialog = (node) => {
+      if (!node) return;
+      node.setAttribute('aria-hidden', 'true');
+      if (node.id === 'mobile-nav' || node.id === 'arc-help-panel' || node.id === 'arc-options-panel') {
+        const burger = document.getElementById('hamburger');
+        const trigger = document.getElementById('arc-help-btn');
+        if (burger) burger.setAttribute('aria-expanded', 'false');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+
+      const dialogs = document.querySelectorAll('[role="dialog"]');
+      dialogs.forEach((dialog) => {
+        const hidden = dialog.getAttribute('aria-hidden');
+        if (hidden !== 'true') {
+          closeDialog(dialog);
+        }
+      });
+    });
+
+    document.querySelectorAll('[role="button"][tabindex="0"]').forEach((element) => {
+      const onKey = (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          element.click();
+        }
+      };
+      element.removeEventListener('keydown', onKey);
+      element.addEventListener('keydown', onKey);
+    });
+
+    document.querySelectorAll('.ahp-faq-q').forEach((button) => {
+      const panel = button.nextElementSibling;
+      if (panel && panel.classList.contains('ahp-faq-a')) {
+        const expanded = panel.style.display !== 'none';
+        button.setAttribute('aria-expanded', String(expanded));
+      }
+      button.addEventListener('click', () => {
+        const panelEl = button.nextElementSibling;
+        if (!panelEl || !panelEl.classList.contains('ahp-faq-a')) return;
+        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+        button.setAttribute('aria-expanded', String(!isExpanded));
+        panelEl.style.display = isExpanded ? 'none' : 'block';
+      });
+    });
+
+    const helpBtn = document.getElementById('arc-help-btn');
+    const helpPanel = document.getElementById('arc-help-panel');
+    if (helpBtn && helpPanel) {
+      helpBtn.setAttribute('aria-expanded', 'false');
+      helpBtn.addEventListener('click', () => {
+        const isOpen = helpBtn.getAttribute('aria-expanded') === 'true';
+        helpBtn.setAttribute('aria-expanded', String(!isOpen));
+        helpPanel.setAttribute('aria-hidden', String(isOpen));
+      });
+    }
+
+    const mobileNav = document.getElementById('mobile-nav');
+    const hamburger = document.getElementById('hamburger');
+    if (mobileNav && hamburger) {
+      hamburger.setAttribute('aria-expanded', 'false');
+      hamburger.addEventListener('click', () => {
+        const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+        hamburger.setAttribute('aria-expanded', String(!isOpen));
+        mobileNav.setAttribute('aria-hidden', String(isOpen));
+      });
+    }
+  })();
+</script>
+
 <!-- ═══ PURGE VECCHIO SERVICE WORKER ═══ -->
 <script src="/scripts/js/sw-purge.js"></script>
 <!-- ═══ SCRIPT ═══ -->
