@@ -12,12 +12,7 @@
 
 import { ApiError } from './http'
 import { decodeBase64Utf8, ghApi } from './github'
-import {
-  SITE_INTERFACE_PATH,
-  defaultSiteInterface,
-  normalizeSiteInterface,
-  siteInterfaceHash
-} from '../site-interface'
+import { SITE_INTERFACE_PATH, defaultSiteInterface, normalizeSiteInterface, siteInterfaceHash } from '../site-interface'
 import type { SiteInterfaceConfig, SiteInterfaceValidation } from '../site-interface'
 
 export interface SiteInterfaceDoc {

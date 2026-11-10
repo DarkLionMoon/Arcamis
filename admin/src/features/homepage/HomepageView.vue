@@ -194,10 +194,14 @@ function scheduleDraftSave(): void {
   draftTimer = setTimeout(writeDraft, 700)
 }
 
-watch(sections, () => {
-  if (loading.value) return
-  if (dirty.value) scheduleDraftSave()
-}, { deep: true })
+watch(
+  sections,
+  () => {
+    if (loading.value) return
+    if (dirty.value) scheduleDraftSave()
+  },
+  { deep: true }
+)
 
 async function load(): Promise<void> {
   loading.value = true
@@ -525,7 +529,10 @@ function startVerification(hash: string): void {
 async function verify(hash: string, attempt: number): Promise<void> {
   verification.value = {
     state: 'pending',
-    message: attempt === 1 ? 'Verifico la homepage pubblicata…' : `Deploy non ancora visibile · tentativo ${attempt}/${VERIFY_ATTEMPTS}…`
+    message:
+      attempt === 1
+        ? 'Verifico la homepage pubblicata…'
+        : `Deploy non ancora visibile · tentativo ${attempt}/${VERIFY_ATTEMPTS}…`
   }
   try {
     const result = await homepageApi.verifyPublished(hash)
@@ -646,7 +653,9 @@ onBeforeUnmount(() => {
         l'HTML statico (la home funziona anche senza JavaScript). Hero e carousel hanno il loro editor: qui non vengono
         duplicati.
       </p>
-      <p v-if="siteState.message" class="arc-hint" :class="{ 'hp-warn': siteState.state !== 'ok' }">{{ siteState.message }}</p>
+      <p v-if="siteState.message" class="arc-hint" :class="{ 'hp-warn': siteState.state !== 'ok' }">
+        {{ siteState.message }}
+      </p>
     </div>
 
     <div v-if="draftNotice" class="arc-panel hp-banner">
@@ -688,7 +697,15 @@ onBeforeUnmount(() => {
               <small>{{ typeLabel(section.type) }} · {{ section.visible ? 'Visibile' : 'Nascosta' }}</small>
             </div>
             <div class="hp-section-actions">
-              <button class="arc-icon-btn" type="button" title="Sposta su" :disabled="index === 0" @click="move(index, -1)">↑</button>
+              <button
+                class="arc-icon-btn"
+                type="button"
+                title="Sposta su"
+                :disabled="index === 0"
+                @click="move(index, -1)"
+              >
+                ↑
+              </button>
               <button
                 class="arc-icon-btn"
                 type="button"
@@ -745,11 +762,15 @@ onBeforeUnmount(() => {
             <label class="arc-fld">
               <span>Descrizione</span>
               <textarea v-model="section.description" class="in" rows="3" maxlength="1200"></textarea>
-              <small class="arc-field-help">Testo semplice. **grassetto dorato**, *corsivo*, invio per andare a capo.</small>
+              <small class="arc-field-help"
+                >Testo semplice. **grassetto dorato**, *corsivo*, invio per andare a capo.</small
+              >
             </label>
 
             <div class="arc-form-grid" style="grid-template-columns: 1fr 1fr">
-              <label class="arc-toggle-line"><input v-model="section.visible" type="checkbox" /> Visibile sul sito</label>
+              <label class="arc-toggle-line"
+                ><input v-model="section.visible" type="checkbox" /> Visibile sul sito</label
+              >
               <label class="arc-toggle-line">
                 <input v-model="section.divider" type="checkbox" /> Separatore dorato sopra la sezione
               </label>
@@ -761,8 +782,8 @@ onBeforeUnmount(() => {
                 <input v-model="section.showMap" type="checkbox" /> Mostra la mappa interattiva
               </label>
               <p class="arc-hint">
-                Punti, immagini e sottoviste della mappa si gestiscono in <router-link to="/mapa">Mappa</router-link>; qui
-                decidi solo se mostrarla nella home.
+                Punti, immagini e sottoviste della mappa si gestiscono in <router-link to="/mapa">Mappa</router-link>;
+                qui decidi solo se mostrarla nella home.
               </p>
             </template>
 
@@ -776,10 +797,28 @@ onBeforeUnmount(() => {
                 <div v-for="(faction, i) in section.factions" :key="'faction-' + i" class="hp-row hp-row--faction">
                   <input v-model="faction.icon" class="in hp-icon" maxlength="24" aria-label="Icona" />
                   <input v-model="faction.name" class="in" maxlength="120" placeholder="Nome" aria-label="Nome" />
-                  <input v-model="faction.description" class="in" maxlength="500" placeholder="Descrizione" aria-label="Descrizione" />
-                  <label class="arc-toggle-line hp-inline"><input v-model="faction.active" type="checkbox" /> attiva</label>
-                  <button class="arc-icon-btn" type="button" title="Sposta su" :disabled="i === 0" @click="moveItem(section.factions, i, -1)">↑</button>
-                  <button class="arc-icon-btn" type="button" title="Rimuovi" @click="section.factions.splice(i, 1)">✕</button>
+                  <input
+                    v-model="faction.description"
+                    class="in"
+                    maxlength="500"
+                    placeholder="Descrizione"
+                    aria-label="Descrizione"
+                  />
+                  <label class="arc-toggle-line hp-inline"
+                    ><input v-model="faction.active" type="checkbox" /> attiva</label
+                  >
+                  <button
+                    class="arc-icon-btn"
+                    type="button"
+                    title="Sposta su"
+                    :disabled="i === 0"
+                    @click="moveItem(section.factions, i, -1)"
+                  >
+                    ↑
+                  </button>
+                  <button class="arc-icon-btn" type="button" title="Rimuovi" @click="section.factions.splice(i, 1)">
+                    ✕
+                  </button>
                 </div>
                 <p v-if="!section.factions.length" class="arc-hint">Nessuna fazione: la griglia non viene mostrata.</p>
               </div>
@@ -796,9 +835,25 @@ onBeforeUnmount(() => {
                   <input v-model="guild.icon" class="in hp-icon" maxlength="24" aria-label="Icona" />
                   <input v-model="guild.name" class="in" maxlength="120" placeholder="Nome" aria-label="Nome" />
                   <input v-model="guild.role" class="in" maxlength="160" placeholder="Ruolo" aria-label="Ruolo" />
-                  <input v-model="guild.color" class="in hp-color" maxlength="60" placeholder="rgba(200,155,60,.6)" aria-label="Colore barra" />
-                  <button class="arc-icon-btn" type="button" title="Sposta su" :disabled="i === 0" @click="moveItem(section.guilds, i, -1)">↑</button>
-                  <button class="arc-icon-btn" type="button" title="Rimuovi" @click="section.guilds.splice(i, 1)">✕</button>
+                  <input
+                    v-model="guild.color"
+                    class="in hp-color"
+                    maxlength="60"
+                    placeholder="rgba(200,155,60,.6)"
+                    aria-label="Colore barra"
+                  />
+                  <button
+                    class="arc-icon-btn"
+                    type="button"
+                    title="Sposta su"
+                    :disabled="i === 0"
+                    @click="moveItem(section.guilds, i, -1)"
+                  >
+                    ↑
+                  </button>
+                  <button class="arc-icon-btn" type="button" title="Rimuovi" @click="section.guilds.splice(i, 1)">
+                    ✕
+                  </button>
                 </div>
                 <p v-if="!section.guilds.length" class="arc-hint">Nessuna gilda: il gruppo non viene mostrato.</p>
               </div>
@@ -813,18 +868,40 @@ onBeforeUnmount(() => {
               <div class="hp-block">
                 <div class="hp-block-head">
                   <h3>Link in fondo alla sezione</h3>
-                  <button class="btn btn-soft btn-sm" type="button" :disabled="section.links.length >= 6" @click="addLink(section)">
+                  <button
+                    class="btn btn-soft btn-sm"
+                    type="button"
+                    :disabled="section.links.length >= 6"
+                    @click="addLink(section)"
+                  >
                     + Link
                   </button>
                 </div>
                 <div v-for="(link, i) in section.links" :key="'link-' + i" class="hp-row hp-row--link">
-                  <input v-model="link.label" class="in" maxlength="80" placeholder="Etichetta" aria-label="Etichetta" />
-                  <input v-model="link.href" class="in" maxlength="2048" placeholder="/novita oppure https://…" aria-label="Destinazione" />
-                  <label class="arc-toggle-line hp-inline"><input v-model="link.external" type="checkbox" /> esterno</label>
-                  <button class="arc-icon-btn" type="button" title="Rimuovi" @click="section.links.splice(i, 1)">✕</button>
+                  <input
+                    v-model="link.label"
+                    class="in"
+                    maxlength="80"
+                    placeholder="Etichetta"
+                    aria-label="Etichetta"
+                  />
+                  <input
+                    v-model="link.href"
+                    class="in"
+                    maxlength="2048"
+                    placeholder="/novita oppure https://…"
+                    aria-label="Destinazione"
+                  />
+                  <label class="arc-toggle-line hp-inline"
+                    ><input v-model="link.external" type="checkbox" /> esterno</label
+                  >
+                  <button class="arc-icon-btn" type="button" title="Rimuovi" @click="section.links.splice(i, 1)">
+                    ✕
+                  </button>
                 </div>
                 <p class="arc-hint">
-                  Le tre card della sezione sono generate automaticamente dal changelog pubblicato: resta una sola fonte.
+                  Le tre card della sezione sono generate automaticamente dal changelog pubblicato: resta una sola
+                  fonte.
                 </p>
               </div>
             </template>
@@ -834,31 +911,70 @@ onBeforeUnmount(() => {
               <div class="hp-block">
                 <div class="hp-block-head">
                   <h3>Passi</h3>
-                  <button class="btn btn-soft btn-sm" type="button" :disabled="section.steps.length >= 8" @click="addStep(section)">
+                  <button
+                    class="btn btn-soft btn-sm"
+                    type="button"
+                    :disabled="section.steps.length >= 8"
+                    @click="addStep(section)"
+                  >
                     + Passo
                   </button>
                 </div>
                 <div v-for="(step, i) in section.steps" :key="'step-' + i" class="hp-row hp-row--step">
                   <input v-model="step.icon" class="in hp-icon" maxlength="24" aria-label="Icona" />
                   <input v-model="step.title" class="in" maxlength="120" placeholder="Titolo" aria-label="Titolo" />
-                  <input v-model="step.description" class="in" maxlength="500" placeholder="Descrizione" aria-label="Descrizione" />
-                  <button class="arc-icon-btn" type="button" title="Sposta su" :disabled="i === 0" @click="moveItem(section.steps, i, -1)">↑</button>
-                  <button class="arc-icon-btn" type="button" title="Rimuovi" @click="section.steps.splice(i, 1)">✕</button>
+                  <input
+                    v-model="step.description"
+                    class="in"
+                    maxlength="500"
+                    placeholder="Descrizione"
+                    aria-label="Descrizione"
+                  />
+                  <button
+                    class="arc-icon-btn"
+                    type="button"
+                    title="Sposta su"
+                    :disabled="i === 0"
+                    @click="moveItem(section.steps, i, -1)"
+                  >
+                    ↑
+                  </button>
+                  <button class="arc-icon-btn" type="button" title="Rimuovi" @click="section.steps.splice(i, 1)">
+                    ✕
+                  </button>
                 </div>
               </div>
               <div class="hp-block">
                 <div class="hp-block-head">
                   <h3>Pulsanti finali</h3>
-                  <button class="btn btn-soft btn-sm" type="button" :disabled="section.cta.length >= 4" @click="addCta(section)">
+                  <button
+                    class="btn btn-soft btn-sm"
+                    type="button"
+                    :disabled="section.cta.length >= 4"
+                    @click="addCta(section)"
+                  >
                     + Pulsante
                   </button>
                 </div>
                 <div v-for="(button, i) in section.cta" :key="'cta-' + i" class="hp-row hp-row--cta">
                   <input v-model="button.label" class="in" maxlength="80" placeholder="Testo" aria-label="Testo" />
-                  <input v-model="button.href" class="in" maxlength="2048" placeholder="/personaggio/… oppure https://…" aria-label="Destinazione" />
-                  <label class="arc-toggle-line hp-inline"><input v-model="button.external" type="checkbox" /> esterno</label>
-                  <label class="arc-toggle-line hp-inline"><input v-model="button.kind" type="checkbox" true-value="discord" false-value="" /> icona Discord</label>
-                  <button class="arc-icon-btn" type="button" title="Rimuovi" @click="section.cta.splice(i, 1)">✕</button>
+                  <input
+                    v-model="button.href"
+                    class="in"
+                    maxlength="2048"
+                    placeholder="/personaggio/… oppure https://…"
+                    aria-label="Destinazione"
+                  />
+                  <label class="arc-toggle-line hp-inline"
+                    ><input v-model="button.external" type="checkbox" /> esterno</label
+                  >
+                  <label class="arc-toggle-line hp-inline"
+                    ><input v-model="button.kind" type="checkbox" true-value="discord" false-value="" /> icona
+                    Discord</label
+                  >
+                  <button class="arc-icon-btn" type="button" title="Rimuovi" @click="section.cta.splice(i, 1)">
+                    ✕
+                  </button>
                 </div>
               </div>
             </template>
@@ -871,34 +987,90 @@ onBeforeUnmount(() => {
               </label>
               <div v-for="(group, gi) in section.groups" :key="'group-' + gi" class="hp-block">
                 <div class="hp-block-head">
-                  <input v-model="group.title" class="in hp-grow" maxlength="120" placeholder="Titolo gruppo" aria-label="Titolo gruppo" />
+                  <input
+                    v-model="group.title"
+                    class="in hp-grow"
+                    maxlength="120"
+                    placeholder="Titolo gruppo"
+                    aria-label="Titolo gruppo"
+                  />
                   <button class="btn btn-soft btn-sm" type="button" @click="addCard(group)">+ Card</button>
-                  <button class="arc-icon-btn" type="button" title="Sposta gruppo su" :disabled="gi === 0" @click="moveItem(section.groups, gi, -1)">↑</button>
-                  <button class="arc-icon-btn" type="button" title="Rimuovi gruppo" @click="section.groups.splice(gi, 1)">✕</button>
+                  <button
+                    class="arc-icon-btn"
+                    type="button"
+                    title="Sposta gruppo su"
+                    :disabled="gi === 0"
+                    @click="moveItem(section.groups, gi, -1)"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    class="arc-icon-btn"
+                    type="button"
+                    title="Rimuovi gruppo"
+                    @click="section.groups.splice(gi, 1)"
+                  >
+                    ✕
+                  </button>
                 </div>
                 <div v-for="(card, ci) in group.cards" :key="'card-' + gi + '-' + ci" class="hp-card-row">
                   <div class="hp-row hp-row--card">
                     <input v-model="card.icon" class="in hp-icon" maxlength="24" placeholder="🌟" aria-label="Icona" />
                     <input v-model="card.name" class="in" maxlength="120" placeholder="Nome card" aria-label="Nome" />
-                    <input v-model="card.description" class="in" maxlength="500" placeholder="Descrizione" aria-label="Descrizione" />
+                    <input
+                      v-model="card.description"
+                      class="in"
+                      maxlength="500"
+                      placeholder="Descrizione"
+                      aria-label="Descrizione"
+                    />
                     <select v-model="card.pageId" class="in" aria-label="Pagina collegata">
                       <option value="">Nessuna pagina</option>
-                      <option v-for="page in pages" :key="page.id" :value="page.id">{{ page.label }} — {{ page.path || '—' }}</option>
+                      <option v-for="page in pages" :key="page.id" :value="page.id">
+                        {{ page.label }} — {{ page.path || '—' }}
+                      </option>
                     </select>
-                    <button class="arc-icon-btn" type="button" title="Rimuovi card" @click="group.cards.splice(ci, 1)">✕</button>
+                    <button class="arc-icon-btn" type="button" title="Rimuovi card" @click="group.cards.splice(ci, 1)">
+                      ✕
+                    </button>
                   </div>
                   <div class="hp-row hp-row--card-media">
-                    <input v-model="card.image" class="in" maxlength="2048" placeholder="Immagine di copertina (facoltativa)" aria-label="Immagine" />
+                    <input
+                      v-model="card.image"
+                      class="in"
+                      maxlength="2048"
+                      placeholder="Immagine di copertina (facoltativa)"
+                      aria-label="Immagine"
+                    />
                     <button class="btn btn-soft btn-sm" type="button" @click="openPicker(gi, ci)">Libreria</button>
-                    <button v-if="card.image" class="arc-icon-btn" type="button" title="Rimuovi immagine" @click="card.image = ''">✕</button>
-                    <a v-if="card.pageId && pagePaths[card.pageId]" class="arc-hint" :href="'/' + pagePaths[card.pageId]" target="_blank" rel="noopener">
+                    <button
+                      v-if="card.image"
+                      class="arc-icon-btn"
+                      type="button"
+                      title="Rimuovi immagine"
+                      @click="card.image = ''"
+                    >
+                      ✕
+                    </button>
+                    <a
+                      v-if="card.pageId && pagePaths[card.pageId]"
+                      class="arc-hint"
+                      :href="'/' + pagePaths[card.pageId]"
+                      target="_blank"
+                      rel="noopener"
+                    >
                       Apri pagina ↗
                     </a>
                   </div>
                 </div>
                 <p v-if="!group.cards.length" class="arc-hint">Nessuna card in questo gruppo.</p>
               </div>
-              <button v-if="section.groups.length < 12" class="btn btn-soft btn-sm" type="button" @click="addGroup(section)">
+              <button
+                v-if="section.groups.length < 12"
+                class="btn btn-soft btn-sm"
+                type="button"
+                @click="addGroup(section)"
+              >
                 + Gruppo
               </button>
             </template>
@@ -938,8 +1110,15 @@ onBeforeUnmount(() => {
         <div class="hp-preview-head">
           <span class="hp-preview-title">Anteprima live</span>
           <div class="hp-devices" role="group" aria-label="Dimensione anteprima">
-            <button v-for="size in (['desktop', 'tablet', 'mobile'] as Device[])" :key="size" class="hp-device" type="button"
-              :class="{ active: device === size }" :aria-pressed="device === size" @click="device = size">
+            <button
+              v-for="size in ['desktop', 'tablet', 'mobile'] as Device[]"
+              :key="size"
+              class="hp-device"
+              type="button"
+              :class="{ active: device === size }"
+              :aria-pressed="device === size"
+              @click="device = size"
+            >
               {{ size === 'desktop' ? '🖥' : size === 'tablet' ? '📱+' : '📱' }}
               <span>{{ size }}</span>
             </button>
@@ -961,12 +1140,7 @@ onBeforeUnmount(() => {
       </aside>
     </div>
 
-    <MediaDrawer
-      :open="pickerOpen"
-      title="Scegli l'immagine della card"
-      @close="picker = null"
-      @pick="onPick"
-    />
+    <MediaDrawer :open="pickerOpen" title="Scegli l'immagine della card" @close="picker = null" @pick="onPick" />
   </section>
 </template>
 

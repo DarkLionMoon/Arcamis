@@ -74,10 +74,7 @@ let verifyTimer: ReturnType<typeof setTimeout> | null = null
 
 const normalizedValue = computed(() => normalizeSiteInterface(config.value).config)
 const dirty = computed(
-  () =>
-    !loading.value &&
-    publishedHash.value !== '' &&
-    siteInterfaceHash(normalizedValue.value) !== publishedHash.value
+  () => !loading.value && publishedHash.value !== '' && siteInterfaceHash(normalizedValue.value) !== publishedHash.value
 )
 useUnsavedGuard(() => dirty.value || registry.dirty, 'modifiche all’interfaccia non salvate')
 
@@ -520,7 +517,12 @@ onBeforeUnmount(() => {
           <div class="arc-fld">
             <span>Logo</span>
             <div class="if-logo-row">
-              <img v-if="config.site.logo" class="if-logo-preview" :src="config.site.logo" :alt="config.site.logoAlt || 'Logo'" />
+              <img
+                v-if="config.site.logo"
+                class="if-logo-preview"
+                :src="config.site.logo"
+                :alt="config.site.logoAlt || 'Logo'"
+              />
               <input
                 v-model="config.site.logo"
                 class="in"
@@ -561,7 +563,12 @@ onBeforeUnmount(() => {
 
           <label class="arc-fld">
             <span>Nota legale</span>
-            <textarea v-model="config.footer.legal" class="in" rows="3" :maxlength="SITE_INTERFACE_LIMITS.legal"></textarea>
+            <textarea
+              v-model="config.footer.legal"
+              class="in"
+              rows="3"
+              :maxlength="SITE_INTERFACE_LIMITS.legal"
+            ></textarea>
           </label>
 
           <div v-for="(link, index) in config.footer.links" :key="'footer-link-' + index" class="if-row if-row--link">
@@ -593,7 +600,13 @@ onBeforeUnmount(() => {
             <label v-if="link.kind !== 'credits'" class="arc-toggle-line if-inline">
               <input v-model="link.external" type="checkbox" /> esterno
             </label>
-            <button class="arc-icon-btn" type="button" title="Sposta su" :disabled="index === 0" @click="moveFooterLink(index, -1)">
+            <button
+              class="arc-icon-btn"
+              type="button"
+              title="Sposta su"
+              :disabled="index === 0"
+              @click="moveFooterLink(index, -1)"
+            >
               ↑
             </button>
             <button
@@ -607,8 +620,12 @@ onBeforeUnmount(() => {
             </button>
             <button class="arc-icon-btn" type="button" title="Rimuovi link" @click="removeFooterLink(index)">✕</button>
           </div>
-          <p v-if="!config.footer.links.length" class="arc-hint">Nessun link: il footer mostra solo nome, tagline e nota legale.</p>
-          <p class="arc-hint">La voce «Pagina Crediti» apre la pagina legale interna; le altre vanno a un percorso o a un URL esterno.</p>
+          <p v-if="!config.footer.links.length" class="arc-hint">
+            Nessun link: il footer mostra solo nome, tagline e nota legale.
+          </p>
+          <p class="arc-hint">
+            La voce «Pagina Crediti» apre la pagina legale interna; le altre vanno a un percorso o a un URL esterno.
+          </p>
         </div>
 
         <div class="arc-panel">
@@ -628,7 +645,8 @@ onBeforeUnmount(() => {
             </label>
           </div>
           <p class="arc-hint">
-            Il placeholder compare nella ricerca desktop e mobile. La nota del disclaimer e i testi del banner restano in
+            Il placeholder compare nella ricerca desktop e mobile. La nota del disclaimer e i testi del banner restano
+            in
             <router-link to="/impostazioni">Impostazioni</router-link>, dove hanno già il loro editor.
           </p>
         </div>
@@ -647,7 +665,9 @@ onBeforeUnmount(() => {
             </label>
             <div v-for="(item, idx) in items" :key="'nav-' + idx" class="arc-navrow">
               <div class="arc-navrow-move">
-                <button class="btn btn-soft btn-sm" type="button" :disabled="idx === 0" @click="moveNavItem(idx, -1)">↑</button>
+                <button class="btn btn-soft btn-sm" type="button" :disabled="idx === 0" @click="moveNavItem(idx, -1)">
+                  ↑
+                </button>
                 <button
                   class="btn btn-soft btn-sm"
                   type="button"
@@ -707,7 +727,7 @@ onBeforeUnmount(() => {
           <span class="if-preview-title">Anteprima live</span>
           <div class="if-devices" role="group" aria-label="Dimensione anteprima">
             <button
-              v-for="size in (['desktop', 'mobile'] as Device[])"
+              v-for="size in ['desktop', 'mobile'] as Device[]"
               :key="size"
               class="if-device"
               type="button"

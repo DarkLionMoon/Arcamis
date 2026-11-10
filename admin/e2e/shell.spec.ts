@@ -60,6 +60,7 @@ test.describe('navigazione per ruolo', () => {
        in più o in meno qui è una regressione di permessi. */
     expect(labels).toEqual([
       'Dashboard',
+      'Homepage',
       'Pagine',
       'Copertine',
       'Imprese',
