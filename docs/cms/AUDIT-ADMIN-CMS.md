@@ -228,6 +228,8 @@ versionato (test dedicati).
 - `content/schemas/interface.schema.json` — schema JSON.
 - `scripts/lib/site-interface.mjs` + `.d.mts` — default, normalizzazione, hash, renderer, tipi.
 - `scripts/__tests__/interface.test.js` — 15 test (configurazione, rendering, rotte, artefatto).
+- `admin/e2e/homepage.spec.ts` — 2 test E2E del builder: testi, visibilità, drag & drop,
+  anteprima, bozza locale, salvataggio e verifica dell'impronta pubblicata.
 - `admin/src/shared/site-interface.ts` — re-export tipizzato del modulo condiviso.
 - `admin/src/shared/api/site-interface.ts` — lettura/scrittura GitHub, cronologia, verifica.
 - `content/homepage.json` — configurazione pubblicata delle sezioni.
@@ -291,11 +293,13 @@ manifest del carousel, contenuti delle pagine.
 | Format check | `npm run format:check` | **ok** |
 | Artefatto home | test dedicati | impronta `5f1e06d9` presente, mappa una sola volta, nessuna sezione nascosta, sezioni assenti da `#pv` |
 | Artefatto interfaccia | test dedicati | impronta `91b7ad79` presente, footer una volta, titolo/meta e 404 aggiornati, nessun marcatore residuo |
+| E2E Homepage Builder | `npx playwright test e2e/homepage.spec.ts --project=chromium` | **2/2 passati** (backend simulato, Chromium) |
 
 **Non eseguiti / bloccati**
 
-- **Playwright E2E e screenshot**: Chromium non si avvia in questo ambiente (librerie di sistema
-  mancanti, nessun `sudo` disponibile). Nessuna verifica visiva né E2E è stata dichiarata.
+- **Playwright E2E e screenshot**: lo spec Homepage Builder passa (2/2) dopo aver fornito al runner
+  le librerie Chromium e il fontconfig locali; il resto della suite E2E e le verifiche visive non
+  sono stati eseguiti in questa iterazione.
 - **Deploy e verifica online**: nessun push/deploy eseguito in questa iterazione. La verifica
   dell'impronta è pronta e va usata dopo la pubblicazione.
 - **Digest del deploy**: non usabile come prova (toolchain Node diversa fra locale e CI).
@@ -308,8 +312,9 @@ manifest del carousel, contenuti delle pagine.
    `md-render`/`notion-render`; collezioni e materiale approvato.
 2. **Fase 6 — Aspetto e SEO**: palette/varianti con vincoli di contrasto e anteprima; OG image,
    canonical, indicizzazione per pagina; checklist che blocchi indicizzazione di bozze/revisione.
-3. **Fase 7 — Verifica**: E2E in un ambiente con browser, prova di deploy su preview, verifica
-   dell'impronta online, test di concorrenza sul salvataggio.
+3. **Fase 7 — Verifica**: estendere gli E2E (Interfaccia, permessi viewer/editor, deploy preview),
+   prova di deploy reale, verifica dell'impronta online e test di concorrenza sul salvataggio.
+   L'Homepage Builder ha già la sua copertura E2E.
 
 ### Limiti dichiarati di questa verticale
 
