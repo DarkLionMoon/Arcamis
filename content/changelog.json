@@ -235,11 +235,11 @@
   },
   {
     "id": "cl-comunicazione-doni-draghi-ftd",
-    "title": "Stato dei Doni dei Draghi — FTD",
+    "title": "0.8.6-B — Stato dei Doni dei Draghi (FTD)",
     "versione": "0",
     "sottoversione": "0.8",
     "patch": "Comunicazione",
     "date": "2026-10-25",
-    "content": "**Pubblicazione:** 25/10/2026, ore 17:56\n**Classificazione:** comunicazione integrativa.\n\n- Annuncio relativo allo stato dei Doni dei Draghi: **FTD**.\n- Il significato di FTD non viene esplicitato nel messaggio originale."
+    "content": "**Pubblicazione:** 25/10/2026, ore 17:56\n**Riferimento:** Patch 0.8.6-B — comunicazione integrativa.\n\n- Annuncio relativo allo stato dei Doni dei Draghi: **FTD**.\n- Il significato di FTD non viene esplicitato nel messaggio originale."
   }
 ]
