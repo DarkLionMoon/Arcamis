@@ -385,12 +385,12 @@ var _fio = new IntersectionObserver(
 
 function initFadeIn(root) {
   var els = (root || document).querySelectorAll(
-    '.shead,.cgrid,.lcard,.n-db-wrap,.hsec,.arcadia-sec,.fade-in,.mys-card,.step,.fpill'
+    '.shead,.cgrid,.lcard,.n-db-wrap,.hsec,.arcadia-sec,.fade-in,.mys-card,.news-card,.step,.fpill'
   );
   els.forEach(function (el, i) {
     if (!el.classList.contains('fade-in')) el.classList.add('fade-in');
     var delay = 0;
-    if (el.classList.contains('mys-card') || el.classList.contains('fpill') || el.classList.contains('step')) {
+    if (el.classList.contains('mys-card') || el.classList.contains('news-card') || el.classList.contains('fpill') || el.classList.contains('step')) {
       var siblings = el.parentElement ? el.parentElement.children : [];
       for (var j = 0; j < siblings.length; j++) {
         if (siblings[j] === el) {

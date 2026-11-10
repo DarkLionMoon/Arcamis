@@ -259,3 +259,180 @@ window.loadChangelog = async function (container) {
 
   render();
 };
+
+/* Pagina Novità: tutte le patch in un unico feed, filtrabili per versione. */
+window.loadNovita = async function (container) {
+  container.innerHTML = '<p class="cl-loading">Caricamento novità…</p>';
+
+  let entries;
+  try {
+    const res = await fetch('/content/changelog.json');
+    if (!res.ok) throw new Error('Fetch error: ' + res.status);
+    entries = await res.json();
+  } catch (e) {
+    container.innerHTML = `<p class="cl-error">Errore nel caricamento delle novità: ${e.message}</p>`;
+    return;
+  }
+
+  if (!Array.isArray(entries) || !entries.length) {
+    container.innerHTML = '<p class="cl-empty">Nessuna novità disponibile.</p>';
+    return;
+  }
+
+  const versionOf = function (entry) {
+    if (entry.patch !== null && entry.patch !== undefined && entry.patch !== '') return String(entry.patch);
+    if (entry.sottoversione !== null && entry.sottoversione !== undefined && entry.sottoversione !== '')
+      return String(entry.sottoversione);
+    return String(entry.versione || '?');
+  };
+
+  const sorted = entries.slice().sort(function (a, b) {
+    const byDate = String(b.date || '').localeCompare(String(a.date || ''));
+    if (byDate !== 0) return byDate;
+    return Number(b._i || 0) - Number(a._i || 0);
+  });
+
+  const versions = [];
+  sorted.forEach(function (entry) {
+    const version = versionOf(entry);
+    if (!versions.includes(version)) versions.push(version);
+  });
+  versions.sort(function (a, b) {
+    return b.localeCompare(a, undefined, { numeric: true });
+  });
+
+  const page = document.createElement('div');
+  page.className = 'nv-page';
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'nv-toolbar';
+
+  const label = document.createElement('label');
+  label.htmlFor = 'nv-version-filter';
+  label.textContent = 'Filtra per versione';
+
+  const select = document.createElement('select');
+  select.id = 'nv-version-filter';
+  select.className = 'nv-select';
+
+  const allOption = document.createElement('option');
+  allOption.value = '';
+  allOption.textContent = 'Tutte le versioni';
+  select.appendChild(allOption);
+
+  versions.forEach(function (version) {
+    const option = document.createElement('option');
+    option.value = version;
+    option.textContent = 'Versione ' + version;
+    select.appendChild(option);
+  });
+
+  const count = document.createElement('span');
+  count.className = 'nv-count';
+  count.setAttribute('aria-live', 'polite');
+
+  toolbar.appendChild(label);
+  toolbar.appendChild(select);
+  toolbar.appendChild(count);
+
+  const list = document.createElement('div');
+  list.className = 'cl-entries nv-entries';
+
+  page.appendChild(toolbar);
+  page.appendChild(list);
+  container.innerHTML = '';
+  container.appendChild(page);
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function makeBadge(text, cls) {
+    const span = document.createElement('span');
+    span.className = 'cl-badge ' + cls;
+    span.textContent = text;
+    return span;
+  }
+
+  function renderList() {
+    const filter = select.value;
+    const visible = filter
+      ? sorted.filter(function (entry) {
+          return versionOf(entry) === filter;
+        })
+      : sorted;
+
+    count.textContent = visible.length + ' patch';
+    list.innerHTML = '';
+
+    if (!visible.length) {
+      const empty = document.createElement('p');
+      empty.className = 'cl-empty';
+      empty.textContent = 'Nessuna patch per questa versione.';
+      list.appendChild(empty);
+      return;
+    }
+
+    visible.forEach(function (entry) {
+      const card = document.createElement('article');
+      card.className = 'cl-entry-card nv-entry';
+      if (/cancellat/i.test(entry.title || '')) card.classList.add('nv-entry--cancelled');
+
+      const header = document.createElement('div');
+      header.className = 'cl-entry-header';
+
+      const title = document.createElement('button');
+      title.type = 'button';
+      title.className = 'cl-entry-title nv-entry-title';
+      title.textContent = entry.title;
+      title.addEventListener('click', function () {
+        const existing = card.querySelector('.cl-inline-content');
+        if (existing) {
+          existing.remove();
+          card.classList.remove('cl-entry-card--open');
+          return;
+        }
+        card.querySelectorAll('.cl-inline-content').forEach(function (node) {
+          node.remove();
+        });
+        card.classList.add('cl-entry-card--open');
+
+        const inline = document.createElement('div');
+        inline.className = 'cl-inline-content';
+        inline.dataset.id = entry.id;
+        card.appendChild(inline);
+        try {
+          const html =
+            entry.content && window.mdRender
+              ? window.mdRender(entry.content)
+              : '<p class="cl-error">Contenuto non disponibile</p>';
+          inline.innerHTML = '<div class="n-body">' + html + '</div>';
+        } catch (_e) {
+          inline.innerHTML = '<div class="cl-error">Errore caricamento</div>';
+        }
+      });
+
+      header.appendChild(title);
+
+      if (entry.date) {
+        const dateEl = document.createElement('span');
+        dateEl.className = 'cl-entry-date';
+        dateEl.textContent = formatDate(entry.date);
+        header.appendChild(dateEl);
+      }
+
+      card.appendChild(header);
+
+      const badges = document.createElement('div');
+      badges.className = 'cl-entry-badges';
+      badges.appendChild(makeBadge('v' + versionOf(entry), 'badge-p'));
+      card.appendChild(badges);
+      list.appendChild(card);
+    });
+  }
+
+  select.addEventListener('change', renderList);
+  renderList();
+};

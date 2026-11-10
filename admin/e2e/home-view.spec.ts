@@ -1,7 +1,7 @@
 import { test, expect, type Page } from 'playwright/test'
 
 /*
-  La Home View (#hv) contiene hero, mappe, Arcadia, Misteri e Guida rapida.
+  La Home View (#hv) contiene hero, mappe, Arcadia, Novità e Guida rapida.
   Le altre pagine vivono in #pv. Questi test proteggono il confine fra le
   due viste anche dopo transizioni, navigazioni rapide e richieste fuori
   ordine: un errore di annidamento HTML o un timer/fetch vecchio non deve
@@ -9,8 +9,8 @@ import { test, expect, type Page } from 'playwright/test'
 */
 
 const HOME_MARKERS = [
-  '#misteri-regno-title',
-  '.mys-cin-grid',
+  '#novita-server-title',
+  '.news-grid',
   '#come-iniziare-title',
   '.start-sec .steps',
   '.start-sec .cta-row'
@@ -103,10 +103,24 @@ test('la Home mostra tutte le sezioni dentro #hv', async ({ page }) => {
   await waitForShell(page)
   await expectHomeView(page)
 
-  await expect(page.locator('#misteri-regno-title')).toHaveText('MISTERI DEL REGNO')
+  await expect(page.locator('#novita-server-title')).toHaveText('NOVITÀ DAL SERVER')
+  await expect(page.locator('.news-card')).toHaveCount(3)
+  await expect(page.locator('.news-links a')).toHaveCount(2)
+  await expect(page.locator('#cronache-arcadia-title')).toHaveCount(0)
+  await expect(page.locator('#misteri-regno-title')).toHaveCount(0)
   await expect(page.locator('#come-iniziare-title')).toContainText('CREA IL TUO PERSONAGGIO')
   await expect(page.locator('.start-sec .step')).toHaveCount(3)
   await expect(page.locator('#hv #carousel-wrap')).toBeVisible()
+})
+
+test('le Novità aprono la pagina dedicata', async ({ page }) => {
+  await page.goto('/')
+  await waitForShell(page)
+
+  await page.locator('.news-card').first().click()
+  await expect(page).toHaveURL(/\/novita\/?$/)
+  await expect(page.locator('#hv')).toBeHidden()
+  await expect(page.locator('#pv')).toBeVisible()
 })
 
 const INTERNAL_PAGES = [

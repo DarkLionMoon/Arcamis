@@ -37,6 +37,7 @@ describe('rotte pubbliche (sorgente)', () => {
     expect(paths).toContain('lore/pantheon/anivia');
     expect(paths.some((p) => p.startsWith('personaggio/lavori/'))).toBe(true);
     expect(paths).toContain('changelog');
+    expect(paths).toContain('novita');
     expect(paths).toContain('credits');
   });
 

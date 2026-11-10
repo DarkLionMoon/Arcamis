@@ -1,6 +1,12 @@
 {
  "pages": [
   {
+   "id": "pag-novita",
+   "title": "Novità",
+   "icon": "📰",
+   "lastEdited": "2026-11-10T00:00:00.000Z"
+  },
+  {
    "id": "pag-arena",
    "title": "Arena",
    "icon": "⚔️",
@@ -40,12 +46,6 @@
    "id": "pag-polpo-verde",
    "title": "Il Polpo Verde",
    "icon": "🐙",
-   "lastEdited": "2026-11-06T00:00:00.000Z"
-  },
-  {
-   "id": "pag-locanda",
-   "title": "Locanda",
-   "icon": "🛏️",
    "lastEdited": "2026-11-06T00:00:00.000Z"
   }
  ]

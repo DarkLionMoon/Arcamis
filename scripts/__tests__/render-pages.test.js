@@ -133,6 +133,20 @@ describe('pagina Changelog e banner meme', () => {
     expect(appJs).toContain("'changelog': 'pag-changelog'")
   })
 
+  it('la pagina Novità è pubblica e monta il feed delle patch', () => {
+    const registry = JSON.parse(
+      fs.readFileSync(path.join(root, 'content/pages/registry.json'), 'utf8')
+    )
+    const page = registry.pages.find((p) => p.k === 'novita')
+    expect(page?.path).toBe('novita')
+    expect(page?.menu).toBe(true)
+    expect(readPage('novita').layout).toBe('wide')
+    const appJs = fs.readFileSync(path.join(root, 'scripts/js/app.js'), 'utf8')
+    expect(appJs).toContain("'novita': 'pag-novita'")
+    const changelogJs = fs.readFileSync(path.join(root, 'scripts/js/changelog.js'), 'utf8')
+    expect(changelogJs).toContain('window.loadNovita')
+  })
+
   it('La Storia di Gandora si dichiara pagina meme', () => {
     expect(readPage('la-storia-di-gandora').meme).toBe(true)
     const schema = JSON.parse(
