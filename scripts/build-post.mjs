@@ -27,6 +27,15 @@ import {
   SITE_URL,
 } from './lib/routes.mjs';
 import {
+  SITE_INTERFACE_PATH,
+  applyDocumentIdentity,
+  applyErrorPageIdentity,
+  applyInterfaceMarkup,
+  applyManifestIdentity,
+  normalizeSiteInterface,
+  siteInterfaceMarker,
+} from './lib/site-interface.mjs';
+import {
   HOMEPAGE_MAP_MARKER_END,
   HOMEPAGE_MAP_MARKER_START,
   HOMEPAGE_MARKER_END,
@@ -170,6 +179,28 @@ function homepagePagePaths() {
   }
 }
 
+/* ── 2c. Identità del sito: nome, logo, loader, footer e testi ──
+   Gli stessi valori alimentano titoli/meta della home e, tramite
+   routes.mjs, quelli di tutte le pagine prerenderizzate. */
+function interfaceConfig() {
+  const file = path.join(root, SITE_INTERFACE_PATH);
+  if (!fs.existsSync(file)) {
+    console.warn('⚠ interfaccia: ' + SITE_INTERFACE_PATH + ' assente, uso i valori predefiniti');
+    return normalizeSiteInterface(null).config;
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (error) {
+    fail(SITE_INTERFACE_PATH + ' non è JSON valido: ' + error.message);
+  }
+  const { config, errors, warnings } = normalizeSiteInterface(parsed);
+  for (const message of [...warnings, ...errors]) console.warn('⚠ interfaccia: ' + message);
+  return config;
+}
+
+const iface = interfaceConfig();
+
 const mapStart = html.indexOf(HOMEPAGE_MAP_MARKER_START);
 const mapEnd = html.indexOf(HOMEPAGE_MAP_MARKER_END);
 const mapHtml = mapStart >= 0 && mapEnd > mapStart
@@ -195,6 +226,12 @@ if (homeStart < 0 || homeEnd < homeStart) {
     '\n    ' +
     html.slice(homeEnd);
 }
+
+/* Identità e testi globali: marcatori della shell + titolo/meta della home.
+   Il commento con l'impronta permette all'Admin di verificare il deploy. */
+html = applyInterfaceMarkup(html, iface);
+html = applyDocumentIdentity(html, iface);
+html = html.replace(/<body([^>]*)>/, `<body$1>\n${siteInterfaceMarker(iface)}`);
 
 writeDist('index.html', html);
 
@@ -236,6 +273,12 @@ writeDist(
   ].join('\n')
 );
 
+/* Il manifest PWA è emesso da Vite nella root di dist: nome completo
+   e nome breve seguono l'identità del sito. */
+if (fs.existsSync(distPath('manifest.webmanifest'))) {
+  writeDist('manifest.webmanifest', applyManifestIdentity(readDist('manifest.webmanifest'), iface));
+}
+
 /* ── 4. admin già compilato ───────────────────────────────── */
 function copyDir(from, to, { skipSourceMaps = false } = {}) {
   if (!fs.existsSync(from)) return 0;
@@ -268,7 +311,9 @@ const routes = collectRoutes(root);
 writeDist('sitemap.xml', renderSitemap(routes));
 writeDist('robots.txt', renderRobots());
 for (const page of ['404.html', 'offline.html']) {
-  if (fs.existsSync(path.join(root, page))) fs.copyFileSync(path.join(root, page), distPath(page));
+  if (!fs.existsSync(path.join(root, page))) continue;
+  const source = fs.readFileSync(path.join(root, page), 'utf8');
+  writeDist(page, applyErrorPageIdentity(source, iface));
 }
 const prerendered = writePages(dist, html, routes);
 const missing = routes.filter((route) => route.path && !fs.existsSync(distPath(routeFile(route.path))));
@@ -323,6 +368,14 @@ console.log('  CSS bundlato  : ' + cssHref);
 console.log('  Prerender     : ' + prerendered + ' rotte con meta dedicati (' + routes.length + ' in sitemap)');
 console.log('  Sitemap/Robots: ' + SITE_URL + '/sitemap.xml');
 console.log('  Service worker: cache arcamis-' + buildVersion + ' (' + existing.length + ' file precache)');
+console.log(
+  '  Interfaccia   : ' +
+    iface.site.name +
+    ' · logo ' +
+    iface.site.logo +
+    ' · impronta ' +
+    (siteInterfaceMarker(iface).match(/interface:([0-9a-f]{8})/) || [])[1]
+);
 console.log(
   '  Admin         : ' + (fs.existsSync(distPath('admin/app.html')) ? 'incluso in /admin' : 'assente') + '\n'
 );

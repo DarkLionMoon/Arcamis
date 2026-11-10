@@ -50,3 +50,6 @@ export { MEDIA_DIR, compressImage, formatBytes, mediaApi, mediaName, mediaUrl, u
 
 export { homepageApi } from './homepage'
 export type { HomepageDoc, HomepageVerify } from './homepage'
+
+export { siteInterfaceApi } from './site-interface'
+export type { SiteInterfaceDoc, SiteInterfaceVerify } from './site-interface'

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://arcamis.pages.dev/content/schemas/interface.schema.json",
+  "title": "Identità e testi globali del sito Arcamis",
+  "type": "object",
+  "required": ["version", "site"],
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "updatedAt": { "type": ["string", "null"] },
+    "site": {
+      "type": "object",
+      "required": ["name", "brand"],
+      "properties": {
+        "name": { "type": "string", "maxLength": 80 },
+        "brand": { "type": "string", "maxLength": 40 },
+        "tagline": { "type": "string", "maxLength": 160 },
+        "logo": { "type": "string", "maxLength": 2048 },
+        "logoAlt": { "type": "string", "maxLength": 120 },
+        "loaderText": { "type": "string", "maxLength": 80 }
+      }
+    },
+    "footer": {
+      "type": "object",
+      "properties": {
+        "legal": { "type": "string", "maxLength": 600 },
+        "links": {
+          "type": "array",
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": ["label"],
+            "properties": {
+              "label": { "type": "string", "maxLength": 80 },
+              "href": { "type": "string", "maxLength": 2048 },
+              "external": { "type": "boolean" },
+              "kind": { "type": "string", "enum": ["", "credits"] }
+            }
+          }
+        }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "properties": {
+        "skipLink": { "type": "string", "maxLength": 120 },
+        "searchPlaceholder": { "type": "string", "maxLength": 80 }
+      }
+    }
+  }
+}

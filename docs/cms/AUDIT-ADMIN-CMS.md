@@ -3,8 +3,9 @@
 Data: 10 novembre 2026 · Ambito: pannello `/admin`, sito pubblico, API Cloudflare Pages
 Metodo: lettura di router/store/feature Admin, `functions/api/*`, `content/**`, `index.html`, `scripts/js/*`, `scripts/lib/*`, build e test.
 
-Questo documento è la **Fase 1 (audit)** e la **Fase 2 (architettura)** del brief. La prima verticale
-realizzata è la **Fase 3 — Homepage Builder**, descritta più sotto. Le fasi 4–7 restano pianificate.
+Questo documento è la **Fase 1 (audit)** e la **Fase 2 (architettura)** del brief. Le verticali
+realizzate sono la **Fase 3 — Homepage Builder** e la **Fase 4 — Interfaccia globale**, descritte
+più sotto. Le fasi 5–7 restano pianificate.
 
 ---
 
@@ -17,11 +18,11 @@ realizzata è la **Fase 3 — Homepage Builder**, descritta più sotto. Le fasi 
 | Homepage — mappa e sottoviste | `content/mappins.json` + markup mappa in `index.html` | Punti e immagine **sì** (Mappa); sottoviste **no** | Fase successiva: sottoviste ancora inline (documentato come limite) |
 | Pagine e contenuti | `content/pages/*.json` + `registry.json` | **Sì** (Pagine, editor, blocchi, template, workflow, versioni, anteprima) | Mantenere; aggiungere libreria componenti (Fase 5) |
 | Navigazione (topbar, drawer, sezioni) | `content/pages/registry.json` → `custom-nav.js` | **Sì** (Navigazione) | Migliorare: drag & drop e anteprima menu; `_pathMap` resta generato da `sync-registry.py` |
-| Footer | `index.html` (`#site-footer`) | **No** | Fase 4: footer configurabile, generato dal build |
+| Footer | `index.html` (`#site-footer`) | **Ora sì** (Interfaccia) | **Implementato**: `content/interface.json` + renderer condiviso + build statico |
 | Banner di manutenzione | KV `site_settings` → `app-ui.js` | **Sì** (Impostazioni) | Già funzionante; unificare nell'Interfaccia del sito |
 | Disclaimer / avvisi | KV `site_settings` → `app-ui.js` | **Sì** (Impostazioni) | Già funzionante; valutare avvisi programmati |
-| Logo, nome sito, immagini brand | `index.html`, `Artboard_1.png` | **No** | Fase 4 |
-| Testi UI (etichette, FAB, help, FAQ, stati vuoti) | `index.html` + `scripts/js/*` | **Parziale** (FAQ nel markup) | Fase 4: testi globali versionati |
+| Logo, nome sito, immagini brand | `index.html`, `Artboard_1.png` | **Ora sì** (Interfaccia) | **Implementato**: nome, nome breve, tagline, logo e alt; titoli/meta/manifest seguono il nome |
+| Testi UI (etichette, FAB, help, FAQ, stati vuoti) | `index.html` + `scripts/js/*` | **Parziale** (skip link e ricerca ora sì; FAQ nel markup) | I testi globali sono versionati; le etichette interne dei JS restano da migrare |
 | Temi (dark, light, blood, forest, abyss, alchemy) | CSS + `app-ui.js` | Scelta utente **sì**; configurazione **no** | Fase 6: palette e varianti con anteprima e controlli di contrasto |
 | SEO (title, description, OG, canonical, robots) | `scripts/lib/routes.mjs` + meta per pagina | **Parziale** (title/description dal registry) | Fase 6: OG image, indicizzazione, stato per pagina |
 | Changelog / Novità | `content/changelog.json` + Admin Changelog | **Sì** | Già funzionante; la home legge la stessa fonte |
@@ -31,8 +32,8 @@ realizzata è la **Fase 3 — Homepage Builder**, descritta più sotto. Le fasi 
 | Glossario | `content/glossary.json` | **Sì** | Già funzionante |
 | Materiale approvato | pagina Markdown + filtri JS | **Parziale** | Fase 5: metadati e filtri configurabili |
 | Ricerca globale | indice generato dal build | **Sì** (indice), nessuna configurazione | Fase 5: pesi/etichette solo se necessari |
-| Crediti e pagine legali | Pagina dal registry | **Parziale** (editor pagine) | Fase 4: testi legali tra i testi globali |
-| 404 / offline | `404.html`, `offline.html` | **No** | Fase 4 |
+| Crediti e pagine legali | Pagina dal registry | **Parziale** (editor pagine) | La nota legale del footer è configurabile; la pagina Crediti resta nel registry |
+| 404 / offline | `404.html`, `offline.html` | **Nome e marchio sì** | Il build applica nome/nome breve; il corpo resta statico |
 | Service worker e cache | generato da `build-post.mjs` | **No** (corretto) | Non rendere modificabile |
 | Analytics | KV + Dashboard | **Sì** (Dashboard) | Già funzionante |
 | Stato deploy | `/api/deploy` + Dashboard | **Sì** (lettura) | Aggiungere verifica del contenuto pubblicato (fatta per la home) |
@@ -155,10 +156,80 @@ Tipi supportati: `marche`, `arcadia`, `news`, `steps`, `wiki`. Lo schema JSON è
 
 ---
 
+## 3b. Architettura dell'interfaccia globale (Fase 4)
+
+### Una sola configurazione per identità e testi
+
+`content/interface.json` (v1) raccoglie ciò che prima era sparso in `index.html`, nei meta e nei
+file di errore:
+
+```json
+{
+  "version": 1,
+  "site": { "name": "Arcamis Wiki", "brand": "ARCAMIS", "tagline": "…",
+            "logo": "/Artboard_1.png", "logoAlt": "Arcamis", "loaderText": "Arcamis" },
+  "footer": { "legal": "…", "links": [{ "label": "…", "href": "…", "external": false, "kind": "" }] },
+  "texts": { "skipLink": "…", "searchPlaceholder": "…" }
+}
+```
+
+- `site.name` alimenta `<title>`, `og:site_name`, JSON-LD e manifest; `site.brand` è il nome breve
+  visibile in header e footer.
+- Il footer accetta al massimo 6 link; `kind: "credits"` apre la pagina legale interna, gli altri
+  richiedono un percorso del sito o un URL `https:`/`mailto:`.
+- Lunghezze limitate per ogni campo; testi sempre escapati; link non validi scartati con avviso;
+  una configurazione assente ricade sui valori storici del sito.
+
+`scripts/lib/site-interface.mjs` è l'unica fonte di default, normalizzazione, hash e rendering,
+usata dal build e dall'Admin. La normalizzazione è idempotente e i default coincidono col file
+versionato (test dedicati).
+
+### Rendering statico e metadati
+
+- `index.html` conserva marcatori stabili per loader, brand dell'header, footer e skip link;
+  `build-post` li sostituisce in `dist`, insieme ai due placeholder di ricerca.
+- `applyDocumentIdentity()` aggiorna titolo, `og:title`, `twitter:title`, `og:site_name` e il nome
+  nel JSON-LD della home; `routes.mjs` legge lo stesso nome per i titoli e i meta di tutte le
+  pagine prerenderizzate.
+- `404.html` e `offline.html` ricevono nome/nome breve; `manifest.webmanifest` riceve nome e
+  `short_name`. Nessuna API o JavaScript è necessario per vedere i valori pubblicati.
+- Il build inserisce `<!-- interface:<hash> -->` dopo `<body>`: l'Admin può verificare il deploy
+  reale senza dichiarare pubblicato ciò che non lo è.
+
+### Admin, permessi e pubblicazione
+
+- `/interfaccia` ora modifica identità, footer e testi globali, con anteprima live desktop/mobile
+  che usa gli stessi CSS e lo stesso renderer del sito (la pagina centrale è un segnaposto
+  dichiarato). La barra di navigazione mobile resta nel registry e ha un salvataggio separato.
+- Bozza locale in `localStorage`, guard sulle modifiche non salvate, validazione prima del commit,
+  cronologia dei commit del file e ripristino nell'editor.
+- Salvataggio tramite il proxy esistente `/api/gh` (ruolo editor/admin, token server-side):
+  nessun nuovo endpoint, nessun token nel browser, CSRF e rate limit invariati. La rotta Admin
+  resta `admin`; le scritture accettano editor e admin.
+- Dopo il commit l'Admin cerca `<!-- interface:<hash> -->` nella home online (8 tentativi, 15 s) e
+  mostra "Pubblicata e verificata" solo al riscontro; in locale lo dice esplicitamente.
+
+### Limiti dichiarati della Fase 4
+
+- Banner di manutenzione e disclaimer restano in Impostazioni (hanno già il loro editor KV): non
+  sono duplicati qui.
+- Il logo configurabile non rigenera favicon e icone PWA: restano asset dedicati.
+- Il corpo dei testi di 404/offline resta statico; cambiano nome e marchio.
+- Non tutte le etichette interne dei JS sono migrate: la Fase 4 copre identità, footer, loader,
+  skip link e ricerca, non l'intera microcopy del sito.
+
+---
+
 ## 4. File creati e modificati
 
 **Creati**
 
+- `content/interface.json` — identità, footer e testi globali pubblicati.
+- `content/schemas/interface.schema.json` — schema JSON.
+- `scripts/lib/site-interface.mjs` + `.d.mts` — default, normalizzazione, hash, renderer, tipi.
+- `scripts/__tests__/interface.test.js` — 15 test (configurazione, rendering, rotte, artefatto).
+- `admin/src/shared/site-interface.ts` — re-export tipizzato del modulo condiviso.
+- `admin/src/shared/api/site-interface.ts` — lettura/scrittura GitHub, cronologia, verifica.
 - `content/homepage.json` — configurazione pubblicata delle sezioni.
 - `content/schemas/homepage.schema.json` — schema JSON.
 - `scripts/lib/homepage.mjs` + `scripts/lib/homepage.d.mts` — default, normalizzazione, hash,
@@ -168,12 +239,19 @@ Tipi supportati: `marche`, `arcadia`, `news`, `steps`, `wiki`. Lo schema JSON è
 - `admin/src/shared/api/homepage.ts` — lettura/scrittura GitHub, cronologia, verifica pubblicato.
 - `admin/src/features/homepage/HomepageView.vue` — Homepage Builder (sezioni, drag & drop,
   visibilità, duplicazione, eliminazione, form per tipo, anteprima, cronologia, bozza).
+- `admin/src/features/interface/InterfaceView.vue` — identità, footer, testi globali, anteprima,
+  cronologia, bozza e verifica del deploy (la sezione navigazione mobile resta com'era).
 - `docs/cms/AUDIT-ADMIN-CMS.md` — questo documento.
 
 **Modificati**
 
-- `index.html` — marcatori della zona generata e del partial mappa (contenuto invariato nel dev).
-- `scripts/build-post.mjs` — generazione delle sezioni nell'HTML pubblicato.
+- `index.html` — marcatori della zona generata, del partial mappa e dell'interfaccia (contenuto
+  invariato nel dev).
+- `scripts/build-post.mjs` — generazione delle sezioni e dell'interfaccia nell'HTML pubblicato,
+  404/offline e manifest.
+- `scripts/lib/routes.mjs` — nome del sito letto da `content/interface.json` per titoli e
+  `og:site_name`.
+- `admin/src/shared/api/index.ts` — export del client interfaccia.
 - `functions/api/admin.js` — `requireEditor()` e controllo di ruolo su sei scritture.
 - `admin/src/app/router/index.ts`, `features/interface/layout/AdminLayout.vue`,
   `features/dashboard/DashboardView.vue`, `shared/icons.ts` — rotta `/homepage`, voce di menu,
@@ -204,14 +282,15 @@ manifest del carousel, contenuti delle pagine.
 
 | Verifica | Comando | Esito |
 |---|---|---|
-| Test root (sito, rotte, contenuti, homepage) | `npm test` | **276/276 passati** (29 file) |
+| Test root (sito, rotte, contenuti, homepage, interfaccia) | `npm test` | **291/291 passati** (30 file) |
 | Test Admin (store, editor, API, guard) | `npm --prefix admin test` | **299/299 passati** (26 file) |
 | Typecheck Admin | `npm --prefix admin run typecheck` | **0 errori** |
-| Build Admin + sito | `npm run build` | **ok** — 712 file in dist, 74 rotte prerenderizzate, 10 file in `export/admin` |
+| Build Admin + sito | `npm run build` | **ok** — 714 file in dist, 74 rotte prerenderizzate, 10 file in `export/admin` |
 | Lint Admin | `npm --prefix admin run lint` | **0 errori** |
 | Lint root | `npm run lint` | **0 errori**, 130 warning preesistenti |
 | Format check | `npm run format:check` | **ok** |
 | Artefatto home | test dedicati | impronta `5f1e06d9` presente, mappa una sola volta, nessuna sezione nascosta, sezioni assenti da `#pv` |
+| Artefatto interfaccia | test dedicati | impronta `91b7ad79` presente, footer una volta, titolo/meta e 404 aggiornati, nessun marcatore residuo |
 
 **Non eseguiti / bloccati**
 
@@ -223,16 +302,13 @@ manifest del carousel, contenuti delle pagine.
 
 ---
 
-## 7. Cosa resta (fasi 4–7)
+## 7. Cosa resta (fasi 5–7)
 
-1. **Fase 4 — Interfaccia globale**: footer, logo/nome, banner e avvisi, testi UI, 404/offline con
-   lo stesso schema versionato + renderer del build; unificare banner/disclaimer oggi in
-   Impostazioni.
-2. **Fase 5 — Editor visuale**: libreria componenti con anteprima e markup compatibile con
+1. **Fase 5 — Editor visuale**: libreria componenti con anteprima e markup compatibile con
    `md-render`/`notion-render`; collezioni e materiale approvato.
-3. **Fase 6 — Aspetto e SEO**: palette/varianti con vincoli di contrasto e anteprima; OG image,
+2. **Fase 6 — Aspetto e SEO**: palette/varianti con vincoli di contrasto e anteprima; OG image,
    canonical, indicizzazione per pagina; checklist che blocchi indicizzazione di bozze/revisione.
-4. **Fase 7 — Verifica**: E2E in un ambiente con browser, prova di deploy su preview, verifica
+3. **Fase 7 — Verifica**: E2E in un ambiente con browser, prova di deploy su preview, verifica
    dell'impronta online, test di concorrenza sul salvataggio.
 
 ### Limiti dichiarati di questa verticale

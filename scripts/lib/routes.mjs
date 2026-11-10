@@ -14,9 +14,20 @@
 ════════════════════════════════════════════════════════════ */
 import fs from 'node:fs';
 import path from 'node:path';
+import { normalizeSiteInterface } from './site-interface.mjs';
 
 export const SITE_URL = (process.env.SITE_URL || 'https://arcamis.pages.dev').replace(/\/+$/, '');
 export const SITE_NAME = 'Arcamis Wiki';
+
+/** Identità del sito da content/interface.json (fallback ai default). */
+export function siteInterface(root = process.cwd()) {
+  const file = path.join(root, 'content', 'interface.json');
+  try {
+    return normalizeSiteInterface(JSON.parse(fs.readFileSync(file, 'utf8'))).config;
+  } catch {
+    return normalizeSiteInterface(null).config;
+  }
+}
 
 /* ── utility testo ────────────────────────────────────────── */
 
@@ -225,12 +236,13 @@ export function hiddenPageKeys(root = process.cwd(), now = Date.now()) {
 export function collectRoutes(root = process.cwd(), now = Date.now()) {
   const pagesDir = path.join(root, 'content', 'pages');
   const registry = readJson(path.join(pagesDir, 'registry.json'));
+  const siteName = siteInterface(root).site.name;
   const routes = [];
 
   /* Home */
   routes.push({
     path: '',
-    title: `${SITE_NAME} — Il mondo di Arcamis`,
+    title: `${siteName} — Il mondo di Arcamis`,
     label: 'Home',
     description:
       'Wiki ufficiale del server D&D Arcamis: regole della campagna, lore delle Marche di Arcamis, pantheon, mestieri e creazione del personaggio.',
@@ -254,7 +266,7 @@ export function collectRoutes(root = process.cwd(), now = Date.now()) {
     const description = isStub(summary) ? fallbackDescription(page.l, sectionLabel) : summary;
     routes.push({
       path: page.path.replace(/^\/+/, ''),
-      title: `${page.l} — ${SITE_NAME}`,
+      title: `${page.l} — ${siteName}`,
       label: page.l,
       description,
       image: firstImage(content),
@@ -308,7 +320,7 @@ export function collectRoutes(root = process.cwd(), now = Date.now()) {
   /* Rotte fisse (non gestite dal registry) */
   routes.push({
     path: 'changelog',
-    title: `Changelog — ${SITE_NAME}`,
+    title: `Changelog — ${siteName}`,
     label: 'Changelog',
     description:
       'Cronologia degli aggiornamenti della wiki di Arcamis: nuove pagine, correzioni e modifiche ai contenuti.',
@@ -320,13 +332,17 @@ export function collectRoutes(root = process.cwd(), now = Date.now()) {
     priority: '0.4',
   });
 
-  /* Deduplica mantenendo l'ordine; la home resta prima. */
+  /* Deduplica mantenendo l'ordine; la home resta prima.
+     `siteName` viaggia con la rotta: renderHead/jsonLd non devono
+     rileggere il file per ogni pagina. */
   const seen = new Set();
-  return routes.filter((route) => {
-    if (seen.has(route.path)) return false;
-    seen.add(route.path);
-    return true;
-  });
+  return routes
+    .filter((route) => {
+      if (seen.has(route.path)) return false;
+      seen.add(route.path);
+      return true;
+    })
+    .map((route) => ({ ...route, siteName }));
 }
 
 /* Percorso del file prerenderizzato per una rotta ('' = index.html). */
@@ -408,7 +424,7 @@ function jsonLd(route) {
     {
       '@type': 'WebSite',
       '@id': `${SITE_URL}/#website`,
-      name: SITE_NAME,
+      name: route.siteName || SITE_NAME,
       url: SITE_URL + '/',
       inLanguage: 'it',
     },
@@ -452,7 +468,7 @@ export function renderHead(route) {
     `<meta property="og:image" content="${escapeHtml(image)}"/>`,
     `<meta property="og:type" content="${route.type === 'article' ? 'article' : 'website'}"/>`,
     `<meta property="og:url" content="${url}"/>`,
-    `<meta property="og:site_name" content="${SITE_NAME}"/>`,
+    `<meta property="og:site_name" content="${escapeHtml(route.siteName || SITE_NAME)}"/>`,
     `<meta property="og:locale" content="it_IT"/>`,
     `<meta name="twitter:card" content="summary_large_image"/>`,
     `<meta name="twitter:title" content="${title}"/>`,

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "updatedAt": null,
+  "site": {
+    "name": "Arcamis Wiki",
+    "brand": "ARCAMIS",
+    "tagline": "Wiki amatoriale di una campagna D&D 5e",
+    "logo": "/Artboard_1.png",
+    "logoAlt": "Arcamis",
+    "loaderText": "Arcamis"
+  },
+  "footer": {
+    "legal": "Non affiliato a Riot Games né a Wizards of the Coast. Le immagini di League of Legends appartengono ai rispettivi titolari.",
+    "links": [
+      { "label": "Crediti & legale", "href": "", "external": false, "kind": "credits" },
+      { "label": "Contatti · Discord", "href": "https://discord.gg/JZPnXZbXEJ", "external": true, "kind": "" },
+      { "label": "Changelog", "href": "/changelog", "external": false, "kind": "" }
+    ]
+  },
+  "texts": {
+    "skipLink": "Vai al contenuto principale",
+    "searchPlaceholder": "Cerca nella wiki…"
+  }
+}

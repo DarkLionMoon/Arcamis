@@ -59,12 +59,16 @@
 </head>
 <body>
 <!-- ═══ SKIP LINK (accessibilità) ═══ -->
+<!-- INTERFACE:SKIP:START -->
 <a href="#main" class="skip-link" id="skip-link">Vai al contenuto principale</a>
+<!-- INTERFACE:SKIP:END -->
 
 <!-- ═══ LOADER ═══ -->
 <div id="site-loader" aria-live="polite" aria-busy="true">
+  <!-- INTERFACE:LOADER:START -->
   <img src="/Artboard_1.png" alt="Arcamis" style="width:280px;height:280px;object-fit:contain;opacity:.85">
   <div class="loader-sub">Arcamis</div>
+  <!-- INTERFACE:LOADER:END -->
   <div class="loader-dots" aria-hidden="true">
     <div class="loader-dot"></div>
     <div class="loader-dot"></div>
@@ -81,8 +85,10 @@
 <div id="progress-bar" aria-hidden="true"></div>
 <header id="topbar" aria-label="Header principale">
   <div id="tlogo" onclick="showHome()" role="button" tabindex="0" aria-label="Torna alla home">
+    <!-- INTERFACE:BRAND:START -->
     <div id="liw"><img id="li" src="/Artboard_1.png" alt="Arcamis" style="display:block"/><span id="lf" style="display:none">⚔</span></div>
     <span id="tlt">ARCAMIS</span>
+    <!-- INTERFACE:BRAND:END -->
   </div>
   <nav id="tnav" aria-label="Navigazione principale">
     <div class="tn ta" data-v="home" onclick="showHome();closeDd()">Home</div>
@@ -391,6 +397,7 @@
 
   <!-- ═══ FOOTER (tutte le viste) ═══ -->
   <footer id="site-footer">
+    <!-- INTERFACE:FOOTER:START -->
     <div class="sf-inner">
       <div class="sf-brand">
         <span class="sf-name">ARCAMIS</span>
@@ -403,6 +410,7 @@
       </nav>
       <p class="sf-legal">Non affiliato a Riot Games né a Wizards of the Coast. Le immagini di League of Legends appartengono ai rispettivi titolari.</p>
     </div>
+    <!-- INTERFACE:FOOTER:END -->
   </footer>
 
 </main><!-- /main -->
