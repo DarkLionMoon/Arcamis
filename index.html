@@ -310,37 +310,8 @@
       <div class="sec-eyebrow">Dal server alla wiki</div>
       <h2 id="novita-server-title" class="sec-h">NOVITÀ DAL SERVER</h2>
       <p class="sec-p">Patch, eventi e cambiamenti della campagna. Qui trovi gli ultimi aggiornamenti registrati; gli annunci ufficiali dello staff arrivano sul Discord.</p>
-      <div class="news-grid">
-        <a class="news-card news-latest" href="/novita" onclick="gp('pag-novita','Novità','📰');return false">
-          <span class="news-top">
-            <span class="news-emblem" aria-hidden="true">📜</span>
-            <time class="news-date" datetime="2026-03-18">18 MAR 2026</time>
-          </span>
-          <span class="news-kicker">Patch 0.3.6</span>
-          <strong class="news-title">Meteo e Itinerario</strong>
-          <span class="news-desc">Il meteo passa a <em>!bollettino</em> e l'itinerario sincronizza i tempi di viaggio con le condizioni di partenza e arrivo.</span>
-          <span class="news-cta">Leggi la patch <span aria-hidden="true">→</span></span>
-        </a>
-        <a class="news-card news-rework" href="/novita" onclick="gp('pag-novita','Novità','📰');return false">
-          <span class="news-top">
-            <span class="news-emblem" aria-hidden="true">🦇</span>
-            <time class="news-date" datetime="2026-03-05">05 MAR 2026</time>
-          </span>
-          <span class="news-kicker">Patch 0.3.4</span>
-          <strong class="news-title">Succubi e Incubi</strong>
-          <span class="news-desc">Rework di Lingua d'Argento con Presenza magnetica. Chi interpreta una succube può richiedere il cambio personaggio senza perdere XP o bag.</span>
-          <span class="news-cta">Leggi la patch <span aria-hidden="true">→</span></span>
-        </a>
-        <a class="news-card news-map" href="/novita" onclick="gp('pag-novita','Novità','📰');return false">
-          <span class="news-top">
-            <span class="news-emblem" aria-hidden="true">🗺️</span>
-            <time class="news-date" datetime="2026-03-01">01 MAR 2026</time>
-          </span>
-          <span class="news-kicker">Patch 0.3.3</span>
-          <strong class="news-title">La nuova mappa</strong>
-          <span class="news-desc">Arriva la nuova mappa ufficiale di Arcamis, destinata ad aggiornarsi con maggiore frequenza e dettaglio.</span>
-          <span class="news-cta">Leggi la patch <span aria-hidden="true">→</span></span>
-        </a>
+      <div class="news-grid" id="news-home-grid" aria-live="polite" aria-busy="true">
+        <p class="news-loading">Caricamento novità…</p>
       </div>
       <div class="news-footer">
         <span>Le comunicazioni ufficiali della campagna sono sul Discord.</span>

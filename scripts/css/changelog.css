@@ -201,6 +201,13 @@
   color: #7adbb8;
   border: 1px solid rgba(60, 180, 120, 0.35);
 }
+.badge-new {
+  background: rgba(200, 160, 60, 0.2);
+  color: #f0cf74;
+  border: 1px solid rgba(200, 160, 60, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
 
 /* States */
 .cl-loading,
@@ -252,6 +259,12 @@
   margin-bottom: 1rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid var(--border, #4a3f2a);
+}
+
+.nv-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .nv-toolbar label {
@@ -313,6 +326,14 @@
   .nv-toolbar {
     align-items: flex-start;
     flex-direction: column;
+  }
+  .nv-filter {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .nv-filter .nv-select {
+    flex: 1;
+    min-width: 0;
   }
   .nv-select {
     width: 100%;

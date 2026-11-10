@@ -105,6 +105,11 @@ test('la Home mostra tutte le sezioni dentro #hv', async ({ page }) => {
 
   await expect(page.locator('#novita-server-title')).toHaveText('NOVITÀ DAL SERVER')
   await expect(page.locator('.news-card')).toHaveCount(3)
+  await expect(page.locator('.news-card .news-kicker')).toHaveText([
+    'Patch 0.3.6',
+    'Patch 0.3.4',
+    'Patch 0.3.3'
+  ])
   await expect(page.locator('.news-links a')).toHaveCount(2)
   await expect(page.locator('#cronache-arcadia-title')).toHaveCount(0)
   await expect(page.locator('#misteri-regno-title')).toHaveCount(0)

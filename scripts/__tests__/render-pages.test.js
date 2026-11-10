@@ -145,6 +145,9 @@ describe('pagina Changelog e banner meme', () => {
     expect(appJs).toContain("'novita': 'pag-novita'")
     const changelogJs = fs.readFileSync(path.join(root, 'scripts/js/changelog.js'), 'utf8')
     expect(changelogJs).toContain('window.loadNovita')
+    expect(changelogJs).toContain('window.loadHomeNovita')
+    const indexHtml = fs.readFileSync(path.join(root, 'index.html'), 'utf8')
+    expect(indexHtml).toContain('id="news-home-grid"')
   })
 
   it('La Storia di Gandora si dichiara pagina meme', () => {

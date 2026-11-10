@@ -286,9 +286,16 @@ window.loadNovita = async function (container) {
     return String(entry.versione || '?');
   };
 
+  const yearOf = function (entry) {
+    const match = String(entry.date || '').match(/^(\d{4})/);
+    return match ? match[1] : '';
+  };
+
   const sorted = entries.slice().sort(function (a, b) {
     const byDate = String(b.date || '').localeCompare(String(a.date || ''));
     if (byDate !== 0) return byDate;
+    const byVersion = versionOf(b).localeCompare(versionOf(a), undefined, { numeric: true });
+    if (byVersion !== 0) return byVersion;
     return Number(b._i || 0) - Number(a._i || 0);
   });
 
@@ -301,11 +308,34 @@ window.loadNovita = async function (container) {
     return b.localeCompare(a, undefined, { numeric: true });
   });
 
+  const years = [];
+  sorted.forEach(function (entry) {
+    const year = yearOf(entry);
+    if (year && !years.includes(year)) years.push(year);
+  });
+  years.sort(function (a, b) {
+    return b.localeCompare(a);
+  });
+
+  const recentIds = new Set(
+    sorted
+      .filter(function (entry) {
+        return !/cancellat/i.test(String(entry.title || ''));
+      })
+      .slice(0, 3)
+      .map(function (entry) {
+        return entry.id;
+      })
+  );
+
   const page = document.createElement('div');
   page.className = 'nv-page';
 
   const toolbar = document.createElement('div');
   toolbar.className = 'nv-toolbar';
+
+  const versionGroup = document.createElement('div');
+  versionGroup.className = 'nv-filter';
 
   const label = document.createElement('label');
   label.htmlFor = 'nv-version-filter';
@@ -327,12 +357,41 @@ window.loadNovita = async function (container) {
     select.appendChild(option);
   });
 
+  versionGroup.appendChild(label);
+  versionGroup.appendChild(select);
+
+  const yearGroup = document.createElement('div');
+  yearGroup.className = 'nv-filter';
+
+  const yearLabel = document.createElement('label');
+  yearLabel.htmlFor = 'nv-year-filter';
+  yearLabel.textContent = 'Anno';
+
+  const yearSelect = document.createElement('select');
+  yearSelect.id = 'nv-year-filter';
+  yearSelect.className = 'nv-select';
+
+  const allYears = document.createElement('option');
+  allYears.value = '';
+  allYears.textContent = 'Tutti gli anni';
+  yearSelect.appendChild(allYears);
+
+  years.forEach(function (year) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year;
+    yearSelect.appendChild(option);
+  });
+
+  yearGroup.appendChild(yearLabel);
+  yearGroup.appendChild(yearSelect);
+
   const count = document.createElement('span');
   count.className = 'nv-count';
   count.setAttribute('aria-live', 'polite');
 
-  toolbar.appendChild(label);
-  toolbar.appendChild(select);
+  toolbar.appendChild(versionGroup);
+  toolbar.appendChild(yearGroup);
   toolbar.appendChild(count);
 
   const list = document.createElement('div');
@@ -357,12 +416,14 @@ window.loadNovita = async function (container) {
   }
 
   function renderList() {
-    const filter = select.value;
-    const visible = filter
-      ? sorted.filter(function (entry) {
-          return versionOf(entry) === filter;
-        })
-      : sorted;
+    const versionFilter = select.value;
+    const yearFilter = yearSelect.value;
+    const visible = sorted.filter(function (entry) {
+      return (
+        (!versionFilter || versionOf(entry) === versionFilter) &&
+        (!yearFilter || yearOf(entry) === yearFilter)
+      );
+    });
 
     count.textContent = visible.length + ' patch';
     list.innerHTML = '';
@@ -370,7 +431,8 @@ window.loadNovita = async function (container) {
     if (!visible.length) {
       const empty = document.createElement('p');
       empty.className = 'cl-empty';
-      empty.textContent = 'Nessuna patch per questa versione.';
+      empty.textContent =
+        versionFilter || yearFilter ? 'Nessuna patch per questi filtri.' : 'Nessuna patch disponibile.';
       list.appendChild(empty);
       return;
     }
@@ -427,6 +489,7 @@ window.loadNovita = async function (container) {
 
       const badges = document.createElement('div');
       badges.className = 'cl-entry-badges';
+      if (recentIds.has(entry.id)) badges.appendChild(makeBadge('Nuova', 'badge-new'));
       badges.appendChild(makeBadge('v' + versionOf(entry), 'badge-p'));
       card.appendChild(badges);
       list.appendChild(card);
@@ -434,5 +497,163 @@ window.loadNovita = async function (container) {
   }
 
   select.addEventListener('change', renderList);
+  yearSelect.addEventListener('change', renderList);
   renderList();
 };
+
+/* Home: le tre patch più recenti, lette dallo stesso changelog della pagina Novità. */
+window.loadHomeNovita = async function (container) {
+  if (!container) return;
+  container.setAttribute('aria-busy', 'true');
+  container.innerHTML = '<p class="news-loading">Caricamento novità…</p>';
+
+  let entries;
+  try {
+    const res = await fetch('/content/changelog.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('Fetch error: ' + res.status);
+    entries = await res.json();
+    if (!Array.isArray(entries)) throw new Error('Formato changelog non valido');
+  } catch (e) {
+    container.setAttribute('aria-busy', 'false');
+    container.innerHTML =
+      '<p class="news-loading">Impossibile caricare le novità. <a href="/novita">Apri tutte le patch</a>.</p>';
+    return;
+  }
+
+  function versionOf(entry) {
+    if (entry.patch !== null && entry.patch !== undefined && entry.patch !== '') return String(entry.patch);
+    if (entry.sottoversione !== null && entry.sottoversione !== undefined && entry.sottoversione !== '')
+      return String(entry.sottoversione);
+    return String(entry.versione || '?');
+  }
+
+  function isCancelled(entry) {
+    return /cancellat/i.test(String(entry.title || ''));
+  }
+
+  function plainText(markdown) {
+    return String(markdown || '')
+      .replace(/```[\s\S]*?```/g, ' ')
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/[#>*_`~]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function excerpt(entry) {
+    const text = plainText(entry.content);
+    if (text.length <= 150) return text;
+    const cut = text.slice(0, 150);
+    const lastSpace = cut.lastIndexOf(' ');
+    return (lastSpace > 90 ? cut.slice(0, lastSpace) : cut).trim() + '…';
+  }
+
+  function cleanTitle(entry) {
+    const title = String(entry.title || 'Aggiornamento')
+      .replace(/^update\s+/i, '')
+      .replace(/\s*\(cancellato\)\s*$/i, '')
+      .trim();
+    return title.charAt(0).toUpperCase() + title.slice(1);
+  }
+
+  function emojiFor(entry) {
+    const title = String(entry.title || '').toLowerCase();
+    if (title.includes('mappa')) return '🗺️';
+    if (title.includes('succub') || title.includes('incub')) return '🦇';
+    if (title.includes('meteo') || title.includes('itinerario') || title.includes('viaggio')) return '🌦️';
+    return '📜';
+  }
+
+  function dateFor(entry) {
+    if (!entry.date) return '';
+    return new Date(entry.date)
+      .toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' })
+      .toUpperCase();
+  }
+
+  const latest = entries
+    .filter(function (entry) {
+      return entry && entry.id && !isCancelled(entry);
+    })
+    .sort(function (a, b) {
+      const byDate = String(b.date || '').localeCompare(String(a.date || ''));
+      if (byDate !== 0) return byDate;
+      const byVersion = versionOf(b).localeCompare(versionOf(a), undefined, { numeric: true });
+      if (byVersion !== 0) return byVersion;
+      return Number(b._i || 0) - Number(a._i || 0);
+    })
+    .slice(0, 3);
+
+  container.innerHTML = '';
+  container.setAttribute('aria-busy', 'false');
+
+  if (!latest.length) {
+    container.innerHTML = '<p class="news-loading">Nessuna patch disponibile.</p>';
+    return;
+  }
+
+  const accents = ['news-latest', 'news-rework', 'news-map'];
+
+  latest.forEach(function (entry, index) {
+    const card = document.createElement('a');
+    card.className = 'news-card ' + accents[index % accents.length];
+    card.href = '/novita';
+    card.setAttribute('onclick', "gp('pag-novita','Novità','📰');return false");
+
+    const top = document.createElement('span');
+    top.className = 'news-top';
+
+    const emblem = document.createElement('span');
+    emblem.className = 'news-emblem';
+    emblem.setAttribute('aria-hidden', 'true');
+    emblem.textContent = emojiFor(entry);
+
+    const date = document.createElement('time');
+    date.className = 'news-date';
+    if (entry.date) date.dateTime = entry.date;
+    date.textContent = dateFor(entry);
+
+    top.appendChild(emblem);
+    top.appendChild(date);
+
+    const kicker = document.createElement('span');
+    kicker.className = 'news-kicker';
+    kicker.textContent = 'Patch ' + versionOf(entry);
+
+    const title = document.createElement('strong');
+    title.className = 'news-title';
+    title.textContent = cleanTitle(entry);
+
+    const desc = document.createElement('span');
+    desc.className = 'news-desc';
+    desc.textContent = excerpt(entry);
+
+    const cta = document.createElement('span');
+    cta.className = 'news-cta';
+    cta.textContent = 'Leggi la patch ';
+    const arrow = document.createElement('span');
+    arrow.setAttribute('aria-hidden', 'true');
+    arrow.textContent = '→';
+    cta.appendChild(arrow);
+
+    card.appendChild(top);
+    card.appendChild(kicker);
+    card.appendChild(title);
+    card.appendChild(desc);
+    card.appendChild(cta);
+    container.appendChild(card);
+  });
+};
+
+(function () {
+  function mount() {
+    const container = document.getElementById('news-home-grid');
+    if (!container || container.dataset.loaded === 'true') return;
+    container.dataset.loaded = 'true';
+    window.loadHomeNovita(container);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
+})();
