@@ -80,6 +80,7 @@ const groups: Array<{ title: string; items: NavItem[] }> = [
   {
     title: 'Contenuti',
     items: [
+      { label: 'Homepage', to: '/homepage', icon: 'home', minRole: 'editor' },
       { label: 'Pagine', to: '/pagine', icon: 'pages' },
       { label: 'Copertine', to: '/copertine', icon: 'covers', minRole: 'editor' },
       { label: 'Imprese', to: '/imprese', icon: 'sparkle', minRole: 'editor' },

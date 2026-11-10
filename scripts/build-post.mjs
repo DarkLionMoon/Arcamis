@@ -26,6 +26,16 @@ import {
   routeFile,
   SITE_URL,
 } from './lib/routes.mjs';
+import {
+  HOMEPAGE_MAP_MARKER_END,
+  HOMEPAGE_MAP_MARKER_START,
+  HOMEPAGE_MARKER_END,
+  HOMEPAGE_MARKER_START,
+  HOMEPAGE_PATH,
+  defaultHomepage,
+  normalizeHomepage,
+  renderHomepageSections,
+} from './lib/homepage.mjs';
 
 const root = process.cwd();
 const dist = path.join(root, 'dist');
@@ -123,6 +133,69 @@ const fontPreloads = fontFiles
 if (fontPreloads && !html.includes('rel="preload" href="/fonts/')) {
   html = html.replace('</head>', fontPreloads + '\n</head>');
 }
+/* ── 2b. Homepage: sezioni da content/homepage.json ────────────
+   Le sezioni vengono scolpite nell'HTML, così la home pubblica si
+   legge anche senza JavaScript. La hero/carousel resta fuori: la
+   gestisce il manifest KV del Carousel (una sola configurazione).
+   La mappa è un partial di index.html: viene estratta e reinserita
+   nella sezione generata, così i suoi ID restano quelli del sito. */
+function homepageConfig() {
+  const file = path.join(root, HOMEPAGE_PATH);
+  if (!fs.existsSync(file)) {
+    console.warn('⚠ homepage: ' + HOMEPAGE_PATH + ' assente, uso i valori predefiniti');
+    return defaultHomepage();
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (error) {
+    fail(HOMEPAGE_PATH + ' non è JSON valido: ' + error.message);
+  }
+  const { config, errors, warnings } = normalizeHomepage(parsed);
+  for (const message of [...warnings, ...errors]) console.warn('⚠ homepage: ' + message);
+  return config;
+}
+
+function homepagePagePaths() {
+  try {
+    const registry = JSON.parse(fs.readFileSync(path.join(root, 'content/pages/registry.json'), 'utf8'));
+    const map = {};
+    for (const page of registry.pages || []) {
+      if (page && page.id && page.path) map[page.id] = String(page.path).replace(/^\/+/, '');
+    }
+    return map;
+  } catch (error) {
+    console.warn('⚠ homepage: registry.json non leggibile, i card wiki restano senza link');
+    return {};
+  }
+}
+
+const mapStart = html.indexOf(HOMEPAGE_MAP_MARKER_START);
+const mapEnd = html.indexOf(HOMEPAGE_MAP_MARKER_END);
+const mapHtml = mapStart >= 0 && mapEnd > mapStart
+    ? html.slice(mapStart + HOMEPAGE_MAP_MARKER_START.length, mapEnd).trim()
+    : '';
+
+const homeStart = html.indexOf(HOMEPAGE_MARKER_START);
+const homeEnd = html.indexOf(HOMEPAGE_MARKER_END);
+if (homeStart < 0 || homeEnd < homeStart) {
+  /* Una shell senza home (fixture di test, pagina standalone) non deve
+     rompere il build: i marcatori sono verificati anche dai test su
+     index.html del progetto. */
+  console.warn('⚠ homepage: marcatori HOMEPAGE:SECTIONS assenti, sezioni non rigenerate');
+} else {
+  const sectionsHtml = renderHomepageSections(homepageConfig(), {
+    mapHtml,
+    pagePaths: homepagePagePaths(),
+  });
+  html =
+    html.slice(0, homeStart + HOMEPAGE_MARKER_START.length) +
+    '\n' +
+    sectionsHtml +
+    '\n    ' +
+    html.slice(homeEnd);
+}
+
 writeDist('index.html', html);
 
 const cssMatch = html.match(/\/scripts\/css\/[^"']+\.css/);

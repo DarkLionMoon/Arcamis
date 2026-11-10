@@ -63,6 +63,8 @@ export interface PageRegistryEntry extends PageWorkflowFields {
   sub?: string // subsection
   c?: number // custom flag (1 = custom page)
   layout?: string // layout key
+  /** Percorso pubblico, generato da sync-registry.py (es. "lore/mappe"). */
+  path?: string
 }
 
 export interface SectionRegistryEntry {

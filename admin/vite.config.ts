@@ -31,8 +31,21 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    /* Il modulo condiviso della homepage vive in scripts/lib/, fuori da
+       admin/: il dev server deve poterlo leggere. */
+    fs: { allow: ['..'] },
     proxy: {
       '/api': {
+        target: 'http://localhost:8788',
+        changeOrigin: true
+      },
+      /* L'anteprima dell'homepage usa gli stessi CSS del sito pubblico;
+         senza proxy, in sviluppo arriverebbero 404 sotto /admin/. */
+      '/scripts': {
+        target: 'http://localhost:8788',
+        changeOrigin: true
+      },
+      '/content': {
         target: 'http://localhost:8788',
         changeOrigin: true
       },

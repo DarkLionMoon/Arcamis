@@ -92,6 +92,20 @@ export async function onRequest(context) {
     }
   }
 
+  /* ── Helper: scritture editoriali (editor o admin) ──
+     Alcune action storiche verificavano solo sessione+CSRF: un viewer
+     poteva quindi modificare copertine, carousel, posa e bozze. Il
+     controllo è esplicito e unico, così non dipende dall'ordine delle
+     verifiche nella singola action. */
+  async function requireEditor() {
+    const role = await sessionRole();
+    if (role === 'admin' || role === 'editor') return null;
+    return new Response(JSON.stringify({ error: 'Permessi insufficienti: serve un ruolo editor o admin' }), {
+      status: 403,
+      headers: cors,
+    });
+  }
+
   /* ── Helper: utente della sessione corrente ── */
   async function sessionUser() {
     const token = getCookie('arc_admin');
@@ -723,6 +737,8 @@ export async function onRequest(context) {
 
   /* ════ SALVA COVER ════ */
   if (action === 'set_cover' && request.method === 'POST') {
+    const denied = await requireEditor();
+    if (denied) return denied;
     const csrfOk = await verifyCsrf(request);
     if (!csrfOk)
       return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
@@ -861,6 +877,8 @@ export async function onRequest(context) {
     }
   }
   if (action === 'set_carousel_config' && request.method === 'POST') {
+    const denied = await requireEditor();
+    if (denied) return denied;
     const csrfOk = await verifyCsrf(request);
     if (!csrfOk)
       return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
@@ -903,6 +921,8 @@ export async function onRequest(context) {
      `img` assente significa «non toccare»: così un'immagine legacy in
      KV (data URL) non viene riscritta quando si salvano solo i testi. */
   if (action === 'set_carousel' && request.method === 'POST') {
+    const denied = await requireEditor();
+    if (denied) return denied;
     const csrfOk = await verifyCsrf(request);
     if (!csrfOk)
       return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
@@ -995,6 +1015,8 @@ export async function onRequest(context) {
 
   /* ════ SALVA POSA ════ */
   if (action === 'set_posa' && request.method === 'POST') {
+    const denied = await requireEditor();
+    if (denied) return denied;
     const csrfOk = await verifyCsrf(request);
     if (!csrfOk)
       return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
@@ -1070,6 +1092,8 @@ export async function onRequest(context) {
 
   /* ════ SAVE DRAFT ════ */
   if (action === 'save_draft' && request.method === 'POST') {
+    const denied = await requireEditor();
+    if (denied) return denied;
     const csrfOk = await verifyCsrf(request);
     if (!csrfOk)
       return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });
@@ -1126,6 +1150,8 @@ export async function onRequest(context) {
 
   /* ════ DELETE DRAFT ════ */
   if (action === 'delete_draft' && request.method === 'POST') {
+    const denied = await requireEditor();
+    if (denied) return denied;
     const csrfOk = await verifyCsrf(request);
     if (!csrfOk)
       return new Response(JSON.stringify({ error: 'CSRF token non valido' }), { status: 403, headers: cors });

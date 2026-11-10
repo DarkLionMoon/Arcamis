@@ -9,6 +9,7 @@ import DashboardView from '@/features/dashboard/DashboardView.vue'
 import MapEditorView from '@/features/map/MapEditorView.vue'
 import CarouselView from '@/features/carousel/CarouselView.vue'
 import UsersView from '@/features/users/UsersView.vue'
+import HomepageView from '@/features/homepage/HomepageView.vue'
 import PageListView from '@/features/pages/PageListView.vue'
 import PageEditorView from '@/features/pages/PageEditorView.vue'
 import CoversView from '@/features/covers/CoversView.vue'
@@ -36,6 +37,7 @@ const routes: RouteRecordRaw[] = [
     component: AdminLayout,
     children: [
       { path: '', name: 'dashboard', component: DashboardView },
+      { path: 'homepage', name: 'homepage', component: HomepageView, meta: { minRole: 'editor' } },
       { path: 'pagine', name: 'pages', component: PageListView },
       { path: 'editor/:key', name: 'editor', component: PageEditorView, meta: { minRole: 'editor', wide: true } },
       { path: 'mapa', name: 'map', component: MapEditorView, meta: { minRole: 'editor' } },

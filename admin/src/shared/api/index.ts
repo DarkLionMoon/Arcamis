@@ -47,3 +47,6 @@ export {
 } from './system'
 
 export { MEDIA_DIR, compressImage, formatBytes, mediaApi, mediaName, mediaUrl, uploadImage } from './media'
+
+export { homepageApi } from './homepage'
+export type { HomepageDoc, HomepageVerify } from './homepage'

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://arcamis.pages.dev/content/schemas/homepage.schema.json",
+  "title": "Configurazione homepage Arcamis",
+  "type": "object",
+  "required": ["version", "sections"],
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "updatedAt": { "type": ["string", "null"] },
+    "sections": {
+      "type": "array",
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "label", "visible"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
+          "type": { "type": "string", "enum": ["marche", "arcadia", "news", "steps", "wiki"] },
+          "label": { "type": "string", "maxLength": 120 },
+          "visible": { "type": "boolean" },
+          "divider": { "type": "boolean" },
+          "eyebrow": { "type": "string", "maxLength": 120 },
+          "title": { "type": "string", "maxLength": 200 },
+          "description": { "type": "string", "maxLength": 1200 },
+          "showMap": { "type": "boolean" },
+          "guildsTitle": { "type": "string", "maxLength": 120 },
+          "footerText": { "type": "string", "maxLength": 300 },
+          "factions": { "type": "array", "maxItems": 12 },
+          "guilds": { "type": "array", "maxItems": 12 },
+          "steps": { "type": "array", "maxItems": 8 },
+          "cta": { "type": "array", "maxItems": 4 },
+          "links": { "type": "array", "maxItems": 6 },
+          "groups": { "type": "array", "maxItems": 12 }
+        }
+      }
+    }
+  }
+}

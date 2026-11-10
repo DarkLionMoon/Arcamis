@@ -130,6 +130,7 @@ const nextScheduled = computed(() => {
 })
 
 const quickActions: Array<{ label: string; to: string; icon: IconName; desc: string }> = [
+  { label: 'Homepage', to: '/homepage', icon: 'home', desc: 'Sezioni e testi della home' },
   { label: 'Pagine', to: '/pagine', icon: 'pages', desc: 'Crea e modifica' },
   { label: 'Copertine', to: '/copertine', icon: 'covers', desc: 'Gestisci copertine' },
   { label: 'Media', to: '/media', icon: 'media', desc: 'Libreria file' },
