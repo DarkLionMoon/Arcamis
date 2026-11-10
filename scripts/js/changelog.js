@@ -280,10 +280,11 @@ window.loadNovita = async function (container) {
   }
 
   const versionOf = function (entry) {
-    if (entry.patch !== null && entry.patch !== undefined && entry.patch !== '') return String(entry.patch);
+    const patch = entry.patch !== null && entry.patch !== undefined ? String(entry.patch) : '';
+    if (/^\d/.test(patch)) return patch;
     if (entry.sottoversione !== null && entry.sottoversione !== undefined && entry.sottoversione !== '')
       return String(entry.sottoversione);
-    return String(entry.versione || '?');
+    return String(entry.versione || patch || '?');
   };
 
   const yearOf = function (entry) {
@@ -320,7 +321,10 @@ window.loadNovita = async function (container) {
   const recentIds = new Set(
     sorted
       .filter(function (entry) {
-        return !/cancellat/i.test(String(entry.title || ''));
+        return (
+          !/cancellat/i.test(String(entry.title || '')) &&
+          !/^(evento|comunicazione)$/i.test(String(entry.patch || ''))
+        );
       })
       .slice(0, 3)
       .map(function (entry) {
@@ -425,7 +429,7 @@ window.loadNovita = async function (container) {
       );
     });
 
-    count.textContent = visible.length + ' patch';
+    count.textContent = visible.length + ' voci';
     list.innerHTML = '';
 
     if (!visible.length) {
@@ -521,10 +525,11 @@ window.loadHomeNovita = async function (container) {
   }
 
   function versionOf(entry) {
-    if (entry.patch !== null && entry.patch !== undefined && entry.patch !== '') return String(entry.patch);
+    const patch = entry.patch !== null && entry.patch !== undefined ? String(entry.patch) : '';
+    if (/^\d/.test(patch)) return patch;
     if (entry.sottoversione !== null && entry.sottoversione !== undefined && entry.sottoversione !== '')
       return String(entry.sottoversione);
-    return String(entry.versione || '?');
+    return String(entry.versione || patch || '?');
   }
 
   function isCancelled(entry) {
@@ -574,7 +579,12 @@ window.loadHomeNovita = async function (container) {
 
   const latest = entries
     .filter(function (entry) {
-      return entry && entry.id && !isCancelled(entry);
+      return (
+        entry &&
+        entry.id &&
+        !isCancelled(entry) &&
+        !/^(evento|comunicazione)$/i.test(String(entry.patch || ''))
+      );
     })
     .sort(function (a, b) {
       const byDate = String(b.date || '').localeCompare(String(a.date || ''));

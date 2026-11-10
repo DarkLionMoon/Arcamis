@@ -12,13 +12,13 @@ const source = JSON.parse(fs.readFileSync(path.join(root, 'content/changelog.jso
 describe('formato changelog', () => {
   it('legge l’array reale del sito con tutte le entry e gli id', () => {
     const entries = parseChangelog(source)
-    expect(entries).toHaveLength(10)
+    expect(entries).toHaveLength(27)
     expect(entries.every((entry) => typeof entry.id === 'string' && entry.id.length > 0)).toBe(true)
   })
 
   it('accetta anche il vecchio wrapper { entries } senza perdere dati', () => {
     const entries = parseChangelog({ entries: source })
-    expect(entries).toHaveLength(10)
+    expect(entries).toHaveLength(27)
   })
 
   it('riscrive un array puro, non { entries }, preservando gli id', () => {

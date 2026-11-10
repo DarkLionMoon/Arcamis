@@ -12,29 +12,29 @@ test('la pagina Novità elenca tutte le patch e filtra per versione e anno', asy
 
   await expect(page.locator('#pbody .nc')).toBeVisible()
   await expect(page.locator('#ph-title')).toContainText('Novità')
-  await expect(page.locator('.nv-entry')).toHaveCount(10)
-  await expect(page.locator('#nv-version-filter option')).toHaveCount(11)
+  await expect(page.locator('.nv-entry')).toHaveCount(27)
+  await expect(page.locator('#nv-version-filter option')).toHaveCount(23)
   await expect(page.locator('#nv-year-filter option')).toHaveCount(2)
   await expect(page.locator('.badge-new')).toHaveCount(3)
   await expect(page.locator('.nv-entry:has(.badge-new) .nv-entry-title')).toHaveText([
-    'Update comandi Meteo e Itinerario',
-    'Update SUCCUBI/INCUBI',
-    'Update MAPPA ARCAMIS'
+    'D&D Beyond Drops e Doni dei Draghi',
+    'Arcana Unleashed e rework del cambio personaggio',
+    'Revisione dei tratti del Celestiale'
   ])
 
-  await page.selectOption('#nv-version-filter', '0.3.6')
+  await page.selectOption('#nv-version-filter', '0.8.6')
   await expect(page.locator('.nv-entry')).toHaveCount(1)
   await expect(page.locator('.badge-new')).toHaveCount(1)
-  await expect(page.locator('.nv-entry-title')).toContainText('Meteo e Itinerario')
+  await expect(page.locator('.nv-entry-title')).toContainText('D&D Beyond Drops')
 
   await page.locator('.nv-entry-title').click()
-  await expect(page.locator('.cl-inline-content')).toContainText('!bollettino')
+  await expect(page.locator('.cl-inline-content')).toContainText('Doni dei Draghi')
 
   await page.selectOption('#nv-version-filter', '')
-  await expect(page.locator('.nv-entry')).toHaveCount(10)
+  await expect(page.locator('.nv-entry')).toHaveCount(27)
 
   await page.selectOption('#nv-year-filter', '2026')
-  await expect(page.locator('.nv-entry')).toHaveCount(10)
+  await expect(page.locator('.nv-entry')).toHaveCount(27)
   await page.selectOption('#nv-year-filter', '')
-  await expect(page.locator('.nv-entry')).toHaveCount(10)
+  await expect(page.locator('.nv-entry')).toHaveCount(27)
 })
