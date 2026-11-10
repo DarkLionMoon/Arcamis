@@ -517,6 +517,16 @@
       "c": 1
     },
     {
+      "k": "novita",
+      "l": "Novità",
+      "i": "📰",
+      "id": "pag-novita",
+      "menu": true,
+      "admin": true,
+      "path": "novita",
+      "c": 1
+    },
+    {
       "k": "credits",
       "l": "Crediti & Legale",
       "i": "⚖️",
@@ -723,6 +733,11 @@
     {
       "path": "changelog",
       "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "novita",
+      "changefreq": "weekly",
       "priority": "0.6"
     },
     {

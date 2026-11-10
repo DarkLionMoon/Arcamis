@@ -117,6 +117,7 @@ var _pathMap = {
   'lore/fumofosco': 'pag-fumofosco',
   'lore/rovine-di-kaldur': 'pag-rovine-di-kaldur',
   'changelog': 'pag-changelog',
+  'novita': 'pag-novita',
   'credits': 'pag-credits'
 };
 

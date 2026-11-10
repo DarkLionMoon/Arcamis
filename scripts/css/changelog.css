@@ -238,3 +238,86 @@
     display: inline-block;
   }
 }
+
+/* ── Pagina Novità ────────────────────────────────────────────────────────── */
+.nv-page {
+  margin-top: 1.25rem;
+}
+
+.nv-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border, #4a3f2a);
+}
+
+.nv-toolbar label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim, #a08840);
+}
+
+.nv-select {
+  min-width: 190px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--border, #4a3f2a);
+  border-radius: 4px;
+  background: var(--card-bg, rgba(30, 24, 16, 0.6));
+  color: var(--text, #e8dfc8);
+  font-family: 'Cinzel', serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.nv-select:hover,
+.nv-select:focus-visible {
+  border-color: var(--gold-dim, #a08840);
+  outline: 2px solid rgba(200, 160, 60, 0.25);
+  outline-offset: 2px;
+}
+
+.nv-count {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--text-muted, #b0a080);
+}
+
+.nv-entries {
+  margin-top: 0.25rem;
+}
+
+.nv-entry-title {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nv-entry-title:hover {
+  text-decoration: underline;
+}
+
+.nv-entry--cancelled .cl-entry-title {
+  color: var(--text-muted, #b0a080);
+  text-decoration: line-through;
+}
+
+@media (max-width: 600px) {
+  .nv-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .nv-select {
+    width: 100%;
+  }
+  .nv-count {
+    margin-left: 0;
+  }
+}

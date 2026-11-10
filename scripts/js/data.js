@@ -60,6 +60,7 @@ var pages = [
   {k:'fumofosco',l:'Fumofosco',i:'🌫️',id:'pag-fumofosco'},
   {k:'rovine-di-kaldur',l:'Rovine di Kaldur',i:'🗿',id:'pag-rovine-di-kaldur'},
   {k:'changelog',l:'Changelog',i:'📜',id:'pag-changelog'},
+  {k:'novita',l:'Novità',i:'📰',id:'pag-novita'},
   {k:'credits',l:'Crediti & Legale',i:'⚖️',id:'pag-credits'}
 ];
 

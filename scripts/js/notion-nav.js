@@ -689,14 +689,15 @@ async function _gpRender(id, label, icon, _epoch) {
             (_scrubHtmlString(_localHtml || '') || _emptyHtml) +
             _footer +
             '</div>';
-          if (_localPage.k === 'changelog' && window.loadChangelog) {
+          if ((_localPage.k === 'changelog' || _localPage.k === 'novita') && window.loadChangelog) {
             var _clWrap = document.createElement('div');
             _clWrap.className = 'hb-changelog-container';
             var _nc = pbody.querySelector('.nc');
             var _ft = pbody.querySelector('.n-page-footer');
             if (_ft) _nc.insertBefore(_clWrap, _ft);
             else _nc.appendChild(_clWrap);
-            window.loadChangelog(_clWrap);
+            if (_localPage.k === 'novita' && window.loadNovita) window.loadNovita(_clWrap);
+            else window.loadChangelog(_clWrap);
           }
           /* Monta l'app Imprese & Licenze nel contenitore integrato.
              I dati di gioco vivono nel JSON della pagina, non nel JS. */

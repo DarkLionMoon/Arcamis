@@ -258,6 +258,12 @@
   "text": "Ogni aggiornamento della wiki viene registrato qui, diviso per versione e patch. Le voci più recenti sono in cima: apri una versione per leggere cosa è cambiato. Il changelog racconta la wiki; le patch della campagna sono annunciate sul Discord."
  },
  {
+  "id": "pag-novita",
+  "title": "Novità",
+  "icon": "📰",
+  "text": "Tutte le patch e gli aggiornamenti della campagna di Arcamis, dalla prima apertura delle porte a oggi. Filtra per versione e apri una patch per leggere i dettagli. Gli annunci ufficiali dello staff arrivano sul Discord."
+ },
+ {
   "id": "pag-credits",
   "title": "Crediti & Legale",
   "icon": "⚖️",

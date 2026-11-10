@@ -339,7 +339,20 @@ body.light .mys-card{
 body.light .mys-name{color:var(--text)}
 body.light .mys-txt{color:rgba(80,60,30,.6)}
 body.light .mys-card:hover{border-color:rgba(160,120,50,.5);box-shadow:0 16px 44px rgba(100,70,20,.2),0 0 28px rgba(160,120,50,.1);}
-body.light .mys-cin{border-color:rgba(120,88,36,.15)}
+body.light .news-card{
+  background:linear-gradient(155deg,rgba(245,238,222,.98),rgba(232,224,205,.99));
+  border-color:rgba(120,88,36,.2);
+}
+body.light .news-card:hover,body.light .news-card:focus-visible{
+  border-color:rgba(160,120,50,.5);
+  box-shadow:0 18px 44px rgba(100,70,20,.2),0 0 28px rgba(160,120,50,.1);
+}
+body.light .news-date{color:rgba(80,60,30,.6)}
+body.light .news-title{color:var(--text)}
+body.light .news-desc{color:var(--text3)}
+body.light .news-cta{color:var(--gold)}
+body.light .news-footer{border-top-color:rgba(120,88,36,.16)}
+body.light .news-links a{color:var(--gold)}
 
 /* ── Guild cards ── */
 body.light .guild-card{

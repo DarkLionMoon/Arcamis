@@ -23,6 +23,7 @@
     '🌟': 'spark',
     '🏰': 'castle',
     '📜': 'scroll',
+    '📰': 'scroll', /* novità / comunicazioni */
     '🌌': 'orbit',
     '📚': 'book',
     '🗺': 'map',
