@@ -17,16 +17,18 @@ import { isSafeRepositoryPath, parseCookie } from './_lib/auth.js';
 export async function onRequest(context) {
   const { request, env } = context;
   const KV = env.ARCAMIS_CACHE;
-  /* Token GitHub: prioritario l'env GH_TOKEN (segreto di Cloudflare Pages),
-     altrimenti il token salvato dall'admin in KV (azione set_gh_token). */
-  let GH_TOKEN = env.GH_TOKEN || '';
-  if (!GH_TOKEN && KV) {
+  /* Token GitHub: il token salvato dall'admin in KV ha la precedenza,
+     così la rotazione da Impostazioni funziona senza redeploy. GH_TOKEN
+     d'ambiente resta il fallback quando KV non contiene un token. */
+  let GH_TOKEN = '';
+  if (KV) {
     try {
       GH_TOKEN = (await KV.get('gh_token')) || '';
     } catch (_) {
       GH_TOKEN = '';
     }
   }
+  if (!GH_TOKEN) GH_TOKEN = env.GH_TOKEN || '';
   const GH_REPO = env.GH_REPO || 'DarkLionMoon/Arcamis';
   const GH_BRANCH = env.GH_BRANCH || 'main';
 
@@ -139,6 +141,26 @@ export async function onRequest(context) {
     return r.json();
   }
 
+  /* GitHub richiede lo sha per aggiornare un file esistente. Se il client
+     non lo invia (es. Changelog), lo si legge dal branch corrente prima
+     del PUT; un 404 significa che il file è nuovo e va creato. */
+  async function currentSha(path) {
+    const r = await fetch(api + '/contents/' + path + '?ref=' + encodeURIComponent(GH_BRANCH), { headers });
+    if (r.status === 404) return null;
+    if (!r.ok) {
+      let msg = 'GitHub ' + r.status;
+      try {
+        const j = await r.json();
+        if (j && (j.message || j.error)) msg = (j.message || j.error) + ' (' + r.status + ')';
+      } catch (_) {
+        /* body non JSON */
+      }
+      throw new Error(msg);
+    }
+    const data = await r.json();
+    return data && data.sha ? data.sha : null;
+  }
+
   try {
     if (action === 'get') {
       const ref = p.ref || GH_BRANCH;
@@ -162,7 +184,12 @@ export async function onRequest(context) {
 
     if (action === 'put' || action === 'binary') {
       const bodyObj = { message: p.message, branch: GH_BRANCH, content: p.content };
-      if (p.sha) bodyObj.sha = p.sha;
+      if (p.sha) {
+        bodyObj.sha = p.sha;
+      } else {
+        const sha = await currentSha(p.path);
+        if (sha) bodyObj.sha = sha;
+      }
       const data = await ghFetch(api + '/contents/' + p.path, {
         method: 'PUT',
         headers,

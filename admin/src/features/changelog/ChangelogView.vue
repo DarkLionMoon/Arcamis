@@ -12,6 +12,8 @@ const ui = useUIStore()
 const loading = ref(true)
 const saving = ref(false)
 const entries = ref<ChangelogEntry[]>([])
+const sha = ref('')
+const loadError = ref('')
 const editingIdx = ref<number | null>(null)
 const adding = ref(false)
 
@@ -24,11 +26,15 @@ function b64decode(str: string): string {
 
 async function load() {
   loading.value = true
+  loadError.value = ''
   try {
     const data = await ghApi.get('content/changelog.json')
     entries.value = parseChangelog(JSON.parse(b64decode(data.content)))
-  } catch {
+    sha.value = data.sha || ''
+  } catch (e) {
     entries.value = []
+    sha.value = ''
+    loadError.value = e instanceof Error ? e.message : String(e)
   } finally {
     loading.value = false
   }
@@ -71,9 +77,19 @@ async function remove(idx: number) {
 }
 
 async function save() {
+  if (loading.value || loadError.value) {
+    ui.toast('Ricarica il changelog prima di salvare', 'error')
+    return
+  }
   saving.value = true
   try {
-    await ghApi.put('content/changelog.json', 'admin: update changelog', serializeChangelog(entries.value))
+    const result = await ghApi.put(
+      'content/changelog.json',
+      'admin: update changelog',
+      serializeChangelog(entries.value),
+      sha.value || undefined
+    )
+    sha.value = result.content.sha
     ui.toast('Changelog salvato — deploy in corso (~30s)', 'success')
   } catch (e) {
     ui.toast('Errore salvataggio: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -114,10 +130,16 @@ onMounted(load)
     <div class="arc-head-row">
       <h1 class="arc-page-title">Changelog</h1>
       <div class="arc-head-actions">
-        <button class="btn btn-p btn-sm" type="button" :disabled="saving" @click="save">💾 Salva</button>
+        <button class="btn btn-p btn-sm" type="button" :disabled="saving || loading || !!loadError" @click="save">
+          💾 Salva
+        </button>
         <button class="btn btn-soft" type="button" @click="load">⟳ Aggiorna</button>
         <button class="btn btn-p" type="button" @click="startAdd">+ Nuova entry</button>
       </div>
+    </div>
+
+    <div v-if="loadError" class="arc-alert arc-alert--error">
+      Impossibile caricare il changelog: {{ loadError }}. Il salvataggio è disabilitato per non sovrascrivere il file.
     </div>
 
     <div v-if="loading" class="arc-empty-side">Caricamento…</div>

@@ -337,6 +337,8 @@ export interface WebhookConfig {
 export interface GhTokenStatus {
   configured?: boolean
   ok?: boolean
+  source?: 'env' | 'kv' | 'none'
+  canAdmin?: boolean
   message?: string
 }
 

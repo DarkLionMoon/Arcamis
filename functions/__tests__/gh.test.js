@@ -110,7 +110,11 @@ describe('/api/gh — autenticazione e ruoli', () => {
     const kv = makeKV({ admin_session_editor: JSON.stringify({ role: 'editor', user: 'e' }) });
     global.fetch = vi.fn(() => Promise.resolve(new Response(JSON.stringify({ content: {} }), { status: 200 })));
     const ctx = {
-      request: makeRequest('put', { path: 'content/pages/x.json', content: 'eA==', message: 'edit' }, 'editor'),
+      request: makeRequest(
+        'put',
+        { path: 'content/pages/x.json', content: 'eA==', message: 'edit', sha: 'sha-old' },
+        'editor'
+      ),
       env: { ARCAMIS_CACHE: kv, GH_TOKEN: 'gh_test' },
     };
     const res = await onRequest(ctx);
@@ -123,7 +127,11 @@ describe('/api/gh — autenticazione e ruoli', () => {
   it('allows admin write operations', async () => {
     const kv = makeKV({ admin_session_admin: sessionJSON() });
     const ctx = {
-      request: makeRequest('put', { path: 'content/pages/x.json', content: 'eA==', message: 'edit' }, 'admin'),
+      request: makeRequest(
+        'put',
+        { path: 'content/pages/x.json', content: 'eA==', message: 'edit', sha: 'sha-old' },
+        'admin'
+      ),
       env: { ARCAMIS_CACHE: kv, GH_TOKEN: 'gh_test' },
     };
     const res = await onRequest(ctx);
@@ -172,5 +180,50 @@ describe('/api/gh — autenticazione e ruoli', () => {
     };
     const res = await onRequest(ctx);
     expect(res.status).toBe(200);
+  });
+
+  it('legge lo sha corrente quando il client non lo invia', async () => {
+    const kv = makeKV({ admin_session_admin: sessionJSON() });
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ sha: 'sha-current' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ content: { sha: 'sha-next' } }), { status: 200 }));
+    const ctx = {
+      request: makeRequest('put', { path: 'content/changelog.json', content: 'W10=', message: 'changelog' }, 'admin'),
+      env: { ARCAMIS_CACHE: kv, GH_TOKEN: 'gh_test' },
+    };
+    const res = await onRequest(ctx);
+    expect(res.status).toBe(200);
+    expect(global.fetch.mock.calls[0][0]).toContain('?ref=main');
+    const body = JSON.parse(global.fetch.mock.calls[1][1].body);
+    expect(body.sha).toBe('sha-current');
+  });
+
+  it('crea un file nuovo quando il GET dello sha risponde 404', async () => {
+    const kv = makeKV({ admin_session_admin: sessionJSON() });
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response('', { status: 404 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ content: { sha: 'sha-new' } }), { status: 200 }));
+    const ctx = {
+      request: makeRequest('put', { path: 'content/new.json', content: 'eA==', message: 'new' }, 'admin'),
+      env: { ARCAMIS_CACHE: kv, GH_TOKEN: 'gh_test' },
+    };
+    const res = await onRequest(ctx);
+    expect(res.status).toBe(200);
+    const body = JSON.parse(global.fetch.mock.calls[1][1].body);
+    expect(body.sha).toBeUndefined();
+  });
+
+  it('usa il token salvato in KV prima di GH_TOKEN', async () => {
+    const kv = makeKV({ admin_session_admin: sessionJSON(), gh_token: 'kv-token' });
+    global.fetch = vi.fn(() => Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 })));
+    const ctx = {
+      request: makeRequest('get', { path: 'content/x.json' }, 'admin'),
+      env: { ARCAMIS_CACHE: kv, GH_TOKEN: 'env-token' },
+    };
+    const res = await onRequest(ctx);
+    expect(res.status).toBe(200);
+    expect(global.fetch.mock.calls[0][1].headers.Authorization).toBe('token kv-token');
   });
 });

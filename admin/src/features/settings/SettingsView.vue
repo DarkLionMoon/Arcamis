@@ -15,9 +15,10 @@ const loading = ref(true)
 const saving = ref(false)
 const webhookSaving = ref(false)
 const tokenSaving = ref(false)
-const tokenStatus = reactive<{ configured: boolean; ok: boolean; message: string }>({
+const tokenStatus = reactive<{ configured: boolean; ok: boolean; source: 'env' | 'kv' | 'none'; message: string }>({
   configured: false,
   ok: false,
+  source: 'none',
   message: ''
 })
 
@@ -53,6 +54,7 @@ async function load() {
     webhook.enabled = !!wh.enabled
     tokenStatus.configured = !!gh.configured
     tokenStatus.ok = !!gh.ok
+    tokenStatus.source = gh.source || 'none'
     tokenStatus.message = gh.message || ''
     registry.setRegistry(reg.pages || [], (reg.sections as SectionRegistryEntry[]) || [], reg.ui)
   } catch (e) {
@@ -109,7 +111,7 @@ async function saveToken() {
   try {
     await settingsApi.setGhToken(token)
     newToken.value = ''
-    ui.toast('Token GitHub salvato', 'success')
+    ui.toast('Token GitHub verificato e salvato', 'success')
     void load()
   } catch (e) {
     ui.toast('Errore: ' + (e instanceof Error ? e.message : String(e)), 'error')
@@ -226,7 +228,16 @@ onMounted(load)
                   : 'non configurato'
               }}
             </span>
+            <template v-if="tokenStatus.configured && tokenStatus.source !== 'none'">
+              — fonte:
+              {{ tokenStatus.source === 'env' ? 'GH_TOKEN di Cloudflare' : 'token salvato dal pannello' }}
+            </template>
             <template v-if="tokenStatus.message"> — {{ tokenStatus.message }}</template>
+          </p>
+          <p class="arc-hint">
+            La verifica controlla l'accesso al repository. Per salvare servono permessi
+            <strong>Contents: Read and write</strong>. Il token salvato dal pannello ha precedenza su
+            <code>GH_TOKEN</code> d'ambiente.
           </p>
           <label class="arc-fld">
             <span>Nuovo token (PAT con diritti sul repo)</span>

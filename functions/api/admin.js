@@ -249,13 +249,41 @@ export async function onRequest(context) {
   }
 
   /* ── Helper: ottieni GitHub token ── */
-  async function getGhToken() {
-    if (env.GH_TOKEN) return env.GH_TOKEN;
+  /* Il token salvato dal pannello ha la precedenza: è quello che l'admin
+     ha appena impostato e deve poter essere usato senza redeploy. */
+  async function readGhToken() {
     try {
-      const stored = await KV.get('gh_token');
-      if (stored) return stored;
+      const stored = KV ? await KV.get('gh_token') : null;
+      if (stored) return { token: stored, source: 'kv' };
     } catch (_) {}
-    return null;
+    if (env.GH_TOKEN) return { token: env.GH_TOKEN, source: 'env' };
+    return { token: null, source: 'none' };
+  }
+
+  async function getGhToken() {
+    return (await readGhToken()).token;
+  }
+
+  async function checkGhToken(token) {
+    const repo = env.GH_REPO || 'DarkLionMoon/Arcamis';
+    try {
+      const res = await fetch('https://api.github.com/repos/' + repo, {
+        headers: {
+          Authorization: 'token ' + token,
+          Accept: 'application/vnd.github.v3+json',
+          'User-Agent': 'ArcamisAdmin',
+        },
+      });
+      if (res.ok) return { ok: true, message: '' };
+      let detail = '';
+      try {
+        const body = await res.json();
+        if (body && (body.message || body.error)) detail = ': ' + (body.message || body.error);
+      } catch (_) {}
+      return { ok: false, message: 'GitHub ' + res.status + detail };
+    } catch (e) {
+      return { ok: false, message: 'GitHub non raggiungibile: ' + (e && e.message ? e.message : String(e)) };
+    }
   }
 
   /* ── Helper: simple line-by-line diff ── */
@@ -646,16 +674,20 @@ export async function onRequest(context) {
 
   /* ════ STATO GITHUB TOKEN ════ */
   if (action === 'gh_token_status') {
-    if (!(await sessionRole())) {
+    const role = await sessionRole();
+    if (!role) {
       return new Response(JSON.stringify({ error: 'Non autenticato' }), { status: 401, headers: cors });
     }
-    const stored = KV ? await KV.get('gh_token') : null;
-    const configured = !!(env.GH_TOKEN || stored);
+    const effective = await readGhToken();
+    const configured = !!effective.token;
+    const check = configured ? await checkGhToken(effective.token) : { ok: false, message: 'Nessun token configurato' };
     return new Response(
       JSON.stringify({
         configured: configured,
-        source: env.GH_TOKEN ? 'env' : stored ? 'kv' : 'none',
-        canAdmin: (await sessionRole()) === 'admin',
+        ok: check.ok,
+        source: effective.source,
+        canAdmin: role === 'admin',
+        message: check.message,
       }),
       { headers: cors }
     );
@@ -679,8 +711,15 @@ export async function onRequest(context) {
     if (!ghToken) {
       return new Response(JSON.stringify({ error: 'token mancante' }), { status: 400, headers: cors });
     }
+    const check = await checkGhToken(ghToken);
+    if (!check.ok) {
+      return new Response(JSON.stringify({ error: 'Token non valido: ' + check.message }), {
+        status: 400,
+        headers: cors,
+      });
+    }
     await KV.put('gh_token', ghToken);
-    await writeAdminLog('set_gh_token', 'gh_token', 'configurato');
+    await writeAdminLog('set_gh_token', 'gh_token', 'configurato (verificato)');
     return new Response(JSON.stringify({ ok: true }), { headers: cors });
   }
 
