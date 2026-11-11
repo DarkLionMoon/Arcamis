@@ -99,6 +99,18 @@
       "sub": ""
     },
     {
+      "k": "crea-pg",
+      "l": "Crea il Personaggio",
+      "i": "🧭",
+      "id": "pag-crea-pg",
+      "c": 1,
+      "menu": true,
+      "admin": true,
+      "path": "personaggio/crea-pg",
+      "sec": "personaggio",
+      "sub": ""
+    },
+    {
       "k": "casate-e-compagnie",
       "l": "Casate e Compagnie",
       "i": "🏰",

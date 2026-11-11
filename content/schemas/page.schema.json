@@ -59,7 +59,8 @@
         "specie",
         "citta",
         "evento",
-        "imprese"
+        "imprese",
+        "crea-pg"
       ]
     },
     "meme": {

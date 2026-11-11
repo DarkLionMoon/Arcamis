@@ -82,6 +82,7 @@ var _pathMap = {
   'personaggio/lavori': 'pag-lavori',
   'personaggio/mestieri': 'pag-mestieri',
   'personaggio/come-si-inizia': 'pag-come-si-inizia',
+  'personaggio/crea-pg': 'pag-crea-pg',
   'in-game/casate-e-compagnie': 'pag-casate-e-compagnie',
   'lore/storia-del-mondo': 'pag-storia-del-mondo',
   'lore/introduzione': 'pag-introduzione',

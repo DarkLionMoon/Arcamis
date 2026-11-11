@@ -80,6 +80,13 @@
       "sec": "personaggio"
     },
     {
+      "k": "crea-pg",
+      "l": "Crea il Personaggio",
+      "i": "🧭",
+      "id": "pag-crea-pg",
+      "sec": "personaggio"
+    },
+    {
       "k": "casate-e-compagnie",
       "l": "Casate e Compagnie",
       "i": "🏰",

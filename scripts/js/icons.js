@@ -27,6 +27,7 @@
     '🌌': 'orbit',
     '📚': 'book',
     '🗺': 'map',
+    '🧭': 'map', /* builder del personaggio */
     '🏙': 'city',
     '📐': 'ruler',
     '🧬': 'helix',

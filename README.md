@@ -121,6 +121,13 @@ admin — vedi Parte 2.)
   `style-explorer.css`; su mobile il master-detail diventa lista → dettaglio
   con "Torna alla lista", mentre group-tabs tiene i gruppi in una striscia
   orizzontale sopra le linguette.
+- **Crea il Personaggio**: builder pubblico in `/personaggio/crea-pg`
+  (`scripts/js/crea-pg.js`, stili in `crea-pg.css`). Legge la tabella del
+  materiale approvato e le schede homebrew, fa scegliere specie, classe e
+  sottoclasse, applica i tre incrementi da +1 della scheda server e calcola
+  PF/CA/competenze, lingue, resistenze e attacchi in una scheda stampabile o
+  esportabile in JSON. La bozza resta in `localStorage`; nessun dato lascia
+  il browser.
 - **Changelog e Novità**: widget e pagina dedicata dai JSON locali.
 - **Missioni (rimossa)**: la sezione missioni non fa più parte della wiki.
   Nessuna rotta, voce di menu, sitemap o vista Admin la espone: il registro
@@ -132,7 +139,7 @@ admin — vedi Parte 2.)
 Ogni pagina dichiara un `layout` (se manca, rilevato dalla chiave):
 `contenuto`, `luoghi`, `cronache`, `personaggio`, `materiale`, `wide`,
 `pantheon`, `collezione`, `bestiario`, `timeline`, `fazioni`, `oggetti`,
-`glossario`, `galleria`, `tabelle`, `schede`, più i layout a
+`glossario`, `galleria`, `tabelle`, `schede`, `crea-pg`, più i layout a
 card `sessione`, `quest`, `npc`, `spell`, `specie`, `citta`, `evento`.
 Nell'editor si sceglie
 tra tre preset — **Wiki standard**, **Immersivo / full width** (`wide`),
