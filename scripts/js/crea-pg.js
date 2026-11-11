@@ -57,6 +57,50 @@
     SKILL_BY_ID[skill.id] = skill;
   });
 
+  // La scheda server scrive le sottorazze come "Razza (Sottorazza)".
+  // La chiave resta il nome usato dalla wiki, così la bozza salvata non cambia.
+  var SPECIES_GROUPS = {
+    'Astral Elf': { parent: 'Elf', subrace: 'Astral', sheetName: 'Elf (Astral)' },
+    'Dragonborn Metallici e Cromatici': {
+      parent: 'Dragonborn',
+      subrace: 'Metallici e Cromatici',
+      sheetName: ''
+    },
+    'Dragonborn Gemmati': { parent: 'Dragonborn', subrace: 'Gemmati', sheetName: '' },
+    'Asceso di Shurima': { parent: 'Asceso', subrace: 'Shurima', sheetName: 'Asceso (Shurima)' },
+    'Asceso di Targon': { parent: 'Asceso', subrace: 'Targon', sheetName: 'Asceso (Targon)' },
+    Darkin: { parent: 'Asceso', subrace: 'Darkin', sheetName: 'Asceso (Darkin)' },
+    Accidia: { parent: 'Demone Capitale', subrace: 'Accidia', sheetName: 'Demone Capitale (Accidia)' },
+    Avarizia: { parent: 'Demone Capitale', subrace: 'Avarizia', sheetName: 'Demone Capitale (Avarizia)' },
+    Gola: { parent: 'Demone Capitale', subrace: 'Gola', sheetName: 'Demone Capitale (Gola)' },
+    Invidia: { parent: 'Demone Capitale', subrace: 'Invidia', sheetName: 'Demone Capitale (Invidia)' },
+    Ira: { parent: 'Demone Capitale', subrace: 'Ira', sheetName: 'Demone Capitale (Ira)' },
+    Lussuria: { parent: 'Demone Capitale', subrace: 'Lussuria', sheetName: 'Demone Capitale (Lussuria)' },
+    Superbia: { parent: 'Demone Capitale', subrace: 'Superbia', sheetName: 'Demone Capitale (Superbia)' },
+    Anfibio: { parent: 'Yordle', subrace: 'Anfibio', sheetName: 'Yordle (Anfibio)' },
+    Foreste: { parent: 'Yordle', subrace: 'Foresta', sheetName: 'Yordle (Foresta)' },
+    Inventore: { parent: 'Yordle', subrace: 'Inventore', sheetName: 'Yordle (Inventore)' },
+    Besheb: { parent: 'Vastaya', subrace: 'Besheb', sheetName: 'Vastaya (Besheb)' },
+    Briny: { parent: 'Vastaya', subrace: 'Bryni', sheetName: 'Vastaya (Bryni)' },
+    Killash: { parent: 'Vastaya', subrace: 'Killash', sheetName: 'Vastaya (Killash)' },
+    Liotlan: { parent: 'Vastaya', subrace: 'Lhotlan', sheetName: 'Vastaya (Lhotlan)' },
+    Marai: { parent: 'Vastaya', subrace: 'Marai', sheetName: 'Vastaya (Marai)' },
+    'Oovi-Kat': { parent: 'Vastaya', subrace: 'Oovi-Kat', sheetName: 'Vastaya (Oovi-Kat)' },
+    Ottrani: { parent: 'Vastaya', subrace: 'Ottrani', sheetName: 'Vastaya (Ottrani)' },
+    Shimon: { parent: 'Vastaya', subrace: 'Shimon', sheetName: 'Vastaya (Shimon)' },
+    Vesani: { parent: 'Vastaya', subrace: 'Vesani', sheetName: 'Vastaya (Vesani)' },
+    Burattino: { parent: 'Ludofatto', subrace: 'Burattino', sheetName: 'Ludofatto (Burattino)' },
+    Ceramico: { parent: 'Ludofatto', subrace: 'Ceramica', sheetName: 'Ludofatto (Ceramica)' },
+    Metallici: { parent: 'Ludofatto', subrace: 'Metallico', sheetName: 'Ludofatto (Metallico)' },
+    Peluche: { parent: 'Ludofatto', subrace: 'Peluche', sheetName: 'Ludofatto (Peluche)' },
+    Chemtech: { parent: 'Potenziato', subrace: 'Chemtech', sheetName: 'Potenziato (Chemtech)' },
+    Hextech: { parent: 'Potenziato', subrace: 'Hextech', sheetName: 'Potenziato (Hextech)' }
+  };
+
+  var GOOGLE_SHEET_ID = '1zS6kffFUEkNhTXMf_vhTzd_DfG-XULPI_mYv1RFKklE';
+  var GOOGLE_SHEET_COPY_URL = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/copy';
+  var GOOGLE_SHEET_XLSX_URL = '/sheets/arcamis-scheda-base.xlsx';
+
   // La scheda server usa tre incrementi da +1 scelti dal giocatore.
   // Sono suggerimenti per il campo Talento di Origine: il testo resta libero.
   var FEATS = [
@@ -432,6 +476,11 @@
       .trim();
   }
 
+  function speciesLabel(item) {
+    if (!item) return '';
+    return item.label || item.name;
+  }
+
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
   }
@@ -682,9 +731,14 @@
         var name = cleanText(lines.shift());
         if (!name) return null;
         var body = lines.join('\n');
+        var group = SPECIES_GROUPS[name] || null;
         return {
           id: 'homebrew:species:' + slugify(name),
           name: name,
+          label: group ? group.parent + ' — ' + group.subrace : name,
+          parent: group ? group.parent : '',
+          subrace: group ? group.subrace : '',
+          sheetName: group ? group.sheetName : name,
           origin: 'homebrew',
           source: 'Homebrew',
           type: firstMatch(body, /\*\*Tipologia:\*\*\s*([^\n]+)/),
@@ -728,9 +782,14 @@
     var approvedSubclasses = [];
     (approvedRows || []).forEach(function (row) {
       if (row.category === 'Specie') {
+        var group = SPECIES_GROUPS[row.name] || null;
         approvedSpecies.push({
           id: 'approved:species:' + slugify(row.name),
           name: row.name,
+          label: group ? group.parent + ' — ' + group.subrace : row.name,
+          parent: group ? group.parent : '',
+          subrace: group ? group.subrace : '',
+          sheetName: group ? group.sheetName : row.name,
           origin: 'approved',
           source: row.source || 'Materiale approvato',
           note: row.note || '',
@@ -1058,9 +1117,12 @@
       '<div class="cpg-card-head"><span class="cpg-stepnum">7</span><div><h2>Scheda del personaggio</h2>' +
       '<p>Una bozza pronta da stampare, copiare o esportare. Non sostituisce la scheda ufficiale dell’Assistenza Tecnica.</p></div></div>' +
       '<div id="cpg-sheet"></div>' +
+      '<p class="cpg-hint">Copia Google e XLSX sono il modello ufficiale della scheda server, pronti da compilare.</p>' +
       '<div class="cpg-actions">' +
       '<button type="button" class="cpg-btn" data-action="print">Stampa / PDF</button>' +
       '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="copy">Copia riepilogo</button>' +
+      '<a class="cpg-btn cpg-btn-ghost" href="' + GOOGLE_SHEET_COPY_URL + '" target="_blank" rel="noopener">Copia scheda Google</a>' +
+      '<a class="cpg-btn cpg-btn-ghost" href="' + GOOGLE_SHEET_XLSX_URL + '" download="arcamis-scheda-personaggio.xlsx">Scarica scheda XLSX</a>' +
       '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="export">Scarica JSON</button>' +
       '<label class="cpg-btn cpg-btn-ghost cpg-import">Importa JSON<input type="file" accept="application/json,.json" data-import></label>' +
       '<button type="button" class="cpg-btn cpg-btn-danger" data-action="reset">Nuovo personaggio</button>' +
@@ -1102,7 +1164,7 @@
       if (!group.items.length) return;
       html += '<optgroup label="' + esc(group.label) + '">';
       group.items.forEach(function (item) {
-        var label = item.name + ' — ' + (item.origin === 'homebrew' ? 'Homebrew' : item.source);
+        var label = speciesLabel(item) + ' — ' + (item.origin === 'homebrew' ? 'Homebrew' : item.source);
         html += option(item.id, label, state.species);
       });
       html += '</optgroup>';
@@ -1157,12 +1219,14 @@
       return;
     }
     var meta = [];
+    if (item.parent) meta.push('Sottorazza di ' + item.parent);
+    if (item.sheetName && item.sheetName !== speciesLabel(item)) meta.push('Scheda server: ' + item.sheetName);
     if (item.type) meta.push('Tipo: ' + item.type);
     if (item.size) meta.push('Taglia: ' + item.size);
     if (item.speed) meta.push('Velocità: ' + item.speed);
     target.innerHTML =
       '<div class="cpg-pick">' +
-      '<div class="cpg-pick-head"><strong>' + esc(item.name) + '</strong>' + sourceBadge(item) + '</div>' +
+      '<div class="cpg-pick-head"><strong>' + esc(speciesLabel(item)) + '</strong>' + sourceBadge(item) + '</div>' +
       (meta.length ? '<p class="cpg-pick-meta">' + esc(meta.join(' · ')) + '</p>' : '') +
       (item.note ? '<p class="cpg-pick-note">' + esc(item.note) + '</p>' : '') +
       (item.summary ? '<p class="cpg-pick-note">' + esc(item.summary) + '</p>' : '') +
@@ -1415,7 +1479,7 @@
       '<div class="cpg-summary-head"><span>Anteprima</span><strong>' +
       esc(state.name || 'Il tuo personaggio') +
       '</strong><p>Livello 1' +
-      (species ? ' · ' + esc(species.name) : '') +
+      (species ? ' · ' + esc(speciesLabel(species)) : '') +
       (cls ? ' · ' + esc(cls.name) : '') +
       (subclass ? ' — ' + esc(subclass.name) : '') +
       '</p></div>' +
@@ -1480,7 +1544,7 @@
       '<header class="cpg-sheet-head"><div><p class="cpg-sheet-kicker">Arcamis · Scheda di livello 1</p><h2>' +
       esc(state.name || 'Senza nome') +
       '</h2><p class="cpg-sheet-sub">' +
-      (species ? esc(species.name) + (species.origin === 'homebrew' ? ' (Homebrew)' : ' (' + esc(species.source) + ')') : 'Specie da scegliere') +
+      (species ? esc(speciesLabel(species)) + (species.origin === 'homebrew' ? ' (Homebrew)' : ' (' + esc(species.source) + ')') : 'Specie da scegliere') +
       ' · ' +
       (cls ? esc(cls.name) : 'Classe da scegliere') +
       (subclass ? ' — ' + esc(subclass.name) + (subclass.origin === 'homebrew' ? ' (Homebrew)' : '') : '') +
@@ -1571,7 +1635,7 @@
       (state.equipment || state.notes ? nl2br([state.equipment, state.notes].filter(Boolean).join('\n\n')) : '—') +
       '</p></section>' +
       '<footer class="cpg-sheet-foot"><p><b>Fonti:</b> ' +
-      (species ? esc(species.name) + ' — ' + esc(species.origin === 'homebrew' ? 'Homebrew' : species.source) : 'specie da scegliere') +
+      (species ? esc(speciesLabel(species)) + ' — ' + esc(species.origin === 'homebrew' ? 'Homebrew' : species.source) : 'specie da scegliere') +
       '; ' +
       (subclass ? esc(subclass.name) + ' — ' + esc(subclass.origin === 'homebrew' ? 'Homebrew' : subclass.source) : 'sottoclasse facoltativa') +
       '.</p><p>Bozza non ufficiale generata dal sito. Le scelte homebrew e la scheda definitiva richiedono l’approvazione dello staff.</p></footer>' +
@@ -1674,7 +1738,7 @@
     lines.push('ARCAMIS — ' + (state.name || 'Personaggio senza nome'));
     lines.push(
       'Livello 1 · ' +
-        (sheet.species ? sheet.species.name : 'specie da scegliere') +
+        (sheet.species ? speciesLabel(sheet.species) : 'specie da scegliere') +
         ' · ' +
         (sheet.cls ? sheet.cls.name : 'classe da scegliere') +
         (sheet.subclass ? ' — ' + sheet.subclass.name : '')

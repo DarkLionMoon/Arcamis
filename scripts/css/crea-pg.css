@@ -599,6 +599,7 @@
 .cpg-btn {
   display: inline-flex;
   align-items: center;
+  text-decoration: none;
   justify-content: center;
   min-height: 36px;
   padding: 8px 13px;

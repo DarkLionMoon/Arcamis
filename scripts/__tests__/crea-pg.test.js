@@ -81,6 +81,33 @@ describe('crea-pg · homebrew', () => {
     expect(catalog.allSpecies).toHaveLength(89);
     expect(catalog.allSubclasses).toHaveLength(159);
   });
+
+  it('mostra la razza madre accanto alle sottorazze', () => {
+    expect(catalog.approvedSpecies.find((item) => item.name === 'Astral Elf')).toMatchObject({
+      parent: 'Elf',
+      subrace: 'Astral',
+      label: 'Elf — Astral',
+      sheetName: 'Elf (Astral)',
+    });
+    expect(catalog.homebrewSpecies.find((item) => item.name === 'Accidia')).toMatchObject({
+      parent: 'Demone Capitale',
+      subrace: 'Accidia',
+      label: 'Demone Capitale — Accidia',
+      sheetName: 'Demone Capitale (Accidia)',
+    });
+    expect(catalog.homebrewSpecies.find((item) => item.name === 'Briny')).toMatchObject({
+      parent: 'Vastaya',
+      subrace: 'Bryni',
+      label: 'Vastaya — Bryni',
+      sheetName: 'Vastaya (Bryni)',
+    });
+    expect(catalog.homebrewSpecies.find((item) => item.name === 'Liotlan')).toMatchObject({
+      parent: 'Vastaya',
+      subrace: 'Lhotlan',
+      label: 'Vastaya — Lhotlan',
+      sheetName: 'Vastaya (Lhotlan)',
+    });
+  });
 });
 
 describe('crea-pg · regole e calcoli', () => {
