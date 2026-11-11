@@ -57,16 +57,10 @@
     SKILL_BY_ID[skill.id] = skill;
   });
 
-  // La scheda server scrive le sottorazze come "Razza (Sottorazza)".
+  // I nomi visibili sono quelli esatti della scheda server ("Razza (Sottorazza)").
   // La chiave resta il nome usato dalla wiki, così la bozza salvata non cambia.
   var SPECIES_GROUPS = {
     'Astral Elf': { parent: 'Elf', subrace: 'Astral', sheetName: 'Elf (Astral)' },
-    'Dragonborn Metallici e Cromatici': {
-      parent: 'Dragonborn',
-      subrace: 'Metallici e Cromatici',
-      sheetName: ''
-    },
-    'Dragonborn Gemmati': { parent: 'Dragonborn', subrace: 'Gemmati', sheetName: '' },
     'Asceso di Shurima': { parent: 'Asceso', subrace: 'Shurima', sheetName: 'Asceso (Shurima)' },
     'Asceso di Targon': { parent: 'Asceso', subrace: 'Targon', sheetName: 'Asceso (Targon)' },
     Darkin: { parent: 'Asceso', subrace: 'Darkin', sheetName: 'Asceso (Darkin)' },
@@ -96,6 +90,46 @@
     Chemtech: { parent: 'Potenziato', subrace: 'Chemtech', sheetName: 'Potenziato (Chemtech)' },
     Hextech: { parent: 'Potenziato', subrace: 'Hextech', sheetName: 'Potenziato (Hextech)' }
   };
+
+  // La scheda Google elenca le sottorazze come voci autonome. Qui la chiave
+  // resta il nome wiki della voce madre, ma il menu mostra il nome esatto.
+  var SPECIES_VARIANTS = {
+    'Dragonborn Metallici e Cromatici': {
+      parent: 'Dragonborn',
+      subraces: ['Black', 'Blue', 'Brass', 'Bronze', 'Copper', 'Gold', 'Green', 'Red', 'Silver', 'White']
+    },
+    'Dragonborn Gemmati': {
+      parent: 'Dragonborn',
+      subraces: ['Amethyst', 'Crystal', 'Emerald', 'Sapphire', 'Topaz']
+    },
+    Elf: { parent: 'Elf', subraces: ['Drow', 'High', 'Wood'] },
+    Genasi: { parent: 'Genasi', subraces: ['Air', 'Earth', 'Fire', 'Water'] },
+    Goliath: {
+      parent: 'Goliath',
+      subraces: ['Cloud Giant', 'Fire Giant', 'Frost Giant', 'Hill Giant', 'Stone Giant', 'Storm Giant']
+    },
+    Khenra: { parent: 'Khenra', subraces: ['Twin Alive', 'Twin Dead'] },
+    Kobold: { parent: 'Kobold', subraces: ['Craftiness', 'Defiance', 'Draconic Sorcery'] },
+    'Simic Hybrid': {
+      parent: 'Simic Hybrid',
+      subraces: ['Manta Glide', 'Nimble Climber', 'Underwater Adaptation']
+    },
+    Tiefling: { parent: 'Tiefling', subraces: ['Abyssal', 'Chthonic', 'Infernal'] },
+    Cervan: { parent: 'Cervan', subraces: ['Grove', 'Pronghorn'] },
+    Gallus: { parent: 'Gallus', subraces: ['Huden', 'Bright'] },
+    Luma: { parent: 'Luma', subraces: ['Sera', 'Sable'] },
+    Raptor: { parent: 'Raptor', subraces: ['Mistral', 'Maran'] },
+    Strig: { parent: 'Strig', subraces: ['Stout', 'Swift'] },
+    Baccai: { parent: 'Baccai', subraces: ['Bestiale', 'Sabbiomante', 'Arcano'] }
+  };
+
+  var SPECIES_RENAMES = {
+    Khoravar: 'Half elf',
+    'Yuan-ti': 'Yuan-Ti'
+  };
+
+  // Voci della wiki non presenti nell'elenco specie della scheda server.
+  var SHEET_SPECIES_EXTRAS = { Hedge: true, Lupin: true };
 
   var GOOGLE_SHEET_ID = '1zS6kffFUEkNhTXMf_vhTzd_DfG-XULPI_mYv1RFKklE';
   var GOOGLE_SHEET_COPY_URL = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/copy';
@@ -481,6 +515,34 @@
     return item.label || item.name;
   }
 
+  function speciesSheetEntries(name) {
+    var variants = SPECIES_VARIANTS[name];
+    if (variants) {
+      return variants.subraces.map(function (subrace) {
+        return {
+          parent: variants.parent,
+          subrace: subrace,
+          sheetName: variants.parent + ' (' + subrace + ')'
+        };
+      });
+    }
+    var group = SPECIES_GROUPS[name];
+    if (group && group.sheetName) {
+      return [{ parent: group.parent, subrace: group.subrace, sheetName: group.sheetName }];
+    }
+    if (SPECIES_RENAMES[name]) {
+      return [{ parent: '', subrace: '', sheetName: SPECIES_RENAMES[name] }];
+    }
+    if (SHEET_SPECIES_EXTRAS[name]) {
+      return [{ parent: '', subrace: '', sheetName: '' }];
+    }
+    return [{ parent: '', subrace: '', sheetName: name }];
+  }
+
+  function speciesCatalogId(origin, name, entry, count) {
+    return origin + ':species:' + slugify(count > 1 ? entry.sheetName : name);
+  }
+
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
   }
@@ -725,30 +787,35 @@
   function parseHomebrewSpecies(markdown) {
     var sections = String(markdown || '').split(/^# /m);
     sections.shift();
-    return sections
-      .map(function (section) {
-        var lines = section.split(/\r?\n/);
-        var name = cleanText(lines.shift());
-        if (!name) return null;
-        var body = lines.join('\n');
-        var group = SPECIES_GROUPS[name] || null;
-        return {
-          id: 'homebrew:species:' + slugify(name),
+    return sections.reduce(function (items, section) {
+      var lines = section.split(/\r?\n/);
+      var name = cleanText(lines.shift());
+      if (!name) return items;
+      var body = lines.join('\n');
+      var entries = speciesSheetEntries(name);
+      var type = firstMatch(body, /\*\*Tipologia:\*\*\s*([^\n]+)/);
+      var size = firstMatch(body, /\*\*Taglia:\*\*\s*([^\n]+)/);
+      var speed = firstMatch(body, /\*\*Velocità:\*\*\s*([^\n]+)/);
+      var summary = firstSummary(body);
+      entries.forEach(function (entry) {
+        items.push({
+          id: speciesCatalogId('homebrew', name, entry, entries.length),
           name: name,
-          label: group ? group.parent + ' — ' + group.subrace : name,
-          parent: group ? group.parent : '',
-          subrace: group ? group.subrace : '',
-          sheetName: group ? group.sheetName : name,
+          label: entry.sheetName || name,
+          parent: entry.parent,
+          subrace: entry.subrace,
+          sheetName: entry.sheetName,
           origin: 'homebrew',
           source: 'Homebrew',
-          type: firstMatch(body, /\*\*Tipologia:\*\*\s*([^\n]+)/),
-          size: firstMatch(body, /\*\*Taglia:\*\*\s*([^\n]+)/),
-          speed: firstMatch(body, /\*\*Velocità:\*\*\s*([^\n]+)/),
-          summary: firstSummary(body),
+          type: type,
+          size: size,
+          speed: speed,
+          summary: summary,
           url: '/lore/specie-homebrew'
-        };
-      })
-      .filter(Boolean);
+        });
+      });
+      return items;
+    }, []);
   }
 
   function parseHomebrewSubclasses(markdown) {
@@ -782,18 +849,20 @@
     var approvedSubclasses = [];
     (approvedRows || []).forEach(function (row) {
       if (row.category === 'Specie') {
-        var group = SPECIES_GROUPS[row.name] || null;
-        approvedSpecies.push({
-          id: 'approved:species:' + slugify(row.name),
-          name: row.name,
-          label: group ? group.parent + ' — ' + group.subrace : row.name,
-          parent: group ? group.parent : '',
-          subrace: group ? group.subrace : '',
-          sheetName: group ? group.sheetName : row.name,
-          origin: 'approved',
-          source: row.source || 'Materiale approvato',
-          note: row.note || '',
-          url: '/personaggio/materiale-approvato'
+        var entries = speciesSheetEntries(row.name);
+        entries.forEach(function (entry) {
+          approvedSpecies.push({
+            id: speciesCatalogId('approved', row.name, entry, entries.length),
+            name: row.name,
+            label: entry.sheetName || row.name,
+            parent: entry.parent,
+            subrace: entry.subrace,
+            sheetName: entry.sheetName,
+            origin: 'approved',
+            source: row.source || 'Materiale approvato',
+            note: row.note || '',
+            url: '/personaggio/materiale-approvato'
+          });
         });
         return;
       }

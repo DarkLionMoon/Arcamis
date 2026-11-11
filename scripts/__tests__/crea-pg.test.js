@@ -38,7 +38,7 @@ describe('crea-pg · materiale approvato', () => {
   });
 
   it('riconosce le specie approvate e la nota di Khoravar', () => {
-    expect(catalog.approvedSpecies).toHaveLength(57);
+    expect(catalog.approvedSpecies).toHaveLength(92);
     expect(catalog.approvedSpecies.find((item) => item.name === 'Khoravar')).toMatchObject({
       source: 'EFA',
       note: 'Half-Elf nel server',
@@ -57,7 +57,7 @@ describe('crea-pg · materiale approvato', () => {
 
 describe('crea-pg · homebrew', () => {
   it('legge tutte le specie homebrew e i loro metadati', () => {
-    expect(catalog.homebrewSpecies).toHaveLength(32);
+    expect(catalog.homebrewSpecies).toHaveLength(34);
     expect(catalog.homebrewSpecies.find((item) => item.name === 'Asceso di Shurima')).toMatchObject({
       type: 'Mostruosità',
       size: 'Media',
@@ -78,35 +78,54 @@ describe('crea-pg · homebrew', () => {
   it('non duplica gli id nel catalogo combinato', () => {
     const ids = catalog.allSpecies.concat(catalog.allSubclasses).map((item) => item.id);
     expect(new Set(ids).size).toBe(ids.length);
-    expect(catalog.allSpecies).toHaveLength(89);
+    expect(catalog.allSpecies).toHaveLength(126);
     expect(catalog.allSubclasses).toHaveLength(159);
   });
 
-  it('mostra la razza madre accanto alle sottorazze', () => {
+  it('usa i nomi della scheda e mostra la razza madre', () => {
     expect(catalog.approvedSpecies.find((item) => item.name === 'Astral Elf')).toMatchObject({
       parent: 'Elf',
       subrace: 'Astral',
-      label: 'Elf — Astral',
+      label: 'Elf (Astral)',
       sheetName: 'Elf (Astral)',
     });
     expect(catalog.homebrewSpecies.find((item) => item.name === 'Accidia')).toMatchObject({
       parent: 'Demone Capitale',
       subrace: 'Accidia',
-      label: 'Demone Capitale — Accidia',
+      label: 'Demone Capitale (Accidia)',
       sheetName: 'Demone Capitale (Accidia)',
     });
     expect(catalog.homebrewSpecies.find((item) => item.name === 'Briny')).toMatchObject({
       parent: 'Vastaya',
       subrace: 'Bryni',
-      label: 'Vastaya — Bryni',
+      label: 'Vastaya (Bryni)',
       sheetName: 'Vastaya (Bryni)',
     });
     expect(catalog.homebrewSpecies.find((item) => item.name === 'Liotlan')).toMatchObject({
       parent: 'Vastaya',
       subrace: 'Lhotlan',
-      label: 'Vastaya — Lhotlan',
+      label: 'Vastaya (Lhotlan)',
       sheetName: 'Vastaya (Lhotlan)',
     });
+    expect(
+      catalog.approvedSpecies.find(
+        (item) => item.name === 'Dragonborn Metallici e Cromatici' && item.subrace === 'Black'
+      )
+    ).toMatchObject({ label: 'Dragonborn (Black)', sheetName: 'Dragonborn (Black)' });
+    expect(
+      catalog.approvedSpecies.find((item) => item.name === 'Elf' && item.subrace === 'Wood')
+    ).toMatchObject({ label: 'Elf (Wood)', sheetName: 'Elf (Wood)' });
+    expect(catalog.approvedSpecies.find((item) => item.name === 'Khoravar')).toMatchObject({
+      label: 'Half elf',
+      sheetName: 'Half elf',
+    });
+    expect(catalog.approvedSpecies.find((item) => item.name === 'Yuan-ti')).toMatchObject({
+      label: 'Yuan-Ti',
+      sheetName: 'Yuan-Ti',
+    });
+    expect(
+      catalog.homebrewSpecies.find((item) => item.name === 'Baccai' && item.subrace === 'Bestiale')
+    ).toMatchObject({ label: 'Baccai (Bestiale)', sheetName: 'Baccai (Bestiale)' });
   });
 });
 
