@@ -1,6 +1,12 @@
 {
  "pages": [
   {
+   "id": "pag-crea-pg",
+   "title": "Crea il Personaggio",
+   "icon": "🧭",
+   "lastEdited": "2026-11-11T12:00:00.000Z"
+  },
+  {
    "id": "pag-novita",
    "title": "Novità",
    "icon": "📰",
@@ -40,12 +46,6 @@
    "id": "pag-forgia",
    "title": "Forgia",
    "icon": "🔨",
-   "lastEdited": "2026-11-06T00:00:00.000Z"
-  },
-  {
-   "id": "pag-polpo-verde",
-   "title": "Il Polpo Verde",
-   "icon": "🐙",
    "lastEdited": "2026-11-06T00:00:00.000Z"
   }
  ]

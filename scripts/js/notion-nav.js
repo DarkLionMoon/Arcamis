@@ -607,6 +607,11 @@ async function _gpRender(id, label, icon, _epoch) {
           } else if (_layout === 'materiale') _localHtml = _renderMateriale(_localJson.content);
           else if (_layout === 'regole' || _layout === 'contenuto') _localHtml = _renderRegole(_localJson.content);
           else if (_layout === 'lavoro') _localHtml = _renderLavoro(_localJson.content);
+          else if (_layout === 'crea-pg')
+            _localHtml =
+              '<div class="cpg-intro">' +
+              _mdToHtml(_localJson.content) +
+              '</div><div id="crea-pg-root"></div>';
           else if (_layout === 'personaggio') _localHtml = _renderPersonaggio(_localJson.content);
           else if (_layout === 'lore' || _layout === 'luoghi')
             _localHtml = _renderLore(_localJson.content, _localJson.title, _localJson.icon);
@@ -664,6 +669,7 @@ async function _gpRender(id, label, icon, _epoch) {
             _layout === 'wide' ||
             _layout === 'compendio' ||
             _layout === 'imprese' ||
+            _layout === 'crea-pg' ||
             _exploreBuilt
           ) {
             pbody.style.maxWidth = 'none';
@@ -705,6 +711,10 @@ async function _gpRender(id, label, icon, _epoch) {
             var _impRoot = document.getElementById('imprese-app-root');
             window._impresePage = _localJson;
             if (_impRoot) window._impreseInit(_impRoot);
+          }
+          if (_layout === 'crea-pg' && window._creaPgInit) {
+            var _cpgRoot = document.getElementById('crea-pg-root');
+            if (_cpgRoot) window._creaPgInit(_cpgRoot, _localJson);
           }
           /* Attiva ricerca live e filtri del browser del materiale. */
           if (window.matBrowserInit) window.matBrowserInit(pbody);

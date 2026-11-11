@@ -32,7 +32,8 @@ export const LAYOUT_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'specie', label: 'Specie' },
   { value: 'citta', label: 'Città' },
   { value: 'evento', label: 'Evento' },
-  { value: 'imprese', label: 'Imprese' }
+  { value: 'imprese', label: 'Imprese' },
+  { value: 'crea-pg', label: 'Builder personaggio' }
 ]
 
 /* ── Preset di layout ─────────────────────────────────────────────
