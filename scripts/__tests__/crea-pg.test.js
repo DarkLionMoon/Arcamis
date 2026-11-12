@@ -232,9 +232,51 @@ describe('crea-pg · regole e calcoli', () => {
     expect(builder.computeSheet(natural, catalog).ac).toBe(13);
   });
 
-  it('mostra le competenze di classe della scheda server', () => {
+  it('mostra le competenze esatte del foglio Class Info', () => {
     const fighter = builder.CLASSES.find((cls) => cls.id === 'fighter');
-    expect(builder.classProficiencyText(fighter)).toContain('Tutte le armature');
-    expect(builder.classProficiencyText(fighter)).toContain('Armi semplici e da guerra');
+    expect(builder.classProficiencyText(fighter)).toContain('Heavy Armor');
+    expect(builder.classProficiencyText(fighter)).toContain('Martial Weapons');
+    const sheet = builder.computeSheet({ ...builder.defaultState(), klass: 'fighter' }, catalog);
+    expect(sheet.classInfo).toMatchObject({
+      firstLevel: 'Heavy Armor',
+      additional: 'Light Armor, Medium Armor, Shields, Simple Weapons, Martial Weapons',
+      spellcasting: '-',
+    });
+  });
+
+  it('usa i talenti della scheda e applica i bonus +1 delle varianti', () => {
+    const state = builder.normalizeState({
+      ...builder.defaultState(),
+      klass: 'fighter',
+      originFeat: 'Feat: Athlete (DEX)',
+      feats: ['Feat: Resilient (Constitution)', 'Feat: Alert', 'Feat: Alert', 'Talento inventato'],
+    });
+    expect(state.feats).toEqual(['Feat: Resilient (Constitution)', 'Feat: Alert']);
+    const sheet = builder.computeSheet(state, catalog);
+    expect(sheet.scores.dex).toBe(15);
+    expect(sheet.scores.con).toBe(14);
+    expect(sheet.featBonuses).toMatchObject({ dex: 1, con: 1 });
+
+    const actor = builder.computeSheet(
+      { ...builder.defaultState(), originFeat: 'Feat: Actor' },
+      catalog
+    );
+    expect(actor.scores.cha).toBe(9);
+    expect(actor.featBonuses.cha).toBe(1);
+  });
+
+  it('accetta lo stile di combattimento solo per il guerriero', () => {
+    const fighter = builder.normalizeState({
+      ...builder.defaultState(),
+      klass: 'fighter',
+      fightingStyle: 'Fighting Style: Archery',
+    });
+    expect(fighter.fightingStyle).toBe('Fighting Style: Archery');
+    const wizard = builder.normalizeState({
+      ...builder.defaultState(),
+      klass: 'wizard',
+      fightingStyle: 'Fighting Style: Archery',
+    });
+    expect(wizard.fightingStyle).toBe('');
   });
 });

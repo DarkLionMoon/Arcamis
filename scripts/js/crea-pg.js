@@ -135,8 +135,8 @@
   var GOOGLE_SHEET_COPY_URL = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/copy';
   var GOOGLE_SHEET_XLSX_URL = '/sheets/arcamis-scheda-base.xlsx';
 
-  // La scheda server usa tre incrementi da +1 scelti dal giocatore.
-  // Sono suggerimenti per il campo Talento di Origine: il testo resta libero.
+  // La scheda server tiene separati i talenti (Features-Traits A2:A59) e
+  // gli stili di combattimento (named range fightingStyles / AQ62).
   var FEATS = [
     'Feat: Aberrant DragonMark',
     'Feat: Actor',
@@ -195,11 +195,70 @@
     'Feat: Mythal Touched (INT)',
     'Feat: Mythal Touched (WIS)',
     'Feat: Weapon Master (DEX)',
-    'Feat: Weapon Master (STR)',
+    'Feat: Weapon Master (STR)'
+  ];
+
+  var FIGHTING_STYLES = [
     'Fighting Style: Archery',
     'Fighting Style: Defense',
-    'Fighting Style: Dueling'
+    'Fighting Style: Dueling',
+    'Fighting Style: Great Weapon Fighting',
+    'Fighting Style: Two-Weapon Fighting',
+    'Fighting Style: Close Quarters Shooter',
+    'Fighting Style: Thrown Weapon Fighting',
+    'Fighting Style: Unarmed Fighting',
+    'Fighting Style: Mariner'
   ];
+
+  // I talenti della scheda indicano la caratteristica aumentata tra parentesi
+  // (es. "Feat: Athlete (DEX)") oppure la fissano nel nome (es. Actor).
+  // Entrambe le forme servono per applicare il +1 come nella scheda.
+  var FEAT_FIXED_ABILITIES = {
+    actor: 'cha',
+    durable: 'con',
+    'keen mind': 'int',
+    linguist: 'int'
+  };
+
+  var FEAT_ABILITY_KEYS = {
+    str: 'str',
+    dex: 'dex',
+    con: 'con',
+    int: 'int',
+    wis: 'wis',
+    cha: 'cha',
+    strength: 'str',
+    dexterity: 'dex',
+    constitution: 'con',
+    intelligence: 'int',
+    wisdom: 'wis',
+    charisma: 'cha'
+  };
+
+  function featAbilityKey(feat) {
+    var name = String(feat || '')
+      .replace(/^Feat:\s*/, '')
+      .toLowerCase();
+    var match = name.match(/\(([^()]+)\)\s*$/);
+    if (match) return FEAT_ABILITY_KEYS[String(match[1]).trim().toLowerCase()] || '';
+    return FEAT_FIXED_ABILITIES[name] || '';
+  }
+
+  function featAbilityBonuses(current) {
+    var bonuses = defaultAbilityIncreases();
+    var picked = [current && current.originFeat].concat(
+      current && Array.isArray(current.feats) ? current.feats : []
+    );
+    var seen = {};
+    picked.forEach(function (feat) {
+      var name = String(feat || '');
+      if (!name || seen[name]) return;
+      seen[name] = true;
+      var key = featAbilityKey(name);
+      if (key) bonuses[key] += 1;
+    });
+    return bonuses;
+  }
 
   var AC_MODES = [
     { id: 'auto', label: 'Automatica (armatura e difese di classe)' },
@@ -371,83 +430,110 @@
     CLASS_ALIASES[slugify(cls.name)] = cls.id;
   });
 
-  // Competenze di 1° livello, riassunte dalla colonna "1st Level Exclusive
-  // Proficiencies" della scheda server. Restano modificabili nel form.
-  var CLASS_PROFICIENCIES = {
+  // Dati esatti del foglio Class Info: H = tiri salvezza e abilità,
+  // I = competenze esclusive di 1° livello, J = competenze aggiuntive o da
+  // multiclasse, K/L = tipo e caratteristica di lancio.
+  var CLASS_SHEET_INFO = {
     artificer: {
-      armor: 'Armature leggere e medie, scudi',
-      weapons: 'Armi semplici, pistola, moschetto',
-      tools: '2 strumenti (utensili da ladro, utensili da inventore, qualsiasi)'
+      savesSkills:
+        'Constitution, Intelligence, Choose 1, Arcana, History, Investigation, Medicine, Nature, Perception, Sleight of Hand',
+      firstLevel: "Simple Weapons, 2 Tool (Thieves' Tools, Tinker's Tools, any), Pistol, Musket",
+      additional:
+        "Light Armor, Medium Armor, Shields, 1 Tool (Tinker's Tools), Choose 1, Arcana, History, Investigation, Medicine, Nature, Perception, Sleight of Hand",
+      spellcasting: 'Artificer Casting · Intelligence'
     },
     barbarian: {
-      armor: 'Armature leggere e medie, scudi',
-      weapons: 'Armi semplici e da guerra',
-      tools: '—'
+      savesSkills:
+        'Strength, Constitution, Choose 2, Animal Handling, Athletics, Intimidation, Nature, Perception, Survival',
+      firstLevel: 'Light Armor, Medium Armor',
+      additional: 'Shields, Simple Weapons, Martial Weapons',
+      spellcasting: '-'
     },
     bard: {
-      armor: 'Armature leggere',
-      weapons: 'Armi semplici',
-      tools: '2 strumenti musicali'
+      savesSkills:
+        'Dexterity, Charisma, Choose 2, Acrobatics, Animal Handling, Arcana, Athletics, Deception, History, Insight, Intimidation, Investigation, Medicine, Nature, Perception, Performance, Persuasion, Religion, Sleight of Hand, Stealth, Survival',
+      firstLevel: 'Simple Weapons, 2 Tools (Musical Instruments)',
+      additional: 'Light Armor, Choose 1, 1 Tool (Musical Instrument)',
+      spellcasting: 'Full Caster · Charisma'
     },
     cleric: {
-      armor: 'Armature leggere e medie, scudi',
-      weapons: 'Armi semplici',
-      tools: '—'
+      savesSkills: 'Wisdom, Charisma, Choose 2, History, Insight, Medicine, Persuasion, Religion',
+      firstLevel: 'Simple Weapons',
+      additional: 'Light Armor, Medium Armor, Shields',
+      spellcasting: 'Full Caster · Wisdom'
     },
     druid: {
-      armor: 'Armature leggere, scudi (non metallici)',
-      weapons: 'Armi semplici',
-      tools: 'Kit da erborista, Druidico'
+      savesSkills:
+        'Intelligence, Wisdom, Choose 2, Arcana, Animal Handling, Insight, Medicine, Nature, Perception, Religion, Survival',
+      firstLevel: 'Simple Weapons',
+      additional: 'Light Armor, Shields, Druidic, 1 Tool (Herbalism Kit)',
+      spellcasting: 'Full Caster · Wisdom'
     },
     fighter: {
-      armor: 'Tutte le armature, scudi',
-      weapons: 'Armi semplici e da guerra',
-      tools: '—'
+      savesSkills:
+        'Strength, Constitution, Choose 2, Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, Survival',
+      firstLevel: 'Heavy Armor',
+      additional: 'Light Armor, Medium Armor, Shields, Simple Weapons, Martial Weapons',
+      spellcasting: '-'
     },
     monk: {
-      armor: '—',
-      weapons: 'Armi semplici e da guerra',
-      tools: '1 strumento (artigiano o musicale)'
+      savesSkills: 'Strength, Dexterity, Choose 2, Acrobatics, Athletics, History, Insight, Religion, Stealth',
+      firstLevel: "1 Tool (Artisan's Tools or Musical Instrument)",
+      additional: 'Simple Weapons, Martial Weapons',
+      spellcasting: '-'
     },
     paladin: {
-      armor: 'Tutte le armature, scudi',
-      weapons: 'Armi semplici e da guerra',
-      tools: '—'
+      savesSkills: 'Wisdom, Charisma, Choose 2, Athletics, Insight, Intimidation, Medicine, Persuasion, Religion',
+      firstLevel: 'Heavy Armor',
+      additional: 'Light Armor, Medium Armor, Shields, Simple Weapons, Martial Weapons',
+      spellcasting: 'Half Caster · Charisma'
     },
     ranger: {
-      armor: 'Armature leggere e medie, scudi',
-      weapons: 'Armi semplici e da guerra',
-      tools: '1 competenza extra tra le abilità della classe'
+      savesSkills:
+        'Strength, Dexterity, Choose 2, Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, Survival',
+      firstLevel: '-',
+      additional:
+        'Light Armor, Medium Armor, Shields, Simple Weapons, Martial Weapons, Choose 1, Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, Survival',
+      spellcasting: 'Half Caster · Wisdom'
     },
     rogue: {
-      armor: 'Armature leggere',
-      weapons: 'Armi semplici e da guerra',
-      tools: '1 strumento, 2 lingue extra'
+      savesSkills:
+        'Dexterity, Intelligence, Choose 3, Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, Sleight of Hand, Stealth',
+      firstLevel: 'Simple Weapons, Martial Weapons',
+      additional: 'Light Armor, Choose 1, 1 Tool, 2 extra language',
+      spellcasting: '-'
     },
     sorcerer: {
-      armor: '—',
-      weapons: 'Armi semplici',
-      tools: '—'
+      savesSkills: 'Constitution, Charisma, Choose 2, Arcana, Deception, Insight, Intimidation, Persuasion, Religion',
+      firstLevel: 'Simple Weapons',
+      additional: '-',
+      spellcasting: 'Full Caster · Charisma'
     },
     warlock: {
-      armor: 'Armature leggere',
-      weapons: 'Armi semplici',
-      tools: '—'
+      savesSkills: 'Wisdom, Charisma, Choose 2, Arcana, Deception, History, Intimidation, Investigation, Nature, Religion',
+      firstLevel: 'Simple Weapons',
+      additional: 'Light Armor',
+      spellcasting: 'Pact Magic · Charisma'
     },
     wizard: {
-      armor: '—',
-      weapons: 'Armi semplici',
-      tools: '—'
+      savesSkills: 'Intelligence, Wisdom, Choose 2, Arcana, History, Insight, Investigation, Medicine, Religion',
+      firstLevel: 'Simple Weapons',
+      additional: '-',
+      spellcasting: 'Full Caster · Intelligence'
     }
   };
 
+  function classSheetInfo(cls) {
+    return cls ? CLASS_SHEET_INFO[cls.id] || null : null;
+  }
+
   function classProficiencyText(cls) {
-    if (!cls) return '';
-    var prof = CLASS_PROFICIENCIES[cls.id];
-    if (!prof) return '';
-    return (
-      'Armature: ' + prof.armor + ' · Armi: ' + prof.weapons + ' · Strumenti: ' + prof.tools
-    );
+    var info = classSheetInfo(cls);
+    if (!info) return '';
+    var parts = [];
+    if (info.firstLevel && info.firstLevel !== '-') parts.push('1° livello: ' + info.firstLevel);
+    if (info.additional && info.additional !== '-') parts.push('Multiclasse: ' + info.additional);
+    return parts.join(' · ');
   }
 
   var ARMORS = [
@@ -623,7 +709,8 @@
     var stateValue = current || defaultState();
     var base = integer(stateValue.scores && stateValue.scores[key], 10);
     var increases = normalizeAbilityIncreases(stateValue.abilityIncreases);
-    return base + (increases[key] || 0);
+    var featBonuses = featAbilityBonuses(stateValue);
+    return base + (increases[key] || 0) + (featBonuses[key] || 0);
   }
 
   /* ── Stato ───────────────────────────────────────────────── */
@@ -636,6 +723,9 @@
       alignment: '',
       deity: '',
       originFeat: '',
+      feats: [],
+      fightingStyle: '',
+      classFeatures: '',
       species: '',
       klass: '',
       subclass: '',
@@ -672,6 +762,18 @@
     base.alignment = String(raw.alignment || '').slice(0, 80);
     base.deity = String(raw.deity || '').slice(0, 120);
     base.originFeat = String(raw.originFeat || '').slice(0, 160);
+    base.feats = Array.isArray(raw.feats)
+      ? raw.feats
+          .filter(function (feat, index, list) {
+            return FEATS.indexOf(feat) !== -1 && list.indexOf(feat) === index;
+          })
+          .slice(0, 12)
+      : [];
+    base.fightingStyle =
+      FIGHTING_STYLES.indexOf(raw.fightingStyle) >= 0 && raw.klass === 'fighter'
+        ? raw.fightingStyle
+        : '';
+    base.classFeatures = String(raw.classFeatures || '').slice(0, 2000);
     base.species = String(raw.species || '');
     base.klass = CLASS_BY_ID[raw.klass] ? raw.klass : '';
     base.subclass = String(raw.subclass || '');
@@ -714,6 +816,10 @@
     var subclass = findById(catalog.allSubclasses, state.subclass);
     if (subclass && state.klass && subclass.classKey !== state.klass) state.subclass = '';
     if (state.klass && !CLASS_BY_ID[state.klass]) state.klass = '';
+    if (state.klass !== 'fighter') state.fightingStyle = '';
+    state.feats = (Array.isArray(state.feats) ? state.feats : []).filter(function (feat) {
+      return FEATS.indexOf(feat) !== -1;
+    });
     var cls = CLASS_BY_ID[state.klass];
     state.skills = state.skills.filter(function (id) {
       return !!SKILL_BY_ID[id] && (!cls || cls.skills.indexOf(id) !== -1);
@@ -919,12 +1025,13 @@
   function computeSheet(stateValue, dataCatalog) {
     var current = stateValue || defaultState();
     var increases = normalizeAbilityIncreases(current.abilityIncreases);
+    var featBonuses = featAbilityBonuses(current);
     var baseScores = {};
     var scores = {};
     ABILITIES.forEach(function (ability) {
       var baseScore = integer(current.scores && current.scores[ability.key], 10);
       baseScores[ability.key] = baseScore;
-      scores[ability.key] = baseScore + (increases[ability.key] || 0);
+      scores[ability.key] = baseScore + (increases[ability.key] || 0) + (featBonuses[ability.key] || 0);
     });
     var mods = {};
     ABILITIES.forEach(function (ability) {
@@ -1004,7 +1111,10 @@
       scores: scores,
       baseScores: baseScores,
       abilityIncreases: increases,
+      featBonuses: featBonuses,
       cls: cls,
+      classInfo: classSheetInfo(cls),
+      fightingStyle: current.fightingStyle || '',
       species: species,
       subclass: subclass,
       armor: armor,
@@ -1040,6 +1150,26 @@
       '>' +
       esc(label) +
       '</option>'
+    );
+  }
+
+  function featLabel(feat) {
+    return String(feat || '')
+      .replace(/^Feat:\s*/, '')
+      .replace(/^Fighting Style:\s*/, '');
+  }
+
+  function featOptions(selected) {
+    var value = String(selected || '');
+    var known = FEATS.indexOf(value) !== -1;
+    return (
+      '<option value="">Nessuno / da definire</option>' +
+      (!known && value
+        ? '<option value="' + esc(value) + '" selected>' + esc(featLabel(value)) + ' (valore precedente)</option>'
+        : '') +
+      FEATS.map(function (feat) {
+        return option(feat, featLabel(feat), value);
+      }).join('')
     );
   }
 
@@ -1094,13 +1224,24 @@
       '<label class="cpg-field">Background<input type="text" data-field="background" maxlength="160" value="' + esc(state.background) + '" placeholder="Es. Guardia cittadina, Studioso…"></label>' +
       '<label class="cpg-field">Allineamento<input type="text" data-field="alignment" maxlength="80" value="' + esc(state.alignment) + '" placeholder="Es. Neutrale buono"></label>' +
       '<label class="cpg-field">Divinità o patrono<input type="text" data-field="deity" maxlength="120" value="' + esc(state.deity) + '" placeholder="Facoltativo"></label>' +
-      '<label class="cpg-field">Talento di Origine<input type="text" data-field="originFeat" list="cpg-feats" maxlength="160" value="' + esc(state.originFeat) + '" placeholder="Se previsto dal background"></label>' +
+      '<label class="cpg-field">Talento di Origine<select data-field="originFeat">' +
+      featOptions(state.originFeat) +
+      '</select></label>' +
       '</div>' +
-      '<datalist id="cpg-feats">' +
+      '<label class="cpg-field">Talenti aggiuntivi<select data-field="feats" class="cpg-multiselect" multiple size="6">' +
       FEATS.map(function (feat) {
-        return '<option value="' + esc(feat) + '"></option>';
+        return (
+          '<option value="' +
+          esc(feat) +
+          '"' +
+          ((state.feats || []).indexOf(feat) !== -1 ? ' selected' : '') +
+          '>' +
+          esc(featLabel(feat)) +
+          '</option>'
+        );
       }).join('') +
-      '</datalist>' +
+      '</select></label>' +
+      '<p class="cpg-hint">Talenti e stili usano gli elenchi della scheda. I talenti con una caratteristica tra parentesi (es. Atleta (DES)) applicano il +1 al punteggio; per selezionare più talenti aggiuntivi usa Ctrl/Cmd.</p>' +
       '<label class="cpg-field">Competenze da background o altre fonti<input type="text" data-field="extraSkills" maxlength="300" value="' + esc(state.extraSkills) + '" placeholder="Es. Storia, Persuasione"></label>' +
       '<div class="cpg-grid2">' +
       '<label class="cpg-field">Aspetto<textarea data-field="appearance" rows="3" maxlength="1200" placeholder="Tratti fisici, abbigliamento, segni particolari…">' + esc(state.appearance) + '</textarea></label>' +
@@ -1134,6 +1275,7 @@
       '<button type="button" data-action="filter-subclass" data-value="homebrew">Homebrew</button>' +
       '</div>' +
       '<div id="cpg-class-info"></div>' +
+      '<div id="cpg-class-choices"></div>' +
       '<div id="cpg-subclass-info"></div>' +
       '</section>' +
 
@@ -1306,6 +1448,8 @@
 
   function renderClassInfo() {
     var target = appRoot && appRoot.querySelector('#cpg-class-info');
+    var choices = appRoot && appRoot.querySelector('#cpg-class-choices');
+    if (choices) choices.innerHTML = '';
     if (!target) return;
     var cls = selectedClass();
     if (!cls) {
@@ -1320,12 +1464,41 @@
         return key;
       })
       .join(', ');
+    var info = classSheetInfo(cls);
+    if (choices) {
+      var fightingStyleField =
+        cls.id === 'fighter'
+          ? '<label class="cpg-field">Stile di combattimento<select data-field="fightingStyle">' +
+            '<option value="">Nessuno / da scegliere</option>' +
+            FIGHTING_STYLES.map(function (style) {
+              return option(style, featLabel(style), state.fightingStyle);
+            }).join('') +
+            '</select></label><p class="cpg-hint">La scheda assegna uno stile di combattimento al Guerriero al 1° livello.</p>'
+          : '<p class="cpg-hint">Lo stile di combattimento compare nella scheda per il Guerriero al 1° livello; per questa classe non è richiesto a questo livello.</p>';
+      choices.innerHTML =
+        fightingStyleField +
+        '<label class="cpg-field">Privilegi di classe<textarea data-field="classFeatures" rows="4" maxlength="2000" placeholder="Trascrivi i privilegi indicati dal manuale approvato.">' +
+        esc(state.classFeatures) +
+        '</textarea></label>' +
+        '<p class="cpg-hint">La scheda lascia libera l’area “Privilegi di Classe”: non esiste un elenco chiuso da cui scegliere.</p>';
+    }
     target.innerHTML =
       '<div class="cpg-pick">' +
       '<div class="cpg-pick-head"><strong>' + esc(cls.name) + ' <small>(' + esc(cls.en) + ')</small></strong></div>' +
       '<p class="cpg-pick-meta">Dado vita d' + cls.die + ' · Caratteristica principale: ' + esc(cls.primary) + '</p>' +
       '<p class="cpg-pick-meta">Tiri salvezza: ' + esc(saves) + ' · Competenze: ' + cls.skillCount + '</p>' +
-      (classProficiencyText(cls) ? '<p class="cpg-pick-meta">' + esc(classProficiencyText(cls)) + '</p>' : '') +
+      (info
+        ? '<p class="cpg-pick-meta"><b>Tiri salvezza e abilità:</b> ' + esc(info.savesSkills) + '</p>' +
+          (info.firstLevel !== '-'
+            ? '<p class="cpg-pick-meta"><b>Competenze di 1° livello:</b> ' + esc(info.firstLevel) + '</p>'
+            : '') +
+          (info.additional !== '-'
+            ? '<p class="cpg-pick-meta"><b>Competenze aggiuntive / multiclasse:</b> ' + esc(info.additional) + '</p>'
+            : '') +
+          (info.spellcasting !== '-'
+            ? '<p class="cpg-pick-meta"><b>Incantesimi:</b> ' + esc(info.spellcasting) + '</p>'
+            : '')
+        : '') +
       '</div>';
   }
 
@@ -1541,6 +1714,7 @@
     if (state.method === 'standard' && !validateStandardArray(state.scores)) warnings.push('Array standard non valido.');
     if (abilityIncreaseTotal(state.abilityIncreases) !== 3) warnings.push('Incrementi della specie: ' + abilityIncreaseTotal(state.abilityIncreases) + '/3.');
     if (cls && state.skills.length !== cls.skillCount) warnings.push('Competenze di classe: ' + state.skills.length + '/' + cls.skillCount + '.');
+    if (cls && !state.originFeat) warnings.push('Talento di Origine: da scegliere.');
     if (species && species.origin === 'homebrew') warnings.push('Specie homebrew: soggetta ad approvazione staff.');
     if (subclass && subclass.origin === 'homebrew') warnings.push('Sottoclasse homebrew: soggetta ad approvazione staff.');
 
@@ -1603,7 +1777,10 @@
       ['Background', state.background],
       ['Allineamento', state.alignment],
       ['Divinità o patrono', state.deity],
-      ['Talento di Origine', state.originFeat],
+      ['Talento di Origine', state.originFeat ? featLabel(state.originFeat) : ''],
+      ['Talenti aggiuntivi', (state.feats || []).map(featLabel).join(', ')],
+      ['Stile di combattimento', state.fightingStyle ? featLabel(state.fightingStyle) : ''],
+      ['Privilegi di classe', state.classFeatures],
       ['Competenze extra', state.extraSkills],
       ['Arma', state.weapon],
       ['Oro', state.gold + ' gp']
@@ -1685,8 +1862,14 @@
       '</dl><p class="cpg-sheet-note">Talento di Origine e incantesimi vanno verificati sul manuale approvato e con l’Assistenza Tecnica.</p></section>' +
       '</div>' +
       '<div class="cpg-sheet-columns">' +
-      '<section><h3>Competenze e lingue</h3><dl class="cpg-sheet-details">' +
+      '<section><h3>Competenze e privilegi</h3><dl class="cpg-sheet-details">' +
       '<div><dt>Competenze</dt><dd>' + (sheet.proficiencies ? nl2br(sheet.proficiencies) : '—') + '</dd></div>' +
+      (sheet.classInfo
+        ? '<div><dt>Tiri salvezza e abilità</dt><dd>' + esc(sheet.classInfo.savesSkills) + '</dd></div>'
+        : '') +
+      (sheet.classInfo && sheet.classInfo.spellcasting !== '-'
+        ? '<div><dt>Incantesimi</dt><dd>' + esc(sheet.classInfo.spellcasting) + '</dd></div>'
+        : '') +
       '<div><dt>Lingue</dt><dd>' + (sheet.languages ? nl2br(sheet.languages) : '—') + '</dd></div>' +
       '<div><dt>Resistenze</dt><dd>' + (sheet.resistances ? nl2br(sheet.resistances) : '—') + '</dd></div>' +
       '</dl></section>' +
@@ -1834,7 +2017,10 @@
     lines.push(sheet.skills.length ? sheet.skills.map(function (skill) { return skill.label + ' ' + fmtMod(skill.mod); }).join(', ') : '—');
     lines.push('');
     lines.push('BACKGROUND: ' + (state.background || '—'));
-    lines.push('TALENTO DI ORIGINE: ' + (state.originFeat || '—'));
+    lines.push('TALENTO DI ORIGINE: ' + (state.originFeat ? featLabel(state.originFeat) : '—'));
+    lines.push('TALENTI AGGIUNTIVI: ' + ((state.feats || []).map(featLabel).join(', ') || '—'));
+    lines.push('STILE DI COMBATTIMENTO: ' + (state.fightingStyle ? featLabel(state.fightingStyle) : '—'));
+    lines.push('PRIVILEGI DI CLASSE: ' + (state.classFeatures || '—'));
     lines.push('ARMA: ' + (state.weapon || '—'));
     lines.push('EQUIPAGGIAMENTO: ' + (state.equipment || '—'));
     lines.push('');
@@ -1953,6 +2139,18 @@
     if (!target) return;
     if (target.matches('select[data-field]')) {
       var field = target.getAttribute('data-field');
+      if (field === 'feats') {
+        var selectedFeats = [];
+        for (var optionIndex = 0; optionIndex < target.options.length; optionIndex += 1) {
+          if (target.options[optionIndex].selected) selectedFeats.push(target.options[optionIndex].value);
+        }
+        state.feats = selectedFeats;
+        saveState();
+        renderStats();
+        renderSummary();
+        renderSheet();
+        return;
+      }
       state[field] = target.value;
       if (field === 'klass') {
         state.subclass = '';
@@ -1975,6 +2173,7 @@
         return;
       }
       saveAndRefresh();
+      if (field === 'originFeat' || field === 'fightingStyle') renderStats();
       if (field === 'species') renderSpeciesInfo();
       if (field === 'subclass') renderSubclassInfo();
       if (field === 'armor') renderSummary();
