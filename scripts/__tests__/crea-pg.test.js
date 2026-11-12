@@ -244,25 +244,51 @@ describe('crea-pg · regole e calcoli', () => {
     });
   });
 
+  it('distingue i talenti di origine dai talenti generali', () => {
+    expect(builder.ORIGIN_FEATS).toHaveLength(13);
+    expect(builder.ORIGIN_FEATS).toEqual(
+      expect.arrayContaining([
+        'Feat: Lucky',
+        'Feat: Magic Initiate',
+        'Feat: Tavern Brawler (CON)',
+        'Feat: Tough',
+      ])
+    );
+    expect(builder.ORIGIN_FEATS).not.toContain('Feat: Athlete (DEX)');
+    expect(builder.FEATS).toEqual(expect.arrayContaining(builder.ORIGIN_FEATS));
+
+    const lucky = builder.computeSheet(
+      { ...builder.defaultState(), originFeat: 'Feat: Lucky' },
+      catalog
+    );
+    expect(lucky.scores).toEqual(builder.defaultState().scores);
+  });
+
   it('usa i talenti della scheda e applica i bonus +1 delle varianti', () => {
     const state = builder.normalizeState({
       ...builder.defaultState(),
       klass: 'fighter',
-      originFeat: 'Feat: Athlete (DEX)',
-      feats: ['Feat: Resilient (Constitution)', 'Feat: Alert', 'Feat: Alert', 'Talento inventato'],
+      originFeat: 'Feat: Lucky',
+      feats: [
+        'Feat: Athlete (DEX)',
+        'Feat: Resilient (Constitution)',
+        'Feat: Actor',
+        'Feat: Alert',
+        'Feat: Alert',
+        'Talento inventato',
+      ],
     });
-    expect(state.feats).toEqual(['Feat: Resilient (Constitution)', 'Feat: Alert']);
+    expect(state.feats).toEqual([
+      'Feat: Athlete (DEX)',
+      'Feat: Resilient (Constitution)',
+      'Feat: Actor',
+      'Feat: Alert',
+    ]);
     const sheet = builder.computeSheet(state, catalog);
     expect(sheet.scores.dex).toBe(15);
     expect(sheet.scores.con).toBe(14);
-    expect(sheet.featBonuses).toMatchObject({ dex: 1, con: 1 });
-
-    const actor = builder.computeSheet(
-      { ...builder.defaultState(), originFeat: 'Feat: Actor' },
-      catalog
-    );
-    expect(actor.scores.cha).toBe(9);
-    expect(actor.featBonuses.cha).toBe(1);
+    expect(sheet.scores.cha).toBe(9);
+    expect(sheet.featBonuses).toMatchObject({ dex: 1, con: 1, cha: 1 });
   });
 
   it('accetta lo stile di combattimento solo per il guerriero', () => {

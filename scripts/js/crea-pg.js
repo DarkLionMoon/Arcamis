@@ -145,23 +145,30 @@
     'Feat: Athlete (STR)',
     'Feat: Chef (CON)',
     'Feat: Chef (WIS)',
+    'Feat: Crafter',
     'Feat: Crusher',
     'Feat: Dual Wielder',
     'Feat: Durable',
     'Feat: Fey Touched (CHA)',
     'Feat: Fey Touched (WIS)',
+    'Feat: Gift of the Chromatic Dragon',
     'Feat: Gift of the Gem Dragon (CHA)',
     'Feat: Gift of the Gem Dragon (INT)',
     'Feat: Gift of the Gem Dragon (WIS)',
+    'Feat: Gift of the Metallic Dragon',
+    'Feat: Healer',
     'Feat: Heavily Armored',
     'Feat: Heavy Armor Master',
     'Feat: Keen Mind',
     'Feat: Lightly Armored (DEX)',
     'Feat: Lightly Armored (STR)',
     'Feat: Linguist',
+    'Feat: Lucky',
+    'Feat: Magic Initiate',
     'Feat: Mobile',
     'Feat: Moderately Armored (DEX)',
     'Feat: Moderately Armored (STR)',
+    'Feat: Musician',
     'Feat: Observant (INT)',
     'Feat: Observant (WIS)',
     'Feat: Piercer (DEX)',
@@ -172,6 +179,7 @@
     'Feat: Resilient (Intelligence)',
     'Feat: Resilient (Strength)',
     'Feat: Resilient (Wisdom)',
+    'Feat: Savage Attacker',
     'Feat: Shadow Touched (CHA)',
     'Feat: Shadow Touched (INT)',
     'Feat: Shadow Touched (WIS)',
@@ -181,6 +189,7 @@
     'Feat: Skill Expert (Intelligence)',
     'Feat: Skill Expert (Strength)',
     'Feat: Skill Expert (Wisdom)',
+    'Feat: Skilled',
     'Feat: Slasher (DEX)',
     'Feat: Slasher (STR)',
     'Feat: Tavern Brawler (CON)',
@@ -191,11 +200,31 @@
     'Feat: Telepathic (CHA)',
     'Feat: Telepathic (INT)',
     'Feat: Telepathic (WIS)',
+    'Feat: Tough',
     'Feat: Mythal Touched (CHA)',
     'Feat: Mythal Touched (INT)',
     'Feat: Mythal Touched (WIS)',
     'Feat: Weapon Master (DEX)',
     'Feat: Weapon Master (STR)'
+  ];
+
+  // Talenti di Origine riconosciuti dal server. La tab Features-Traits della
+  // scheda non li elenca tutti: l'elenco viene dalle regole del server
+  // (PHB'24) e dal changelog per i Doni del Drago TCE diventati Origine.
+  var ORIGIN_FEATS = [
+    'Feat: Alert',
+    'Feat: Crafter',
+    'Feat: Gift of the Chromatic Dragon',
+    'Feat: Gift of the Metallic Dragon',
+    'Feat: Healer',
+    'Feat: Lucky',
+    'Feat: Magic Initiate',
+    'Feat: Musician',
+    'Feat: Savage Attacker',
+    'Feat: Skilled',
+    'Feat: Tavern Brawler (CON)',
+    'Feat: Tavern Brawler (STR)',
+    'Feat: Tough'
   ];
 
   var FIGHTING_STYLES = [
@@ -1159,15 +1188,16 @@
       .replace(/^Fighting Style:\s*/, '');
   }
 
-  function featOptions(selected) {
+  function featOptions(selected, list) {
     var value = String(selected || '');
-    var known = FEATS.indexOf(value) !== -1;
+    var options = Array.isArray(list) ? list : FEATS;
+    var known = options.indexOf(value) !== -1;
     return (
       '<option value="">Nessuno / da definire</option>' +
       (!known && value
         ? '<option value="' + esc(value) + '" selected>' + esc(featLabel(value)) + ' (valore precedente)</option>'
         : '') +
-      FEATS.map(function (feat) {
+      options.map(function (feat) {
         return option(feat, featLabel(feat), value);
       }).join('')
     );
@@ -1225,7 +1255,7 @@
       '<label class="cpg-field">Allineamento<input type="text" data-field="alignment" maxlength="80" value="' + esc(state.alignment) + '" placeholder="Es. Neutrale buono"></label>' +
       '<label class="cpg-field">Divinità o patrono<input type="text" data-field="deity" maxlength="120" value="' + esc(state.deity) + '" placeholder="Facoltativo"></label>' +
       '<label class="cpg-field">Talento di Origine<select data-field="originFeat">' +
-      featOptions(state.originFeat) +
+      featOptions(state.originFeat, ORIGIN_FEATS) +
       '</select></label>' +
       '</div>' +
       '<label class="cpg-field">Talenti aggiuntivi<select data-field="feats" class="cpg-multiselect" multiple size="6">' +
@@ -1241,7 +1271,7 @@
         );
       }).join('') +
       '</select></label>' +
-      '<p class="cpg-hint">Talenti e stili usano gli elenchi della scheda. I talenti con una caratteristica tra parentesi (es. Atleta (DES)) applicano il +1 al punteggio; per selezionare più talenti aggiuntivi usa Ctrl/Cmd.</p>' +
+      '<p class="cpg-hint">Il Talento di Origine usa l’elenco dei talenti di origine del server; i talenti generali e le varianti con caratteristica (es. Atleta (DES)) vanno in Talenti aggiuntivi e applicano il +1. Per selezionare più talenti aggiuntivi usa Ctrl/Cmd.</p>' +
       '<label class="cpg-field">Competenze da background o altre fonti<input type="text" data-field="extraSkills" maxlength="300" value="' + esc(state.extraSkills) + '" placeholder="Es. Storia, Persuasione"></label>' +
       '<div class="cpg-grid2">' +
       '<label class="cpg-field">Aspetto<textarea data-field="appearance" rows="3" maxlength="1200" placeholder="Tratti fisici, abbigliamento, segni particolari…">' + esc(state.appearance) + '</textarea></label>' +
@@ -1715,6 +1745,9 @@
     if (abilityIncreaseTotal(state.abilityIncreases) !== 3) warnings.push('Incrementi della specie: ' + abilityIncreaseTotal(state.abilityIncreases) + '/3.');
     if (cls && state.skills.length !== cls.skillCount) warnings.push('Competenze di classe: ' + state.skills.length + '/' + cls.skillCount + '.');
     if (cls && !state.originFeat) warnings.push('Talento di Origine: da scegliere.');
+    if (state.originFeat && ORIGIN_FEATS.indexOf(state.originFeat) === -1) {
+      warnings.push('Il Talento di Origine salvato non è nell’elenco dei talenti di origine: riselezionalo.');
+    }
     if (species && species.origin === 'homebrew') warnings.push('Specie homebrew: soggetta ad approvazione staff.');
     if (subclass && subclass.origin === 'homebrew') warnings.push('Sottoclasse homebrew: soggetta ad approvazione staff.');
 
@@ -2408,6 +2441,7 @@
     STANDARD_ARRAY: STANDARD_ARRAY,
     AC_MODES: AC_MODES,
     FEATS: FEATS,
+    ORIGIN_FEATS: ORIGIN_FEATS,
     abilityIncreaseTotal: abilityIncreaseTotal,
     classProficiencyText: classProficiencyText,
     finalScoreFor: finalScoreFor
