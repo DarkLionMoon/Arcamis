@@ -1454,8 +1454,9 @@
       if (!group.items.length) return;
       html += '<optgroup label="' + esc(group.label) + '">';
       group.items.forEach(function (item) {
-        var label = speciesLabel(item) + ' — ' + (item.origin === 'homebrew' ? 'Homebrew' : item.source);
-        html += option(item.id, label, state.species);
+        /* Il menu usa il nome della tab Race Info senza suffissi: la fonte
+           resta visibile nella scheda della specie. */
+        html += option(item.id, speciesLabel(item), state.species);
       });
       html += '</optgroup>';
     });

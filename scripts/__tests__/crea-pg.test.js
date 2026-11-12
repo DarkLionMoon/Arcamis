@@ -157,6 +157,14 @@ describe('crea-pg · homebrew', () => {
     expect(catalog.approvedSpecies.find((item) => item.name === 'Hedge').sheetInfo).toBeNull();
   });
 
+  it('usa i nomi esatti della tab Race Info anche nel catalogo', () => {
+    const sheetNames = Object.keys(raceInfo.races);
+    const labels = new Set(catalog.allSpecies.map((item) => item.label));
+    expect(sheetNames.filter((name) => !labels.has(name))).toEqual([]);
+    expect(catalog.allSpecies.filter((item) => item.sheetName === item.label)).toHaveLength(124);
+    expect(catalog.allSpecies.some((item) => item.label.includes(' — '))).toBe(false);
+  });
+
   it('usa i tratti Race Info come default modificabile', () => {
     const warforged = catalog.approvedSpecies.find((item) => item.name === 'Warforged');
     const hedge = catalog.approvedSpecies.find((item) => item.name === 'Hedge');
