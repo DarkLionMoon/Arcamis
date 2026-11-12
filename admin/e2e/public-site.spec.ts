@@ -273,7 +273,7 @@ test.describe('mega-menu della topbar', () => {
     await expect(menu).toBeHidden()
   })
 
-  test('Personaggio mostra Creazione e Crea il Personaggio', async ({ page }) => {
+  test('Personaggio mostra le due voci e apre il builder', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 })
     await page.goto('/')
 
@@ -285,9 +285,13 @@ test.describe('mega-menu della topbar', () => {
     await expect(
       pg.locator('.tn-mega-links .tn-item', { hasText: 'Creazione' })
     ).toHaveCount(1)
-    await expect(
-      pg.locator('.tn-mega-links .tn-item', { hasText: 'Crea il Personaggio' })
-    ).toHaveCount(1)
+    const builderLink = pg.locator('.tn-mega-links .tn-item', { hasText: 'Crea il Personaggio' })
+    await expect(builderLink).toHaveCount(1)
+    await builderLink.click()
+
+    await expect(page).toHaveURL(/\/personaggio\/crea-pg$/)
+    await expect(page.locator('#cpg-step-identita h2')).toHaveText('Identità')
+    await expect(page.locator('#cpg-species')).toBeVisible()
   })
 })
 
