@@ -205,12 +205,21 @@
     'Feat: Mythal Touched (INT)',
     'Feat: Mythal Touched (WIS)',
     'Feat: Weapon Master (DEX)',
-    'Feat: Weapon Master (STR)'
+    'Feat: Weapon Master (STR)',
+    // Doni dei Draghi homebrew: confermati come talenti di Origine
+    // dall'Assistenza Tecnica il 12/11/2026.
+    'Feat: Dono del Drago del Fuoco',
+    'Feat: Dono del Drago della Montagna',
+    'Feat: Dono del Drago del Vento',
+    'Feat: Dono del Drago dell\'Acqua',
+    'Feat: Dono del Drago Hextech',
+    'Feat: Dono del Drago Chemtech'
   ];
 
   // Talenti di Origine riconosciuti dal server. La tab Features-Traits della
   // scheda non li elenca tutti: l'elenco viene dalle regole del server
-  // (PHB'24) e dal changelog per i Doni del Drago TCE diventati Origine.
+  // (PHB'24), dal changelog per i Doni del Drago TCE diventati Origine e
+  // dalla conferma dell'Assistenza Tecnica per i Doni dei Draghi homebrew.
   var ORIGIN_FEATS = [
     'Feat: Alert',
     'Feat: Crafter',
@@ -224,7 +233,13 @@
     'Feat: Skilled',
     'Feat: Tavern Brawler (CON)',
     'Feat: Tavern Brawler (STR)',
-    'Feat: Tough'
+    'Feat: Tough',
+    'Feat: Dono del Drago del Fuoco',
+    'Feat: Dono del Drago della Montagna',
+    'Feat: Dono del Drago del Vento',
+    'Feat: Dono del Drago dell\'Acqua',
+    'Feat: Dono del Drago Hextech',
+    'Feat: Dono del Drago Chemtech'
   ];
 
   var FIGHTING_STYLES = [

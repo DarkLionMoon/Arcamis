@@ -245,13 +245,15 @@ describe('crea-pg · regole e calcoli', () => {
   });
 
   it('distingue i talenti di origine dai talenti generali', () => {
-    expect(builder.ORIGIN_FEATS).toHaveLength(13);
+    expect(builder.ORIGIN_FEATS).toHaveLength(19);
     expect(builder.ORIGIN_FEATS).toEqual(
       expect.arrayContaining([
         'Feat: Lucky',
         'Feat: Magic Initiate',
         'Feat: Tavern Brawler (CON)',
         'Feat: Tough',
+        'Feat: Dono del Drago del Fuoco',
+        'Feat: Dono del Drago Chemtech',
       ])
     );
     expect(builder.ORIGIN_FEATS).not.toContain('Feat: Athlete (DEX)');
@@ -262,6 +264,12 @@ describe('crea-pg · regole e calcoli', () => {
       catalog
     );
     expect(lucky.scores).toEqual(builder.defaultState().scores);
+
+    const dragon = builder.computeSheet(
+      { ...builder.defaultState(), originFeat: 'Feat: Dono del Drago del Fuoco' },
+      catalog
+    );
+    expect(dragon.scores).toEqual(builder.defaultState().scores);
   });
 
   it('usa i talenti della scheda e applica i bonus +1 delle varianti', () => {
