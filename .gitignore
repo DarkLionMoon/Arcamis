@@ -37,3 +37,4 @@ artifacts/
 # Report e artefatti locali dei test
 admin/test-results/
 content/search-entries.json
+.lighthouseci/
