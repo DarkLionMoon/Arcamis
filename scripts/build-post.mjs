@@ -121,6 +121,22 @@ for (const [from, to] of jsMap) {
   html = html.split(`"${from}"`).join(`"${to}"`);
 }
 
+/* Le feature pesanti (builder e imprese) non sono nella shell: notion-nav
+   le carica quando la rotta le richiede. La mappa permette di usare i nomi
+   hashati anche nei caricamenti dinamici, che Vite non riscrive. */
+const featureScripts = {};
+for (const [from, to] of jsMap) {
+  if (from === '/scripts/js/crea-pg.js' || from === '/scripts/js/imprese.js') {
+    featureScripts[from] = to;
+  }
+}
+if (Object.keys(featureScripts).length) {
+  html = html.replace(
+    '</head>',
+    `<script>window.__ARC_JS=${JSON.stringify(featureScripts)};</script>\n</head>`
+  );
+}
+
 /* LCP: preload dell'immagine della prima slide. Inserito qui perché Vite
    riscriverebbe l'href verso assets/ mentre lo slide usa /cover.webp. */
 const preloadTag = '<link rel="preload" as="image" href="/cover.webp" fetchpriority="high"/>';

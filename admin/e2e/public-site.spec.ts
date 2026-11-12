@@ -258,17 +258,40 @@ test.describe('mega-menu della topbar', () => {
     await page.setViewportSize({ width: 1280, height: 900 })
     await page.goto('/')
 
-    const pg = page.locator('#dd-pg')
-    await pg.hover()
-    const menu = pg.locator('.tn-menu')
+    /* Personaggio ha due voci dopo l'aggiunta del builder: il caso a voce
+       singola resta coperto da Imprese. */
+    const imprese = page.locator('#dd-imprese')
+    await imprese.hover()
+    const menu = imprese.locator('.tn-menu')
     await expect(menu).toBeVisible()
-    await expect(pg.locator('.tn-mega-count')).toHaveText('1 voce')
-    await expect(pg.locator('.tn-mega-feature')).toBeHidden()
+    await expect(imprese.locator('.tn-mega-count')).toHaveText('1 voce')
+    await expect(imprese.locator('.tn-mega-feature')).toBeHidden()
     expect((await menu.boundingBox())!.width).toBeLessThanOrEqual(440)
 
     /* Escape chiude il pannello. */
     await page.keyboard.press('Escape')
     await expect(menu).toBeHidden()
+  })
+
+  test('Personaggio mostra le due voci e apre il builder', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.goto('/')
+
+    const pg = page.locator('#dd-pg')
+    await pg.hover()
+    await expect(pg.locator('.tn-menu')).toBeVisible()
+    await expect(pg.locator('.tn-mega-count')).toHaveText('2 voci')
+    await expect(pg.locator('.tn-mega-links .tn-item')).toHaveCount(2)
+    await expect(
+      pg.locator('.tn-mega-links .tn-item', { hasText: 'Creazione' })
+    ).toHaveCount(1)
+    const builderLink = pg.locator('.tn-mega-links .tn-item', { hasText: 'Crea il Personaggio' })
+    await expect(builderLink).toHaveCount(1)
+    await builderLink.click()
+
+    await expect(page).toHaveURL(/\/personaggio\/crea-pg$/)
+    await expect(page.locator('#cpg-step-identita h2')).toHaveText('Identità')
+    await expect(page.locator('#cpg-species')).toBeVisible()
   })
 })
 

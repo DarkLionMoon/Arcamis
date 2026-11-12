@@ -1,0 +1,660 @@
+{
+  "_meta": {
+    "source": "public/sheets/arcamis-scheda-base.xlsx",
+    "sheet": "Race Info",
+    "range": "B5:K129",
+    "generated": "2026-11-12"
+  },
+  "races": {
+    "Aarakocra": {
+      "speed": "30, Fly 30",
+      "languages": "Common, 2 extra",
+      "attack": "Talon 1d6 slashing"
+    },
+    "Aetherborn": {
+      "speed": "30 ft",
+      "resistances": "Born of Aether\nYou have resistance to necrotic damage",
+      "languages": "Common, 2 extra",
+      "features": "Menacing\nYou gain proficiency in the Intimidation skill."
+    },
+    "Autognome": {
+      "speed": "30 ft",
+      "resistances": "Mechanical Nature\nYou have resistance to poison damange and\nimmunity to disease, and you have advantage\non saving throws against being paralyzed or\npoisoned. You don't need to ear, drink and breathe",
+      "languages": "Common, 2 extra",
+      "features": "Specialized Design\nYou gain proficiency 2 tool of your choice."
+    },
+    "Bugbear": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Sneaky\nYou gain proficiency in the Stealth skill."
+    },
+    "Centaur": {
+      "speed": "40 ft",
+      "languages": "Common, 2 extra",
+      "attack": "Hooves 1d6 bludgeoning",
+      "features": "Natural Affinity\nYou gain proficiency with one of the following skills of your choice: Animal Handling, Medicine, Nature, or Survival."
+    },
+    "Changeling": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Changeling Instincts\nYou gain proficiency with two of the following skills of your choice: Deception, Insight, Intimidation, Performance and Persuasion."
+    },
+    "Dragonborn (Amethyst)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Force damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Black)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Acid damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Blue)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Lightning damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Brass)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Fire damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Bronze)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Lightning damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Copper)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Acid damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Crystal)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Radiant damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Emerald)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Psychic damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Gold)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Fire damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Green)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Poison damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Red)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Fire damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Sapphire)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Thunder damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Silver)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Cold damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (Topaz)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Necrotic damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dragonborn (White)": {
+      "ac": "10+dex",
+      "speed": "30 ft",
+      "resistances": "Damage Resistance\nYou have resistance to Cold damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Dwarf": {
+      "speed": "30 ft",
+      "hp": "1",
+      "resistances": "Dwarven Resilience\nYou have advantage on saving throws against poison, and you have resistance against poison damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Elf (Astral)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Keen Senses\nYou gain proficiency in the Perception skill."
+    },
+    "Elf (Drow)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Keen Senses\nYou gain proficiency with one of the following skills of your choice: Insight, Perception, or Survival."
+    },
+    "Elf (High)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Keen Senses\nYou gain proficiency with one of the following skills of your choice: Insight, Perception, or Survival."
+    },
+    "Elf (Wood)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra",
+      "features": "Keen Senses\nYou gain proficiency with one of the following skills of your choice: Insight, Perception, or Survival."
+    },
+    "Fairy": {
+      "speed": "30, Fly 30",
+      "languages": "Common, 2 extra"
+    },
+    "Firbolg": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Genasi (Air)": {
+      "speed": "35 ft",
+      "resistances": "Lightning Resistance\nYou have resistance to lightning damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Genasi (Earth)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Genasi (Fire)": {
+      "speed": "30 ft",
+      "resistances": "Fire Resistance\nYou have resistance to fire damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Genasi (Water)": {
+      "speed": "30, Swim 30",
+      "resistances": "Acid Resistance\nYou have resistance to acid damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Giff": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "proficiencies": "Pistol, Musket"
+    },
+    "Githyanki": {
+      "speed": "30 ft",
+      "resistances": "Psychic Resilience\nYou have resistance to psychic damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Githzerai": {
+      "speed": "30 ft",
+      "resistances": "Psychic Resilience\nYou have resistance to psychic damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Goblin": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Goliath (Cloud Giant)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Goliath (Fire Giant)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Goliath (Frost Giant)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Goliath (Hill Giant)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Goliath (Stone Giant)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Goliath (Storm Giant)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Hadozee": {
+      "speed": "30, 30 climbing",
+      "languages": "Common, 2 extra"
+    },
+    "Halfling": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Hobgoblin": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Human": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Skill Versatility\nYou gain proficiency in one skill of your choice"
+    },
+    "Kalashtar": {
+      "speed": "30 ft",
+      "resistances": "Mental Discipline\nYou have resistance to psychic damage.\nadvantage on Wisdom and Charisma saving throws",
+      "languages": "Common, Quori, 2 extra",
+      "features": "Skill Versatility\nYou gain proficiency in one skill of your choice"
+    },
+    "Kender": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Kender Curiosity.\nThanks to the mystical origin of your people, you gain proficiency with one of the following skills of your choice: Insight, Investigation, Sleight of Hand, Stealth, or Survival."
+    },
+    "Kenku": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Kenku Recall\nYou gain proficiency with two skills of your choice"
+    },
+    "Khenra (Twin Alive)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra",
+      "proficiencies": "Khopesh, Spear, and Javelin"
+    },
+    "Khenra (Twin Dead)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra",
+      "proficiencies": "Khopesh, Spear, and Javelin"
+    },
+    "Kobold (Craftiness)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Craftiness\nYou gain proficiency with one of the following skills of your choice: Arcana, Investigation, Medicine, Sleight of Hand, and Survival."
+    },
+    "Kobold (Defiance)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Kobold (Draconic Sorcery)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Kor": {
+      "speed": "30, Climb 30",
+      "languages": "Common, 2 extra",
+      "features": "Kor Climbing\nYou have proficiency in the Athletics and Acrobatics skills."
+    },
+    "Leonin": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra",
+      "attack": "Claw 1d6 slashing",
+      "features": "Hunter's Instincts\nYou gain proficiency with one of the following skills of your choice: Athletics, Intimidation, Perception, and Survival."
+    },
+    "Minotaur": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "attack": "Horns 1d6 piercing"
+    },
+    "Naga": {
+      "speed": "30 ft",
+      "resistances": "Poison Immunity\nYou are immune to poison damage and the poisoned condition.",
+      "languages": "Common, 2 extra",
+      "features": "Poison Affinity\nYou gain proficiency with the poisoner’s kit."
+    },
+    "Owlin": {
+      "speed": "30, Fly 30",
+      "languages": "Common, 2 extra",
+      "features": "Silent Feathers\nYou gain proficiency in the Stealth skill."
+    },
+    "Plasmoid": {
+      "speed": "30 ft",
+      "resistances": "Natural Resilience\nYou have resistance to acid and poison damage,\nand you have advantage on saving throws \nagainst beign poisoned",
+      "languages": "Common, 2 extra"
+    },
+    "Satyr": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra",
+      "attack": "Ram 1d6 bludgeoning",
+      "features": "Reveler\nYou gain proficiency in the Performance skill and Persuasion Skill.\n1 tool (Musical Instrument)"
+    },
+    "Simic Hybrid (Manta Glide)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Simic Hybrid (Nimble Climber)": {
+      "speed": "30, Climb 30",
+      "languages": "Common, 2 extra"
+    },
+    "Simic Hybrid (Underwater Adaptation)": {
+      "speed": "30, Swim 30",
+      "languages": "Common, 2 extra"
+    },
+    "Siren": {
+      "speed": "30, Fly 30",
+      "languages": "Common, 2 extra"
+    },
+    "Tabaxi": {
+      "speed": "30, Climb 30",
+      "languages": "Common, 2 extra",
+      "attack": "Claw 1d6 slashing",
+      "features": "Cat's Talents\nYou gain proficiency in the Perception and Stealth skills."
+    },
+    "Thri-kreen": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Tiefling (Abyssal)": {
+      "speed": "30 ft",
+      "resistances": "Hellish Resistance\nYou have resistance to Poison damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Tiefling (Chthonic)": {
+      "speed": "30 ft",
+      "resistances": "Hellish Resistance\nYou have resistance to Necrotic damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Tiefling (Infernal)": {
+      "speed": "30 ft",
+      "resistances": "Hellish Resistance\nYou have resistance to Fire damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Vedalken": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Tireless Precision\nYou gain proficiency in one of the following skills of your choice: Arcana, History, Investigation, Medicine, Performance, and Sleight of Hand. You are also proficient with 1 tool of your choice. Whenever you make an ability check with the chosen skill or tool, roll a d4 and add the number rolled to the check's total."
+    },
+    "Warforged": {
+      "ac": "10+dex+1",
+      "speed": "30 ft",
+      "resistances": "Constructed Resilience\n• You have advantage on saving throws against being poisoned, and you have resistance to poison damage.\n• You don’t need to eat, drink, or breathe.\n• You are immune to disease.\n• You don’t need to sleep, and magic can’t put you to sleep.",
+      "languages": "Common, 2 extra",
+      "features": "Specialized Design\nYou gain proficiency with one skill of your choice and 1 tool of your choice."
+    },
+    "Yuan-Ti": {
+      "speed": "30 ft",
+      "resistances": "Poison Resilience. You have advantage on saving throws you make to avoid or end the poisoned condition on yourself. You also have resistance to poison damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Potenziato (Hextech)": {
+      "speed": "30 ft",
+      "resistances": "Difese Arcane\nYou have resistance to -.",
+      "languages": "Common, Piltoviano, 1 extra",
+      "features": "Versatile\nYou gain proficiency with two of the following skills of your choice: Arcana, Athletics, Intimidation, Perception, Medicine or Stealth."
+    },
+    "Potenziato (Chemtech)": {
+      "speed": "30 ft",
+      "resistances": "Forma Tossica\n You have advantage on saving throws you make to avoid or end the poisoned condition on yourself. You also have resistance to poison damage.",
+      "languages": "Common, Thieves' cant, 1 extra",
+      "features": "Versatile\nYou gain proficiency with two of the following skills of your choice: Arcana, Athletics, Intimidation, Perception, Medicine or Stealth."
+    },
+    "Vastaya (Marai)": {
+      "speed": "30, Swim 30",
+      "languages": "Common, Sylvan, 1 extra",
+      "features": "Versatile\nYou gain proficiency with Survival skill"
+    },
+    "Vastaya (Lhotlan)": {
+      "speed": "30 ft",
+      "languages": "Common, Sylvan, 1 extra",
+      "attack": "Piuma 1d6 piercing",
+      "features": "Versatile\nYou gain proficiency with Athletics and Survival skill"
+    },
+    "Vastaya (Oovi-Kat)": {
+      "speed": "30 ft",
+      "languages": "Common, Sylvan, 1 extra",
+      "features": "Versatile\nYou gain proficiency with Survival skill"
+    },
+    "Vastaya (Shimon)": {
+      "ac": "12+cos",
+      "speed": "30 ft",
+      "languages": "Common, Sylvan, 1 extra",
+      "features": "Versatile\nYou gain proficiency with Survival skill"
+    },
+    "Vastaya (Killash)": {
+      "speed": "30 ft",
+      "languages": "Common, Sylvan, 1 extra",
+      "attack": "Bite 1d6 piercing",
+      "features": "Versatile\nYou gain proficiency with Survival skill"
+    },
+    "Vastaya (Bryni)": {
+      "speed": "40 ft",
+      "languages": "Common, Sylvan, 1 extra",
+      "features": "Versatile\nYou gain proficiency with Survival skill"
+    },
+    "Vastaya (Besheb)": {
+      "speed": "30, Fly 30",
+      "languages": "Common, Sylvan, 1 extra",
+      "features": "Versatile\nYou gain proficiency with Survival skill"
+    },
+    "Vastaya (Vesani)": {
+      "speed": "30 ft",
+      "languages": "Common, Sylvan, 1 extra",
+      "features": "Versatile\nYou gain proficiency in Survival skill.\nNatural Charme\nYou gain proficiency with one of the following skills of your choice: Deception, Intimidation, Performance, Persuasion."
+    },
+    "Vastaya (Ottrani)": {
+      "speed": "30, climbing 30",
+      "languages": "Common, Sylvan, 1 extra",
+      "features": "Versatile\nYou gain proficiency with Survival skill"
+    },
+    "Yordle (Foresta)": {
+      "speed": "30 ft",
+      "resistances": "advantage on - saving throws",
+      "languages": "Common, Yordle, 1 extra",
+      "features": "Guerriglia di Bandle\nYou gain proficiency with Stealth skill"
+    },
+    "Yordle (Inventore)": {
+      "speed": "30 ft",
+      "resistances": "advantage on - saving throws",
+      "languages": "Common, Yordle, 1 extra",
+      "features": "You gain proficiency with Tinker's tools."
+    },
+    "Yordle (Anfibio)": {
+      "speed": "30, Swim 30",
+      "resistances": "advantage on - saving throws",
+      "languages": "Common, Yordle, 1 extra"
+    },
+    "Asceso (Shurima)": {
+      "speed": "30 ft",
+      "languages": "Common, Shurimano Antico, Shurimano Moderno",
+      "features": "Signori del deserto\nYou gain proficiency with one of the following skills of your choice: Intimidation, Religion, Nature, Survival"
+    },
+    "Asceso (Targon)": {
+      "speed": "30 ft",
+      "languages": "Common, Targoniano, 1 extra",
+      "features": "Astri Incarnati\nYou gain proficiency in Survival skill.\nYou gain proficiency with one of the following skills of your choice: Arcana, Athletics, Intimidation or Stealth."
+    },
+    "Asceso (Darkin)": {
+      "speed": "30 ft",
+      "languages": "Common, Shurimano Antico, 1 extra"
+    },
+    "Celestiale": {
+      "speed": "30 ft",
+      "resistances": "Nato dalla luce\nYou have resistance to radiant damage",
+      "languages": "Common, Celestial, 1 extra",
+      "features": "Versatile\nYou gain proficiency with two of the following skills of your choice: History, Religion"
+    },
+    "Voidborn": {
+      "ac": "12+pb",
+      "speed": "30 ft",
+      "resistances": "Cresciuto nel vuoto\nYou have resistance to acid and poison damage,\nand you have advantage on saving throws \nagainst beign poisoned. You also have vulnerability to thunder damage.",
+      "languages": "Common, Quori, 1 extra"
+    },
+    "Spirito di Ionia": {
+      "speed": "30 ft",
+      "languages": "Common, Sylvan, 1 extra",
+      "features": "Natura Spiritica\nYou gain proficiency in one of the following skills of your choice: Deception, Performance."
+    },
+    "Reborn": {
+      "speed": "30 ft",
+      "resistances": "Deathless Nature\nYou have resistance to poison damage,\nand you have advantage on saving throws \nagainst beign poisoned.",
+      "languages": "Common, 2 extra",
+      "features": "Skill Versatility\nYou gain proficiency in two skill of your choice"
+    },
+    "Hexblood": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Skill Versatility\nYou gain proficiency in two skill of your choice"
+    },
+    "Dhampir": {
+      "speed": "35, Climb 35",
+      "resistances": "Trace of Undeath\nYou have resistance to Necrotic damage.",
+      "languages": "Common, 2 extra"
+    },
+    "Half elf": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "features": "Skill Versatility\nYou gain proficiency in one skill of your choice"
+    },
+    "Vulpin": {
+      "speed": "30 ft",
+      "resistances": "Evasive\nYou add your Intelligence modifier on Dexterity saving throws.",
+      "languages": "Common, 2 extra",
+      "attack": "Bite 1d6 piercing"
+    },
+    "Mapach": {
+      "speed": "30, Climb 20",
+      "resistances": "Resilience\nYou have advantage on saving throws \nagainst beign poisoned.",
+      "languages": "Common, 2 extra"
+    },
+    "Jerbeen": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra"
+    },
+    "Cervan (Grove)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra",
+      "features": "Pratical\nYou gain proficiency with one of the following skills of your choice: Medicine, Athletics, Nature, and Survival.."
+    },
+    "Cervan (Pronghorn)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "attack": "Antlers 1d6 piercing",
+      "features": "Pratical\nYou gain proficiency with one of the following skills of your choice: Medicine, Athletics, Nature, and Survival.."
+    },
+    "Strig (Stout)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "attack": "Talons 1d4 piercing",
+      "features": "Imposing\nYou gain proficiency in Intimidation."
+    },
+    "Strig (Swift)": {
+      "speed": "35 ft",
+      "languages": "Common, 2 extra",
+      "attack": "Talons 1d4 piercing",
+      "features": "Survivor\nYou gain proficiency in Survival."
+    },
+    "Raptor (Mistral)": {
+      "speed": "25 ft",
+      "languages": "Common, 2 extra",
+      "attack": "Talons 1d4 piercing",
+      "proficiencies": "Longbow, Shortbow, Spear",
+      "features": "Agile\nYou gain proficiency in Acrobatics.\nVista Acuta\nYou gain proficiency in Perception."
+    },
+    "Raptor (Maran)": {
+      "speed": "25, Swim 25",
+      "languages": "Common, 2 extra",
+      "attack": "Talons 1d4 piercing",
+      "proficiencies": "Longbow, Shortbow, Spear",
+      "features": "Vista Acuta\nYou gain proficiency in Perception."
+    },
+    "Luma (Sera)": {
+      "speed": "25 ft",
+      "languages": "Common, 2 extra",
+      "features": "Center of attention\nYou gain proficiency in Performance."
+    },
+    "Luma (Sable)": {
+      "speed": "25 ft",
+      "resistances": "Resilience\nYou have advantage on saving throws \nagainst beign poisoned.",
+      "languages": "Common, 2 extra"
+    },
+    "Gallus (Huden)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "proficiencies": "Simple weapons",
+      "features": "One With Wood\nYou gain proficiency in Nature."
+    },
+    "Gallus (Bright)": {
+      "speed": "30 ft",
+      "languages": "Common, 2 extra",
+      "proficiencies": "Simple weapons",
+      "features": "Understanding\nYou gain proficiency in Insight."
+    },
+    "Baccai (Bestiale)": {
+      "speed": "30 ft",
+      "languages": "Common, Shurimano Antico, Shurimano Moderno",
+      "attack": "Artiglio 1d6 slashing",
+      "features": "Conoscenza dei tempi Antichi\nYou gain proficiency with one of the following skills of your choice: History, Religion, Arcana."
+    },
+    "Baccai (Sabbiomante)": {
+      "speed": "30 ft",
+      "languages": "Common, Shurimano Antico, Shurimano Moderno",
+      "features": "Conoscenza dei tempi Antichi\nYou gain proficiency with one of the following skills of your choice: History, Religion, Arcana."
+    },
+    "Baccai (Arcano)": {
+      "speed": "30 ft",
+      "languages": "Common, Shurimano Antico, Shurimano Moderno",
+      "attack": "Baccai Energy 1d6",
+      "features": "Conoscenza dei tempi Antichi\nYou gain proficiency with one of the following skills of your choice: History, Religion, Arcana."
+    },
+    "Demone Capitale (Accidia)": {
+      "speed": "30 ft",
+      "languages": "Common, Infernal, 1 extra",
+      "features": "Nato dai Vizi\nYou gain proficiency with Persuasion skill"
+    },
+    "Demone Capitale (Avarizia)": {
+      "speed": "30 ft",
+      "languages": "Common, Infernal, 1 extra",
+      "features": "Nato dai Vizi\nYou gain proficiency with Persuasion skill\nDesiderio irrefrenabile\nYou gain proficiency with Investigation skill"
+    },
+    "Demone Capitale (Gola)": {
+      "speed": "30 ft",
+      "languages": "Common, Infernal, 1 extra",
+      "features": "Nato dai Vizi\nYou gain proficiency with Persuasion skill"
+    },
+    "Demone Capitale (Invidia)": {
+      "speed": "30 ft",
+      "languages": "Common, Infernal, 1 extra",
+      "features": "Nato dai Vizi\nYou gain proficiency with Persuasion skill"
+    },
+    "Demone Capitale (Ira)": {
+      "speed": "30 ft",
+      "languages": "Common, Infernal, 1 extra",
+      "features": "Nato dai Vizi\nYou gain proficiency with Persuasion skill\nCollera\nYou gain proficiency with Intimidation skill"
+    },
+    "Demone Capitale (Lussuria)": {
+      "speed": "30 ft",
+      "languages": "Common, Infernal, 1 extra",
+      "features": "Nato dai Vizi\nYou gain proficiency with Persuasion skill"
+    },
+    "Demone Capitale (Superbia)": {
+      "speed": "30 ft",
+      "languages": "Common, Infernal, 1 extra",
+      "features": "Nato dai Vizi\nYou gain proficiency with Persuasion skill"
+    },
+    "Ludofatto (Burattino)": {
+      "speed": "30 ft",
+      "resistances": "Natura Artificiale\n• You don’t need to eat, drink, or breathe.\n• You don’t need to sleep, and magic can’t put you to sleep.",
+      "languages": "Common, 2 extra",
+      "features": "Qualità Artigianale\nYou gain proficiency with one of the following skills of your choice: Intimidation, Performance, Persuasion."
+    },
+    "Ludofatto (Ceramica)": {
+      "speed": "30 ft",
+      "resistances": "Natura Artificiale\n• You don’t need to eat, drink, or breathe.\n• You don’t need to sleep, and magic can’t put you to sleep.",
+      "languages": "Common, 2 extra",
+      "features": "Qualità Artigianale\nYou gain proficiency with one of the following skills of your choice: Intimidation, Performance, Persuasion."
+    },
+    "Ludofatto (Metallico)": {
+      "speed": "30 ft",
+      "resistances": "Natura Artificiale\n• You don’t need to eat, drink, or breathe.\n• You don’t need to sleep, and magic can’t put you to sleep.",
+      "languages": "Common, 2 extra",
+      "features": "Qualità Artigianale\nYou gain proficiency with one of the following skills of your choice: Intimidation, Performance, Persuasion."
+    },
+    "Ludofatto (Peluche)": {
+      "speed": "30 ft",
+      "resistances": "Natura Artificiale\n• You don’t need to eat, drink, or breathe.\n• You don’t need to sleep, and magic can’t put you to sleep.",
+      "languages": "Common, 2 extra",
+      "features": "Qualità Artigianale\nYou gain proficiency with one of the following skills of your choice: Intimidation, Performance, Persuasion."
+    }
+  }
+}

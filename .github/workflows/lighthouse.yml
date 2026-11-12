@@ -1,0 +1,54 @@
+name: Lighthouse CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lighthouse-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Performance & accessibilità
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Stessa build della CI e dello staging: l'audit misura l'artefatto
+      # realmente pubblicabile, non il dev server.
+      - name: Build sito
+        run: npm run build:site
+
+      # LHCI avvia `vite preview` sulla dist e ferma il server al termine.
+      # Nessun deploy, nessun segreto e nessun servizio esterno.
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./lighthouserc.json
+          runs: 1
+          uploadArtifacts: false
+
+      - name: Salva i report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci
+          retention-days: 7
+          if-no-files-found: warn

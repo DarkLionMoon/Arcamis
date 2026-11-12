@@ -206,6 +206,7 @@
   transition: border-color 0.16s, box-shadow 0.16s;
 }
 .cpg-field textarea { min-height: 78px; resize: vertical; }
+.cpg-field .cpg-multiselect { min-height: 132px; }
 .cpg-field input:focus,
 .cpg-field select:focus,
 .cpg-field textarea:focus {
@@ -316,6 +317,25 @@
   color: var(--text3);
   font-size: 13px;
   line-height: 1.5;
+}
+.cpg-race-sheet {
+  margin: 10px 0 0;
+}
+.cpg-race-sheet > div {
+  align-items: flex-start;
+}
+.cpg-race-sheet dt {
+  min-width: 120px;
+}
+.cpg-pick .cpg-hint {
+  margin: 7px 0 9px;
+}
+#cpg-armor-info {
+  display: block;
+  margin: 5px 0 0;
+}
+#cpg-weapon-info .cpg-hint {
+  margin: 4px 0 0;
 }
 .cpg-badge {
   display: inline-flex;
@@ -599,6 +619,7 @@
 .cpg-btn {
   display: inline-flex;
   align-items: center;
+  text-decoration: none;
   justify-content: center;
   min-height: 36px;
   padding: 8px 13px;

@@ -126,7 +126,7 @@ admin — vedi Parte 2.)
   materiale approvato e le schede homebrew, fa scegliere specie, classe e
   sottoclasse, applica i tre incrementi da +1 della scheda server e calcola
   PF/CA/competenze, lingue, resistenze e attacchi in una scheda stampabile o
-  esportabile in JSON. La bozza resta in `localStorage`; nessun dato lascia
+  esportabile in JSON, con una copia Google o l'XLSX esatto del modello ufficiale della scheda server. L'XLSX è l'esportazione diretta della scheda Google: conserva fogli, layout e formule; i wrapper `__xludf` introdotti dall'export vengono ripristinati da Google Fogli all'import. Le specie usano i nomi esatti della scheda Google (es. `Elf (Astral)`, `Demone Capitale (Accidia)`); le sottorazze sono voci selezionabili distinte. La bozza resta in `localStorage`; nessun dato lascia
   il browser.
 - **Changelog e Novità**: widget e pagina dedicata dai JSON locali.
 - **Missioni (rimossa)**: la sezione missioni non fa più parte della wiki.

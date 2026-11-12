@@ -57,8 +57,87 @@
     SKILL_BY_ID[skill.id] = skill;
   });
 
-  // La scheda server usa tre incrementi da +1 scelti dal giocatore.
-  // Sono suggerimenti per il campo Talento di Origine: il testo resta libero.
+  // I nomi visibili sono quelli esatti della scheda server ("Razza (Sottorazza)").
+  // La chiave resta il nome usato dalla wiki, così la bozza salvata non cambia.
+  var SPECIES_GROUPS = {
+    'Astral Elf': { parent: 'Elf', subrace: 'Astral', sheetName: 'Elf (Astral)' },
+    'Asceso di Shurima': { parent: 'Asceso', subrace: 'Shurima', sheetName: 'Asceso (Shurima)' },
+    'Asceso di Targon': { parent: 'Asceso', subrace: 'Targon', sheetName: 'Asceso (Targon)' },
+    Darkin: { parent: 'Asceso', subrace: 'Darkin', sheetName: 'Asceso (Darkin)' },
+    Accidia: { parent: 'Demone Capitale', subrace: 'Accidia', sheetName: 'Demone Capitale (Accidia)' },
+    Avarizia: { parent: 'Demone Capitale', subrace: 'Avarizia', sheetName: 'Demone Capitale (Avarizia)' },
+    Gola: { parent: 'Demone Capitale', subrace: 'Gola', sheetName: 'Demone Capitale (Gola)' },
+    Invidia: { parent: 'Demone Capitale', subrace: 'Invidia', sheetName: 'Demone Capitale (Invidia)' },
+    Ira: { parent: 'Demone Capitale', subrace: 'Ira', sheetName: 'Demone Capitale (Ira)' },
+    Lussuria: { parent: 'Demone Capitale', subrace: 'Lussuria', sheetName: 'Demone Capitale (Lussuria)' },
+    Superbia: { parent: 'Demone Capitale', subrace: 'Superbia', sheetName: 'Demone Capitale (Superbia)' },
+    Anfibio: { parent: 'Yordle', subrace: 'Anfibio', sheetName: 'Yordle (Anfibio)' },
+    Foreste: { parent: 'Yordle', subrace: 'Foresta', sheetName: 'Yordle (Foresta)' },
+    Inventore: { parent: 'Yordle', subrace: 'Inventore', sheetName: 'Yordle (Inventore)' },
+    Besheb: { parent: 'Vastaya', subrace: 'Besheb', sheetName: 'Vastaya (Besheb)' },
+    Briny: { parent: 'Vastaya', subrace: 'Bryni', sheetName: 'Vastaya (Bryni)' },
+    Killash: { parent: 'Vastaya', subrace: 'Killash', sheetName: 'Vastaya (Killash)' },
+    Liotlan: { parent: 'Vastaya', subrace: 'Lhotlan', sheetName: 'Vastaya (Lhotlan)' },
+    Marai: { parent: 'Vastaya', subrace: 'Marai', sheetName: 'Vastaya (Marai)' },
+    'Oovi-Kat': { parent: 'Vastaya', subrace: 'Oovi-Kat', sheetName: 'Vastaya (Oovi-Kat)' },
+    Ottrani: { parent: 'Vastaya', subrace: 'Ottrani', sheetName: 'Vastaya (Ottrani)' },
+    Shimon: { parent: 'Vastaya', subrace: 'Shimon', sheetName: 'Vastaya (Shimon)' },
+    Vesani: { parent: 'Vastaya', subrace: 'Vesani', sheetName: 'Vastaya (Vesani)' },
+    Burattino: { parent: 'Ludofatto', subrace: 'Burattino', sheetName: 'Ludofatto (Burattino)' },
+    Ceramico: { parent: 'Ludofatto', subrace: 'Ceramica', sheetName: 'Ludofatto (Ceramica)' },
+    Metallici: { parent: 'Ludofatto', subrace: 'Metallico', sheetName: 'Ludofatto (Metallico)' },
+    Peluche: { parent: 'Ludofatto', subrace: 'Peluche', sheetName: 'Ludofatto (Peluche)' },
+    Chemtech: { parent: 'Potenziato', subrace: 'Chemtech', sheetName: 'Potenziato (Chemtech)' },
+    Hextech: { parent: 'Potenziato', subrace: 'Hextech', sheetName: 'Potenziato (Hextech)' }
+  };
+
+  // La scheda Google elenca le sottorazze come voci autonome. Qui la chiave
+  // resta il nome wiki della voce madre, ma il menu mostra il nome esatto.
+  var SPECIES_VARIANTS = {
+    'Dragonborn Metallici e Cromatici': {
+      parent: 'Dragonborn',
+      subraces: ['Black', 'Blue', 'Brass', 'Bronze', 'Copper', 'Gold', 'Green', 'Red', 'Silver', 'White']
+    },
+    'Dragonborn Gemmati': {
+      parent: 'Dragonborn',
+      subraces: ['Amethyst', 'Crystal', 'Emerald', 'Sapphire', 'Topaz']
+    },
+    Elf: { parent: 'Elf', subraces: ['Drow', 'High', 'Wood'] },
+    Genasi: { parent: 'Genasi', subraces: ['Air', 'Earth', 'Fire', 'Water'] },
+    Goliath: {
+      parent: 'Goliath',
+      subraces: ['Cloud Giant', 'Fire Giant', 'Frost Giant', 'Hill Giant', 'Stone Giant', 'Storm Giant']
+    },
+    Khenra: { parent: 'Khenra', subraces: ['Twin Alive', 'Twin Dead'] },
+    Kobold: { parent: 'Kobold', subraces: ['Craftiness', 'Defiance', 'Draconic Sorcery'] },
+    'Simic Hybrid': {
+      parent: 'Simic Hybrid',
+      subraces: ['Manta Glide', 'Nimble Climber', 'Underwater Adaptation']
+    },
+    Tiefling: { parent: 'Tiefling', subraces: ['Abyssal', 'Chthonic', 'Infernal'] },
+    Cervan: { parent: 'Cervan', subraces: ['Grove', 'Pronghorn'] },
+    Gallus: { parent: 'Gallus', subraces: ['Huden', 'Bright'] },
+    Luma: { parent: 'Luma', subraces: ['Sera', 'Sable'] },
+    Raptor: { parent: 'Raptor', subraces: ['Mistral', 'Maran'] },
+    Strig: { parent: 'Strig', subraces: ['Stout', 'Swift'] },
+    Baccai: { parent: 'Baccai', subraces: ['Bestiale', 'Sabbiomante', 'Arcano'] }
+  };
+
+  var SPECIES_RENAMES = {
+    Khoravar: 'Half elf',
+    'Yuan-ti': 'Yuan-Ti'
+  };
+
+  // Voci della wiki non presenti nella tab Race Info: restano fuori dal
+  // builder, che deve mostrare solo le specie della scheda.
+  var SHEET_SPECIES_EXTRAS = { Hedge: true, Lupin: true };
+
+  var GOOGLE_SHEET_ID = '1zS6kffFUEkNhTXMf_vhTzd_DfG-XULPI_mYv1RFKklE';
+  var GOOGLE_SHEET_COPY_URL = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/copy';
+  var GOOGLE_SHEET_XLSX_URL = '/sheets/arcamis-scheda-base.xlsx';
+
+  // La scheda server tiene separati i talenti (Features-Traits A2:A59) e
+  // gli stili di combattimento (named range fightingStyles / AQ62).
   var FEATS = [
     'Feat: Aberrant DragonMark',
     'Feat: Actor',
@@ -67,23 +146,30 @@
     'Feat: Athlete (STR)',
     'Feat: Chef (CON)',
     'Feat: Chef (WIS)',
+    'Feat: Crafter',
     'Feat: Crusher',
     'Feat: Dual Wielder',
     'Feat: Durable',
     'Feat: Fey Touched (CHA)',
     'Feat: Fey Touched (WIS)',
+    'Feat: Gift of the Chromatic Dragon',
     'Feat: Gift of the Gem Dragon (CHA)',
     'Feat: Gift of the Gem Dragon (INT)',
     'Feat: Gift of the Gem Dragon (WIS)',
+    'Feat: Gift of the Metallic Dragon',
+    'Feat: Healer',
     'Feat: Heavily Armored',
     'Feat: Heavy Armor Master',
     'Feat: Keen Mind',
     'Feat: Lightly Armored (DEX)',
     'Feat: Lightly Armored (STR)',
     'Feat: Linguist',
+    'Feat: Lucky',
+    'Feat: Magic Initiate',
     'Feat: Mobile',
     'Feat: Moderately Armored (DEX)',
     'Feat: Moderately Armored (STR)',
+    'Feat: Musician',
     'Feat: Observant (INT)',
     'Feat: Observant (WIS)',
     'Feat: Piercer (DEX)',
@@ -94,6 +180,7 @@
     'Feat: Resilient (Intelligence)',
     'Feat: Resilient (Strength)',
     'Feat: Resilient (Wisdom)',
+    'Feat: Savage Attacker',
     'Feat: Shadow Touched (CHA)',
     'Feat: Shadow Touched (INT)',
     'Feat: Shadow Touched (WIS)',
@@ -103,6 +190,7 @@
     'Feat: Skill Expert (Intelligence)',
     'Feat: Skill Expert (Strength)',
     'Feat: Skill Expert (Wisdom)',
+    'Feat: Skilled',
     'Feat: Slasher (DEX)',
     'Feat: Slasher (STR)',
     'Feat: Tavern Brawler (CON)',
@@ -113,15 +201,109 @@
     'Feat: Telepathic (CHA)',
     'Feat: Telepathic (INT)',
     'Feat: Telepathic (WIS)',
+    'Feat: Tough',
     'Feat: Mythal Touched (CHA)',
     'Feat: Mythal Touched (INT)',
     'Feat: Mythal Touched (WIS)',
     'Feat: Weapon Master (DEX)',
     'Feat: Weapon Master (STR)',
+    // Doni dei Draghi homebrew: confermati come talenti di Origine
+    // dall'Assistenza Tecnica il 12/11/2026.
+    'Feat: Dono del Drago del Fuoco',
+    'Feat: Dono del Drago della Montagna',
+    'Feat: Dono del Drago del Vento',
+    'Feat: Dono del Drago dell\'Acqua',
+    'Feat: Dono del Drago Hextech',
+    'Feat: Dono del Drago Chemtech'
+  ];
+
+  // Talenti di Origine riconosciuti dal server. La tab Features-Traits della
+  // scheda non li elenca tutti: l'elenco viene dalle regole del server
+  // (PHB'24), dal changelog per i Doni del Drago TCE diventati Origine e
+  // dalla conferma dell'Assistenza Tecnica per i Doni dei Draghi homebrew.
+  var ORIGIN_FEATS = [
+    'Feat: Alert',
+    'Feat: Crafter',
+    'Feat: Gift of the Chromatic Dragon',
+    'Feat: Gift of the Metallic Dragon',
+    'Feat: Healer',
+    'Feat: Lucky',
+    'Feat: Magic Initiate',
+    'Feat: Musician',
+    'Feat: Savage Attacker',
+    'Feat: Skilled',
+    'Feat: Tavern Brawler (CON)',
+    'Feat: Tavern Brawler (STR)',
+    'Feat: Tough',
+    'Feat: Dono del Drago del Fuoco',
+    'Feat: Dono del Drago della Montagna',
+    'Feat: Dono del Drago del Vento',
+    'Feat: Dono del Drago dell\'Acqua',
+    'Feat: Dono del Drago Hextech',
+    'Feat: Dono del Drago Chemtech'
+  ];
+
+  var FIGHTING_STYLES = [
     'Fighting Style: Archery',
     'Fighting Style: Defense',
-    'Fighting Style: Dueling'
+    'Fighting Style: Dueling',
+    'Fighting Style: Great Weapon Fighting',
+    'Fighting Style: Two-Weapon Fighting',
+    'Fighting Style: Close Quarters Shooter',
+    'Fighting Style: Thrown Weapon Fighting',
+    'Fighting Style: Unarmed Fighting',
+    'Fighting Style: Mariner'
   ];
+
+  // I talenti della scheda indicano la caratteristica aumentata tra parentesi
+  // (es. "Feat: Athlete (DEX)") oppure la fissano nel nome (es. Actor).
+  // Entrambe le forme servono per applicare il +1 come nella scheda.
+  var FEAT_FIXED_ABILITIES = {
+    actor: 'cha',
+    durable: 'con',
+    'keen mind': 'int',
+    linguist: 'int'
+  };
+
+  var FEAT_ABILITY_KEYS = {
+    str: 'str',
+    dex: 'dex',
+    con: 'con',
+    int: 'int',
+    wis: 'wis',
+    cha: 'cha',
+    strength: 'str',
+    dexterity: 'dex',
+    constitution: 'con',
+    intelligence: 'int',
+    wisdom: 'wis',
+    charisma: 'cha'
+  };
+
+  function featAbilityKey(feat) {
+    var name = String(feat || '')
+      .replace(/^Feat:\s*/, '')
+      .toLowerCase();
+    var match = name.match(/\(([^()]+)\)\s*$/);
+    if (match) return FEAT_ABILITY_KEYS[String(match[1]).trim().toLowerCase()] || '';
+    return FEAT_FIXED_ABILITIES[name] || '';
+  }
+
+  function featAbilityBonuses(current) {
+    var bonuses = defaultAbilityIncreases();
+    var picked = [current && current.originFeat].concat(
+      current && Array.isArray(current.feats) ? current.feats : []
+    );
+    var seen = {};
+    picked.forEach(function (feat) {
+      var name = String(feat || '');
+      if (!name || seen[name]) return;
+      seen[name] = true;
+      var key = featAbilityKey(name);
+      if (key) bonuses[key] += 1;
+    });
+    return bonuses;
+  }
 
   var AC_MODES = [
     { id: 'auto', label: 'Automatica (armatura e difese di classe)' },
@@ -293,98 +475,149 @@
     CLASS_ALIASES[slugify(cls.name)] = cls.id;
   });
 
-  // Competenze di 1° livello, riassunte dalla colonna "1st Level Exclusive
-  // Proficiencies" della scheda server. Restano modificabili nel form.
-  var CLASS_PROFICIENCIES = {
+  // Dati esatti del foglio Class Info: H = tiri salvezza e abilità,
+  // I = competenze esclusive di 1° livello, J = competenze aggiuntive o da
+  // multiclasse, K/L = tipo e caratteristica di lancio.
+  var CLASS_SHEET_INFO = {
     artificer: {
-      armor: 'Armature leggere e medie, scudi',
-      weapons: 'Armi semplici, pistola, moschetto',
-      tools: '2 strumenti (utensili da ladro, utensili da inventore, qualsiasi)'
+      savesSkills:
+        'Constitution, Intelligence, Choose 1, Arcana, History, Investigation, Medicine, Nature, Perception, Sleight of Hand',
+      firstLevel: "Simple Weapons, 2 Tool (Thieves' Tools, Tinker's Tools, any), Pistol, Musket",
+      additional:
+        "Light Armor, Medium Armor, Shields, 1 Tool (Tinker's Tools), Choose 1, Arcana, History, Investigation, Medicine, Nature, Perception, Sleight of Hand",
+      spellcasting: 'Artificer Casting · Intelligence'
     },
     barbarian: {
-      armor: 'Armature leggere e medie, scudi',
-      weapons: 'Armi semplici e da guerra',
-      tools: '—'
+      savesSkills:
+        'Strength, Constitution, Choose 2, Animal Handling, Athletics, Intimidation, Nature, Perception, Survival',
+      firstLevel: 'Light Armor, Medium Armor',
+      additional: 'Shields, Simple Weapons, Martial Weapons',
+      spellcasting: '-'
     },
     bard: {
-      armor: 'Armature leggere',
-      weapons: 'Armi semplici',
-      tools: '2 strumenti musicali'
+      savesSkills:
+        'Dexterity, Charisma, Choose 2, Acrobatics, Animal Handling, Arcana, Athletics, Deception, History, Insight, Intimidation, Investigation, Medicine, Nature, Perception, Performance, Persuasion, Religion, Sleight of Hand, Stealth, Survival',
+      firstLevel: 'Simple Weapons, 2 Tools (Musical Instruments)',
+      additional: 'Light Armor, Choose 1, 1 Tool (Musical Instrument)',
+      spellcasting: 'Full Caster · Charisma'
     },
     cleric: {
-      armor: 'Armature leggere e medie, scudi',
-      weapons: 'Armi semplici',
-      tools: '—'
+      savesSkills: 'Wisdom, Charisma, Choose 2, History, Insight, Medicine, Persuasion, Religion',
+      firstLevel: 'Simple Weapons',
+      additional: 'Light Armor, Medium Armor, Shields',
+      spellcasting: 'Full Caster · Wisdom'
     },
     druid: {
-      armor: 'Armature leggere, scudi (non metallici)',
-      weapons: 'Armi semplici',
-      tools: 'Kit da erborista, Druidico'
+      savesSkills:
+        'Intelligence, Wisdom, Choose 2, Arcana, Animal Handling, Insight, Medicine, Nature, Perception, Religion, Survival',
+      firstLevel: 'Simple Weapons',
+      additional: 'Light Armor, Shields, Druidic, 1 Tool (Herbalism Kit)',
+      spellcasting: 'Full Caster · Wisdom'
     },
     fighter: {
-      armor: 'Tutte le armature, scudi',
-      weapons: 'Armi semplici e da guerra',
-      tools: '—'
+      savesSkills:
+        'Strength, Constitution, Choose 2, Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, Survival',
+      firstLevel: 'Heavy Armor',
+      additional: 'Light Armor, Medium Armor, Shields, Simple Weapons, Martial Weapons',
+      spellcasting: '-'
     },
     monk: {
-      armor: '—',
-      weapons: 'Armi semplici e da guerra',
-      tools: '1 strumento (artigiano o musicale)'
+      savesSkills: 'Strength, Dexterity, Choose 2, Acrobatics, Athletics, History, Insight, Religion, Stealth',
+      firstLevel: "1 Tool (Artisan's Tools or Musical Instrument)",
+      additional: 'Simple Weapons, Martial Weapons',
+      spellcasting: '-'
     },
     paladin: {
-      armor: 'Tutte le armature, scudi',
-      weapons: 'Armi semplici e da guerra',
-      tools: '—'
+      savesSkills: 'Wisdom, Charisma, Choose 2, Athletics, Insight, Intimidation, Medicine, Persuasion, Religion',
+      firstLevel: 'Heavy Armor',
+      additional: 'Light Armor, Medium Armor, Shields, Simple Weapons, Martial Weapons',
+      spellcasting: 'Half Caster · Charisma'
     },
     ranger: {
-      armor: 'Armature leggere e medie, scudi',
-      weapons: 'Armi semplici e da guerra',
-      tools: '1 competenza extra tra le abilità della classe'
+      savesSkills:
+        'Strength, Dexterity, Choose 2, Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, Survival',
+      firstLevel: '-',
+      additional:
+        'Light Armor, Medium Armor, Shields, Simple Weapons, Martial Weapons, Choose 1, Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, Survival',
+      spellcasting: 'Half Caster · Wisdom'
     },
     rogue: {
-      armor: 'Armature leggere',
-      weapons: 'Armi semplici e da guerra',
-      tools: '1 strumento, 2 lingue extra'
+      savesSkills:
+        'Dexterity, Intelligence, Choose 3, Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, Sleight of Hand, Stealth',
+      firstLevel: 'Simple Weapons, Martial Weapons',
+      additional: 'Light Armor, Choose 1, 1 Tool, 2 extra language',
+      spellcasting: '-'
     },
     sorcerer: {
-      armor: '—',
-      weapons: 'Armi semplici',
-      tools: '—'
+      savesSkills: 'Constitution, Charisma, Choose 2, Arcana, Deception, Insight, Intimidation, Persuasion, Religion',
+      firstLevel: 'Simple Weapons',
+      additional: '-',
+      spellcasting: 'Full Caster · Charisma'
     },
     warlock: {
-      armor: 'Armature leggere',
-      weapons: 'Armi semplici',
-      tools: '—'
+      savesSkills: 'Wisdom, Charisma, Choose 2, Arcana, Deception, History, Intimidation, Investigation, Nature, Religion',
+      firstLevel: 'Simple Weapons',
+      additional: 'Light Armor',
+      spellcasting: 'Pact Magic · Charisma'
     },
     wizard: {
-      armor: '—',
-      weapons: 'Armi semplici',
-      tools: '—'
+      savesSkills: 'Intelligence, Wisdom, Choose 2, Arcana, History, Insight, Investigation, Medicine, Religion',
+      firstLevel: 'Simple Weapons',
+      additional: '-',
+      spellcasting: 'Full Caster · Intelligence'
     }
   };
 
+  function classSheetInfo(cls) {
+    return cls ? CLASS_SHEET_INFO[cls.id] || null : null;
+  }
+
   function classProficiencyText(cls) {
-    if (!cls) return '';
-    var prof = CLASS_PROFICIENCIES[cls.id];
-    if (!prof) return '';
-    return (
-      'Armature: ' + prof.armor + ' · Armi: ' + prof.weapons + ' · Strumenti: ' + prof.tools
-    );
+    var info = classSheetInfo(cls);
+    if (!info) return '';
+    var parts = [];
+    if (info.firstLevel && info.firstLevel !== '-') parts.push('1° livello: ' + info.firstLevel);
+    if (info.additional && info.additional !== '-') parts.push('Multiclasse: ' + info.additional);
+    return parts.join(' · ');
   }
 
   var ARMORS = [
-    { id: 'none', label: 'Nessuna armatura', base: 10, dex: 'full' },
-    { id: 'leather', label: 'Cuoio', base: 11, dex: 'full' },
-    { id: 'studded', label: 'Cuoio borchiato', base: 12, dex: 'full' },
-    { id: 'hide', label: 'Cuoio rinforzato', base: 12, dex: 'max2' },
-    { id: 'chain-shirt', label: 'Giaco di maglia', base: 13, dex: 'max2' },
-    { id: 'scale', label: 'Corazza di scaglie', base: 14, dex: 'max2' },
-    { id: 'breastplate', label: 'Corazza di petto', base: 14, dex: 'max2' },
-    { id: 'half-plate', label: 'Mezza armatura', base: 15, dex: 'max2' },
-    { id: 'ring', label: 'Armatura ad anelli', base: 14, dex: 'none' },
-    { id: 'chain-mail', label: 'Cotta di maglia', base: 16, dex: 'none' },
-    { id: 'splint', label: 'Armatura a strisce', base: 17, dex: 'none' },
-    { id: 'plate', label: 'Corazza a piastre', base: 18, dex: 'none' }
+    { id: 'none', label: 'Nessuna armatura', base: 10, dex: 'full', category: '' },
+    { id: 'leather', label: 'Cuoio', base: 11, dex: 'full', category: 'Leggera' },
+    { id: 'studded', label: 'Cuoio borchiato', base: 12, dex: 'full', category: 'Leggera' },
+    { id: 'hide', label: 'Cuoio rinforzato', base: 12, dex: 'max2', category: 'Media' },
+    { id: 'chain-shirt', label: 'Giaco di maglia', base: 13, dex: 'max2', category: 'Media' },
+    { id: 'scale', label: 'Corazza di scaglie', base: 14, dex: 'max2', category: 'Media', stealth: true },
+    { id: 'breastplate', label: 'Corazza di petto', base: 14, dex: 'max2', category: 'Media' },
+    { id: 'half-plate', label: 'Mezza armatura', base: 15, dex: 'max2', category: 'Media', stealth: true },
+    { id: 'ring', label: 'Armatura ad anelli', base: 14, dex: 'none', category: 'Pesante', stealth: true },
+    {
+      id: 'chain-mail',
+      label: 'Cotta di maglia',
+      base: 16,
+      dex: 'none',
+      category: 'Pesante',
+      strength: 13,
+      stealth: true
+    },
+    {
+      id: 'splint',
+      label: 'Armatura a strisce',
+      base: 17,
+      dex: 'none',
+      category: 'Pesante',
+      strength: 15,
+      stealth: true
+    },
+    {
+      id: 'plate',
+      label: 'Corazza a piastre',
+      base: 18,
+      dex: 'none',
+      category: 'Pesante',
+      strength: 15,
+      stealth: true
+    }
   ];
   var ARMOR_BY_ID = {};
   ARMORS.forEach(function (armor) {
@@ -430,6 +663,36 @@
       .replace(/`/g, '')
       .replace(/\s+/g, ' ')
       .trim();
+  }
+
+  function speciesLabel(item) {
+    if (!item) return '';
+    return item.label || item.name;
+  }
+
+  function speciesSheetEntries(name) {
+    var variants = SPECIES_VARIANTS[name];
+    if (variants) {
+      return variants.subraces.map(function (subrace) {
+        return {
+          parent: variants.parent,
+          subrace: subrace,
+          sheetName: variants.parent + ' (' + subrace + ')'
+        };
+      });
+    }
+    var group = SPECIES_GROUPS[name];
+    if (group && group.sheetName) {
+      return [{ parent: group.parent, subrace: group.subrace, sheetName: group.sheetName }];
+    }
+    if (SPECIES_RENAMES[name]) {
+      return [{ parent: '', subrace: '', sheetName: SPECIES_RENAMES[name] }];
+    }
+    return [{ parent: '', subrace: '', sheetName: name }];
+  }
+
+  function speciesCatalogId(origin, name, entry, count) {
+    return origin + ':species:' + slugify(count > 1 ? entry.sheetName : name);
   }
 
   function clamp(value, min, max) {
@@ -512,7 +775,8 @@
     var stateValue = current || defaultState();
     var base = integer(stateValue.scores && stateValue.scores[key], 10);
     var increases = normalizeAbilityIncreases(stateValue.abilityIncreases);
-    return base + (increases[key] || 0);
+    var featBonuses = featAbilityBonuses(stateValue);
+    return base + (increases[key] || 0) + (featBonuses[key] || 0);
   }
 
   /* ── Stato ───────────────────────────────────────────────── */
@@ -525,7 +789,11 @@
       alignment: '',
       deity: '',
       originFeat: '',
+      feats: [],
+      fightingStyle: '',
+      classFeatures: '',
       species: '',
+      speciesFeatures: '',
       klass: '',
       subclass: '',
       method: 'standard',
@@ -561,7 +829,20 @@
     base.alignment = String(raw.alignment || '').slice(0, 80);
     base.deity = String(raw.deity || '').slice(0, 120);
     base.originFeat = String(raw.originFeat || '').slice(0, 160);
+    base.feats = Array.isArray(raw.feats)
+      ? raw.feats
+          .filter(function (feat, index, list) {
+            return FEATS.indexOf(feat) !== -1 && list.indexOf(feat) === index;
+          })
+          .slice(0, 12)
+      : [];
+    base.fightingStyle =
+      FIGHTING_STYLES.indexOf(raw.fightingStyle) >= 0 && raw.klass === 'fighter'
+        ? raw.fightingStyle
+        : '';
+    base.classFeatures = String(raw.classFeatures || '').slice(0, 2000);
     base.species = String(raw.species || '');
+    base.speciesFeatures = String(raw.speciesFeatures || '').slice(0, 1200);
     base.klass = CLASS_BY_ID[raw.klass] ? raw.klass : '';
     base.subclass = String(raw.subclass || '');
     base.method = ['standard', 'pointbuy', 'manual'].indexOf(raw.method) >= 0 ? raw.method : 'standard';
@@ -574,7 +855,7 @@
     base.acMode = AC_MODE_IDS.indexOf(raw.acMode) >= 0 ? raw.acMode : 'auto';
     base.bonusHp = clamp(integer(raw.bonusHp, 0), 0, 99);
     base.languages = String(raw.languages || '').slice(0, 300);
-    base.resistances = String(raw.resistances || '').slice(0, 300);
+    base.resistances = String(raw.resistances || '').slice(0, 1200);
     base.attacks = String(raw.attacks || '').slice(0, 1200);
     base.proficiencies = String(raw.proficiencies || '').slice(0, 600);
     base.skills = Array.isArray(raw.skills)
@@ -603,11 +884,107 @@
     var subclass = findById(catalog.allSubclasses, state.subclass);
     if (subclass && state.klass && subclass.classKey !== state.klass) state.subclass = '';
     if (state.klass && !CLASS_BY_ID[state.klass]) state.klass = '';
+    if (state.klass !== 'fighter') state.fightingStyle = '';
+    state.feats = (Array.isArray(state.feats) ? state.feats : []).filter(function (feat) {
+      return FEATS.indexOf(feat) !== -1;
+    });
     var cls = CLASS_BY_ID[state.klass];
     state.skills = state.skills.filter(function (id) {
       return !!SKILL_BY_ID[id] && (!cls || cls.skills.indexOf(id) !== -1);
     });
     if (cls && state.skills.length > cls.skillCount) state.skills = state.skills.slice(0, cls.skillCount);
+  }
+
+  /* Base64 URL-safe senza dipendenze: la build condivisa resta un link
+     normale, senza creare un account o salvare dati sul server. */
+  var B64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+  function utf8Bytes(text) {
+    var bytes = [];
+    var value = String(text);
+    for (var i = 0; i < value.length; i += 1) {
+      var code = value.charCodeAt(i);
+      if (code < 0x80) bytes.push(code);
+      else if (code < 0x800) bytes.push(0xc0 | (code >> 6), 0x80 | (code & 63));
+      else if (code >= 0xd800 && code <= 0xdbff && i + 1 < value.length) {
+        var next = value.charCodeAt(++i);
+        var point = 0x10000 + ((code - 0xd800) << 10) + (next - 0xdc00);
+        bytes.push(0xf0 | (point >> 18), 0x80 | ((point >> 12) & 63), 0x80 | ((point >> 6) & 63), 0x80 | (point & 63));
+      } else bytes.push(0xe0 | (code >> 12), 0x80 | ((code >> 6) & 63), 0x80 | (code & 63));
+    }
+    return bytes;
+  }
+
+  function utf8String(bytes) {
+    var output = '';
+    for (var i = 0; i < bytes.length; i += 1) {
+      var code = bytes[i];
+      if (code < 0x80) output += String.fromCharCode(code);
+      else if (code < 0xe0) {
+        output += String.fromCharCode(((code & 31) << 6) | (bytes[++i] & 63));
+      } else if (code < 0xf0) {
+        output += String.fromCharCode(((code & 15) << 12) | ((bytes[++i] & 63) << 6) | (bytes[++i] & 63));
+      } else {
+        var point = ((code & 7) << 18) | ((bytes[++i] & 63) << 12) | ((bytes[++i] & 63) << 6) | (bytes[++i] & 63);
+        point -= 0x10000;
+        output += String.fromCharCode(0xd800 + (point >> 10), 0xdc00 + (point & 1023));
+      }
+    }
+    return output;
+  }
+
+  function base64UrlEncode(text) {
+    var bytes = utf8Bytes(text);
+    var output = '';
+    for (var i = 0; i < bytes.length; i += 3) {
+      var a = bytes[i];
+      var b = i + 1 < bytes.length ? bytes[i + 1] : 0;
+      var c = i + 2 < bytes.length ? bytes[i + 2] : 0;
+      output += B64_CHARS.charAt(a >> 2);
+      output += B64_CHARS.charAt(((a & 3) << 4) | (b >> 4));
+      if (i + 1 < bytes.length) output += B64_CHARS.charAt(((b & 15) << 2) | (c >> 6));
+      if (i + 2 < bytes.length) output += B64_CHARS.charAt(c & 63);
+    }
+    return output;
+  }
+
+  function base64UrlDecode(value) {
+    var input = String(value || '').replace(/[^A-Za-z0-9_-]/g, '');
+    var bytes = [];
+    for (var i = 0; i < input.length; i += 4) {
+      var a = B64_CHARS.indexOf(input.charAt(i));
+      var b = B64_CHARS.indexOf(input.charAt(i + 1));
+      var c = i + 2 < input.length ? B64_CHARS.indexOf(input.charAt(i + 2)) : -1;
+      var d = i + 3 < input.length ? B64_CHARS.indexOf(input.charAt(i + 3)) : -1;
+      if (a < 0 || b < 0) break;
+      bytes.push((a << 2) | (b >> 4));
+      if (c >= 0) bytes.push(((b & 15) << 4) | (c >> 2));
+      if (d >= 0) bytes.push(((c & 3) << 6) | d);
+    }
+    return utf8String(bytes);
+  }
+
+  function encodeShareState(value) {
+    return base64UrlEncode(JSON.stringify(normalizeState(value)));
+  }
+
+  function decodeShareState(token) {
+    if (!token) return null;
+    try {
+      return normalizeState(JSON.parse(base64UrlDecode(token)));
+    } catch (_error) {
+      return null;
+    }
+  }
+
+  function sharedStateFromUrl() {
+    try {
+      if (!global.location || !global.location.search) return null;
+      var params = new global.URLSearchParams(global.location.search);
+      return decodeShareState(params.get('build'));
+    } catch (_error) {
+      return null;
+    }
   }
 
   function loadState() {
@@ -673,28 +1050,39 @@
     return '';
   }
 
-  function parseHomebrewSpecies(markdown) {
+  function parseHomebrewSpecies(markdown, raceData) {
     var sections = String(markdown || '').split(/^# /m);
     sections.shift();
-    return sections
-      .map(function (section) {
-        var lines = section.split(/\r?\n/);
-        var name = cleanText(lines.shift());
-        if (!name) return null;
-        var body = lines.join('\n');
-        return {
-          id: 'homebrew:species:' + slugify(name),
+    return sections.reduce(function (items, section) {
+      var lines = section.split(/\r?\n/);
+      var name = cleanText(lines.shift());
+      if (!name) return items;
+      var body = lines.join('\n');
+      var entries = speciesSheetEntries(name);
+      var type = firstMatch(body, /\*\*Tipologia:\*\*\s*([^\n]+)/);
+      var size = firstMatch(body, /\*\*Taglia:\*\*\s*([^\n]+)/);
+      var speed = firstMatch(body, /\*\*Velocità:\*\*\s*([^\n]+)/);
+      var summary = firstSummary(body);
+      entries.forEach(function (entry) {
+        items.push({
+          id: speciesCatalogId('homebrew', name, entry, entries.length),
           name: name,
+          label: entry.sheetName || name,
+          parent: entry.parent,
+          subrace: entry.subrace,
+          sheetName: entry.sheetName,
           origin: 'homebrew',
           source: 'Homebrew',
-          type: firstMatch(body, /\*\*Tipologia:\*\*\s*([^\n]+)/),
-          size: firstMatch(body, /\*\*Taglia:\*\*\s*([^\n]+)/),
-          speed: firstMatch(body, /\*\*Velocità:\*\*\s*([^\n]+)/),
-          summary: firstSummary(body),
+          type: type,
+          size: size,
+          speed: speed,
+          summary: summary,
+          sheetInfo: raceData && raceData[entry.sheetName] ? raceData[entry.sheetName] : null,
           url: '/lore/specie-homebrew'
-        };
-      })
-      .filter(Boolean);
+        });
+      });
+      return items;
+    }, []);
   }
 
   function parseHomebrewSubclasses(markdown) {
@@ -723,18 +1111,28 @@
       .filter(Boolean);
   }
 
-  function buildCatalog(approvedRows, speciesMarkdown, subclassesMarkdown) {
+  function buildCatalog(approvedRows, speciesMarkdown, subclassesMarkdown, raceInfo, weapons) {
+    var raceData = raceInfo && raceInfo.races ? raceInfo.races : raceInfo || {};
     var approvedSpecies = [];
     var approvedSubclasses = [];
     (approvedRows || []).forEach(function (row) {
       if (row.category === 'Specie') {
-        approvedSpecies.push({
-          id: 'approved:species:' + slugify(row.name),
-          name: row.name,
-          origin: 'approved',
-          source: row.source || 'Materiale approvato',
-          note: row.note || '',
-          url: '/personaggio/materiale-approvato'
+        if (SHEET_SPECIES_EXTRAS[row.name]) return;
+        var entries = speciesSheetEntries(row.name);
+        entries.forEach(function (entry) {
+          approvedSpecies.push({
+            id: speciesCatalogId('approved', row.name, entry, entries.length),
+            name: row.name,
+            label: entry.sheetName || row.name,
+            parent: entry.parent,
+            subrace: entry.subrace,
+            sheetName: entry.sheetName,
+            origin: 'approved',
+            source: row.source || 'Materiale approvato',
+            note: row.note || '',
+            sheetInfo: raceData[entry.sheetName] || null,
+            url: '/personaggio/materiale-approvato'
+          });
         });
         return;
       }
@@ -754,15 +1152,31 @@
       });
     });
 
-    var homebrewSpecies = parseHomebrewSpecies(speciesMarkdown);
+    var homebrewSpecies = parseHomebrewSpecies(speciesMarkdown, raceData);
     var homebrewSubclasses = parseHomebrewSubclasses(subclassesMarkdown);
+    /* L'ordine delle specie è quello della tab Race Info, non quello
+       alfabetico dei due gruppi: il menu deve rispecchiare la scheda. */
+    var sheetOrder = {};
+    Object.keys(raceData).forEach(function (name, index) {
+      sheetOrder[name] = index;
+    });
+    function bySheetOrder(a, b) {
+      var aIndex = sheetOrder[a.label];
+      var bIndex = sheetOrder[b.label];
+      if (aIndex === undefined) aIndex = Number.MAX_SAFE_INTEGER;
+      if (bIndex === undefined) bIndex = Number.MAX_SAFE_INTEGER;
+      return aIndex - bIndex || a.label.localeCompare(b.label);
+    }
+    approvedSpecies.sort(bySheetOrder);
+    homebrewSpecies.sort(bySheetOrder);
     return {
       approvedSpecies: approvedSpecies,
       approvedSubclasses: approvedSubclasses,
       homebrewSpecies: homebrewSpecies,
       homebrewSubclasses: homebrewSubclasses,
-      allSpecies: approvedSpecies.concat(homebrewSpecies),
-      allSubclasses: approvedSubclasses.concat(homebrewSubclasses)
+      allSpecies: approvedSpecies.concat(homebrewSpecies).sort(bySheetOrder),
+      allSubclasses: approvedSubclasses.concat(homebrewSubclasses),
+      weapons: weapons || []
     };
   }
 
@@ -791,12 +1205,13 @@
   function computeSheet(stateValue, dataCatalog) {
     var current = stateValue || defaultState();
     var increases = normalizeAbilityIncreases(current.abilityIncreases);
+    var featBonuses = featAbilityBonuses(current);
     var baseScores = {};
     var scores = {};
     ABILITIES.forEach(function (ability) {
       var baseScore = integer(current.scores && current.scores[ability.key], 10);
       baseScores[ability.key] = baseScore;
-      scores[ability.key] = baseScore + (increases[ability.key] || 0);
+      scores[ability.key] = baseScore + (increases[ability.key] || 0) + (featBonuses[ability.key] || 0);
     });
     var mods = {};
     ABILITIES.forEach(function (ability) {
@@ -876,7 +1291,10 @@
       scores: scores,
       baseScores: baseScores,
       abilityIncreases: increases,
+      featBonuses: featBonuses,
       cls: cls,
+      classInfo: classSheetInfo(cls),
+      fightingStyle: current.fightingStyle || '',
       species: species,
       subclass: subclass,
       armor: armor,
@@ -897,6 +1315,7 @@
       languages: current.languages || '',
       resistances: current.resistances || '',
       attacks: current.attacks || '',
+      weaponInfo: findWeapon(dataCatalog && dataCatalog.weapons, current.weapon),
       classProficiencies: classProficiencyText(cls)
     };
   }
@@ -912,6 +1331,27 @@
       '>' +
       esc(label) +
       '</option>'
+    );
+  }
+
+  function featLabel(feat) {
+    return String(feat || '')
+      .replace(/^Feat:\s*/, '')
+      .replace(/^Fighting Style:\s*/, '');
+  }
+
+  function featOptions(selected, list) {
+    var value = String(selected || '');
+    var options = Array.isArray(list) ? list : FEATS;
+    var known = options.indexOf(value) !== -1;
+    return (
+      '<option value="">Nessuno / da definire</option>' +
+      (!known && value
+        ? '<option value="' + esc(value) + '" selected>' + esc(featLabel(value)) + ' (valore precedente)</option>'
+        : '') +
+      options.map(function (feat) {
+        return option(feat, featLabel(feat), value);
+      }).join('')
     );
   }
 
@@ -966,13 +1406,24 @@
       '<label class="cpg-field">Background<input type="text" data-field="background" maxlength="160" value="' + esc(state.background) + '" placeholder="Es. Guardia cittadina, Studioso…"></label>' +
       '<label class="cpg-field">Allineamento<input type="text" data-field="alignment" maxlength="80" value="' + esc(state.alignment) + '" placeholder="Es. Neutrale buono"></label>' +
       '<label class="cpg-field">Divinità o patrono<input type="text" data-field="deity" maxlength="120" value="' + esc(state.deity) + '" placeholder="Facoltativo"></label>' +
-      '<label class="cpg-field">Talento di Origine<input type="text" data-field="originFeat" list="cpg-feats" maxlength="160" value="' + esc(state.originFeat) + '" placeholder="Se previsto dal background"></label>' +
+      '<label class="cpg-field">Talento di Origine<select data-field="originFeat">' +
+      featOptions(state.originFeat, ORIGIN_FEATS) +
+      '</select></label>' +
       '</div>' +
-      '<datalist id="cpg-feats">' +
+      '<label class="cpg-field">Talenti aggiuntivi<select data-field="feats" class="cpg-multiselect" multiple size="6">' +
       FEATS.map(function (feat) {
-        return '<option value="' + esc(feat) + '"></option>';
+        return (
+          '<option value="' +
+          esc(feat) +
+          '"' +
+          ((state.feats || []).indexOf(feat) !== -1 ? ' selected' : '') +
+          '>' +
+          esc(featLabel(feat)) +
+          '</option>'
+        );
       }).join('') +
-      '</datalist>' +
+      '</select></label>' +
+      '<p class="cpg-hint">Il Talento di Origine usa l’elenco dei talenti di origine del server; i talenti generali e le varianti con caratteristica (es. Atleta (DES)) vanno in Talenti aggiuntivi e applicano il +1. Per selezionare più talenti aggiuntivi usa Ctrl/Cmd.</p>' +
       '<label class="cpg-field">Competenze da background o altre fonti<input type="text" data-field="extraSkills" maxlength="300" value="' + esc(state.extraSkills) + '" placeholder="Es. Storia, Persuasione"></label>' +
       '<div class="cpg-grid2">' +
       '<label class="cpg-field">Aspetto<textarea data-field="appearance" rows="3" maxlength="1200" placeholder="Tratti fisici, abbigliamento, segni particolari…">' + esc(state.appearance) + '</textarea></label>' +
@@ -991,6 +1442,8 @@
       '</div>' +
       '<label class="cpg-field">Specie<select id="cpg-species" data-field="species"></select></label>' +
       '<div id="cpg-species-info"></div>' +
+      '<label class="cpg-field">Tratti della specie<textarea data-field="speciesFeatures" rows="6" maxlength="1200" placeholder="I tratti della specie compaiono qui quando la scegli; puoi modificarli o integrarli.">' + esc(state.speciesFeatures) + '</textarea></label>' +
+      '<p class="cpg-hint">I tratti della tab Race Info sono il valore di partenza. Le modifiche restano nella bozza e nella scheda stampata.</p>' +
       '</section>' +
 
       '<section class="cpg-card" id="cpg-step-classe">' +
@@ -1006,6 +1459,7 @@
       '<button type="button" data-action="filter-subclass" data-value="homebrew">Homebrew</button>' +
       '</div>' +
       '<div id="cpg-class-info"></div>' +
+      '<div id="cpg-class-choices"></div>' +
       '<div id="cpg-subclass-info"></div>' +
       '</section>' +
 
@@ -1035,7 +1489,7 @@
       '<div class="cpg-card-head"><span class="cpg-stepnum">6</span><div><h2>Equipaggiamento</h2>' +
       '<p>Il server parte da 50 gp. Armatura e scudo servono solo a calcolare la CA.</p></div></div>' +
       '<div class="cpg-grid2">' +
-      '<label class="cpg-field">Armatura<select id="cpg-armor" data-field="armor">' + armorOptions + '</select></label>' +
+      '<label class="cpg-field">Armatura<select id="cpg-armor" data-field="armor">' + armorOptions + '</select><span id="cpg-armor-info" class="cpg-hint"></span></label>' +
       '<label class="cpg-field">Formula CA<select id="cpg-ac-mode" data-field="acMode">' +
       AC_MODES.map(function (mode) {
         return option(mode.id, mode.label, state.acMode);
@@ -1043,12 +1497,13 @@
       '</select></label>' +
       '<label class="cpg-check"><input type="checkbox" data-field="shield"' + (state.shield ? ' checked' : '') + '> Scudo (+2 CA)</label>' +
       '<label class="cpg-field">PF bonus per livello<input type="number" data-field="bonusHp" min="0" max="99" value="' + esc(state.bonusHp) + '" placeholder="0"></label>' +
-      '<label class="cpg-field">Arma principale<input type="text" data-field="weapon" maxlength="160" value="' + esc(state.weapon) + '" placeholder="Es. Spada lunga, arco corto…"></label>' +
+      '<label class="cpg-field">Arma principale<input type="text" data-field="weapon" list="cpg-weapons" maxlength="160" value="' + esc(state.weapon) + '" placeholder="Es. Longsword, Shortbow…">' + weaponDatalist() + '</label>' +
+      '<div id="cpg-weapon-info"></div>' +
       '<label class="cpg-field">Oro iniziale (gp)<input type="number" data-field="gold" min="0" max="999999" value="' + esc(state.gold) + '"></label>' +
       '<label class="cpg-field">Velocità<input type="text" data-field="speed" maxlength="40" value="' + esc(state.speed) + '" placeholder="30 ft (9 m)"></label>' +
       '</div>' +
       '<label class="cpg-field">Lingue<input type="text" data-field="languages" maxlength="300" value="' + esc(state.languages) + '" placeholder="Es. Comune, 2 lingue extra"></label>' +
-      '<label class="cpg-field">Resistenze, immunità e vulnerabilità<input type="text" data-field="resistances" maxlength="300" value="' + esc(state.resistances) + '" placeholder="Es. Resistenza al fuoco; immunità al veleno"></label>' +
+      '<label class="cpg-field">Resistenze, immunità e vulnerabilità<textarea data-field="resistances" rows="3" maxlength="1200" placeholder="Es. Resistenza al fuoco; immunità al veleno">' + esc(state.resistances) + '</textarea></label>' +
       '<label class="cpg-field">Competenze aggiuntive<input type="text" data-field="proficiencies" maxlength="600" value="' + esc(state.proficiencies) + '" placeholder="Armi, armature, strumenti o altre competenze non coperte dalla classe"></label>' +
       '<label class="cpg-field">Attacchi<textarea data-field="attacks" rows="4" maxlength="1200" placeholder="Es. Spada lunga +5, 1d8+3 taglienti; Arco corto +4, 1d6+2 perforanti">' + esc(state.attacks) + '</textarea></label>' +
       '<label class="cpg-field">Inventario e note<textarea data-field="equipment" rows="5" maxlength="1200" placeholder="Oggetti iniziali, borsa, strumenti, altro equipaggiamento…">' + esc(state.equipment) + '</textarea></label>' +
@@ -1058,9 +1513,13 @@
       '<div class="cpg-card-head"><span class="cpg-stepnum">7</span><div><h2>Scheda del personaggio</h2>' +
       '<p>Una bozza pronta da stampare, copiare o esportare. Non sostituisce la scheda ufficiale dell’Assistenza Tecnica.</p></div></div>' +
       '<div id="cpg-sheet"></div>' +
+      '<p class="cpg-hint">Copia Google e XLSX sono il modello ufficiale della scheda server, pronti da compilare.</p>' +
       '<div class="cpg-actions">' +
       '<button type="button" class="cpg-btn" data-action="print">Stampa / PDF</button>' +
       '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="copy">Copia riepilogo</button>' +
+      '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="share">Copia link build</button>' +
+      '<a class="cpg-btn cpg-btn-ghost" href="' + GOOGLE_SHEET_COPY_URL + '" target="_blank" rel="noopener">Copia scheda Google</a>' +
+      '<a class="cpg-btn cpg-btn-ghost" href="' + GOOGLE_SHEET_XLSX_URL + '" download="arcamis-scheda-personaggio.xlsx">Scarica scheda XLSX</a>' +
       '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="export">Scarica JSON</button>' +
       '<label class="cpg-btn cpg-btn-ghost cpg-import">Importa JSON<input type="file" accept="application/json,.json" data-import></label>' +
       '<button type="button" class="cpg-btn cpg-btn-danger" data-action="reset">Nuovo personaggio</button>' +
@@ -1092,21 +1551,15 @@
     if (!appRoot || !catalog) return;
     var select = appRoot.querySelector('#cpg-species');
     if (!select) return;
-    var groups = [
-      { label: 'Materiale approvato', items: catalog.approvedSpecies, origin: 'approved' },
-      { label: 'Homebrew', items: catalog.homebrewSpecies, origin: 'homebrew' }
-    ];
     var html = '<option value="">Scegli una specie…</option>';
-    groups.forEach(function (group) {
-      if (ui.speciesFilter !== 'all' && ui.speciesFilter !== group.origin) return;
-      if (!group.items.length) return;
-      html += '<optgroup label="' + esc(group.label) + '">';
-      group.items.forEach(function (item) {
-        var label = item.name + ' — ' + (item.origin === 'homebrew' ? 'Homebrew' : item.source);
-        html += option(item.id, label, state.species);
+    catalog.allSpecies
+      .filter(function (item) {
+        return ui.speciesFilter === 'all' || item.origin === ui.speciesFilter;
+      })
+      .forEach(function (item) {
+        /* Nome esatto della tab Race Info, nell'ordine della scheda. */
+        html += option(item.id, speciesLabel(item), state.species);
       });
-      html += '</optgroup>';
-    });
     select.innerHTML = html;
     select.value = state.species;
     if (select.value !== state.species) {
@@ -1148,6 +1601,136 @@
     }
   }
 
+  function findWeapon(items, name) {
+    var target = String(name || '').trim().toLowerCase();
+    if (!target || !items) return null;
+    for (var i = 0; i < items.length; i += 1) {
+      if (String(items[i].name || '').toLowerCase() === target) return items[i];
+    }
+    return null;
+  }
+
+  function weaponSummary(info) {
+    if (!info) return '';
+    return [info.damage, info.type, info.category, info.range, info.properties]
+      .filter(Boolean)
+      .join(' · ');
+  }
+
+  function weaponDatalist() {
+    var items = (catalog && catalog.weapons) || [];
+    return (
+      '<datalist id="cpg-weapons">' +
+      items
+        .map(function (weapon) {
+          return '<option value="' + esc(weapon.name) + '"></option>';
+        })
+        .join('') +
+      '</datalist>'
+    );
+  }
+
+  function renderWeaponInfo() {
+    var target = appRoot && appRoot.querySelector('#cpg-weapon-info');
+    if (!target) return;
+    var info = findWeapon(catalog && catalog.weapons, state.weapon);
+    if (!info) {
+      target.innerHTML = '';
+      return;
+    }
+    target.innerHTML = '<p class="cpg-hint">Scheda: ' + esc(weaponSummary(info)) + '</p>';
+  }
+
+  function renderArmorInfo() {
+    var target = appRoot && appRoot.querySelector('#cpg-armor-info');
+    if (!target) return;
+    var armor = ARMOR_BY_ID[state.armor] || ARMOR_BY_ID.none;
+    var parts = [];
+    if (armor.category) parts.push(armor.category);
+    if (armor.strength) parts.push('Forza ' + armor.strength);
+    if (armor.stealth) parts.push('Svantaggio a Furtività');
+    target.textContent = parts.length ? 'Scheda: ' + parts.join(' · ') : '';
+    target.className = parts.length ? 'cpg-hint' : '';
+  }
+
+  var RACE_SHEET_FIELDS = [
+    ['ac', 'CA naturale'],
+    ['speed', 'Velocità'],
+    ['hp', 'PF bonus per livello'],
+    ['resistances', 'Resistenze, immunità e vulnerabilità'],
+    ['languages', 'Lingue'],
+    ['attack', 'Attacco naturale'],
+    ['proficiencies', 'Competenze armi e armature'],
+    ['features', 'Altri tratti e competenze']
+  ];
+
+  function raceSheetHtml(info) {
+    if (!info) return '';
+    var rows = RACE_SHEET_FIELDS.map(function (pair) {
+      var value = info[pair[0]];
+      if (!value || value === '-') return '';
+      return '<div><dt>' + esc(pair[1]) + '</dt><dd>' + nl2br(value) + '</dd></div>';
+    }).filter(Boolean);
+    if (!rows.length) return '';
+    return (
+      '<dl class="cpg-sheet-details cpg-race-sheet">' + rows.join('') + '</dl>' +
+      '<p class="cpg-hint">Dati dalla tab Race Info della scheda server; il pulsante li riporta nella scheda.</p>' +
+      '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="apply-species-sheet">Applica i dati della scheda</button>'
+    );
+  }
+
+  function raceAcMode(value) {
+    if (value === '10+dex') return 'natural';
+    if (value === '10+dex+1') return 'natural1';
+    if (value === '12+cos') return 'natural-con';
+    if (value === '12+pb') return 'natural-pb';
+    return '';
+  }
+
+  function syncField(field) {
+    var input = appRoot && appRoot.querySelector('[data-field="' + field + '"]');
+    if (input) input.value = state[field];
+  }
+
+  function speciesFeatureDefaults(item) {
+    var features = item && item.sheetInfo && item.sheetInfo.features;
+    return features && features !== '-' ? features : '';
+  }
+
+  function ensureSpeciesFeatures() {
+    if (state.speciesFeatures) return;
+    state.speciesFeatures = speciesFeatureDefaults(selectedSpecies());
+  }
+
+  function applySpeciesSheet(item) {
+    if (!item || !item.sheetInfo) return;
+    var info = item.sheetInfo;
+    state.speed = info.speed || state.speed;
+    state.bonusHp = info.hp ? clamp(integer(info.hp, 0), 0, 99) : 0;
+    state.languages = info.languages || '';
+    state.resistances = info.resistances || '';
+    state.speciesFeatures = speciesFeatureDefaults(item);
+    state.acMode = raceAcMode(info.ac) || 'auto';
+    var attackLines = String(state.attacks || '')
+      .split('\n')
+      .filter(function (line) {
+        return line.indexOf('Specie (scheda): ') !== 0;
+      });
+    if (info.attack) attackLines.push('Specie (scheda): ' + info.attack);
+    state.attacks = attackLines.filter(Boolean).join('\n');
+    var proficiencyParts = String(state.proficiencies || '')
+      .split(' · ')
+      .filter(function (part) {
+        return part.indexOf('Specie (scheda): ') !== 0;
+      });
+    if (info.proficiencies) proficiencyParts.push('Specie (scheda): ' + info.proficiencies);
+    state.proficiencies = proficiencyParts.filter(Boolean).join(' · ');
+    ['speed', 'bonusHp', 'languages', 'resistances', 'speciesFeatures', 'attacks', 'proficiencies'].forEach(syncField);
+    var acSelect = appRoot && appRoot.querySelector('[data-field="acMode"]');
+    if (acSelect) acSelect.value = state.acMode;
+    saveAndRefresh();
+  }
+
   function renderSpeciesInfo() {
     var target = appRoot && appRoot.querySelector('#cpg-species-info');
     if (!target) return;
@@ -1157,15 +1740,18 @@
       return;
     }
     var meta = [];
+    if (item.parent) meta.push('Sottorazza di ' + item.parent);
+    if (item.sheetName && item.sheetName !== speciesLabel(item)) meta.push('Scheda server: ' + item.sheetName);
     if (item.type) meta.push('Tipo: ' + item.type);
     if (item.size) meta.push('Taglia: ' + item.size);
     if (item.speed) meta.push('Velocità: ' + item.speed);
     target.innerHTML =
       '<div class="cpg-pick">' +
-      '<div class="cpg-pick-head"><strong>' + esc(item.name) + '</strong>' + sourceBadge(item) + '</div>' +
+      '<div class="cpg-pick-head"><strong>' + esc(speciesLabel(item)) + '</strong>' + sourceBadge(item) + '</div>' +
       (meta.length ? '<p class="cpg-pick-meta">' + esc(meta.join(' · ')) + '</p>' : '') +
       (item.note ? '<p class="cpg-pick-note">' + esc(item.note) + '</p>' : '') +
       (item.summary ? '<p class="cpg-pick-note">' + esc(item.summary) + '</p>' : '') +
+      raceSheetHtml(item.sheetInfo) +
       (item.speed ? '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="use-species-speed" data-speed="' + esc(item.speed) + '">Usa la velocità della specie</button>' : '') +
       sourceLink(item) +
       '</div>';
@@ -1173,6 +1759,8 @@
 
   function renderClassInfo() {
     var target = appRoot && appRoot.querySelector('#cpg-class-info');
+    var choices = appRoot && appRoot.querySelector('#cpg-class-choices');
+    if (choices) choices.innerHTML = '';
     if (!target) return;
     var cls = selectedClass();
     if (!cls) {
@@ -1187,12 +1775,41 @@
         return key;
       })
       .join(', ');
+    var info = classSheetInfo(cls);
+    if (choices) {
+      var fightingStyleField =
+        cls.id === 'fighter'
+          ? '<label class="cpg-field">Stile di combattimento<select data-field="fightingStyle">' +
+            '<option value="">Nessuno / da scegliere</option>' +
+            FIGHTING_STYLES.map(function (style) {
+              return option(style, featLabel(style), state.fightingStyle);
+            }).join('') +
+            '</select></label><p class="cpg-hint">La scheda assegna uno stile di combattimento al Guerriero al 1° livello.</p>'
+          : '<p class="cpg-hint">Lo stile di combattimento compare nella scheda per il Guerriero al 1° livello; per questa classe non è richiesto a questo livello.</p>';
+      choices.innerHTML =
+        fightingStyleField +
+        '<label class="cpg-field">Privilegi di classe<textarea data-field="classFeatures" rows="4" maxlength="2000" placeholder="Trascrivi i privilegi indicati dal manuale approvato.">' +
+        esc(state.classFeatures) +
+        '</textarea></label>' +
+        '<p class="cpg-hint">La scheda lascia libera l’area “Privilegi di Classe”: non esiste un elenco chiuso da cui scegliere.</p>';
+    }
     target.innerHTML =
       '<div class="cpg-pick">' +
       '<div class="cpg-pick-head"><strong>' + esc(cls.name) + ' <small>(' + esc(cls.en) + ')</small></strong></div>' +
       '<p class="cpg-pick-meta">Dado vita d' + cls.die + ' · Caratteristica principale: ' + esc(cls.primary) + '</p>' +
       '<p class="cpg-pick-meta">Tiri salvezza: ' + esc(saves) + ' · Competenze: ' + cls.skillCount + '</p>' +
-      (classProficiencyText(cls) ? '<p class="cpg-pick-meta">' + esc(classProficiencyText(cls)) + '</p>' : '') +
+      (info
+        ? '<p class="cpg-pick-meta"><b>Tiri salvezza e abilità:</b> ' + esc(info.savesSkills) + '</p>' +
+          (info.firstLevel !== '-'
+            ? '<p class="cpg-pick-meta"><b>Competenze di 1° livello:</b> ' + esc(info.firstLevel) + '</p>'
+            : '') +
+          (info.additional !== '-'
+            ? '<p class="cpg-pick-meta"><b>Competenze aggiuntive / multiclasse:</b> ' + esc(info.additional) + '</p>'
+            : '') +
+          (info.spellcasting !== '-'
+            ? '<p class="cpg-pick-meta"><b>Incantesimi:</b> ' + esc(info.spellcasting) + '</p>'
+            : '')
+        : '') +
       '</div>';
   }
 
@@ -1408,6 +2025,10 @@
     if (state.method === 'standard' && !validateStandardArray(state.scores)) warnings.push('Array standard non valido.');
     if (abilityIncreaseTotal(state.abilityIncreases) !== 3) warnings.push('Incrementi della specie: ' + abilityIncreaseTotal(state.abilityIncreases) + '/3.');
     if (cls && state.skills.length !== cls.skillCount) warnings.push('Competenze di classe: ' + state.skills.length + '/' + cls.skillCount + '.');
+    if (cls && !state.originFeat) warnings.push('Talento di Origine: da scegliere.');
+    if (state.originFeat && ORIGIN_FEATS.indexOf(state.originFeat) === -1) {
+      warnings.push('Il Talento di Origine salvato non è nell’elenco dei talenti di origine: riselezionalo.');
+    }
     if (species && species.origin === 'homebrew') warnings.push('Specie homebrew: soggetta ad approvazione staff.');
     if (subclass && subclass.origin === 'homebrew') warnings.push('Sottoclasse homebrew: soggetta ad approvazione staff.');
 
@@ -1415,7 +2036,7 @@
       '<div class="cpg-summary-head"><span>Anteprima</span><strong>' +
       esc(state.name || 'Il tuo personaggio') +
       '</strong><p>Livello 1' +
-      (species ? ' · ' + esc(species.name) : '') +
+      (species ? ' · ' + esc(speciesLabel(species)) : '') +
       (cls ? ' · ' + esc(cls.name) : '') +
       (subclass ? ' — ' + esc(subclass.name) : '') +
       '</p></div>' +
@@ -1468,11 +2089,15 @@
     var details = [
       ['Giocatore', state.player],
       ['Background', state.background],
+      ['Tratti della specie', state.speciesFeatures],
       ['Allineamento', state.alignment],
       ['Divinità o patrono', state.deity],
-      ['Talento di Origine', state.originFeat],
+      ['Talento di Origine', state.originFeat ? featLabel(state.originFeat) : ''],
+      ['Talenti aggiuntivi', (state.feats || []).map(featLabel).join(', ')],
+      ['Stile di combattimento', state.fightingStyle ? featLabel(state.fightingStyle) : ''],
+      ['Privilegi di classe', state.classFeatures],
       ['Competenze extra', state.extraSkills],
-      ['Arma', state.weapon],
+      ['Arma', state.weapon ? state.weapon + (sheet.weaponInfo ? ' — ' + weaponSummary(sheet.weaponInfo) : '') : ''],
       ['Oro', state.gold + ' gp']
     ];
     return (
@@ -1480,7 +2105,7 @@
       '<header class="cpg-sheet-head"><div><p class="cpg-sheet-kicker">Arcamis · Scheda di livello 1</p><h2>' +
       esc(state.name || 'Senza nome') +
       '</h2><p class="cpg-sheet-sub">' +
-      (species ? esc(species.name) + (species.origin === 'homebrew' ? ' (Homebrew)' : ' (' + esc(species.source) + ')') : 'Specie da scegliere') +
+      (species ? esc(speciesLabel(species)) + (species.origin === 'homebrew' ? ' (Homebrew)' : ' (' + esc(species.source) + ')') : 'Specie da scegliere') +
       ' · ' +
       (cls ? esc(cls.name) : 'Classe da scegliere') +
       (subclass ? ' — ' + esc(subclass.name) + (subclass.origin === 'homebrew' ? ' (Homebrew)' : '') : '') +
@@ -1552,8 +2177,14 @@
       '</dl><p class="cpg-sheet-note">Talento di Origine e incantesimi vanno verificati sul manuale approvato e con l’Assistenza Tecnica.</p></section>' +
       '</div>' +
       '<div class="cpg-sheet-columns">' +
-      '<section><h3>Competenze e lingue</h3><dl class="cpg-sheet-details">' +
+      '<section><h3>Competenze e privilegi</h3><dl class="cpg-sheet-details">' +
       '<div><dt>Competenze</dt><dd>' + (sheet.proficiencies ? nl2br(sheet.proficiencies) : '—') + '</dd></div>' +
+      (sheet.classInfo
+        ? '<div><dt>Tiri salvezza e abilità</dt><dd>' + esc(sheet.classInfo.savesSkills) + '</dd></div>'
+        : '') +
+      (sheet.classInfo && sheet.classInfo.spellcasting !== '-'
+        ? '<div><dt>Incantesimi</dt><dd>' + esc(sheet.classInfo.spellcasting) + '</dd></div>'
+        : '') +
       '<div><dt>Lingue</dt><dd>' + (sheet.languages ? nl2br(sheet.languages) : '—') + '</dd></div>' +
       '<div><dt>Resistenze</dt><dd>' + (sheet.resistances ? nl2br(sheet.resistances) : '—') + '</dd></div>' +
       '</dl></section>' +
@@ -1571,7 +2202,7 @@
       (state.equipment || state.notes ? nl2br([state.equipment, state.notes].filter(Boolean).join('\n\n')) : '—') +
       '</p></section>' +
       '<footer class="cpg-sheet-foot"><p><b>Fonti:</b> ' +
-      (species ? esc(species.name) + ' — ' + esc(species.origin === 'homebrew' ? 'Homebrew' : species.source) : 'specie da scegliere') +
+      (species ? esc(speciesLabel(species)) + ' — ' + esc(species.origin === 'homebrew' ? 'Homebrew' : species.source) : 'specie da scegliere') +
       '; ' +
       (subclass ? esc(subclass.name) + ' — ' + esc(subclass.origin === 'homebrew' ? 'Homebrew' : subclass.source) : 'sottoclasse facoltativa') +
       '.</p><p>Bozza non ufficiale generata dal sito. Le scelte homebrew e la scheda definitiva richiedono l’approvazione dello staff.</p></footer>' +
@@ -1588,6 +2219,8 @@
     renderStats();
     renderAbilityIncreases();
     renderSkills();
+    renderWeaponInfo();
+    renderArmorInfo();
     renderSummary();
     renderSheet();
     refreshFilterButtons();
@@ -1674,7 +2307,7 @@
     lines.push('ARCAMIS — ' + (state.name || 'Personaggio senza nome'));
     lines.push(
       'Livello 1 · ' +
-        (sheet.species ? sheet.species.name : 'specie da scegliere') +
+        (sheet.species ? speciesLabel(sheet.species) : 'specie da scegliere') +
         ' · ' +
         (sheet.cls ? sheet.cls.name : 'classe da scegliere') +
         (sheet.subclass ? ' — ' + sheet.subclass.name : '')
@@ -1688,6 +2321,7 @@
     lines.push('Competenza +2 · Percezione passiva ' + sheet.passive);
     lines.push('LINGUE: ' + (sheet.languages || '—'));
     lines.push('RESISTENZE: ' + (sheet.resistances || '—'));
+    lines.push('TRATTI DELLA SPECIE: ' + (state.speciesFeatures || '—'));
     lines.push('COMPETENZE DI CLASSE: ' + (sheet.proficiencies || '—'));
     lines.push('ATTACCHI: ' + (sheet.attacks || '—'));
     lines.push('');
@@ -1701,18 +2335,20 @@
     lines.push(sheet.skills.length ? sheet.skills.map(function (skill) { return skill.label + ' ' + fmtMod(skill.mod); }).join(', ') : '—');
     lines.push('');
     lines.push('BACKGROUND: ' + (state.background || '—'));
-    lines.push('TALENTO DI ORIGINE: ' + (state.originFeat || '—'));
-    lines.push('ARMA: ' + (state.weapon || '—'));
+    lines.push('TALENTO DI ORIGINE: ' + (state.originFeat ? featLabel(state.originFeat) : '—'));
+    lines.push('TALENTI AGGIUNTIVI: ' + ((state.feats || []).map(featLabel).join(', ') || '—'));
+    lines.push('STILE DI COMBATTIMENTO: ' + (state.fightingStyle ? featLabel(state.fightingStyle) : '—'));
+    lines.push('PRIVILEGI DI CLASSE: ' + (state.classFeatures || '—'));
+    lines.push('ARMA: ' + (state.weapon ? state.weapon + (sheet.weaponInfo ? ' — ' + weaponSummary(sheet.weaponInfo) : '') : '—'));
     lines.push('EQUIPAGGIAMENTO: ' + (state.equipment || '—'));
     lines.push('');
     lines.push('Bozza non ufficiale — scelte homebrew soggette ad approvazione staff.');
     return lines.join('\n');
   }
 
-  function copySummary() {
-    var text = plainSummary();
+  function copyText(text, message, errorMessage) {
     function done() {
-      setStatus('Riepilogo copiato negli appunti.');
+      setStatus(message);
     }
     function fallback() {
       var area = global.document.createElement('textarea');
@@ -1722,19 +2358,43 @@
       area.style.left = '-9999px';
       global.document.body.appendChild(area);
       area.select();
+      var copied = false;
       try {
-        global.document.execCommand('copy');
-        done();
+        copied = global.document.execCommand('copy');
       } catch (_error) {
-        setStatus('Copia non disponibile: usa Stampa / PDF oppure scarica il JSON.', true);
+        /* execCommand non disponibile: il messaggio di errore lo dice. */
       }
       global.document.body.removeChild(area);
+      if (copied) done();
+      else setStatus(errorMessage, true);
     }
     if (global.navigator && global.navigator.clipboard && global.navigator.clipboard.writeText) {
       global.navigator.clipboard.writeText(text).then(done).catch(fallback);
       return;
     }
     fallback();
+  }
+
+  function copySummary() {
+    copyText(
+      plainSummary(),
+      'Riepilogo copiato negli appunti.',
+      'Copia non disponibile: usa Stampa / PDF oppure scarica il JSON.'
+    );
+  }
+
+  function shareBuild() {
+    try {
+      var base = global.location.href.split('#')[0].split('?')[0];
+      var url = base + '?build=' + encodeShareState(state);
+      copyText(
+        url,
+        'Link della build copiato: aprilo per ritrovare tutte le scelte.',
+        'Copia non disponibile: seleziona il link dalla barra degli indirizzi dopo averlo aperto.'
+      );
+    } catch (_error) {
+      setStatus('Non riesco a creare il link della build in questo browser.', true);
+    }
   }
 
   function exportJson() {
@@ -1768,6 +2428,7 @@
         var raw = payload.character || payload.state || payload;
         state = normalizeState(raw);
         reconcileState();
+        ensureSpeciesFeatures();
         saveState();
         appRoot.innerHTML = renderShell();
         refreshAll();
@@ -1805,6 +2466,7 @@
       if (field === 'gold') state.gold = clamp(integer(target.value, 0), 0, 999999);
       else if (field === 'bonusHp') state.bonusHp = clamp(integer(target.value, 0), 0, 99);
       else state[field] = String(target.value || '');
+      if (field === 'weapon') renderWeaponInfo();
       saveAndRefresh();
       return;
     }
@@ -1820,7 +2482,23 @@
     if (!target) return;
     if (target.matches('select[data-field]')) {
       var field = target.getAttribute('data-field');
+      if (field === 'feats') {
+        var selectedFeats = [];
+        for (var optionIndex = 0; optionIndex < target.options.length; optionIndex += 1) {
+          if (target.options[optionIndex].selected) selectedFeats.push(target.options[optionIndex].value);
+        }
+        state.feats = selectedFeats;
+        saveState();
+        renderStats();
+        renderSummary();
+        renderSheet();
+        return;
+      }
       state[field] = target.value;
+      if (field === 'species') {
+        state.speciesFeatures = speciesFeatureDefaults(selectedSpecies());
+        syncField('speciesFeatures');
+      }
       if (field === 'klass') {
         state.subclass = '';
         state.skills = [];
@@ -1842,9 +2520,13 @@
         return;
       }
       saveAndRefresh();
+      if (field === 'originFeat' || field === 'fightingStyle') renderStats();
       if (field === 'species') renderSpeciesInfo();
       if (field === 'subclass') renderSubclassInfo();
-      if (field === 'armor') renderSummary();
+      if (field === 'armor') {
+        renderArmorInfo();
+        renderSummary();
+      }
       return;
     }
 
@@ -1916,6 +2598,10 @@
       saveAndRefresh();
       return;
     }
+    if (action === 'apply-species-sheet') {
+      applySpeciesSheet(selectedSpecies());
+      return;
+    }
     if (action === 'filter-species') {
       ui.speciesFilter = target.getAttribute('data-value');
       var species = selectedSpecies();
@@ -1969,6 +2655,10 @@
       copySummary();
       return;
     }
+    if (action === 'share') {
+      shareBuild();
+      return;
+    }
     if (action === 'export') {
       exportJson();
       return;
@@ -1999,12 +2689,30 @@
       fetch('/content/pages/sottoclassi-homebrew.json').then(function (response) {
         if (!response.ok) throw new Error('sottoclassi homebrew');
         return response.json();
-      })
+      }),
+      fetch('/data/specie-scheda.json')
+        .then(function (response) {
+          if (!response.ok) throw new Error('dati specie scheda');
+          return response.json();
+        })
+        .catch(function () {
+          return { races: {} };
+        }),
+      fetch('/data/armi-scheda.json')
+        .then(function (response) {
+          if (!response.ok) throw new Error('dati armi scheda');
+          return response.json();
+        })
+        .catch(function () {
+          return { weapons: [] };
+        })
     ]).then(function (documents) {
       return buildCatalog(
         parseApprovedTable(documents[0].content),
         documents[1].content,
-        documents[2].content
+        documents[2].content,
+        documents[3],
+        documents[4] && documents[4].weapons
       );
     });
   }
@@ -2016,12 +2724,18 @@
     loadCatalog()
       .then(function (dataCatalog) {
         catalog = dataCatalog;
-        state = loadState();
+        var shared = sharedStateFromUrl();
+        state = shared || loadState();
         reconcileState();
+        ensureSpeciesFeatures();
         root.innerHTML = renderShell();
         bindEvents(root);
         refreshAll();
-        setStatus('Bozza salvata in questo browser.');
+        setStatus(
+          shared
+            ? 'Build condivisa caricata. La bozza locale resta salvata finché non modifichi questa.'
+            : 'Bozza salvata in questo browser.'
+        );
       })
       .catch(function () {
         root.innerHTML =
@@ -2071,14 +2785,18 @@
     defaultState: defaultState,
     normalizeState: normalizeState,
     slugify: slugify,
+    encodeShareState: encodeShareState,
+    decodeShareState: decodeShareState,
     CLASSES: CLASSES,
     SKILLS: SKILLS,
     STANDARD_ARRAY: STANDARD_ARRAY,
     AC_MODES: AC_MODES,
     FEATS: FEATS,
+    ORIGIN_FEATS: ORIGIN_FEATS,
     abilityIncreaseTotal: abilityIncreaseTotal,
     classProficiencyText: classProficiencyText,
-    finalScoreFor: finalScoreFor
+    finalScoreFor: finalScoreFor,
+    speciesFeatureDefaults: speciesFeatureDefaults
   };
   global._creaPgInit = mount;
 })(window);

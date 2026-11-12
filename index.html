@@ -132,7 +132,7 @@
 </div>
 
 <!-- ═══ MOBILE NAV DRAWER ═══ -->
-<div id="mobile-nav" role="dialog" aria-label="Menu di navigazione mobile" aria-hidden="true">
+<div id="mobile-nav" role="dialog" aria-modal="true" aria-label="Menu di navigazione mobile" aria-hidden="true" inert>
   <div class="mn-search">
     <span class="mn-search-icon">⌕</span>
     <input id="m-ts" type="text" placeholder="Cerca nella wiki…" autocomplete="off" aria-label="Cerca nella wiki" oninput="msearch(this.value)"/>
@@ -635,16 +635,9 @@
       });
     }
 
-    const mobileNav = document.getElementById('mobile-nav');
-    const hamburger = document.getElementById('hamburger');
-    if (mobileNav && hamburger) {
-      hamburger.setAttribute('aria-expanded', 'false');
-      hamburger.addEventListener('click', () => {
-        const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
-        hamburger.setAttribute('aria-expanded', String(!isOpen));
-        mobileNav.setAttribute('aria-hidden', String(isOpen));
-      });
-    }
+    /* Apertura/chiusura del drawer: toggleMobileNav() in app-ui.js gestisce
+       classe, aria-expanded, aria-hidden, inert e focus. Qui non serve un
+       secondo listener che riscriverebbe gli attributi fuori sincrono. */
   })();
 </script>
 
@@ -661,9 +654,9 @@
 <script src="/scripts/js/entity-page.js" defer></script>
 <script src="/scripts/js/notion-render.js" defer></script>
   <script src="/scripts/js/notion-nav.js" defer></script>
-  <script src="/scripts/js/crea-pg.js" defer></script>
+  <!-- crea-pg.js e imprese.js sono caricati on demand da notion-nav.js,
+       solo sulle rispettive rotte: non servono sulla home o sulle pagine lore. -->
   <script src="/scripts/js/explorer.js" defer></script>
-  <script src="/scripts/js/imprese.js" defer></script>
   <script src="/scripts/js/materiale-browser.js" defer></script>
 <script src="/scripts/js/fx.js" defer></script>
 <script src="/scripts/js/app-ui.js" defer></script>
