@@ -117,6 +117,7 @@
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
+  flex: 0 0 100%;
   width: 100%;
 }
 .imprese-app .imp-tab-btn {
@@ -973,8 +974,7 @@
 @media (max-width: 860px) {
   .imprese-app .imp-sidenav { display: none; }
   .imprese-app .imp-mobile-nav-btn { display: flex; }
-  .imprese-app .imp-tabs { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
-  .imprese-app .imp-tabs::-webkit-scrollbar { display: none; }
+  .imprese-app .imp-tabs { overflow: visible; flex-wrap: wrap; }
   .imprese-app .imp-card-type-body { grid-template-columns: 1fr; }
   .imprese-app .imp-licenza-body { grid-template-columns: 1fr; }
   .imprese-app .imp-main { flex-direction: column; }

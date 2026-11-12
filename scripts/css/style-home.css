@@ -8,7 +8,7 @@
    HOME NEW SECTIONS
 ════════════════════════════════════ */
 @keyframes bounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,9px)}}
-.scroll-ind{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);z-index:10;color:rgba(var(--gold-rgb),.5);font-size:20px;animation:bounce 2.2s ease-in-out infinite;cursor:pointer;user-select:none;letter-spacing:.1em;font-family:'Cinzel',serif;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.scroll-ind{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);z-index:10;color:rgba(var(--gold-rgb),.5);font-size:20px;animation:bounce 2.2s ease-in-out infinite;cursor:pointer;user-select:none;letter-spacing:.1em;font-family:'Cinzel',serif;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0;-webkit-appearance:none;appearance:none}
 .hsec{padding:64px 64px 0}
 .hsec+.hsec{padding-top:56px}
 #hv>div:last-child{padding-bottom:72px}
