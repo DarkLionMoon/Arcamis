@@ -29,13 +29,17 @@ function loadBuilder() {
 const raceInfo = JSON.parse(
   fs.readFileSync(path.join(root, 'public/data/specie-scheda.json'), 'utf8')
 );
+const weaponsData = JSON.parse(
+  fs.readFileSync(path.join(root, 'public/data/armi-scheda.json'), 'utf8')
+);
 const builder = loadBuilder();
 const approvedRows = builder.parseApprovedTable(readContent('materiale-approvato'));
 const catalog = builder.buildCatalog(
   approvedRows,
   readContent('specie-homebrew'),
   readContent('sottoclassi-homebrew'),
-  raceInfo
+  raceInfo,
+  weaponsData.weapons
 );
 
 describe('crea-pg · materiale approvato', () => {
@@ -151,6 +155,20 @@ describe('crea-pg · homebrew', () => {
     });
     expect(catalog.allSpecies.filter((item) => item.sheetInfo)).toHaveLength(124);
     expect(catalog.approvedSpecies.find((item) => item.name === 'Hedge').sheetInfo).toBeNull();
+  });
+
+  it('importa le armi della tab Attack Info', () => {
+    expect(catalog.weapons).toHaveLength(45);
+    expect(catalog.weapons.find((item) => item.name === 'Longsword')).toMatchObject({
+      damage: '1d8',
+      type: 'slashing',
+      properties: 'Versatile (1d10)',
+    });
+    expect(catalog.weapons.find((item) => item.name === 'Dagger')).toMatchObject({
+      range: 'Melee or Ranged',
+      monk: true,
+    });
+    expect(catalog.weapons.some((item) => item.name === 'Natural Attack')).toBe(false);
   });
 });
 
@@ -322,6 +340,24 @@ describe('crea-pg · regole e calcoli', () => {
     expect(sheet.scores.con).toBe(14);
     expect(sheet.scores.cha).toBe(9);
     expect(sheet.featBonuses).toMatchObject({ dex: 1, con: 1, cha: 1 });
+  });
+
+  it('riporta i requisiti delle armature della scheda', () => {
+    const chainMail = builder.computeSheet(
+      { ...builder.defaultState(), armor: 'chain-mail' },
+      catalog
+    );
+    expect(chainMail.armor).toMatchObject({
+      category: 'Pesante',
+      strength: 13,
+      stealth: true,
+    });
+    const leather = builder.computeSheet(
+      { ...builder.defaultState(), armor: 'leather' },
+      catalog
+    );
+    expect(leather.armor).toMatchObject({ category: 'Leggera' });
+    expect(leather.armor.strength).toBeUndefined();
   });
 
   it('accetta lo stile di combattimento solo per il guerriero', () => {

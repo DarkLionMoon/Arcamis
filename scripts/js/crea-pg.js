@@ -581,18 +581,42 @@
   }
 
   var ARMORS = [
-    { id: 'none', label: 'Nessuna armatura', base: 10, dex: 'full' },
-    { id: 'leather', label: 'Cuoio', base: 11, dex: 'full' },
-    { id: 'studded', label: 'Cuoio borchiato', base: 12, dex: 'full' },
-    { id: 'hide', label: 'Cuoio rinforzato', base: 12, dex: 'max2' },
-    { id: 'chain-shirt', label: 'Giaco di maglia', base: 13, dex: 'max2' },
-    { id: 'scale', label: 'Corazza di scaglie', base: 14, dex: 'max2' },
-    { id: 'breastplate', label: 'Corazza di petto', base: 14, dex: 'max2' },
-    { id: 'half-plate', label: 'Mezza armatura', base: 15, dex: 'max2' },
-    { id: 'ring', label: 'Armatura ad anelli', base: 14, dex: 'none' },
-    { id: 'chain-mail', label: 'Cotta di maglia', base: 16, dex: 'none' },
-    { id: 'splint', label: 'Armatura a strisce', base: 17, dex: 'none' },
-    { id: 'plate', label: 'Corazza a piastre', base: 18, dex: 'none' }
+    { id: 'none', label: 'Nessuna armatura', base: 10, dex: 'full', category: '' },
+    { id: 'leather', label: 'Cuoio', base: 11, dex: 'full', category: 'Leggera' },
+    { id: 'studded', label: 'Cuoio borchiato', base: 12, dex: 'full', category: 'Leggera' },
+    { id: 'hide', label: 'Cuoio rinforzato', base: 12, dex: 'max2', category: 'Media' },
+    { id: 'chain-shirt', label: 'Giaco di maglia', base: 13, dex: 'max2', category: 'Media' },
+    { id: 'scale', label: 'Corazza di scaglie', base: 14, dex: 'max2', category: 'Media', stealth: true },
+    { id: 'breastplate', label: 'Corazza di petto', base: 14, dex: 'max2', category: 'Media' },
+    { id: 'half-plate', label: 'Mezza armatura', base: 15, dex: 'max2', category: 'Media', stealth: true },
+    { id: 'ring', label: 'Armatura ad anelli', base: 14, dex: 'none', category: 'Pesante', stealth: true },
+    {
+      id: 'chain-mail',
+      label: 'Cotta di maglia',
+      base: 16,
+      dex: 'none',
+      category: 'Pesante',
+      strength: 13,
+      stealth: true
+    },
+    {
+      id: 'splint',
+      label: 'Armatura a strisce',
+      base: 17,
+      dex: 'none',
+      category: 'Pesante',
+      strength: 15,
+      stealth: true
+    },
+    {
+      id: 'plate',
+      label: 'Corazza a piastre',
+      base: 18,
+      dex: 'none',
+      category: 'Pesante',
+      strength: 15,
+      stealth: true
+    }
   ];
   var ARMOR_BY_ID = {};
   ARMORS.forEach(function (armor) {
@@ -997,7 +1021,7 @@
       .filter(Boolean);
   }
 
-  function buildCatalog(approvedRows, speciesMarkdown, subclassesMarkdown, raceInfo) {
+  function buildCatalog(approvedRows, speciesMarkdown, subclassesMarkdown, raceInfo, weapons) {
     var raceData = raceInfo && raceInfo.races ? raceInfo.races : raceInfo || {};
     var approvedSpecies = [];
     var approvedSubclasses = [];
@@ -1045,7 +1069,8 @@
       homebrewSpecies: homebrewSpecies,
       homebrewSubclasses: homebrewSubclasses,
       allSpecies: approvedSpecies.concat(homebrewSpecies),
-      allSubclasses: approvedSubclasses.concat(homebrewSubclasses)
+      allSubclasses: approvedSubclasses.concat(homebrewSubclasses),
+      weapons: weapons || []
     };
   }
 
@@ -1184,6 +1209,7 @@
       languages: current.languages || '',
       resistances: current.resistances || '',
       attacks: current.attacks || '',
+      weaponInfo: findWeapon(dataCatalog && dataCatalog.weapons, current.weapon),
       classProficiencies: classProficiencyText(cls)
     };
   }
@@ -1355,7 +1381,7 @@
       '<div class="cpg-card-head"><span class="cpg-stepnum">6</span><div><h2>Equipaggiamento</h2>' +
       '<p>Il server parte da 50 gp. Armatura e scudo servono solo a calcolare la CA.</p></div></div>' +
       '<div class="cpg-grid2">' +
-      '<label class="cpg-field">Armatura<select id="cpg-armor" data-field="armor">' + armorOptions + '</select></label>' +
+      '<label class="cpg-field">Armatura<select id="cpg-armor" data-field="armor">' + armorOptions + '</select><span id="cpg-armor-info" class="cpg-hint"></span></label>' +
       '<label class="cpg-field">Formula CA<select id="cpg-ac-mode" data-field="acMode">' +
       AC_MODES.map(function (mode) {
         return option(mode.id, mode.label, state.acMode);
@@ -1363,7 +1389,8 @@
       '</select></label>' +
       '<label class="cpg-check"><input type="checkbox" data-field="shield"' + (state.shield ? ' checked' : '') + '> Scudo (+2 CA)</label>' +
       '<label class="cpg-field">PF bonus per livello<input type="number" data-field="bonusHp" min="0" max="99" value="' + esc(state.bonusHp) + '" placeholder="0"></label>' +
-      '<label class="cpg-field">Arma principale<input type="text" data-field="weapon" maxlength="160" value="' + esc(state.weapon) + '" placeholder="Es. Spada lunga, arco corto…"></label>' +
+      '<label class="cpg-field">Arma principale<input type="text" data-field="weapon" list="cpg-weapons" maxlength="160" value="' + esc(state.weapon) + '" placeholder="Es. Longsword, Shortbow…">' + weaponDatalist() + '</label>' +
+      '<div id="cpg-weapon-info"></div>' +
       '<label class="cpg-field">Oro iniziale (gp)<input type="number" data-field="gold" min="0" max="999999" value="' + esc(state.gold) + '"></label>' +
       '<label class="cpg-field">Velocità<input type="text" data-field="speed" maxlength="40" value="' + esc(state.speed) + '" placeholder="30 ft (9 m)"></label>' +
       '</div>' +
@@ -1469,6 +1496,58 @@
       state.subclass = '';
       select.value = '';
     }
+  }
+
+  function findWeapon(items, name) {
+    var target = String(name || '').trim().toLowerCase();
+    if (!target || !items) return null;
+    for (var i = 0; i < items.length; i += 1) {
+      if (String(items[i].name || '').toLowerCase() === target) return items[i];
+    }
+    return null;
+  }
+
+  function weaponSummary(info) {
+    if (!info) return '';
+    return [info.damage, info.type, info.category, info.range, info.properties]
+      .filter(Boolean)
+      .join(' · ');
+  }
+
+  function weaponDatalist() {
+    var items = (catalog && catalog.weapons) || [];
+    return (
+      '<datalist id="cpg-weapons">' +
+      items
+        .map(function (weapon) {
+          return '<option value="' + esc(weapon.name) + '"></option>';
+        })
+        .join('') +
+      '</datalist>'
+    );
+  }
+
+  function renderWeaponInfo() {
+    var target = appRoot && appRoot.querySelector('#cpg-weapon-info');
+    if (!target) return;
+    var info = findWeapon(catalog && catalog.weapons, state.weapon);
+    if (!info) {
+      target.innerHTML = '';
+      return;
+    }
+    target.innerHTML = '<p class="cpg-hint">Scheda: ' + esc(weaponSummary(info)) + '</p>';
+  }
+
+  function renderArmorInfo() {
+    var target = appRoot && appRoot.querySelector('#cpg-armor-info');
+    if (!target) return;
+    var armor = ARMOR_BY_ID[state.armor] || ARMOR_BY_ID.none;
+    var parts = [];
+    if (armor.category) parts.push(armor.category);
+    if (armor.strength) parts.push('Forza ' + armor.strength);
+    if (armor.stealth) parts.push('Svantaggio a Furtività');
+    target.textContent = parts.length ? 'Scheda: ' + parts.join(' · ') : '';
+    target.className = parts.length ? 'cpg-hint' : '';
   }
 
   var RACE_SHEET_FIELDS = [
@@ -1905,7 +1984,7 @@
       ['Stile di combattimento', state.fightingStyle ? featLabel(state.fightingStyle) : ''],
       ['Privilegi di classe', state.classFeatures],
       ['Competenze extra', state.extraSkills],
-      ['Arma', state.weapon],
+      ['Arma', state.weapon ? state.weapon + (sheet.weaponInfo ? ' — ' + weaponSummary(sheet.weaponInfo) : '') : ''],
       ['Oro', state.gold + ' gp']
     ];
     return (
@@ -2027,6 +2106,8 @@
     renderStats();
     renderAbilityIncreases();
     renderSkills();
+    renderWeaponInfo();
+    renderArmorInfo();
     renderSummary();
     renderSheet();
     refreshFilterButtons();
@@ -2145,7 +2226,7 @@
     lines.push('TALENTI AGGIUNTIVI: ' + ((state.feats || []).map(featLabel).join(', ') || '—'));
     lines.push('STILE DI COMBATTIMENTO: ' + (state.fightingStyle ? featLabel(state.fightingStyle) : '—'));
     lines.push('PRIVILEGI DI CLASSE: ' + (state.classFeatures || '—'));
-    lines.push('ARMA: ' + (state.weapon || '—'));
+    lines.push('ARMA: ' + (state.weapon ? state.weapon + (sheet.weaponInfo ? ' — ' + weaponSummary(sheet.weaponInfo) : '') : '—'));
     lines.push('EQUIPAGGIAMENTO: ' + (state.equipment || '—'));
     lines.push('');
     lines.push('Bozza non ufficiale — scelte homebrew soggette ad approvazione staff.');
@@ -2248,6 +2329,7 @@
       if (field === 'gold') state.gold = clamp(integer(target.value, 0), 0, 999999);
       else if (field === 'bonusHp') state.bonusHp = clamp(integer(target.value, 0), 0, 99);
       else state[field] = String(target.value || '');
+      if (field === 'weapon') renderWeaponInfo();
       saveAndRefresh();
       return;
     }
@@ -2300,7 +2382,10 @@
       if (field === 'originFeat' || field === 'fightingStyle') renderStats();
       if (field === 'species') renderSpeciesInfo();
       if (field === 'subclass') renderSubclassInfo();
-      if (field === 'armor') renderSummary();
+      if (field === 'armor') {
+        renderArmorInfo();
+        renderSummary();
+      }
       return;
     }
 
@@ -2467,13 +2552,22 @@
         })
         .catch(function () {
           return { races: {} };
+        }),
+      fetch('/data/armi-scheda.json')
+        .then(function (response) {
+          if (!response.ok) throw new Error('dati armi scheda');
+          return response.json();
+        })
+        .catch(function () {
+          return { weapons: [] };
         })
     ]).then(function (documents) {
       return buildCatalog(
         parseApprovedTable(documents[0].content),
         documents[1].content,
         documents[2].content,
-        documents[3]
+        documents[3],
+        documents[4] && documents[4].weapons
       );
     });
   }
