@@ -258,12 +258,14 @@ test.describe('mega-menu della topbar', () => {
     await page.setViewportSize({ width: 1280, height: 900 })
     await page.goto('/')
 
-    const pg = page.locator('#dd-pg')
-    await pg.hover()
-    const menu = pg.locator('.tn-menu')
+    /* Personaggio ha due voci dopo l'aggiunta del builder: il caso a voce
+       singola resta coperto da Imprese. */
+    const imprese = page.locator('#dd-imprese')
+    await imprese.hover()
+    const menu = imprese.locator('.tn-menu')
     await expect(menu).toBeVisible()
-    await expect(pg.locator('.tn-mega-count')).toHaveText('1 voce')
-    await expect(pg.locator('.tn-mega-feature')).toBeHidden()
+    await expect(imprese.locator('.tn-mega-count')).toHaveText('1 voce')
+    await expect(imprese.locator('.tn-mega-feature')).toBeHidden()
     expect((await menu.boundingBox())!.width).toBeLessThanOrEqual(440)
 
     /* Escape chiude il pannello. */
