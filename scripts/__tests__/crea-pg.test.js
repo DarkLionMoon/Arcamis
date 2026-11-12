@@ -50,7 +50,7 @@ describe('crea-pg · materiale approvato', () => {
   });
 
   it('riconosce le specie approvate e la nota di Khoravar', () => {
-    expect(catalog.approvedSpecies).toHaveLength(92);
+    expect(catalog.approvedSpecies).toHaveLength(90);
     expect(catalog.approvedSpecies.find((item) => item.name === 'Khoravar')).toMatchObject({
       source: 'EFA',
       note: 'Half-Elf nel server',
@@ -90,7 +90,7 @@ describe('crea-pg · homebrew', () => {
   it('non duplica gli id nel catalogo combinato', () => {
     const ids = catalog.allSpecies.concat(catalog.allSubclasses).map((item) => item.id);
     expect(new Set(ids).size).toBe(ids.length);
-    expect(catalog.allSpecies).toHaveLength(126);
+    expect(catalog.allSpecies).toHaveLength(124);
     expect(catalog.allSubclasses).toHaveLength(159);
   });
 
@@ -154,7 +154,7 @@ describe('crea-pg · homebrew', () => {
       speed: '30 ft',
     });
     expect(catalog.allSpecies.filter((item) => item.sheetInfo)).toHaveLength(124);
-    expect(catalog.approvedSpecies.find((item) => item.name === 'Hedge').sheetInfo).toBeNull();
+    expect(catalog.approvedSpecies.some((item) => item.name === 'Hedge' || item.name === 'Lupin')).toBe(false);
   });
 
   it('usa i nomi esatti della tab Race Info anche nel catalogo', () => {
@@ -167,10 +167,9 @@ describe('crea-pg · homebrew', () => {
 
   it('usa i tratti Race Info come default modificabile', () => {
     const warforged = catalog.approvedSpecies.find((item) => item.name === 'Warforged');
-    const hedge = catalog.approvedSpecies.find((item) => item.name === 'Hedge');
     expect(builder.speciesFeatureDefaults(warforged)).toContain('Specialized Design');
     expect(builder.speciesFeatureDefaults(warforged)).toContain('one skill of your choice');
-    expect(builder.speciesFeatureDefaults(hedge)).toBe('');
+    expect(builder.speciesFeatureDefaults(null)).toBe('');
   });
 
   it('importa le armi della tab Attack Info', () => {

@@ -128,7 +128,8 @@
     'Yuan-ti': 'Yuan-Ti'
   };
 
-  // Voci della wiki non presenti nell'elenco specie della scheda server.
+  // Voci della wiki non presenti nella tab Race Info: restano fuori dal
+  // builder, che deve mostrare solo le specie della scheda.
   var SHEET_SPECIES_EXTRAS = { Hedge: true, Lupin: true };
 
   var GOOGLE_SHEET_ID = '1zS6kffFUEkNhTXMf_vhTzd_DfG-XULPI_mYv1RFKklE';
@@ -687,9 +688,6 @@
     if (SPECIES_RENAMES[name]) {
       return [{ parent: '', subrace: '', sheetName: SPECIES_RENAMES[name] }];
     }
-    if (SHEET_SPECIES_EXTRAS[name]) {
-      return [{ parent: '', subrace: '', sheetName: '' }];
-    }
     return [{ parent: '', subrace: '', sheetName: name }];
   }
 
@@ -1027,6 +1025,7 @@
     var approvedSubclasses = [];
     (approvedRows || []).forEach(function (row) {
       if (row.category === 'Specie') {
+        if (SHEET_SPECIES_EXTRAS[row.name]) return;
         var entries = speciesSheetEntries(row.name);
         entries.forEach(function (entry) {
           approvedSpecies.push({
