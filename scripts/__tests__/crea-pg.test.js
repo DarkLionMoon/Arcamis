@@ -26,9 +26,17 @@ function loadBuilder() {
   return sandbox.window.ArcCharacterBuilder;
 }
 
+const raceInfo = JSON.parse(
+  fs.readFileSync(path.join(root, 'public/data/specie-scheda.json'), 'utf8')
+);
 const builder = loadBuilder();
 const approvedRows = builder.parseApprovedTable(readContent('materiale-approvato'));
-const catalog = builder.buildCatalog(approvedRows, readContent('specie-homebrew'), readContent('sottoclassi-homebrew'));
+const catalog = builder.buildCatalog(
+  approvedRows,
+  readContent('specie-homebrew'),
+  readContent('sottoclassi-homebrew'),
+  raceInfo
+);
 
 describe('crea-pg · materiale approvato', () => {
   it('legge la tabella senza intestazioni né righe separatore', () => {
@@ -126,6 +134,23 @@ describe('crea-pg · homebrew', () => {
     expect(
       catalog.homebrewSpecies.find((item) => item.name === 'Baccai' && item.subrace === 'Bestiale')
     ).toMatchObject({ label: 'Baccai (Bestiale)', sheetName: 'Baccai (Bestiale)' });
+  });
+
+  it('importa i tratti della tab Race Info della scheda', () => {
+    expect(Object.keys(raceInfo.races)).toHaveLength(124);
+    expect(catalog.approvedSpecies.find((item) => item.sheetName === 'Dwarf').sheetInfo).toMatchObject({
+      speed: '30 ft',
+      hp: '1',
+      languages: 'Common, 2 extra',
+    });
+    expect(catalog.approvedSpecies.find((item) => item.sheetName === 'Warforged').sheetInfo).toMatchObject({
+      ac: '10+dex+1',
+    });
+    expect(catalog.homebrewSpecies.find((item) => item.name === 'Accidia').sheetInfo).toMatchObject({
+      speed: '30 ft',
+    });
+    expect(catalog.allSpecies.filter((item) => item.sheetInfo)).toHaveLength(124);
+    expect(catalog.approvedSpecies.find((item) => item.name === 'Hedge').sheetInfo).toBeNull();
   });
 });
 

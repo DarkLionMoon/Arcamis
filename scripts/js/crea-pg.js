@@ -771,6 +771,7 @@
       fightingStyle: '',
       classFeatures: '',
       species: '',
+      speciesFeatures: '',
       klass: '',
       subclass: '',
       method: 'standard',
@@ -819,6 +820,7 @@
         : '';
     base.classFeatures = String(raw.classFeatures || '').slice(0, 2000);
     base.species = String(raw.species || '');
+    base.speciesFeatures = String(raw.speciesFeatures || '').slice(0, 1200);
     base.klass = CLASS_BY_ID[raw.klass] ? raw.klass : '';
     base.subclass = String(raw.subclass || '');
     base.method = ['standard', 'pointbuy', 'manual'].indexOf(raw.method) >= 0 ? raw.method : 'standard';
@@ -831,7 +833,7 @@
     base.acMode = AC_MODE_IDS.indexOf(raw.acMode) >= 0 ? raw.acMode : 'auto';
     base.bonusHp = clamp(integer(raw.bonusHp, 0), 0, 99);
     base.languages = String(raw.languages || '').slice(0, 300);
-    base.resistances = String(raw.resistances || '').slice(0, 300);
+    base.resistances = String(raw.resistances || '').slice(0, 1200);
     base.attacks = String(raw.attacks || '').slice(0, 1200);
     base.proficiencies = String(raw.proficiencies || '').slice(0, 600);
     base.skills = Array.isArray(raw.skills)
@@ -934,7 +936,7 @@
     return '';
   }
 
-  function parseHomebrewSpecies(markdown) {
+  function parseHomebrewSpecies(markdown, raceData) {
     var sections = String(markdown || '').split(/^# /m);
     sections.shift();
     return sections.reduce(function (items, section) {
@@ -961,6 +963,7 @@
           size: size,
           speed: speed,
           summary: summary,
+          sheetInfo: raceData && raceData[entry.sheetName] ? raceData[entry.sheetName] : null,
           url: '/lore/specie-homebrew'
         });
       });
@@ -994,7 +997,8 @@
       .filter(Boolean);
   }
 
-  function buildCatalog(approvedRows, speciesMarkdown, subclassesMarkdown) {
+  function buildCatalog(approvedRows, speciesMarkdown, subclassesMarkdown, raceInfo) {
+    var raceData = raceInfo && raceInfo.races ? raceInfo.races : raceInfo || {};
     var approvedSpecies = [];
     var approvedSubclasses = [];
     (approvedRows || []).forEach(function (row) {
@@ -1011,6 +1015,7 @@
             origin: 'approved',
             source: row.source || 'Materiale approvato',
             note: row.note || '',
+            sheetInfo: raceData[entry.sheetName] || null,
             url: '/personaggio/materiale-approvato'
           });
         });
@@ -1032,7 +1037,7 @@
       });
     });
 
-    var homebrewSpecies = parseHomebrewSpecies(speciesMarkdown);
+    var homebrewSpecies = parseHomebrewSpecies(speciesMarkdown, raceData);
     var homebrewSubclasses = parseHomebrewSubclasses(subclassesMarkdown);
     return {
       approvedSpecies: approvedSpecies,
@@ -1363,7 +1368,7 @@
       '<label class="cpg-field">Velocità<input type="text" data-field="speed" maxlength="40" value="' + esc(state.speed) + '" placeholder="30 ft (9 m)"></label>' +
       '</div>' +
       '<label class="cpg-field">Lingue<input type="text" data-field="languages" maxlength="300" value="' + esc(state.languages) + '" placeholder="Es. Comune, 2 lingue extra"></label>' +
-      '<label class="cpg-field">Resistenze, immunità e vulnerabilità<input type="text" data-field="resistances" maxlength="300" value="' + esc(state.resistances) + '" placeholder="Es. Resistenza al fuoco; immunità al veleno"></label>' +
+      '<label class="cpg-field">Resistenze, immunità e vulnerabilità<textarea data-field="resistances" rows="3" maxlength="1200" placeholder="Es. Resistenza al fuoco; immunità al veleno">' + esc(state.resistances) + '</textarea></label>' +
       '<label class="cpg-field">Competenze aggiuntive<input type="text" data-field="proficiencies" maxlength="600" value="' + esc(state.proficiencies) + '" placeholder="Armi, armature, strumenti o altre competenze non coperte dalla classe"></label>' +
       '<label class="cpg-field">Attacchi<textarea data-field="attacks" rows="4" maxlength="1200" placeholder="Es. Spada lunga +5, 1d8+3 taglienti; Arco corto +4, 1d6+2 perforanti">' + esc(state.attacks) + '</textarea></label>' +
       '<label class="cpg-field">Inventario e note<textarea data-field="equipment" rows="5" maxlength="1200" placeholder="Oggetti iniziali, borsa, strumenti, altro equipaggiamento…">' + esc(state.equipment) + '</textarea></label>' +
@@ -1466,6 +1471,74 @@
     }
   }
 
+  var RACE_SHEET_FIELDS = [
+    ['ac', 'CA naturale'],
+    ['speed', 'Velocità'],
+    ['hp', 'PF bonus per livello'],
+    ['resistances', 'Resistenze, immunità e vulnerabilità'],
+    ['languages', 'Lingue'],
+    ['attack', 'Attacco naturale'],
+    ['proficiencies', 'Competenze armi e armature'],
+    ['features', 'Altri tratti e competenze']
+  ];
+
+  function raceSheetHtml(info) {
+    if (!info) return '';
+    var rows = RACE_SHEET_FIELDS.map(function (pair) {
+      var value = info[pair[0]];
+      if (!value || value === '-') return '';
+      return '<div><dt>' + esc(pair[1]) + '</dt><dd>' + nl2br(value) + '</dd></div>';
+    }).filter(Boolean);
+    if (!rows.length) return '';
+    return (
+      '<dl class="cpg-sheet-details cpg-race-sheet">' + rows.join('') + '</dl>' +
+      '<p class="cpg-hint">Dati dalla tab Race Info della scheda server; il pulsante li riporta nella scheda.</p>' +
+      '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="apply-species-sheet">Applica i dati della scheda</button>'
+    );
+  }
+
+  function raceAcMode(value) {
+    if (value === '10+dex') return 'natural';
+    if (value === '10+dex+1') return 'natural1';
+    if (value === '12+cos') return 'natural-con';
+    if (value === '12+pb') return 'natural-pb';
+    return '';
+  }
+
+  function syncField(field) {
+    var input = appRoot && appRoot.querySelector('[data-field="' + field + '"]');
+    if (input) input.value = state[field];
+  }
+
+  function applySpeciesSheet(item) {
+    if (!item || !item.sheetInfo) return;
+    var info = item.sheetInfo;
+    state.speed = info.speed || state.speed;
+    state.bonusHp = info.hp ? clamp(integer(info.hp, 0), 0, 99) : 0;
+    state.languages = info.languages || '';
+    state.resistances = info.resistances || '';
+    state.speciesFeatures = info.features || '';
+    state.acMode = raceAcMode(info.ac) || 'auto';
+    var attackLines = String(state.attacks || '')
+      .split('\n')
+      .filter(function (line) {
+        return line.indexOf('Specie (scheda): ') !== 0;
+      });
+    if (info.attack) attackLines.push('Specie (scheda): ' + info.attack);
+    state.attacks = attackLines.filter(Boolean).join('\n');
+    var proficiencyParts = String(state.proficiencies || '')
+      .split(' · ')
+      .filter(function (part) {
+        return part.indexOf('Specie (scheda): ') !== 0;
+      });
+    if (info.proficiencies) proficiencyParts.push('Specie (scheda): ' + info.proficiencies);
+    state.proficiencies = proficiencyParts.filter(Boolean).join(' · ');
+    ['speed', 'bonusHp', 'languages', 'resistances', 'attacks', 'proficiencies'].forEach(syncField);
+    var acSelect = appRoot && appRoot.querySelector('[data-field="acMode"]');
+    if (acSelect) acSelect.value = state.acMode;
+    saveAndRefresh();
+  }
+
   function renderSpeciesInfo() {
     var target = appRoot && appRoot.querySelector('#cpg-species-info');
     if (!target) return;
@@ -1486,6 +1559,7 @@
       (meta.length ? '<p class="cpg-pick-meta">' + esc(meta.join(' · ')) + '</p>' : '') +
       (item.note ? '<p class="cpg-pick-note">' + esc(item.note) + '</p>' : '') +
       (item.summary ? '<p class="cpg-pick-note">' + esc(item.summary) + '</p>' : '') +
+      raceSheetHtml(item.sheetInfo) +
       (item.speed ? '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="use-species-speed" data-speed="' + esc(item.speed) + '">Usa la velocità della specie</button>' : '') +
       sourceLink(item) +
       '</div>';
@@ -1823,6 +1897,7 @@
     var details = [
       ['Giocatore', state.player],
       ['Background', state.background],
+      ['Tratti della specie', state.speciesFeatures],
       ['Allineamento', state.alignment],
       ['Divinità o patrono', state.deity],
       ['Talento di Origine', state.originFeat ? featLabel(state.originFeat) : ''],
@@ -2052,6 +2127,7 @@
     lines.push('Competenza +2 · Percezione passiva ' + sheet.passive);
     lines.push('LINGUE: ' + (sheet.languages || '—'));
     lines.push('RESISTENZE: ' + (sheet.resistances || '—'));
+    lines.push('TRATTI DELLA SPECIE: ' + (state.speciesFeatures || '—'));
     lines.push('COMPETENZE DI CLASSE: ' + (sheet.proficiencies || '—'));
     lines.push('ATTACCHI: ' + (sheet.attacks || '—'));
     lines.push('');
@@ -2296,6 +2372,10 @@
       saveAndRefresh();
       return;
     }
+    if (action === 'apply-species-sheet') {
+      applySpeciesSheet(selectedSpecies());
+      return;
+    }
     if (action === 'filter-species') {
       ui.speciesFilter = target.getAttribute('data-value');
       var species = selectedSpecies();
@@ -2379,12 +2459,21 @@
       fetch('/content/pages/sottoclassi-homebrew.json').then(function (response) {
         if (!response.ok) throw new Error('sottoclassi homebrew');
         return response.json();
-      })
+      }),
+      fetch('/data/specie-scheda.json')
+        .then(function (response) {
+          if (!response.ok) throw new Error('dati specie scheda');
+          return response.json();
+        })
+        .catch(function () {
+          return { races: {} };
+        })
     ]).then(function (documents) {
       return buildCatalog(
         parseApprovedTable(documents[0].content),
         documents[1].content,
-        documents[2].content
+        documents[2].content,
+        documents[3]
       );
     });
   }

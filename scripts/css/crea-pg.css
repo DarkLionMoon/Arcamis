@@ -318,6 +318,18 @@
   font-size: 13px;
   line-height: 1.5;
 }
+.cpg-race-sheet {
+  margin: 10px 0 0;
+}
+.cpg-race-sheet > div {
+  align-items: flex-start;
+}
+.cpg-race-sheet dt {
+  min-width: 120px;
+}
+.cpg-pick .cpg-hint {
+  margin: 7px 0 9px;
+}
 .cpg-badge {
   display: inline-flex;
   align-items: center;
