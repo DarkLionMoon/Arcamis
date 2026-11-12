@@ -261,17 +261,45 @@ document.addEventListener('keydown', function (e) {
 });
 
 /* ════ MOBILE NAV ════ */
+var _navReturnFocus = null;
+function _navFocusable(root) {
+  if (!root || !root.querySelectorAll) return [];
+  return Array.prototype.filter.call(
+    root.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])'),
+    function (node) {
+      return !node.disabled && node.offsetParent !== null;
+    }
+  );
+}
+function _restoreNavFocus() {
+  if (_navReturnFocus && _navReturnFocus.focus) _navReturnFocus.focus();
+  _navReturnFocus = null;
+}
 function toggleMobileNav() {
   var el = document.getElementById('mobile-nav');
+  if (!el) return;
   var isOpen = el.classList.toggle('open');
-  document.body.classList.toggle('nav-open');
-  if (el) el.setAttribute('aria-hidden', String(!isOpen));
+  document.body.classList.toggle('nav-open', isOpen);
+  el.setAttribute('aria-hidden', String(!isOpen));
+  if ('inert' in el) el.inert = !isOpen;
+  var burger = document.getElementById('hamburger');
+  if (burger) burger.setAttribute('aria-expanded', String(isOpen));
+  if (isOpen) {
+    _navReturnFocus = document.activeElement;
+    var first = _navFocusable(el)[0];
+    if (first) setTimeout(function () { first.focus(); }, 30);
+  } else {
+    _restoreNavFocus();
+  }
 }
 function closeMobileNav() {
   var el = document.getElementById('mobile-nav');
   if (el) {
+    var wasOpen = el.classList.contains('open');
     el.classList.remove('open');
     el.setAttribute('aria-hidden', 'true');
+    if ('inert' in el) el.inert = true;
+    if (wasOpen) _restoreNavFocus();
   }
   document.body.classList.remove('nav-open');
   var msr = document.getElementById('m-sr');
@@ -282,6 +310,27 @@ function closeMobileNav() {
   var mts = document.getElementById('m-ts');
   if (mts) mts.value = '';
 }
+
+/* Il drawer è un dialogo modale: il Tab resta dentro finché è aperto. */
+document.addEventListener('keydown', function (event) {
+  if (event.key !== 'Tab') return;
+  var el = document.getElementById('mobile-nav');
+  if (!el || !el.classList.contains('open')) return;
+  var items = _navFocusable(el);
+  if (!items.length) return;
+  var first = items[0];
+  var last = items[items.length - 1];
+  if (!el.contains(document.activeElement)) {
+    event.preventDefault();
+    first.focus();
+  } else if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
 
 /* ════ SEARCH (client-side su indice statico) ════ */
 var _searchDebounce = null;

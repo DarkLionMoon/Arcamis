@@ -895,6 +895,98 @@
     if (cls && state.skills.length > cls.skillCount) state.skills = state.skills.slice(0, cls.skillCount);
   }
 
+  /* Base64 URL-safe senza dipendenze: la build condivisa resta un link
+     normale, senza creare un account o salvare dati sul server. */
+  var B64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+  function utf8Bytes(text) {
+    var bytes = [];
+    var value = String(text);
+    for (var i = 0; i < value.length; i += 1) {
+      var code = value.charCodeAt(i);
+      if (code < 0x80) bytes.push(code);
+      else if (code < 0x800) bytes.push(0xc0 | (code >> 6), 0x80 | (code & 63));
+      else if (code >= 0xd800 && code <= 0xdbff && i + 1 < value.length) {
+        var next = value.charCodeAt(++i);
+        var point = 0x10000 + ((code - 0xd800) << 10) + (next - 0xdc00);
+        bytes.push(0xf0 | (point >> 18), 0x80 | ((point >> 12) & 63), 0x80 | ((point >> 6) & 63), 0x80 | (point & 63));
+      } else bytes.push(0xe0 | (code >> 12), 0x80 | ((code >> 6) & 63), 0x80 | (code & 63));
+    }
+    return bytes;
+  }
+
+  function utf8String(bytes) {
+    var output = '';
+    for (var i = 0; i < bytes.length; i += 1) {
+      var code = bytes[i];
+      if (code < 0x80) output += String.fromCharCode(code);
+      else if (code < 0xe0) {
+        output += String.fromCharCode(((code & 31) << 6) | (bytes[++i] & 63));
+      } else if (code < 0xf0) {
+        output += String.fromCharCode(((code & 15) << 12) | ((bytes[++i] & 63) << 6) | (bytes[++i] & 63));
+      } else {
+        var point = ((code & 7) << 18) | ((bytes[++i] & 63) << 12) | ((bytes[++i] & 63) << 6) | (bytes[++i] & 63);
+        point -= 0x10000;
+        output += String.fromCharCode(0xd800 + (point >> 10), 0xdc00 + (point & 1023));
+      }
+    }
+    return output;
+  }
+
+  function base64UrlEncode(text) {
+    var bytes = utf8Bytes(text);
+    var output = '';
+    for (var i = 0; i < bytes.length; i += 3) {
+      var a = bytes[i];
+      var b = i + 1 < bytes.length ? bytes[i + 1] : 0;
+      var c = i + 2 < bytes.length ? bytes[i + 2] : 0;
+      output += B64_CHARS.charAt(a >> 2);
+      output += B64_CHARS.charAt(((a & 3) << 4) | (b >> 4));
+      if (i + 1 < bytes.length) output += B64_CHARS.charAt(((b & 15) << 2) | (c >> 6));
+      if (i + 2 < bytes.length) output += B64_CHARS.charAt(c & 63);
+    }
+    return output;
+  }
+
+  function base64UrlDecode(value) {
+    var input = String(value || '').replace(/[^A-Za-z0-9_-]/g, '');
+    var bytes = [];
+    for (var i = 0; i < input.length; i += 4) {
+      var a = B64_CHARS.indexOf(input.charAt(i));
+      var b = B64_CHARS.indexOf(input.charAt(i + 1));
+      var c = i + 2 < input.length ? B64_CHARS.indexOf(input.charAt(i + 2)) : -1;
+      var d = i + 3 < input.length ? B64_CHARS.indexOf(input.charAt(i + 3)) : -1;
+      if (a < 0 || b < 0) break;
+      bytes.push((a << 2) | (b >> 4));
+      if (c >= 0) bytes.push(((b & 15) << 4) | (c >> 2));
+      if (d >= 0) bytes.push(((c & 3) << 6) | d);
+    }
+    return utf8String(bytes);
+  }
+
+  function encodeShareState(value) {
+    return base64UrlEncode(JSON.stringify(normalizeState(value)));
+  }
+
+  function decodeShareState(token) {
+    if (!token) return null;
+    try {
+      return normalizeState(JSON.parse(base64UrlDecode(token)));
+    } catch (_error) {
+      return null;
+    }
+  }
+
+  function sharedStateFromUrl() {
+    try {
+      if (!global.location || !global.location.search) return null;
+      var params = new global.URLSearchParams(global.location.search);
+      return decodeShareState(params.get('build'));
+    } catch (_error) {
+      return null;
+    }
+  }
+
   function loadState() {
     try {
       var raw = global.localStorage && global.localStorage.getItem(STORAGE_KEY);
@@ -1425,6 +1517,7 @@
       '<div class="cpg-actions">' +
       '<button type="button" class="cpg-btn" data-action="print">Stampa / PDF</button>' +
       '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="copy">Copia riepilogo</button>' +
+      '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="share">Copia link build</button>' +
       '<a class="cpg-btn cpg-btn-ghost" href="' + GOOGLE_SHEET_COPY_URL + '" target="_blank" rel="noopener">Copia scheda Google</a>' +
       '<a class="cpg-btn cpg-btn-ghost" href="' + GOOGLE_SHEET_XLSX_URL + '" download="arcamis-scheda-personaggio.xlsx">Scarica scheda XLSX</a>' +
       '<button type="button" class="cpg-btn cpg-btn-ghost" data-action="export">Scarica JSON</button>' +
@@ -2253,10 +2346,9 @@
     return lines.join('\n');
   }
 
-  function copySummary() {
-    var text = plainSummary();
+  function copyText(text, message, errorMessage) {
     function done() {
-      setStatus('Riepilogo copiato negli appunti.');
+      setStatus(message);
     }
     function fallback() {
       var area = global.document.createElement('textarea');
@@ -2266,19 +2358,43 @@
       area.style.left = '-9999px';
       global.document.body.appendChild(area);
       area.select();
+      var copied = false;
       try {
-        global.document.execCommand('copy');
-        done();
+        copied = global.document.execCommand('copy');
       } catch (_error) {
-        setStatus('Copia non disponibile: usa Stampa / PDF oppure scarica il JSON.', true);
+        /* execCommand non disponibile: il messaggio di errore lo dice. */
       }
       global.document.body.removeChild(area);
+      if (copied) done();
+      else setStatus(errorMessage, true);
     }
     if (global.navigator && global.navigator.clipboard && global.navigator.clipboard.writeText) {
       global.navigator.clipboard.writeText(text).then(done).catch(fallback);
       return;
     }
     fallback();
+  }
+
+  function copySummary() {
+    copyText(
+      plainSummary(),
+      'Riepilogo copiato negli appunti.',
+      'Copia non disponibile: usa Stampa / PDF oppure scarica il JSON.'
+    );
+  }
+
+  function shareBuild() {
+    try {
+      var base = global.location.href.split('#')[0].split('?')[0];
+      var url = base + '?build=' + encodeShareState(state);
+      copyText(
+        url,
+        'Link della build copiato: aprilo per ritrovare tutte le scelte.',
+        'Copia non disponibile: seleziona il link dalla barra degli indirizzi dopo averlo aperto.'
+      );
+    } catch (_error) {
+      setStatus('Non riesco a creare il link della build in questo browser.', true);
+    }
   }
 
   function exportJson() {
@@ -2539,6 +2655,10 @@
       copySummary();
       return;
     }
+    if (action === 'share') {
+      shareBuild();
+      return;
+    }
     if (action === 'export') {
       exportJson();
       return;
@@ -2604,13 +2724,18 @@
     loadCatalog()
       .then(function (dataCatalog) {
         catalog = dataCatalog;
-        state = loadState();
+        var shared = sharedStateFromUrl();
+        state = shared || loadState();
         reconcileState();
         ensureSpeciesFeatures();
         root.innerHTML = renderShell();
         bindEvents(root);
         refreshAll();
-        setStatus('Bozza salvata in questo browser.');
+        setStatus(
+          shared
+            ? 'Build condivisa caricata. La bozza locale resta salvata finché non modifichi questa.'
+            : 'Bozza salvata in questo browser.'
+        );
       })
       .catch(function () {
         root.innerHTML =
@@ -2660,6 +2785,8 @@
     defaultState: defaultState,
     normalizeState: normalizeState,
     slugify: slugify,
+    encodeShareState: encodeShareState,
+    decodeShareState: decodeShareState,
     CLASSES: CLASSES,
     SKILLS: SKILLS,
     STANDARD_ARRAY: STANDARD_ARRAY,

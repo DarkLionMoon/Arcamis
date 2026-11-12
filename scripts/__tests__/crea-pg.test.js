@@ -164,6 +164,24 @@ describe('crea-pg · homebrew', () => {
     expect(catalog.allSpecies.some((item) => item.label.includes(' — '))).toBe(false);
   });
 
+  it('codifica e decodifica una build condivisibile', () => {
+    const original = builder.normalizeState({
+      name: 'Àrkan Test',
+      method: 'pointbuy',
+      klass: 'fighter',
+      species: 'approved:species:aarakocra',
+      scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
+      skills: ['athletics', 'perception']
+    });
+    const token = builder.encodeShareState(original);
+    expect(token).toMatch(/^[A-Za-z0-9_-]+$/);
+    const restored = builder.decodeShareState(token);
+    expect(restored.name).toBe('Àrkan Test');
+    expect(restored.scores.str).toBe(15);
+    expect(restored.skills).toEqual(['athletics', 'perception']);
+    expect(builder.decodeShareState('non-valido')).toBeNull();
+  });
+
   it('usa i tratti Race Info come default modificabile', () => {
     const warforged = catalog.approvedSpecies.find((item) => item.name === 'Warforged');
     expect(builder.speciesFeatureDefaults(warforged)).toContain('Specialized Design');

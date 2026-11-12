@@ -26,6 +26,55 @@ var _scrollPositions = {};
 var _pantheonData = null;
 var _panCollCache = null;
 
+/* Feature pesanti caricate solo sulla rotta che le usa. In produzione il
+   build inietta window.__ARC_JS con i nomi hashati; in sviluppo si usa il
+   percorso originale. La promise evita doppi caricamenti. */
+var _featureLoads = {};
+function _featureScript(src) {
+  return (window.__ARC_JS && window.__ARC_JS[src]) || src;
+}
+function _loadFeatureScript(src) {
+  if (_featureLoads[src]) return _featureLoads[src];
+  _featureLoads[src] = new Promise(function (resolve, reject) {
+    if (typeof document === 'undefined' || !document.createElement) {
+      reject(new Error('documento non disponibile'));
+      return;
+    }
+    var script = document.createElement('script');
+    script.src = _featureScript(src);
+    script.async = true;
+    script.onload = function () { resolve(); };
+    script.onerror = function () { reject(new Error('caricamento fallito: ' + src)); };
+    (document.head || document.body).appendChild(script);
+  });
+  return _featureLoads[src];
+}
+function _featureError(root, label) {
+  if (root && root.innerHTML !== undefined) {
+    root.innerHTML =
+      '<div class="n-empty"><div class="n-empty-icon">⚠</div>' +
+      '<div class="n-empty-title">' + _siteEsc(label) + '</div>' +
+      '<div class="n-empty-msg">Non riesco a caricare questa funzione. Ricarica la pagina e riprova.</div></div>';
+  }
+}
+function _withFeature(globalName, src, root, callback) {
+  if (window[globalName]) {
+    if (!document.contains || document.contains(root)) callback();
+    return;
+  }
+  _loadFeatureScript(src)
+    .then(function () {
+      if (!window[globalName]) {
+        _featureError(root, 'Funzione non disponibile');
+        return;
+      }
+      if (!document.contains || document.contains(root)) callback();
+    })
+    .catch(function () {
+      _featureError(root, 'Funzione non disponibile');
+    });
+}
+
 /* Helper HTML — esc()/attr() sono privati nell'IIFE di md-render.js,
    quindi qui servono versioni locali per il render dei JSON locali. */
 function _siteEsc(s) {
@@ -639,7 +688,9 @@ async function _gpRender(id, label, icon, _epoch) {
             _localHtml = _mdToHtml(_localJson.content);
           } else if (_layout === 'imprese') {
             /* App integrata: il mount avviene dopo l'inserimento nel DOM. */
-            _localHtml = '<div class="imprese-app" id="imprese-app-root"></div>';
+            _localHtml =
+              '<div class="imprese-app" id="imprese-app-root">' +
+              '<div class="n-empty"><div class="n-empty-msg">Caricamento Imprese e Licenze…</div></div></div>';
           } else {
             /* Auto-detect by page key (legacy fallback) */
             _localHtml =
@@ -707,14 +758,22 @@ async function _gpRender(id, label, icon, _epoch) {
           }
           /* Monta l'app Imprese & Licenze nel contenitore integrato.
              I dati di gioco vivono nel JSON della pagina, non nel JS. */
-          if (_layout === 'imprese' && window._impreseInit) {
+          if (_layout === 'imprese') {
             var _impRoot = document.getElementById('imprese-app-root');
             window._impresePage = _localJson;
-            if (_impRoot) window._impreseInit(_impRoot);
+            if (_impRoot) {
+              _withFeature('_impreseInit', '/scripts/js/imprese.js', _impRoot, function () {
+                if (window._impreseInit) window._impreseInit(_impRoot);
+              });
+            }
           }
-          if (_layout === 'crea-pg' && window._creaPgInit) {
+          if (_layout === 'crea-pg') {
             var _cpgRoot = document.getElementById('crea-pg-root');
-            if (_cpgRoot) window._creaPgInit(_cpgRoot, _localJson);
+            if (_cpgRoot) {
+              _withFeature('_creaPgInit', '/scripts/js/crea-pg.js', _cpgRoot, function () {
+                if (window._creaPgInit) window._creaPgInit(_cpgRoot, _localJson);
+              });
+            }
           }
           /* Attiva ricerca live e filtri del browser del materiale. */
           if (window.matBrowserInit) window.matBrowserInit(pbody);
