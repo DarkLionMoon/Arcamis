@@ -1062,12 +1062,27 @@
 
     var homebrewSpecies = parseHomebrewSpecies(speciesMarkdown, raceData);
     var homebrewSubclasses = parseHomebrewSubclasses(subclassesMarkdown);
+    /* L'ordine delle specie è quello della tab Race Info, non quello
+       alfabetico dei due gruppi: il menu deve rispecchiare la scheda. */
+    var sheetOrder = {};
+    Object.keys(raceData).forEach(function (name, index) {
+      sheetOrder[name] = index;
+    });
+    function bySheetOrder(a, b) {
+      var aIndex = sheetOrder[a.label];
+      var bIndex = sheetOrder[b.label];
+      if (aIndex === undefined) aIndex = Number.MAX_SAFE_INTEGER;
+      if (bIndex === undefined) bIndex = Number.MAX_SAFE_INTEGER;
+      return aIndex - bIndex || a.label.localeCompare(b.label);
+    }
+    approvedSpecies.sort(bySheetOrder);
+    homebrewSpecies.sort(bySheetOrder);
     return {
       approvedSpecies: approvedSpecies,
       approvedSubclasses: approvedSubclasses,
       homebrewSpecies: homebrewSpecies,
       homebrewSubclasses: homebrewSubclasses,
-      allSpecies: approvedSpecies.concat(homebrewSpecies),
+      allSpecies: approvedSpecies.concat(homebrewSpecies).sort(bySheetOrder),
       allSubclasses: approvedSubclasses.concat(homebrewSubclasses),
       weapons: weapons || []
     };
@@ -1443,22 +1458,15 @@
     if (!appRoot || !catalog) return;
     var select = appRoot.querySelector('#cpg-species');
     if (!select) return;
-    var groups = [
-      { label: 'Materiale approvato', items: catalog.approvedSpecies, origin: 'approved' },
-      { label: 'Homebrew', items: catalog.homebrewSpecies, origin: 'homebrew' }
-    ];
     var html = '<option value="">Scegli una specie…</option>';
-    groups.forEach(function (group) {
-      if (ui.speciesFilter !== 'all' && ui.speciesFilter !== group.origin) return;
-      if (!group.items.length) return;
-      html += '<optgroup label="' + esc(group.label) + '">';
-      group.items.forEach(function (item) {
-        /* Il menu usa il nome della tab Race Info senza suffissi: la fonte
-           resta visibile nella scheda della specie. */
+    catalog.allSpecies
+      .filter(function (item) {
+        return ui.speciesFilter === 'all' || item.origin === ui.speciesFilter;
+      })
+      .forEach(function (item) {
+        /* Nome esatto della tab Race Info, nell'ordine della scheda. */
         html += option(item.id, speciesLabel(item), state.species);
       });
-      html += '</optgroup>';
-    });
     select.innerHTML = html;
     select.value = state.species;
     if (select.value !== state.species) {
