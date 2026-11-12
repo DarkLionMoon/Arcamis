@@ -272,6 +272,23 @@ test.describe('mega-menu della topbar', () => {
     await page.keyboard.press('Escape')
     await expect(menu).toBeHidden()
   })
+
+  test('Personaggio mostra Creazione e Crea il Personaggio', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.goto('/')
+
+    const pg = page.locator('#dd-pg')
+    await pg.hover()
+    await expect(pg.locator('.tn-menu')).toBeVisible()
+    await expect(pg.locator('.tn-mega-count')).toHaveText('2 voci')
+    await expect(pg.locator('.tn-mega-links .tn-item')).toHaveCount(2)
+    await expect(
+      pg.locator('.tn-mega-links .tn-item', { hasText: 'Creazione' })
+    ).toHaveCount(1)
+    await expect(
+      pg.locator('.tn-mega-links .tn-item', { hasText: 'Crea il Personaggio' })
+    ).toHaveCount(1)
+  })
 })
 
 /* ── I quattro pattern sulle pagine reali ─────────────────── */
