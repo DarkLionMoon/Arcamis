@@ -157,6 +157,14 @@ describe('crea-pg · homebrew', () => {
     expect(catalog.approvedSpecies.find((item) => item.name === 'Hedge').sheetInfo).toBeNull();
   });
 
+  it('usa i tratti Race Info come default modificabile', () => {
+    const warforged = catalog.approvedSpecies.find((item) => item.name === 'Warforged');
+    const hedge = catalog.approvedSpecies.find((item) => item.name === 'Hedge');
+    expect(builder.speciesFeatureDefaults(warforged)).toContain('Specialized Design');
+    expect(builder.speciesFeatureDefaults(warforged)).toContain('one skill of your choice');
+    expect(builder.speciesFeatureDefaults(hedge)).toBe('');
+  });
+
   it('importa le armi della tab Attack Info', () => {
     expect(catalog.weapons).toHaveLength(45);
     expect(catalog.weapons.find((item) => item.name === 'Longsword')).toMatchObject({

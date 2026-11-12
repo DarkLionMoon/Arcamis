@@ -1336,6 +1336,8 @@
       '</div>' +
       '<label class="cpg-field">Specie<select id="cpg-species" data-field="species"></select></label>' +
       '<div id="cpg-species-info"></div>' +
+      '<label class="cpg-field">Tratti della specie<textarea data-field="speciesFeatures" rows="6" maxlength="1200" placeholder="I tratti della specie compaiono qui quando la scegli; puoi modificarli o integrarli.">' + esc(state.speciesFeatures) + '</textarea></label>' +
+      '<p class="cpg-hint">I tratti della tab Race Info sono il valore di partenza. Le modifiche restano nella bozza e nella scheda stampata.</p>' +
       '</section>' +
 
       '<section class="cpg-card" id="cpg-step-classe">' +
@@ -1589,6 +1591,16 @@
     if (input) input.value = state[field];
   }
 
+  function speciesFeatureDefaults(item) {
+    var features = item && item.sheetInfo && item.sheetInfo.features;
+    return features && features !== '-' ? features : '';
+  }
+
+  function ensureSpeciesFeatures() {
+    if (state.speciesFeatures) return;
+    state.speciesFeatures = speciesFeatureDefaults(selectedSpecies());
+  }
+
   function applySpeciesSheet(item) {
     if (!item || !item.sheetInfo) return;
     var info = item.sheetInfo;
@@ -1596,7 +1608,7 @@
     state.bonusHp = info.hp ? clamp(integer(info.hp, 0), 0, 99) : 0;
     state.languages = info.languages || '';
     state.resistances = info.resistances || '';
-    state.speciesFeatures = info.features || '';
+    state.speciesFeatures = speciesFeatureDefaults(item);
     state.acMode = raceAcMode(info.ac) || 'auto';
     var attackLines = String(state.attacks || '')
       .split('\n')
@@ -1612,7 +1624,7 @@
       });
     if (info.proficiencies) proficiencyParts.push('Specie (scheda): ' + info.proficiencies);
     state.proficiencies = proficiencyParts.filter(Boolean).join(' · ');
-    ['speed', 'bonusHp', 'languages', 'resistances', 'attacks', 'proficiencies'].forEach(syncField);
+    ['speed', 'bonusHp', 'languages', 'resistances', 'speciesFeatures', 'attacks', 'proficiencies'].forEach(syncField);
     var acSelect = appRoot && appRoot.querySelector('[data-field="acMode"]');
     if (acSelect) acSelect.value = state.acMode;
     saveAndRefresh();
@@ -2292,6 +2304,7 @@
         var raw = payload.character || payload.state || payload;
         state = normalizeState(raw);
         reconcileState();
+        ensureSpeciesFeatures();
         saveState();
         appRoot.innerHTML = renderShell();
         refreshAll();
@@ -2358,6 +2371,10 @@
         return;
       }
       state[field] = target.value;
+      if (field === 'species') {
+        state.speciesFeatures = speciesFeatureDefaults(selectedSpecies());
+        syncField('speciesFeatures');
+      }
       if (field === 'klass') {
         state.subclass = '';
         state.skills = [];
@@ -2581,6 +2598,7 @@
         catalog = dataCatalog;
         state = loadState();
         reconcileState();
+        ensureSpeciesFeatures();
         root.innerHTML = renderShell();
         bindEvents(root);
         refreshAll();
@@ -2642,7 +2660,8 @@
     ORIGIN_FEATS: ORIGIN_FEATS,
     abilityIncreaseTotal: abilityIncreaseTotal,
     classProficiencyText: classProficiencyText,
-    finalScoreFor: finalScoreFor
+    finalScoreFor: finalScoreFor,
+    speciesFeatureDefaults: speciesFeatureDefaults
   };
   global._creaPgInit = mount;
 })(window);
